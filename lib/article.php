@@ -27,7 +27,7 @@ class Article extends BlogEntry {
 		$this->timestamp = "";
 		$this->subject = "";
 		$this->data = "";
-		$this->has_html = false;
+		$this->has_html = MARKUP_BBCODE;
 		$this->file = $path . ($path ? PATH_DELIM.$revision : "");
 		$this->allow_comment = true;
 		$this->template_file = ARTICLE_TEMPLATE;
@@ -41,7 +41,7 @@ class Article extends BlogEntry {
 		return $path;
 	}
 	
-	function insert ($base_path=false) {
+	function insert ($branch=false, $base_path=false) {
 	
 		if (! check_login()) return false;
 	
@@ -49,7 +49,8 @@ class Article extends BlogEntry {
 		if (!$base_path) $basepath = getcwd().PATH_DELIM.BLOG_ARTICLE_PATH;
 		else $basepath = $base_path;
 		if (! is_dir($basepath)) create_directory_wrappers($basepath, BLOG_ARTICLES);
-		$dir_path = $basepath.PATH_DELIM.$this->getPath();
+		if (! $branch) $dir_path = $basepath.PATH_DELIM.$this->getPath();
+		else $dir_path = $basepath.PATH_DELIM.$branch;
 		$ret = create_directory_wrappers($dir_path, ARTICLE_BASE);
 
 		$this->file = $dir_path.PATH_DELIM.ENTRY_DEFAULT_FILE;
@@ -72,7 +73,7 @@ class Article extends BlogEntry {
 
 		$tmp->set("TITLE", $this->subject);
 		$tmp->set("POSTDATE", $this->prettyDate() );
-		if (! $this->has_html) $this->data = $this->addHTML($this->data);
+		$this->data = $this->markup($this->data);
 		$tmp->set("BODY", $this->data);
 		$tmp->set("PERMALINK", $this->permalink() );
 		$tmp->set("POSTEDIT", $this->permalink()."edit.php");

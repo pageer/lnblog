@@ -21,6 +21,7 @@
 session_start();
 require_once("config.php");
 require_once("blog.php");
+require_once("blogcomment.php");
 
 if (! check_login() ) redirect("index.php");
 

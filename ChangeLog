@@ -1,6 +1,39 @@
+01-Apr-2005:
+- Fixed pages for adding and editing articles and entries to preserve the
+form data if there is an error.
+- Added a field to new article page that allows setting the branch name, i.e.
+the directory component of the path under the content directory.
+- On second thought, maybe home directories should be easy to configure.  
+Moved the regular expression in localpath_to_uri() to a constant in the
+blogconfig.php file.
+- Fixed bugs in showmonth.php, include_sidebar.php.
+- Added config option for number of entries to put in RSS feeds.
+
+31-Mar-2005:
+- Fixed localpath_to_uri() for home directories yet again.  This time, it 
+uses a regular expression to match /home/.+/www, like I use on my system.
+This is a dirty, dirty hack, but I can't see it coming up too often.
+- Various LBCode (LnBlog BBCode) tags have been added and documented.
+- Changed FTP file writing to use binary in stead of ASCII mode.  This fixes
+a CrLf conversion problem I was having.
+- Added code to autoconvert relative paths in LBCode [url] and [img] tags to
+absolute URIs.  This should help make the RSS feeds validate.
+
+21-Mar-2005:
+- Fixed blog creation bug (realpath() doesn't work on non-existentARTICLE_POST_URL files.
+- Fixed localpath_to_uri() to work with user home directories, i.e. ~/www.
+
+18-Mar-2005:
+- Integrated FTP file writing into code.  Can select between writing files
+and directories using native filesystem functions or FTP functions using 
+"pluggable" filesystem classes.
+
+13-Mar-2005:
+- File upload support added.
+
 03-Mar-2005:
 - Changed name from Basic Blog, which was too common and kind of sucked, to
-LnBlog, seems to be fairly uncommon.
+LnBlog, seems to be fairly uncommon and sucks slightly less.
 
 Version 0.1.0: 02-Mar-2005
 - Initial public release.

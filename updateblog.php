@@ -40,6 +40,7 @@ $blogdesc = "desc";
 $blogimage = "image";
 $blogtheme = "theme";
 $blogmax = "maxent";
+$blogrss = "maxrss";
 $blogpath = "blogpath";
 $submitid = "submit";
 
@@ -53,6 +54,8 @@ $tpl->set("BLOG_THEME_ID", $blogtheme);
 $tpl->set("BLOG_THEME", $blog->theme);
 $tpl->set("BLOG_MAX_ID", $blogmax);
 $tpl->set("BLOG_MAX", $blog->max_entries);
+$tpl->set("BLOG_RSS_MAX_ID", $blogrss);
+$tpl->set("BLOG_RSS_MAX", $blog->max_rss);
 #$tpl->set("BLOG_PATH_ID", $blogpath);
 #$tpl->set("BLOG_PATH", $blog->home_path);
 $tpl->set("POST_PAGE", current_file());
@@ -64,6 +67,7 @@ if (POST($blogdesc)) $blog->description = POST($blogdesc);
 if (POST($blogimage)) $blog->image = POST($blogimage);
 if (POST($blogtheme)) $blog->theme = POST($blogtheme);
 if (POST($blogmax)) $blog->max_entries = POST($blogmax);
+if (POST($blogmax)) $blog->max_rss = POST($blogrss);
 
 if (POST("submit")) {
 	$ret = $blog->update();

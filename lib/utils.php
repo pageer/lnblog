@@ -21,6 +21,8 @@
 # Utility library.  Implements some general purpose functions plus some
 # wrappers that implement functionality available in PHP 5.
 
+require_once("fs.php");
+
 define("LOGIN_TOKEN", "lToken");
 define("LAST_LOGIN_TIME", "lastLTime");
 define("CURRENT_USER", "uName");
@@ -35,27 +37,53 @@ define("ENTRY_COMMENTS", 5);
 define("ARTICLE_BASE", 6);
 define("BLOG_ARTICLES", 7);
 
-# Write contents to a file.  Basically a wrapper around fopen and fwrite.
+# Return the canonical path for a given file.  The file need no exist.
+# Removes all '.' and '..' components and returns an absolute path.
 
-function write_file($path, $contents, $mode="w") {
-	$fh = fopen($path, $mode);
-	if ($fh) {
-		$ret = fwrite($fh, $contents);
-		fclose($fh);
-	} else $ret = false;
+function canonicalize ($path) {
+	if ( file_exists($path) ) return realpath($path);
+	# If the path is relative, prepend the current directory.
+	if ( strtoupper(substr(PHP_OS,0,3))=='WIN' ) {
+		$prepend_cwd = ( substr($path, 2, 2) != ':\\' );
+	} else {
+		$prepend_cwd = ( substr($path, 1, 1) != '/' );
+	}
+	if ($prepend_cwd) $path = getcwd().PATH_DELIM.$path;
+	$components = explode(PATH_DELIM, $path);
+	$ret = array();
+	$i = 0;
+	$last_item = false;
+	foreach ($components as $item) {
+		if ($item == '..') $i--;
+		elseif ($item != '.') $ret[$i++] = $item;
+	}
+	$ret = array_slice($ret, 0, $i);
+	$ret = implode(PATH_DELIM, $ret);
+	return $ret;
+}
+
+# Write contents to a file.  Basically a wrapper around fopen and fwrite.
+# This function was rewritten to use the FS abstract interface.  For 
+# one-off writes, this is fine, but for writing multiple files in the
+# same call, the FS interface should be used directly.
+
+function write_file($path, $contents) {
+	$fs = CreateFS();
+	$ret = $fs->write_file($path, $contents);
+	$fs->destruct();
 	return $ret;
 }
 
 # Makes directory recursively.
+# This was also rewritten to use the FS interface.  Same deal.
 
-function mkdir_rec($path, $mode=0777) {
-	$parent = dirname($path);
-	if ( $parent == $path ) return false;
-	$old_mask = umask(0000);
-	if (! is_dir($parent) )	$ret = mkdir_rec($parent, $mode);
-	else $ret = true;
-	if ($ret) $ret = mkdir($path, $mode);
-	umask($old_mask);
+function mkdir_rec($path, $mode=false) {
+	$fs = CreateFS();
+	# Only pass mode if it is specified.  This lets us default to the
+	# appropriate default mode for the concrete subclass of FS, which is
+	# different between, say, FTPFS and NativeFS.
+	if ($mode) $ret = $fs->mkdir_rec($path, $mode);
+	else $ret = $fs->mkdir_rec($path);
 	return $ret;
 }
 
@@ -83,14 +111,14 @@ function scan_directory($path, $dirs_only=false) {
 function find_document_root($path=false) {
 	# List of common document root names.
 	$doc_roots = array("wwwroot", "inetpub", "htdocs", "htsdocs", "httpdocs", 
-	                   "httpsdocs", "webroot");
+	                   "httpsdocs", "webroot", "www");
 	$curr_path = $path ? realpath($path) : getcwd();
 	$parent_dir = dirname($curr_path);
 	$base_dir = basename($curr_path);
 	# If we've hit the beginning of the hierarchy, return failure.
 	if ($parent_dir == $curr_path) return false;
 	foreach ($doc_roots as $root)
-		if ( strtolower($base_dir) == strtolower($root) ) return $curr_path;
+		if ( strcasecmp($base_dir, $root) == 0 ) return $curr_path;
 	return find_document_root($parent_dir);
 }
 
@@ -159,7 +187,7 @@ function COOKIE($key, $val="") {
 
 function POST($key, $val="") {
 	if (php_version_at_least("4.1.0")) {
-		if ($val) $ret = $_POST[$key] = $val;
+		if ($val) return $_POST[$key] = $val;
 		elseif (isset($_POST[$key])) return $_POST[$key];
 		else return false;
 	} else {
@@ -178,6 +206,22 @@ function GET($key, $val="") {
 		if ($val) return $HTTP_GET_VARS[$key] = $val;
 		elseif (isset($HTTP_GET_VARS[$key])) return $HTTP_GET_VARS[$key];
 		else return false;
+	}
+}
+
+function has_post() {
+	if (php_version_at_least("4.1.0")) {
+		return count($_POST);
+	} else {
+		return count($HTTP_POST_VARS);
+	}
+}
+
+function has_get() {
+	if (php_version_at_least("4.1.0")) {
+		return count($_GET);
+	} else {
+		return count($HTTP_GET_VARS);
 	}
 }
 
@@ -205,6 +249,12 @@ function localpath_to_uri($path, $full_uri=true) {
 	if (is_dir($full_path)) $full_path .= PATH_DELIM;
 	$root = find_document_root($full_path);
 	$url_path = str_replace($root, "", $full_path);
+	# Account for user home directories in path.  Please note that this is 
+	# an ugly, ugly hack to make this function work when I'm testing on my
+	# local workstation, where I use ~/www for by web root.
+	if ( preg_match(LOCALPATH_TO_URI_MATCH_RE, $full_path) ) {
+		$url_path = '/~'.basename(dirname($root)).$url_path;
+	}
 	# Remove any drive letter.
 	if ( strtoupper( substr(PHP_OS,0,3) ) == 'WIN' ) 
 		$url_path = preg_replace("/[A-Z]:(.*)/", "$1", $url_path);
@@ -221,7 +271,8 @@ function localpath_to_uri($path, $full_uri=true) {
 	return $url_path;
 }
 
-# Quick function to get the user's IP address.
+# Quick function to get the user's IP address.  This should probably be
+# extended to account for proxies and such.
 
 function get_ip() {
 	return $_SERVER["REMOTE_ADDR"];
@@ -237,19 +288,6 @@ function refresh($path, $delay=0) {
 	header("Refresh: ".$delay."; ".$path);
 }
 
-# A copy function that reads data from src and writes it to dest.
-
-function fcopy($src, $dest) {
-	$fh = fopen($src, "r");
-	$length = filesize($src);
-	$contents = fread($fh, $length);
-	fclose($fh);
-	$fh = fopen($dest, "w");
-	$ret = fwrite($fh, $contents, $length);
-	fclose($fh);
-	return $ret;
-}
-
 # Create the required wrapper scripts for a directory.  Note that
 # the instpath parameter is for the software installation path 
 # and is only required for the BLOG_BASE type, as it is used 
@@ -258,13 +296,15 @@ function fcopy($src, $dest) {
 
 function create_directory_wrappers($path, $type, $instpath="") {
 
+	$fs = CreateFS();
+
 	$head = "<?php\nrequire_once(\"config.php\");\ninclude(\"";
 	$tail = ".php\");\n?>";
 
 	$blog_templ_dir = "BLOG_ROOT.'".PATH_DELIM.BLOG_TEMPLATE_DIR."'";
 	$sys_templ_dir = "INSTALL_ROOT.'".PATH_DELIM.BLOG_TEMPLATE_DIR."'";
 
-	if (! is_dir($path)) $ret = mkdir_rec($path);
+	if (! is_dir($path)) $ret = $fs->mkdir_rec($path);
 	$config_data = "<?php\n";
 	$config_data .= "if (! defined(\"PATH_SEPARATOR\") ) ".
 		"define(\"PATH_SEPARATOR\", strtoupper(substr(PHP_OS,0,3)=='WIN')?';':':');\n";
@@ -291,47 +331,51 @@ function create_directory_wrappers($path, $type, $instpath="") {
 	switch ($type) {
 		case BLOG_BASE:
 			if (!is_dir($instpath)) return false;
-			$ret &= write_file($current."index.php", $head."showblog".$tail);
-			$ret &= write_file($current."new.php", $head."newentry".$tail);
-			$ret &= write_file($current."newart.php", $head."newarticle".$tail);
-			$ret &= write_file($current."edit.php", $head."updateblog".$tail);
-			$ret &= write_file($current."login.php", $head."bloglogin".$tail);
-			$ret &= write_file($current."logout.php", $head."bloglogout".$tail);
-			$ret &= write_file($current."config.php", $config_data);
+			$ret &= $fs->write_file($current."index.php", $head."showblog".$tail);
+			$ret &= $fs->write_file($current."new.php", $head."newentry".$tail);
+			$ret &= $fs->write_file($current."newart.php", $head."newarticle".$tail);
+			$ret &= $fs->write_file($current."edit.php", $head."updateblog".$tail);
+			$ret &= $fs->write_file($current."login.php", $head."bloglogin".$tail);
+			$ret &= $fs->write_file($current."logout.php", $head."bloglogout".$tail);
+			$ret &= $fs->write_file($current."uploadfile.php", $head."fileupload".$tail);
+			$ret &= $fs->write_file($current."config.php", $config_data);
 			break;
 		case BLOG_ENTRIES:
-			$ret = write_file($current."index.php", $head."showarchive".$tail);
-			$ret &= copy($parent."config.php", $current."config.php");
+			$ret = $fs->write_file($current."index.php", $head."showarchive".$tail);
+			$ret &= $fs->copy($parent."config.php", $current."config.php");
 			break;
 		case YEAR_ENTRIES:
-			$ret = write_file($current."index.php", $head."showyear".$tail);
-			$ret &= copy($parent."config.php", $current."config.php");
+			$ret = $fs->write_file($current."index.php", $head."showyear".$tail);
+			$ret &= $fs->copy($parent."config.php", $current."config.php");
 			break;
 		case MONTH_ENTRIES:
-			$ret = write_file($current."index.php", $head."showmonth".$tail);
-			$ret &= copy($parent."config.php", $current."config.php");
+			$ret = $fs->write_file($current."index.php", $head."showmonth".$tail);
+			$ret &= $fs->copy($parent."config.php", $current."config.php");
 			break;
 		case ENTRY_BASE:
-			$ret = write_file($current."index.php", $head."showentry".$tail);
-			$ret &= write_file($current."edit.php", $head."editentry".$tail);
-			$ret &= copy($parent."config.php", $current."config.php");
+			$ret = $fs->write_file($current."index.php", $head."showentry".$tail);
+			$ret &= $fs->write_file($current."edit.php", $head."editentry".$tail);
+			$ret &= $fs->write_file($current."delete.php", $head."delentry".$tail);
+			$ret &= $fs->write_file($current."uploadfile.php", $head."fileupload".$tail);
+			$ret &= $fs->copy($parent."config.php", $current."config.php");
 			break;
 		case ENTRY_COMMENTS:
-			$ret = write_file($current."index.php", $head."showcomments".$tail);
-			$ret = write_file($current."delete.php", $head."delcomment".$tail);
-			$ret &= copy($parent."config.php", $current."config.php");
+			$ret = $fs->write_file($current."index.php", $head."showcomments".$tail);
+			$ret = $fs->write_file($current."delete.php", $head."delcomment".$tail);
+			$ret &= $fs->copy($parent."config.php", $current."config.php");
 			break;
 		case ARTICLE_BASE:
-			$ret = write_file($current."index.php", $head."showarticle".$tail);
-			$ret &= write_file($current."edit.php", $head."editarticle".$tail);
-			$ret &= copy($parent."config.php", $current."config.php");
+			$ret = $fs->write_file($current."index.php", $head."showarticle".$tail);
+			$ret &= $fs->write_file($current."edit.php", $head."editarticle".$tail);
+			$ret &= $fs->write_file($current."uploadfile.php", $head."fileupload".$tail);
+			$ret &= $fs->copy($parent."config.php", $current."config.php");
 			break;
 		case BLOG_ARTICLES:
-			$ret = write_file($current."index.php", $head."showarticles".$tail);
-			$ret &= copy($parent."config.php", $current."config.php");
+			$ret = $fs->write_file($current."index.php", $head."showarticles".$tail);
+			$ret &= $fs->copy($parent."config.php", $current."config.php");
 			break;
 	}
-
+	$fs->destruct();
 	return $ret;
 }
 
@@ -357,6 +401,12 @@ function create_passwd_file($dirpath, $uname, $pwd) {
 	$content .= "define(\"AUTH_PASSWORD\", \"".md5($pass.$uid)."\");\n";
 	$content .= "?>";
 	return write_file($dirpath.PATH_DELIM."passwd.php", $content);
+}
+
+function passwd_file_exists($dir=false) {
+	if (! $dir) $dir = getcwd();
+	$path = realpath($dir.PATH_DELIM."passwd.php");
+	return file_exists($path);
 }
 
 function do_login($uname, $pwd) {
@@ -398,5 +448,11 @@ function check_login()  {
 	if ($auth_ok) return true;
 	else return false;
 }
+
+# A simple XOR encryption function.  This is primarily for the FTP password,
+# since I don't really want to store that as clear text, even if it is in 
+# a PHP file.
+
+function simple_encrypt($data, $key) {}
 
 ?>

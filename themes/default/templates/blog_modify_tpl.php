@@ -41,6 +41,10 @@ foreach ($dir as $theme) { ?>
 <span class="basic_form_data"><input id="<?php echo $BLOG_MAX_ID; ?>" name="<?php echo $BLOG_MAX_ID; ?>" value="<?php echo $BLOG_MAX; ?>" /></span>
 </div>
 <div>
+<span class="basic_form_label"><label for="<?php echo $BLOG_RSS_MAX_ID; ?>">Maximum number of entries in RSS feeds</label></span>
+<span class="basic_form_data"><input id="<?php echo $BLOG_RSS_MAX_ID; ?>" name="<?php echo $BLOG_RSS_MAX_ID; ?>" value="<?php echo $BLOG_RSS_MAX; ?>" /></span>
+</div>
+<div>
 <span class="basic_form_submit"><input name="<?php echo $SUBMIT_ID; ?>" id="<?php echo $SUBMIT_ID; ?>" type="submit" value="Submit" /></span>
 <span class="basic_form_clear"><input name="clear" id="clear" type="reset" value="Clear" /></span>
 </div>

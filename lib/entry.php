@@ -20,6 +20,10 @@
 
 require_once("utils.php");
 
+define("MARKUP_NONE", 0);
+define("MARKUP_BBCODE", 1);
+define("MARKUP_HTML", 2);
+
 class Entry {
 
 	var $id;
@@ -31,9 +35,37 @@ class Entry {
 	var $abstract;
 	var $data;
 	var $file;
-	var $has_html;
+	var $has_html = MARKUP_NONE;
 
 	#var $store_path = CFG_ENTRY_DIR;
+
+	function data($value=false) {
+		if ($value) $this->data = $value;
+		else return $this->data;
+	}
+	/*
+	function data($value=false) {
+		if ($value) $this->data = $value;
+		else {
+			$ret = $this->data;
+			if ($this->has_html == MARKUP_BBCODE) 
+				$ret = $this->absolutizeBBCodeURI($ret, 
+						localpath_to_uri(dirname($this->file) ) );
+			return $this->data;
+		}
+	}
+	*/
+
+	# A function to search BBCode marked-up text and convert the URIs in
+	# links and images from relative to absolute.
+
+	function absolutizeBBCodeURI($data, $current_uri) {
+		$ret = preg_replace("/\[img=([^\/]+)\]/",
+		                    "[img=".$current_uri."$1]", $data);
+		$ret = preg_replace("/\[url=([^\/]+)\]/", 
+		                    "[url=".$current_uri."$1]", $ret);
+		return $ret;
+	}
 
 	function stripHTML($data) {
 		$ret = htmlentities($data);
@@ -42,23 +74,71 @@ class Entry {
 
 	function addHTML($data) {
 		$ret = $data;
-		$ret = preg_replace("/((http|https|ftp):\/\/\S*)/i", "<a href=\"\$1\">\$1</a>", $ret);
+		$patterns[0] = "/((http|https|ftp):\/\/\S*)/i";
+		$patterns[1] = '/\r\n\r\n/';
+		$patterns[2] = '/\n\n/';
+		$patterns[3] = '/\n/';
+		$replacements[0] = "<a href=\"\$1\">\$1</a>";
+		$replacements[1] = '</p><p>';
+		$replacements[2] = '</p><p>';
+		$replacements[3] = '<br />';
+		ksort($patterns);
+		ksort($replacements);
+		$ret = preg_replace($patterns, $replacements, $ret);
 		$ret = "<p>".$ret."</p>";
-		$ret = preg_replace('/\r\n\r\n/', '</p><p>', $ret);
-		$ret = preg_replace('/\n\n/', '</p><p>', $ret);
-		$ret = preg_replace('/\n/', '<br />', $ret);
 		return $ret;
 	}
 
 	function bbcodeToHTML($data) {
 		$ret = $data;
-		$ret = preg_replace("/\[url=(\S+)\](.+)\[\/url\]/Ui", '<a href="$1">$2</a>', $ret);
-		$ret = preg_replace("/\[b\](.+)\[\/b\]/Ui", '<strong>$1</strong>', $ret);
-		$ret = preg_replace("/\[i\](.+)\[\/i\]/Ui", '<em>$1</em>', $ret);
+		# Single-parameter tags.
+		$patterns[0] = "/\[url=(\S+)\](.+)\[\/url\]/Ui";
+		$patterns[1] = "/\[img=(.+)](.+)\[\/img\]/";
+		$patterns[2] = "/\[ab=(.+)\](.+)\[\/ab\]/Ui";
+		$patterns[3] = "/\[ac=(.+)\](.+)\[\/ac\]/Ui";
+		$patterns[4] = "/\[quote\](.+)[\/quote]/Ui";
+		$patterns[5] = "/\[b\](.+)\[\/b\]/Ui";
+		$patterns[6] = "/\[i\](.+)\[\/i\]/Ui";
+		$patterns[7] = "/\[u\](.+)\[\/u\]/Ui";
+		$patterns[8] = '/\r\n\r\n/';
+		$patterns[9] = '/\n\n/';
+		$patterns[10] = '/\n/';
+		$patterns[11] = '/\[q\](.+)\[\/q\]/Ui';
+		#$patterns[12] = '/\[list\](\*(.+))+\[\/list\]/';
+		$replacements[0] = '<a href="$1">$2</a>';
+		$replacements[1] = '<img alt="$2" title="$2" src="$1" />';
+		$replacements[2] = '<abbr title="$1">$2</abbr>';
+		$replacements[3] = '<acronym title="$1">$2</acronym>';
+		$replacements[4] = '<blockquote>$1</blockquote>';
+		$replacements[5] = '<strong>$1</strong>';
+		$replacements[6] = '<strong>$1</strong>';
+		$replacements[7] = '<span style="text-decoration: underline;">$1</span>';
+		$replacements[8] = '</p><p>';
+		$replacements[9] = '</p><p>';
+		$replacements[10] = '<br />';
+		$replacements[11] = '<q>$1</q>';
+		ksort($patterns);
+		ksort($replacements);
+		$ret = preg_replace($patterns, $replacements, $ret);
 		$ret = "<p>".$ret."</p>";
-		$ret = preg_replace('/\r\n\r\n/', '</p><p>', $ret);
-		$ret = preg_replace('/\n\n/', '</p><p>', $ret);
-		$ret = preg_replace('/\n/', '<br />', $ret);
+
+		return $ret;
+	}
+
+	function markup($data) {
+		switch ($this->has_html) {
+			case MARKUP_NONE:
+				$ret = $this->stripHTML($data);
+				$ret = $this->addHTML($data);
+				break;
+			case MARKUP_BBCODE:
+				$ret = $this->stripHTML($data);
+				$ret = $this->bbcodeToHtml($data);
+				break;
+			case MARKUP_HTML:
+				$ret = $data;
+				break;
+		}
 		return $ret;
 	}
 
@@ -128,7 +208,7 @@ class Entry {
 			foreach ($data as $line) {
 				preg_match('/<!--META (.*): (.*) META-->/', $line, $matches);
 				if ($matches) $this->addMetadata($matches[1], $matches[2]);
-				$cleanline = preg_replace("/<!--META.*META-->\s/", "", $line);
+				$cleanline = preg_replace("/<!--META.*META-->\s\n?\r?/", "", $line);
 				#if (preg_match("/\S/", $cleanline) == 0) $cleanline = "";
 				
 				$file_data .= $cleanline;
@@ -137,6 +217,22 @@ class Entry {
 		$this->abstract = $this->getAbstract();
 		$this->data = $file_data;
 		return $file_data;
+	}
+
+	# Read just the metadata for the entry into the class properties.
+	# Hopefully, this will save us a little time reading large files.
+
+	function readFileMetadata() {
+		$fh = fopen($this->file, "r");
+		$has_data = true;
+		if (! $fh) return false;
+		else 
+			while (! feof($fh) && $has_data) {
+				$line = fgets($fh);
+				preg_match('/<!--META (.*): (.*) META-->/', $line, $matches);
+				if ($matches) $this->addMetadata($matches[1], $matches[2]);
+				else $has_data = false;
+			}
 	}
 	
 	function metadataFields() {
@@ -159,44 +255,15 @@ class Entry {
 	}
 
 	function writeFileData($file_data="") {
+		$fs = CreateFS();
 		$header = $this->putMetadataFields();
 		$file_data = $header.$this->data;
 		if (! is_dir(dirname($this->file)) ) 
-			mkdir_rec(dirname($this->file), 0777); 
-		$ret = write_file($this->file, $file_data);
+			$fs->mkdir_rec(dirname($this->file)); 
+		$ret = $fs->write_file($this->file, $file_data);
+		$fs->destruct();
 		return $ret;
 	}
 
-	function getBlogBasedir() {
-		# Under the current design, we should never end up more than 5 levels 
-		# beneath the blog root.  Comments will be 5 levels, blog entries will
-		# be 4, month archives will be 3, year archives 2, and nothing else
-		# should be more than one.
-		$curr_dir = getcwd();
-		for ($i=0; $i<=5; $i++) {
-			# Look for the blog metadata file.
-			$path = $curr_dir.PATH_DELIM.BLOG_CONFIG_PATH;
-			if ( file_exists($path) ) return $curr_dir;
-			$curr_dir = dirname($curr_dir);
-		}
-		return false;
-	}
-
-	function getTemplatePath($file=false) {
-		$curr_dir = getcwd();
-		for ($i=0; $i<=5; $i++) {
-			if ($file) {
-				$path = $curr_dir.PATH_DELIM.BLOG_TEMPLATE_DIR.PATH_DELIM.$file;
-				if ( file_exists($path) ) return $path;
-			} else {
-				$path = $curr_dir.PATH_DELIM.BLOG_TEMPLATE_DIR;
-				if ( is_dir($path) ) return $path;
-			}
-			$curr_dir = dirname($curr_dir);
-		}
-		return false;
-	}
-
 }
-
 ?>

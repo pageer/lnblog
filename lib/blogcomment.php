@@ -40,6 +40,7 @@ class BlogComment extends Entry {
 		$this->url = "";
 		$this->email = "";
 		$this->name = ANON_POST_NAME;
+		$this->has_html = MARKUP_NONE;
 		if ( file_exists($this->file) ) $this->readFileData();
 		#else echo "<p>Cannot find file: ".$this->file."</p>";
 		else $this->file = "";
@@ -89,15 +90,18 @@ class BlogComment extends Entry {
 	
 	function delete () {
 		if (! check_login() ) return false;
+		$fs = CreateFS();
 		$curr_ts = time();
 		$dir_path = dirname($this->file);
 		if (! is_dir($dir_path.PATH_DELIM.COMMENT_DELETED_PATH) )
-			mkdir_rec($dir_path.PATH_DELIM.COMMENT_DELETED_PATH);
+			$fs->mkdir_rec($dir_path.PATH_DELIM.COMMENT_DELETED_PATH);
 		$source_file = $this->file;
 		$target_file = basename($this->file)."-".$this->getPath($curr_ts);
 		$target_file = $dir_path.PATH_DELIM.COMMENT_DELETED_PATH.
 			PATH_DELIM.$target_file;
-		return rename($source_file, $target_file);
+		$ret = $fs->rename($source_file, $target_file);
+		$fs->destruct();
+		return $ret;
 	}
 	
 	function insert($basepath) {
@@ -177,7 +181,7 @@ class BlogComment extends Entry {
 		$t->set("DATE", $this->prettyDate() );
 		$t->set("EMAIL", $this->email);
 		$t->set("ANCHOR", $this->getAnchor() );
-		if (! $this->has_html) $this->data = $this->addHTML($this->data);
+		$this->data = $this->markup($this->data);
 		$t->set("BODY", $this->data);
 		
 		$ret = $t->process();

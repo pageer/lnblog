@@ -21,6 +21,8 @@
 session_start();
 require_once("config.php");
 require_once("blog.php");
+require_once("blogentry.php");
+require_once("blogcomment.php");
 
 $SUBMIT_ID = "submit";
 

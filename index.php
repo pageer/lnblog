@@ -24,6 +24,11 @@ require_once("blogconfig.php");
 require_once("utils.php");
 require_once("blog.php");
 
+if ( ! file_exists(INSTALL_ROOT.PATH_DELIM.FS_PLUGIN_CONFIG) ) {
+	redirect("fs_setup.php");
+	exit;
+}
+
 $update =  "update";
 $upgrade = "upgrade";
 $fixperm = "fixperm";
@@ -47,7 +52,7 @@ if (POST($upgrade)) {
 	refresh(htmlentities("updateblog.php?blogpath=".POST($update)));
 } elseif (POST($fixperm)) {
 	$b = new Blog(POST($fixperm));
-	echo "<p>Fix perms</p>";
+	#echo "<p>Fix perms</p>";
 	$upgrade_status = $b->fixDirectoryPermissions();
 }
 

@@ -27,7 +27,7 @@ $ent = new Article($entry_path);
 $blg = new Blog();
 
 $submit_id = "submit";
-$tpl = new PHPTemplate(BLOG_EDIT_TEMPLATE);
+$tpl = new PHPTemplate(ARTICLE_EDIT_TEMPLATE);
 $tpl->set("SUBMIT_ID", $submit_id);
 $blg->exportVars($tpl);
 
@@ -43,6 +43,9 @@ if (POST($submit_id)) {
 	} else {
 		$tpl->set("HAS_UPDATE_ERROR");
 		$tpl->set("UPDATE_ERROR_MESSAGE", "Error updating blog entry.");
+		$tpl->set("SUBJECT", $ent->subject);
+		$tpl->set("DATA", $ent->data);
+		$tpl->set("COMMENTS", $ent->allow_comment);
 	}
 }
 $body = $tpl->process();

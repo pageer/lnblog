@@ -24,11 +24,13 @@
 # breaking anything.
 
 session_start();
+require_once("rss.php");
 require_once("blog.php");
+require_once("blogentry.php");
 
 $entry_path = getcwd();
 $ent = new BlogEntry;
-$blg = new Blog($ent->getBlogBasedir());
+$blg = new Blog();
 
 $submit_id = "submit";
 $tpl = new PHPTemplate(BLOG_EDIT_TEMPLATE);
@@ -47,6 +49,9 @@ if (POST($submit_id)) {
 	} else {
 		$tpl->set("HAS_UPDATE_ERROR");
 		$tpl->set("UPDATE_ERROR_MESSAGE", "Error creating blog entry.");
+		$tpl->set("SUBJECT", POST(ENTRY_POST_SUBJECT) );
+		$tpl->set("DATA", POST(ENTRY_POST_DATA) );
+		$tpl->set("HAS_HTML", POST(ENTRY_POST_HTML) );
 	}
 }
 $body = $tpl->process();

@@ -46,15 +46,19 @@ if (check_login()) {
 <h3>Weblog Administration</h3>
 <ul>
 <?php
-	$ent = new BlogEntry();
-	if ( $ent->isEntry(getcwd()) ) { 
+	if (class_exists("BlogEntry")) {
+		$ent = new BlogEntry();
+		if ( $ent->isEntry(getcwd()) ) { 
 ?>
 <li><a href="edit.php">Edit this post</a></li>
+<li><a href="uploadfile.php">Upload file for this post</a></li>
 <?php 
- 	}
+ 		}
+	}
 ?>
 <li><a href="<?php echo $BLOG_URL_ROOTREL; ?>new.php">Add new post</a></li>
 <li><a href="<?php echo $BLOG_URL_ROOTREL; ?>newart.php">Add new article</a></li>
+<li><a href="<?php echo $BLOG_URL_ROOTREL; ?>uploadfile.php">Upload file for blog</a></li>
 <li><a href="<?php echo $BLOG_URL_ROOTREL; ?>edit.php">Edit weblog settings</a></li>
 <li><a href="<?php echo $BLOG_URL_ROOTREL; ?>logout.php">Logout</a></li>
 </ul>

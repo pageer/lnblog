@@ -19,42 +19,42 @@
 */
 
 session_start();
+require_once("config.php");
 require_once("blog.php");
 require_once("blogentry.php");
-require_once("rss.php");
 
-$entry_path = getcwd();
-$ent = new BlogEntry($entry_path);
-$blg = new Blog();
+if (! check_login() ) redirect("index.php");
 
-$submit_id = "submit";
-$tpl = new PHPTemplate(BLOG_EDIT_TEMPLATE);
-$tpl->set("SUBMIT_ID", $submit_id);
-$blg->exportVars($tpl);
+$blog = new Blog();
+$ent = new BlogEntry(getcwd());
 
-$tpl->set("SUBJECT", $ent->subject);
-$tpl->set("DATA", $ent->data);
-$tpl->set("HAS_HTML", $ent->has_html);
-$tpl->set("COMMENTS", $ent->allow_comment);
+$conf_id = "ok";
+$cancel_id = "cancel";
+$message = "Remove the weblog entry\"".$ent->subject."\"?";
 
-if (POST($submit_id)) {
-	$ent->getPostData();
-	if ($ent->data) {
-		$ent->update();
-		#$year = date("Y", $ent->timestamp);
-		#$month = date("m", $ent->timestamp);
-		#$blg->createPath($year, $month);
-		$blg->updateRSS1();
-		$blg->updateRSS2();
-		redirect($blg->getURL());
-	} else {
-		$tpl->set("HAS_UPDATE_ERROR");
-		$tpl->set("UPDATE_ERROR_MESSAGE", "Error updating blog entry.");
-	}
+if (POST($conf_id)) {
+	$ret = $ent->delete();
+	if ($ret) redirect(BLOG_ROOT_URL);
+	else $message = "Unable to delete \"".$ent->subject."\".  Try again?";
+} elseif (POST($cancel_id)) {
+	redirect("index.php");
 }
+
+$tpl = new PHPTemplate(CONFIRM_TEMPLATE);
+$tpl->set("CONFIRM_TITLE", "Remove entry?");
+$tpl->set("CONFIRM_MESSAGE",$message);
+$tpl->set("CONFIRM_PAGE", current_file() );
+$tpl->set("OK_ID", $conf_id);
+$tpl->set("OK_LABEL", "Yes");
+$tpl->set("CANCEL_ID", "cancel");
+$tpl->set("CANCEL_LABEL", "No");
+
 $body = $tpl->process();
+
 $tpl->file = BASIC_LAYOUT_TEMPLATE;
+$blog->exportVars($tpl);
+$tpl->set("PAGE_TITLE", $blog->name." - Delete comment");
 $tpl->set("PAGE_CONTENT", $body);
-$tpl->set("PAGE_TITLE", $blg->name." - New Entry");
+
 echo $tpl->process();
 ?>

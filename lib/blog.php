@@ -20,9 +20,9 @@
 
 require_once("utils.php");
 require_once("blogconfig.php");
-require_once("blogentry.php");
+#require_once("blogentry.php");
 require_once("template.php");
-require_once("rss.php");
+#require_once("rss.php");
 
 class Blog {
 
@@ -32,6 +32,7 @@ class Blog {
 	var $image;
 	var $theme;
 	var $max_entries = BLOG_MAX_ENTRIES;
+	var $max_rss = BLOG_MAX_ENTRIES;
 	var $user = "";
 	var $pass = "";
 	var $entrylist;
@@ -109,6 +110,7 @@ class Blog {
 				case "description": $this->description = $data; break;
 				case "image": $this->image = $data; break;
 				case "max entries": $this->max_entries = $data; break;
+				case "max rss": $this->max_rss = $data; break;
 				case "theme": $this->theme = $data; break;
 			}
 			
@@ -117,14 +119,13 @@ class Blog {
 
 	function writeBlogData() {
 		$path = $this->home_path.PATH_DELIM.BLOG_CONFIG_PATH;
-		$fh = fopen($path, 'wt');
-		if (!$fh) return false;
 		$str = "Name = ".$this->name."\n";
 		$str .= "Description = ".$this->description."\n";
 		$str .= "Image = ".$this->image."\n";
 		$str .= "Max Entries = ".$this->max_entries."\n";
+		$str .= "Max RSS = ".$this->max_rss."\n";
 		$str .= "Theme = ".$this->theme."\n";
-		$ret = fwrite($fh, $str);
+		$ret = write_file($path, $str);
 		return $ret;
 	}
 
@@ -267,7 +268,7 @@ class Blog {
 		$feed->description = $this->description;
 		$feed->site = $this->getURL();
 	
-		if (! $this->entrylist) $this->getRecent();
+		if (! $this->entrylist) $this->getRecent($this->max_rss);
 		foreach ($this->entrylist as $ent) 
 			$feed->entrylist[] = new RSS1Entry($ent->permalink(), $ent->subject, $ent->subject);
 		
@@ -286,7 +287,7 @@ class Blog {
 		$feed->description = $this->description;
 		$feed->title = $this->name;
 	
-		if (! $this->entrylist) $this->getRecent();
+		if (! $this->entrylist) $this->getRecent($this->max_rss);
 		foreach ($this->entrylist as $ent) 
 			$feed->entrylist[] = new RSS2Entry($ent->permalink(), $ent->subject, "<![CDATA[".$ent->markup($ent->data)."]]>");
 		
@@ -382,15 +383,17 @@ class Blog {
 	# directories that I couldn't alter via FTP.
 
 	function fixDirectoryPermissions($start_dir=false) {
+		$fs = CreateFS();
 		if (! $start_dir) $start_dir = $this->home_path;
 		$dir_list = scan_directory($start_dir, true);
 		$ret = true;
 		foreach ($dir_list as $dir) {
 			$path = $start_dir.PATH_DELIM.$dir;
-			echo "<p>$path</p>";
-			$ret &= chmod($path, 0777);
+			#echo "<p>$path</p>";
+			$ret &= $fs->chmod($path, $fs->defaultMode() );
 			$ret &= $this->fixDirectoryPermissions($path);
 		}
+		$fs->destruct();
 		return $ret;
 	}
 
@@ -400,6 +403,7 @@ class Blog {
 
 	function insert ($path=false) {
 		if (! check_login()) return false;
+		$fs = CreateFS();
 		# Get the installation directory, then create and get the blog
 		# directory.  These directories are added to the include_path using
 		# a config file that is copied to all entry directories.
@@ -414,15 +418,19 @@ class Blog {
 		}
 		
 		$inst_path = getcwd();
-		if ($path) $this->home_path = realpath($path);
-		if (! is_dir($this->home_path)) mkdir_rec($this->home_path);
+		if ($path) $this->home_path = canonicalize($path);
+		echo "<p>".getcwd().PATH_DELIM.$this->home_path."</p>";
+		#$this->home_path = realpath(getcwd().PATH_DELIM.$this->home_path);
+		$this->home_path = canonicalize($this->home_path);
+		echo "<p>$path, ".$this->home_path."</p>";
+		if (! is_dir($this->home_path)) $fs->mkdir_rec($this->home_path);
 		chdir($this->home_path);
 		$this->home_path = getcwd();
 		$blog_path = $this->home_path;
 		$ent_path = $this->home_path.PATH_DELIM.BLOG_ENTRY_PATH;
-		if (! is_dir($ent_path) ) mkdir_rec($ent_path);
+		if (! is_dir($ent_path) ) $fs->mkdir_rec($ent_path);
 		$rss_path = $this->home_path.PATH_DELIM.BLOG_FEED_PATH;
-		if (! is_dir($rss_path) ) mkdir_rec($rss_path);
+		if (! is_dir($rss_path) ) $fs->mkdir_rec($rss_path);
 		$blog_templ_dir = $blog_path.PATH_DELIM.BLOG_TEMPLATE_DIR;
 		$sys_templ_dir = $inst_path.PATH_DELIM.BLOG_TEMPLATE_DIR;
 		
@@ -430,6 +438,7 @@ class Blog {
 		$ret &= create_directory_wrappers($ent_path, BLOG_ENTRIES);
 		 
 		$ret = $this->writeBlogData();
+		$fs->destruct();
 		return $ret;
 	}
 	
@@ -447,11 +456,14 @@ class Blog {
 	
 	function delete () {
 		if (! check_login()) return false;
+		$fs = CreateFS();
 		if (! is_dir($this->home_path.PATH_DELIM.BLOG_DELETED_PATH) )
-			mkdir_rec($this->home_path.PATH_DELIM.BLOG_DELETED_PATH);
+			$fs->mkdir_rec($this->home_path.PATH_DELIM.BLOG_DELETED_PATH);
 		$source = $this->home_path.PATH_DELIM.BLOG_CONFIG_PATH;
 		$target = $this->home_path.PATH_DELIM.BLOG_DELETED_PATH.PATH_DELIM.BLOG_CONFIG_PATH."-".date(ENTRY_PATH_FORMAT);
-		return rename($source, $target);
+		$ret = $fs->rename($source, $target);
+		$fs->destruct();
+		return $ret;
 	}
 	
 }

@@ -1,6 +1,6 @@
+<div id="commentsubmit">
 <h3>Add your comments</h3>
 <p>You must enter something in the comment body.  No HTML code allowed.  URLs starting with http:// or ftp:// will be automatically converted to hyperlinks.  Spam and other junk comments will be deleted.</p>
-<div id="commentsubmit">
 <fieldset>
 <form id="commentform" method="post" action="index.php">
 <div>

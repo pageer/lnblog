@@ -2,6 +2,6 @@
 
 @media print {
 	#menubar {
-		visibility: hidden;
+		display: none;
 	}
 }

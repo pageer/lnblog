@@ -20,7 +20,7 @@
 
 session_start();
 require_once("blogconfig.php");
-ini_set("include_path", ini_get("include_path").PATH_SEPARATOR.getcwd().PATH_DELIM."templates");
+#ini_set("include_path", ini_get("include_path").PATH_SEPARATOR.getcwd().PATH_DELIM."templates");
 require_once("blog.php");
 
 if (! check_login() ) {

@@ -21,10 +21,12 @@
 session_start();
 require_once("config.php");
 require_once("blog.php");
+require_once("blogentry.php");
+require_once("blogcomment.php");
 
 $entry_path = getcwd();
 $ent = new BlogEntry($entry_path);
-$blg = new Blog($ent->getBlogBasedir());
+$blg = new Blog();
 			
 if (POST(COMMENT_POST_REMEMBER)) {
 	if (POST(COMMENT_POST_NAME)) setcookie(COMMENT_POST_NAME, POST(COMMENT_POST_NAME));

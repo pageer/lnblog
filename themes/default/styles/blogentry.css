@@ -41,9 +41,14 @@ div.blogentryfooter li {
 
 .blogadmin {
 	display: inline;
+	margin-right: 1%;
 }
 
 div.blogentry  div.blogentrybody {
 	padding: 1%;
 	/*white-space: pre;*/
+}
+
+div.blogentry div.blogentrybody p {
+	text-indent: 1em;
 }

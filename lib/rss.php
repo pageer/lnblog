@@ -91,21 +91,26 @@ class RSS1 {
 		$ret .= "<title>".$this->title."</title>\n";
 		$ret .= "<link>".$this->site."</link>\n";
 		$ret .= "<description>".$this->description."</description>\n";
-		$ret .= '<image rdf:resource="'.$this->image."\" />\n";
+		if ($this->image) 
+			$ret .= '<image rdf:resource="'.$this->image."\" />\n";
 		$ret .= "<items>\n<rdf:Seq>\n".$list_text."</rdf:Seq>\n</items>";
 		$ret .= "\n</channel>\n";
-		$ret .= '<image rdf:about="'.$this->url."\">\n";
-		$ret .= "<title>".$this->title."</title>\n";
-		$ret .= "<link>".$this->site."</link>\n";
-		$ret .= "<url>".$this->image."</url>\n</image>\n";
+		if ($this->image) {
+			$ret .= '<image rdf:about="'.$this->url."\">\n";
+			$ret .= "<title>".$this->title."</title>\n";
+			$ret .= "<link>".$this->site."</link>\n";
+			$ret .= "<url>".$this->image."</url>\n</image>\n";
+		}
 		$ret .= $detail_text."</rdf:RDF>";
 
 		return $ret;
 	}
 
 	function writeFile($path) {
+		$fs = CreateFS();
 		$content = $this->get();
-		return write_file($path, $content);
+		$ret = $fs->write_file($path, $content);
+		return $ret;
 	}
 
 }
@@ -186,8 +191,11 @@ class RSS2 {
 	}
 
 	function writeFile($path) {
+		$fs = CreateFS();
 		$content = $this->get();
-		return write_file($path, $content);
+		$ret = $fs->write_file($path, $content);
+		$fs->destruct();
+		return $ret;
 	}
 
 }

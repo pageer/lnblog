@@ -22,11 +22,9 @@ require_once("blogconfig.php");
 require_once("utils.php");
 require_once("template.php");
 require_once("entry.php");
-require_once("blogcomment.php");
+#require_once("blogcomment.php");
 
-define("MARKUP_NONE", 0);
-define("MARKUP_BBCODE", 1);
-define("MARKUP_HTML", 2);
+
 
 class BlogEntry extends Entry {
 	
@@ -55,9 +53,18 @@ class BlogEntry extends Entry {
 	function getPath($curr_ts, $just_name=false, $long_format=false) {
 		$year = date("Y", $curr_ts);
 		$month = date("m", $curr_ts);
-		$fmt = $long_format ? ENTRY_PATH_FORMAT_LONG : ENTRY_PATH_FORMAT;
-		$base = date($fmt, $curr_ts);
-		return $year.PATH_DELIM.$month.PATH_DELIM.$base;
+		#if ($just_name || $long_format) {
+			$fmt = $long_format ? ENTRY_PATH_FORMAT_LONG : ENTRY_PATH_FORMAT;
+			$base = date($fmt, $curr_ts);
+		/*
+		} else {
+			$base = strtolower($this->subject);
+			$base = preg_replace("/\s+/", "_",$base);
+			$base = date("d", $curr_ts)."-".$base;
+		}
+		*/
+		if ($just_name) return $base;
+		else return $year.PATH_DELIM.$month.PATH_DELIM.$base;
 	}
 
 	function metadataFields() {
@@ -111,7 +118,8 @@ class BlogEntry extends Entry {
 	function update () {
 		
 		if (! check_login()) return false;
-
+		
+		$fs = CreateFS();
 		$dir_path = dirname($this->file);
 		$this->ip = get_ip();
 		$curr_ts = time();
@@ -119,9 +127,10 @@ class BlogEntry extends Entry {
 		$this->timestamp = $curr_ts;
 
 		$target = $dir_path.PATH_DELIM.
-			basename($this->getPath($curr_ts, false, true)).ENTRY_PATH_SUFFIX;
+			$this->getPath($curr_ts, true, true).ENTRY_PATH_SUFFIX;
 		$source = $dir_path.PATH_DELIM.ENTRY_DEFAULT_FILE;
-		$ret = rename($source, $target);
+		$ret = $fs->rename($source, $target);
+		$fs->destruct();
 		if (! $ret) return false;
 		$ret = $this->writeFileData();
 		return $ret;
@@ -131,13 +140,16 @@ class BlogEntry extends Entry {
 		
 		if (! check_login()) return false;
 		
+		$fs = CreateFS();
 		$curr_ts = time();
 		$dir_path = dirname($this->file);
 		if (! $this->isEntry($dir_path) ) return false;
 		$source_file = $dir_path.PATH_DELIM.ENTRY_DEFAULT_FILE;
 		$target_file = $dir_path.PATH_DELIM.
-			basename($this->getPath($curr_ts, false, true)).ENTRY_PATH_SUFFIX;
-		return rename($source_file, $target_file);
+			$this->getPath($curr_ts, true, true).ENTRY_PATH_SUFFIX;
+		$ret = $fs->rename($source_file, $target_file);
+		$fs->destruct();
+		return $ret;
 	}
 
 	function insert ($base_path=false) {
@@ -191,29 +203,14 @@ class BlogEntry extends Entry {
 		}
 	}
 
-	function markup($data) {
-		switch ($this->has_html) {
-			case MARKUP_NONE:
-				$ret = $this->stripHTML($data);
-				$ret = $this->addHTML($data);
-				break;
-			case MARKUP_BBCODE:
-				$ret = $this->stripHTML($data);
-				$ret = $this->bbcodeToHtml($data);
-				break;
-			case MARKUP_HTML:
-				$ret = $data;
-				break;
-		}
-		return $ret;
-	}
-
 	function get() {
 		$tmp = new PHPTemplate(ENTRY_TEMPLATE);
 
 		$tmp->set("SUBJECT", $this->subject);
 		$tmp->set("POSTDATE", $this->prettyDate() );
-		$this->data = $this->markup($this->data);
+		if ($this->has_html == MARKUP_BBCODE)
+			$this->data = $this->absolutizeBBCodeURI($this->data, $this->permalink() );
+		$this->data = $this->markup($this->data() );
 		$tmp->set("ABSTRACT", $this->abstract);
 		$tmp->set("BODY", $this->data);
 		$tmp->set("PERMALINK", $this->permalink() );

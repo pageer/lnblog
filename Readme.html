@@ -1,10 +1,15 @@
-<?xml version="1.0" encoding=""?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <title>LnBlog Documentation</title>
+  <style>
+    td, th {
+      border: thin solid black;
+	 }
+
+  </style>
 </head>
 <body>
 
@@ -108,22 +113,127 @@ option  buttons below the edit area.  They are:</p>
 on the plain-text input and convert all http and ftp URLs to links.</li>
 <li><strong>BBCode</strong>: Use a dialect of the BBCode markup popular in
 web forums to markup your page.  Paragraphs and line breaks are inserted like
-with auto-markup, but you can also include [b], [i], and [url] tags to make
-bold, italic, and linked text.  These are currently the only tags supported.
+with auto-markup, but you can also include other supported tags.  See the
+<a href="#lbcode">LBCode Syntax</a> section for details.
 </li>
 <li><strong>Raw HTML</strong>: The text you type is treated as raw HTML code.
 No processing is done and there's no guarantee that your page will validate.
 In other words, this is for people who know what they're doing.</li>
 </ol>
-<h2>Adding Articles</h2>
+
+<h2><a name="lbcode">LBCode Syntax</a></h2>
+<p>LnBlog supports marking up your text with a variant of LBCode, which is a 
+variant of BBCode, the markup language used in many popular web-board and 
+forums, including phpBB.  I call this dialect LBCode because it makes 
+absolutely no attempt to match the official syntax (if there is such a thing)
+of BBCode.  The promary purpose of LBCode is to let the user write rich text
+that is valid XHTML 1.0 Strict without having to learn any XHTML.  Below is 
+a table of the currently supported tags, with descrition, example, and the 
+mapping to HTML.  Please note that LnBlog does not currently handle LBCode
+errors gracefully - errors in tags will simply be ignored.</p>
+<table>
+<tr><th>Description</th><th>Code</th><th>Example</th><th>HTML equivalent</th></tr>
+<tr>
+<td>Bold text</td>
+<td>[b]bold[/b]</td>
+<td><strong>bold</strong></td>
+<td>&lt;strong&gt;bold&lt;/strong&gt;</td>
+</tr><tr>
+<td>Italic text</td>
+<td>[i]italic[/i]</td>
+<td><em>italic</em></td>
+<td>&lt;em&gt;italic&lt;/em&gt;</td>
+</tr><tr>
+<td>Underlined text</td>
+<td>[u]underline[/u]</td>
+<td><span style="text-decoration: underline">underline</span></td>
+<td>&lt;span style="text-decoration: underline"&gt;underline&lt;/span&gt;</td>
+</tr><tr>
+<td>Abbreviation</td>
+<td>[ab=Full phrase]abbreviation[/ab]</td>
+<td><abbr title="Full phrase">abbreviation</abbr></td>
+<td>&lt;abbr title="Full phrase"&gt;abbreviation&lt;/abbr&gt;</td>
+</tr><tr>
+<td>Acronym</td>
+<td>[ac=Full phrase]acronym[/ac]</td>
+<td><acronym title="Full phrase">acronym</acronym></td>
+<td>&lt;acronym title="Full phrase"&gt;acronym&lt;/acronym&gt;</td>
+</tr><tr>
+<td>Block quotation</td>
+<td>[quote]Quotation[/quote]</td>
+<td><blockquote>Quotation</blockquote></td>
+<td>&lt;blockquote&gt;Quotation&lt;/blockquote&gt;</td>
+</tr><tr>
+<td>Short quotation</td>
+<td>[q]Quote[/q]</td>
+<td><q>Quote</q></td>
+<td>&lt;q&gt;Quote&lt;/q&gt;</td>
+</tr><tr>
+<td>Hyperlink</td>
+<td>[url=http://www.google.com]Google</td>
+<td><a href="http://www.google.com">Google</a>[/url]</td>
+<td>&lt;a href="http://www.google.com"&gt;Google&lt;/a&gt;</td>
+</tr><tr>
+<td>Image</td>
+<td>[img=http://www.google.com/images/logo.gif]Google logo[/img]</td>
+<td><img src="http://www.google.com/images/logo.gif" alt="Google logo" title="Google logo" /></td>
+<td>&lt;img src="http://www.google.com/images/logo.gif" alt="Google logo" title="Google logo" /&gt;</td>
+</tr></table>
+<h4>Notes on LBCode</h4>
+<ol>
+	<li>When you give just a file name (i.e. a path containing to '/' characters)
+	as the target for an [img] or [url] tag, LnBlog will automatically convert it
+	to an absolute URI to a file in the entry directory when it is displayed.  This 
+	feature is provided for two reasons: because you will not know the absoute URI of a 
+	blog entry until <em>after</em> you post it and because the post can be displayed at its
+	permanent location (in which case the relative link is valid) or in another place (the
+	front page of the blog or an RSS feed), where the relative link is <em>not</em> valid.</li>
+	<li>In Mozilla-based browser, [ac] and [ab] both do the same thing.  They
+	are both provided because there is a semantic difference, i.e. that an 
+	abbreviation is simply a shortening of a phrase using the initial letters,
+	whereas an acronym is such a shortening that actually spells a 
+	pronounceable word.  However, while the &lt;abbr&gt; tag is often the
+	semantically correct one, Internet Explorer 6 doesn't support it, so you
+	should use this tag with care.</li>
+	<li>In the [img] tag, the text between the opening and closing tags <em>is
+	required</em>.  This is because it is used as the text for both the ALT 
+	attribute, which is required in XHTML, and the TITLE attribute, which 
+	gives you the tooltips in Mozilla-based browsers.  Since Internet 
+	Explorer incorrectly uses the ALT text for tooltips, you'll actually get 
+	the same tooltip in all browsers.</li>
+	<li>In Mozilla-based browsers, the &lt;q&gt; tag renders quotation marks 
+	automatically.  However, this depends on the CSS2 :before and :after 
+	pseudo-elements, which are not supported by Internet Explorer, so use
+	this with care.  Note that in the default LnBlog stylsheets, the &lt;q&gt;
+	tag is rendered with italic text, so that even in Internet Explorer, it
+	can be distinguished from normal text.</li>
+</ol>
+
+<h2><abbr title="Content Management System">CMS</abbr> Features</h2>
+
+<p>While LnBlog is a technically a weblog package, it also includes several
+"mini-<abbr title="Content Management System">CMS</abbr> features.  These 
+exist mostly for the sake of maintaining the design conssitency of the site 
+and making it slightly easier to manage.  The following sections describe these.</p>
+
+<h3>Adding Articles</h3>
 <p>An article in LnBlog is just a blog entry with a different URL and 
-different display template.  It's basically a "mini-CMS" feature, i.e. a 
-cheap and easy way to add static content that meshes with the overall look
+different display template.  It's basically a cheap and easy way to add 
+static content that meshes with the overall look
 and feel of the blog, but doesn't require any extra work.  You still get 
 BBCode support and revision history, but the URL structure is pneumonic 
-and comments are turned off by default.  The URL of an article will look like
-this:<br />
-http://www.yoursite.com/yourblog/content/article_subject/<br />
-instead of the usual blog entry URL based on the entry year, month, and day.</p>
+and comments are turned off by default.  You can enter the last component of the
+article URL when you first post it or go with the default, which is to use the 
+subject with all letters converted to lower case, spaces converted to underscores,
+and all other characters removed.</p>
+
+<h3>Uploading Files</h3>
+<p>LnBlog provides pages to upload files to the root of the current blog or to the
+current entry or article.  Currently, you can only upload one file at a time.  You 
+should also note the file size limit when trying to upload a file.  To change this,
+must change the values of the PHP configuration variables upload_max_size and 
+post_max_size by creating a .htaccess file (if you use Apache) or by modifying 
+the system php.ini file.</p>
+
 </body>
 </html>

@@ -27,11 +27,28 @@ session_start();
 require_once("blog.php");
 require_once("article.php");
 
+if (! check_login() ) redirect("index.php");
+
 $ent = new Article;
 $blg = new Blog();
 
+$subject = "subject";
+$path = "path";
+$data = "data";
+$html = "html";
+$comments = "comments";
+$url = "art_url";
+
 $submit_id = "submit";
-$tpl = new PHPTemplate(BLOG_EDIT_TEMPLATE);
+$tpl = new PHPTemplate(ARTICLE_EDIT_TEMPLATE);
+
+$tpl->set("ARTICLE_POST_SUBJECT", $subject);
+$tpl->set("ARTICLE_POST_PATH", $path);
+$tpl->set("ARTICLE_POST_DATA", $data);
+$tpl->set("ARTICLE_POST_HTML", $html);
+$tpl->set("ARTICLE_POST_COMMENTS", $comments);
+$tpl->set("ARTICLE_POST_URL", $url);
+
 # Disable comments by default.
 $tpl->set("COMMENTS", 0);
 $tpl->set("SUBMIT_ID", $submit_id);
@@ -40,16 +57,22 @@ $blg->exportVars($tpl);
 
 $has_error = "";
 if (POST($submit_id)) {
+	
+	$tpl->set("SUBJECT", POST($subject) );
+	$tpl->set("URL", POST($url) );
+	$tpl->set("DATA", POST($data) );
+	$tpl->set("HAS_HTML", POST($html) );
+
 	$ent->getPostData();
 	if ($ent->data) {
-		$ent->insert();
-		#$blg->updateRSS1();
+		$ent->insert(trim(POST($url)));
 		redirect($ent->permalink());
 	} else {
 		$tpl->set("HAS_UPDATE_ERROR");
 		$tpl->set("UPDATE_ERROR_MESSAGE", "Error creating article.");
 	}
 }
+
 $body = $tpl->process();
 $tpl->file = BASIC_LAYOUT_TEMPLATE;
 $tpl->set("PAGE_CONTENT", $body);

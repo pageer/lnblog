@@ -11,15 +11,19 @@
 <?php 
 # Check if the user is logged in and, if so, present administrative options.
 if (check_login()) { 
-	$ent = new BlogEntry();
-	if ( $ent->isEntry(getcwd()) ) { 
+	if (class_exists("BlogEntry")) {
+		$ent = new BlogEntry();
+		if ( $ent->isEntry(getcwd()) ) { 
 ?>
 <li><a href="edit.php">Edit this post</a></li>
+<li><a href="uploadfile.php">Upload to entry</a></li>
 <?php 
- 	}
+ 		}
+	}
 ?>
 <li><a href="<?php echo $BLOG_URL_ROOTREL; ?>new.php">Add new post</a></li>
 <li><a href="<?php echo $BLOG_URL_ROOTREL; ?>newart.php">Add new article</a></li>
+<li><a href="<?php echo $BLOG_URL_ROOTREL; ?>uploadfile.php">Upload to weblog</a></li>
 <li><a href="<?php echo $BLOG_URL_ROOTREL; ?>edit.php">Edit weblog settings</a></li>
 <li><a href="<?php echo $BLOG_URL_ROOTREL; ?>logout.php">Logout</a></li>
 <?php 
