@@ -1,0 +1,21 @@
+/* Site banner styles. */
+@media print {
+	#banner {
+		width: 100%;
+		border: none; /*thin solid black;*/
+		background-color: white;
+	}
+
+	#banner h1 {
+		width: 100%;
+		text-align: center;
+		vertical-align: middle;
+		color: black;
+	}
+
+	#banner a:link, #banner a:visited {
+		color: black;
+		text-decoration: none;
+	}
+
+}

@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<title>LnBlog Installation</title>
+</head>
+<body>
+<h1>Installing LnBlog</h1>
+<p>The installation for LnBlog is a fairly easy process.  For those who
+are not technologically inclined, just follow these step-by-step instructions.</p>
+<ol>
+<li>
+<strong>Download and uncompress the LnBlog archive.</strong><p>
+The downloaded archive is a standard ZIP file format.  On Windows you can 
+decompress this with WinZip or pretty much any other compression program.  On
+Linux, you can use your desktop environment's decompression utility, such as 
+Ark, or run <code>unzip&nbsp;lnblog-version.zip</code> from the command 
+line.</p>
+</li>
+<li>
+<strong>Upload the LnBlog folder to your web host.</strong><p>
+Use your favorite FTP program to upload the entire LnBlog installation
+folder to your web hosting account.  The folder <em>must</em> go someplace 
+under your web root.  If you place it outside the web root, you will not be 
+able to run the setup and configuration programs.  Usually it is easiest to 
+simply put the LnBlog folder in the root of your website.</p>
+</li>
+<li>
+<strong>Change folder permissions on the web server.</strong><p>
+After uploading the LnBlog folder, you need to change the security on it.
+On Linux/Apache serves, this generally means making the directory writable 
+to everyone.  If you don't do this, you will not be able to create a login in
+the next step.  If you don't like having this folder world-writable, you can
+always change the permissions back once you finish setting up a login.</p>
+<p>The exact method for changing permissions will vary with your FTP tool.
+I use Konqueror's integrated FTP support, so I can change permissions in the
+file properties box.  I also use the LFTP command-line FTP client, which
+supports a chmod command.  Some clients, such as the Windows command-line
+ftp.exe program, do not support changing permissions.</p>
+<p><strong>Please note</strong>, you might also want to change the
+permissions on your web root directory to be world-writable as well.  If you 
+do not, then each time you create a new blog, you will have to manually 
+create the directory and make it writable.</p></li>
+<li>
+<strong>Create an administrative login.</strong><p>
+Once the LnBlog folder permissions are set, you can open up your web 
+browser and navigate to it.  If you put the foler in your website root and 
+named it just "lnblog", then you would navigate to 
+http://www.yoursite.com/lnblog/ to
+find it.  When you do this, you will be prompted to create an administrative 
+login.  This login will be used to add new blogs, upgrade old blogs, and will
+also be the default login for any blogs you create.</p>
+</li>
+<li>
+<strong>Log in.</strong><p>
+After creating an administrative account, you will be directed to the login 
+page.  Enter the username and password you just created and you will see the
+administrative page.  </p></li>
+<li>
+<strong>Create a new blog.</strong><p>
+Click on the "Add new blog" link to create a new weblog.
+On the new weblog page, you can enter the path to the blog, the name, a 
+description, the web server path to an icon for the blog, the theme to use
+(LnBlog ships with two themes: "default", which I think is very nice,
+and "skepticats", which is the original and somewhat less nice theme)
+and the maximum 
+number of entries to display on the front page.  When you are done, hit 
+submit and you will be taken to the front page of your new blog.</p><p>
+<strong>Please note</strong> that it is best to use a relative path to the 
+blog.  So, if the URL of LnBlog on your site is 
+http://mysite.com/lnblog/ and you want to create a blog at 
+http://mysite.com/myblog/, then you When you should give the path as 
+../myblog.</p><p>
+<strong>Also note</strong> that if the web server account does not have 
+write permissions to the directory where you want the blog, then LnBlog
+will not be able to create it.  You can either change the permissions on the
+folder that will contain your weblog folder, or you can manually create the
+folder and change the permissions to be writable by everyone.</p>
+</li>
+</ol>
+</body>
+</html>

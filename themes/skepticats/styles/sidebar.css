@@ -1,0 +1,25 @@
+/* Sidebar styles. */
+
+@import url(sidebar_print.css);
+
+#sidebar {
+	border: thin solid black;
+	float: right;
+	clear: right;
+	padding: 1%;
+	margin: 1%;
+	width: 30%;
+	/*height: 80%;*/
+}
+
+#sidebar h1, #sidebar h2 {
+	font-size: 100%;
+	margin-right: 1em;
+	margin-left: 1em;
+}
+
+#sidebar ul li {
+	list-style-type: none;
+	margin-right: 1em;
+	margin-left: 1em;
+} 

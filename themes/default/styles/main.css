@@ -1,0 +1,38 @@
+/* 
+Main style sheet.  This controls the basic page look, including the page header, 
+menu bar, and sidebar.  It does not include the blog entries, comments, forums, etc.
+*/
+
+/* @import url(http://localhost/tc/styles/banner.css); */
+@import url(banner.css);
+@import url(menubar.css);
+@import url(sidebar.css);
+@import url(article.css);
+
+@import url(main_print.css);
+
+html, body { height: 100%; }
+
+/* Styles for the page content area. */
+
+#pagecontent {
+	margin: 1% 1% 1% 1%;
+	width: 60%;
+	float: left;
+}
+
+a:link {
+	text-decoration: none;
+	color: blue;
+}
+
+a:visited {
+	text-decoration: none;
+	color: #8B008B;
+}
+
+a:hover {
+	text-decoration: underline;
+	color: red;
+}
+

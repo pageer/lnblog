@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding=""?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <title>LnBlog Documentation</title>
+</head>
+<body>
+
+<h1>LnBlog</h1>
+<p>A simple file-based weblog focused on design elegance.</p>
+<p>Copyright (c) 2005, Peter A. Geer &lt;<a href="mailto:pageer@skepticats.com">pageer@skepticats.com</a>&gt;</p>
+
+<h2>Introduction</h2>
+
+<p>LnBlog is a simple blog written in PHP which stores data in text files.
+It is strives to be easy to use, easy to manage, and feature rich whil 
+maintaining a clean, elegant, and modular design.  It is built to create 
+sites with a clean, directory-based URL structure and valid XHTML and CSS for
+style and layout.</p>
+
+<h2>Status</h2>
+
+<p>Currently, LnBlog is in the active developmen, which just means 
+that it is functional and tested, but not anywhere close to done yet.  There
+are still lots of features to add, both in the back-end code and in terms of
+interface elements.  You can see the <a href="TODO">to do list</a> to get an
+idea of what is currently planned.  If you have any comments or suggestions, 
+or if you have any problems or find any bugs, feel free to <a href="mailto:pageer@skepticats.com">e-mail me</a>.</p>
+
+<h2>Requirements</h2>
+
+<p>LnBlog is fairly light on requirements.  It does not require any 
+particular operating system or web server and is known to work on 
+Linux/Apache and WinXP/IIS.  The only hard requirements are the following:</p>
+<ol>
+<li>PHP 4.0 or greater.</li>
+<li>Support for Perl Compatible Regular Expression (PCRE), which is enabled
+by default in most PHP packages.</li>
+<li>The ability for scripts to read and write files to the server.  This 
+implies that <strong>Safe Mode is turned off</strong> and that file and
+directory permissions are set up correctly.  If your web host
+has safe mode turned on, try contacting their support department and asking 
+them to turn off PHP's Safe Mode for your account.  My hosting company did it
+with no questions asked, but your milage may vary.
+</li>
+</ol>
+
+<h2>Feature List</h2>
+
+<ul>
+  <li>Anonymous reader comments.</li>
+  <li>Automatically generated RSS feeds.</li>
+  <li>Easily create multiple weblogs, with independent or shared logins.</li>
+  <li>Change between multiple themes, each of which can have completely a
+  different look and behavior, i.e. different styles, HTML markup, images, 
+  and even client-side scripts.</li>
+  <li>Default themes use valid XHTML Strict and CSS-based page layout.</li>
+  <li>Flexible HTML templating system that allows templates to be tweaked
+  on a per-blog basis.</li>
+  <li>Support for posting with simple auto-markup, a simple subset of BBcode,
+  or raw HTML code.</li>
+</ul>
+
+<h2>Initial Setup</h2>
+
+<p>For step-by-step instructions, please see the 
+<a href="install.html">install guide</a>.  If you're more technically 
+inclined, then it's probably safe to just skip to the summary below.</p>
+
+<p>Here's the quick version.  Just extract the installation archive and
+upload the whole LnBlog directory to a location in
+the publicly accessible portion of your web hosting account.  Make sure the
+directory is writable by the web server so that you can set a password.  (You
+can always change the permissions back afterward, if this bothers you.) 
+This username and password
+will be used for the administration pages and for any blogs you create.  
+When you're done with that, fire up your favorite browser and point it 
+to the URL of LnBlog on your web host,
+e.g. http://www.mysite.com/lnblog/ or something similar. This will run the
+LnBlog setup, which will prompt you to create a login and allow you to
+create a new blog.</p>
+
+<p>Please note that you may need to change the file permissions on some 
+folders to make LnBlog work.  In particular, to
+create a new blog, the web server must be able to write files in the 
+specified folder, and if that folder does not exist, the web server must be
+able to create it.  Usually, this means that you must either change the 
+permissions on your web root directory to be writable by the web server,
+or you must create and change the permissions on each blog directory by hand.
+Alternatively, you could create a singe directory that is writable by the 
+web server and put all your blogs under that.  
+It's your site, so it's your call.
+</p>
+
+<h2>Adding Entries</h2>
+
+<p>Adding a blog entry is pretty self-explanatory.  Just log in and click on the
+"add entry" link.  You will be taken to the entry edit screen, where you can 
+enter the subject for your entry, the entry text itself, and turn comments for
+this entry on or off.</p>
+
+<p>There are three possible input modes, which you can change between with the
+option  buttons below the edit area.  They are:</p>
+<ol>
+<li><strong>Auto-markup</strong>: Add HTML paragraphs and line breaks based 
+on the plain-text input and convert all http and ftp URLs to links.</li>
+<li><strong>BBCode</strong>: Use a dialect of the BBCode markup popular in
+web forums to markup your page.  Paragraphs and line breaks are inserted like
+with auto-markup, but you can also include [b], [i], and [url] tags to make
+bold, italic, and linked text.  These are currently the only tags supported.
+</li>
+<li><strong>Raw HTML</strong>: The text you type is treated as raw HTML code.
+No processing is done and there's no guarantee that your page will validate.
+In other words, this is for people who know what they're doing.</li>
+</ol>
+<h2>Adding Articles</h2>
+<p>An article in LnBlog is just a blog entry with a different URL and 
+different display template.  It's basically a "mini-CMS" feature, i.e. a 
+cheap and easy way to add static content that meshes with the overall look
+and feel of the blog, but doesn't require any extra work.  You still get 
+BBCode support and revision history, but the URL structure is pneumonic 
+and comments are turned off by default.  The URL of an article will look like
+this:<br />
+http://www.yoursite.com/yourblog/content/article_subject/<br />
+instead of the usual blog entry URL based on the entry year, month, and day.</p>
+</body>
+</html>

@@ -1,0 +1,40 @@
+h1, h2 {
+	margin: 0px auto;
+	text-align: center;
+}
+
+form {
+	margin: 10% auto;
+	padding: 2%;
+	width: 50%;
+	background-color: #c3c3c3;
+	border: thin solid black;
+}
+
+form div.formrow {
+	width: 100%;
+	clear: both;
+	padding-bottom: 1%;
+}
+
+form div.formrow span.label, div.formrow span.leftbtn {
+	width: 49%;
+	/*right: 50%;*/
+	text-align: right;
+	/*position: relative;*/
+	float: left;
+	/*clear: left;*/
+}
+
+form div.formrow span.field, div.formrow span.rightbtn {
+	width: 49%;
+	/*left: 50%;*/
+	text-align: left;
+	/*position: relative;*/
+	float: right;
+	/*clear: right;*/
+}
+
+#login, #clear {
+	width: 6em;
+}

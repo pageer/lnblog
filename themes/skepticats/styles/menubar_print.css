@@ -1,0 +1,7 @@
+/* Site-map menu bar styles. */
+
+@media print {
+	#menubar {
+		visibility: hidden;
+	}
+}

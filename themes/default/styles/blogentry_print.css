@@ -1,0 +1,44 @@
+/* Blog entry styles for print media. */
+
+@media print {
+
+	div.blogentry {
+		border: thin solid black;
+		/*width: 50%;*/
+	}
+
+	div.blogentry div.blogentryheader {
+		border: thin solid black;
+		background-color: #c3c3c3;
+	}
+	
+	div.blogentry div.blogentryheader h2 {
+		margin: 0px;
+		padding: 0px;
+	}
+	
+	div.blogentry div.blogentryheader div.bloguser {
+		display: inline;
+		clear: none;
+		width: 50%;
+		margin-right: 5%;
+		text-align: left;
+	}
+	
+	div.blogentry div.blogentryheader div.blogadmin {
+		width: 40%;
+		left: 50%;
+		clear: none;
+		display: inline;
+		text-align: right;
+	}
+	
+	div.blogentry div.blogentryheader div.blogadmin a {
+		margin-right: 1em;
+	}
+	
+	div.blogentry  div.blogentrybody {
+		padding: 1%;
+	}
+
+}
