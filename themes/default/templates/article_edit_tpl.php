@@ -2,15 +2,15 @@
 <h3><?php echo $UPDATE_ERROR_MESSAGE; ?></h3>
 <?php } ?>
 <fieldset>
-<form id="postform" method="post">
+<form id="postform" method="post" action="<?php echo $FORM_ACTION; ?>">
 <div>
-<span class="basic_form_label"><label for="<?php echo $ARTICLE_POST_SUBJECT; ?>">Subject</label></span>
-<span class="basic_form_data"><input id="<?php echo $ARTICLE_POST_SUBJECT; ?>" name="<?php echo $ARTICLE_POST_SUBJECT; ?>" type="text" <?php if (isset($SUBJECT)) { ?>value="<?php echo $SUBJECT; ?>" <?php } ?>/></span>
+<label class="basic_form_label" for="<?php echo $ARTICLE_POST_SUBJECT; ?>">Subject</label>
+<input id="<?php echo $ARTICLE_POST_SUBJECT; ?>" name="<?php echo $ARTICLE_POST_SUBJECT; ?>" type="text" <?php if (isset($SUBJECT)) { ?>value="<?php echo $SUBJECT; ?>" <?php } ?>/>
 </div>
 <?php if (isset($ARTICLE_POST_URL)) { ?>
 <div>
-<span class="basic_form_label"><label for="<?php echo $ARTICLE_POST_URL; ?>">Article path</label></span>
-<span class="basic_form_data"><input id="<?php echo $ARTICLE_POST_URL; ?>" name="<?php echo $ARTICLE_POST_URL; ?>" type="text" <?php if (isset($URL)) { ?>value="<?php echo $URL; ?>" <?php } ?>/></span>
+<label class="basic_form_label" for="<?php echo $ARTICLE_POST_URL; ?>">Article path</label>
+<input id="<?php echo $ARTICLE_POST_URL; ?>" name="<?php echo $ARTICLE_POST_URL; ?>" type="text" <?php if (isset($URL)) { ?>value="<?php echo $URL; ?>" <?php } ?>/>
 </div>
 <?php } ?>
 <div>
@@ -19,20 +19,20 @@
 </textarea>
 </div>
 <div>
-<span class="check_label"><label for="mode_none">Auto-markup only</label></span>
-<span class="check_data"><input id="mode_none" name="<?php echo $ARTICLE_POST_HTML; ?>" type="radio" <?php if ($HAS_HTML == MARKUP_NONE) { ?>checked="checked"<?php } ?> value="<?php echo MARKUP_NONE; ?>" /></span>
+<label for="mode_none">Auto-markup only</label>
+<input id="mode_none" name="<?php echo $ARTICLE_POST_HTML; ?>" type="radio" <?php if ($HAS_HTML == MARKUP_NONE) { ?>checked="checked"<?php } ?> value="<?php echo MARKUP_NONE; ?>" />
 </div>
 <div>
-<span class="check_label"><label for="mode_bbcode">Use BBcode markup</label></span>
-<span class="check_data"><input id="mode_bbcode" name="<?php echo $ARTICLE_POST_HTML; ?>" type="radio" <?php if ($HAS_HTML == MARKUP_BBCODE) { ?>checked="checked"<?php } ?> value="<?php echo MARKUP_BBCODE; ?>" /></span>
+<label for="mode_bbcode">Use <a onclick="javascript:window.open('<?php echo INSTALL_ROOT_URL; ?>/Readme.html#lbcode'); return false;" href="<?php echo INSTALL_ROOT_URL; ?>/Readme.html#lbcode">LBcode</a> markup</label>
+<input id="mode_bbcode" name="<?php echo $ARTICLE_POST_HTML; ?>" type="radio" <?php if ($HAS_HTML == MARKUP_BBCODE) { ?>checked="checked"<?php } ?> value="<?php echo MARKUP_BBCODE; ?>" />
 </div>
 <div>
-<span class="check_label"><label for="mode_html">Allow HTML markup</label></span>
-<span class="check_data"><input id="mode_html" name="<?php echo $ARTICLE_POST_HTML; ?>" type="radio" <?php if ($HAS_HTML == MARKUP_HTML) { ?>checked="checked"<?php } ?> value="<?php echo MARKUP_HTML; ?>" /></span>
+<label for="mode_html">Allow HTML markup</label>
+<input id="mode_html" name="<?php echo $ARTICLE_POST_HTML; ?>" type="radio" <?php if ($HAS_HTML == MARKUP_HTML) { ?>checked="checked"<?php } ?> value="<?php echo MARKUP_HTML; ?>" />
 </div>
 <div>
-<span class="check_label"><label for="<?php echo $ARTICLE_POST_COMMENTS; ?>">Allow comments</label></span>
-<span class="check_data"><input id="<?php echo $ARTICLE_POST_COMMENTS; ?>" name="<?php echo $ARTICLE_POST_COMMENTS; ?>" type="checkbox" <?php if (! (isset($COMMENTS) && !$COMMENTS) ) { ?>checked="checked"<?php } ?> /></span>
+<label for="<?php echo $ARTICLE_POST_COMMENTS; ?>">Allow comments</label>
+<input id="<?php echo $ARTICLE_POST_COMMENTS; ?>" name="<?php echo $ARTICLE_POST_COMMENTS; ?>" type="checkbox" <?php if (! (isset($COMMENTS) && !$COMMENTS) ) { ?>checked="checked"<?php } ?> />
 </div>
 <div>
 <span class="basic_form_submit"><input name="<?php echo $SUBMIT_ID; ?>" id="<?php echo $SUBMIT_ID; ?>" type="submit" value="Submit" /></span>
@@ -43,4 +43,3 @@
 <script type="text/javascript">
 document.forms[0].elements['<?php echo $ARTICLE_POST_SUBJECT; ?>'].focus();
 </script>
-</div>

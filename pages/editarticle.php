@@ -31,6 +31,7 @@ $tpl = new PHPTemplate(ARTICLE_EDIT_TEMPLATE);
 $tpl->set("SUBMIT_ID", $submit_id);
 $blg->exportVars($tpl);
 
+$tpl->set("FORM_ACTION", current_file() );
 $tpl->set("SUBJECT", $ent->subject);
 $tpl->set("DATA", $ent->data);
 $tpl->set("COMMENTS", $ent->allow_comment);

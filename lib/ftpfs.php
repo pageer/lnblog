@@ -168,6 +168,13 @@ class FTPFS extends FS {
 		return $ret;
 	}
 
+	function delete($src) {
+		if (! $this->connected() ) return false;
+		$ftp_src = $this->localpathToFSPath($src);
+		$ret = ftp_delete($this->connection, $ftp_src);
+		return $ret;
+	}
+
 	function write_file($path, $contents) {
 		if (! $this->connected() ) return false;
 		$temp = tmpfile();

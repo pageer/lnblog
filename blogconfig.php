@@ -38,6 +38,8 @@ define("ENTRY_DEFAULT_FILE", "current.htm"); # Name of data file
 define("ENTRY_DATE_FORMAT", "Y-m-d H:i T");  # Format to display post dates
 define("ENTRY_COMMENT_DIR", "comments");     # Comment directory
 define("ENTRY_PATH_SUFFIX", ".htm");         # Extension for data files
+define("STICKY_PATH", "sticky.txt");         # If present, show articel in sidebar
+
 # These are constants for the entry submission form.  
 # Is this the best way to do it?
 define("ENTRY_POST_SUBJECT", "subject");

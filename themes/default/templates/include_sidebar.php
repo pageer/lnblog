@@ -31,6 +31,25 @@ if (is_dir($BLOG_BASE_DIR.PATH_DELIM.BLOG_ARTICLE_PATH)) {
 ?>
 <h3><a href="<?php echo $BLOG_URL_ROOTREL.BLOG_ARTICLE_PATH; ?>/">Articles</a></h3>
 <ul>
+<?php
+$art_list = scan_directory($BLOG_BASE_DIR.PATH_DELIM.BLOG_ARTICLE_PATH, true);
+$ret_list = array();
+if (count($art_list) > 0) {
+	foreach ($art_list as $item) {
+		$file = $BLOG_BASE_DIR.PATH_DELIM.BLOG_ARTICLE_PATH.PATH_DELIM.$item.PATH_DELIM.STICKY_PATH;
+		if (file_exists($file)) {
+			$text = file($file);
+			$ret_list[$item] = $text[0];
+		}
+	}
+}
+if (count($ret_list) > 0) {
+	foreach($ret_list as $dir=>$sub) { ?>
+<li><a href="<?php echo "$BLOG_URL_ROOTREL/".BLOG_ARTICLE_PATH."/$dir/"; ?>"><?php echo $sub; ?></a></li>
+<?php }
+} else { ?>
+<li></li>
+<?php } ?>
 </ul>
 <?php } ?>
 <h3>News Feeds</h3>

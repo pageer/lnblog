@@ -34,6 +34,16 @@ class Article extends BlogEntry {
 		if ( file_exists($this->file) )$this->readFileData();
 	}
 
+	function markSticky($show=true) {
+		$f = CreateFS();
+		if ($show) 
+			$ret = $f->write_file(dirname($this->file).PATH_DELIM.STICKY_PATH, $this->subject);
+		else 
+			$ret = $f->delete(dirname($this->file).PATH_DELIM.STICKY_PATH);
+		$f->destruct();
+		return $ret;
+	}
+
 	function getPath() {
 		$path = strtolower($this->subject);
 		$path = preg_replace("/\s+/", "_", $path);

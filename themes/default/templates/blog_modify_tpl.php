@@ -6,27 +6,27 @@
 <form id="addblog" method="post" action="<?php echo $POST_PAGE; ?>">
 <?php if (isset($BLOG_PATH_ID)) { ?>
 <div>
-<span class="basic_form_label"><label for="<?php echo $BLOG_PATH_ID; ?>">Blog path</label></span>
-<span class="basic_form_data"><input id="<?php echo $BLOG_PATH_ID; ?>" name="<?php echo $BLOG_PATH_ID; ?>" value="<?php echo $BLOG_PATH_REL; ?>" /></span>
+<label for="<?php echo $BLOG_PATH_ID; ?>">Blog path</label>
+<input id="<?php echo $BLOG_PATH_ID; ?>" name="<?php echo $BLOG_PATH_ID; ?>" value="<?php echo $BLOG_PATH_REL; ?>" />
 </div>
 <?php } ?>
 <div>
-<span class="basic_form_label"><label for="<?php echo $BLOG_NAME_ID; ?>">Blog name</label></span>
-<span class="basic_form_data"><input id="<?php echo $BLOG_NAME_ID; ?>" name="<?php echo $BLOG_NAME_ID; ?>" value="<?php echo $BLOG_NAME; ?>" /></span>
+<label for="<?php echo $BLOG_NAME_ID; ?>">Blog name</label>
+<input id="<?php echo $BLOG_NAME_ID; ?>" name="<?php echo $BLOG_NAME_ID; ?>" value="<?php echo $BLOG_NAME; ?>" />
 </div>
 <div>
-<span class="basic_form_label"><label for="<?php echo $BLOG_DESC_ID; ?>">Description</label></span>
-<span class="basic_form_data"><input id="<?php echo $BLOG_DESC_ID; ?>" name="<?php echo $BLOG_DESC_ID; ?>" value="<?php echo $BLOG_DESC; ?>" /></span>
+<label for="<?php echo $BLOG_DESC_ID; ?>">Description</label>
+<input id="<?php echo $BLOG_DESC_ID; ?>" name="<?php echo $BLOG_DESC_ID; ?>" value="<?php echo $BLOG_DESC; ?>" />
 </div>
 <?php if (0) { ?>
 <div>
-<span class="basic_form_label"><label for="<?php echo $BLOG_IMAGE_ID; ?>">Blog icon</label></span>
-<span class="basic_form_data"><input id="<?php echo $BLOG_IMAGE_ID; ?>" name="<?php echo $BLOG_IMAGE_ID; ?>" value="<?php echo $BLOG_IMAGE; ?>" /></span>
+<label for="<?php echo $BLOG_IMAGE_ID; ?>">Blog icon</label>
+<input id="<?php echo $BLOG_IMAGE_ID; ?>" name="<?php echo $BLOG_IMAGE_ID; ?>" value="<?php echo $BLOG_IMAGE; ?>" />
 </div>
 <?php  } ?>
 <div>
-<span class="basic_form_label"><label for="<?php echo $BLOG_THEME_ID; ?>">Theme</label></span>
-<span class="basic_form_data"><select id="<?php echo $BLOG_THEME_ID; ?>" name="<?php echo $BLOG_THEME_ID; ?>">
+<label for="<?php echo $BLOG_THEME_ID; ?>">Theme</label>
+<select id="<?php echo $BLOG_THEME_ID; ?>" name="<?php echo $BLOG_THEME_ID; ?>">
 <?php 
 $dir = scan_directory(INSTALL_ROOT.PATH_DELIM."themes", true);
 sort($dir);
@@ -34,15 +34,15 @@ foreach ($dir as $theme) { ?>
 <option value="<?php echo $theme; ?>"<?php if (isset($BLOG_THEME) && $theme == $BLOG_THEME) { ?> selected="selected"<?php } ?>>
 <?php echo $theme; ?></option>
 <?php } ?>
-</select></span>
+</select>
 </div>
 <div>
-<span class="basic_form_label"><label for="<?php echo $BLOG_MAX_ID; ?>">Maximum number of entries</label></span>
-<span class="basic_form_data"><input id="<?php echo $BLOG_MAX_ID; ?>" name="<?php echo $BLOG_MAX_ID; ?>" value="<?php echo $BLOG_MAX; ?>" /></span>
+<label for="<?php echo $BLOG_MAX_ID; ?>">Maximum number of entries</label>
+<input id="<?php echo $BLOG_MAX_ID; ?>" name="<?php echo $BLOG_MAX_ID; ?>" value="<?php echo $BLOG_MAX; ?>" />
 </div>
 <div>
-<span class="basic_form_label"><label for="<?php echo $BLOG_RSS_MAX_ID; ?>">Maximum number of entries in RSS feeds</label></span>
-<span class="basic_form_data"><input id="<?php echo $BLOG_RSS_MAX_ID; ?>" name="<?php echo $BLOG_RSS_MAX_ID; ?>" value="<?php echo $BLOG_RSS_MAX; ?>" /></span>
+<label for="<?php echo $BLOG_RSS_MAX_ID; ?>">Maximum number of entries in RSS feeds</label>
+<input id="<?php echo $BLOG_RSS_MAX_ID; ?>" name="<?php echo $BLOG_RSS_MAX_ID; ?>" value="<?php echo $BLOG_RSS_MAX; ?>" />
 </div>
 <div>
 <span class="basic_form_submit"><input name="<?php echo $SUBMIT_ID; ?>" id="<?php echo $SUBMIT_ID; ?>" type="submit" value="Submit" /></span>

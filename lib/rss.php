@@ -182,7 +182,6 @@ class RSS2 {
 		$ret .= "<channel>\n";
 		$ret .= '<link>'.$this->url."</link>\n";
 		$ret .= "<title>".$this->title."</title>\n";
-		#$ret .= "<link>".$this->url."</link>\n";
 		$ret .= "<description>".$this->description."</description>\n";
 		$ret .= $detail_text;
 		$ret .= "</channel>\n</rss>";

@@ -289,7 +289,10 @@ class Blog {
 	
 		if (! $this->entrylist) $this->getRecent($this->max_rss);
 		foreach ($this->entrylist as $ent) 
-			$feed->entrylist[] = new RSS2Entry($ent->permalink(), $ent->subject, "<![CDATA[".$ent->markup($ent->data)."]]>");
+			$feed->entrylist[] = new RSS2Entry($ent->permalink(), 
+				$ent->subject, 
+				"<![CDATA[".$ent->markup($ent->data)."]]>", 
+				$ent->commentlink() );
 		
 		$ret = $feed->writeFile($path);	
 		return $ret;

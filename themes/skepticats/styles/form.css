@@ -69,3 +69,15 @@ textarea {
 #submit, #clear {
 	width: 6em;
 }
+
+form label {
+	width: 50%;
+	text-align: right;
+	margin-right: 1%;
+	float: left;
+}
+
+label.none,  li label {
+	width: auto;
+	float: none;
+}

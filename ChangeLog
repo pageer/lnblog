@@ -1,3 +1,13 @@
+04-Apr-2005:
+- Fixed several templates so that the HTML actually validates now.
+- Added some styles to make forms slightly nicer.
+- Added ordered and unordered lists to LBCode.
+- Added a "sticky" file for articles that gives a quick and easy way
+to determine if they are to be displayed in the sidebar.
+- Added delete() function to FS plugin interface to work with the
+sticky files for articles.
+- We'll call this release 0.2.0.  It's finally worth using!  Yay!
+
 01-Apr-2005:
 - Fixed pages for adding and editing articles and entries to preserve the
 form data if there is an error.

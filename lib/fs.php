@@ -38,6 +38,7 @@ class FS {
 	function defaultMode() {}
 	function copy($src, $dest) {}
 	function rename($src, $dest) {}
+	function delete($src) {}
 	function write_file($path, $contents) {}
 
 }

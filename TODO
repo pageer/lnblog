@@ -4,7 +4,6 @@ Features to be added:
 * Documentation on the template mechanism.
 * Improved user interface for blog settings and administration.
 * A nice Javascript interface for BBCode in entires and/or comments.
-* More extensive BBCode-style markup.
 * Trackback support.
 * Support for polls.
 * Internationalization support.

@@ -36,4 +36,4 @@ if (check_login()) {
 ?>
 </ul>
 <?php } ?>
-<a href="http://www.skepticats.com/basicblog/"><img alt="Powered by <?php echo PACKAGE_NAME; ?>" title="Powered by <?php echo PACKAGE_NAME; ?>" src="<?php echo THEME_IMAGES; ?>/logo.png" /></a>
+<a href="<?php echo PACKAGE_URL; ?>"><img alt="Powered by <?php echo PACKAGE_NAME; ?>" title="Powered by <?php echo PACKAGE_NAME; ?>" src="<?php echo THEME_IMAGES; ?>/logo.png" /></a>

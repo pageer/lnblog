@@ -42,6 +42,7 @@ $url = "art_url";
 $submit_id = "submit";
 $tpl = new PHPTemplate(ARTICLE_EDIT_TEMPLATE);
 
+$tpl->set("FORM_ACTION", current_file() );
 $tpl->set("ARTICLE_POST_SUBJECT", $subject);
 $tpl->set("ARTICLE_POST_PATH", $path);
 $tpl->set("ARTICLE_POST_DATA", $data);

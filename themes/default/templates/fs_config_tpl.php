@@ -14,8 +14,12 @@ toggle_active() {
 </script>
 <form method="post" action="<?php echo $FORM_ACTION; ?>">
 <div>
-<label for="<?php echo $USE_FTP_ID; ?>">Use FTP file writing</label>
-<input type="checkbox" name="<?php echo $USE_FTP_ID; ?>" id="<?php echo $USE_FTP_ID; ?>" <?php if (isset($USE_FTP)) { ?>checked="checked"<?php } ?> onclick="deactivate();" />
+<label for="native">Use native functions for file writing</label>
+<input type="radio" name="<?php echo $USE_FTP_ID; ?>" id="native" <?php if (! isset($USE_FTP)) { ?>checked="checked"<?php } ?> />
+</div>
+<div>
+<label for="ftpfs">Use FTP file writing</label>
+<input type="radio" name="<?php echo $USE_FTP_ID; ?>" id="ftpfs" <?php if (isset($USE_FTP)) { ?>checked="checked"<?php } ?> value="ftpfs" onclick="deactivate();" />
 </div>
 <div>
 <label for="<?php echo $USER_ID; ?>">Username</label>
@@ -42,7 +46,7 @@ toggle_active() {
 <input type="text" name="<?php echo $PREF_ID; ?>" id="<?php echo $PREF_ID; ?>"<?php if (isset($PREF)) { ?> value="<?php echo $PREF;?>"<?php } ?> />
 </div>
 <div>
-<span><input type="submit" value="Create" /></span>
-<span><input type="reset" value="Clear" /></span>
+<span class="basic_form_submit"><input type="submit" value="Create" /></span>
+<span class="basic_form_clear"><input type="reset" value="Clear" /></span>
 </div>
 </form>

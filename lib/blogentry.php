@@ -102,6 +102,10 @@ class BlogEntry extends Entry {
 	function permalink() {
 		return localpath_to_uri(dirname($this->file));
 	}
+
+	function commentlink() {
+		return localpath_to_uri(dirname($this->file).PATH_DELIM.ENTRY_COMMENT_DIR);
+	}
 	
 	function getByPath ($path, $revision=ENTRY_DEFAULT_FILE) {
 		$file_path = $path.PATH_DELIM.$revision;

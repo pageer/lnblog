@@ -20,7 +20,7 @@
 <h2>Introduction</h2>
 
 <p>LnBlog is a simple blog written in PHP which stores data in text files.
-It is strives to be easy to use, easy to manage, and feature rich whil 
+It is strives to be easy to use, easy to manage, and feature rich while
 maintaining a clean, elegant, and modular design.  It is built to create 
 sites with a clean, directory-based URL structure and valid XHTML and CSS for
 style and layout.</p>
@@ -43,18 +43,17 @@ Linux/Apache and WinXP/IIS.  The only hard requirements are the following:</p>
 <li>PHP 4.0 or greater.</li>
 <li>Support for Perl Compatible Regular Expression (PCRE), which is enabled
 by default in most PHP packages.</li>
-<li>The ability for scripts to read and write files to the server.  This 
-implies that <strong>Safe Mode is turned off</strong> and that file and
-directory permissions are set up correctly.  If your web host
-has safe mode turned on, try contacting their support department and asking 
-them to turn off PHP's Safe Mode for your account.  My hosting company did it
-with no questions asked, but your milage may vary.
+<li>The ability for scripts to read and write files to the server.  To do this,
+you must <em>either</em> have FTP access to the web server and configure LnBLog
+to use it, <em>or</em> have PHP's safe mode disabled and appropriate directory permissions
+set on the web server.
 </li>
 </ol>
 
 <h2>Feature List</h2>
 
 <ul>
+  <li><strong>Works in Safe Mode</strong> when using FTP support.</li>
   <li>Anonymous reader comments.</li>
   <li>Automatically generated RSS feeds.</li>
   <li>Easily create multiple weblogs, with independent or shared logins.</li>
@@ -76,27 +75,17 @@ inclined, then it's probably safe to just skip to the summary below.</p>
 
 <p>Here's the quick version.  Just extract the installation archive and
 upload the whole LnBlog directory to a location in
-the publicly accessible portion of your web hosting account.  Make sure the
-directory is writable by the web server so that you can set a password.  (You
-can always change the permissions back afterward, if this bothers you.) 
-This username and password
-will be used for the administration pages and for any blogs you create.  
-When you're done with that, fire up your favorite browser and point it 
-to the URL of LnBlog on your web host,
-e.g. http://www.mysite.com/lnblog/ or something similar. This will run the
-LnBlog setup, which will prompt you to create a login and allow you to
-create a new blog.</p>
-
-<p>Please note that you may need to change the file permissions on some 
-folders to make LnBlog work.  In particular, to
-create a new blog, the web server must be able to write files in the 
-specified folder, and if that folder does not exist, the web server must be
-able to create it.  Usually, this means that you must either change the 
-permissions on your web root directory to be writable by the web server,
-or you must create and change the permissions on each blog directory by hand.
-Alternatively, you could create a singe directory that is writable by the 
-web server and put all your blogs under that.  
-It's your site, so it's your call.
+the publicly accessible portion of your web hosting account.  You can them navigate
+to that directory with your favorite browser to run the configuration scripts.  The 
+first script configures file writing.  If you have FTP access to the web server, you
+can use FTP for file writing (this is recommended) by selecting the FTP option and giving the
+appropriate information below.  Otherwise, LnBlog will use PHP's standard filesystem 
+functions, which will require that Safe Mode be turned off and appropriate permissions 
+set on the relevant directories.</p>
+<p>After file writing support is configured, you must set an administrator login.  This 
+will be used to add new weblogs as well as to log into the ones you create.  After that's 
+set, you can log in and start adding new blogs.  There are also administrative functions to
+modify a blog and update a blog (used when upgrading LnBlog).
 </p>
 
 <h2>Adding Entries</h2>
@@ -109,9 +98,9 @@ this entry on or off.</p>
 <p>There are three possible input modes, which you can change between with the
 option  buttons below the edit area.  They are:</p>
 <ol>
-<li><strong>Auto-markup</strong>: Add HTML paragraphs and line breaks based 
+<li><strong>Auto-markup</strong>: Adds HTML paragraphs and line breaks based 
 on the plain-text input and convert all http and ftp URLs to links.</li>
-<li><strong>BBCode</strong>: Use a dialect of the BBCode markup popular in
+<li><strong>LBCode</strong>: Use a dialect of the BBCode markup popular in
 web forums to markup your page.  Paragraphs and line breaks are inserted like
 with auto-markup, but you can also include other supported tags.  See the
 <a href="#lbcode">LBCode Syntax</a> section for details.
@@ -122,15 +111,16 @@ In other words, this is for people who know what they're doing.</li>
 </ol>
 
 <h2><a name="lbcode">LBCode Syntax</a></h2>
-<p>LnBlog supports marking up your text with a variant of LBCode, which is a 
+<p>LnBlog supports marking up your text with LBCode, which is a 
 variant of BBCode, the markup language used in many popular web-board and 
-forums, including phpBB.  I call this dialect LBCode because it makes 
+forum packages, such as phpBB.  I call this dialect LBCode because it makes 
 absolutely no attempt to match the official syntax (if there is such a thing)
-of BBCode.  The promary purpose of LBCode is to let the user write rich text
-that is valid XHTML 1.0 Strict without having to learn any XHTML.  Below is 
-a table of the currently supported tags, with descrition, example, and the 
+of BBCode.  The primary purpose of LBCode is to let the user write rich text
+that is valid XHTML 1.0 Strict without having to learn any XHTML or worry about 
+making mistakes while writing.  Below is 
+a table of the currently supported tags, with descriptions, example, and the 
 mapping to HTML.  Please note that LnBlog does not currently handle LBCode
-errors gracefully - errors in tags will simply be ignored.</p>
+errors gracefully - incorrect syntax will simply be displayed as plain text.</p>
 <table>
 <tr><th>Description</th><th>Code</th><th>Example</th><th>HTML equivalent</th></tr>
 <tr>
@@ -170,23 +160,56 @@ errors gracefully - errors in tags will simply be ignored.</p>
 <td>&lt;q&gt;Quote&lt;/q&gt;</td>
 </tr><tr>
 <td>Hyperlink</td>
-<td>[url=http://www.google.com]Google</td>
-<td><a href="http://www.google.com">Google</a>[/url]</td>
+<td>[url=http://www.google.com]Google[/url]</td>
+<td><a href="http://www.google.com">Google</a></td>
 <td>&lt;a href="http://www.google.com"&gt;Google&lt;/a&gt;</td>
 </tr><tr>
 <td>Image</td>
 <td>[img=http://www.google.com/images/logo.gif]Google logo[/img]</td>
 <td><img src="http://www.google.com/images/logo.gif" alt="Google logo" title="Google logo" /></td>
 <td>&lt;img src="http://www.google.com/images/logo.gif" alt="Google logo" title="Google logo" /&gt;</td>
+</tr><tr>
+<td>Number list</td>
+<td>[numlist]<br />
+[*]First item<br />
+[*]Second item<br />
+[/numlist]</td>
+<td><ol>
+<li>First item</li>
+<li>Second item</li>
+</ol></td>
+<td>&lt;ol&gt;<br />
+&lt;li&gt;First item&lt;/li&gt;<br />
+&lt;li&gt;Second item&lt;/li&gt;<br />
+&lt;/ol&gt;
+</td>
+</tr><tr>
+<td>Unordered list</td>
+<td>[list]<br />
+[*]First item<br />
+[*]Second item<br />
+[/list]</td>
+<td><ul>
+<li>First item</li>
+<li>Second item</li>
+</ul></td>
+<td>&lt;ul&gt;<br />
+&lt;li&gt;First item&lt;/li&gt;<br />
+&lt;li&gt;Second item&lt;/li&gt;<br />
+&lt;/ul&gt;
+</td>
 </tr></table>
 <h4>Notes on LBCode</h4>
 <ol>
-	<li>When you give just a file name (i.e. a path containing to '/' characters)
+	<li>The line breaks between items in numbered lists and unordered lists are <em>not</em>
+	optional.  You <em>must</em> put each item on a single line and you must put the beginning
+	and ending tags on their own line.</li>
+	<li>When you give just a file name (i.e. a path containing <em>no</em> '/' characters)
 	as the target for an [img] or [url] tag, LnBlog will automatically convert it
 	to an absolute URI to a file in the entry directory when it is displayed.  This 
 	feature is provided for two reasons: because you will not know the absoute URI of a 
 	blog entry until <em>after</em> you post it and because the post can be displayed at its
-	permanent location (in which case the relative link is valid) or in another place (the
+	permanent location, in which case the relative link is valid, or in another place (the
 	front page of the blog or an RSS feed), where the relative link is <em>not</em> valid.</li>
 	<li>In Mozilla-based browser, [ac] and [ab] both do the same thing.  They
 	are both provided because there is a semantic difference, i.e. that an 
@@ -234,6 +257,9 @@ should also note the file size limit when trying to upload a file.  To change th
 must change the values of the PHP configuration variables upload_max_size and 
 post_max_size by creating a .htaccess file (if you use Apache) or by modifying 
 the system php.ini file.</p>
+
+<h2>License</h2>
+<p></p>
 
 </body>
 </html>

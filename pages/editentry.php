@@ -32,6 +32,7 @@ $tpl = new PHPTemplate(BLOG_EDIT_TEMPLATE);
 $tpl->set("SUBMIT_ID", $submit_id);
 $blg->exportVars($tpl);
 
+$tpl->set("FORM_ACTION", current_file() );
 $tpl->set("SUBJECT", $ent->subject);
 $tpl->set("DATA", $ent->data);
 $tpl->set("HAS_HTML", $ent->has_html);

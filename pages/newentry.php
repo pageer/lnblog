@@ -34,6 +34,7 @@ $blg = new Blog();
 
 $submit_id = "submit";
 $tpl = new PHPTemplate(BLOG_EDIT_TEMPLATE);
+$tpl->set("FORM_ACTION", current_file() );
 $tpl->set("SUBMIT_ID", $submit_id);
 $tpl->set("HAS_HTML", MARKUP_BBCODE);
 $blg->exportVars($tpl);
