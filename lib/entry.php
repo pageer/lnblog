@@ -72,13 +72,17 @@ class Entry {
 		return $ret;
 	}
 
-	function addHTML($data) {
+	function addHTML($data, $use_nofollow=false) {
 		$ret = $data;
 		$patterns[0] = "/((http|https|ftp):\/\/\S*)/i";
 		$patterns[1] = '/\r\n\r\n/';
 		$patterns[2] = '/\n\n/';
 		$patterns[3] = '/\n/';
-		$replacements[0] = "<a href=\"\$1\">\$1</a>";
+		$replacements[0] = "<a href=\"\$1\"" .
+			$use_nofollow ?
+			" rel=\"nofollow\"" :
+			"" .
+			">\$1</a>";
 		$replacements[1] = '</p><p>';
 		$replacements[2] = '</p><p>';
 		$replacements[3] = '<br />';
@@ -113,7 +117,7 @@ class Entry {
 		$replacements[3] = '<acronym title="$1">$2</acronym>';
 		$replacements[4] = '<blockquote>$1</blockquote>';
 		$replacements[5] = '<strong>$1</strong>';
-		$replacements[6] = '<strong>$1</strong>';
+		$replacements[6] = '<em>$1</em>';
 		$replacements[7] = '<span style="text-decoration: underline;">$1</span>';
 		$replacements[8] = '<q>$1</q>';
 		$replacements[9] = "</p><ul>$1</ul><p>";
@@ -130,11 +134,11 @@ class Entry {
 		return $ret;
 	}
 
-	function markup($data) {
+	function markup($data, $use_nofollow=false) {
 		switch ($this->has_html) {
 			case MARKUP_NONE:
 				$ret = $this->stripHTML($data);
-				$ret = $this->addHTML($data);
+				$ret = $this->addHTML($data, $use_nofollow);
 				break;
 			case MARKUP_BBCODE:
 				$ret = $this->stripHTML($data);

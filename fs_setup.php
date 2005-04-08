@@ -139,8 +139,8 @@ if ( has_post() ) {
 			define("FTP_ROOT", trim(POST($root)) );
 			if (trim(POST($pref)) != '') {
 				define("FTPFS_PATH_PREFIX", trim(POST($pref)) );
-				echo "<p>Found prefix</p>";
-			} else echo "<p>No dice...</p>";
+				#echo "<p>Found prefix</p>";
+			} 
 			$content = "<?php\n".
 				'define("FS_PLUGIN", "'.FS_PLUGIN."\");\n".
 				'define("FTPFS_USER", "'.FTPFS_USER."\");\n".

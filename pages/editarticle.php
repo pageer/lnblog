@@ -22,8 +22,7 @@ session_start();
 require_once("blog.php");
 require_once("article.php");
 
-$entry_path = getcwd();
-$ent = new Article($entry_path);
+$ent = new Article( getcwd() );
 $blg = new Blog();
 
 $submit_id = "submit";
@@ -31,12 +30,18 @@ $tpl = new PHPTemplate(ARTICLE_EDIT_TEMPLATE);
 $tpl->set("SUBMIT_ID", $submit_id);
 $blg->exportVars($tpl);
 
+	$tpl->set("ARTICLE_POST_SUBJECT", ENTRY_POST_SUBJECT);
+$tpl->set("ARTICLE_POST_DATA", ENTRY_POST_DATA);
+$tpl->set("ARTICLE_POST_COMMENTS", ENTRY_POST_COMMENTS);
+$tpl->set("ARTICLE_POST_HTML", ENTRY_POST_HTML);
+
 $tpl->set("FORM_ACTION", current_file() );
 $tpl->set("SUBJECT", $ent->subject);
 $tpl->set("DATA", $ent->data);
 $tpl->set("COMMENTS", $ent->allow_comment);
+$tpl->set("HAS_HTML", $ent->has_html);
 
-if (POST($submit_id)) {
+if ( has_post() ) {
 	$ent->getPostData();
 	if ($ent->data) {
 		$ent->update();
@@ -47,6 +52,7 @@ if (POST($submit_id)) {
 		$tpl->set("SUBJECT", $ent->subject);
 		$tpl->set("DATA", $ent->data);
 		$tpl->set("COMMENTS", $ent->allow_comment);
+		$tpl->set("HAS_HTML", $ent->has_html);
 	}
 }
 $body = $tpl->process();

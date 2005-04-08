@@ -156,7 +156,7 @@ class FileUpload {
 		}
 	*/
 		$tmp_dir = ini_get("upload_tmp_dir");
-		echo "<p>$tmp_dir</p><p>".$this->tempname."</p>";
+		#echo "<p>$tmp_dir</p><p>".$this->tempname."</p>";
 		$fs = CreateFS();
 		if (is_file($this->tempname)) $tmp_path = $this->tempname;
 		else $tmp_path = $tmp_dir.PATH_DELIM.$this->tempname;

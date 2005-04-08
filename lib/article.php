@@ -34,7 +34,7 @@ class Article extends BlogEntry {
 		if ( file_exists($this->file) )$this->readFileData();
 	}
 
-	function markSticky($show=true) {
+	function setSticky($show=true) {
 		$f = CreateFS();
 		if ($show) 
 			$ret = $f->write_file(dirname($this->file).PATH_DELIM.STICKY_PATH, $this->subject);
@@ -44,13 +44,22 @@ class Article extends BlogEntry {
 		return $ret;
 	}
 
-	function getPath() {
-		$path = strtolower($this->subject);
-		$path = preg_replace("/\s+/", "_", $path);
-		$path = preg_replace("/\W+/", "", $path);
-		return $path;
+	function getPath($curr_ts=false, $just_name=false, $long_format=false) {
+		if (! $curr_ts) {
+			$path = strtolower($this->subject);
+			$path = preg_replace("/\s+/", "_", $path);
+			$path = preg_replace("/\W+/", "", $path);
+			return $path;
+		} else {
+			$year = date("Y", $curr_ts);
+			$month = date("m", $curr_ts);
+			$fmt = $long_format ? ENTRY_PATH_FORMAT_LONG : ENTRY_PATH_FORMAT;
+			$base = date($fmt, $curr_ts);
+			if ($just_name) return $base;
+			else return $year.PATH_DELIM.$month.PATH_DELIM.$base;
+		}
 	}
-	
+
 	function insert ($branch=false, $base_path=false) {
 	
 		if (! check_login()) return false;

@@ -1,3 +1,13 @@
+06-Apr-2005
+- Fixed bugs and removed debugging code that showed up when attempting to
+post an entry and upload the files for the 0.2.0 release. ;)
+- Fixed missing template variable errors in new blog page.
+- Fixed error where comment delete was not picking up the comments directory
+when showing entry and comments and ended up linking to entry delete.
+- Fixed error updating articles caused by inherited update() method calling
+getPath(), which was changed in BlogEntry, but not article.
+- OK, let's make THIS release 0.2.0.
+
 04-Apr-2005:
 - Fixed several templates so that the HTML actually validates now.
 - Added some styles to make forms slightly nicer.

@@ -56,8 +56,7 @@ $tpl->set("SUBMIT_ID", $submit_id);
 $tpl->set("HAS_HTML", MARKUP_BBCODE);
 $blg->exportVars($tpl);
 
-$has_error = "";
-if (POST($submit_id)) {
+if ( has_post() ) {
 	
 	$tpl->set("SUBJECT", POST($subject) );
 	$tpl->set("URL", POST($url) );
@@ -66,8 +65,14 @@ if (POST($submit_id)) {
 
 	$ent->getPostData();
 	if ($ent->data) {
-		$ent->insert(trim(POST($url)));
-		redirect($ent->permalink());
+		$ret =  $ent->insert(trim(POST($url)));
+		if ($ret) {
+			$ent->setSticky();
+			redirect($ent->permalink());
+		} else {
+			$tpl->set("HAS_UPDATE_ERROR");
+			$tpl->set("UPDATE_ERROR_MESSAGE", "Could not write file.");
+		}
 	} else {
 		$tpl->set("HAS_UPDATE_ERROR");
 		$tpl->set("UPDATE_ERROR_MESSAGE", "Error creating article.");

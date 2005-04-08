@@ -128,7 +128,6 @@
       <openfolder url="lib" />
       <openfolder url="themes" />
       <openfolder url="themes/default" />
-      <openfolder url="themes/default/scripts" />
       <openfolder url="themes/default/styles" />
       <openfolder url="themes/default/templates" />
       <openfolder url="themes/skepticats" />

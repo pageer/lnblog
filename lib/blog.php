@@ -48,6 +48,7 @@ class Blog {
 		$this->description = '';
 		$this->image = '';
 		$this->max_entries = BLOG_MAX_ENTRIES;
+		$this->max_rss = BLOG_MAX_ENTRIES;
 		$this->theme = "default";
 		$this->user = "";
 		$this->pass = "";
@@ -392,7 +393,6 @@ class Blog {
 		$ret = true;
 		foreach ($dir_list as $dir) {
 			$path = $start_dir.PATH_DELIM.$dir;
-			#echo "<p>$path</p>";
 			$ret &= $fs->chmod($path, $fs->defaultMode() );
 			$ret &= $this->fixDirectoryPermissions($path);
 		}
@@ -422,10 +422,8 @@ class Blog {
 		
 		$inst_path = getcwd();
 		if ($path) $this->home_path = canonicalize($path);
-		echo "<p>".getcwd().PATH_DELIM.$this->home_path."</p>";
 		#$this->home_path = realpath(getcwd().PATH_DELIM.$this->home_path);
 		$this->home_path = canonicalize($this->home_path);
-		echo "<p>$path, ".$this->home_path."</p>";
 		if (! is_dir($this->home_path)) $fs->mkdir_rec($this->home_path);
 		chdir($this->home_path);
 		$this->home_path = getcwd();

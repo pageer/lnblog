@@ -40,3 +40,8 @@ div.commentfooter li {
 div.commentdata {
 	padding: 1%;
 }
+
+div.commentfooter li.commenturl, div.commentfooter li.commentname {
+	display: inline;
+	margin-right: 1%;
+}

@@ -74,7 +74,7 @@ class NativeFS extends FS {
 
 	function copy($src, $dest)   { return copy($src, $dest); }
 	function rename($src, $dest) { return rename($src, $dest); }
-	function delete($src)        ( return unlink($src); }
+	function delete($src)        { return unlink($src); }
 
 	function write_file($path, $contents) {
 		$fh = fopen($path, "w");

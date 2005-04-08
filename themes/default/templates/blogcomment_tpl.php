@@ -23,7 +23,7 @@
 		<li class="commenturl">(<a href="<?php echo $URL; ?>"><?php echo $URL; ?></a>)</li>
 		<?php } ?>
 		<?php if ( check_login() ) { ?>
-		<li class="admin"><a href="<?php file_exists("delete.php") ? "" : ENTRY_COMMENT_PATH; ?>delete.php?comment=<?php echo $ANCHOR; ?>">Delete</a></li>
+		<li class="admin"><a href="<?php echo is_dir(ENTRY_COMMENT_DIR) ? ENTRY_COMMENT_DIR."/" : ""; ?>delete.php?comment=<?php echo $ANCHOR; ?>">Delete</a></li>
 		<?php } ?>
 	</ul>
 </div>

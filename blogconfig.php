@@ -49,6 +49,7 @@ define("ENTRY_POST_DATA", "data");
 define("ENTRY_POST_HTML", "usehtml");
 
 # Comment configuration
+define("COMMENT_NOFOLLOW", true);             # Use Google rel="nofollow"?
 define("ANON_POST_NAME", "Anonymous Reader"); # Displayed when no name given
 define("NO_SUBJECT", "No Subject");           # Ditto, but for subjet
 define("COMMENT_PATH_FORMAT", "Y-m-d_His");   # File name format

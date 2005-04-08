@@ -5,6 +5,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <title><?php echo $PAGE_TITLE; ?></title>
+<meta http-equiv="Content-type" content="text/html; charset=iso-8859-1" />
 <?php 
 if (isset($STYLE_SHEETS)) {
 	foreach ($STYLE_SHEETS as $sheet) {
