@@ -7,8 +7,8 @@ define("PACKAGE_URL", "http://www.skepticats.com/lnblog/");
 define("PACKAGE_DESCRIPTION", PACKAGE_NAME.": a simple and elegant weblog");
 define("PACKAGE_COPYRIGHT", "Copyright (c) 2005, Peter A. Geer <pageer@skepticats.com>");
 
-#define("FS_PLUGIN", "ftpfs");
 # Miscellaneous configuration.
+
 # This is the regular expression used to determine if a local path refers to
 # a user's web root, which would be referred to with a URI like
 # http://www.example.com/~jowblow/
@@ -39,6 +39,8 @@ define("ENTRY_DATE_FORMAT", "Y-m-d H:i T");  # Format to display post dates
 define("ENTRY_COMMENT_DIR", "comments");     # Comment directory
 define("ENTRY_PATH_SUFFIX", ".htm");         # Extension for data files
 define("STICKY_PATH", "sticky.txt");         # If present, show articel in sidebar
+define("COMMENT_RSS1_PATH", "comments.rdf"); # RSS 1.0 feed for comments
+define("COMMENT_RSS2_PATH", "comments.xml"); # RSS 2.0 feed for comments.
 
 # These are constants for the entry submission form.  
 # Is this the best way to do it?

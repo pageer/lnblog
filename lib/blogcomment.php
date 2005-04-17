@@ -58,6 +58,9 @@ class BlogComment extends Entry {
 		$ret["E-Mail"] =  $this->email;
 		$ret["URL"] = $this->url;
 		$ret["Date"] =  $this->date;
+		$ret["PostDate"] = $this->post_date;
+		$ret["Timestamp"] =  $this->timestamp;
+		$ret["PostTimestamp"] = $this->post_ts;
 		$ret["Timestamp"] =  $this->timestamp;
 		$ret["IP"] =  $this->ip;
 		$ret["Subject"] =  $this->subject;
@@ -71,6 +74,9 @@ class BlogComment extends Entry {
 			case "E-Mail": $this->email = $val; break;
 			case "URL": $this->url = $val; break;
 			case "Date": $this->date = $val; break;
+			case "PostDate": $this->post_date = $val; break;
+			case "Timestamp": $this->timestamp = $val; break;
+			case "PostTimestamp": $this->post_ts = $val; break;
 			case "Timestamp": $this->timestamp = $val; break;
 			case "IP": $this->ip = $val; break;
 			case "Subject": $this->subject = $val; break;
@@ -169,6 +175,10 @@ class BlogComment extends Entry {
 		return $ret;
 	}
 
+	function permalink() {
+		return localpath_to_uri(dirname($this->file))."#".$this->getAnchor();
+	}
+
 	function get() {
 		$t = new PHPTemplate(COMMENT_TEMPLATE);
 
@@ -178,7 +188,8 @@ class BlogComment extends Entry {
 		$t->set("SUBJECT", $this->subject);
 		$t->set("URL", $this->url);
 		$t->set("NAME", $this->name);
-		$t->set("DATE", $this->prettyDate() );
+		$t->set("DATE", $this->prettyDate($this->post_ts) );
+		$t->set("EDITDATE", $this->prettyDate() );
 		$t->set("EMAIL", $this->email);
 		$t->set("ANCHOR", $this->getAnchor() );
 		$this->data = $this->markup($this->data, COMMENT_NOFOLLOW);

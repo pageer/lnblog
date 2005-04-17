@@ -33,23 +33,32 @@ $ent = new BlogEntry;
 $blg = new Blog();
 
 $submit_id = "submit";
+$preview_id = "preview";
 $tpl = new PHPTemplate(BLOG_EDIT_TEMPLATE);
 $tpl->set("FORM_ACTION", current_file() );
 $tpl->set("SUBMIT_ID", $submit_id);
+$tpl->set("PREV_ID", $preview_id);
 $tpl->set("HAS_HTML", MARKUP_BBCODE);
 $blg->exportVars($tpl);
 
 $has_error = "";
-if (POST($submit_id)) {
+if ( has_post() ) {
 	$ent->getPostData();
 	if ($ent->data) {
-		$ent->insert();
-		$blg->updateRSS1();
-		$blg->updateRSS2();
-		redirect($blg->getURL());
+		if (POST($submit_id)) {
+			$ent->insert();
+			$blg->updateRSS1();
+			$blg->updateRSS2();
+			redirect($blg->getURL());
+		} else {
+			$tpl->set("PREVIEW_DATA", $ent->get() );
+			$tpl->set("SUBJECT", POST(ENTRY_POST_SUBJECT) );
+			$tpl->set("DATA", POST(ENTRY_POST_DATA) );
+			$tpl->set("HAS_HTML", POST(ENTRY_POST_HTML) );
+		}
 	} else {
 		$tpl->set("HAS_UPDATE_ERROR");
-		$tpl->set("UPDATE_ERROR_MESSAGE", "Error creating blog entry.");
+		$tpl->set("UPDATE_ERROR_MESSAGE", "Entry has no data.");
 		$tpl->set("SUBJECT", POST(ENTRY_POST_SUBJECT) );
 		$tpl->set("DATA", POST(ENTRY_POST_DATA) );
 		$tpl->set("HAS_HTML", POST(ENTRY_POST_HTML) );

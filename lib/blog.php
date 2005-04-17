@@ -266,6 +266,7 @@ class Blog {
 
 		$feed->url = $feed_url;
 		$feed->image = $this->image;
+		$feed->title = $this->name;
 		$feed->description = $this->description;
 		$feed->site = $this->getURL();
 	

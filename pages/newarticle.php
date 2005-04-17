@@ -32,14 +32,15 @@ if (! check_login() ) redirect("index.php");
 $ent = new Article;
 $blg = new Blog();
 
-$subject = "subject";
+$subject = ENTRY_POST_SUBJECT;
 $path = "path";
-$data = "data";
-$html = "html";
-$comments = "comments";
+$data = ENTRY_POST_DATA;
+$html = ENTRY_POST_HTML;
+$comments = ENTRY_POST_COMMENTS;
 $url = "art_url";
 
 $submit_id = "submit";
+$preview_id = "preview";
 $tpl = new PHPTemplate(ARTICLE_EDIT_TEMPLATE);
 
 $tpl->set("FORM_ACTION", current_file() );
@@ -53,6 +54,7 @@ $tpl->set("ARTICLE_POST_URL", $url);
 # Disable comments by default.
 $tpl->set("COMMENTS", 0);
 $tpl->set("SUBMIT_ID", $submit_id);
+$tpl->set("PREV_ID", $preview_id);
 $tpl->set("HAS_HTML", MARKUP_BBCODE);
 $blg->exportVars($tpl);
 
@@ -65,17 +67,21 @@ if ( has_post() ) {
 
 	$ent->getPostData();
 	if ($ent->data) {
-		$ret =  $ent->insert(trim(POST($url)));
-		if ($ret) {
-			$ent->setSticky();
-			redirect($ent->permalink());
+		if (POST($submit_id)) {
+			$ret =  $ent->insert(trim(POST($url)));
+			if ($ret) {
+				$ent->setSticky();
+				redirect($ent->permalink());
+			} else {
+				$tpl->set("HAS_UPDATE_ERROR");
+				$tpl->set("UPDATE_ERROR_MESSAGE", "Could not write file.");
+			}
 		} else {
-			$tpl->set("HAS_UPDATE_ERROR");
-			$tpl->set("UPDATE_ERROR_MESSAGE", "Could not write file.");
+			$tpl->set("PREVIEW_DATA", $ent->get() );
 		}
 	} else {
 		$tpl->set("HAS_UPDATE_ERROR");
-		$tpl->set("UPDATE_ERROR_MESSAGE", "Error creating article.");
+		$tpl->set("UPDATE_ERROR_MESSAGE", "Article has no text.");
 	}
 }
 

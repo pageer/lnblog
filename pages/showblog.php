@@ -29,6 +29,16 @@ $ret = $blog->getWeblog();
 $tpl = new PHPTemplate();
 $tpl->file = BASIC_LAYOUT_TEMPLATE;
 $blog->exportVars($tpl);
+if (defined("BLOG_ROOT")) {
+	if (is_file(BLOG_ROOT.PATH_DELIM.BLOG_FEED_PATH.PATH_DELIM.BLOG_RSS2_NAME)) {
+		$tpl->set("XML_FEED", BLOG_ROOT_URL.BLOG_FEED_PATH."/".BLOG_RSS2_NAME);
+		$tpl->set("XML_FEED_TITLE", $blog->name." RSS 2.0 feed");
+	}
+	if (is_file(BLOG_ROOT.PATH_DELIM.BLOG_FEED_PATH.PATH_DELIM.BLOG_RSS1_NAME)) {
+		$tpl->set("RDF_FEED", BLOG_ROOT_URL.BLOG_FEED_PATH."/".BLOG_RSS1_NAME);
+		$tpl->set("RDF_FEED_TITLE", $blog->name." RSS 1.0 feed");
+	}
+}
 $tpl->set("PAGE_TITLE", $blog->name);
 $tpl->set("PAGE_CONTENT", $ret);
 

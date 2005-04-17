@@ -91,7 +91,8 @@ class Article extends BlogEntry {
 		$tmp = new PHPTemplate(ARTICLE_TEMPLATE);
 
 		$tmp->set("TITLE", $this->subject);
-		$tmp->set("POSTDATE", $this->prettyDate() );
+		$tmp->set("POSTDATE", $this->prettyDate($this->post_ts) );
+		$tmp->set("EDITDATE", $this->prettyDate() );
 		$this->data = $this->markup($this->data);
 		$tmp->set("BODY", $this->data);
 		$tmp->set("PERMALINK", $this->permalink() );

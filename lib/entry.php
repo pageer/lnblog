@@ -31,6 +31,8 @@ class Entry {
 	var $ip;
 	var $date;
 	var $timestamp;
+	var $post_date;
+	var $post_ts;
 	var $subject;
 	var $abstract;
 	var $data;
@@ -105,8 +107,8 @@ class Entry {
 		$patterns[6] = "/\[i\](.+)\[\/i\]/Usi";
 		$patterns[7] = "/\[u\](.+)\[\/u\]/Usi";
 		$patterns[8] = '/\[q\](.+)\[\/q\]/Usi';
-		$patterns[9] = "/\r?\n\s*\[list\]\s*\r?\n(.+)\[\/list\]\s*\r?\n/Usi";
-		$patterns[10] = "/\r?\n\s*\[numlist\]\s*\r?\n(.+)\[\/numlist\]\s*\r?\n/Usi";
+		$patterns[9] = "/(\r?\n\s*)?\[list\]\s*\r?\n(.+)\[\/list\](\s*\r?\n)?/Usi";
+		$patterns[10] = "/(\r?\n\s*)?\[numlist\]\s*\r?\n(.+)\[\/numlist\](\s*\r?\n)?/Usi";
 		$patterns[11] = "/\[\*\](.*)\r?\n/Usi";
 		$patterns[12] = '/\r\n\r\n/';
 		$patterns[13] = '/\n\n/';
@@ -120,8 +122,8 @@ class Entry {
 		$replacements[6] = '<em>$1</em>';
 		$replacements[7] = '<span style="text-decoration: underline;">$1</span>';
 		$replacements[8] = '<q>$1</q>';
-		$replacements[9] = "</p><ul>$1</ul><p>";
-		$replacements[10] = "</p><ol>$1</ol><p>";
+		$replacements[9] = "</p><ul>$2</ul><p>";
+		$replacements[10] = "</p><ol>$2</ol><p>";
 		$replacements[11] = '<li>$1</li>';
 		$replacements[12] = '</p><p>';
 		$replacements[13] = '</p><p>';
@@ -138,11 +140,11 @@ class Entry {
 		switch ($this->has_html) {
 			case MARKUP_NONE:
 				$ret = $this->stripHTML($data);
-				$ret = $this->addHTML($data, $use_nofollow);
+				$ret = $this->addHTML($ret, $use_nofollow);
 				break;
 			case MARKUP_BBCODE:
 				$ret = $this->stripHTML($data);
-				$ret = $this->bbcodeToHtml($data);
+				$ret = $this->bbcodeToHtml($ret);
 				break;
 			case MARKUP_HTML:
 				$ret = $data;
@@ -159,22 +161,9 @@ class Entry {
 		return $ret;
 	}
 
-	function prettyDate() {
-		# This is a hack.  We remove any fractional seconds (which Sybase 
-		# includes in datetime fields) because it confuses strtotime.
-		# We also convert full time zones to abbreviations, e.g. we change
-		# "Eastern Standard Time" to "EST", because Windows likes to output
-		# the spelled-out version, but strtotime() doesn't like it.
-		#echo "<p>$this->date</p>";
-		#$clean_date = preg_replace("/\.\d+/", "", $this->date);
-		#$clean_date = preg_replace("/[A-Za-z] ?/", "", $clean_date);
-		#echo "<p>$clean_date</p>";
-		
-		#$date_ts = strtotime($clean_date);
-		$date_ts = $this->timestamp;
-		#echo "<p>".$this->date.", ".$date_ts.", ".$clean_date."</p>";
+	function prettyDate($ts=false) {
+		$date_ts = $ts ? $ts : $this->timestamp;
 		$print_date = date(ENTRY_DATE_FORMAT, $date_ts);
-		#echo "<p>$print_date</p>";
 		return $print_date;
 	}
 
@@ -188,12 +177,15 @@ class Entry {
 	
 	function addMetadata($key, $val) {
 		switch ($key) {
-			case "PostID":  $this->id = $val; break;
-			case "UserID":  $this->uid = $val; break;
-			case "Date":    $this->date = $val; break;
-			case "IP":      $this->ip = $val; break;
-			case "Subject": $this->subject = $val; break;
-			case "HasHTML": $this->has_html = $val; break;
+			case "PostID":        $this->id = $val; break;
+			case "UserID":        $this->uid = $val; break;
+			case "Date":          $this->date = $val; break;
+			case "PostDate":      $this->post_date = $val; break;
+			case "Timestamp":     $this->timestamp = $val; break;
+			case "PostTimestamp": $this->post_ts = $val; break;
+			case "IP":            $this->ip = $val; break;
+			case "Subject":       $this->subject = $val; break;
+			case "HasHTML":       $this->has_html = $val; break;
 		}
 	}
 	
@@ -217,7 +209,7 @@ class Entry {
 			foreach ($data as $line) {
 				preg_match('/<!--META (.*): (.*) META-->/', $line, $matches);
 				if ($matches) $this->addMetadata($matches[1], $matches[2]);
-				$cleanline = preg_replace("/<!--META.*META-->\s\n?\r?/", "", $line);
+				$cleanline = preg_replace("/<!--META.*META-->\s\r?\n?\r?/", "", $line);
 				#if (preg_match("/\S/", $cleanline) == 0) $cleanline = "";
 				
 				$file_data .= $cleanline;
@@ -249,6 +241,9 @@ class Entry {
 		$ret["PostID"] = $this->id;
 		$ret["UserID"] = $this->uid;
 		$ret["Date"] = $this->date;
+		$ret["PostDate"] = $this->post_date;
+		$ret["Timestamp"] =  $this->timestamp;
+		$ret["PostTimestamp"] = $this->post_ts;
 		$ret["IP"] = $this->ip;
 		$ret["Subject"] = $this->subject;
 		$ret["HasHTML"] = $this->has_html ? 1 : 0;

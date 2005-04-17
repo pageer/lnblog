@@ -1,6 +1,9 @@
 <?php if (isset($HAS_UPDATE_ERROR)) { ?>
 <h3><?php echo $UPDATE_ERROR_MESSAGE; ?></h3>
 <?php } ?>
+<?php if (isset($PREVIEW_DATA)) {
+	echo $PREVIEW_DATA;
+} ?>
 <fieldset>
 <form id="postform" method="post" action="<?php echo $FORM_ACTION; ?>">
 <div>
@@ -28,9 +31,10 @@
 <label for="<?php echo ENTRY_POST_COMMENTS; ?>">Allow comments</label>
 <input id="<?php echo ENTRY_POST_COMMENTS; ?>" name="<?php echo ENTRY_POST_COMMENTS; ?>" type="checkbox" <?php if (! (isset($COMMENTS) && !$COMMENTS) ) { ?>checked="checked"<?php } ?> />
 </div>
-<div>
-<span class="basic_form_submit"><input name="<?php echo $SUBMIT_ID; ?>" id="<?php echo $SUBMIT_ID; ?>" type="submit" value="Submit" /></span>
-<span class="basic_form_clear"><input name="clear" id="clear" type="reset" value="Clear" /></span>
+<div class="threebutton">
+<input name="<?php echo $SUBMIT_ID; ?>" id="<?php echo $SUBMIT_ID; ?>" type="submit" value="Submit" />
+<input name="<?php echo $PREV_ID; ?>" id="<?php echo $PREV_ID; ?>" type="submit" value="Preview" />
+<input name="clear" id="clear" type="reset" value="Clear" />
 </div>
 </form>
 </fieldset>

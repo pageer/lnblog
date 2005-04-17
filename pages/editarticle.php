@@ -26,11 +26,13 @@ $ent = new Article( getcwd() );
 $blg = new Blog();
 
 $submit_id = "submit";
+$preview_id = "preview";
 $tpl = new PHPTemplate(ARTICLE_EDIT_TEMPLATE);
 $tpl->set("SUBMIT_ID", $submit_id);
+$tpl->set("PREV_ID", $preview_id);
 $blg->exportVars($tpl);
 
-	$tpl->set("ARTICLE_POST_SUBJECT", ENTRY_POST_SUBJECT);
+$tpl->set("ARTICLE_POST_SUBJECT", ENTRY_POST_SUBJECT);
 $tpl->set("ARTICLE_POST_DATA", ENTRY_POST_DATA);
 $tpl->set("ARTICLE_POST_COMMENTS", ENTRY_POST_COMMENTS);
 $tpl->set("ARTICLE_POST_HTML", ENTRY_POST_HTML);
@@ -44,15 +46,15 @@ $tpl->set("HAS_HTML", $ent->has_html);
 if ( has_post() ) {
 	$ent->getPostData();
 	if ($ent->data) {
-		$ent->update();
-		redirect($ent->permalink());
+		if (POST($submit_id)) {
+			$ent->update();
+			redirect($ent->permalink());
+		} else {
+			$tpl->set("PREVIEW_DATA", $ent->get() );
+		}
 	} else {
 		$tpl->set("HAS_UPDATE_ERROR");
 		$tpl->set("UPDATE_ERROR_MESSAGE", "Error updating blog entry.");
-		$tpl->set("SUBJECT", $ent->subject);
-		$tpl->set("DATA", $ent->data);
-		$tpl->set("COMMENTS", $ent->allow_comment);
-		$tpl->set("HAS_HTML", $ent->has_html);
 	}
 }
 $body = $tpl->process();

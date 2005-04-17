@@ -6,6 +6,12 @@
 <head>
 <title><?php echo $PAGE_TITLE; ?></title>
 <meta http-equiv="Content-type" content="text/html; charset=iso-8859-1" />
+<?php if (isset($RDF_FEED)) { ?>
+<link rel="alternate" title="<?php echo $RDF_FEED_TITLE; ?>" type="application/rdf" href="<?php echo $RDF_FEED; ?>" />
+<?php } ?>
+<?php if (isset($XML_FEED)) { ?>
+<link rel="alternate" title="<?php echo $XML_FEED_TITLE; ?>" type="application/rss+xml" href="<?php echo $XML_FEED; ?>" />
+<?php } ?>
 <?php 
 if (isset($STYLE_SHEETS)) {
 	foreach ($STYLE_SHEETS as $sheet) {

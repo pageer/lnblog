@@ -37,7 +37,9 @@ class BlogEntry extends Entry {
 		#var $uid;
 		$this->ip = get_ip();
 		$this->date = "";
+		$this->post_date = false;
 		$this->timestamp = "";
+		$this->post_ts = false;
 		$this->subject = "";
 		$this->data = "";
 		$this->abstract = "";
@@ -72,7 +74,9 @@ class BlogEntry extends Entry {
 		#$ret["PostID"] =  $this->id;
 		#$ret["UserID"] =  $this->uid;
 		$ret["Date"] =  $this->date;
+		$ret["PostDate"] = $this->post_date;
 		$ret["Timestamp"] =  $this->timestamp;
+		$ret["PostTimestamp"] = $this->post_ts;
 		$ret["IP"] =  $this->ip;
 		$ret["Subject"] =  $this->subject;
 		$ret["Abstract"] = $this->abstract;
@@ -83,10 +87,12 @@ class BlogEntry extends Entry {
 	
 	function addMetadata($key, $val) {
 		switch ($key) {
-			#case "PostID": $this->id = $val; break;
-			#case "UserID": $this->uid = $val; break;
+			case "PostID": $this->id = $val; break;
+			case "UserID": $this->uid = $val; break;
 			case "Date": $this->date = $val; break;
+			case "PostDate": $this->post_date = $val; break;
 			case "Timestamp": $this->timestamp = $val; break;
+			case "PostTimestamp": $this->post_ts = $val; break;
 			case "IP": $this->ip = $val; break;
 			case "Subject": $this->subject = $val; break;
 			case "Abstract": $this->abstract = $val; break;
@@ -181,8 +187,13 @@ class BlogEntry extends Entry {
 		create_directory_wrappers($dir_path.PATH_DELIM.ENTRY_COMMENT_DIR, ENTRY_COMMENTS);
 				
 		$this->file = $dir_path.PATH_DELIM.ENTRY_DEFAULT_FILE;
+		# Set the timestamp and date, plus the ones for the original post, if
+		# this is a new entry.
 		$this->date = date(ENTRY_DATE_FORMAT, $curr_ts);
+		if (! $this->post_date) 
+			$this->post_date = date(ENTRY_DATE_FORMAT, $curr_ts);
 		$this->timestamp = $curr_ts;
+		if (! $this->post_ts) $this->post_ts = $curr_ts;
 		$this->ip = get_ip();
 		
 		if (get_magic_quotes_gpc() ) {
@@ -211,7 +222,8 @@ class BlogEntry extends Entry {
 		$tmp = new PHPTemplate(ENTRY_TEMPLATE);
 
 		$tmp->set("SUBJECT", $this->subject);
-		$tmp->set("POSTDATE", $this->prettyDate() );
+		$tmp->set("POSTDATE", $this->prettyDate($this->post_ts) );
+		$tmp->set("EDITDATE", $this->prettyDate() );
 		if ($this->has_html == MARKUP_BBCODE)
 			$this->data = $this->absolutizeBBCodeURI($this->data, $this->permalink() );
 		$this->data = $this->markup($this->data() );
@@ -224,6 +236,47 @@ class BlogEntry extends Entry {
 		$tmp->set("COMMENTCOUNT", $this->getCommentCount() );
 		
 		$ret = $tmp->process();
+		return $ret;
+	}
+
+	function updateRSS1() {
+		$feed = new RSS1;
+		$comment_path = dirname($this->file).PATH_DELIM.ENTRY_COMMENT_DIR;
+		$path = $comment_path.PATH_DELIM.COMMENT_RSS1_PATH;
+		$feed_url = localpath_to_uri($path);
+
+		$feed->url = localpath_to_uri($path);;
+		#$feed->image = $this->image;
+		$feed->title = $this->subject;
+		$feed->description = $this->subject;
+		$feed->site = BLOG_ROOT_URL;
+	
+		$comm_list = $this->getCommentArray();
+		foreach ($comm_list as $ent) 
+			$feed->entrylist[] = new RSS1Entry($ent->permalink(), $ent->subject, $ent->subject);
+		
+		$ret = $feed->writeFile($path);	
+		return $ret;
+	}
+
+	function updateRSS2() {
+		$feed = new RSS2;
+		$comment_path = dirname($this->file).PATH_DELIM.ENTRY_COMMENT_DIR;
+		$path = $comment_path.PATH_DELIM.COMMENT_RSS2_PATH;
+		$feed_url = localpath_to_uri($path);
+
+		$feed->url = $feed_url;
+		#$feed->image = $this->image;
+		$feed->description = $this->subject;
+		$feed->title = $this->subject;
+	
+		$comm_list = $this->getCommentArray();
+		foreach ($comm_list as $ent) 
+			$feed->entrylist[] = new RSS2Entry($ent->permalink(), 
+				$ent->subject, 
+				"<![CDATA[".$ent->markup($ent->data)."]]>");
+		
+		$ret = $feed->writeFile($path);	
 		return $ret;
 	}
 
@@ -243,7 +296,7 @@ class BlogEntry extends Entry {
 
 	}
 
-	function getComments($sort_asc=true) {
+	function getCommentArray($sort_asc=true) {
 		$dir_path = dirname($this->file);
 		$comment_dir_path = $dir_path.PATH_DELIM.ENTRY_COMMENT_DIR;
 		if (! is_dir($comment_dir_path)) return false;
@@ -257,11 +310,20 @@ class BlogEntry extends Entry {
 		}
 		if ($sort_asc) sort($comment_files);
 		else rsort($comment_files);
+
+		$comment_array = array();
+		foreach ($comment_files as $file) 
+			$comment_array[] = new BlogComment($comment_dir_path.PATH_DELIM.$file);
 		
+		return $comment_array;
+	}
+
+	function getComments($sort_asc=true) {
+		$comment_files = $this->getCommentArray($sort_asc);	
+		if (!$comment_files) return "";
 		$ret = "";
 		foreach ($comment_files as $file) {
-			$curr_comment = new BlogComment($comment_dir_path.PATH_DELIM.$file);
-			$ret .= $curr_comment->get();
+			$ret .= $file->get();
 		}
 		return $ret;
 	}

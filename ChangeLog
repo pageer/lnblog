@@ -1,4 +1,22 @@
-06-Apr-2005
+16-Apr-2005:
+- Fixed bone-head bug in stipping HTML entities.
+- Added rel links for RSS to page headers.  Use blog RSS for main page, use 
+comment RSS for entry, article, and comment pages.
+
+14-Apr-2005:
+- Added preview function for posting or editing entries and articles.
+- Added RSS feeds for comments on articles and entries.
+
+08-Apr-2005:
+- Fixed error where the original post date was not tracked in the entry 
+metadata.  Post date and current version date are now separate in both the
+metadata and the template variables.
+- Fixed (hopefully) a bug in the LBCode regexps for lists that required a new
+line at the end and beginning of a list.
+- Added destination name to successful file upload message.
+- Fixed missing license section in Readme.html file.  Oops!
+
+06-Apr-2005:
 - Fixed bugs and removed debugging code that showed up when attempting to
 post an entry and upload the files for the 0.2.0 release. ;)
 - Fixed missing template variable errors in new blog page.

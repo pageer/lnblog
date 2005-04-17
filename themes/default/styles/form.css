@@ -20,6 +20,15 @@ textarea {
 	width: 100%;
 }
 
+form div.threebutton {
+	text-align: center;
+}
+
+form div.threebutton input {
+	margin-right: 1%;
+	margin-left: 1%;
+}
+
 .basic_form_label {
 	float: left;
 	clear: left;

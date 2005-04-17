@@ -68,7 +68,12 @@ if (count($ret_list) > 0) {
 <?php } ?>
 <h3>News Feeds</h3>
 <ul>
-<li><a href="<?php echo $BLOG_RSS1_FEED; ?>">Links - <abbr title="RDF Site Summary">RSS</abbr> 1.0</a></li>
+<?php if (isset($ENTRY_RSS1_FEED)) { ?>
+<li><a href="<?php echo $ENTRY_RSS1_FEED; ?>">Comment Links - <abbr title="RDF Site Summary">RSS</abbr> 1.0</a></li>
+<li><a href="<?php echo $ENTRY_RSS2_FEED; ?>">Full comments - <abbr title="Rich Site Summary">RSS</abbr> 2.0</a></li>
+<li></li>
+<?php } ?>
+<li><a href="<?php echo $BLOG_RSS1_FEED; ?>">Entry Links - <abbr title="RDF Site Summary">RSS</abbr> 1.0</a></li>
 <li><a href="<?php echo $BLOG_RSS2_FEED; ?>">Full entries - <abbr title="Rich Site Summary">RSS</abbr> 2.0</a></li>
 </ul>
 <?php 

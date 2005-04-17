@@ -3,6 +3,11 @@
 <?php if (0) { ?><h3><a href="<?php echo $BLOG_URL_ROOTREL.BLOG_ARTICLE_PATH; ?>/">Articles</a></h3><?php } ?>
 <h3>Syndicate</h3>
 <ul>
+<?php if (isset($ENTRY_RSS1_FEED)) { ?>
+<li><a href="<?php echo $ENTRY_RSS1_FEED; ?>">Comment Links</a></li>
+<li><a href="<?php echo $ENTRY_RSS2_FEED; ?>">Full comments</a></li>
+<li></li>
+<?php } ?>
 <li><a href="<?php echo $BLOG_RSS1_FEED; ?>" title="RSS 1.0">Links</a></li>
 <li><a href="<?php echo $BLOG_RSS2_FEED; ?>" title="RSS 2.0">Entries</a></li>
 </ul>

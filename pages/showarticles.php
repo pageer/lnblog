@@ -23,6 +23,7 @@ require_once("config.php");
 require_once("blog.php");
 require_once("article.php");
 require_once("template.php");
+
 $blog = new Blog();
 
 $year_dir = basename(getcwd());

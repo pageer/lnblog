@@ -23,6 +23,7 @@ require_once("config.php");
 require_once("blog.php");
 require_once("blogentry.php");
 require_once("blogcomment.php");
+require_once("rss.php");
 
 $entry_path = getcwd();
 $ent = new BlogEntry($entry_path);
@@ -45,10 +46,16 @@ $SUBMIT_ID = "submit";
 
 $comm = new BlogComment;
 if (POST($SUBMIT_ID)) $comm->getPostData();
-if ($comm->data && $ent->allow_comment) $comm->insert(getcwd().PATH_DELIM.ENTRY_COMMENT_DIR);
+if ($comm->data && $ent->allow_comment) {
+	$comm->insert(getcwd().PATH_DELIM.ENTRY_COMMENT_DIR);
+	$ent->updateRSS1();
+	$ent->updateRSS2();
+}
 
-$content .= $ent->getComments(); 
+# Add comments for current entry.
+$content .= $ent->getComments();
 
+# Add comment form if applicable.
 if ($ent->allow_comment) { 
 	$comm_tpl = new PHPTemplate;
 	$comm_tpl->file = COMMENT_FORM_TEMPLATE;
@@ -56,9 +63,23 @@ if ($ent->allow_comment) {
 	$content .= $comm_tpl->process();
 }
 
+# Set up template for basic page layout.
 $tpl = new PHPTemplate(BASIC_LAYOUT_TEMPLATE);
 $blg->exportVars($tpl);
 $tpl->set("PAGE_TITLE", $title);
 $tpl->set("PAGE_CONTENT", $content);
+
+# Set RSS feeds for comments, if we have any.
+if (is_file(dirname($ent->file).PATH_DELIM.ENTRY_COMMENT_DIR.PATH_DELIM.COMMENT_RSS2_PATH)) {
+	$tpl->set("ENTRY_RSS2_FEED", $ent->permalink().ENTRY_COMMENT_DIR."/".COMMENT_RSS2_PATH);
+	$tpl->set("XML_FEED", $ent->permalink().ENTRY_COMMENT_DIR."/".COMMENT_RSS2_PATH);
+	$tpl->set("XML_FEED_TITLE", "RSS 2.0 feed for comments on '".$ent->subject."'");
+}
+if (is_file(dirname($ent->file).PATH_DELIM.ENTRY_COMMENT_DIR.PATH_DELIM.COMMENT_RSS1_PATH)) {
+	$tpl->set("ENTRY_RSS1_FEED", $ent->permalink().ENTRY_COMMENT_DIR."/".COMMENT_RSS1_PATH);
+	$tpl->set("RDF_FEED", $ent->permalink().ENTRY_COMMENT_DIR."/".COMMENT_RSS1_PATH);
+	$tpl->set("RDF_FEED_TITLE", "RSS 1.0 feed for comments on '".$ent->subject."'");
+}
+
 echo $tpl->process();
 ?>

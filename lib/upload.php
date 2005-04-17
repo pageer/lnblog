@@ -169,7 +169,7 @@ class FileUpload {
 		if (!$err) $err = $this->error;
 		switch ($err) {
 			case FILEUPLOAD_NO_ERROR:
-				$ret = "File successfully uploaded.";
+				$ret = "File '".$this->destname."' successfully uploaded.";
 				break;
 			case FILEUPLOAD_NO_FILE:
 				$ret = "No file was uploaded.";
