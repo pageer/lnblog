@@ -13,7 +13,7 @@
 	<li class="blogadmin"><a href="<?php echo $POSTDELETE; ?>">Delete</a></li>
 <?php } ?>
 </ul>
-<?php if (! empty($COMMENTCOUNT)) { ?>
+<?php if (isset($COMMENTCOUNT)) { ?>
 <h3><a href="<?php echo $POSTCOMMENTS; ?>">View reader comments (<?php echo$COMMENTCOUNT; ?>)</a></h3>
 <?php } ?>
 </div>

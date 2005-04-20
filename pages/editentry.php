@@ -41,7 +41,14 @@ $tpl->set("HAS_HTML", $ent->has_html);
 $tpl->set("COMMENTS", $ent->allow_comment);
 
 if ( has_post() ) {
+	
+	# Reset template variables to new data from form.
 	$ent->getPostData();
+	$tpl->set("SUBJECT", $ent->subject);
+	$tpl->set("DATA", $ent->data);
+	$tpl->set("HAS_HTML", $ent->has_html);
+	$tpl->set("COMMENTS", $ent->allow_comment);
+	
 	if ($ent->data) {
 		if (POST($submit_id)) {
 			$ent->update();

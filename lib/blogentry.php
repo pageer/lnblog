@@ -224,11 +224,12 @@ class BlogEntry extends Entry {
 		$tmp->set("SUBJECT", $this->subject);
 		$tmp->set("POSTDATE", $this->prettyDate($this->post_ts) );
 		$tmp->set("EDITDATE", $this->prettyDate() );
-		if ($this->has_html == MARKUP_BBCODE)
-			$this->data = $this->absolutizeBBCodeURI($this->data, $this->permalink() );
-		$this->data = $this->markup($this->data() );
+		$body_text = $this->data;
+		if ($this->has_html == MARKUP_BBCODE) 
+			$body_text = $this->absolutizeBBCodeURI($body_text, $this->permalink() );
+		$body_text = $this->markup($body_text);
 		$tmp->set("ABSTRACT", $this->abstract);
-		$tmp->set("BODY", $this->data);
+		$tmp->set("BODY", $body_text);
 		$tmp->set("PERMALINK", $this->permalink() );
 		$tmp->set("POSTEDIT", $this->permalink()."edit.php");
 		$tmp->set("POSTDELETE", $this->permalink()."delete.php");

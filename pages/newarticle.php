@@ -60,12 +60,12 @@ $blg->exportVars($tpl);
 
 if ( has_post() ) {
 	
-	$tpl->set("SUBJECT", POST($subject) );
-	$tpl->set("URL", POST($url) );
-	$tpl->set("DATA", POST($data) );
-	$tpl->set("HAS_HTML", POST($html) );
-
 	$ent->getPostData();
+	$tpl->set("SUBJECT", $ent->subject);
+	$tpl->set("URL", POST($url) );
+	$tpl->set("DATA", $ent->data );
+	$tpl->set("HAS_HTML", $ent->has_html );
+
 	if ($ent->data) {
 		if (POST($submit_id)) {
 			$ret =  $ent->insert(trim(POST($url)));

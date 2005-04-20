@@ -43,25 +43,24 @@ $blg->exportVars($tpl);
 
 $has_error = "";
 if ( has_post() ) {
+	
+	# Set data recieved from form to template variables.
 	$ent->getPostData();
+	$tpl->set("PREVIEW_DATA", $ent->get() );
+	$tpl->set("SUBJECT", $ent->subject);
+	$tpl->set("DATA", $ent->data);
+	$tpl->set("HAS_HTML", $ent->has_html);
+	
 	if ($ent->data) {
 		if (POST($submit_id)) {
 			$ent->insert();
 			$blg->updateRSS1();
 			$blg->updateRSS2();
 			redirect($blg->getURL());
-		} else {
-			$tpl->set("PREVIEW_DATA", $ent->get() );
-			$tpl->set("SUBJECT", POST(ENTRY_POST_SUBJECT) );
-			$tpl->set("DATA", POST(ENTRY_POST_DATA) );
-			$tpl->set("HAS_HTML", POST(ENTRY_POST_HTML) );
 		}
 	} else {
 		$tpl->set("HAS_UPDATE_ERROR");
 		$tpl->set("UPDATE_ERROR_MESSAGE", "Entry has no data.");
-		$tpl->set("SUBJECT", POST(ENTRY_POST_SUBJECT) );
-		$tpl->set("DATA", POST(ENTRY_POST_DATA) );
-		$tpl->set("HAS_HTML", POST(ENTRY_POST_HTML) );
 	}
 }
 $body = $tpl->process();

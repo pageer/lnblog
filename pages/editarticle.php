@@ -44,7 +44,14 @@ $tpl->set("COMMENTS", $ent->allow_comment);
 $tpl->set("HAS_HTML", $ent->has_html);
 
 if ( has_post() ) {
+	
+	# Update the template variables with the new values.
 	$ent->getPostData();
+	$tpl->set("SUBJECT", $ent->subject);
+	$tpl->set("DATA", $ent->data);
+	$tpl->set("COMMENTS", $ent->allow_comment);
+	$tpl->set("HAS_HTML", $ent->has_html);
+	
 	if ($ent->data) {
 		if (POST($submit_id)) {
 			$ent->update();

@@ -1,7 +1,16 @@
+19-Apr-2005:
+- Fixed version number constant, which hadn't been changed since 0.1.0.
+- Fixed preview bugs in new/edit article and post pages.
+- Fixed get() method of decendants of Entry class to NOT modify the data 
+property, but still set the template variables appropriately.
+- Changed blog entry display templates to show link to comments 
+all the time, not just when there are comments.
+
 16-Apr-2005:
 - Fixed bone-head bug in stipping HTML entities.
 - Added rel links for RSS to page headers.  Use blog RSS for main page, use 
 comment RSS for entry, article, and comment pages.
+- This is release 0.2.1.
 
 14-Apr-2005:
 - Added preview function for posting or editing entries and articles.

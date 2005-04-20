@@ -93,8 +93,11 @@ class Article extends BlogEntry {
 		$tmp->set("TITLE", $this->subject);
 		$tmp->set("POSTDATE", $this->prettyDate($this->post_ts) );
 		$tmp->set("EDITDATE", $this->prettyDate() );
-		$this->data = $this->markup($this->data);
-		$tmp->set("BODY", $this->data);
+		$body_text = $this->data;
+		if ($this->has_html == MARKUP_BBCODE) 
+			$body_text = $this->absolutizeBBCodeURI($body_text, $this->permalink() );
+		$body_text = $this->markup($body_text);
+		$tmp->set("BODY", $body_text);
 		$tmp->set("PERMALINK", $this->permalink() );
 		$tmp->set("POSTEDIT", $this->permalink()."edit.php");
 		$tmp->set("POSTDELETE", $this->permalink()."delete.php");

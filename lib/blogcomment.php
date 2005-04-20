@@ -192,8 +192,7 @@ class BlogComment extends Entry {
 		$t->set("EDITDATE", $this->prettyDate() );
 		$t->set("EMAIL", $this->email);
 		$t->set("ANCHOR", $this->getAnchor() );
-		$this->data = $this->markup($this->data, COMMENT_NOFOLLOW);
-		$t->set("BODY", $this->data);
+		$t->set("BODY", $this->markup($this->data, COMMENT_NOFOLLOW) );
 		
 		$ret = $t->process();
 		return $ret;
