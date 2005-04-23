@@ -18,7 +18,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-# Display a all blog entries for a given month.
+# This file is used to display a blog entry with its comments.
 
 session_start();
 require_once("config.php");
@@ -28,14 +28,8 @@ require_once("template.php");
 
 $blog = new Blog();
 
-$curr_dir = getcwd();
-$month_dir = basename($curr_dir);
-$year_dir = basename(dirname($curr_dir));
-$current_month = mktime(0, 0, 0, $month_dir, 1, $year_dir);
-
-$title = strftime("%B %Y", $current_month);
-
-$blog->getMonth();
+$title = "all entries for ".$blog->name;
+$blog->getRecent(-1);
 
 $tpl = new PHPTemplate(ARCHIVE_TEMPLATE);
 $tpl->set("ARCHIVE_TITLE", $title);
@@ -43,8 +37,6 @@ $tpl->set("ARCHIVE_TITLE", $title);
 $LINK_LIST = array();
 
 foreach ($blog->entrylist as $ent) { 
-	$ts = mktime(0, 0, 0, $ent, 1, $year_dir);
-	$month_name = strftime("%B %Y", $ts);
 	$LINK_LIST[] = array("URL"=>$ent->permalink(), "DESC"=>$ent->subject);
 }
 

@@ -195,6 +195,7 @@ class Blog {
 	}
 	
 	# Get the most recent entries across all months and years.
+	# Pass -1 (or some negative integer) to get all entries ever.
 	
 	function getRecent($num_entries=false) {
 	
@@ -203,6 +204,8 @@ class Blog {
 		$ent_dir = $this->home_path.PATH_DELIM.BLOG_ENTRY_PATH;
 		$dirhand = opendir($ent_dir);
 		$show_max = $num_entries ? $num_entries : $this->max_entries;
+		if (! $num_entries) $show_max = $this->max_entries;
+		else $show_max = $num_entries;
 		$num_found = 0;
 		
 		$year_list = scan_directory($ent_dir, true);
@@ -221,7 +224,7 @@ class Blog {
 						$this->entrylist[] = new BlogEntry($ent_path);
 						$num_found++;
 						# If we've hit the max, then break out of all 3 loops.
-						if ($num_found >= $show_max) break 3;
+						if ($num_found >= $show_max && $show_max > 0) break 3;
 					}
 				}
 			}

@@ -1,3 +1,9 @@
+<<<<<<< .mine
+22-Apr-2005:
+- Added Javascript editor.
+- Added "show all entries" page for archives.
+- This will be release 0.2.2.
+
 19-Apr-2005:
 - Fixed version number constant, which hadn't been changed since 0.1.0.
 - Fixed preview bugs in new/edit article and post pages.
@@ -6,6 +12,16 @@ property, but still set the template variables appropriately.
 - Changed blog entry display templates to show link to comments 
 all the time, not just when there are comments.
 
+=======
+19-Apr-2005:
+- Fixed version number constant, which hadn't been changed since 0.1.0.
+- Fixed preview bugs in new/edit article and post pages.
+- Fixed get() method of decendants of Entry class to NOT modify the data 
+property, but still set the template variables appropriately.
+- Changed blog entry display templates to show link to comments 
+all the time, not just when there are comments.
+
+>>>>>>> .r18
 16-Apr-2005:
 - Fixed bone-head bug in stipping HTML entities.
 - Added rel links for RSS to page headers.  Use blog RSS for main page, use 

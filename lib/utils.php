@@ -342,6 +342,7 @@ function create_directory_wrappers($path, $type, $instpath="") {
 			break;
 		case BLOG_ENTRIES:
 			$ret = $fs->write_file($current."index.php", $head."showarchive".$tail);
+			$ret = $fs->write_file($current."all.php", $head."showall".$tail);
 			$ret &= $fs->copy($parent."config.php", $current."config.php");
 			break;
 		case YEAR_ENTRIES:

@@ -6,14 +6,13 @@
 } ?>
 <fieldset>
 <form id="postform" method="post" action="<?php echo $FORM_ACTION; ?>">
+<?php include("js_editor.php"); ?>
 <div>
 <label class="basic_form_label" for="<?php echo ENTRY_POST_SUBJECT; ?>">Subject</label>
 <input id="<?php echo ENTRY_POST_SUBJECT; ?>" name="<?php echo ENTRY_POST_SUBJECT; ?>" type="text" <?php if (isset($SUBJECT)) { ?>value="<?php echo $SUBJECT; ?>" <?php } ?>/>
 </div>
 <div>
-<textarea id="<?php echo ENTRY_POST_DATA; ?>" name="<?php echo ENTRY_POST_DATA; ?>" rows="18" cols="40">
-<?php if (isset($DATA)) echo $DATA; ?>
-</textarea>
+<textarea id="<?php echo ENTRY_POST_DATA; ?>" name="<?php echo ENTRY_POST_DATA; ?>" rows="18" cols="40"><?php if (isset($DATA)) echo $DATA; ?></textarea>
 </div>
 <div>
 <label for="mode_none">Auto-markup only</label>

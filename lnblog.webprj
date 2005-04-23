@@ -1,6 +1,6 @@
 <!DOCTYPE webproject>
 <webproject>
-  <project usePreviewPrefix="0" previewPrefix="" type="Local" name="LnBlog" encoding="iso 8859-1" >
+  <project usePreviewPrefix="0" type="Local" previewPrefix="" name="LnBlog" encoding="iso 8859-1" >
     <upload/>
     <author>Peter Geer</author>
     <email>pageer@skepticats.com</email>
@@ -122,8 +122,31 @@
     <item url="" uploadstatus="1" />
     <templates>templates/</templates>
     <toolbars>toolbars/</toolbars>
+    <item url="quanta_toolbars/" />
+    <item url="themes/default/templates/js_editor.php" />
+    <item url="themes/tuxice/" />
+    <item url="themes/tuxice/styles/" />
+    <item url="themes/tuxice/styles/article.css" />
+    <item url="themes/tuxice/styles/article_print.css" />
+    <item url="themes/tuxice/styles/banner.css" />
+    <item url="themes/tuxice/styles/banner_print.css" />
+    <item url="themes/tuxice/styles/blog.css" />
+    <item url="themes/tuxice/styles/blogentry.css" />
+    <item url="themes/tuxice/styles/blogentry_print.css" />
+    <item url="themes/tuxice/styles/comment.css" />
+    <item url="themes/tuxice/styles/contact.css" />
+    <item url="themes/tuxice/styles/form.css" />
+    <item url="themes/tuxice/styles/login.css" />
+    <item url="themes/tuxice/styles/main.css" />
+    <item url="themes/tuxice/styles/main_print.css" />
+    <item url="themes/tuxice/styles/menubar.css" />
+    <item url="themes/tuxice/styles/menubar_print.css" />
+    <item url="themes/tuxice/styles/sidebar.css" />
+    <item url="themes/tuxice/styles/sidebar_print.css" />
+    <item url="themes/tuxice/styles/update.css" />
     <treestatus>
       <openfolder url="lib" />
+      <openfolder url="pages" />
       <openfolder url="themes" />
       <openfolder url="themes/default" />
       <openfolder url="themes/default/styles" />

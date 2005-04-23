@@ -15,6 +15,7 @@
 
 <h1>LnBlog</h1>
 <p>A simple file-based weblog focused on design elegance.</p>
+<p>Homepage: <a href="http://www.skepticats.com/lnblog/">http://www.skepticats.com/lnblog/</a>
 <p>Copyright (c) 2005, Peter A. Geer &lt;<a href="mailto:pageer@skepticats.com">pageer@skepticats.com</a>&gt;</p>
 
 <h2>Introduction</h2>
@@ -27,7 +28,7 @@ style and layout.</p>
 
 <h2>Status</h2>
 
-<p>Currently, LnBlog is in the active developmen, which just means 
+<p>Currently, LnBlog is in the active development, which just means 
 that it is functional and tested, but not anywhere close to done yet.  There
 are still lots of features to add, both in the back-end code and in terms of
 interface elements.  You can see the <a href="TODO">to do list</a> to get an
@@ -231,6 +232,30 @@ errors gracefully - incorrect syntax will simply be displayed as plain text.</p>
 	tag is rendered with italic text, so that even in Internet Explorer, it
 	can be distinguished from normal text.</li>
 </ol>
+
+<h2>LBCode Editor</h2>
+<p>When posting using LBCode markup, you can use LnBlog's simple Javascript-based 
+LBCode editor to insert the codes for you.  The editor is simply a series of buttons
+and two text boxes, labeled "text" and "attribute."   The "text" box is used to enter
+the contents of an LBCode tag, i.e. the actual text the goes between the opening and 
+closing tags.  The "attribute" box is used to enter any attribute for the opening tag.
+such as the URL for an image or link, or the phrase that an appbreviation or acronym
+stands for.</p>
+<p>To use the editor, just type in the text and attribute you want and click the 
+appropriate button.  If you want to add a word in bold, type your word into the box
+labeled "text" and click the bold button.  If you want to add a link, put the link
+text in the "text" box and the URL for the link in the "attribute" box and click the 
+URL button.  The corresponding markup will be added to your post at the current cursor
+position or at the end, depending on your browser's Javascript support.  Inserting at the
+cursor positio works on Opera 8.0, Firefox 1.0.3, and Internet Explorer 6.0.  I haven't 
+tried it on other browsers, so your mileage may vary.</p>
+<p>An extra feature of the editor is that the abbreviation and acronym buttons will save 
+any attributes you use during your post and add them automatically.  So, for example, 
+if you enter the abbreviation with the text "GNU" and the attribute "GNU's Not UNIX," 
+then if you mention GNU later in your post, you can just enter "GNU" for the text and 
+leave the attribute blank.  When you hit the abbreviation button, the attribute 
+"GNU's Not UNIX" will be added automatically.
+</p>
 
 <h2><abbr title="Content Management System">CMS</abbr> Features</h2>
 
