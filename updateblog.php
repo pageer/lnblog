@@ -21,11 +21,7 @@
 session_start();
 require_once("blogconfig.php");
 require_once("blog.php");
-
-if (! check_login() ) {
-	refresh("login.php");
-	exit;
-}
+require_once("user.php");
 
 if (POST("blogpath")) $blog_path = POST("blogpath");
 elseif (GET("blogpath")) $blog_path = GET("blogpath");
@@ -34,6 +30,11 @@ else $blog_path = false;
 $blog = new Blog($blog_path);
 $tpl = new PHPTemplate(BLOG_UPDATE_TEMPLATE);
 $blog->exportVars($tpl);
+
+if (! $blog->canModifyBlog() ) {
+	refresh("login.php");
+	exit;
+}
 
 $blogname = "blogname";
 $blogdesc = "desc";

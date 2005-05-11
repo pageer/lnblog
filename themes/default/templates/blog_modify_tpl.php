@@ -4,10 +4,18 @@
 <?php } ?>
 <fieldset>
 <form id="addblog" method="post" action="<?php echo $POST_PAGE; ?>">
-<?php if (isset($BLOG_PATH_ID)) { ?>
+<?php if (isset($BLOG_PATH_ID)) { # for new blogs ?>
 <div>
 <label for="<?php echo $BLOG_PATH_ID; ?>">Blog path</label>
 <input id="<?php echo $BLOG_PATH_ID; ?>" name="<?php echo $BLOG_PATH_ID; ?>" value="<?php echo $BLOG_PATH_REL; ?>" />
+</div>
+<div>
+<label for="<?php echo $BLOG_OWNER_ID; ?>">Blog owner</label>
+<input id="<?php echo $BLOG_OWNER_ID; ?>" name="<?php echo $BLOG_OWNER_ID; ?>" value="<?php echo $BLOG_OWNER; ?>" />
+</div>
+<div>
+<label for="<?php echo $BLOG_WRITERS_ID; ?>">Additional allowed writers</label>
+<input id="<?php echo $BLOG_WRITERS_ID; ?>" name="<?php echo $BLOG_WRITERS_ID; ?>" value="<?php echo $BLOG_WRITERS; ?>" />
 </div>
 <?php } ?>
 <div>

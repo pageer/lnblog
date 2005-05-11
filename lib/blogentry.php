@@ -34,7 +34,7 @@ class BlogEntry extends Entry {
 	var $abstract;
 
 	function BlogEntry ($path="", $revision=ENTRY_DEFAULT_FILE) {
-		#var $uid;
+		
 		$this->ip = get_ip();
 		$this->date = "";
 		$this->post_date = false;
@@ -44,6 +44,8 @@ class BlogEntry extends Entry {
 		$this->data = "";
 		$this->abstract = "";
 		$this->has_html = MARKUP_BBCODE;
+		# If a directory is specified, set the file path to the given revision.
+		# If no revision is given, use the default.
 		$this->file = $path . ($path ? PATH_DELIM.$revision : "");
 		$this->allow_comment = true;
 		$this->template_file = ENTRY_TEMPLATE;
@@ -72,7 +74,7 @@ class BlogEntry extends Entry {
 	function metadataFields() {
 		$ret = array();
 		#$ret["PostID"] =  $this->id;
-		#$ret["UserID"] =  $this->uid;
+		$ret["UserID"] =  $this->uid;
 		$ret["Date"] =  $this->date;
 		$ret["PostDate"] = $this->post_date;
 		$ret["Timestamp"] =  $this->timestamp;
@@ -101,7 +103,8 @@ class BlogEntry extends Entry {
 		}
 	}
 	
-	function isEntry ($path) {
+	function isEntry ($path=false) {
+		if (! $path) $path = $this->file;
 		return file_exists($path.PATH_DELIM.ENTRY_DEFAULT_FILE);
 	}
 

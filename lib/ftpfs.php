@@ -182,7 +182,6 @@ class FTPFS extends FS {
 		$ftp_path = $this->localpathToFSPath($path);
 		if ($ret !== false) {
 			$ret = fseek($temp, 0);
-			#echo "<p>$ftp_path</p>";
 			if ($ret != -1) {
 				$ret = ftp_fput($this->connection, $ftp_path, $temp, FTP_BINARY);
 			}

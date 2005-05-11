@@ -22,10 +22,12 @@
 # wrappers that implement functionality available in PHP 5.
 
 require_once("fs.php");
-
+require_once("user.php");
+/*
 define("LOGIN_TOKEN", "lToken");
 define("LAST_LOGIN_TIME", "lastLTime");
 define("CURRENT_USER", "uName");
+*/
 
 # Types of directories to create.
 define("BLOG_BASE", 0);
@@ -271,6 +273,37 @@ function localpath_to_uri($path, $full_uri=true) {
 	return $url_path;
 }
 
+# A quick function to swap back to the default style/image/script if the
+# one requested doesn't exist in the current theme.
+function link_item($item) {
+	
+	if (is_file($item)) return $item;
+	# Determine what type of item we have by file extension.  This allows the
+	# user to create single-directory themes.
+	$pos = strrpos($item, ".");
+	if (!$pos) return $item;
+	$ext = strtolower(substr($item, $pos));
+	$file = basename($item);
+	switch ($ext) {
+		case ".css": 
+			$ret = DEFAULT_STYLES."/".$file;
+			break;
+		case ".js":
+		case ".vbs":
+			$ret = DEFAULT_SCRIPTS."/".$file;
+			break;
+		case ".jpg":
+		case ".jpeg":
+		case ".gif":
+		case ".png":
+		case ".tif":
+		case ".tiff":
+			$ret = DEFAULT_IMAEGS."/".$file;
+			break;
+	}
+	return $ret;
+}
+
 # Quick function to get the user's IP address.  This should probably be
 # extended to account for proxies and such.
 
@@ -393,7 +426,7 @@ function create_directory_wrappers($path, $type, $instpath="") {
 function make_login_token($ts) {
 	return md5(get_ip().$ts);
 }
-
+/*
 function create_passwd_file($dirpath, $uname, $pwd) {
 	$uid = trim($uname);
 	$pass = trim($pwd);
@@ -403,7 +436,7 @@ function create_passwd_file($dirpath, $uname, $pwd) {
 	$content .= "?>";
 	return write_file($dirpath.PATH_DELIM."passwd.php", $content);
 }
-
+*/
 function passwd_file_exists($dir=false) {
 	if (! $dir) $dir = getcwd();
 	$path = realpath($dir.PATH_DELIM."passwd.php");
@@ -412,6 +445,9 @@ function passwd_file_exists($dir=false) {
 
 function do_login($uname, $pwd) {
 	if ( trim($uname) == "" || trim($pwd) == "" ) return false;
+	$usr = new User($uname);
+	return $usr->login($pwd);
+	/*
 	require("passwd.php");
 	$uid = trim($uname);
 	$pass = trim($pwd);
@@ -430,17 +466,27 @@ function do_login($uname, $pwd) {
 		$ret = true;
 	} else $ret = false;
 	return $ret;
+	*/
 }
 
 function do_logout() {
+	$usr = new User();
+	$usr->logout();
+/*
 	SESSION(CURRENT_USER, false);
 	SESSION(LOGIN_TOKEN, false);
 	SESSION(LAST_LOGIN_TIME, false);
 	setcookie(LOGIN_TOKEN, "");
 	setcookie(LAST_LOGIN_TIME, "");
+*/
 }
 
+# Check that 
+
 function check_login()  {
+	$usr = new User();
+	return $usr->checkLogin();
+/*
 	$cookie_ts = COOKIE(LAST_LOGIN_TIME);
 	$auth_token = make_login_token($cookie_ts);
 	$auth_ok = ($auth_token == SESSION(LOGIN_TOKEN) );
@@ -448,12 +494,7 @@ function check_login()  {
 	#echo "<p>$cookie_ts</p><p>$auth_token</p>";
 	if ($auth_ok) return true;
 	else return false;
+*/
 }
-
-# A simple XOR encryption function.  This is primarily for the FTP password,
-# since I don't really want to store that as clear text, even if it is in 
-# a PHP file.
-
-function simple_encrypt($data, $key) {}
 
 ?>

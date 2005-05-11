@@ -2,9 +2,9 @@
 
 # Information on the package itself.
 define("PACKAGE_NAME", "LnBlog");
-define("PACKAGE_VERSION", "0.2.2");
+define("PACKAGE_VERSION", "0.2.3");
 define("PACKAGE_URL", "http://www.skepticats.com/lnblog/");
-define("PACKAGE_DESCRIPTION", PACKAGE_NAME.": a simple and elegant weblog");
+define("PACKAGE_DESCRIPTION", PACKAGE_NAME.": a simple and (hopefully) elegant weblog");
 define("PACKAGE_COPYRIGHT", "Copyright (c) 2005, Peter A. Geer <pageer@skepticats.com>");
 
 # Miscellaneous configuration.
@@ -18,6 +18,13 @@ define("PACKAGE_COPYRIGHT", "Copyright (c) 2005, Peter A. Geer <pageer@skepticat
 # or change the document root from www to something else.  Of course, if you
 # don't use ~user directories, you can probably ignore this.
 define("LOCALPATH_TO_URI_MATCH_RE", "/^\/home\/[^\/]+\/www/");
+
+# User authentication configuration.
+# Use sessions in authentication or just cookies.
+define("AUTH_USE_SESSION", true);
+# Username of site administrator.  This is the only one who can add or 
+# delete blogs.
+define("ADMIN_USER", "administrator");
 
 # Blog configuration
 define("BLOG_CONFIG_PATH", "blogdata.txt");  # File to store blog data
@@ -122,6 +129,12 @@ if (! defined("THEME_IMAGES"))
 	define("THEME_IMAGES", INSTALL_ROOT_URL."themes/".THEME_NAME."/images");
 if (! defined("THEME_SCRIPTS")) 
 	define("THEME_SCRIPTS", INSTALL_ROOT_URL."themes/".THEME_NAME."/scripts");
+if (! defined("DEFULT_STYLES")) 
+	define("DEFULT_STYLES", INSTALL_ROOT_URL."themes/default/styles");
+if (! defined("DEFULT_IMAGES")) 
+	define("DEFULT_IMAGES", INSTALL_ROOT_URL."themes/default/images");
+if (! defined("DEFULT_SCRIPTS")) 
+	define("DEFULT_SCRIPTS", INSTALL_ROOT_URL."themes/default/scripts");
 
 # Add class libraries and pages to the include path.
 ini_set("include_path", ini_get("include_path").

@@ -40,6 +40,9 @@ if (defined("BLOG_ROOT")) {
 $user_name = "user";
 $password = "passwd";
 $confirm = "confirm";
+$full_name = "fullname";
+$email = "email";
+$homepage = "homepage";
 $reset="reset";  # Set to 1 to reset the password.
 
 $tpl = new PHPTemplate(CREATE_LOGIN_TEMPLATE);
@@ -48,6 +51,10 @@ $tpl->set("FORM_ACTION", current_file());
 $tpl->set("UNAME", $user_name);
 $tpl->set("PWD", $password);
 $tpl->set("CONFIRM", $confirm);
+$tpl->set("FULLNAME", $full_name);
+$tpl->set("EMAIL", $email);
+$tpl->set("URL", $homepage);
+if (!defined("BLOG_ROOT")) $tpl->set("UNAME_VALUE", ADMIN_USER);
 
 # Reset the password and username.  You'll have to be logged in to do this.
 $do_reset = ( GET($reset) && check_login() ) || (! is_file(getcwd().PATH_DELIM."passwd.php") );
@@ -60,7 +67,15 @@ if ($post_complete && $do_reset) {
 	if ( POST($confirm) != POST($password) ) {
 		$tpl->set("FORM_MESSAGE", "The passwords you entered do not match.");
 	} else {
-		$ret = create_passwd_file(getcwd(), POST($user_name), POST($password));
+		#$ret = create_passwd_file(getcwd(), POST($user_name), POST($password));
+		$usr = new User;
+		$usr->username(trim(POST($user_name)));
+		$usr->password(trim(POST($password)));
+		$usr->name(trim(POST($full_name)));
+		$usr->email(trim(POST($email)));
+		$usr->homepage(trim(POST($homepage)));
+		$usr->save();
+		$usr->login(POST($password));
 		redirect("bloglogin.php");
 	}
 } elseif ($partial_post) {

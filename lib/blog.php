@@ -20,9 +20,14 @@
 
 require_once("utils.php");
 require_once("blogconfig.php");
-#require_once("blogentry.php");
 require_once("template.php");
-#require_once("rss.php");
+
+define("UPDATE_SUCCESS", 1);
+define("UPDATE_NO_DATA_ERROR", 0);
+define("UPDATE_ENTRY_ERROR", -1);
+define("UPDATE_RSS1_ERROR", -2);
+define("UPDATE_RSS2_ERROR", -3);
+define("UPDATE_AUTH_ERROR", -4);
 
 class Blog {
 
@@ -35,16 +40,14 @@ class Blog {
 	var $max_rss = BLOG_MAX_ENTRIES;
 	var $user = "";
 	var $pass = "";
+	var $owner = ADMIN_USER;
+	var $write_list;
 	var $entrylist;
-
-	# NOTE: Use of realpath() requires PHP 4.
 
 	function Blog($path="") {
 		$this->name = '';
 		if (defined("BLOG_ROOT")) $this->home_path = BLOG_ROOT;
 		else $this->home_path = $path ? realpath($path) : getcwd();
-		# Check the home_path set above.
-		#$this->findBaseDir();
 		$this->description = '';
 		$this->image = '';
 		$this->max_entries = BLOG_MAX_ENTRIES;
@@ -52,41 +55,31 @@ class Blog {
 		$this->theme = "default";
 		$this->user = "";
 		$this->pass = "";
+		$this->owner = ADMIN_USER;
+		$this->write_list = array();
 		$this->entrylist = array();
 		$this->readBlogData();
 	}
-	
+
+	# Set and return the write list.  Accepts both arrays and comma-delimited
+	# strings when setting the list.
+
+	function writers($list=false) {
+		if ($list === false) {
+			return $this->write_list;
+		} elseif (is_array($list)) {
+			$this->write_list = $list;
+		} else {
+			$this->write_list = explode(",", $list);
+		}
+	}
+
 	function blogExists() {
 		if (is_file($this->home_path.PATH_DELIM.BLOG_CONFIG_PATH))
 			return true;
 		else return false;
 	}
 	
-	# Function to search up the directory tree for the blog root.  It will
-	# stop when it gets to the web root.
-
-	function findBaseDir() {
-		# Test the current home_path first.
-		$curr_path = $this->home_path.PATH_DELIM.BLOG_CONFIG_PATH;
-		if (is_file($curr_path)) return $this->home_path;
-		
-		$web_root = find_document_root($this->home_path);
-		do {
-			$curr_path = dirname($curr_path);
-			$curr_file = $curr_path.PATH_DELIM.BLOG_CONFIG_PATH;
-			if (is_file($curr_file)) {
-				$this->home_path = $curr_path;
-				return $curr_path;
-			}
-		} while ($curr_path != $web_root);
-	}
-
-	function hasData() {
-		$path = $this->home_path.PATH_DELIM.BLOG_CONFIG_PATH;
-		if (is_file($path)) return true;
-		else return false;
-	}
-
 	# Read and write a simple text file with the blog metadata.
 	# Format is key = data, each record is a single line, unrecognized
 	# keys are ignored.
@@ -98,7 +91,7 @@ class Blog {
 		if (! $config_data) return false;
 
 		foreach ($config_data as $line) {
-			# Split the string on the equal sign.  We pass on the limit 
+			# Split the string on the equal sign.  We skip the limit 
 			# parameter for the sake of compatibility.
 			$line_data = explode("=", $line);
 			$key = strtolower(trim($line_data[0]));
@@ -113,6 +106,8 @@ class Blog {
 				case "max entries": $this->max_entries = $data; break;
 				case "max rss": $this->max_rss = $data; break;
 				case "theme": $this->theme = $data; break;
+				case "owner": $this->owner = $data; break;
+				case "write list": $this->write_list = explode(",", $data); break;
 			}
 			
 		}
@@ -126,36 +121,12 @@ class Blog {
 		$str .= "Max Entries = ".$this->max_entries."\n";
 		$str .= "Max RSS = ".$this->max_rss."\n";
 		$str .= "Theme = ".$this->theme."\n";
+		$str .= "Owner = ".$this->owner."\n";
+		$str .= "Write List = ".implode(",", $this->write_list);
 		$ret = write_file($path, $str);
 		return $ret;
 	}
 
-	function password($val="") {
-		if ($val) $this->pass = md5($val);
-		else return $this->pass;
-	}
-	
-	function doLogin($uname, $pwd) {
-		if ($uname == "" || $pwd == "") return false;
-		$pw_hash = md5($pwd);
-		$auth_tok = 
-		$ret = ($uname == $this->user);
-		$ret &= ($pw_hash == $this->pass);
-		if ($ret) {
-			setcookie($this->name."litu", md5($uname) );
-			setcookie($this->name."litp", md5($pwd) );
-		}
-		return $ret;
-	}
-
-	function checkLogin() {
-		$uname_hash = md5($uname);
-		$pw_hash = md5($pwd);
-		$ret = ($uname_hash == $this->user);
-		$ret &= ($pw_hash == $this->pass);
-		return $ret;
-	}
-	
 	function getMonth($year=false, $month=false) {
 		$ent = new BlogEntry;
 		$curr_dir = getcwd();
@@ -199,13 +170,42 @@ class Blog {
 	
 	function getRecent($num_entries=false) {
 	
-		$entry = new BlogEntry;
-	
-		$ent_dir = $this->home_path.PATH_DELIM.BLOG_ENTRY_PATH;
-		$dirhand = opendir($ent_dir);
 		$show_max = $num_entries ? $num_entries : $this->max_entries;
 		if (! $num_entries) $show_max = $this->max_entries;
 		else $show_max = $num_entries;
+
+		$this->getEntries($show_max);
+		
+	}
+	
+	# Convenience function to get "previous entries" for a sidebar.
+	# Returns a list of entries starting after the the end of the 
+	# blog's max_entires property.  Returns another max_entries or
+	# num_entries, if it is set.
+	
+	function getNextMax($num_entries=false) {
+		
+		$show_max = $num_entries ? $num_entries : $this->max_entries;
+		if (! $num_entries) $show_max = $this->max_entries;
+		else $show_max = $num_entries;
+	
+		$this->getEntries($show_max, $this->max_entries);
+		return $this->entrylist;
+
+	}
+	
+	# Scan all entries in order and get number of them, starting at offset.
+	# To get all entries ever, pass -1.
+	
+	function getEntries($number,$offset=0) {
+	
+		$entry = new BlogEntry;
+		$this->entrylist = array();
+		if ($number == 0) return;
+	
+		$ent_dir = $this->home_path.PATH_DELIM.BLOG_ENTRY_PATH;
+		$dirhand = opendir($ent_dir);
+		$num_scanned = 0;
 		$num_found = 0;
 		
 		$year_list = scan_directory($ent_dir, true);
@@ -221,17 +221,20 @@ class Blog {
 				foreach ($ents as $e) {
 					$ent_path = $path.PATH_DELIM.$e;
 					if ( $entry->isEntry($ent_path) ) {
-						$this->entrylist[] = new BlogEntry($ent_path);
-						$num_found++;
-						# If we've hit the max, then break out of all 3 loops.
-						if ($num_found >= $show_max && $show_max > 0) break 3;
+						if ($num_scanned >= $offset) {
+							$this->entrylist[] = new BlogEntry($ent_path);
+							$num_found++;
+							# If we've hit the max, then break out of all 3 loops.
+							if ($num_found >= $number && $number != -1) break 3;
+						}
+						$num_scanned++;
 					}
-				}
-			}
-		}
+				}  # End month loop
+			}  # End year loop
+		}  # End archive loop
 		
 	}
-
+	
 	# Export blog variables to a PHPTemplate class.
 
 	function exportVars(&$tpl) {
@@ -303,47 +306,12 @@ class Blog {
 		return $ret;
 	}
 
-	function validate() {
-		$ret = preg_match("/^\d+$/", $this->blogid);
-		$ret &= preg_match("/^\d+$/", $this->max_entries);
-		$ret &= preg_match("/^\w+$/", $this->short_name);
-		$ret &= (trim($this->ownerid) != "");
-		return $ret;
-	}
-
-	function createYear($year) {
-		$path = $this->home_path.PATH_DELIM.BLOG_ENTRY_PATH.PATH_DELIM.$year;
-		if (is_file($path.PATH_DELIM."config.php")) return true;
-		if (! is_dir($path)) { 
-			$ret = mkdir_rec($path);
-			$ret &= create_directory_wrappers($path, YEAR_ENTRIES);
-		}
-		return $ret;
-	}
-
-	function createMonth($year, $month) {
-		$path = $this->home_path.PATH_DELIM.BLOG_ENTRY_PATH.PATH_DELIM.$year.PATH_DELIM.PATH_DELIM.$month;
-		if (is_file($path.PATH_DELIM."config.php")) return true;
-		if (! is_dir($path)) {
-			$ret = 
-			$ret &= create_directory_wrappers($path, MONTH_ENTRIES);
-		}
-		return $ret;
-	}
-
-	function createPath($year, $month) {
-		$ret = $this->createYear($year);
-		if ($ret) $ret = $this->createMonth($year, $month);
-		return $ret;
-	}
-
 	# This is an upgrade function that will create new config and wrapper 
 	# scripts to upgrade a directory of blog data to the current version.
 	# The data files should always work unmodified, so they do not need to
 	# be upgraded.  This should not be required too often, if all goes well.
 	# It is assumed that this function will only be run from the package
 	# installation directory.
-	# NOTE: Uses realpath(), which requires PHP 4.
 
 	function upgradeWrappers () {
 		$inst_path = getcwd();
@@ -404,12 +372,8 @@ class Blog {
 		return $ret;
 	}
 
-	function setLogin($uname, $pwd) {
-		return create_passwd_file($this->home_path, $uname, $pwd);
-	}
-
 	function insert ($path=false) {
-		if (! check_login()) return false;
+		if (! $this->canAddBlog() ) return false;
 		$fs = CreateFS();
 		# Get the installation directory, then create and get the blog
 		# directory.  These directories are added to the include_path using
@@ -448,7 +412,7 @@ class Blog {
 	}
 	
 	function update () {
-		if (! check_login()) return false;
+		if (! $this->canModifyBlog() ) return false;
 		if (get_magic_quotes_gpc()) {
 			$this->home_path = stripslashes($this->home_path);
 			$this->name = stripslashes($this->name);
@@ -470,7 +434,166 @@ class Blog {
 		$fs->destruct();
 		return $ret;
 	}
-	
-}
 
+#---------------------------------------------------------------------------
+# Security checking functions.
+
+	# Determines if the user can add a new entry.  The user must be in the
+	# blog's write list or be the blog owner.
+
+	function canAddEntry($usr=false) {
+		$u = new User($usr);
+		if (! $u->checkLogin() ) return false;
+		if (ADMIN_USER == $u->username() ||
+		    $this->owner == $u->username() ) return true;
+		foreach ($this->write_list as $writer)
+			if ($u->username() == $writer) return true;
+		return false;
+	}
+
+	# Determines if the user can edit or delete the entry.  Also applies to
+	# modifying user comments.
+
+	function canModifyEntry($ent=false, $usr=false) {
+		$u = new User($usr);
+		if (! $u->checkLogin() ) return false;
+		if (!$ent) $ent = new BlogEntry(getcwd());
+		if (ADMIN_USER == $u->username() ||
+		    $this->owner == $u->username() ||
+		    $ent->uid == $u->username() ) return true;
+		return false;
+	}
+
+	# Same as canAddEntry(), but for articles.
+
+	function canAddArticle($usr=false) {
+		$u = new User($usr);
+		if (! $u->checkLogin() ) return false;
+		if (ADMIN_USER == $u->username() ||
+		    $this->owner == $u->username() ) return true;
+		foreach ($this->write_list as $writer)
+			if ($u->username() == $writer) return true;
+		return false;
+	}
+
+	# Again, same as camModifyEntry(), but for articles.
+
+	function canModifyArticle($ent=false, $usr=false) {
+		$u = new User($usr);
+		if (! $u->checkLogin() ) return false;
+		if (!$ent) $ent = new BlogEntry(getcwd());
+		if (ADMIN_USER == $u->username() ||
+		    $this->owner == $u->username() ||
+		    $ent->uid == $u->username() ) return true;
+		return false;
+	}
+
+	function canAddBlog($usr=false) {
+		$u = new User($usr);
+		if (! $u->checkLogin() ) return false;
+		if (ADMIN_USER == $u->username() ) return true;
+		return false;
+	}
+
+	function canModifyBlog($usr=false) {
+		$u = new User($usr);
+		if (! $u->checkLogin() ) return false;
+		if (ADMIN_USER == $u->username() ||
+		    $this->owner == $u->username() ) return true;
+		return false;
+	}
+
+#---------------------------------------------------------------------------
+# Interface with BlogEntry and Article classes.  
+
+	# Set data for the preview page.
+
+	function previewEntry($tpl) {
+		$ent = new BlogEntry(getcwd());
+		if ( has_post() ) $ent->getPostData();
+		else return false;
+		$tpl->set("PREVIEW_DATA", $ent->get() );
+		$tpl->set("SUBJECT", $ent->subject);
+		$tpl->set("DATA", $ent->data);
+		$tpl->set("HAS_HTML", $ent->has_html);
+		$tpl->set("COMMENTS", $ent->allow_comment);
+		return true;
+	}
+
+	function errorEntry($error, $tpl) {
+		$ent = new BlogEntry(getcwd());
+		if ( has_post() ) $ent->getPostData();
+		else return false;
+		$tpl->set("SUBJECT", $ent->subject);
+		$tpl->set("DATA", $ent->data);
+		$tpl->set("HAS_HTML", $ent->has_html);
+		$tpl->set("COMMENTS", $ent->allow_comment);
+		switch ($error) {
+			case UPDATE_SUCCESS:
+				break;
+			case UPDATE_NO_DATA_ERROR:
+				$tpl->set("HAS_UPDATE_ERROR");
+				$tpl->set("UPDATE_ERROR_MESSAGE", "No data entered.");
+				break;
+			case UPDATE_ENTRY_ERROR:
+				$tpl->set("HAS_UPDATE_ERROR");
+				$tpl->set("UPDATE_ERROR_MESSAGE", "Error updating blog entry.");
+				break;
+			case UPDATE_RSS1_ERROR:
+				$tpl->set("HAS_UPDATE_ERROR");
+				$tpl->set("UPDATE_ERROR_MESSAGE", "Error updating RSS1 feed.");
+				break;
+			case UPDATE_RSS2_ERROR:
+				$tpl->set("HAS_UPDATE_ERROR");
+				$tpl->set("UPDATE_ERROR_MESSAGE", "Error updating RSS2 feed.");
+				break;
+			case UPDATE_AUTH_ERROR:
+				$tpl->set("HAS_UPDATE_ERROR");
+				$tpl->set("UPDATE_ERROR_MESSAGE", "Security error: you can't perform this operation.");
+				break;
+		}
+		return true;
+
+	}
+
+	function newEntry() {
+		$ent = new BlogEntry();
+		$ent->getPostData();
+		if ($ent->data == '') return UPDATE_NO_DATA_ERROR;
+		if (! $this->canAddEntry() ) return UPDATE_AUTH_ERROR;
+		$ret = $ent->insert();
+		if ($ret) {
+			$this->updateRSS1();
+			$this->updateRSS2();
+		} else $ret = UPDATE_ENTRY_ERROR;
+		return $ret;
+	}
+
+	function updateEntry() {
+		$ent = new BlogEntry(getcwd());
+		$ent->getPostData();
+		if ($ent->data == '') return UPDATE_NO_DATA_ERROR;
+		if (! $this->canModifyEntry(&$ent) ) return UPDATE_AUTH_ERROR;
+		$ret = $ent->update();
+		if ($ret) {
+			$this->updateRSS1();
+			$this->updateRSS2();
+		} else $ret = UPDATE_ENTRY_ERROR;
+		return $ret;
+	}
+
+	function deleteEntry() {
+		$ent = new BlogEntry(getcwd());
+		if ($ent->data == '') return UPDATE_NO_DATA_ERROR;
+		if (! $this->canModifyEntry(&$ent) ) return UPDATE_AUTH_ERROR;
+		$ret = $ent->update();
+		if ($ret) {
+			$this->updateRSS1();
+			$this->updateRSS2();
+		} else $ret = UPDATE_ENTRY_ERROR;
+		return $ret;
+
+	}
+
+}
 ?>

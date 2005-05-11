@@ -3,10 +3,33 @@
 <p><?php echo $FORM_MESSAGE; ?></p>
 <?php } ?>
 <form method="post" action="<?php echo $FORM_ACTION; ?>">
-<div><label for="<?php echo $UNAME; ?>">Username</label><input type="text" id="<?php echo $UNAME; ?>" name="<?php echo $UNAME; ?>" <?php if (isset($UNAME_VALUE)) echo 'value="'.$UNAME_VALUE.'" '; ?>/></div>
-<div><label for="<?php echo $PWD; ?>">Password</label><input type="password" id="<?php echo $PWD; ?>" name="<?php echo $PWD; ?>" <?php if (isset($PWD_VALUE)) echo 'value="'.$PWD_VALUE.'" '; ?>/></div>
-<div><label for="<?php echo $CONFIRM; ?>">Confirm</label><input type="password" id="<?php echo $CONFIRM; ?>" name="<?php echo $CONFIRM; ?>" <?php if (isset($CONFIRM_VALUE)) echo 'value="'.$CONFIRM_VALUE.'" '; ?>/></div>
-<div><span class="basic_form_submit"><input type="submit" value="Create" /></span><span class="basic_form_clear"><input type="reset" value="Clear" /></span></div>
+<div>
+<label for="<?php echo $UNAME; ?>">Username</label>
+<input type="text" id="<?php echo $UNAME; ?>" name="<?php echo $UNAME; ?>" <?php if (isset($UNAME_VALUE)) echo 'value="'.$UNAME_VALUE.'" '; ?>/>
+</div>
+<div>
+<label for="<?php echo $PWD; ?>">Password</label>
+<input type="password" id="<?php echo $PWD; ?>" name="<?php echo $PWD; ?>" <?php if (isset($PWD_VALUE)) echo 'value="'.$PWD_VALUE.'" '; ?>/>
+</div>
+<div>
+<label for="<?php echo $CONFIRM; ?>">Confirm</label>
+<input type="password" id="<?php echo $CONFIRM; ?>" name="<?php echo $CONFIRM; ?>" <?php if (isset($CONFIRM_VALUE)) echo 'value="'.$CONFIRM_VALUE.'" '; ?>/>
+</div>
+<div>
+<label for="<?php echo $FULLNAME; ?>">Real name</label>
+<input type="text" id="<?php echo $FULLNAME; ?>" name="<?php echo $FULLNAME; ?>" <?php if (isset($FULLNAME_VALUE)) echo 'value="'.$FULLNAME_VALUE.'" '; ?>/>
+</div>
+<div>
+<label for="<?php echo $EMAIL; ?>">E-Mail</label>
+<input type="text" id="<?php echo $EMAIL; ?>" name="<?php echo $EMAIL; ?>" <?php if (isset($EMAIL_VALUE)) echo 'value="'.$EMAIL_VALUE.'" '; ?>/>
+</div>
+<div>
+<label for="<?php echo $HOMEPAGE; ?>">Homepage</label>
+<input type="text" id="<?php echo $HOMEPAGE; ?>" name="<?php echo $HOMEPAGE; ?>" <?php if (isset($HOMEPAGE_VALUE)) echo 'value="'.$HOMEPAGE_VALUE.'" '; ?>/>
+</div>
+<div>
+<span class="basic_form_submit"><input type="submit" value="Create" /></span>
+<span class="basic_form_clear"><input type="reset" value="Clear" /></span></div>
 </form>
 <script type="text/javascript">
 <!--

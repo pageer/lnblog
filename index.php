@@ -41,9 +41,10 @@ $tpl->set("UPGRADE", $upgrade);
 $tpl->set("PERMS", $fixperm);
 $tpl->set("FORM_ACTION", current_file());
 
-$logged_in = check_login();
+$usr = new User;
 if (! is_file("passwd.php")) redirect("newlogin.php");
-elseif (! $logged_in) redirect("bloglogin.php");
+elseif (! $usr->checkLogin() || $usr->username() != ADMIN_USER) 
+	redirect("bloglogin.php");
 
 if (POST($upgrade)) {
 	$b = new Blog(POST($upgrade));

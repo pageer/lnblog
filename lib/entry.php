@@ -18,6 +18,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+require_once("user.php");
 require_once("utils.php");
 
 define("MARKUP_NONE", 0);
@@ -38,8 +39,6 @@ class Entry {
 	var $data;
 	var $file;
 	var $has_html = MARKUP_NONE;
-
-	#var $store_path = CFG_ENTRY_DIR;
 
 	function data($value=false) {
 		if ($value) $this->data = $value;
@@ -64,7 +63,7 @@ class Entry {
 	function absolutizeBBCodeURI($data, $current_uri) {
 		$ret = preg_replace("/\[img=([^\/]+)\]/",
 		                    "[img=".$current_uri."$1]", $data);
-		$ret = preg_replace("/\[url=([^\/]+)\]/", 
+		$ret = preg_replace("/\[url=([^\/:@]+)\]/", 
 		                    "[url=".$current_uri."$1]", $ret);
 		return $ret;
 	}
@@ -97,7 +96,7 @@ class Entry {
 
 	function bbcodeToHTML($data) {
 		$ret = $data;
-		# Single-parameter tags.
+		
 		$patterns[0] = "/\[url=(\S+)\](.+)\[\/url\]/Usi";
 		$patterns[1] = "/\[img=(.+)](.+)\[\/img\]/Usi";
 		$patterns[2] = "/\[ab=(.+)\](.+)\[\/ab\]/Usi";
@@ -110,9 +109,9 @@ class Entry {
 		$patterns[9] = "/(\r?\n\s*)?\[list\]\s*\r?\n(.+)\[\/list\](\s*\r?\n)?/Usi";
 		$patterns[10] = "/(\r?\n\s*)?\[numlist\]\s*\r?\n(.+)\[\/numlist\](\s*\r?\n)?/Usi";
 		$patterns[11] = "/\[\*\](.*)\r?\n/Usi";
-		$patterns[12] = '/\r\n\r\n/';
-		$patterns[13] = '/\n\n/';
-		$patterns[14] = '/\n/';
+		$patterns[12] = "/\[code\](.*)\[\/code\]/Usi";
+		$patterns[13] = "/\[t\](.*)\[\/t\]/Usi";
+		
 		$replacements[0] = '<a href="$1">$2</a>';
 		$replacements[1] = '<img alt="$2" title="$2" src="$1" />';
 		$replacements[2] = '<abbr title="$1">$2</abbr>';
@@ -125,12 +124,20 @@ class Entry {
 		$replacements[9] = "</p><ul>$2</ul><p>";
 		$replacements[10] = "</p><ol>$2</ol><p>";
 		$replacements[11] = '<li>$1</li>';
-		$replacements[12] = '</p><p>';
-		$replacements[13] = '</p><p>';
-		$replacements[14] = '<br />';
+		$replacements[12] = '<code>$1</code>';
+		$replacements[13] = '<tt>$1</tt>';
+		
+		
+		$whitespace_patterns[0] = '/\r\n\r\n/';
+		$whitespace_patterns[1] = '/\n\n/';
+		$whitespace_patterns[2] = '/\n/';
+		$whitespace_replacements[0] = '</p><p>';
+		$whitespace_replacements[1] = '</p><p>';
+		$whitespace_replacements[2] = '<br />';
 		ksort($patterns);
 		ksort($replacements);
 		$ret = preg_replace($patterns, $replacements, $ret);
+		$ret = preg_replace($whitespace_patterns, $whitespace_replacements, $ret);
 		$ret = "<p>".$ret."</p>";
 
 		return $ret;

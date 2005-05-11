@@ -28,8 +28,6 @@ require_once("rss.php");
 require_once("blog.php");
 require_once("blogentry.php");
 
-$entry_path = getcwd();
-$ent = new BlogEntry;
 $blg = new Blog();
 
 $submit_id = "submit";
@@ -41,28 +39,14 @@ $tpl->set("PREV_ID", $preview_id);
 $tpl->set("HAS_HTML", MARKUP_BBCODE);
 $blg->exportVars($tpl);
 
-$has_error = "";
-if ( has_post() ) {
-	
-	# Set data recieved from form to template variables.
-	$ent->getPostData();
-	$tpl->set("PREVIEW_DATA", $ent->get() );
-	$tpl->set("SUBJECT", $ent->subject);
-	$tpl->set("DATA", $ent->data);
-	$tpl->set("HAS_HTML", $ent->has_html);
-	
-	if ($ent->data) {
-		if (POST($submit_id)) {
-			$ent->insert();
-			$blg->updateRSS1();
-			$blg->updateRSS2();
-			redirect($blg->getURL());
-		}
-	} else {
-		$tpl->set("HAS_UPDATE_ERROR");
-		$tpl->set("UPDATE_ERROR_MESSAGE", "Entry has no data.");
-	}
+if (POST($submit_id)) {
+	$ret = $blg->newEntry();
+	if ($ret == UPDATE_SUCCESS) redirect($blg->getURL());
+	else $blg->errorEntry($ret, $tpl);
+} elseif (POST($preview_id)) {
+	$blg->previewEntry($tpl);
 }
+
 $body = $tpl->process();
 $tpl->file = BASIC_LAYOUT_TEMPLATE;
 $tpl->set("PAGE_CONTENT", $body);

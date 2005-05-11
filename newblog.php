@@ -22,14 +22,12 @@ session_start();
 require_once("blogconfig.php");
 #ini_set("include_path", ini_get("include_path").PATH_SEPARATOR.getcwd().PATH_DELIM."templates");
 require_once("blog.php");
-
-if (! check_login() ) {
-	refresh("login.php");
-	exit;
-}
+require_once("user.php");
 
 $blogpath = "blogpath";
 $blogname = "blogname";
+$blogowner = "blogowner";
+$blogwriters = "blogwriters";
 $blogdesc = "desc";
 $blogimage = "image";
 $blogtheme = "theme";
@@ -42,10 +40,16 @@ if (POST($blogpath)) $path = POST($blogpath);
 else $path = false;
 
 $blog = new Blog($path);
+if (! $blog->canAddBlog() ) {
+	refresh("login.php");
+	exit;
+}
 $tpl = new PHPTemplate(BLOG_UPDATE_TEMPLATE);
 
 if (POST($blogpath)) $blog->home_path = POST($blogpath);
 else $blog->home_path = "../myblog";
+if (POST($blogname)) $blog->owner = POST($blogname);
+if (POST($blogname)) $blog->writers(POST($blogwriters) );
 if (POST($blogname)) $blog->name = POST($blogname);
 if (POST($blogdesc)) $blog->description = POST($blogdesc);
 if (POST($blogimage)) $blog->image = POST($blogimage);
@@ -56,6 +60,10 @@ if (POST($blogrssmax)) $blog->max_rss = POST($blogrssmax);
 $tpl->set("BLOG_PATH_ID", $blogpath);
 $tpl->set("BLOG_PATH_REL", $blog->home_path);
 $tpl->set("BLOG_NAME_ID", $blogname);
+$tpl->set("BLOG_OWNER_ID", $blogowner);
+$tpl->set("BLOG_OWNER", $blog->owner);
+$tpl->set("BLOG_WRITERS_ID", $blogwriters);
+$tpl->set("BLOG_WRITERS", implode(",", $blog->writers()) );
 $tpl->set("BLOG_NAME", $blog->name);
 $tpl->set("BLOG_DESC_ID", $blogdesc);
 $tpl->set("BLOG_DESC", $blog->description);

@@ -1,4 +1,24 @@
-<?php if (defined("BLOG_ROOT")) {   # If there is no blog, skip all this. ?>
+<?php if (defined("BLOG_ROOT")) {   # If there is no blog, skip all this. 
+
+# Get a blog entry for us to work with.  If one exists, then use it.
+if (isset($blog) && get_class($blog) == "Blog") {
+	# We already have a defined blog, so do nothing.
+} else {
+	$blog = new Blog();
+}
+
+if (class_exists("BlogEntry")) $next_list = $blog->getNextMax();
+else $next_list = array();
+
+if ( count($next_list) > 0 ) {
+?>
+<h3>Recent Entries</h3>
+<ul>
+<?php foreach ($next_list as $ent) { ?>
+<li><a href="<?php echo $ent->permalink(); ?>"><?php echo $ent->subject; ?></a></li>
+<?php } ?>
+</ul>
+<?php } ?>
 <h3><a href="<?php echo $BLOG_URL_ROOTREL.BLOG_ENTRY_PATH; ?>/">Archives</a></h3>
 <ul>
 <?php 
@@ -104,5 +124,5 @@ if (check_login()) {
 <?php 
 } 
 ?>
-<?php } ?>
+<?php } # This is where we end BLOG_ROOT condition on first line. ?>
 <a href="<?php echo PACKAGE_URL; ?>"><img alt="Powered by <?php echo PACKAGE_NAME; ?>" title="Powered by <?php echo PACKAGE_NAME; ?>" src="<?php echo THEME_IMAGES; ?>/logo.png" /></a>
