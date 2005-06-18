@@ -55,6 +55,11 @@ div.blogentryfooter ul, .postdata {
 	margin-right: 1%;
 }
 
+ul.postadmin li {
+	display: inline;
+	margin-right: 1%;
+}
+
 div.blogentry  div.blogentrybody {
 	padding: 1%;
 	/*white-space: pre;*/

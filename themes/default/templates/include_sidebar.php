@@ -113,6 +113,7 @@ if (check_login()) {
 <li><a href="<?php echo $BLOG_URL_ROOTREL; ?>newart.php">Add new article</a></li>
 <li><a href="<?php echo $BLOG_URL_ROOTREL; ?>uploadfile.php">Upload file for blog</a></li>
 <li><a href="<?php echo $BLOG_URL_ROOTREL; ?>edit.php">Edit weblog settings</a></li>
+<li><a href="<?php echo $BLOG_URL_ROOTREL; ?>map.php">Edit custom sitemap</a></li>
 <li><a href="<?php echo $BLOG_URL_ROOTREL; ?>logout.php">Logout</a></li>
 </ul>
 <?php 

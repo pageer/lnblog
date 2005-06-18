@@ -1,3 +1,8 @@
+17-Jun-2005:
+- Put link contents of sitemap in user-editable file rather than template.
+- Added a page to display user info (not yet in interface).
+- Added new features to the documentation.
+
 06-Jun-2005:
 - Added a getlink() function to calculate URLs for linking images and style
 sheets from different themes.  Converted style sheets, templates, and pages

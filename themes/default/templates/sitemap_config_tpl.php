@@ -36,7 +36,7 @@ to work correctly.</p>
 <a id="testlink"></a>
 </div>
 -->
-<form>
+<form method="post" action="<?php echo $FORM_ACTION; ?>">
 <textarea id="output" name="output" rows="10"><?php if (isset($CURRENT_SITEMAP)) echo $CURRENT_SITEMAP; ?></textarea>
 <div><input type="submit" value="Save sitemap" />
 </form>

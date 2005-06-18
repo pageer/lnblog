@@ -1,11 +1,9 @@
 Features to be added:
 
-* Support reuse of styles, images, and scripts across different themes,
-  like the way we do with templates.
 * Documentation on the theme mechanism.
 * Documentation on how templates get strung together to make a page.
 * Improved user interface for blog settings and administration.
-* Add search  capability.
+* Add search capability.
 * Support for polls.
 * Internationalization support?
 * Multi-page articles?

@@ -1,5 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html lang="en"><head>
+
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <title>LnBlog Documentation</title>
 
@@ -10,31 +11,45 @@
 td, th {
 border: thin solid black;
 }
+p.license {
+font-size: 80%;
+}
   </style></head>
-
 <body>
 <h1>LnBlog</h1>
 
-
-<p>A simple file-based weblog focused on design elegance.</p>
-
-
-<p>Homepage: <a href="http://www.skepticats.com/lnblog/">http://www.skepticats.com/lnblog/</a>
-</p>
+<p>Homepage: <a href="http://www.skepticats.com/lnblog/">http://www.skepticats.com/lnblog/</a></p>
 
 
-<p>Copyright (c) 2005, Peter A. Geer &lt;<a href="mailto:pageer@skepticats.com">pageer@skepticats.com</a>&gt;</p>
+<p>LnBlog: A simple file-based weblog focused on design elegance.<br />
+Copyright (C) 2005 Peter A. Geer &lt;<a href="mailto:pageer@skepticats.com">pageer@skepticats.com</a>&gt;</p>
+
+<p class="license">This program is free software; you can redistribute it and/or modify
+it under the terms of the <a href="http://www.gnu.org/copyleft/gpl.html">GNU General Public License</a> as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.</p>
+
+
+<p class="license">
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+<a href="http://www.gnu.org/copyleft/gpl.html">GNU General Public License</a> for more details.</p>
+
+
+<p class="license">You should have received a copy of the <a href="http://www.gnu.org/copyleft/gpl.html">GNU General Public License</a>
+along with this program; if not, write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.</p>
 
 
 <h2>Introduction</h2>
 
 
-<p>LnBlog is a simple blog written in PHP which stores data in text files.
+<p>LnBlog is a simple weblog package written in PHP which stores data in text files.
 It is strives to be easy to use, easy to manage, and feature rich while
 maintaining a clean, elegant, and modular design. It is built to create
 sites with a clean, directory-based URL structure and valid XHTML and CSS for
-style and layout.</p>
-
+style and layout.&nbsp; Plus, it's light on requirements and cross-platform.<br />
+</p>
 
 <h2>Status</h2>
 
@@ -82,11 +97,12 @@ set on the web server.<br />
 <li>Automatically generated RSS feeds for blog entries and comments.</li><li>Send and receive TrackBack pings.</li>
 <li>Create multiple user accounts with basic serucity on entires and blogs.</li>
 <li>E-mail notification when new comments are posted.</li>
-<li>Easily create multiple weblogs.</li>
+<li>Easily create multiple weblogs.</li><li>Create static "articles" in addition to weblog entries.</li>
+
 <li>Change between multiple themes, each of which can have completely a
 different look and behavior, i.e. different styles, HTML markup, images, and even client-side scripts.</li>
-<li>Default themes use valid XHTML Strict and CSS-based page layout.</li>
-<li>Flexible HTML templating system that allows templates to be tweaked
+<li>Default themes use valid XHTML Strict for markup and CSS-based page layout.</li>
+<li>Flexible theming system that allows HTML templates, scripts, and stylesheets to be tweaked
 on a per-blog basis.</li>
 <li>Support for posting with simple auto-markup, a simple subset of BBcode,
 or raw HTML code.</li>
@@ -120,38 +136,217 @@ appropriate permissions set on the relevant directories.</p>
 configured, you must set an administrator login. This will be used to
 add new weblogs as well as to log into the ones you create. After
 that's
-set, you can log in and start adding new blogs. There are also
+set, you can log in and start adding new blogs and/or users. There are also
 administrative functions to
-modify a blog and update a blog (used when upgrading LnBlog).
-</p>
+modify a blog and update a blog (used when upgrading LnBlog).</p>
+
+<h2>Upgrading</h2>
+
+<p>Upgrading your LnBlog installation is actually quite easy.&nbsp;
+If you are paranoid, you will want to make backup copies of the
+configuration files in your LnBlog directory.&nbsp; These files are
+named fsconfig.php, passwd.php, and sitemap.htm, and are used to store
+information global to your installation.&nbsp; They are generally
+not affected by upgrades, and they are not hard to recreate if
+destroyed, but I thought I should warn you anyway.</p>
+
+<p><strong>Note:</strong> the exception to this rule is the passwd.php file when upgrading from LnBlog 0.2
+to version 0.3. The format of this file has changed and you should <strong>delete</strong> the old one and
+let the software create a new one. Version 0.3 adds support for multiple users using a mechanism that is
+incompatible with the previous passwd.php format. After you delete this file, go to your LnBlog administration
+page and you will be prompted to create a new administrator account.</p>
+
+<p>To upgrade LnBlog, simply extract the
+new version from the ZIP archive and upload it to your web host into
+the same location as the old version, overwriting the old
+files.&nbsp; Alternatively, you can move or delete the old
+installation folder and put the new one in its place, provided you copy
+the above mentioned configuration files into the new installation
+directory.</p>
+
+<p>Once that's done, you may need
+to upgrade the files for each individual blog.&nbsp; This is done
+by going to the administration page and using the "upgrade blog"
+option.&nbsp; Simply put the relative path to your blog (e.g.
+../myblog, as described in the <a href="#addblog">"Adding New Blogs" section</a>)
+and click the "Upgrade" button.&nbsp; This will upgrade the
+configuration files for the blog and add any new pages.&nbsp; You
+will have to do this separately for each blog that youhave. </p>
 
 
-<h2>Adding Entries</h2>
+<h2>Adding New Users</h2>
 
 
-<p>Adding a blog entry is pretty self-explanatory. Just log in and click on the
-"add entry" link. You will be taken to the entry edit screen, where you can
-enter the subject for your entry, the entry text itself, and turn comments for
-this entry on or off.</p>
+<p>In addition to the administrator account, you can create as many new user accounts as you
+like. (<strong>Disclaimer</strong>: LnBlog was not buit to handle large numbers of users. While there is no
+<em>inherent</em>
+limit on the number of users, I doubt that the current implementation
+will scale
+well. You have been warned.)&nbsp; To create a new account log in
+to the LnBlog administration page and click the "Add new user"
+link.&nbsp; Only the administrator account can create new users.</p>
 
 
-<p>There are three possible input modes, which you can change between with the
-option buttons below the edit area. They are:</p>
+<p>The form to add new users
+should be fairly self-explanatory.&nbsp; You are required to enter
+a username, password, and password confirmation.&nbsp; The real
+name, e-mail, and homepage are all optional.&nbsp; However, please
+note that the user will (obviously) not receive e-mail confirmation of
+comments on his posts if you do not give an e-mail address.</p>
+
+
+<h2>Security</h2>
+
+
+<p>LnBlog uses a very simple
+security based on user ownership.&nbsp; The rules for determining
+what each user can do are as follows</p>
 
 
 <ol>
 
 
-<li><strong>Auto-markup</strong>: Adds HTML paragraphs and line breaks based on the plain-text input and converts all http:// and ftp:// URLs to links.</li>
-<li><strong>LBCode</strong>: Use a dialect of the BBCode markup popular in
+<li>The administrator can do everything that can be done.</li>
+<li>The owner of a blog can
+modify the blog properties (theme, name, number of posts shown, etc.),
+can add entries and articles to it,and can modify the entries and articles of other users who post to the blog. </li>
+<li>The owner of an entry or article can modify that entry or article, including comments and trackbacks.</li><li>A user can only add articles or entries to a blog he owns or one he is explicitly on the write-list for.</li>
+<li>Anybody, user or anonymous reader, can add comments.</li>
+</ol>
+
+
+<p>To put it more succinctly,
+there's the administrator (can do anything), the blog owner (can do
+anything with the blog), the other users (can do anything with their
+own posts), and everybody else (can only post comments).&nbsp;
+Which role a particular person will take depends on who they are and
+what blog you're talking about.&nbsp;The owner of one blog may be just a regular reader on another.&nbsp; <br />
+</p>
+
+
+<h2><a name="addblog">Adding New Blogs</a></h2>
+
+
+<p><a name="addblog">Adding new blogs is done on the LnBlog administration page. Only the administrator account
+can add new blogs.</a></p>
+
+
+<p><a name="addblog">To add a new blog, just click
+the "Add new blog" link and fill out the form on the resulting
+page.&nbsp; The fields define various properties of the blog, and
+are as follows:</a></p>
+
+
+<ol>
+
+
+<li><a name="addblog"><strong>Blog path</strong>:
+The path to the blog on the local machine, relative to the current
+directory.&nbsp; (Yes, I know this is a bad way to do it, but I
+haven't had time to fix it yet.)&nbsp; You will note that the
+default path "../myblog" is given as an example.&nbsp; If the
+LnBlog folder is in the root of your web directory, then your blog will
+be stored in the "myblog" folder in the root web directory.&nbsp;
+In other words, if you get to the LnBlog administration page at
+http://somehost.com/LnBlog/ then using ../myblog will put your weblog
+at http://somehost.com/myblog/, which is probably what you
+want.&nbsp; I hope that isn't too confusing for non-technical users.</a></li>
+<li><a name="addblog"><strong>Blog owner</strong>: The username of whoever owns the blog.
+This is the user who will be allowed to change these settings later. By
+default, this is the administrator.</a></li>
+<li><a name="addblog"><strong>Additional allowed writers</strong>:
+A comma-separated list of usernames other than the owner who can post new
+entries and articles to this blog.</a></li>
+<li><a name="addblog"><strong>Blog name</strong>: The name of the blog.</a></li>
+<li><a name="addblog"><strong>Description</strong>: A short description of the blog.</a></li>
+<li><a name="addblog"><strong>Theme</strong>: The theme visual used for the blog.</a></li>
+<li><a name="addblog"><strong>Blog name</strong>: The name of the blog.</a></li>
+<li><a name="addblog"><strong>Maximum number of entries</strong>:
+The maximum number of entries to display on the homepage of the blog.
+For example, if this is 10, then the main page of the blog will display the
+last 10 entries.</a></li>
+<li><a name="addblog"><strong>Maximum number of entries in RSS feeds</strong>:
+The maximum number of entries that will be put in the main blog RSS feed.</a></li>
+</ol>
+
+
+<h2><a name="addblog">Adding Entries</a></h2>
+
+
+<p><a name="addblog">Adding a blog entry is pretty self-explanatory. Just log in and
+click on the
+"add entry" link. You will be taken to the entry edit screen, where you
+can
+enter the subject for your entry, the entry text itself, and turn
+comments for
+this entry on or off.&nbsp; Note that in order to add an entry, you
+must either be the owner of the blog you're adding it to, or you must
+be on the allowed writers list for that blog.<br />
+</a></p>
+
+
+<p><a name="addblog">There are three possible input modes, which you can change between with the
+option buttons below the edit area. They are:</a></p>
+
+
+<ol>
+
+
+<li><a name="addblog"><strong>Auto-markup</strong>: Adds HTML paragraphs and line breaks based on the plain-text input and converts all http:// and ftp:// URLs to links.</a></li>
+<li><a name="addblog"><strong>LBCode</strong>: Use a dialect of the BBCode markup popular in
 web forums to markup your page. Paragraphs and line breaks are inserted like
 with auto-markup, but you can also include other supported tags. See the
-<a href="#lbcode">LBCode Syntax</a> section for details.
+</a><a href="#lbcode">LBCode Syntax</a> section for details.
 </li>
 <li><strong>Raw HTML</strong>: The text you type is treated as raw HTML code.
 No processing is done and there's no guarantee that your page will validate.
 In other words, this is for people who know what they're doing.</li>
 </ol>
+
+<h2>User Comments</h2>
+
+<p>LnBlog allows anonymous user comments by default.&nbsp; You can turn
+off the ability to add comments with a checkbox on the entry edit
+screen.&nbsp; Comments have a required body text and optional subject,
+name, e-mail, and homepage fields.&nbsp; For logged-in users, comments
+will also store the username, so that the up-to-date name, e-mail, and
+homepage can be displayed automatically.&nbsp; Currently, comments
+cannot be edited, but they can be deleted by users with permission to
+modify the entry.</p>
+<p>If the blog owner has an e-mail address</p>
+
+
+<h2>TrackBacks</h2>
+
+
+<p>LnBlog has some very primitive support for Trackbacks.&nbsp; Each
+entry has a trackback URL and will store and display any trackback
+pings it receives. <br />
+</p>
+
+<p>To send a trackback ping, you must be logged in and have permission to modify the blog.&nbsp;
+You can then click on the "Send trackback ping" link for your blog
+entry and start the two-step ping process.&nbsp; The first step is to
+enter the URL you wish to ping.&nbsp; The second is to confirm the ping
+data and send it. <br />
+</p>
+
+
+<p>Due mostly to laziness on my part, LnBlog does not yet support
+"real" trackback pings.&nbsp; Instead, it uses a simple HTML form with
+element names conforming to the TrackBack specification to submit the
+HTTP POST request.&nbsp; As a result of this, you will notice that
+after the ping, you are directed to the page you pinged, which will
+probably show you the XML response dictated by the specification.&nbsp;
+If this is a 0 (zero), that means the ping succeeded.&nbsp; Otherwise,
+you should hopefully see an error message.&nbsp; Because of the
+suckiness of this situation, sending a trackback ping will open a new
+browser window so that you don't have to manually go back to your blog.</p>
+
+
+<p>LnBlog currently does not support TrackBack&nbsp; URL
+autodiscovery.&nbsp; There is no bookmarklet to pick up trackback URLs
+for other blogs and there is no RDF section embedded in LnBlog entries.</p>
 
 
 <h2><a name="lbcode">LBCode Syntax</a></h2>
@@ -302,7 +497,12 @@ pseudo-elements, which are not supported by Internet Explorer, so use
 this with care. Note that in the default LnBlog stylsheets, the
 &lt;q&gt;
 tag is rendered with italic text, so that even in Internet Explorer, it
-can be distinguished from normal text.</li>
+can be distinguished from normal text.</li><li>The
+current LBCode handler does not deal gracefully with multiline
+tags.&nbsp; So if, e.g., you have a multiline block quotation, the
+LBCode handler will still put &lt;br /&gt; tags in for the line
+breaks.&nbsp; </li>
+
 </ol>
 
 
@@ -395,18 +595,50 @@ upload_max_size and post_max_size by creating a .htaccess file (if you
 use Apache) or by modifying
 the system php.ini file.</p>
 
+<h3>Sitemap Editing</h3>
 
-<h2>License</h2>
+<p>Part of LnBlog's basic page
+layout includes a sitemap, also refered to as the menubar.&nbsp; In
+the default theme, this is the bar just under the banner with your blog
+name.&nbsp; It is intended for global site navigation, e.g. to go
+from one blog to another or to other sections of your
+website.&nbsp; Needless to say, you will want to customize it for
+your own site.<br />
+</p>
+
+<p>There are two ways to edit the
+menubar: globally for al LnBlog blogs, or locally to just the current
+blog.&nbsp; To edit the global sitemap, use the link on the LnBlog
+administration page where you will see a link to the sitemap
+editor.&nbsp; To change the sitemap for a particular blog, log in
+and use the link in the administration section of the blog
+sidebar.&nbsp; Note that setting a sitemap for the blog will override
+the global sitemap.</p>
+
+<p>The sitemap editor is a simple
+Javascript form that creates a list of links.&nbsp; Just enter the
+text you want for the link, the tooltip (what to display when hovering
+the mouse over the link), and the target <abbr title="Uniform Resource Locator">URL</abbr>
+for the link, either relative or absolute.&nbsp; When you click the
+"Add Link" button, a line will be added to the output box with the <abbr title="HyperText Markup Language">HTML</abbr>
+code for the information you specified.&nbsp; When a page is displayed,
+LnBlog will read this file and put each line into a list item to be
+displayed in the menubar.&nbsp; Please note that, currently, if you
+want to create a more complicated menu layout, you will have to modify
+the menubar template. </p>
+
+<h2>License Information<br />
+</h2>
 
 
 <p>
 LnBlog: A simple file-based weblog focused on design elegance.<br />
-Copyright (C) 2005 Peter A. Geer &lt;pageer@skepticats.com&gt;</p>
+Copyright (C) 2005 Peter A. Geer &lt;<a href="mailto:pageer@skepticats.com">pageer@skepticats.com</a>&gt;</p>
 
 
 <p>
 This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
+it under the terms of the <a href="http://www.gnu.org/copyleft/gpl.html">GNU General Public License</a> as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.</p>
 
@@ -415,11 +647,11 @@ the Free Software Foundation; either version 2 of the License, or
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.</p>
+<a href="http://www.gnu.org/copyleft/gpl.html">GNU General Public License</a> for more details.</p>
 
 
 <p>
-You should have received a copy of the GNU General Public License
+You should have received a copy of the <a href="http://www.gnu.org/copyleft/gpl.html">GNU General Public License</a>
 along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.</p>
 

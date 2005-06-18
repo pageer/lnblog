@@ -313,14 +313,16 @@ class BlogEntry extends Entry {
 			if ($ret) {
 				if ($this->mail_notify) {
 					$u = new User($this->uid);
-					mail($u->email(), "Comment on ".$this->subject,
-					     "A new reader comment has been posted.\n".
-						  "The URL for this comment is: ".$cmt->permalink()."\n\n".
-					     "Name: ".$cmt->name."\n".
-					     "E-mail: ".$cmt->email."\n".
-					     "URL: ".$cmt->url."\n".
-						  "Subject: ".$cmt->subject."\n\n".
-						  $cmt->data, "From: LnBlog comment notifier");
+					if ($u->email()) {
+						mail($u->email(), "Comment on ".$this->subject,
+						     "A new reader comment has been posted.\n".
+							  "The URL for this comment is: ".$cmt->permalink()."\n\n".
+						     "Name: ".$cmt->name."\n".
+						     "E-mail: ".$cmt->email."\n".
+						     "URL: ".$cmt->url."\n".
+							  "Subject: ".$cmt->subject."\n\n".
+						  	$cmt->data, "From: LnBlog comment notifier");
+					}
 				}
 				$this->updateRSS1();
 				$this->updateRSS2();

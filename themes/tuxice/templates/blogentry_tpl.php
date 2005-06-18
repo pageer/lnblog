@@ -23,7 +23,7 @@
 <div class="blogentryfooter">
 <?php if (check_login()) { ?>
 <ul class="postadmin">
-	<li><a href="<?php echo $PERMALINK; ?>trackback.php?send_ping=yes">Send TrackBack Ping</a></li>
+	<li><a onclick="javascript:window.open('<?php echo $PERMALINK; ?>trackback.php?send_ping=yes'); return false;" href="<?php echo $PERMALINK; ?>trackback.php?send_ping=yes">Send TrackBack Ping</a></li>
 	<li><a href="<?php echo $POSTEDIT; ?>">Edit</a></li>
 	<li><a href="<?php echo $POSTDELETE; ?>">Delete</a></li>
 </ul>

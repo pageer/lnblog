@@ -94,6 +94,10 @@ form label, fieldset label {
 	float: left;
 }
 
+form#tbconfirm label {
+	width: 30%;
+}
+
 label.none,  li label, form div.editorbox label {
 	width: auto;
 	float: none;

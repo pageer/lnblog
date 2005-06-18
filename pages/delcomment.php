@@ -23,7 +23,10 @@ require_once("config.php");
 require_once("blog.php");
 require_once("blogcomment.php");
 
-if (! check_login() ) redirect("index.php");
+$blog = new Blog();
+$comm = new BlogComment();
+
+if (! $blog->canModifyEntry() ) redirect("index.php");
 
 $comm_id = "comment";
 
@@ -31,8 +34,6 @@ $anchor = POST($comm_id);
 if (!$anchor) $anchor = GET($comm_id);
 if (!$anchor) redirect("index.php");
 
-$blog = new Blog();
-$comm = new BlogComment();
 $comm->file = $comm->getFilename($anchor);
 $comm->readFileData();
 

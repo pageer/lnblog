@@ -36,9 +36,6 @@ if (POST(COMMENT_POST_REMEMBER)) {
 	if (POST(COMMENT_POST_URL)) setcookie(COMMENT_POST_URL, POST(COMMENT_POST_URL));
 }
 
-$title = $ent->subject . " - " . $blg->name;
-$content =  $ent->get();
-
 # This code will detect if a comment has been submitted and, if so,
 # will add it.  We do this before printing the comments so that a 
 # new comment will be displayed on the page.
@@ -49,6 +46,10 @@ $comm = new BlogComment;
 if (POST($SUBMIT_ID)) {
 	$ent->addComment(getcwd().PATH_DELIM.ENTRY_COMMENT_DIR);
 }
+
+# Get the entry AFTER posting the comment so that the comment count is right.
+$title = $ent->subject . " - " . $blg->name;
+$content =  $ent->get();
 
 # Array for adding style sheets.  We build this as we go so that we don't 
 # end up sending more stylesheets than we need to.
