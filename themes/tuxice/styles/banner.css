@@ -1,0 +1,36 @@
+/* Site banner styles. */
+
+@import url(banner_print.css);
+
+#banner {
+	/*border: thin solid black;*/
+	/*background-color: #f4f4f4;*/
+	background: url(../images/tux.png);
+	background-repeat: no-repeat;
+	/*left: 35%;*/
+	width: 100%;
+	height: 50px;
+}
+
+#banner h1 {
+	display: inline;
+	vertical-align: middle;
+	margin-left: 60px;
+	color: white;
+}
+
+#banner h3 {
+	display: inline;
+	vertical-align: middle;
+	margin-left: 4em;
+	color: #f4f4f4;
+}
+
+#banner a:link, #banner a:visited {
+	color: white;
+	text-decoration: none;
+}
+
+#banner a:hover {
+	text-decoration: underline;
+}

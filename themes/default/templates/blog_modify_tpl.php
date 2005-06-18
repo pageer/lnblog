@@ -9,15 +9,17 @@
 <label for="<?php echo $BLOG_PATH_ID; ?>">Blog path</label>
 <input id="<?php echo $BLOG_PATH_ID; ?>" name="<?php echo $BLOG_PATH_ID; ?>" value="<?php echo $BLOG_PATH_REL; ?>" />
 </div>
+<?php } ?>
+<?php if (isset($BLOG_OWNER_ID)) { ?>
 <div>
 <label for="<?php echo $BLOG_OWNER_ID; ?>">Blog owner</label>
 <input id="<?php echo $BLOG_OWNER_ID; ?>" name="<?php echo $BLOG_OWNER_ID; ?>" value="<?php echo $BLOG_OWNER; ?>" />
 </div>
+<?php } ?>
 <div>
 <label for="<?php echo $BLOG_WRITERS_ID; ?>">Additional allowed writers</label>
 <input id="<?php echo $BLOG_WRITERS_ID; ?>" name="<?php echo $BLOG_WRITERS_ID; ?>" value="<?php echo $BLOG_WRITERS; ?>" />
 </div>
-<?php } ?>
 <div>
 <label for="<?php echo $BLOG_NAME_ID; ?>">Blog name</label>
 <input id="<?php echo $BLOG_NAME_ID; ?>" name="<?php echo $BLOG_NAME_ID; ?>" value="<?php echo $BLOG_NAME; ?>" />

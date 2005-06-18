@@ -1,0 +1,9 @@
+/* Sidebar styles for print media. */
+
+@media print {
+
+	#sidebar {
+		display: none;
+	}
+	
+}

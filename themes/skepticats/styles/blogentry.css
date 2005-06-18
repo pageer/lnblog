@@ -57,3 +57,7 @@ div.blogentry  div.blogentrybody {
 	padding: 1%;
 	/*white-space: pre;*/
 }
+
+.bloguser, .bloguserurl {
+	display: inline;
+}

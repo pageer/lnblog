@@ -24,6 +24,7 @@ require_once("blog.php");
 require_once("blogentry.php");
 require_once("blogcomment.php");
 require_once("rss.php");
+require_once("tb.php");
 
 $entry_path = getcwd();
 $ent = new BlogEntry($entry_path);
@@ -45,18 +46,26 @@ $content =  $ent->get();
 $SUBMIT_ID = "submit";
 
 $comm = new BlogComment;
-if (POST($SUBMIT_ID)) $comm->getPostData();
-if ($comm->data && $ent->allow_comment) {
-	$comm->insert(getcwd().PATH_DELIM.ENTRY_COMMENT_DIR);
-	$ent->updateRSS1();
-	$ent->updateRSS2();
+if (POST($SUBMIT_ID)) {
+	$ent->addComment(getcwd().PATH_DELIM.ENTRY_COMMENT_DIR);
 }
 
-# Add comments for current entry.
-$content .= $ent->getComments();
+# Array for adding style sheets.  We build this as we go so that we don't 
+# end up sending more stylesheets than we need to.
+$extra_styles = array("blogentry.css");
+
+# Add TrackBacks for current entry.
+$tmp_content = $ent->getTrackbacks();
+$content .= $tmp_content;
+if ($tmp_content) $extra_styles[] = "trackback.css";
+# Now add the comments.
+$tmp_content = $ent->getComments();
+$content .= $tmp_content;
+if ($tmp_content) $extra_styles[] = "comment.css";
 
 # Add comment form if applicable.
 if ($ent->allow_comment) { 
+	$extra_styles[] = "form.css";
 	$comm_tpl = new PHPTemplate;
 	$comm_tpl->file = COMMENT_FORM_TEMPLATE;
 	$comm_tpl->set("SUBMIT_ID", $SUBMIT_ID);
@@ -68,6 +77,7 @@ $tpl = new PHPTemplate(BASIC_LAYOUT_TEMPLATE);
 $blg->exportVars($tpl);
 $tpl->set("PAGE_TITLE", $title);
 $tpl->set("PAGE_CONTENT", $content);
+$tpl->set("STYLE_SHEETS", $extra_styles);
 
 # Set RSS feeds for comments, if we have any.
 if (is_file(dirname($ent->file).PATH_DELIM.ENTRY_COMMENT_DIR.PATH_DELIM.COMMENT_RSS2_PATH)) {

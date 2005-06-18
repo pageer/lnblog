@@ -37,19 +37,27 @@ $title = strftime("%B %Y", $current_month);
 
 $blog->getMonth();
 
-$tpl = new PHPTemplate(ARCHIVE_TEMPLATE);
-$tpl->set("ARCHIVE_TITLE", $title);
+# Optionally show all the entries as a weblog.
+if (strtolower(GET("show")) == "all") {
+	$body = $blog->getWeblog();
+} else {
 
-$LINK_LIST = array();
+	$tpl = new PHPTemplate(ARCHIVE_TEMPLATE);
+	$tpl->set("ARCHIVE_TITLE", $title);
+	$tpl->set("SHOW_TEXT");
 
-foreach ($blog->entrylist as $ent) { 
-	$ts = mktime(0, 0, 0, $ent, 1, $year_dir);
-	$month_name = strftime("%B %Y", $ts);
-	$LINK_LIST[] = array("URL"=>$ent->permalink(), "DESC"=>$ent->subject);
+	$LINK_LIST = array();
+
+	foreach ($blog->entrylist as $ent) { 
+		$ts = mktime(0, 0, 0, $ent, 1, $year_dir);
+		$month_name = strftime("%B %Y", $ts);
+		$LINK_LIST[] = array("URL"=>$ent->permalink(), "DESC"=>$ent->subject);
+	}
+
+	$tpl->set("LINK_LIST", $LINK_LIST);
+	$body = $tpl->process();
 }
 
-$tpl->set("LINK_LIST", $LINK_LIST);
-$body = $tpl->process();
 $title = $blog->name." - ".$title;
 
 $page_tpl = new PHPTemplate(BASIC_LAYOUT_TEMPLATE);

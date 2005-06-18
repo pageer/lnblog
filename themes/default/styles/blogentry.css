@@ -39,7 +39,12 @@ div.blogentryfooter li {
 	list-style-type: none;
 }
 
-.blogadmin {
+ul.postadmin li {
+	display: inline;
+	margin-right: 1%;
+}
+
+li.bloguser, li.bloguserurl {
 	display: inline;
 	margin-right: 1%;
 }
@@ -51,4 +56,9 @@ div.blogentry  div.blogentrybody {
 
 div.blogentry div.blogentrybody p {
 	text-indent: 1em;
+}
+
+.blogentryfooter h3 {
+	margin-bottom: 0px;
+	margin-top: 0px
 }

@@ -45,18 +45,21 @@ $content =  $ent->get();
 $SUBMIT_ID = "submit";
 
 $comm = new BlogComment;
-if (POST($SUBMIT_ID)) $comm->getPostData();
-if ($comm->data && $ent->allow_comment) {
-	$comm->insert(getcwd().PATH_DELIM.ENTRY_COMMENT_DIR);
-	$ent->updateRSS1();
-	$ent->updateRSS2();
+if (POST($SUBMIT_ID)) {
+	$ent->addComment(getcwd().PATH_DELIM.ENTRY_COMMENT_DIR);
 }
 
+# Extra styles - don't include more than we need to render the page.
+$extra_styles = array("article.css");
+
 # Add comments for current entry.
-$content .= $ent->getComments(); 
+$tmp_content = $ent->getComments(); 
+$content .= $tmp_content;
+if ($tmp_content) $extra_styles[] = "comment.css";
 
 # Add comment form if applicable.
 if ($ent->allow_comment) { 
+	$extra_styles[] = "form.css";
 	$comm_tpl = new PHPTemplate;
 	$comm_tpl->file = COMMENT_FORM_TEMPLATE;
 	$comm_tpl->set("SUBMIT_ID", $SUBMIT_ID);
@@ -68,6 +71,7 @@ $tpl = new PHPTemplate(BASIC_LAYOUT_TEMPLATE);
 $blg->exportVars($tpl);
 $tpl->set("PAGE_TITLE", $title);
 $tpl->set("PAGE_CONTENT", $content);
+$tpl->set("STYLE_SHEETS", $extra_styles);
 
 # Set RSS feeds for comments, if we have any.
 if (is_file(dirname($ent->file).PATH_DELIM.ENTRY_COMMENT_DIR.PATH_DELIM.COMMENT_RSS2_PATH)) {

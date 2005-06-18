@@ -44,9 +44,9 @@ function create_passwd_file () {
 			$tmpdata .= ($tmpdata != '' ? ', ' : '') . "'$key'=>'$val'";
 		}
 		$data .= $tmpdata.");\n";
-		$data .= "?>";
 	}
-	write_file(INSTALL_ROOT.PATH_DELIM."passwd.php", $data);
+	$data .= "?>";
+	return write_file(INSTALL_ROOT.PATH_DELIM."passwd.php", $data);
 }
 
 # Class to manipulate and authenticate users.  Is designed so that a user's
@@ -96,10 +96,10 @@ class User {
 	# Convenience function to export relevant user data to a template.
 
 	function exportVars(&$tpl) {
-		$tpl->set("USER_ID", $this->username);
-		$tpl->set("USER_NAME", $this->fullname);
-		$tpl->set("USER_EMAIL", $this->email);
-		$tpl->set("USER_HOMEPAGE", $this->homepage);
+		if ($this->username) $tpl->set("USER_ID", $this->username);
+		if ($this->fullname) $tpl->set("USER_NAME", $this->fullname);
+		if ($this->email) $tpl->set("USER_EMAIL", $this->email);
+		if ($this->homepage) $tpl->set("USER_HOMEPAGE", $this->homepage);
 	}
 
 	function get($uname) {
@@ -250,6 +250,10 @@ class User {
 			if ($this->username == $usr && $this->passwd = $pwhash) return true;
 			else return false;
 		}
+	}
+
+	function isAdministrator() {
+		return ($this->username == ADMIN_USER);
 	}
 
 }

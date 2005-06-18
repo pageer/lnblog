@@ -73,6 +73,20 @@ class Entry {
 		return $ret;
 	}
 
+	# Removes all markup (both HTML and LBCode tags) from the entry data 
+	# and returns just plain text.
+
+	function getPlainText() {
+		if ($this->has_html == MARKUP_HTML) {
+			$patterns = array('/<.+>/Usi', '/<\/.+>/Usi');
+		} elseif ($this->has_html == MARKUP_BBCODE) {
+			$patterns = array('/\[.+\]/Usi', '/\[\/.+\]/Usi');
+		}
+		$replacements = array('', '', '', '');
+		$ret = preg_replace($patters, $replacements, $this->data);
+		return $ret;
+	}
+
 	function addHTML($data, $use_nofollow=false) {
 		$ret = $data;
 		$patterns[0] = "/((http|https|ftp):\/\/\S*)/i";
@@ -116,7 +130,7 @@ class Entry {
 		$replacements[1] = '<img alt="$2" title="$2" src="$1" />';
 		$replacements[2] = '<abbr title="$1">$2</abbr>';
 		$replacements[3] = '<acronym title="$1">$2</acronym>';
-		$replacements[4] = '<blockquote>$1</blockquote>';
+		$replacements[4] = '</p><blockquote><p>$1</p></blockquote><p>';
 		$replacements[5] = '<strong>$1</strong>';
 		$replacements[6] = '<em>$1</em>';
 		$replacements[7] = '<span style="text-decoration: underline;">$1</span>';

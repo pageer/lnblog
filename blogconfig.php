@@ -18,6 +18,8 @@ define("PACKAGE_COPYRIGHT", "Copyright (c) 2005, Peter A. Geer <pageer@skepticat
 # or change the document root from www to something else.  Of course, if you
 # don't use ~user directories, you can probably ignore this.
 define("LOCALPATH_TO_URI_MATCH_RE", "/^\/home\/[^\/]+\/www/");
+# The file to save the sitemap link list for the menubar.
+define("SITEMAP_FILE", "sitemap.htm");
 
 # User authentication configuration.
 # Use sessions in authentication or just cookies.
@@ -44,10 +46,14 @@ define("ENTRY_PATH_FORMAT_LONG", "d_His");   # Used for old data file names
 define("ENTRY_DEFAULT_FILE", "current.htm"); # Name of data file
 define("ENTRY_DATE_FORMAT", "Y-m-d H:i T");  # Format to display post dates
 define("ENTRY_COMMENT_DIR", "comments");     # Comment directory
-define("ENTRY_PATH_SUFFIX", ".htm");         # Extension for data files
-define("STICKY_PATH", "sticky.txt");         # If present, show articel in sidebar
+define("ENTRY_TRACKBACK_DIR", "trackback");  # Dir to store TrackBack pings.
+define("ENTRY_PATH_SUFFIX", ".htm");         # Extension for entry data files
+define("STICKY_PATH", "sticky.txt");         # If present, show article in sidebar
 define("COMMENT_RSS1_PATH", "comments.rdf"); # RSS 1.0 feed for comments
 define("COMMENT_RSS2_PATH", "comments.xml"); # RSS 2.0 feed for comments.
+
+# Trackback configuration
+define("TRACKBACK_PATH_SUFFIX", ".txt");     # File suffix for saved pings.
 
 # These are constants for the entry submission form.  
 # Is this the best way to do it?
@@ -72,7 +78,6 @@ define("COMMENT_POST_URL", "url");
 define("COMMENT_POST_DATA", "data");
 define("COMMENT_POST_REMEMBER", "remember");
 
-# Template file data.
 # These are just constants for the names of template files.
 define("BLOG_TEMPLATE_DIR", "templates");
 define("BASIC_LAYOUT_TEMPLATE", "basic_layout_tpl.php");
@@ -92,6 +97,14 @@ define("BLOG_UPDATE_TEMPLATE", "blog_modify_tpl.php");
 define("BLOG_ADMIN_TEMPLATE", "blog_admin_tpl.php");
 define("UPLOAD_TEMPLATE", "upload_form_tpl.php");
 define("FS_CONFIG_TEMPLATE", "fs_config_tpl.php");
+define("TRACKBACK_PING_TEMPLATE", "send_trackback_tpl.php");
+define("TRACKBACK_TEMPLATE", "trackback_tpl.php");
+define("TRACKBACK_LIST_TEMPLATE", "trackback_list_tpl.php");
+define("SITEMAP_TEMPLATE", "sitemap_config_tpl.php");
+define("USER_INFO", "user_info_tpl.php");
+
+#----------------------------------------------------------------------------
+# This section should not normally need to be changed.
 
 # Path delimiter for local paths.
 define("PATH_DELIM", strtoupper(substr(PHP_OS,0,3)=='WIN')?'\\':'/');

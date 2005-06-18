@@ -43,32 +43,37 @@ $title = $ent->subject . " - " . $blg->name;
 # will add it.  We do this before printing the comments so that a 
 # new comment will be displayed on the page.
 $comm = new BlogComment;
-if (POST($SUBMIT_ID)) $comm->getPostData();
-if ($comm->data) {
-	$comm->insert(getcwd());
-	$ent->updateRSS1();
-	$ent->updateRSS2();
+if (POST($SUBMIT_ID)) {
+	$ent->addComment(getcwd());
 }
 
 $content = $ent->getComments(); 
 
+# Extra styles to add.  Build the list as we go to keep from including more
+# style sheets than we need to.
+$extra_styles = array("comment.css");
+
 if ($ent->allow_comment) { 
+	$extra_styles[] = "form.css";
 	$comm_tpl = new PHPTemplate;
 	$comm_tpl->file = COMMENT_FORM_TEMPLATE;
 	$comm_tpl->set("SUBMIT_ID", "submit");
 	$content .= $comm_tpl->process();
 }
 
+/*
 $tpl = new PHPTemplate(COMMENT_LIST_TEMPLATE);
 $tpl->set("ENTRY_PERMALINK", $ent->permalink() );
 $tpl->set("ENTRY_SUBJECT", $ent->subject);
 $tpl->set("COMMENT_LIST", $content);
 $content = $tpl->process();
+*/
 
-$tpl->file = BASIC_LAYOUT_TEMPLATE;
+$tpl = new PHPTemplate(BASIC_LAYOUT_TEMPLATE);
 $blg->exportVars($tpl);
 $tpl->set("PAGE_TITLE", $title);
 $tpl->set("PAGE_CONTENT", $content);
+$tpl->set("STYLE_SHEETS", $extra_styles);
 
 # Set RSS feeds for comments, if we have any.
 if (is_file($entry_path.PATH_DELIM.ENTRY_COMMENT_DIR.PATH_DELIM.COMMENT_RSS2_PATH)) {

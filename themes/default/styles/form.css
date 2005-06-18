@@ -3,13 +3,17 @@
 fieldset {
 	width: 100%;
 	border: 0px;
+	margin: 0;
+	padding: 0;
 }
 
 form {
 	width: 100%;
+	margin: 0;
+	padding: 0;
 }
 
-form div {
+form div, fieldset div {
 	width: 100%;
 	clear: both;
 	margin-top: 0.5em;
@@ -18,6 +22,10 @@ form div {
 
 textarea {
 	width: 100%;
+}
+
+textarea.textbox {
+	width: 40%;
 }
 
 form div.threebutton {
@@ -33,7 +41,7 @@ form div.threebutton input {
 	float: left;
 	clear: left;
 	text-align: right;
-	width: 25%;
+	width: 24%;
 }
 
 .basic_form_data {
@@ -79,7 +87,7 @@ form div.threebutton input {
 	width: 6em;
 }
 
-form label {
+form label, fieldset label {
 	width: 50%;
 	text-align: right;
 	margin-right: 1%;

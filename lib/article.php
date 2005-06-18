@@ -22,6 +22,7 @@ require_once("blogentry.php");
 class Article extends BlogEntry {
 
 	function Article($path="", $revision=ENTRY_DEFAULT_FILE) {
+		$this->uid = ADMIN_USER;
 		$this->ip = get_ip();
 		$this->date = "";
 		$this->timestamp = "";

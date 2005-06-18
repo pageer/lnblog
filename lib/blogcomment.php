@@ -54,6 +54,7 @@ class BlogComment extends Entry {
 	function metadataFields() {
 		$ret = array();
 		$ret["PostID"] =  $this->id;
+		$ret["UserID"] =  $this->uid;
 		$ret["Name"] =  $this->name;
 		$ret["E-Mail"] =  $this->email;
 		$ret["URL"] = $this->url;
@@ -70,6 +71,7 @@ class BlogComment extends Entry {
 	function addMetadata($key, $val) {
 		switch ($key) {
 			case "PostID": $this->id = $val; break;
+			case "UserID": $this->uid = $val; break;
 			case "Name": $this->name = $val; break;
 			case "E-Mail": $this->email = $val; break;
 			case "URL": $this->url = $val; break;
@@ -111,7 +113,10 @@ class BlogComment extends Entry {
 	}
 	
 	function insert($basepath) {
+		
 		$curr_ts = time();
+		$usr = new User;
+		if ($usr->checkLogin()) $this->uid = $usr->username();
 	
 		# Check if the file path is NULL so that we can re-use this routine
 		# when updating an entry.
@@ -185,6 +190,11 @@ class BlogComment extends Entry {
 		#$t->set("ID", $this->id);
 		if (! $this->name) $this->name = ANON_POST_NAME;
 		if (! $this->subject) $this->subject = NO_SUBJECT;
+		if ($this->uid) {
+			$u = new User($this->uid);
+			$u->exportVars($t);
+		}
+		
 		$t->set("SUBJECT", $this->subject);
 		$t->set("URL", $this->url);
 		$t->set("NAME", $this->name);

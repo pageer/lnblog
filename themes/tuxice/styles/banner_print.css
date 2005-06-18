@@ -1,0 +1,8 @@
+/* Site banner styles. */
+@media print {
+
+	#banner {
+		display: none;
+	}
+
+}

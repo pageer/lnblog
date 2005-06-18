@@ -1,10 +1,8 @@
 <!DOCTYPE webproject>
 <webproject>
-  <project usePreviewPrefix="0" type="Local" previewPrefix="" name="LnBlog" encoding="iso 8859-1" >
+  <project usePreviewPrefix="0" previewPrefix="" type="Local" usePersistentBookmarks="0" name="LnBlog" encoding="iso 8859-1" enableEvents="true" >
     <upload/>
-    <author>Peter Geer</author>
-    <email>pageer@skepticats.com</email>
-    <defaultDTD>-//W3C//DTD XHTML 1.0 Strict//EN</defaultDTD>
+    <defaultDTD>-//w3c//dtd xhtml 1.0 strict//en</defaultDTD>
     <item url="lib/" uploadstatus="1" />
     <item url="lib/article.php" uploadstatus="1" />
     <item url="lib/blog.php" uploadstatus="1" />
@@ -122,38 +120,81 @@
     <item url="" uploadstatus="1" />
     <templates>templates/</templates>
     <toolbars>toolbars/</toolbars>
-    <item url="quanta_toolbars/" />
-    <item url="themes/default/templates/js_editor.php" />
-    <item url="themes/tuxice/" />
-    <item url="themes/tuxice/styles/" />
-    <item url="themes/tuxice/styles/article.css" />
-    <item url="themes/tuxice/styles/article_print.css" />
-    <item url="themes/tuxice/styles/banner.css" />
-    <item url="themes/tuxice/styles/banner_print.css" />
-    <item url="themes/tuxice/styles/blog.css" />
-    <item url="themes/tuxice/styles/blogentry.css" />
-    <item url="themes/tuxice/styles/blogentry_print.css" />
-    <item url="themes/tuxice/styles/comment.css" />
-    <item url="themes/tuxice/styles/contact.css" />
-    <item url="themes/tuxice/styles/form.css" />
-    <item url="themes/tuxice/styles/login.css" />
-    <item url="themes/tuxice/styles/main.css" />
-    <item url="themes/tuxice/styles/main_print.css" />
-    <item url="themes/tuxice/styles/menubar.css" />
-    <item url="themes/tuxice/styles/menubar_print.css" />
-    <item url="themes/tuxice/styles/sidebar.css" />
-    <item url="themes/tuxice/styles/sidebar_print.css" />
-    <item url="themes/tuxice/styles/update.css" />
+    <item url="quanta_toolbars/" uploadstatus="1" />
+    <item url="themes/default/templates/js_editor.php" uploadstatus="1" />
+    <item url="themes/tuxice/" uploadstatus="1" />
+    <item url="themes/tuxice/styles/" uploadstatus="1" />
+    <item url="themes/tuxice/styles/article.css" uploadstatus="1" />
+    <item url="themes/tuxice/styles/article_print.css" uploadstatus="1" />
+    <item url="themes/tuxice/styles/banner.css" uploadstatus="1" />
+    <item url="themes/tuxice/styles/banner_print.css" uploadstatus="1" />
+    <item url="themes/tuxice/styles/blog.css" uploadstatus="1" />
+    <item url="themes/tuxice/styles/blogentry.css" uploadstatus="1" />
+    <item url="themes/tuxice/styles/blogentry_print.css" uploadstatus="1" />
+    <item url="themes/tuxice/styles/comment.css" uploadstatus="1" />
+    <item url="themes/tuxice/styles/contact.css" uploadstatus="1" />
+    <item url="themes/tuxice/styles/form.css" uploadstatus="1" />
+    <item url="themes/tuxice/styles/login.css" uploadstatus="1" />
+    <item url="themes/tuxice/styles/main.css" uploadstatus="1" />
+    <item url="themes/tuxice/styles/main_print.css" uploadstatus="1" />
+    <item url="themes/tuxice/styles/menubar.css" uploadstatus="1" />
+    <item url="themes/tuxice/styles/menubar_print.css" uploadstatus="1" />
+    <item url="themes/tuxice/styles/sidebar.css" uploadstatus="1" />
+    <item url="themes/tuxice/styles/sidebar_print.css" uploadstatus="1" />
+    <item url="themes/tuxice/styles/update.css" uploadstatus="1" />
+    <uploadprofiles showtreeviews="true" defaultProfile="@" >
+      <profile remote_host="" remote_port="" remote_path="" remote_protocol="ftp" user="" name="@" />
+    </uploadprofiles>
+    <item url="lib/ftp.php" uploadstatus="1" />
+    <item url="lib/tb.php" uploadstatus="1" />
+    <item url="lib/user.php" uploadstatus="1" />
+    <item url="pages/showall.php" uploadstatus="1" />
+    <item url="pages/showtrackbacks.php" uploadstatus="1" />
+    <item url="pages/tb_ping.php" uploadstatus="1" />
+    <item url="quanta_templates/" uploadstatus="1" />
+    <item url="themes/default/images/rss1_button.png" uploadstatus="1" />
+    <item url="themes/default/images/rss1_comments_button.png" uploadstatus="1" />
+    <item url="themes/default/images/rss2_button.png" uploadstatus="1" />
+    <item url="themes/default/images/rss2_comments_button.png" uploadstatus="1" />
+    <item url="themes/default/styles/trackback.css" uploadstatus="1" />
+    <item url="themes/default/templates/send_trackback_tpl.php" uploadstatus="1" />
+    <item url="themes/default/templates/trackback_list_tpl.php" uploadstatus="1" />
+    <item url="themes/default/templates/trackback_tpl.php" uploadstatus="1" />
+    <item url="themes/tuxice/images/" uploadstatus="1" />
+    <item url="themes/tuxice/images/Penguin.png" uploadstatus="1" />
+    <item url="themes/tuxice/images/background.png" uploadstatus="1" />
+    <item url="themes/tuxice/images/logo.png" uploadstatus="1" />
+    <item url="themes/tuxice/images/rss1_button.png" uploadstatus="1" />
+    <item url="themes/tuxice/images/rss1_comments_button.png" uploadstatus="1" />
+    <item url="themes/tuxice/images/rss2_button.png" uploadstatus="1" />
+    <item url="themes/tuxice/images/rss2_comments_button.png" uploadstatus="1" />
+    <item url="themes/tuxice/images/tux.png" uploadstatus="1" />
+    <item url="themes/tuxice/scripts/" uploadstatus="1" />
+    <item url="themes/tuxice/styles/trackback.css" uploadstatus="1" />
+    <item url="themes/tuxice/templates/" uploadstatus="1" />
+    <item url="themes/tuxice/templates/basic_layout_tpl.php" uploadstatus="1" />
+    <item url="themes/tuxice/templates/include_banner.php" uploadstatus="1" />
+    <item url="LICENSE" uploadstatus="1" />
+    <item url="TODO" uploadstatus="1" />
+    <item url="lnblog.webprj" uploadstatus="1" />
+    <item url="passwd.php" uploadstatus="1" />
+    <author>Peter Geer</author>
+    <email>pageer@skepticats.com</email>
+    <debuggerclient>No Debugger</debuggerclient>
+    <exclude cvsignore="false" >.directory;.svn;</exclude>
+    <teamdata>
+      <taskleaders/>
+      <subprojectleaders/>
+      <mailinglist address="" />
+    </teamdata>
+    <events/>
     <treestatus>
-      <openfolder url="lib" />
-      <openfolder url="pages" />
       <openfolder url="themes" />
       <openfolder url="themes/default" />
-      <openfolder url="themes/default/styles" />
       <openfolder url="themes/default/templates" />
-      <openfolder url="themes/skepticats" />
-      <openfolder url="themes/skepticats/styles" />
-      <openfolder url="themes/skepticats/templates" />
+      <openfolder url="themes/tuxice" />
+      <openfolder url="themes/tuxice/styles" />
+      <openfolder url="themes/tuxice/templates" />
     </treestatus>
   </project>
 </webproject>

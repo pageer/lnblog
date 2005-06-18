@@ -21,67 +21,10 @@
 # Do the standard library includes.
 require_once("blogconfig.php");
 require_once("template.php");
+$EXCLUDE_FS = true;
+require_once("utils.php");
 
 session_start();
-
-# These functions are more or less copied from utils.php because we can't
-# include utils.php due to conflicts with includign fs.php, which I really
-# don't feel like resolving right now.
-
-function has_post() {
-	$ver1_arr = explode(".", phpversion() );
-	$ver2_arr = explode(".", "4.1.0");
-	$ver_ret = 0;
-	for ($i=0; $i < 3; $i++)  
-		if ($ver1_arr[$i] != $ver2_arr[$i]) {
-			$ver_ret = $ver1_arr[$i] > $ver2_arr[$i] ? 1 : -1;
-			break;
-		}
-	if ($ver_ret >= 0) return count($_POST);
-	else return count($HTTP_POST_VARS);
-}
-
-function POST($key, $val="") {
-	$ver1_arr = explode(".", phpversion() );
-	$ver2_arr = explode(".", "4.1.0");
-	$ver_ret = 0;
-	for ($i=0; $i < 3; $i++)  
-		if ($ver1_arr[$i] != $ver2_arr[$i]) {
-			$ver_ret = $ver1_arr[$i] > $ver2_arr[$i] ? 1 : -1;
-			break;
-		}
-	if ($ver_ret >= 0) {
-		if ($val) return $_POST[$key] = $val;
-		elseif (isset($_POST[$key])) return $_POST[$key];
-		else return false;
-	} else {
-		if ($val) return $HTTP_POST_VARS[$key] = $val;
-		elseif (isset($HTTP_POST_VARS[$key])) return $HTTP_POST_VARS[$key];
-		else return false;
-	}
-}
-
-function SERVER($key, $val="") {
-	$ver1_arr = explode(".", phpversion() );
-	$ver2_arr = explode(".", "4.1.0");
-	$ver_ret = 0;
-	for ($i=0; $i < 3; $i++)  
-		if ($ver1_arr[$i] != $ver2_arr[$i]) {
-			$ver_ret = $ver1_arr[$i] > $ver2_arr[$i] ? 1 : -1;
-			break;
-		}
-	if ($ver_ret >= 0) {
-		if ($val) return $_SERVER[$key] = $val;
-		elseif (isset($_SERVER[$key])) return $_SERVER[$key];
-		else return false;
-	} else {
-		if ($val) return $HTTP_SERVER_VARS[$key] = $val;
-		elseif (isset($HTTP_SERVER_VARS[$key])) return $HTTP_SERVER_VARS[$key];
-		else return false;
-	}
-}
-
-# Now we get to the real code.
 
 $ftp = "use_ftp";
 $uid = "ftp_user";
@@ -182,6 +125,7 @@ $body = $tpl->process();
 $tpl->reset(BASIC_LAYOUT_TEMPLATE);
 $tpl->set("PAGE_CONTENT", $body);
 $tpl->set("PAGE_TITLE", $page_name);
+$tpl->set("STYLE_SHEETS", array("form.css") );
 
 echo $tpl->process();
 ?>

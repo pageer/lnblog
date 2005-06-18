@@ -54,6 +54,7 @@ $tpl->reset(BASIC_LAYOUT_TEMPLATE);
 $blog->exportVars($tpl);
 $tpl->set("PAGE_CONTENT", $body);
 $tpl->set("PAGE_TITLE", $page_name." - Login");
+$tpl->set("STYLE_SHEETS", array("form.css") );
 
 echo $tpl->process();
 ?>

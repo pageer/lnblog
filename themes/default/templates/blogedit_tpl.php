@@ -38,5 +38,5 @@
 </form>
 </fieldset>
 <script type="text/javascript">
-document.forms[0].elements['<?php echo ENTRY_POST_SUBJECT; ?>'].focus();
+document.getElementById('<?php echo ENTRY_POST_SUBJECT; ?>').focus();
 </script>

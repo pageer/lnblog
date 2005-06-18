@@ -24,22 +24,25 @@ require_once("template.php");
 require_once("entry.php");
 #require_once("blogcomment.php");
 
-
-
 class BlogEntry extends Entry {
 	
 	var $blogid;
 	var $allow_comment = true;
 	var $has_html;
+	var $mail_notify = true;
+	var $sent_ping = true;
 	var $abstract;
 
 	function BlogEntry ($path="", $revision=ENTRY_DEFAULT_FILE) {
 		
+		$this->uid = ADMIN_USER;
 		$this->ip = get_ip();
 		$this->date = "";
 		$this->post_date = false;
 		$this->timestamp = "";
 		$this->post_ts = false;
+		$this->mail_notify = true;
+		$this->sent_ping = true;
 		$this->subject = "";
 		$this->data = "";
 		$this->abstract = "";
@@ -80,6 +83,8 @@ class BlogEntry extends Entry {
 		$ret["Timestamp"] =  $this->timestamp;
 		$ret["PostTimestamp"] = $this->post_ts;
 		$ret["IP"] =  $this->ip;
+		$ret["Mail Notification"] = $this->mail_notify;
+		$ret["TrackBack Ping"] = $this->sent_ping;
 		$ret["Subject"] =  $this->subject;
 		$ret["Abstract"] = $this->abstract;
 		$ret["AllowComment"] =  $this->allow_comment;
@@ -87,15 +92,20 @@ class BlogEntry extends Entry {
 		return $ret;
 	}
 	
+	# Note that for some fields, the assignment is conditional.
+	# This is to prevent default values from being over-written by empty ones.
+	
 	function addMetadata($key, $val) {
 		switch ($key) {
 			case "PostID": $this->id = $val; break;
-			case "UserID": $this->uid = $val; break;
+			case "UserID": if ($val) $this->uid = $val; break;
 			case "Date": $this->date = $val; break;
 			case "PostDate": $this->post_date = $val; break;
 			case "Timestamp": $this->timestamp = $val; break;
 			case "PostTimestamp": $this->post_ts = $val; break;
 			case "IP": $this->ip = $val; break;
+			case "Mail Notification": $this->mail_notify = $val; break;
+			case "TrackBack Ping": $this->sent_ping = $val; break;
 			case "Subject": $this->subject = $val; break;
 			case "Abstract": $this->abstract = $val; break;
 			case "AllowComment": $this->allow_comment = $val; break;
@@ -167,7 +177,9 @@ class BlogEntry extends Entry {
 
 	function insert ($base_path=false) {
 	
-		if (! check_login()) return false;
+		$usr = new User;
+		if (! $usr->checkLogin() ) return false;
+		$this->uid = $usr->username();
 	
 		$curr_ts = time();
 		if (!$base_path) $basepath = getcwd().PATH_DELIM.BLOG_ENTRY_PATH;
@@ -188,6 +200,7 @@ class BlogEntry extends Entry {
 
 		# Create the comments directory.
 		create_directory_wrappers($dir_path.PATH_DELIM.ENTRY_COMMENT_DIR, ENTRY_COMMENTS);
+		create_directory_wrappers($dir_path.PATH_DELIM.ENTRY_TRACKBACK_DIR, ENTRY_TRACKBACKS);
 				
 		$this->file = $dir_path.PATH_DELIM.ENTRY_DEFAULT_FILE;
 		# Set the timestamp and date, plus the ones for the original post, if
@@ -223,25 +236,32 @@ class BlogEntry extends Entry {
 
 	function get() {
 		$tmp = new PHPTemplate(ENTRY_TEMPLATE);
-
+		
+		$usr = new User($this->uid);
+		$usr->exportVars($tmp);
+		
 		$tmp->set("SUBJECT", $this->subject);
 		$tmp->set("POSTDATE", $this->prettyDate($this->post_ts) );
 		$tmp->set("EDITDATE", $this->prettyDate() );
 		$body_text = $this->data;
-		if ($this->has_html == MARKUP_BBCODE) 
+		if ($this->has_html == MARKUP_BBCODE) {
 			$body_text = $this->absolutizeBBCodeURI($body_text, $this->permalink() );
+		}
 		$body_text = $this->markup($body_text);
 		$tmp->set("ABSTRACT", $this->abstract);
 		$tmp->set("BODY", $body_text);
+		$tmp->set("ALLOW_COMMENTS", $this->allow_comment);
 		$tmp->set("PERMALINK", $this->permalink() );
 		$tmp->set("POSTEDIT", $this->permalink()."edit.php");
 		$tmp->set("POSTDELETE", $this->permalink()."delete.php");
-		$tmp->set("POSTCOMMENTS", $this->permalink().ENTRY_COMMENT_DIR);
 		$tmp->set("COMMENTCOUNT", $this->getCommentCount() );
+		$tmp->set("TRACKBACKCOUNT", $this->getTrackbackCount() );
 		
 		$ret = $tmp->process();
 		return $ret;
 	}
+
+	# Comment handling functions.
 
 	function updateRSS1() {
 		$feed = new RSS1;
@@ -281,6 +301,32 @@ class BlogEntry extends Entry {
 				"<![CDATA[".$ent->markup($ent->data)."]]>");
 		
 		$ret = $feed->writeFile($path);	
+		return $ret;
+	}
+
+	function addComment($path) {
+		if (! $this->allow_comment) return false;
+		$cmt = new BlogComment;
+		$cmt->getPostData();
+		if ($cmt->data) {
+			$ret = $cmt->insert($path);
+			if ($ret) {
+				if ($this->mail_notify) {
+					$u = new User($this->uid);
+					mail($u->email(), "Comment on ".$this->subject,
+					     "A new reader comment has been posted.\n".
+						  "The URL for this comment is: ".$cmt->permalink()."\n\n".
+					     "Name: ".$cmt->name."\n".
+					     "E-mail: ".$cmt->email."\n".
+					     "URL: ".$cmt->url."\n".
+						  "Subject: ".$cmt->subject."\n\n".
+						  $cmt->data, "From: LnBlog comment notifier");
+				}
+				$this->updateRSS1();
+				$this->updateRSS2();
+			}
+		}
+		else $ret = false;
 		return $ret;
 	}
 
@@ -329,7 +375,89 @@ class BlogEntry extends Entry {
 		foreach ($comment_files as $file) {
 			$ret .= $file->get();
 		}
+		$tpl = new PHPTemplate(COMMENT_LIST_TEMPLATE);
+		$tpl->set("ENTRY_PERMALINK", $this->permalink() );
+		$tpl->set("ENTRY_SUBJECT", $this->subject);
+		$tpl->set("COMMENT_LIST", $ret);
+		$ret = $tpl->process();
+
 		return $ret;
+	}
+
+	# TrackBack handling functions.  
+
+	function getTrackbackCount() {
+		$dir_path = dirname($this->file);
+		$tb_path = $dir_path.PATH_DELIM.ENTRY_TRACKBACK_DIR;
+		$tb_dir_content = scan_directory($tb_path);
+		if ($tb_dir_content === false) return false;
+		
+		$count = 0;
+		foreach ($tb_dir_content as $file) {
+			$cond = is_file($tb_path.PATH_DELIM.$file) && 
+			        preg_match("/[\w\d]+".TRACKBACK_PATH_SUFFIX."/", $file);
+			if ($cond) $count++;
+		}
+		return $count;
+	}
+
+	# Get an array of Trackback objects that contains all TrackBacks for 
+	# this entry.
+
+	function getTrackbackArray($sort_asc=true) {
+		$dir_path = dirname($this->file);
+		$tb_path = $dir_path.PATH_DELIM.ENTRY_TRACKBACK_DIR;
+		if (! is_dir($tb_path)) return false;
+		else $tb_dir_content = scan_directory($tb_path);
+		
+		$tb_files = array();
+		foreach ($tb_dir_content as $file) {
+			$cond = is_file($tb_path.PATH_DELIM.$file) && 
+			        preg_match("/[\w\d]+".TRACKBACK_PATH_SUFFIX."/", $file);
+			if ($cond) $tb_files[] = $file; 
+		}
+		if ($sort_asc) sort($tb_files);
+		else rsort($tb_files);
+
+		$tb_array = array();
+		foreach ($tb_files as $file) 
+			$tb_array[] = new Trackback($tb_path.PATH_DELIM.$file);
+		
+		return $tb_array;
+	}
+
+	# Get some HTML that displays the TrackBacks for this entry.
+
+	function getTrackbacks($sort_asc=true) {
+		$trackbacks = $this->getTrackbackArray($sort_asc);	
+		if (!$trackbacks) return "";
+		$ret = "";
+		foreach ($trackbacks as $tb) {
+			$ret .= $tb->get();
+		}
+		
+		$tpl = new PHPTemplate(TRACKBACK_LIST_TEMPLATE);
+		$tpl->set("ENTRY_PERMALINK", $this->permalink() );
+		$tpl->set("ENTRY_SUBJECT", $this->subject);
+		$tpl->set("TB_LIST", $ret);
+		$ret = $tpl->process();
+		
+		return $ret;
+	}
+
+	function getPing() {
+		$tb = new Trackback;
+		$ret = $tb->receive(dirname($this->file).PATH_DELIM.ENTRY_TRACKBACK_DIR);
+		return $ret;
+	}
+
+	function sendPing($url, $excerpt='') {
+		$tb = new Trackback;
+		$tb->title = $this->subject;
+		$tb->blog = BLOG_ROOT_URL;
+		$tb->url = $this->permalink();
+		$tb->data = $excerpt;
+		return $tb->send($url);
 	}
 
 }

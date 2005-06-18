@@ -1,14 +1,15 @@
 /* Styles for comments. */
 
-@import url(form.css);
-
 #entrycomments {
 	margin-top: 1%;
 }
 
+.commentlist {
+	list-style-type: none;
+	padding-left: 0;
+}
 
-div.fullcomment {
-	/*border: thin solid black;*/
+.fullcomment {
 	border-bottom: thin dotted black;
 }
 
@@ -44,4 +45,8 @@ div.commentdata {
 div.commentfooter li.commenturl, div.commentfooter li.commentname {
 	display: inline;
 	margin-right: 1%;
+}
+
+div.commentname li[class~='user'] {
+	font-weight: bold;
 }

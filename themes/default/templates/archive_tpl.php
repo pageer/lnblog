@@ -6,3 +6,6 @@
 <li><a href="<?php echo $LINK["URL"]; ?>"><?php echo $LINK["DESC"]; ?></a></li>
 <?php } ?>
 </ul>
+<?php if (isset($SHOW_TEXT)) { ?>
+<p><a href="?show=all">Show all entries at once</a></p>
+<?php } ?>

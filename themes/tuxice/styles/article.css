@@ -1,0 +1,49 @@
+/* Styles for blog entries. */
+
+@import url(article_print.css);
+
+div.article {
+	/*border: thin solid black;*/
+	border-bottom: thin dotted black;
+	margin-bottom: 1%;
+	/*width: 50%;*/
+}
+
+/*
+div.articleheader {
+	border-bottom: thin solid black;
+	background-color: #c3c3c3;
+}
+*/
+
+div.articleheader img {
+	border: none;
+	float: right;
+}
+
+div.articleheader h2 {
+	margin: 0px;
+	padding: 0px;
+}
+
+div.articlefooter {
+	font-size: 80%;
+}
+
+div.articlefooter ul {
+	margin: 0px;
+	padding: 0px;
+}
+
+div.articlefooter li {
+	list-style-type: none;
+}
+
+.blogadmin {
+	display: inline;
+}
+
+div.article  div.articlebody {
+	padding: 1%;
+	/*white-space: pre;*/
+}

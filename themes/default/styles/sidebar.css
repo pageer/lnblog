@@ -60,6 +60,10 @@
 	background-color: white;
 }
 
+#sidebar ul.imglist li a:hover {
+	background-color: #f4f4f4;  /* Match the normal background. */
+}
+
 #sidebar ul li a {
 	display: block;
 	padding-left: 8%;
@@ -68,6 +72,7 @@
 
 #sidebar img {
 	text-align: center;
+	vertical-align: middle;
 	margin: 1% 0 1% 5%;
 	border: 0px;
 }

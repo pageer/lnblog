@@ -42,9 +42,13 @@ $tpl->set("PERMS", $fixperm);
 $tpl->set("FORM_ACTION", current_file());
 
 $usr = new User;
-if (! is_file("passwd.php")) redirect("newlogin.php");
-elseif (! $usr->checkLogin() || $usr->username() != ADMIN_USER) 
+if (! is_file(INSTALL_ROOT.PATH_DELIM."passwd.php")) {
+	redirect("newlogin.php");
+	exit;
+} elseif (! $usr->checkLogin() || $usr->username() != ADMIN_USER) {
 	redirect("bloglogin.php");
+	exit;
+}
 
 if (POST($upgrade)) {
 	$b = new Blog(POST($upgrade));

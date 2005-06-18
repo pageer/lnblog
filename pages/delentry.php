@@ -23,17 +23,14 @@ require_once("config.php");
 require_once("blog.php");
 require_once("blogentry.php");
 
-if (! check_login() ) redirect("index.php");
-
 $blog = new Blog();
-$ent = new BlogEntry(getcwd());
 
 $conf_id = "ok";
 $cancel_id = "cancel";
 $message = "Remove the weblog entry\"".$ent->subject."\"?";
 
 if (POST($conf_id)) {
-	$ret = $ent->delete();
+	$ret = $blog->deleteEntry();
 	if ($ret) redirect(BLOG_ROOT_URL);
 	else $message = "Unable to delete \"".$ent->subject."\".  Try again?";
 } elseif (POST($cancel_id)) {

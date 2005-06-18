@@ -1,0 +1,69 @@
+/* Styles for blog entries. */
+
+@import url(blogentry_print.css);
+
+div.blogentry {
+	/*border: thin solid black;*/
+	border-bottom: thin dotted black;
+	margin-bottom: 1%;
+	/*width: 50%;*/
+}
+
+/*
+div.blogentryheader {
+	border-bottom: thin solid black;
+	background-color: #c3c3c3;
+}
+*/
+
+div.blogentryheader img {
+	border: none;
+	float: right;
+}
+
+div.blogentryheader {
+	margin: 0px;
+	padding: 0px;
+	/*background-color: #c3c3c3;
+	border: 1px solid black;*/
+}
+/*
+.blogentryheader h2, .blogentryheader ul {
+	margin-left: 1em;
+}*/
+
+.blogentrybody {
+	border: 1px dotted black;
+	background-color: white;
+}
+
+.blogentryfooter, .postdata {
+	font-size: 80%;
+}
+
+div.blogentryfooter ul, .postdata {
+	margin: 0px;
+	padding: 0px;
+}
+
+.blogentryfooter li, .blogentryheader li {
+	list-style-type: none;
+}
+
+.blogadmin {
+	display: inline;
+	margin-right: 1%;
+}
+
+div.blogentry  div.blogentrybody {
+	padding: 1%;
+	/*white-space: pre;*/
+}
+
+div.blogentry div.blogentrybody p {
+	text-indent: 1em;
+}
+
+.bloguser, .bloguserurl {
+	display: inline;
+}

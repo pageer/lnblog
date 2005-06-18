@@ -21,13 +21,11 @@
 # Utility library.  Implements some general purpose functions plus some
 # wrappers that implement functionality available in PHP 5.
 
-require_once("fs.php");
+require_once("blogconfig.php");
+if (empty($EXCLUDE_FS)) {
+	require_once("fs.php");
+}
 require_once("user.php");
-/*
-define("LOGIN_TOKEN", "lToken");
-define("LAST_LOGIN_TIME", "lastLTime");
-define("CURRENT_USER", "uName");
-*/
 
 # Types of directories to create.
 define("BLOG_BASE", 0);
@@ -38,6 +36,13 @@ define("ENTRY_BASE", 4);
 define("ENTRY_COMMENTS", 5);
 define("ARTICLE_BASE", 6);
 define("BLOG_ARTICLES", 7);
+define("ENTRY_TRACKBACKS", 8);
+
+# Types of files for use with the getlink() function.
+# For convenience, these are defined as the directories under a theme.
+define("LINK_IMAGE", "images");
+define("LINK_STYLESHEET", "styles");
+define("LINK_SCRIPT", "scripts");
 
 # Return the canonical path for a given file.  The file need no exist.
 # Removes all '.' and '..' components and returns an absolute path.
@@ -371,6 +376,7 @@ function create_directory_wrappers($path, $type, $instpath="") {
 			$ret &= $fs->write_file($current."login.php", $head."bloglogin".$tail);
 			$ret &= $fs->write_file($current."logout.php", $head."bloglogout".$tail);
 			$ret &= $fs->write_file($current."uploadfile.php", $head."fileupload".$tail);
+			$ret &= $fs->write_file($current."map.php", $head."sitemap".$tail);
 			$ret &= $fs->write_file($current."config.php", $config_data);
 			break;
 		case BLOG_ENTRIES:
@@ -391,6 +397,7 @@ function create_directory_wrappers($path, $type, $instpath="") {
 			$ret &= $fs->write_file($current."edit.php", $head."editentry".$tail);
 			$ret &= $fs->write_file($current."delete.php", $head."delentry".$tail);
 			$ret &= $fs->write_file($current."uploadfile.php", $head."fileupload".$tail);
+			$ret &= $fs->write_file($current."trackback.php", $head."tb_ping".$tail);
 			$ret &= $fs->copy($parent."config.php", $current."config.php");
 			break;
 		case ENTRY_COMMENTS:
@@ -398,10 +405,17 @@ function create_directory_wrappers($path, $type, $instpath="") {
 			$ret = $fs->write_file($current."delete.php", $head."delcomment".$tail);
 			$ret &= $fs->copy($parent."config.php", $current."config.php");
 			break;
+		case ENTRY_TRACKBACKS:
+			$ret = $fs->write_file($current."index.php", $head."showtrackbacks".$tail);
+			$ret &= $fs->copy($parent."config.php", $current."config.php");
+			break;
 		case ARTICLE_BASE:
 			$ret = $fs->write_file($current."index.php", $head."showarticle".$tail);
 			$ret &= $fs->write_file($current."edit.php", $head."editarticle".$tail);
 			$ret &= $fs->write_file($current."uploadfile.php", $head."fileupload".$tail);
+			# Note: since articles are decended from blgo entries, we don't
+			# need a separate page for article trackbacks.
+			$ret &= $fs->write_file($current."trackback.php", $head."tb_ping".$tail);
 			$ret &= $fs->copy($parent."config.php", $current."config.php");
 			break;
 		case BLOG_ARTICLES:
@@ -413,88 +427,83 @@ function create_directory_wrappers($path, $type, $instpath="") {
 	return $ret;
 }
 
-# User authentication functions. 
+# Returns a path suitable for use with <link> tags or as an href or src 
+# attribute.  Takes a file name and optional type (script, image, or style 
+# sheet) and returns a URI.  If the type is not given, the function guesses 
+# it from the file extension.
 
-# Authentication can be on a system wide or per-directory basis.  The username and 
-# password are stored in the passwd.php file as defined consntants and the file is
-# require()ed to retreive the values.  Note that the password is an MD5 hash or the 
-# actual password contactenated with the username.
+function getlink($name, $type=false) {
+	if ($type) {
+		$l_type = $type;
+	} else {
+	
+		# Extract the file extension, i.e. the part after the last '.' 
+		$file_ext = strtolower(substr($name, strpos($name, ".") + 1));
 
-# Authentication is checked by comparing a server-side session variable 
-# to a client side cookie.
+		# Choose a type based on extension.  This is the place to add any
+		# extra extensions you need to support.  I don't know what the 
+		# performance penalty for that might be, but it's probably small.
+		switch ($file_ext) {
+			case "jpg":
+			case "jpeg":
+			case "png":
+			case "gif":
+			case "bmp":
+			case "tif":
+			case "tiff":
+				$l_type = LINK_IMAGE;
+				break;
+			case "js":
+			case "vbs":
+				$ltype = LINK_SCRIPT;
+				break;
+			case "css":
+				$l_type = LINE_STYLESHEET;
+				break;
+		}
+	}
 
-function make_login_token($ts) {
-	return md5(get_ip().$ts);
+	# If we didn't find a suitable file type, then bail out.
+	if (! $l_type) return false;
+
+	# Find the file using a search-path metaphor.  This isn't actually 
+	# configurable, though.
+	
+	# First case: check the blog directory
+	if ( defined("BLOG_ROOT") && defined("BLOG_ROOT_URL") &&
+	     file_exists(BLOG_ROOT.PATH_DELIM.$l_type.PATH_DELIM.$name) ) {
+		
+		return BLOG_ROOT_URL.$l_type."/".$name;
+		
+	# Second case: check the current theme directory
+	} elseif ( file_exists(INSTALL_ROOT.PATH_DELIM."themes".PATH_DELIM.THEME_NAME.PATH_DELIM.$l_type.PATH_DELIM.$name) ) {
+	
+		return INSTALL_ROOT_URL."themes/".THEME_NAME."/".$l_type."/".$name;
+
+	# Last case: use the default theme
+	} else {
+		return INSTALL_ROOT_URL."themes/default/".$l_type."/".$name;
+	}
+
 }
-/*
-function create_passwd_file($dirpath, $uname, $pwd) {
-	$uid = trim($uname);
-	$pass = trim($pwd);
-	$content =  "<?php\n";
-	$content .= "define(\"AUTH_USERNAME\", \"".$uid."\");\n";
-	$content .= "define(\"AUTH_PASSWORD\", \"".md5($pass.$uid)."\");\n";
-	$content .= "?>";
-	return write_file($dirpath.PATH_DELIM."passwd.php", $content);
-}
-*/
-function passwd_file_exists($dir=false) {
-	if (! $dir) $dir = getcwd();
-	$path = realpath($dir.PATH_DELIM."passwd.php");
-	return file_exists($path);
-}
+
+# User authentication functions.  These are just for compatibility with the old code.
+# The functions themselves have been rewritten to use the new User class.
 
 function do_login($uname, $pwd) {
 	if ( trim($uname) == "" || trim($pwd) == "" ) return false;
 	$usr = new User($uname);
 	return $usr->login($pwd);
-	/*
-	require("passwd.php");
-	$uid = trim($uname);
-	$pass = trim($pwd);
-	$user_name = AUTH_USERNAME;
-	$password = AUTH_PASSWORD;
-	$check_passwd = md5($pass.$uid);
-	if ($uname == $user_name && $password == $check_passwd) {
-		# Create a login token.
-		$ts = time();
-		$token = make_login_token($ts);
-		#setcookie(LOGIN_TOKEN, $token);
-		setcookie(LAST_LOGIN_TIME, $ts);
-		SESSION(CURRENT_USER, AUTH_USERNAME);
-		SESSION(LOGIN_TOKEN, $token);
-		SESSION(LAST_LOGIN_TIME, $ts);
-		$ret = true;
-	} else $ret = false;
-	return $ret;
-	*/
 }
 
 function do_logout() {
 	$usr = new User();
 	$usr->logout();
-/*
-	SESSION(CURRENT_USER, false);
-	SESSION(LOGIN_TOKEN, false);
-	SESSION(LAST_LOGIN_TIME, false);
-	setcookie(LOGIN_TOKEN, "");
-	setcookie(LAST_LOGIN_TIME, "");
-*/
 }
-
-# Check that 
 
 function check_login()  {
 	$usr = new User();
 	return $usr->checkLogin();
-/*
-	$cookie_ts = COOKIE(LAST_LOGIN_TIME);
-	$auth_token = make_login_token($cookie_ts);
-	$auth_ok = ($auth_token == SESSION(LOGIN_TOKEN) );
-	$auth_ok &= ($cookie_ts == SESSION(LAST_LOGIN_TIME) );
-	#echo "<p>$cookie_ts</p><p>$auth_token</p>";
-	if ($auth_ok) return true;
-	else return false;
-*/
 }
 
 ?>

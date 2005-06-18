@@ -43,32 +43,19 @@ $tpl->set("DATA", $ent->data);
 $tpl->set("COMMENTS", $ent->allow_comment);
 $tpl->set("HAS_HTML", $ent->has_html);
 
-if ( has_post() ) {
-	
-	# Update the template variables with the new values.
-	$ent->getPostData();
-	$tpl->set("SUBJECT", $ent->subject);
-	$tpl->set("DATA", $ent->data);
-	$tpl->set("COMMENTS", $ent->allow_comment);
-	$tpl->set("HAS_HTML", $ent->has_html);
-	
-	if ($ent->data) {
-		if (POST($submit_id)) {
-			$ent->update();
-			redirect($ent->permalink());
-		} else {
-			$tpl->set("PREVIEW_DATA", $ent->get() );
-		}
-	} else {
-		$tpl->set("HAS_UPDATE_ERROR");
-		$tpl->set("UPDATE_ERROR_MESSAGE", "Error updating blog entry.");
-	}
-}
+if (POST($submit_id)) {
+	$ret = $blg->updateArticle();
+	$last_art =& $blg->last_article;
+	if ($ret == UPDATE_SUCCESS) redirect($last_art->permalink());
+	else $blg->errorArticle($ret, $tpl);
+} elseif (POST($preview_id)) {
+	$blg->previewArticle($tpl);
+}	
+
 $body = $tpl->process();
 $tpl->file = BASIC_LAYOUT_TEMPLATE;
 $tpl->set("PAGE_CONTENT", $body);
 $tpl->set("PAGE_TITLE", $blg->name." - New Entry");
-$styles = array(THEME_STYLES."/main.css", THEME_STYLES."/blog.css", THEME_STYLES."/form.css");
-$tpl->set("STYLE_SHEETS", $styles);
+$tpl->set("STYLE_SHEETS", array("form.css", "article.css") );
 echo $tpl->process();
 ?>

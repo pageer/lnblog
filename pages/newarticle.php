@@ -27,28 +27,18 @@ session_start();
 require_once("blog.php");
 require_once("article.php");
 
-if (! check_login() ) redirect("index.php");
-
-$ent = new Article;
 $blg = new Blog();
 
-$subject = ENTRY_POST_SUBJECT;
-$path = "path";
-$data = ENTRY_POST_DATA;
-$html = ENTRY_POST_HTML;
-$comments = ENTRY_POST_COMMENTS;
 $url = "art_url";
-
 $submit_id = "submit";
 $preview_id = "preview";
 $tpl = new PHPTemplate(ARTICLE_EDIT_TEMPLATE);
 
 $tpl->set("FORM_ACTION", current_file() );
-$tpl->set("ARTICLE_POST_SUBJECT", $subject);
-$tpl->set("ARTICLE_POST_PATH", $path);
-$tpl->set("ARTICLE_POST_DATA", $data);
-$tpl->set("ARTICLE_POST_HTML", $html);
-$tpl->set("ARTICLE_POST_COMMENTS", $comments);
+$tpl->set("ARTICLE_POST_SUBJECT", ENTRY_POST_SUBJECT);
+$tpl->set("ARTICLE_POST_DATA", ENTRY_POST_DATA);
+$tpl->set("ARTICLE_POST_HTML", ENTRY_POST_HTML);
+$tpl->set("ARTICLE_POST_COMMENTS", ENTRY_POST_COMMENTS);
 $tpl->set("ARTICLE_POST_URL", $url);
 
 # Disable comments by default.
@@ -58,38 +48,20 @@ $tpl->set("PREV_ID", $preview_id);
 $tpl->set("HAS_HTML", MARKUP_BBCODE);
 $blg->exportVars($tpl);
 
-if ( has_post() ) {
-	
-	$ent->getPostData();
-	$tpl->set("SUBJECT", $ent->subject);
-	$tpl->set("URL", POST($url) );
-	$tpl->set("DATA", $ent->data );
-	$tpl->set("HAS_HTML", $ent->has_html );
-
-	if ($ent->data) {
-		if (POST($submit_id)) {
-			$ret =  $ent->insert(trim(POST($url)));
-			if ($ret) {
-				$ent->setSticky();
-				redirect($ent->permalink());
-			} else {
-				$tpl->set("HAS_UPDATE_ERROR");
-				$tpl->set("UPDATE_ERROR_MESSAGE", "Could not write file.");
-			}
-		} else {
-			$tpl->set("PREVIEW_DATA", $ent->get() );
-		}
-	} else {
-		$tpl->set("HAS_UPDATE_ERROR");
-		$tpl->set("UPDATE_ERROR_MESSAGE", "Article has no text.");
-	}
+if (POST($submit_id)) {
+	$ret = $blg->newArticle(POST($url));
+	$last_art =& $blg->last_article;
+	if ($ret == UPDATE_SUCCESS) redirect($blg->last_article->permalink());
+	else $blg->errorArticle($ret, $tpl);
+} elseif (POST($preview_id)) {
+	$tpl->set("URL", POST($url));
+	$blg->previewArticle($tpl);
 }
 
 $body = $tpl->process();
 $tpl->file = BASIC_LAYOUT_TEMPLATE;
 $tpl->set("PAGE_CONTENT", $body);
 $tpl->set("PAGE_TITLE", $blg->name." - New Article");
-$styles = array(THEME_STYLES."/main.css", THEME_STYLES."/blog.css", THEME_STYLES."/form.css");
-$tpl->set("STYLE_SHEETS", $styles);
+$tpl->set("STYLE_SHEETS", array("form.css", "article.css") );
 echo $tpl->process();
 ?>

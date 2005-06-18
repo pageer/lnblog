@@ -1,6 +1,7 @@
 <h1><?php echo PACKAGE_NAME; ?> System Administration</h1>
 <form method="post" action="<?php echo $FORM_ACTION; ?>">
 <ul>
+<li><a href="sitemap.php">Modify site-wide menubar</a></li>
 <?php if (isset($SHOW_NEW)) { ?>
 <li><a href="newblog.php">Add new blog</a></li>
 <?php } ?>

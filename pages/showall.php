@@ -48,6 +48,7 @@ $page_tpl = new PHPTemplate(BASIC_LAYOUT_TEMPLATE);
 $blog->exportVars($page_tpl);
 $page_tpl->set("PAGE_TITLE", $title);
 $page_tpl->set("PAGE_CONTENT", $body);
+#$page_tpl->set("STYLE_SHEETS", array("blogentry.css") );
 echo $page_tpl->process();
 
 ?>

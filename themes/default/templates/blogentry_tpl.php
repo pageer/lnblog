@@ -6,15 +6,36 @@
 <?php echo $BODY; ?>
 </div>
 <div class="blogentryfooter">
-<ul>
+<ul class="postdata">
 	<li class="blogdate">Posted <?php echo $POSTDATE; ?></li>
-<?php if (check_login()) { ?>
-	<li class="blogadmin"><a href="<?php echo $POSTEDIT; ?>">Edit</a></li>
-	<li class="blogadmin"><a href="<?php echo $POSTDELETE; ?>">Delete</a></li>
+<?php if ( isset($USER_EMAIL) && isset($USER_NAME) ) { ?>
+	<li class="bloguser">By <a href="mailto:<?php echo $USER_EMAIL; ?>"><?php echo $USER_NAME; ?></a></li>
+<?php } elseif (isset($USER_EMAIL)) { ?>
+	<li class="bloguser">By <a href="mailto:<?php echo $USER_EMAIL; ?>"><?php echo $USER_ID; ?></a></li>
+<?php } elseif (isset($USER_NAME)) { ?>
+	<li class="bloguser">By <?php echo $USER_NAME; ?></li>
+<?php } else { ?>
+	<li class="bloguser">By <?php echo $USER_ID; ?></li>
+<?php } ?>
+<?php if (isset($USER_HOMEPAGE)) { ?>
+	<li class="bloguserurl">(<a href="<?php echo $USER_HOMEPAGE; ?>"><?php echo $USER_HOMEPAGE; ?></a>)</li>
 <?php } ?>
 </ul>
-<?php if (isset($COMMENTCOUNT)) { ?>
-<h3><a href="<?php echo $POSTCOMMENTS; ?>">View reader comments (<?php echo$COMMENTCOUNT; ?>)</a></h3>
+<?php if (check_login()) { ?>
+<ul class="postadmin">
+	<li><a href="<?php echo $PERMALINK; ?>/trackback.php?send_ping=yes">Send TrackBack Ping</a></li>
+	<li><a href="<?php echo $POSTEDIT; ?>">Edit</a></li>
+	<li><a href="<?php echo $POSTDELETE; ?>">Delete</a></li>
+</ul>
+<?php } ?>
+<p>TrackBack <abbr title="Uniform Resource Locator">URL</abbr>: <a href="<?php echo $PERMALINK; ?>trackback.php"><?php echo $PERMALINK; ?>trackback.php</a></p>
+<?php if ( ! empty($COMMENTCOUNT) ) { ?>
+<h3><a href="<?php echo $PERMALINK.ENTRY_COMMENT_DIR; ?>/">View reader comments (<?php echo $COMMENTCOUNT; ?>)</a></h3>
+<?php } elseif ( ! empty($ALLOW_COMMENTS) ) { ?>
+<h3><a href="<?php echo $PERMALINK.ENTRY_COMMENT_DIR; ?>/">Post a comment</a></h3>
+<?php } ?>
+<?php if ( ! empty($TRACKBACKCOUNT) ) { ?>
+<h3><a href="<?php echo $PERMALINK.ENTRY_TRACKBACK_DIR; ?>/">View TrackBacks (<?php echo $TRACKBACKCOUNT; ?>)</a></h3>
 <?php } ?>
 </div>
 </div>

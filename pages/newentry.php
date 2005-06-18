@@ -51,7 +51,6 @@ $body = $tpl->process();
 $tpl->file = BASIC_LAYOUT_TEMPLATE;
 $tpl->set("PAGE_CONTENT", $body);
 $tpl->set("PAGE_TITLE", $blg->name." - New Entry");
-$styles = array(THEME_STYLES."/main.css", THEME_STYLES."/blog.css", THEME_STYLES."/form.css");
-$tpl->set("STYLE_SHEETS", $styles);
+$tpl->set("STYLE_SHEETS", array("form.css", "blogentry.css") );
 echo $tpl->process();
 ?>

@@ -1,4 +1,36 @@
-<<<<<<< .mine
+06-Jun-2005:
+- Added a getlink() function to calculate URLs for linking images and style
+sheets from different themes.  Converted style sheets, templates, and pages
+to use this, so it is now possible to share style sheets and images between
+themes without having multiple copies of the file.
+- Added code to showtrackback.php to accept a trackback ping.  It doesn't 
+seem to work, though.  Maybe the server doesn't like posts to directories?
+- Fixed themes to not show things like "view comments" links when they are
+not relevant (e.g. no comments, commenting disabled).
+
+30-May-2005:
+- Fixed up new tuxice theme.
+
+26-May-2005:
+- Added a display page for trackbacks, much like the comments page.
+
+24-May-2005:
+- Added e-mail notification for comment posting.  Note that this assumes that
+PHP's mail server information is correctly configured.
+- Added TrackBack support.
+
+23-May-2005:
+- Extensive changes to user authentication.  Added support for multiple user
+accounts with information (e-mail, real name, etc.) for the user.
+- Added a permissions mechanism to the Blog class.  New articles and entries
+are now added and modified by methods of the Blog class.  Permission is 
+determined based on an administrator account, the Blog owner, a "writers" 
+list for the blog, and the owner of an existing entry or article.
+- Tweaks to display templates to make partial user/reader information show
+up in a nicer format.
+- Added a more colorful theme with a different layout.
+- Added recognition of logged-in users to comment class.
+
 22-Apr-2005:
 - Added Javascript editor.
 - Added "show all entries" page for archives.
@@ -12,16 +44,6 @@ property, but still set the template variables appropriately.
 - Changed blog entry display templates to show link to comments 
 all the time, not just when there are comments.
 
-=======
-19-Apr-2005:
-- Fixed version number constant, which hadn't been changed since 0.1.0.
-- Fixed preview bugs in new/edit article and post pages.
-- Fixed get() method of decendants of Entry class to NOT modify the data 
-property, but still set the template variables appropriately.
-- Changed blog entry display templates to show link to comments 
-all the time, not just when there are comments.
-
->>>>>>> .r18
 16-Apr-2005:
 - Fixed bone-head bug in stipping HTML entities.
 - Added rel links for RSS to page headers.  Use blog RSS for main page, use 
@@ -83,7 +105,8 @@ a CrLf conversion problem I was having.
 absolute URIs.  This should help make the RSS feeds validate.
 
 21-Mar-2005:
-- Fixed blog creation bug (realpath() doesn't work on non-existentARTICLE_POST_URL files.
+- Fixed blog creation bug (realpath() doesn't work on non-existent 
+ARTICLE_POST_URL files).
 - Fixed localpath_to_uri() to work with user home directories, i.e. ~/www.
 
 18-Mar-2005:

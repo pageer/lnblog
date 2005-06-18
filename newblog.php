@@ -48,7 +48,7 @@ $tpl = new PHPTemplate(BLOG_UPDATE_TEMPLATE);
 
 if (POST($blogpath)) $blog->home_path = POST($blogpath);
 else $blog->home_path = "../myblog";
-if (POST($blogname)) $blog->owner = POST($blogname);
+if (POST($blogname)) $blog->owner = POST($blogowner);
 if (POST($blogname)) $blog->writers(POST($blogwriters) );
 if (POST($blogname)) $blog->name = POST($blogname);
 if (POST($blogdesc)) $blog->description = POST($blogdesc);

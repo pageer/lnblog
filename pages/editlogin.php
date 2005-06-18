@@ -23,7 +23,9 @@ require_once("blog.php");
 
 session_start();
 
-if (! logged_in() ) {
+$usr = new User;
+
+if (! $usr->checkLogin() ) {
 	redirect("index.php");
 	echo "<p>You must be logged in to change your login.</p>";
 	exit;
@@ -45,30 +47,43 @@ if (defined("BLOG_ROOT")) {
 $user_name = "user";
 $password = "passwd";
 $confirm = "confirm";
+$full_name = "fullname";
+$email = "email";
+$homepage = "homepage";
 $reset="reset";  # Set to 1 to reset the password.
 
 $tpl = new PHPTemplate(CREATE_LOGIN_TEMPLATE);
 $tpl->set("FORM_TITLE", $form_title);
 $tpl->set("FORM_ACTION", current_file());
-$tpl->set("UNAME", $user_name);
 $tpl->set("PWD", $password);
-$tpl->set("CONFIRM", $confirm);
+$tpl->set("CONFIRM", $confirm)
+$tpl->set("FULLNAME", $full_name);
+$tpl->set("FULLNAME_VALUE", $usr->name() );
+$tpl->set("EMAIL", $email);
+$tpl->set("EMAIL_VALUE", $usr->email() );
+$tpl->set("HOMEPAGE", $homepage);
+$tpl->set("HOMEPAGE_VALUE", $usr->homepage() );
 
-$post_complete = POST($user_name) && POST($password) && POST($confirm);
-$partial_post = POST($user_name) || POST($password) || POST($confirm);
-
-if ($post_complete) {
-	if ( POST($confirm) != POST($password) ) {
+if (has_post()$) {
+	
+	if ( trim(POST($password)) && 
+	     trim(POST($password)) == trim(POST($confirm))) {
+		$pwd_change = true
+		$usr->password(trim(POST($password)));
+	} elseif ( trim(POST($password)) && 
+	           trim(POST($password)) == trim(POST($confirm))) {
 		$tpl->set("FORM_MESSAGE", "The passwords you entered do not match.");
 	} else {
-		$ret = create_passwd_file(getcwd(), POST($user_name), POST($password));
-		redirect("bloglogin.php");
+		$pwd_change = false;
 	}
-} elseif ($partial_post) {
-	# Let's do them in reverse, so that the most logical message appears.
-	if (! POST($confirm)) $tpl->set("FORM_MESSAGE", "You must confirm your password.");
-	if (! POST($password)) $tpl->set("FORM_MESSAGE", "You must enter a password.");
-	if (! POST($user_name)) $tpl->set("FORM_MESSAGE", "You must enter a username.");
+	
+	$usr->name(trim(POST($full_name)));
+	$usr->email(trim(POST($email)));
+	$usr->homepage(trim(POST($homepage)));
+	$usr->save();
+	if ($pwd_change) $usr->login(POST($password));
+	redirect("bloglogin.php");
+	
 }
 
 $body = $tpl->process();

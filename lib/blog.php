@@ -43,6 +43,8 @@ class Blog {
 	var $owner = ADMIN_USER;
 	var $write_list;
 	var $entrylist;
+	var $last_blogentry;
+	var $last_article;
 
 	function Blog($path="") {
 		$this->name = '';
@@ -58,6 +60,8 @@ class Blog {
 		$this->owner = ADMIN_USER;
 		$this->write_list = array();
 		$this->entrylist = array();
+		$this->last_blogentry = false;
+		$this->last_article = false;
 		$this->readBlogData();
 	}
 
@@ -337,8 +341,10 @@ class Blog {
 				foreach ($month_list as $ent) {
 					$ent_path = $month_path.PATH_DELIM.$ent;
 					$cmt_path = $ent_path.PATH_DELIM.ENTRY_COMMENT_DIR;
+					$tb_path = $ent_path.PATH_DELIM.ENTRY_TRACKBACK_DIR;
 					$ret &= create_directory_wrappers($ent_path, ENTRY_BASE);
 					$ret &= create_directory_wrappers($cmt_path, ENTRY_COMMENTS);
+					$ret &= create_directory_wrappers($tb_path, ENTRY_TRACKBACKS);
 				}
 			}
 		}
@@ -508,8 +514,9 @@ class Blog {
 
 	# Set data for the preview page.
 
-	function previewEntry($tpl) {
+	function previewEntry(&$tpl) {
 		$ent = new BlogEntry(getcwd());
+		$this->last_blogentry =& $ent;
 		if ( has_post() ) $ent->getPostData();
 		else return false;
 		$tpl->set("PREVIEW_DATA", $ent->get() );
@@ -520,8 +527,22 @@ class Blog {
 		return true;
 	}
 
-	function errorEntry($error, $tpl) {
+	function previewArticle(&$tpl) {
+		$ent = new Article(getcwd());
+		$this->last_article =& $ent;
+		if ( has_post() ) $ent->getPostData();
+		else return false;
+		$tpl->set("PREVIEW_DATA", $ent->get() );
+		$tpl->set("SUBJECT", $ent->subject);
+		$tpl->set("DATA", $ent->data);
+		$tpl->set("HAS_HTML", $ent->has_html);
+		$tpl->set("COMMENTS", $ent->allow_comment);
+		return true;
+	}
+
+	function errorEntry($error, &$tpl) {
 		$ent = new BlogEntry(getcwd());
+		$this->last_blogentry =& $ent;
 		if ( has_post() ) $ent->getPostData();
 		else return false;
 		$tpl->set("SUBJECT", $ent->subject);
@@ -556,8 +577,38 @@ class Blog {
 
 	}
 
+	function errorArticle($error, &$tpl) {
+		$ent = new Article(getcwd());
+		$this->last_article =& $ent;
+		if ( has_post() ) $ent->getPostData();
+		else return false;
+		$tpl->set("SUBJECT", $ent->subject);
+		$tpl->set("DATA", $ent->data);
+		$tpl->set("HAS_HTML", $ent->has_html);
+		$tpl->set("COMMENTS", $ent->allow_comment);
+		switch ($error) {
+			case UPDATE_SUCCESS:
+				break;
+			case UPDATE_NO_DATA_ERROR:
+				$tpl->set("HAS_UPDATE_ERROR");
+				$tpl->set("UPDATE_ERROR_MESSAGE", "No data entered.");
+				break;
+			case UPDATE_ENTRY_ERROR:
+				$tpl->set("HAS_UPDATE_ERROR");
+				$tpl->set("UPDATE_ERROR_MESSAGE", "Error updating blog entry.");
+				break;
+			case UPDATE_AUTH_ERROR:
+				$tpl->set("HAS_UPDATE_ERROR");
+				$tpl->set("UPDATE_ERROR_MESSAGE", "Security error: you can't perform this operation.");
+				break;
+		}
+		return true;
+
+	}
+
 	function newEntry() {
 		$ent = new BlogEntry();
+		$this->last_blogentry =& $ent;
 		$ent->getPostData();
 		if ($ent->data == '') return UPDATE_NO_DATA_ERROR;
 		if (! $this->canAddEntry() ) return UPDATE_AUTH_ERROR;
@@ -569,11 +620,12 @@ class Blog {
 		return $ret;
 	}
 
-	function updateEntry() {
-		$ent = new BlogEntry(getcwd());
+	function updateEntry($path=false) {
+		$ent = new BlogEntry($path?$path:getcwd());
+		$this->last_blogentry =& $ent;
 		$ent->getPostData();
 		if ($ent->data == '') return UPDATE_NO_DATA_ERROR;
-		if (! $this->canModifyEntry(&$ent) ) return UPDATE_AUTH_ERROR;
+		if (! $this->canModifyEntry($ent) ) return UPDATE_AUTH_ERROR;
 		$ret = $ent->update();
 		if ($ret) {
 			$this->updateRSS1();
@@ -582,15 +634,62 @@ class Blog {
 		return $ret;
 	}
 
-	function deleteEntry() {
-		$ent = new BlogEntry(getcwd());
+	function deleteEntry($path=false) {
+		$ent = new BlogEntry($path?$path:getcwd());
+		$this->last_blogentry =& $ent;
 		if ($ent->data == '') return UPDATE_NO_DATA_ERROR;
-		if (! $this->canModifyEntry(&$ent) ) return UPDATE_AUTH_ERROR;
+		if (! $this->canModifyEntry($ent) ) return UPDATE_AUTH_ERROR;
 		$ret = $ent->update();
 		if ($ret) {
 			$this->updateRSS1();
 			$this->updateRSS2();
 		} else $ret = UPDATE_ENTRY_ERROR;
+		return $ret;
+
+	}
+
+	function newArticle($path=false) {
+		$ent = new Article();
+		$this->last_article =& $ent;
+		$ent->getPostData();
+		if ($ent->data == '') return UPDATE_NO_DATA_ERROR;
+		if (! $this->canAddArticle() ) return UPDATE_AUTH_ERROR;
+		# Set the branch and base path where the article will live.
+		$base = false;
+		$branch = false;
+		if ($path) {
+			if (strstr($path, "/")) {
+				$base = dirname($path);
+				$branch = basename($path);
+			} else {
+				$branch = $path;
+			}
+		}
+		$ret = $ent->insert($branch, $base);
+		if ($ret) {
+			$ent->setSticky();
+		} else $ret = UPDATE_ENTRY_ERROR;
+		return $ret;
+	}
+
+	function updateArticle($path=false) {
+		$ent = new Article($path?$path:getcwd());
+		$this->last_article =& $ent;
+		$ent->getPostData();
+		if ($ent->data == '') return UPDATE_NO_DATA_ERROR;
+		if (! $this->canModifyArticle($ent) ) return UPDATE_AUTH_ERROR;
+		$ret = $ent->update();
+		if (! $ret) $ret = UPDATE_ENTRY_ERROR;
+		return $ret;
+	}
+
+	function deleteArticle($path=false) {
+		$ent = new Article($path?$path:getcwd());
+		$this->last_article =& $ent;
+		if ($ent->data == '') return UPDATE_NO_DATA_ERROR;
+		if (! $this->canModifyEntry($ent) ) return UPDATE_AUTH_ERROR;
+		$ret = $ent->update();
+		if (! $ret) $ret = UPDATE_ENTRY_ERROR;
 		return $ret;
 
 	}

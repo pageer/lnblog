@@ -3,10 +3,12 @@
 <p><?php echo $FORM_MESSAGE; ?></p>
 <?php } ?>
 <form method="post" action="<?php echo $FORM_ACTION; ?>">
+<?php if (isset($UNAME)) { ?>
 <div>
 <label for="<?php echo $UNAME; ?>">Username</label>
 <input type="text" id="<?php echo $UNAME; ?>" name="<?php echo $UNAME; ?>" <?php if (isset($UNAME_VALUE)) echo 'value="'.$UNAME_VALUE.'" '; ?>/>
 </div>
+<?php } ?>
 <div>
 <label for="<?php echo $PWD; ?>">Password</label>
 <input type="password" id="<?php echo $PWD; ?>" name="<?php echo $PWD; ?>" <?php if (isset($PWD_VALUE)) echo 'value="'.$PWD_VALUE.'" '; ?>/>

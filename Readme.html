@@ -1,109 +1,151 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html>
-<head>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="en"><head>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <title>LnBlog Documentation</title>
-  <style>
-    td, th {
-      border: thin solid black;
-	 }
 
-  </style>
-</head>
+
+
+
+  <style type="text/css">
+td, th {
+border: thin solid black;
+}
+  </style></head>
+
 <body>
-
 <h1>LnBlog</h1>
+
+
 <p>A simple file-based weblog focused on design elegance.</p>
+
+
 <p>Homepage: <a href="http://www.skepticats.com/lnblog/">http://www.skepticats.com/lnblog/</a>
+</p>
+
+
 <p>Copyright (c) 2005, Peter A. Geer &lt;<a href="mailto:pageer@skepticats.com">pageer@skepticats.com</a>&gt;</p>
+
 
 <h2>Introduction</h2>
 
+
 <p>LnBlog is a simple blog written in PHP which stores data in text files.
 It is strives to be easy to use, easy to manage, and feature rich while
-maintaining a clean, elegant, and modular design.  It is built to create 
+maintaining a clean, elegant, and modular design. It is built to create
 sites with a clean, directory-based URL structure and valid XHTML and CSS for
 style and layout.</p>
 
+
 <h2>Status</h2>
 
-<p>Currently, LnBlog is in the active development, which just means 
-that it is functional and tested, but not anywhere close to done yet.  There
+
+<p>Currently, LnBlog is in the active development, which just means
+that it is functional and tested, but not anywhere close to done yet. There
 are still lots of features to add, both in the back-end code and in terms of
-interface elements.  You can see the <a href="TODO">to do list</a> to get an
-idea of what is currently planned.  If you have any comments or suggestions, 
+interface elements. You can see the <a href="TODO">to do list</a> to get an
+idea of what is currently planned. If you have any comments or suggestions,
 or if you have any problems or find any bugs, feel free to <a href="mailto:pageer@skepticats.com">e-mail me</a>.</p>
+
 
 <h2>Requirements</h2>
 
-<p>LnBlog is fairly light on requirements.  It does not require any 
-particular operating system or web server and is known to work on 
-Linux/Apache and WinXP/IIS.  The only hard requirements are the following:</p>
+
+<p>LnBlog is fairly light on
+requirements. It does not require any particular operating system or
+web server and is known to work on
+Linux/Apache and WinXP/IIS. The only hard and fast requirements are the
+following:</p>
+
+
 <ol>
+
+
 <li>PHP 4.0 or greater.</li>
 <li>Support for Perl Compatible Regular Expression (PCRE), which is enabled
 by default in most PHP packages.</li>
-<li>The ability for scripts to read and write files to the server.  To do this,
+<li>The ability for scripts to read and write files to the server. To do this,
 you must <em>either</em> have FTP access to the web server and configure LnBLog
 to use it, <em>or</em> have PHP's safe mode disabled and appropriate directory permissions
-set on the web server.
+set on the web server.<br />
 </li>
 </ol>
 
+
 <h2>Feature List</h2>
 
+
 <ul>
-  <li><strong>Works in Safe Mode</strong> when using FTP support.</li>
-  <li>Anonymous reader comments.</li>
-  <li>Automatically generated RSS feeds.</li>
-  <li>Easily create multiple weblogs, with independent or shared logins.</li>
-  <li>Change between multiple themes, each of which can have completely a
-  different look and behavior, i.e. different styles, HTML markup, images, 
-  and even client-side scripts.</li>
-  <li>Default themes use valid XHTML Strict and CSS-based page layout.</li>
-  <li>Flexible HTML templating system that allows templates to be tweaked
-  on a per-blog basis.</li>
-  <li>Support for posting with simple auto-markup, a simple subset of BBcode,
-  or raw HTML code.</li>
+
+
+<li><strong>Works in Safe Mode</strong> when using FTP support.</li>
+<li>Anonymous reader comments.</li>
+<li>Automatically generated RSS feeds for blog entries and comments.</li><li>Send and receive TrackBack pings.</li>
+<li>Create multiple user accounts with basic serucity on entires and blogs.</li>
+<li>E-mail notification when new comments are posted.</li>
+<li>Easily create multiple weblogs.</li>
+<li>Change between multiple themes, each of which can have completely a
+different look and behavior, i.e. different styles, HTML markup, images, and even client-side scripts.</li>
+<li>Default themes use valid XHTML Strict and CSS-based page layout.</li>
+<li>Flexible HTML templating system that allows templates to be tweaked
+on a per-blog basis.</li>
+<li>Support for posting with simple auto-markup, a simple subset of BBcode,
+or raw HTML code.</li>
 </ul>
+
 
 <h2>Initial Setup</h2>
 
-<p>For step-by-step instructions, please see the 
-<a href="install.html">install guide</a>.  If you're more technically 
-inclined, then it's probably safe to just skip to the summary below.</p>
 
-<p>Here's the quick version.  Just extract the installation archive and
+<p>For step-by-step instructions, please see the
+<a href="install.html">install guide</a>. If you're more technically inclined, then it's probably safe to just skip to the summary below.</p>
+
+
+<p>Here's the quick version. Just
+extract the installation archive and
 upload the whole LnBlog directory to a location in
-the publicly accessible portion of your web hosting account.  You can them navigate
-to that directory with your favorite browser to run the configuration scripts.  The 
-first script configures file writing.  If you have FTP access to the web server, you
-can use FTP for file writing (this is recommended) by selecting the FTP option and giving the
-appropriate information below.  Otherwise, LnBlog will use PHP's standard filesystem 
-functions, which will require that Safe Mode be turned off and appropriate permissions 
-set on the relevant directories.</p>
-<p>After file writing support is configured, you must set an administrator login.  This 
-will be used to add new weblogs as well as to log into the ones you create.  After that's 
-set, you can log in and start adding new blogs.  There are also administrative functions to
+the publicly accessible portion of your web hosting account. You can
+them navigate
+to that directory with your favorite browser to run the configuration
+scripts. The first script configures file writing. If you have FTP
+access to the web server, you
+can use FTP for file writing (this is recommended) by selecting the FTP
+option and giving the
+appropriate information below. Otherwise, LnBlog will use PHP's
+standard filesystem
+functions, which will require that Safe Mode be turned off and
+appropriate permissions set on the relevant directories.</p>
+
+
+<p>After file writing support is
+configured, you must set an administrator login. This will be used to
+add new weblogs as well as to log into the ones you create. After
+that's
+set, you can log in and start adding new blogs. There are also
+administrative functions to
 modify a blog and update a blog (used when upgrading LnBlog).
 </p>
 
+
 <h2>Adding Entries</h2>
 
-<p>Adding a blog entry is pretty self-explanatory.  Just log in and click on the
-"add entry" link.  You will be taken to the entry edit screen, where you can 
+
+<p>Adding a blog entry is pretty self-explanatory. Just log in and click on the
+"add entry" link. You will be taken to the entry edit screen, where you can
 enter the subject for your entry, the entry text itself, and turn comments for
 this entry on or off.</p>
 
+
 <p>There are three possible input modes, which you can change between with the
-option  buttons below the edit area.  They are:</p>
+option buttons below the edit area. They are:</p>
+
+
 <ol>
-<li><strong>Auto-markup</strong>: Adds HTML paragraphs and line breaks based 
-on the plain-text input and convert all http and ftp URLs to links.</li>
+
+
+<li><strong>Auto-markup</strong>: Adds HTML paragraphs and line breaks based on the plain-text input and converts all http:// and ftp:// URLs to links.</li>
 <li><strong>LBCode</strong>: Use a dialect of the BBCode markup popular in
-web forums to markup your page.  Paragraphs and line breaks are inserted like
-with auto-markup, but you can also include other supported tags.  See the
+web forums to markup your page. Paragraphs and line breaks are inserted like
+with auto-markup, but you can also include other supported tags. See the
 <a href="#lbcode">LBCode Syntax</a> section for details.
 </li>
 <li><strong>Raw HTML</strong>: The text you type is treated as raw HTML code.
@@ -111,19 +153,32 @@ No processing is done and there's no guarantee that your page will validate.
 In other words, this is for people who know what they're doing.</li>
 </ol>
 
+
 <h2><a name="lbcode">LBCode Syntax</a></h2>
-<p>LnBlog supports marking up your text with LBCode, which is a 
-variant of BBCode, the markup language used in many popular web-board and 
-forum packages, such as phpBB.  I call this dialect LBCode because it makes 
-absolutely no attempt to match the official syntax (if there is such a thing)
-of BBCode.  The primary purpose of LBCode is to let the user write rich text
-that is valid XHTML 1.0 Strict without having to learn any XHTML or worry about 
-making mistakes while writing.  Below is 
-a table of the currently supported tags, with descriptions, example, and the 
-mapping to HTML.  Please note that LnBlog does not currently handle LBCode
-errors gracefully - incorrect syntax will simply be displayed as plain text.</p>
+
+
+<p>LnBlog supports marking up your
+text with LBCode, which is a
+variant of BBCode, the markup language used in many popular web-board
+and forum packages, such as phpBB. I call this dialect LBCode because
+it makes
+absolutely no attempt to match the official syntax (if there is such a
+thing)
+of BBCode. The primary purpose of LBCode is to let the user write rich
+text
+that is valid XHTML 1.0 Strict without having to learn any XHTML or
+worry about making mistakes while writing. Below is
+a table of the currently supported tags, with descriptions, example,
+and the mapping to HTML. Please note that LnBlog does not currently
+handle LBCode
+errors gracefully - incorrect syntax will simply be displayed as plain
+text.</p>
+
+
 <table>
-<tr><th>Description</th><th>Code</th><th>Example</th><th>HTML equivalent</th></tr>
+
+
+<tbody><tr><th>Description</th><th>Code</th><th>Example</th><th>HTML equivalent</th></tr>
 <tr>
 <td>Bold text</td>
 <td>[b]bold[/b]</td>
@@ -137,7 +192,7 @@ errors gracefully - incorrect syntax will simply be displayed as plain text.</p>
 </tr><tr>
 <td>Underlined text</td>
 <td>[u]underline[/u]</td>
-<td><span style="text-decoration: underline">underline</span></td>
+<td><span style="text-decoration: underline;">underline</span></td>
 <td>&lt;span style="text-decoration: underline"&gt;underline&lt;/span&gt;</td>
 </tr><tr>
 <td>Abbreviation</td>
@@ -152,7 +207,7 @@ errors gracefully - incorrect syntax will simply be displayed as plain text.</p>
 </tr><tr>
 <td>Block quotation</td>
 <td>[quote]Quotation[/quote]</td>
-<td><blockquote>Quotation</blockquote></td>
+<td><blockquote><p>Quotation</p></blockquote></td>
 <td>&lt;blockquote&gt;Quotation&lt;/blockquote&gt;</td>
 </tr><tr>
 <td>Short quotation</td>
@@ -199,108 +254,174 @@ errors gracefully - incorrect syntax will simply be displayed as plain text.</p>
 &lt;li&gt;Second item&lt;/li&gt;<br />
 &lt;/ul&gt;
 </td>
-</tr></table>
+</tr></tbody>
+</table>
+
+
 <h4>Notes on LBCode</h4>
+
+
 <ol>
-	<li>The line breaks between items in numbered lists and unordered lists are <em>not</em>
-	optional.  You <em>must</em> put each item on a single line and you must put the beginning
-	and ending tags on their own line.</li>
-	<li>When you give just a file name (i.e. a path containing <em>no</em> '/' characters)
-	as the target for an [img] or [url] tag, LnBlog will automatically convert it
-	to an absolute URI to a file in the entry directory when it is displayed.  This 
-	feature is provided for two reasons: because you will not know the absoute URI of a 
-	blog entry until <em>after</em> you post it and because the post can be displayed at its
-	permanent location, in which case the relative link is valid, or in another place (the
-	front page of the blog or an RSS feed), where the relative link is <em>not</em> valid.</li>
-	<li>In Mozilla-based browser, [ac] and [ab] both do the same thing.  They
-	are both provided because there is a semantic difference, i.e. that an 
-	abbreviation is simply a shortening of a phrase using the initial letters,
-	whereas an acronym is such a shortening that actually spells a 
-	pronounceable word.  However, while the &lt;abbr&gt; tag is often the
-	semantically correct one, Internet Explorer 6 doesn't support it, so you
-	should use this tag with care.</li>
-	<li>In the [img] tag, the text between the opening and closing tags <em>is
-	required</em>.  This is because it is used as the text for both the ALT 
-	attribute, which is required in XHTML, and the TITLE attribute, which 
-	gives you the tooltips in Mozilla-based browsers.  Since Internet 
-	Explorer incorrectly uses the ALT text for tooltips, you'll actually get 
-	the same tooltip in all browsers.</li>
-	<li>In Mozilla-based browsers, the &lt;q&gt; tag renders quotation marks 
-	automatically.  However, this depends on the CSS2 :before and :after 
-	pseudo-elements, which are not supported by Internet Explorer, so use
-	this with care.  Note that in the default LnBlog stylsheets, the &lt;q&gt;
-	tag is rendered with italic text, so that even in Internet Explorer, it
-	can be distinguished from normal text.</li>
+
+
+<li>The line breaks between items in numbered lists and unordered lists are <em>not</em>
+optional. You <em>must</em> put each item on a single line and you must put the beginning
+and ending tags on their own line.</li>
+<li>When you give just a file name (i.e. a path containing <em>no</em>
+'/' characters)
+as the target for an [img] or [url] tag, LnBlog will automatically
+convert it
+to an absolute URI to a file in the entry directory when it is
+displayed. This feature is provided for two reasons: because you will
+not know the absoute URI of a
+blog entry until <em>after</em> you post it and because the post can be displayed at its
+permanent location, in which case the relative link is valid, or in another place (the
+front page of the blog or an RSS feed), where the relative link is <em>not</em> valid.</li>
+<li>In Mozilla-based browser, [ac]
+and [ab] both do the same thing. They
+are both provided because there is a semantic difference, i.e. that an
+abbreviation is simply a shortening of a phrase using the initial
+letters,
+whereas an acronym is such a shortening that actually spells a
+pronounceable word. However, while the &lt;abbr&gt; tag is
+often the
+semantically correct one, Internet Explorer 6 doesn't support it, so
+you
+should use this tag with care.</li>
+<li>In the [img] tag, the text between the opening and closing tags <em>is
+required</em>.
+This is because it is used as the text for both the ALT
+attribute, which is required in XHTML, and the TITLE attribute, which
+gives you the tooltips in Mozilla-based browsers. Since Internet
+Explorer incorrectly uses the ALT text for tooltips, you'll actually
+get the same tooltip in all browsers.</li>
+<li>In Mozilla-based browsers, the
+&lt;q&gt; tag renders quotation marks automatically. However,
+this depends on the CSS2 :before and :after
+pseudo-elements, which are not supported by Internet Explorer, so use
+this with care. Note that in the default LnBlog stylsheets, the
+&lt;q&gt;
+tag is rendered with italic text, so that even in Internet Explorer, it
+can be distinguished from normal text.</li>
 </ol>
 
+
 <h2>LBCode Editor</h2>
-<p>When posting using LBCode markup, you can use LnBlog's simple Javascript-based 
-LBCode editor to insert the codes for you.  The editor is simply a series of buttons
-and two text boxes, labeled "text" and "attribute."   The "text" box is used to enter
-the contents of an LBCode tag, i.e. the actual text the goes between the opening and 
-closing tags.  The "attribute" box is used to enter any attribute for the opening tag.
-such as the URL for an image or link, or the phrase that an appbreviation or acronym
+
+
+<p>When posting using LBCode
+markup, you can use LnBlog's simple Javascript-based
+LBCode editor to insert the codes for you. The editor is simply a
+series of buttons
+and two text boxes, labeled "text" and "attribute." The "text" box is
+used to enter
+the contents of an LBCode tag, i.e. the actual text the goes between
+the opening and closing tags. The "attribute" box is used to enter any
+attribute for the opening tag.
+such as the URL for an image or link, or the phrase that an
+appbreviation or acronym
 stands for.</p>
-<p>To use the editor, just type in the text and attribute you want and click the 
-appropriate button.  If you want to add a word in bold, type your word into the box
-labeled "text" and click the bold button.  If you want to add a link, put the link
-text in the "text" box and the URL for the link in the "attribute" box and click the 
-URL button.  The corresponding markup will be added to your post at the current cursor
-position or at the end, depending on your browser's Javascript support.  Inserting at the
-cursor positio works on Opera 8.0, Firefox 1.0.3, and Internet Explorer 6.0.  I haven't 
-tried it on other browsers, so your mileage may vary.</p>
-<p>An extra feature of the editor is that the abbreviation and acronym buttons will save 
-any attributes you use during your post and add them automatically.  So, for example, 
-if you enter the abbreviation with the text "GNU" and the attribute "GNU's Not UNIX," 
-then if you mention GNU later in your post, you can just enter "GNU" for the text and 
-leave the attribute blank.  When you hit the abbreviation button, the attribute 
-"GNU's Not UNIX" will be added automatically.
+
+
+<p>To use the editor, just type in
+the text and attribute you want and click the appropriate button. If
+you want to add a word in bold, type your word into the box
+labeled "text" and click the bold button. If you want to add a link,
+put the link
+text in the "text" box and the URL for the link in the "attribute" box
+and click the
+URL button. The corresponding markup will be added to your post at the
+current cursor
+position or at the end, depending on your browser's Javascript support.
+Inserting at the
+cursor position works on Opera 8.0, Firefox 1.0.3, and sorta-kinda
+works in Internet Explorer 6.0. I haven't tried it on other browsers,
+so your mileage may vary.</p>
+
+
+<p>An extra feature of the editor
+is that the abbreviation and acronym buttons will save any attributes
+you use during your post and add them automatically. So, for example,
+if you enter the abbreviation with the text "GNU" and the attribute
+"GNU's Not UNIX," then if you mention GNU later in your post, you can
+just enter "GNU" for the text and
+leave the attribute blank. When you hit the abbreviation button, the
+attribute "GNU's Not UNIX" will be added automatically.
 </p>
+
 
 <h2><abbr title="Content Management System">CMS</abbr> Features</h2>
 
+
 <p>While LnBlog is a technically a weblog package, it also includes several
-"mini-<abbr title="Content Management System">CMS</abbr> features.  These 
-exist mostly for the sake of maintaining the design conssitency of the site 
-and making it slightly easier to manage.  The following sections describe these.</p>
+"mini-<abbr title="Content Management System">CMS</abbr>"
+features. These
+exist mostly for the sake of maintaining the design consistency of the
+site and making it slightly easier to manage. The following sections
+describe these.</p>
+
 
 <h3>Adding Articles</h3>
-<p>An article in LnBlog is just a blog entry with a different URL and 
-different display template.  It's basically a cheap and easy way to add 
+
+
+<p>An article in LnBlog is just a
+blog entry with a different URL and different display template. It's
+basically a cheap and easy way to add
 static content that meshes with the overall look
-and feel of the blog, but doesn't require any extra work.  You still get 
-BBCode support and revision history, but the URL structure is pneumonic 
-and comments are turned off by default.  You can enter the last component of the
-article URL when you first post it or go with the default, which is to use the 
-subject with all letters converted to lower case, spaces converted to underscores,
-and all other characters removed.</p>
+and feel of the blog, but doesn't require any extra
+work. You still get BBCode support and revision history, but the URL
+structure is pneumonic and comments are turned off by default. You can
+enter the last component of the
+article URL when you first post it or go with the default, which is to
+use the subject with all letters converted to lower case, spaces
+converted to underscores,
+and all other characters removed.&nbsp; In addition, articles have
+a "sticky" attribute that you can set.&nbsp; This will cause a link
+to the article to be displayed in the sidebar (provided you're using
+one of the default themes).<br />
+</p>
+
 
 <h3>Uploading Files</h3>
-<p>LnBlog provides pages to upload files to the root of the current blog or to the
-current entry or article.  Currently, you can only upload one file at a time.  You 
-should also note the file size limit when trying to upload a file.  To change this,
-must change the values of the PHP configuration variables upload_max_size and 
-post_max_size by creating a .htaccess file (if you use Apache) or by modifying 
+
+
+<p>LnBlog provides pages to upload
+files to the root of the current blog or to the
+current entry or article. Currently, you can only upload one file at a
+time. You should also note the file size limit when trying to upload a
+file. To change this,
+must change the values of the PHP configuration variables
+upload_max_size and post_max_size by creating a .htaccess file (if you
+use Apache) or by modifying
 the system php.ini file.</p>
 
+
 <h2>License</h2>
+
+
 <p>
 LnBlog: A simple file-based weblog focused on design elegance.<br />
 Copyright (C) 2005 Peter A. Geer &lt;pageer@skepticats.com&gt;</p>
-<p>
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.</p>
-<p>
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.</p>
-<p>
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.</p>
 
-</body>
-</html>
+
+<p>
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.</p>
+
+
+<p>
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.</p>
+
+
+<p>
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.</p>
+
+
+</body></html>

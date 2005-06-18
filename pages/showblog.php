@@ -41,6 +41,7 @@ if (defined("BLOG_ROOT")) {
 }
 $tpl->set("PAGE_TITLE", $blog->name);
 $tpl->set("PAGE_CONTENT", $ret);
+$tpl->set("STYLE_SHEETS", array("blogentry.css") );
 
 echo $tpl->process();
 ?>

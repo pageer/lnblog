@@ -1,0 +1,7 @@
+/* Site-map menu bar styles. */
+
+@media print {
+	#menubar {
+		display: none;
+	}
+}
