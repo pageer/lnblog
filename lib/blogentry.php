@@ -372,21 +372,26 @@ class BlogEntry extends Entry {
 
 	function getComments($sort_asc=true) {
 		$comment_files = $this->getCommentArray($sort_asc);	
-		if (!$comment_files) return "";
 		$ret = "";
-		foreach ($comment_files as $file) {
-			$ret .= $file->get();
+		if ($comment_files) { 
+			foreach ($comment_files as $file) {
+				$ret .= $file->get();
+			}
 		}
-		$tpl = new PHPTemplate(COMMENT_LIST_TEMPLATE);
-		$tpl->set("ENTRY_PERMALINK", $this->permalink() );
-		$tpl->set("ENTRY_SUBJECT", $this->subject);
-		$tpl->set("COMMENT_LIST", $ret);
-		$ret = $tpl->process();
+
+		# Suppress the comment stuff entirely for posts that don't have comments and don't allow them.
+		if ($ret || $this->allow_comment) {
+			$tpl = new PHPTemplate(COMMENT_LIST_TEMPLATE);
+			$tpl->set("ENTRY_PERMALINK", $this->permalink() );
+			$tpl->set("ENTRY_SUBJECT", $this->subject);
+			$tpl->set("COMMENT_LIST", $ret);
+			$ret = $tpl->process();
+		}
 
 		return $ret;
 	}
 
-	# TrackBack handling functions.  
+	# TrackBack handling functions.
 
 	function getTrackbackCount() {
 		$dir_path = dirname($this->file);

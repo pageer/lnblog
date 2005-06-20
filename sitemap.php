@@ -49,10 +49,14 @@ if (has_post()) {
 		$target_file = INSTALL_ROOT.PATH_DELIM.SITEMAP_FILE;
 	}
 
-	$ret = write_file($target_file, POST("output"));
+	if (get_magic_quotes_gpc()) $data = stripslashes(POST("output"));
+	else $data = POST("output");
+	$ret = write_file($target_file, $data);
+
 	if (! $ret) {
 		$tpl->set("SITEMAP_ERROR", "Cannot create file");
 		$tpl->set("ERROR_MESSAGE", "Unable to create file ".$target_file.".");
+		$tpl->set("CURRENT_SITEMAP", $data);
 	}
 	
 } else {

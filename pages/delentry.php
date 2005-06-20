@@ -21,17 +21,19 @@
 session_start();
 require_once("config.php");
 require_once("blog.php");
+require_once("rss.php");
 require_once("blogentry.php");
 
 $blog = new Blog();
+$ent = new BlogEntry(getcwd());
 
 $conf_id = "ok";
 $cancel_id = "cancel";
-$message = "Remove the weblog entry\"".$ent->subject."\"?";
+$message = "Remove the weblog entry \"".$ent->subject."\"?";
 
 if (POST($conf_id)) {
 	$ret = $blog->deleteEntry();
-	if ($ret) redirect(BLOG_ROOT_URL);
+	if ($ret == UPDATE_SUCCESS) redirect(BLOG_ROOT_URL);
 	else $message = "Unable to delete \"".$ent->subject."\".  Try again?";
 } elseif (POST($cancel_id)) {
 	redirect("index.php");

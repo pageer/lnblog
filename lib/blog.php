@@ -637,9 +637,8 @@ class Blog {
 	function deleteEntry($path=false) {
 		$ent = new BlogEntry($path?$path:getcwd());
 		$this->last_blogentry =& $ent;
-		if ($ent->data == '') return UPDATE_NO_DATA_ERROR;
 		if (! $this->canModifyEntry($ent) ) return UPDATE_AUTH_ERROR;
-		$ret = $ent->update();
+		$ret = $ent->delete();
 		if ($ret) {
 			$this->updateRSS1();
 			$this->updateRSS2();
@@ -686,9 +685,8 @@ class Blog {
 	function deleteArticle($path=false) {
 		$ent = new Article($path?$path:getcwd());
 		$this->last_article =& $ent;
-		if ($ent->data == '') return UPDATE_NO_DATA_ERROR;
 		if (! $this->canModifyEntry($ent) ) return UPDATE_AUTH_ERROR;
-		$ret = $ent->update();
+		$ret = $ent->delete();
 		if (! $ret) $ret = UPDATE_ENTRY_ERROR;
 		return $ret;
 

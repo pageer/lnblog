@@ -1,3 +1,7 @@
+19-Jun-2005:
+- Fixed bugs in sitemap creation, deleting entries, and deleting comments.
+This will be version 0.3.0.
+
 17-Jun-2005:
 - Put link contents of sitemap in user-editable file rather than template.
 - Added a page to display user info (not yet in interface).

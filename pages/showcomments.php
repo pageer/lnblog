@@ -61,14 +61,6 @@ if ($ent->allow_comment) {
 	$content .= $comm_tpl->process();
 }
 
-/*
-$tpl = new PHPTemplate(COMMENT_LIST_TEMPLATE);
-$tpl->set("ENTRY_PERMALINK", $ent->permalink() );
-$tpl->set("ENTRY_SUBJECT", $ent->subject);
-$tpl->set("COMMENT_LIST", $content);
-$content = $tpl->process();
-*/
-
 $tpl = new PHPTemplate(BASIC_LAYOUT_TEMPLATE);
 $blg->exportVars($tpl);
 $tpl->set("PAGE_TITLE", $title);
