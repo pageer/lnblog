@@ -2,7 +2,7 @@
 
 # Information on the package itself.
 define("PACKAGE_NAME", "LnBlog");
-define("PACKAGE_VERSION", "0.2.3");
+define("PACKAGE_VERSION", "0.3.1");
 define("PACKAGE_URL", "http://www.skepticats.com/lnblog/");
 define("PACKAGE_DESCRIPTION", PACKAGE_NAME.": a simple and (hopefully) elegant weblog");
 define("PACKAGE_COPYRIGHT", "Copyright (c) 2005, Peter A. Geer <pageer@skepticats.com>");
