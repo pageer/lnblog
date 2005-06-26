@@ -1,3 +1,14 @@
+25-Jun-2005:
+- Fixed bug with putting colons in entry metadata.
+- Fixed bug where ownership was not correctly set on inserted articles.
+- Fixed crashing bug in article preview.
+- Fixed article add and display pages.
+- Added username to logout link.
+- This is version 0.3.1.
+
+24-Jun-2005:
+- Added keyboard navigation to the entry editor and comment form.
+
 19-Jun-2005:
 - Fixed bugs in sitemap creation, deleting entries, and deleting comments.
 This will be version 0.3.0.

@@ -7,6 +7,9 @@ if (isset($blog) && get_class($blog) == "Blog") {
 	$blog = new Blog();
 }
 
+# Do we *really* want to include the BlogEntry class just so that the
+# sidebar remains consistent?
+require_once("blogentry.php");
 if (class_exists("BlogEntry")) $next_list = $blog->getNextMax();
 else $next_list = array();
 
@@ -94,7 +97,8 @@ foreach ($year_list as $year) {
 <?php 
 
 # Check if the user is logged in and, if so, present administrative options.
-if (check_login()) { 
+$usr = new User();
+if ($usr->checkLogin()) { 
 ?>
 <h3>Weblog Administration</h3>
 <ul>
@@ -114,7 +118,7 @@ if (check_login()) {
 <li><a href="<?php echo $BLOG_URL_ROOTREL; ?>uploadfile.php">Upload file for blog</a></li>
 <li><a href="<?php echo $BLOG_URL_ROOTREL; ?>edit.php">Edit weblog settings</a></li>
 <li><a href="<?php echo $BLOG_URL_ROOTREL; ?>map.php">Edit custom sitemap</a></li>
-<li><a href="<?php echo $BLOG_URL_ROOTREL; ?>logout.php">Logout</a></li>
+<li><a href="<?php echo $BLOG_URL_ROOTREL; ?>logout.php">Logout <?php echo $usr->username(); ?></a></li>
 </ul>
 <?php 
 # If the user isn't logged in, give him a login link.

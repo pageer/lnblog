@@ -32,7 +32,9 @@ class Article extends BlogEntry {
 		$this->file = $path . ($path ? PATH_DELIM.$revision : "");
 		$this->allow_comment = true;
 		$this->template_file = ARTICLE_TEMPLATE;
-		if ( file_exists($this->file) )$this->readFileData();
+		if ( file_exists($this->file) ) {
+			$this->readFileData();
+		}
 	}
 
 	function setSticky($show=true) {
@@ -63,7 +65,9 @@ class Article extends BlogEntry {
 
 	function insert ($branch=false, $base_path=false) {
 	
-		if (! check_login()) return false;
+		$usr = new User();
+		if (! $usr->checkLogin()) return false;
+		$this->uid = $usr->username();
 	
 		$curr_ts = time();
 		if (!$base_path) $basepath = getcwd().PATH_DELIM.BLOG_ARTICLE_PATH;
@@ -75,7 +79,9 @@ class Article extends BlogEntry {
 
 		$this->file = $dir_path.PATH_DELIM.ENTRY_DEFAULT_FILE;
 		$this->date = date(ENTRY_DATE_FORMAT, $curr_ts);
+		if (! $this->post_date) $this->post_date = date(ENTRY_DATE_FORMAT, $curr_ts);
 		$this->timestamp = $curr_ts;
+		if (! $this->post_ts) $this->post_ts = $curr_ts;
 		$this->ip = get_ip();
 		
 		if (get_magic_quotes_gpc() ) {
@@ -90,6 +96,9 @@ class Article extends BlogEntry {
 	
 	function get() {
 		$tmp = new PHPTemplate(ARTICLE_TEMPLATE);
+
+		$usr = new User($this->uid);
+		$usr->exportVars($tmp);
 
 		$tmp->set("TITLE", $this->subject);
 		$tmp->set("POSTDATE", $this->prettyDate($this->post_ts) );

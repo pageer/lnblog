@@ -516,6 +516,9 @@ class Blog {
 
 	function previewEntry(&$tpl) {
 		$ent = new BlogEntry(getcwd());
+		$u = new User;
+		# Set the username for the preview.
+		if (!$ent->isEntry()) $ent->uid = $u->username();
 		$this->last_blogentry =& $ent;
 		if ( has_post() ) $ent->getPostData();
 		else return false;
@@ -529,6 +532,9 @@ class Blog {
 
 	function previewArticle(&$tpl) {
 		$ent = new Article(getcwd());
+		$u = new User();
+		# Set the username for the preview.
+		if (!$ent->isEntry()) $ent->uid = $u->username();
 		$this->last_article =& $ent;
 		if ( has_post() ) $ent->getPostData();
 		else return false;

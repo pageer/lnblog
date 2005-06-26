@@ -4,23 +4,23 @@
 <fieldset>
 <form id="commentform" method="post" action="index.php">
 <div>
-<label class="basic_form_label" for="<?php echo COMMENT_POST_SUBJECT; ?>">Subject</label>
-<input style="width: 70%" id="<?php echo COMMENT_POST_SUBJECT; ?>" name="<?php echo COMMENT_POST_SUBJECT; ?>" type="text" />
+<label class="basic_form_label" for="<?php echo COMMENT_POST_SUBJECT; ?>"><em>S</em>ubject</label>
+<input style="width: 70%" id="<?php echo COMMENT_POST_SUBJECT; ?>" name="<?php echo COMMENT_POST_SUBJECT; ?>" accesskey="s" type="text" />
 </div>
 <div>
-<textarea id="<?php echo COMMENT_POST_DATA; ?>" name="<?php echo COMMENT_POST_DATA; ?>" rows="10" cols="20"></textarea>
+<textarea id="<?php echo COMMENT_POST_DATA; ?>" name="<?php echo COMMENT_POST_DATA; ?>" accesskey="d" rows="10" cols="20"></textarea>
 </div>
 <div>
-<label style="width: 40%" for="<?php echo COMMENT_POST_NAME; ?>">Name</label>
-<input id="<?php echo COMMENT_POST_NAME; ?>" name="<?php echo COMMENT_POST_NAME; ?>" type="text" <?php if (COOKIE(COMMENT_POST_NAME)) echo 'value="'.COOKIE(COMMENT_POST_NAME).'" '; ?>/>
+<label style="width: 40%" for="<?php echo COMMENT_POST_NAME; ?>"><em>N</em>ame</label>
+<input id="<?php echo COMMENT_POST_NAME; ?>" name="<?php echo COMMENT_POST_NAME; ?>" accesskey="n" type="text" <?php if (COOKIE(COMMENT_POST_NAME)) echo 'value="'.COOKIE(COMMENT_POST_NAME).'" '; ?>/>
 </div>
 <div>
-<label style="width: 40%" for="<?php echo COMMENT_POST_URL; ?>">Homepage</label>
-<input id="<?php echo COMMENT_POST_URL; ?>" name="<?php echo COMMENT_POST_URL; ?>" type="text" <?php if (COOKIE(COMMENT_POST_URL)) echo 'value="'.COOKIE(COMMENT_POST_URL).'" '; ?>/>
+<label style="width: 40%" for="<?php echo COMMENT_POST_URL; ?>"><em>H</em>omepage</label>
+<input id="<?php echo COMMENT_POST_URL; ?>" name="<?php echo COMMENT_POST_URL; ?>" accesskey="h" type="text" <?php if (COOKIE(COMMENT_POST_URL)) echo 'value="'.COOKIE(COMMENT_POST_URL).'" '; ?>/>
 </div>
 <div>
-<label style="width: 40%" for="<?php echo COMMENT_POST_EMAIL; ?>">E-Mail</label>
-<input id="<?php echo COMMENT_POST_EMAIL; ?>" name="<?php echo COMMENT_POST_EMAIL; ?>" type="text" <?php if (COOKIE(COMMENT_POST_EMAIL)) echo 'value="'.COOKIE(COMMENT_POST_EMAIL).'" '; ?>/>
+<label style="width: 40%" for="<?php echo COMMENT_POST_EMAIL; ?>"><em>E</em>-Mail</label>
+<input id="<?php echo COMMENT_POST_EMAIL; ?>" name="<?php echo COMMENT_POST_EMAIL; ?>" accesskey="e" type="text" <?php if (COOKIE(COMMENT_POST_EMAIL)) echo 'value="'.COOKIE(COMMENT_POST_EMAIL).'" '; ?>/>
 </div>
 <div>
 <label for="<?php echo COMMENT_POST_REMEMBER; ?>">Remember me</label>

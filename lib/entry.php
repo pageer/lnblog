@@ -184,15 +184,13 @@ class Entry {
 
 	function prettyDate($ts=false) {
 		$date_ts = $ts ? $ts : $this->timestamp;
+		# If we don't aren't passed a timestamp and don't already have one,
+		# then just use the current time.
+		if (! $date_ts) $date_ts = time();
 		$print_date = date(ENTRY_DATE_FORMAT, $date_ts);
 		return $print_date;
 	}
 
-	function univDate($ts=false) {
-		if ($ts) return date(CFG_DB_DATE_FMT, $ts);
-		else     return date(CFG_DB_DATE_FMT);
-	}
-	
 	# Add metadata from the file to the object.  Unknown metadata will be 
 	# ignored, while recognized data will be set to class properties.
 	
@@ -210,17 +208,6 @@ class Entry {
 		}
 	}
 	
-	function generateFilePath($ts) {
-		$base = date(CFG_STORE_DATE_FMT, $ts) . "-" . $this->uid;
-		$ret = $base . ".htm";
-		$i = 0;
-		while ( file_exists($ret) ) {
-			$ret = $base . "-" . $i . ".htm";
-			$i =+ 1;
-		}
-		return $this->store_path . "/" . $ret;
-	}
-
 	function readFileData() {
 		#$data = file($this->store_path . "/" . $this->datafile);
 		$data = file($this->file);
@@ -228,7 +215,7 @@ class Entry {
 		if (! $data) $file_data = false;
 		else 
 			foreach ($data as $line) {
-				preg_match('/<!--META (.*): (.*) META-->/', $line, $matches);
+				preg_match('/<!--META ([\w|\s]*): (.*) META-->/', $line, $matches);
 				if ($matches) $this->addMetadata($matches[1], $matches[2]);
 				$cleanline = preg_replace("/<!--META.*META-->\s\r?\n?\r?/", "", $line);
 				#if (preg_match("/\S/", $cleanline) == 0) $cleanline = "";

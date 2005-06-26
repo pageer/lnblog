@@ -57,5 +57,6 @@ $tpl->file = BASIC_LAYOUT_TEMPLATE;
 $tpl->set("PAGE_CONTENT", $body);
 $tpl->set("PAGE_TITLE", $blg->name." - New Entry");
 $tpl->set("STYLE_SHEETS", array("form.css", "article.css") );
+$tpl->set("SCRIPTS", array("editor.js") );
 echo $tpl->process();
 ?>

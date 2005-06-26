@@ -98,13 +98,18 @@ form#tbconfirm label {
 	width: 30%;
 }
 
-label.none,  li label, form div.editorbox label {
+label.none,  li label, div.editorbox label {
 	width: auto;
 	float: none;
 }
 
-div.button_row input {
+div.button_row input, div.button_row button {
 	width: 7em;
+}
+
+div.button_row button em, div.editorbox label em, form label em, form button em  {
+	text-decoration: underline;
+	font-style: normal;
 }
 
 div.editorbox input {
