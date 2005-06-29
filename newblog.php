@@ -36,7 +36,7 @@ $blogrssmax = "maxrss";
 $blogpath = "blogpath";
 $submitid = "submit";
 
-if (POST($blogpath)) $path = POST($blogpath);
+if (POST($blogpath)) $path = trim(POST($blogpath));
 else $path = false;
 
 $blog = new Blog($path);
@@ -47,7 +47,8 @@ if (! $blog->canAddBlog() ) {
 $tpl = new PHPTemplate(BLOG_UPDATE_TEMPLATE);
 
 if (POST($blogpath)) $blog->home_path = POST($blogpath);
-else $blog->home_path = "../myblog";
+else $blog->home_path = "myblog";
+
 if (POST($blogname)) $blog->owner = POST($blogowner);
 if (POST($blogname)) $blog->writers(POST($blogwriters) );
 if (POST($blogname)) $blog->name = POST($blogname);
@@ -81,10 +82,17 @@ $tpl->set("POST_PAGE", current_file());
 $tpl->set("SUBMIT_ID", $submitid);
 $tpl->set("UPDATE_TITLE", "Create new weblog");
 
-if (POST("submit")) {
+if (has_post()) {
+
+	# If the user doesn't give us an absolute path, assume it's relative
+	# to the DOCUMENT_ROOT.
+	if (! is_absolute($blog->home_path)) {
+		$blog->home_path = calculate_document_root().PATH_DELIM.$blog->home_path;
+	}
+
 	$ret = $blog->insert();
 	if (!$ret) $tpl->set("UPDATE_MESSAGE", "Error creating blog.");
-	else refresh($blog->getURL());
+	else redirect($blog->getURL());
 }
 
 $blog->exportVars($tpl);

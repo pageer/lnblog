@@ -24,6 +24,7 @@ require_once("blog.php");
 session_start();
 
 $redir_page = "index.php";
+$tpl = new PHPTemplate(CREATE_LOGIN_TEMPLATE);
 
 # Allow us to use this to create the admin login.
 if (file_exists(INSTALL_ROOT.PATH_DELIM."passwd.php")) {
@@ -38,7 +39,9 @@ if (file_exists(INSTALL_ROOT.PATH_DELIM."passwd.php")) {
 	# Add the template directory to the include_path.
 	#ini_set("include_path", ini_get("include_path").PATH_SEPARATOR."templates");
 	$page_name = "Create Administrator Login";
-	$form_title = "System Aministration Login";
+	$form_title = "Create Aministration Login";
+	$tpl->set("UNAME_VALUE", ADMIN_USER);
+	$tpl->set("DISABLE_UNAME", true);
 }
 
 $user_name = "user";
@@ -49,7 +52,6 @@ $email = "email";
 $homepage = "homepage";
 $reset="reset";  # Set to 1 to reset the password.
 
-$tpl = new PHPTemplate(CREATE_LOGIN_TEMPLATE);
 $tpl->set("FORM_TITLE", $form_title);
 $tpl->set("FORM_ACTION", current_file());
 $tpl->set("UNAME", $user_name);
@@ -58,7 +60,6 @@ $tpl->set("CONFIRM", $confirm);
 $tpl->set("FULLNAME", $full_name);
 $tpl->set("EMAIL", $email);
 $tpl->set("HOMEPAGE", $homepage);
-if (! file_exists(INSTALL_ROOT.PATH_DELIM."passwd.php")) $tpl->set("UNAME_VALUE", ADMIN_USER);
 
 # Reset the password and username.  You'll have to be logged in to do this.
 #$do_reset = ( GET($reset) && check_login() ) || (! is_file(getcwd().PATH_DELIM."passwd.php") );
@@ -79,8 +80,9 @@ if ($post_complete) {
 		$usr->email(trim(POST($email)));
 		$usr->homepage(trim(POST($homepage)));
 		$usr->save();
-		$usr->login(POST($password));
-		redirect("bloglogin.php");
+		#$usr->login(POST($password));
+		#redirect("bloglogin.php");
+		redirect("index.php");
 		exit;
 	}
 } elseif ($partial_post) {
@@ -97,6 +99,7 @@ $tpl->reset(BASIC_LAYOUT_TEMPLATE);
 #if (defined("BLOG_ROOT")) $blog->exportVars($tpl);
 $tpl->set("PAGE_CONTENT", $body);
 $tpl->set("PAGE_TITLE", $page_name);
+$tpl->set("STYLE_SHEETS", array("form.css") );
 
 echo $tpl->process();
 ?>

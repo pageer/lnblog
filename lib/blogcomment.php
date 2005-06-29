@@ -44,6 +44,13 @@ class BlogComment extends Entry {
 		if ( file_exists($this->file) ) $this->readFileData();
 		#else echo "<p>Cannot find file: ".$this->file."</p>";
 		else $this->file = "";
+		# Over-ride the personal info for comments by logged-in users.
+		if ($this->uid) {
+			$usr = new User($this->uid);
+			$this->name = $usr->name();
+			$this->email = $usr->email();
+			$this->url = $usr->homepage();
+		}
 	}
 		
 	function getPath($ts) {
@@ -163,7 +170,8 @@ class BlogComment extends Entry {
 		$this->email = $this->stripHTML($this->email);
 		$this->url = $this->stripHTML($this->url);
 		$this->subject = $this->stripHTML($this->subject);
-		$this->data = $this->stripHTML($this->data);
+		# Don't strip HTML from the comment data, because we do that 
+		# when we add in the links and other markup.
 	}
 
 	function getAnchor() {
@@ -203,6 +211,7 @@ class BlogComment extends Entry {
 		$t->set("EMAIL", $this->email);
 		$t->set("ANCHOR", $this->getAnchor() );
 		$t->set("BODY", $this->markup($this->data, COMMENT_NOFOLLOW) );
+		#$t->set("BODY", $this->data);
 		
 		$ret = $t->process();
 		return $ret;

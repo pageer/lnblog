@@ -1,3 +1,20 @@
+29-Jun-2005:
+- Added non-admin error message to admin page login.
+- Made the new blog path relative to DOCUMENT_ROOT, not current directory.
+- Updated install and readme files.
+- Fixed missing personal info in e-mail notifications for comments by 
+logged-in users.
+- Fixed wrong redirects on some admin pages.
+
+28-Jun-2005:
+- Fixed mangling of double-quotes in comments.
+- Moved list of HTML document root directories to blogconfig.php and added
+a DOCUMENT_ROOT stored in fsconfig.php, which, if set, will be returned by
+find_document_root() in lieu of doing the actual search.
+- Made the username box read-only when creating the administrator account.
+- Added test pages for determining the HTML doc root and the FTP root.
+- Fixed FTP support to allow non-standard ports.
+
 25-Jun-2005:
 - Fixed bug with putting colons in entry metadata.
 - Fixed bug where ownership was not correctly set on inserted articles.

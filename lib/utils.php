@@ -22,6 +22,7 @@
 # wrappers that implement functionality available in PHP 5.
 
 require_once("blogconfig.php");
+# This should only be skipped when we're configuring FTP file writing.
 if (empty($EXCLUDE_FS)) {
 	require_once("fs.php");
 }
@@ -50,12 +51,7 @@ define("LINK_SCRIPT", "scripts");
 function canonicalize ($path) {
 	if ( file_exists($path) ) return realpath($path);
 	# If the path is relative, prepend the current directory.
-	if ( strtoupper(substr(PHP_OS,0,3))=='WIN' ) {
-		$prepend_cwd = ( substr($path, 2, 2) != ':\\' );
-	} else {
-		$prepend_cwd = ( substr($path, 1, 1) != '/' );
-	}
-	if ($prepend_cwd) $path = getcwd().PATH_DELIM.$path;
+	if (! is_absolute($path)) $path = getcwd().PATH_DELIM.$path;
 	$components = explode(PATH_DELIM, $path);
 	$ret = array();
 	$i = 0;
@@ -67,6 +63,16 @@ function canonicalize ($path) {
 	$ret = array_slice($ret, 0, $i);
 	$ret = implode(PATH_DELIM, $ret);
 	return $ret;
+}
+
+# Return whether or not a path is absolute.
+
+function is_absolute($path) {
+	if (PATH_DELIM == "/") {
+		return ( substr($path, 0, 1) == "/" );
+	} else {
+		return ( substr($path, 1, 2) == ":\\" );
+	}
 }
 
 # Write contents to a file.  Basically a wrapper around fopen and fwrite.
@@ -113,12 +119,13 @@ function scan_directory($path, $dirs_only=false) {
 
 # Finds the document root by checking common directory names.
 # This assumes that we are, in fact, currently somewhere under it.
-# NOTE: Use of realpath() requires PHP 4.
 
 function find_document_root($path=false) {
-	# List of common document root names.
-	$doc_roots = array("wwwroot", "inetpub", "htdocs", "htsdocs", "httpdocs", 
-	                   "httpsdocs", "webroot", "www");
+	# Check if we have a DOCUMENT_ROOT defined.  This is set at setup time
+	# and stored in the fsconfig.php file.
+	if ( defined("DOCUMENT_ROOT") ) return DOCUMENT_ROOT;
+	# Get list of common document root names.
+	$doc_roots = explode(",", DOCROOT_NAMES);
 	$curr_path = $path ? realpath($path) : getcwd();
 	$parent_dir = dirname($curr_path);
 	$base_dir = basename($curr_path);
@@ -127,6 +134,31 @@ function find_document_root($path=false) {
 	foreach ($doc_roots as $root)
 		if ( strcasecmp($base_dir, $root) == 0 ) return $curr_path;
 	return find_document_root($parent_dir);
+}
+
+# An alternate way to find the document root.  This one works by comparing
+# the current URL on the server to the current directory.  The idea is that
+# we can find the location of the current URL in the path and remove it to
+# get the document root.
+# NOTE: This function IS case-sensitive.  It also assumes that the 
+
+function calculate_document_root() {
+	# Bail out if DOCUMENT_ROOT is already defined.
+	if ( defined("DOCUMENT_ROOT") ) return DOCUMENT_ROOT;
+	
+	# Get the current URL and the path to the file.
+	$curr_uri = current_uri();
+	$curr_file = getcwd().PATH_DELIM.basename($curr_uri);
+	if (PATH_DELIM != "/") $curr_uri = str_replace("/", PATH_DELIM, $curr_uri);
+
+	if ( preg_match(URI_TO_LOCALPATH_MATCH_RE, $curr_uri) ) {
+		$curr_uri = preg_replace(URI_TO_LOCALPATH_MATCH_RE, URI_TO_LOCALPATH_REPLACE_RE,$curr_uri);
+	}
+
+	# Find the location 
+	$pos = strpos($curr_file, $curr_uri);
+	return substr($curr_file, 0, $pos + 1);
+	
 }
 
 # Version comparison function, since we want this to work with PHP 4.0 as
@@ -248,19 +280,22 @@ function current_file() {
 }
 
 # Convert a local path to a URI.
-# NOTE: Use of realpath() requires PHP 4.
 
 function localpath_to_uri($path, $full_uri=true) {
 	$full_path = realpath($path);
 	# Add a trailing slash if the path is a directory.
 	if (is_dir($full_path)) $full_path .= PATH_DELIM;
-	$root = find_document_root($full_path);
-	$url_path = str_replace($root, "", $full_path);
+	#$root = find_document_root($full_path);
+	$root = calculate_document_root();
+	#$url_path = str_replace($root, "", $full_path);
 	# Account for user home directories in path.  Please note that this is 
 	# an ugly, ugly hack to make this function work when I'm testing on my
 	# local workstation, where I use ~/www for by web root.
 	if ( preg_match(LOCALPATH_TO_URI_MATCH_RE, $full_path) ) {
-		$url_path = '/~'.basename(dirname($root)).$url_path;
+		#$url_path = '/~'.basename(dirname($root)).$url_path;
+		$url_path = preg_replace(LOCALPATH_TO_URI_MATCH_RE, LOCALPATH_TO_URI_REPLACE_RE, $full_path);
+	} else {
+		$url_path = str_replace($root, "", $full_path);
 	}
 	# Remove any drive letter.
 	if ( strtoupper( substr(PHP_OS,0,3) ) == 'WIN' ) 
@@ -269,6 +304,11 @@ function localpath_to_uri($path, $full_uri=true) {
 	if (PATH_DELIM != "/") 
 		$url_path = str_replace(PATH_DELIM, "/", $url_path);
 	
+	# The URI should *always* be absolute.  Therefore, we allow for the 
+	# DOCUMENT_ROOT to have a slash at the end by prepending a
+	# slash here if we don't already have one.
+	if (substr($url_path, 0, 1) != "/") $url_path = "/".$url_path;
+		
 	if ($full_uri) {
 		# Add the protocol and server.
 		$protocol = "http";

@@ -2,26 +2,36 @@
 
 # Information on the package itself.
 define("PACKAGE_NAME", "LnBlog");
-define("PACKAGE_VERSION", "0.3.1");
+define("PACKAGE_VERSION", "0.3.2");
 define("PACKAGE_URL", "http://www.skepticats.com/lnblog/");
 define("PACKAGE_DESCRIPTION", PACKAGE_NAME.": a simple and (hopefully) elegant weblog");
 define("PACKAGE_COPYRIGHT", "Copyright (c) 2005, Peter A. Geer <pageer@skepticats.com>");
 
 # Miscellaneous configuration.
 
-# This is the regular expression used to determine if a local path refers to
+# These are the regular expression used to determine if a local path refers to
 # a user's web root, which would be referred to with a URI like
 # http://www.example.com/~jowblow/
-# The generated URI will use the parent of the document root, e.g.
+# and vice versa.  The generated URI will use the parent of the document root, e.g.
 # /home/users/joeblow/www/ would be translated to /~joeblow/.
 # Depending on your setup, you may need to add components before the username
 # or change the document root from www to something else.  Of course, if you
 # don't use ~user directories, you can probably ignore this.
-define("LOCALPATH_TO_URI_MATCH_RE", "/^\/home\/[^\/]+\/www/");
+define("LOCALPATH_TO_URI_MATCH_RE", "/^\/home\/([^\/]+)\/www(.*)/");
+define("LOCALPATH_TO_URI_REPLACE_RE", "/~$1$2");
+define("URI_TO_LOCALPATH_MATCH_RE", "/^\/~([^\/]+)(.*)/");
+define("URI_TO_LOCALPATH_REPLACE_RE", "$2"); #"/home/$1/www$2");
+
 # The file to save the sitemap link list for the menubar.
 define("SITEMAP_FILE", "sitemap.htm");
 
+# The list of directory names that can be the document root.  The 
+# find_document_root() function searches up the tree from its starting
+# directory and terminates when it finds something in the list.
+define("DOCROOT_NAMES", "wwwroot,inetpub,htdocs,htsdocs,httpdocs,httpsdocs,webroot,www,html");
+
 # User authentication configuration.
+
 # Use sessions in authentication or just cookies.
 define("AUTH_USE_SESSION", true);
 # Username of site administrator.  This is the only one who can add or 

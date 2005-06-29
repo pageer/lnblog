@@ -32,6 +32,7 @@
 */
 
 require_once("blogconfig.php");
+require_once("fs.php");
 
 class FTPFS extends FS {
 	
@@ -39,18 +40,31 @@ class FTPFS extends FS {
 	var $username;
 	var $connection;
 	var $status;
+	var $ftp_root;
 	
 	function FTPFS($host=false, $user=false, $pass=false) {
 		$this->default_mode = 0755;
 		if ($host) $this->host = $host;
-		else $this->host = FTPFS_HOST;
+		elseif (defined("FTPFS_HOST")) $this->host = FTPFS_HOST;
 		if ($user) $this->username = $user;
-		else $this->username = FTPFS_USER;
-		if (!$pass) $pass = FTPFS_PASSWORD;
-		$this->connection = ftp_connect($this->host);
+		elseif (defined("FTPFS_USER")) $this->username = FTPFS_USER;
+		if (!$pass && defined("FTPFS_PASSWORD")) $pass = FTPFS_PASSWORD;
+
+		if (defined("FTP_ROOT")) $this->ftp_root = FTP_ROOT;
+		else $this->ftp_root = "";
+	
+		$colon_pos = strpos(":", $this->host);
+		if ($colon_pos > 0) {
+			$this->connection = ftp_connect(substr($this->host, 0, $colon_pos), 
+			                                substr($this->host, $colon_pos+1));
+		} else {
+			$this->connection = ftp_connect($this->host);
+		}
+
 		if ($this->connection !== false) {
 			$this->status = ftp_login($this->connection, $this->username, $pass);
 		} else $this->status = false;
+		
 	}
 
 	# A non-tranparent destructor.  Needed to cleanly disconnect from the 
@@ -61,7 +75,7 @@ class FTPFS extends FS {
 	}
 
 	# These functions convert between local paths and FTP paths.  They depend 
-	# on the FTP_ROOT constant, which is defined when the FTP configuration
+	# on a correct FTP_ROOT, which is defined when the FTP configuration
 	# is done and contains the full local path to the FTP root directory.
 	# It defaults to two levels above the INSTALL_ROOT, i.e. it 
 	# assumes that the web root is one level below the FTP root.
@@ -69,10 +83,15 @@ class FTPFS extends FS {
 	function localpathToFSPath($path) {
 		$char1 = substr($path, 0, 1);
 		$char2 = substr($path, 1, 1);
+		# Check if $path is relative.
 		if ($char1 != '/' && $char2 != ':') $path = getcwd().PATH_DELIM.$path;
-		$ret = substr_replace($path, '', 0, strlen(FTP_ROOT) );
+		# Since $path should be absolute now, strip the leading FTP_ROOT part.
+		$ret = substr($path, strlen($this->ftp_root) );
+		# Convert native path delimiters to '/'
 		if (PATH_DELIM != '/') $ret = str_replace(PATH_DELIM, '/', $ret);
+		# If we end up with a relative path, add a leading '/'
 		if ( substr($ret, 0, 1) != '/' ) $ret = '/'.$ret;
+		# Add the prefix, if applicable.
 		if ( defined("FTPFS_PATH_PREFIX") ) $ret = FTPFS_PATH_PREFIX.$ret;
 		return $ret;
 	}
@@ -80,7 +99,7 @@ class FTPFS extends FS {
 	function FSPathToLocalpath($path) {
 		$ret = $path;
 		if ( PATH_DELIM != '/' ) $ret = substr_replace(PATH_DELIM, '/', $ret);
-		$ret = realpath(FTP_ROOT.PATH_DELIM.$ret);
+		$ret = realpath($this->ftp_root.PATH_DELIM.$ret);
 		return $ret;
 	}
 
@@ -93,7 +112,15 @@ class FTPFS extends FS {
 	function reconnect($password=false) {
 		if (!$password) $password = FTPFS_PASSWORD;
 		if ($this->connected() ) ftp_close($this->connection);
-		$this->connection = ftp_connect($this->host, $this->username, $pass);
+
+		$colon_pos = strpos(":", $this->host);
+		if ($colon_pos > 0) {
+			$this->connection = ftp_connect(substr($this->host, 0, $colon_pos), 
+			                                substr($this->host, $colon_pos+1));
+		} else {
+			$this->connection = ftp_connect($this->host);
+		}
+		
 		if ($this->connection !== false) {
 			$this->status = ftp_login($this->connection, $this->username, $pass);
 		} else $this->status = false;

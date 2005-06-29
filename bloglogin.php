@@ -28,10 +28,12 @@ $blog = new Blog;
 if (defined("BLOG_ROOT")) {
 	$page_name = $blog->name;
 	$redir_url = $blog->getURL();
+	$admin_login = false;
 } else {
 	ini_set("include_path", ini_get("include_path").PATH_SEPARATOR."templates");
 	$page_name = "System Administration";
 	$redir_url = "index.php";
+	$admin_login = true;
 }
 
 $user_name = "user";
@@ -45,8 +47,13 @@ $tpl->set("PWD", $password);
 
 if ( POST($user_name) && POST($password) ) {
 	$ret = do_login(POST($user_name), POST($password));
-	if ($ret) redirect($redir_url);
-	else $tpl->set("FORM_MESSAGE", "Error logging in.  Please check your username and password.");
+	# Throw up an error if a regular user tries to log in as administrator.
+	if ( $admin_login && (POST($user_name) != ADMIN_USER) ) {
+		$tpl->set("FORM_MESSAGE", "Only the administrator account can log into the administrative pages.");
+	} else {
+		if ($ret) redirect($redir_url);
+		else $tpl->set("FORM_MESSAGE", "Error logging in.  Please check your username and password.");
+	}
 }
 
 $body = $tpl->process();

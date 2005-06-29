@@ -51,12 +51,18 @@ if (! is_file(INSTALL_ROOT.PATH_DELIM."passwd.php")) {
 }
 
 if (POST($upgrade)) {
-	$b = new Blog(POST($upgrade));
+	if (is_absolute(POST($upgrade))) $upgrade_path = trim(POST($upgrade));
+	else $upgrade_path = calculate_document_root().PATH_DELIM.trim(POST($upgrade));
+	$b = new Blog($upgrade_path);
 	$upgrade_status = $b->upgradeWrappers();
 } elseif (POST($update)) {
-	refresh(htmlentities("updateblog.php?blogpath=".POST($update)));
+	if (is_absolute(POST($update))) $update_path = trim(POST($update));
+	else $update_path = calculate_document_root().PATH_DELIM.trim(POST($update));
+	refresh(htmlentities("updateblog.php?blogpath=".$update_path));
 } elseif (POST($fixperm)) {
-	$b = new Blog(POST($fixperm));
+	if (is_absolute(POST($fixperm))) $fixperm_path = trim(POST($fixperm));
+	else $fixperm_path = calculate_document_root().PATH_DELIM.trim(POST($fixperm));
+	$b = new Blog(POST($fixperm_path));
 	#echo "<p>Fix perms</p>";
 	$upgrade_status = $b->fixDirectoryPermissions();
 }

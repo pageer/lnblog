@@ -9,8 +9,8 @@
 </form>
 <script type="text/javascript">
 <!--
-document.getElementById('<?php echo $UNAME; ?>').focus();
-//document.forms[0].elements['<?php echo $UNAME; ?>'].focus();
+var elem = document.getElementById('<?php echo $UNAME; ?>');
+elem.focus();
 -->
 </script>
 

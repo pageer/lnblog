@@ -26,6 +26,7 @@ require_once("utils.php");
 
 session_start();
 
+$docroot = "documentroot";
 $ftp = "use_ftp";
 $uid = "ftp_user";
 $pwd = "ftp_pwd";
@@ -33,6 +34,7 @@ $conf = "ftp_conf";
 $host = "ftp_host";
 $root = "ftp_root";
 $pref = "ftp_prefix";
+$docroot = "webroot";
 
 if ( file_exists(INSTALL_ROOT.PATH_DELIM.FS_PLUGIN_CONFIG) ) {
 	header("Location: index.php");
@@ -45,8 +47,8 @@ $redir_page = "index.php";
 
 $tpl = new PHPTemplate(FS_CONFIG_TEMPLATE);
 
-$tpl->set("FORM_TITLE", "Configure File Writing");
 $tpl->set("FORM_ACTION", basename(SERVER("PHP_SELF")) );
+$tpl->set("DOC_ROOT_ID", $docroot);
 $tpl->set("USE_FTP_ID", $ftp);
 $tpl->set("USER_ID", $uid);
 $tpl->set("PASS_ID", $pwd);
@@ -54,9 +56,11 @@ $tpl->set("CONF_ID", $conf);
 $tpl->set("HOST_ID", $host);
 $tpl->set("ROOT_ID", $root);
 $tpl->set("PREF_ID", $pref);
+$tpl->set("DOC_ROOT_ID", $docroot);
 
 if ( has_post() ) {
 
+	$tpl->set("DOC_ROOT", POST($docroot) );
 	$tpl->set("USE_FTP", POST($ftp) );
 	$tpl->set("USER", POST($uid) );
 	$tpl->set("PASS", POST($pwd) );
@@ -66,7 +70,7 @@ if ( has_post() ) {
 	$tpl->set("PREF", POST($pref) );
 
 	# Check that all required fields have been specified.
-	$vars = array($uid, $pwd, $conf, $host, $root);
+	$vars = array($uid, $pwd, $conf, $host, $root, $docroot);
 	$has_all_data = true;
 	foreach ($vars as $val) {
 		$has_all_data &= ( trim(POST($val)) != "" );
@@ -74,6 +78,9 @@ if ( has_post() ) {
 	}
 
 	if ( $has_all_data && trim(POST($pwd)) == trim(POST($conf)) ) {
+
+		define("DOCUMENT_ROOT", trim(POST($docroot)) );
+
 		if ( POST($ftp) ) {
 			define("FS_PLUGIN", "ftpfs");
 			define("FTPFS_USER", trim(POST($uid)) );
@@ -85,6 +92,7 @@ if ( has_post() ) {
 				#echo "<p>Found prefix</p>";
 			} 
 			$content = "<?php\n".
+				'define("DOCUMENT_ROOT", "'.DOCUMENT_ROOT."\");\n".
 				'define("FS_PLUGIN", "'.FS_PLUGIN."\");\n".
 				'define("FTPFS_USER", "'.FTPFS_USER."\");\n".
 				'define("FTPFS_PASSWORD", "'.FTPFS_PASSWORD."\");\n".
@@ -96,12 +104,15 @@ if ( has_post() ) {
 			$content .= '?>';
 		} else {
 			define("FS_PLUGIN", "nativefs");
-			$content = "<?php\ndefine(\"FS_PLUGIN\", ".FS_PLUGIN."\");\n?>";
+			$content = "<?php\n".
+				'define("DOCUMENT_ROOT", "'.DOCUMENT_ROOT."\");\n".
+				'define("FS_PLUGIN", "'.FS_PLUGIN."\");\n?>";
 		}
 	
 		require_once("fs.php");
 	
 		$fs = CreateFS();
+		$content = str_replace('\\', '\\\\', $content);
 		$ret = $fs->write_file(INSTALL_ROOT.PATH_DELIM.FS_PLUGIN_CONFIG, $content);
 		$fs->destruct();	
 		if (! $ret) $tpl->set("FORM_MESSAGE", "Could not create file.");
@@ -117,8 +128,10 @@ if ( has_post() ) {
 	}
 	
 } else {
-	$tpl->set("ROOT", realpath(getcwd().PATH_DELIM."..".PATH_DELIM."..") );
-	$tpl->set("HOST", SERVER("SERVER_NAME") );
+	
+	#$tpl->set("ROOT", realpath(getcwd().PATH_DELIM."..".PATH_DELIM."..") );
+	$tpl->set("HOST", "localhost" );
+	$tpl->set("DOC_ROOT", calculate_document_root() );
 }
 
 $body = $tpl->process();

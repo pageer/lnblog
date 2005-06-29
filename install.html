@@ -1,94 +1,162 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html>
-<head>
-<title>LnBlog Installation</title>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="en"><head>
+  <title>LnBlog Installation</title>
+
+
+
 </head>
+
 <body>
 <h1>Installing LnBlog</h1>
-<p>The installation for LnBlog is a fairly easy process.  For those who
+
+
+<p>Copyright (C) 2005 Peter A. Geer &lt;<a href="mailto:pageer@skepticats.com">pageer@skepticats.com</a>&gt;<br />
+Last update: 2005-Jun-29</p>
+
+
+<p>The installation for LnBlog is a fairly easy process. For those who
 are not technologically inclined, just follow these step-by-step instructions.</p>
+
+
 <ol>
+
+
 <li>
-<strong>Download and uncompress the LnBlog archive.</strong><p>
-The downloaded archive is a standard ZIP file format.  On Windows you can 
-decompress this with WinZip or pretty much any other compression program.  On
-Linux, you can use your desktop environment's decompression utility, such as 
-Ark, or run <code>unzip&nbsp;lnblog-version.zip</code> from the command 
+<strong>Download and uncompress the LnBlog archive.</strong><p>The
+downloaded archive is a standard ZIP file format. On Windows you can
+decompress this with WinZip or pretty much any other compression
+program. On
+Linux, you can use your desktop environment's decompression utility,
+such as Ark, or run <code>unzip&nbsp;lnblog-version.zip</code> from the command
 line.</p>
 </li>
 <li>
 <strong>Upload the LnBlog folder to your web host.</strong><p>
 Use your favorite FTP program to upload the entire LnBlog installation
-folder to your web hosting account.  The folder <em>must</em> go someplace 
-under your web root.  If you place it outside the web root, you will not be 
-able to run the setup and configuration programs.  Usually it is easiest to 
+folder to your web hosting account. The folder <em>must</em>
+go someplace
+under your web root. If you place it outside the web root, you will not
+be able to run the setup and configuration programs. Usually it is
+easiest to
 simply put the LnBlog folder in the root of your website.</p>
 </li>
 <li>
-<strong>Set up file the writing plugin.</strong><p>
-After uploading the LnBlog folder, you can open up your web browser and 
-navigate to it.  If, for example, you put the foler in your website root and 
-named it just "lnblog", then you would navigate to 
-<code>http://www.yoursite.com/lnblog/</code> to find it.  The first time you
-visit this page, LnBlog will present you with the FTP file writing 
-configuration page.</p>
-<p>LnBlog provides two ways to write files on the web server.  The first way
-is to use the "native" filesystem functions.  To configure this, all you need
-do is leave the "use native filesystem functions" option selected and hit the 
-submit button.  This is 
-not recommended, however, because you will need to manually change file 
-permissions to make the directories you want to put blogs in writable by 
-everyone.  Furthermore, your account <em>will not</em> own any files or 
-directories that LnBlog creates, which can cause problems if you want to 
-manage your site outside the software.</p>
-<p>The second, and recommended, method for writing files is to use the FTP
-interface.  This requires that you be able to access you web space via FTP,
-which you almost certainly can.  To configure this, you need to select the
-"use FTP" option, enter your username and password, and confirm the FTP host 
-name and the path to your FTP root.  The FTP host name (which you will 
-probably have to change) is the server address that you use to upload files 
-to your site, such as <code>ftp.mysite.com</code>.  In the (fairly common) 
-case where the FTP and web servers are the same system, you can also use 
-'localhost'.  The FTP root path is an absolute path to the root of your site,
-i.e. where you end up when you FTP into your site.  By default LnBlog guesses
-that this is two levels above where it is installed, which is probably right 
-if you put LnBlog in your web root.  The optional prefix value is a string to
-prepend to all FTP paths, such as the '~' character.  The prefix is intended 
-primarily for developer testing and is usually not required.</p></li>
+<strong>Configure file access.</strong>
+<p>
+After uploading the LnBlog folder, you can open up your web browser and
+navigate to it. If, for example, you put the foler in your website root and named it just "lnblog", then you would navigate to
+<code>http://www.yoursite.com/lnblog/</code> to find it. The first time you
+visit this page, LnBlog will ask you to set the web document root directory and
+configure file writing.</p>
+<p>The document root is directory on the web server where you put the files for your home page,
+and is used to determine the <abbr title="Uniform Resource Locator">URL</abbr>s
+for your pages. LnBlog will attempt to calculate this based on where it is located.
+In most cases, the default should be correct, but if it isn't you will have to
+set it manually. If you are unsure of what to set, click the link to the test
+page to try out some different values and see the results.</p>
+<p>The second part of this page is the file writing configuration.
+LnBlog provides two ways to write files on the web server. The first way
+is to use the "native" filesystem functions. To configure this, all you need
+do is leave the "use native filesystem functions" option selected and
+hit the submit button. This is
+not recommended, however, because you will need to manually change file
+permissions to make the directories you want to put blogs in writable by
+everyone. Furthermore, your account most likely <em>will not</em> own any files or directories that LnBlog creates,
+which can cause problems if you want to
+manage your site outside of LnBlog. Also note that you will have to change the file
+permissions on the LnBlog directory to make it writable by everyone <em>before</em> completing this step.
+
+If you don't, the native
+file writing functions may not be able to save this setting.</p>
+<p>The second, and recommended,
+method for writing files is to use the FTP
+interface. This requires that you be able to access you web space via
+FTP,
+which you almost certainly can. To configure this, you need to select
+the
+"use FTP" option, enter your username and password, and confirm the FTP
+host name and the path to your FTP root. The FTP host name (which you
+will
+probably have to change) is the server address that you use to upload
+files to your site, such as <code>ftp.mysite.com</code>.
+In the (fairly common)
+case where the FTP and web servers are the same system, you can also
+use 'localhost'. The FTP root path is the path on the web werver where
+your FTP
+access starts. This will vary depending on the server configuration.
+For some
+servers, your FTP root will be the system root, while on others, it
+will be the
+"home" directory of your hosting account. If you do not know what
+directory to use,
+click the link to the test page, fill in your login information, and it
+will try
+to determine the correct path. The optional prefix value is a string to
+prepend to all FTP paths, such as the '~' character. The prefix is
+occasionally used
+for unusual configurations, but is normally not required.</p></li>
 <li>
-<strong>Create an administrative login.</strong><p>
+<strong>Create an administrator login.</strong><p>
 Once you enter your file writing information, LnBlog will prompt you to
-create an administrative login.  This login will be used to add new blogs,
-upgrade old blogs, and will also be the default login for any blogs you 
-create.</p>
+create an administrative login. This login will be used to add new blogs,
+upgrade old blogs, and add new users. The username should already by there,
+so just enter and confirm your password and fill in any other fields you like.</p>
 </li>
 <li>
 <strong>Log in.</strong><p>
-After creating an administrative account, you will be directed to the login 
-page.  Enter the username and password you just created and you will see the
-administrative page.  </p></li>
-<li>
-<strong>Create a new blog.</strong><p>
-Click on the "Add new blog" link to create a new weblog.
-On the new weblog page, you can enter the path to the blog, the name, a 
-description, the web server path to an icon for the blog, the theme to use
-(LnBlog ships with two themes: "default", which I think is very nice,
-and "skepticats", which is the original and somewhat less nice theme)
-and the maximum 
-number of entries to display on the front page.  When you are done, hit 
-submit and you will be taken to the front page of your new blog.</p><p>
-<strong>Please note</strong> that it is best to use a relative path to the 
-blog.  So, if the URL of LnBlog on your site is 
-http://mysite.com/lnblog/ and you want to create a blog at 
-http://mysite.com/myblog/, then you When you should give the path as 
-../myblog.</p><p>
-<strong>Also note</strong> that if the web server account does not have 
+After creating an administrative account, you will be directed to the login
+page. Enter the username and password you just created and you will see the
+administrative page. </p></li>
+<li><strong>Create a new user (optional)</strong><p>You
+may want to create a new user account (aside from the administrator)
+for
+day to day use. To do this, click the "Add new user" link.&nbsp; On
+the resulting page, you can enter the username, password,
+and so forth, just as you did when creating the administrator
+account.&nbsp; Only the username, password, and password
+confirmation are required, though you will also have to fill in a valid
+e-mail address is you want the user to be able to receive e-mail
+confirmation of comments on his posts.&nbsp; The real name and
+homepage are for purely cosmetic purposes.<br />
+</p>
+</li><li>
+<strong>Create a new blog.</strong>
+<p>Click
+on the "Add new blog" link to create a new weblog.
+On the new weblog page, you can enter the path to the blog, the owner,
+who can write to it,&nbsp; the name, a
+description, the theme to
+use
+(LnBlog ships with three themes: "default", which I think is nice and
+fairly conservative, "tuxice" which is a fairly bright Linux theme, and
+"skepticats", which is the original and somewhat out-of-date theme)
+and the maximum
+number of entries to display on the front page and in RSS feeds. When
+you are done, hit
+submit and you will be taken to the front page of your new blog.</p>
+<p>While most of the fields on this page should be self-explanatory, it is important to understand
+the first three. The blog path is a path on the web server. You can either give an
+absolute path, i.e. the full path on the server, or a relative one. Relative paths will
+be interpreted as relative to the document root you set earlier, so that if you give
+the path as simply "myblog", then LnBlog will create a "myblog" directory in the root
+of your website.</p>
+<p>The blog owner is the username of the account that runs the blog. This person will be
+able to change blog settings, post new entries, and so forth. This is a required field and
+
+defaults to administrator,
+but should be set to the username of whoever will be the primary user of this blog. The
+allowed additional writers, on the other hand, is an optional comma-separated list of other usernames
+that are allowed to post new entries to this blog. They cannot change blog settings or edit
+other users' posts - just add and modify their own. This is useful if you want to have something
+like a news page that several people will be updating.</p>
+
+<p><strong>Note</strong> that if you are using "native" file writing and the web server account does not have
 write permissions to the directory where you want the blog, then LnBlog
-will not be able to create it.  You can either change the permissions on the
+will not be able to create it. You can either change the permissions on the
 folder that will contain your weblog folder, or you can manually create the
 folder and change the permissions to be writable by everyone.</p>
 </li>
 </ol>
-</body>
-</html>
+
+
+</body></html>

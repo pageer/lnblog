@@ -44,18 +44,6 @@ class Entry {
 		if ($value) $this->data = $value;
 		else return $this->data;
 	}
-	/*
-	function data($value=false) {
-		if ($value) $this->data = $value;
-		else {
-			$ret = $this->data;
-			if ($this->has_html == MARKUP_BBCODE) 
-				$ret = $this->absolutizeBBCodeURI($ret, 
-						localpath_to_uri(dirname($this->file) ) );
-			return $this->data;
-		}
-	}
-	*/
 
 	# A function to search BBCode marked-up text and convert the URIs in
 	# links and images from relative to absolute.

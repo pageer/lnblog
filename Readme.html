@@ -51,6 +51,7 @@ sites with a clean, directory-based URL structure and valid XHTML and CSS for
 style and layout.&nbsp; Plus, it's light on requirements and cross-platform.<br />
 </p>
 
+
 <h2>Status</h2>
 
 
@@ -98,7 +99,6 @@ set on the web server.<br />
 <li>Create multiple user accounts with basic serucity on entires and blogs.</li>
 <li>E-mail notification when new comments are posted.</li>
 <li>Easily create multiple weblogs.</li><li>Create static "articles" in addition to weblog entries.</li>
-
 <li>Change between multiple themes, each of which can have completely a
 different look and behavior, i.e. different styles, HTML markup, images, and even client-side scripts.</li>
 <li>Default themes use valid XHTML Strict for markup and CSS-based page layout.</li>
@@ -140,7 +140,9 @@ set, you can log in and start adding new blogs and/or users. There are also
 administrative functions to
 modify a blog and update a blog (used when upgrading LnBlog).</p>
 
+
 <h2>Upgrading</h2>
+
 
 <p>Upgrading your LnBlog installation is actually quite easy.&nbsp;
 If you are paranoid, you will want to make backup copies of the
@@ -150,11 +152,18 @@ information global to your installation.&nbsp; They are generally
 not affected by upgrades, and they are not hard to recreate if
 destroyed, but I thought I should warn you anyway.</p>
 
-<p><strong>Note:</strong> the exception to this rule is the passwd.php file when upgrading from LnBlog 0.2
-to version 0.3. The format of this file has changed and you should <strong>delete</strong> the old one and
+
+<p><strong>Exception 1:</strong> The format of passwd.php has changed between versions 0.2 and 0.3 and you should <strong>delete</strong> the old one and
 let the software create a new one. Version 0.3 adds support for multiple users using a mechanism that is
 incompatible with the previous passwd.php format. After you delete this file, go to your LnBlog administration
 page and you will be prompted to create a new administrator account.</p>
+
+<p><span style="font-weight: bold;">Exception 2:</span> An additional configuration constant, DOCUMENT_ROOT, has been added to fsconfig.php in verion 0.3.2.&nbsp; You
+may upgrade by deleting your fsconfig.php and going to the
+administrative page to recreate it.&nbsp; However, if your site was
+functioning correctly with the old version, it should continue to do so
+with the old fsconfig.php file.</p>
+
 
 <p>To upgrade LnBlog, simply extract the
 new version from the ZIP archive and upload it to your web host into
@@ -164,11 +173,11 @@ installation folder and put the new one in its place, provided you copy
 the above mentioned configuration files into the new installation
 directory.</p>
 
+
 <p>Once that's done, you may need
 to upgrade the files for each individual blog.&nbsp; This is done
 by going to the administration page and using the "upgrade blog"
-option.&nbsp; Simply put the relative path to your blog (e.g.
-../myblog, as described in the <a href="#addblog">"Adding New Blogs" section</a>)
+option.&nbsp; Simply put the relative path to your blog (e.g. myblog, as described in the <a href="#addblog">"Adding New Blogs" section</a>)
 and click the "Upgrade" button.&nbsp; This will upgrade the
 configuration files for the blog and add any new pages.&nbsp; You
 will have to do this separately for each blog that youhave. </p>
@@ -218,7 +227,7 @@ can add entries and articles to it,and can modify the entries and articles of ot
 <p>To put it more succinctly,
 there's the administrator (can do anything), the blog owner (can do
 anything with the blog), the other users (can do anything with their
-own posts), and everybody else (can only post comments).&nbsp;
+own posts - provided they <em>can</em> post), and everybody else (can only post comments).&nbsp;
 Which role a particular person will take depends on who they are and
 what blog you're talking about.&nbsp;The owner of one blog may be just a regular reader on another.&nbsp; <br />
 </p>
@@ -241,16 +250,12 @@ are as follows:</a></p>
 
 
 <li><a name="addblog"><strong>Blog path</strong>:
-The path to the blog on the local machine, relative to the current
-directory.&nbsp; (Yes, I know this is a bad way to do it, but I
-haven't had time to fix it yet.)&nbsp; You will note that the
-default path "../myblog" is given as an example.&nbsp; If the
-LnBlog folder is in the root of your web directory, then your blog will
-be stored in the "myblog" folder in the root web directory.&nbsp;
-In other words, if you get to the LnBlog administration page at
-http://somehost.com/LnBlog/ then using ../myblog will put your weblog
-at http://somehost.com/myblog/, which is probably what you
-want.&nbsp; I hope that isn't too confusing for non-technical users.</a></li>
+The path to the blog on the web server machine.&nbsp; You may
+specify either an absolute path or a relative path, in which case the
+path is computed relative to your web root directory.&nbsp; So, if
+you specify the path "myblog", then the web address of the blog will be
+<code>http://www.mysite.com/myblog/</code>
+</a></li>
 <li><a name="addblog"><strong>Blog owner</strong>: The username of whoever owns the blog.
 This is the user who will be allowed to change these settings later. By
 default, this is the administrator.</a></li>
@@ -303,7 +308,9 @@ No processing is done and there's no guarantee that your page will validate.
 In other words, this is for people who know what they're doing.</li>
 </ol>
 
+
 <h2>User Comments</h2>
+
 
 <p>LnBlog allows anonymous user comments by default.&nbsp; You can turn
 off the ability to add comments with a checkbox on the entry edit
@@ -313,7 +320,16 @@ will also store the username, so that the up-to-date name, e-mail, and
 homepage can be displayed automatically.&nbsp; Currently, comments
 cannot be edited, but they can be deleted by users with permission to
 modify the entry.</p>
-<p>If the blog owner has an e-mail address</p>
+
+
+<p>If the owner of a post has an e-mail address specified for his
+username, then he will receive e-mail notification of any new comments
+on his posts.&nbsp; The e-mail is send using PHP's mail() function,
+so that must be correctly configured for your server.&nbsp; The
+messages themselves are in plain-text format and include the URL of the
+comment, as well as the comment itself and any personal information
+entered by the reader.<br />
+</p>
 
 
 <h2>TrackBacks</h2>
@@ -323,6 +339,7 @@ modify the entry.</p>
 entry has a trackback URL and will store and display any trackback
 pings it receives. <br />
 </p>
+
 
 <p>To send a trackback ping, you must be logged in and have permission to modify the blog.&nbsp;
 You can then click on the "Send trackback ping" link for your blog
@@ -344,7 +361,7 @@ suckiness of this situation, sending a trackback ping will open a new
 browser window so that you don't have to manually go back to your blog.</p>
 
 
-<p>LnBlog currently does not support TrackBack&nbsp; URL
+<p>LnBlog currently does not support TrackBack URL
 autodiscovery.&nbsp; There is no bookmarklet to pick up trackback URLs
 for other blogs and there is no RDF section embedded in LnBlog entries.</p>
 
@@ -404,6 +421,11 @@ text.</p>
 <td>[quote]Quotation[/quote]</td>
 <td><blockquote><p>Quotation</p></blockquote></td>
 <td>&lt;blockquote&gt;Quotation&lt;/blockquote&gt;</td>
+</tr><tr>
+<td>Source code</td>
+<td>[code]Source code[/code]</td>
+<td><code>Source code</code></td>
+<td>&lt;code&gt;Source coden&lt;/code&gt;</td>
 </tr><tr>
 <td>Short quotation</td>
 <td>[q]Quote[/q]</td>
@@ -499,7 +521,7 @@ this with care. Note that in the default LnBlog stylsheets, the
 tag is rendered with italic text, so that even in Internet Explorer, it
 can be distinguished from normal text.</li><li>The
 current LBCode handler does not deal gracefully with multiline
-tags.&nbsp; So if, e.g., you have a multiline block quotation, the
+tags.&nbsp; So if, e.g., you have a multiline block quotation or code block, the
 LBCode handler will still put &lt;br /&gt; tags in for the line
 breaks.&nbsp; </li>
 
@@ -595,7 +617,9 @@ upload_max_size and post_max_size by creating a .htaccess file (if you
 use Apache) or by modifying
 the system php.ini file.</p>
 
+
 <h3>Sitemap Editing</h3>
+
 
 <p>Part of LnBlog's basic page
 layout includes a sitemap, also refered to as the menubar.&nbsp; In
@@ -615,6 +639,7 @@ and use the link in the administration section of the blog
 sidebar.&nbsp; Note that setting a sitemap for the blog will override
 the global sitemap.</p>
 
+
 <p>The sitemap editor is a simple
 Javascript form that creates a list of links.&nbsp; Just enter the
 text you want for the link, the tooltip (what to display when hovering
@@ -626,6 +651,7 @@ LnBlog will read this file and put each line into a list item to be
 displayed in the menubar.&nbsp; Please note that, currently, if you
 want to create a more complicated menu layout, you will have to modify
 the menubar template. </p>
+
 
 <h2>License Information<br />
 </h2>

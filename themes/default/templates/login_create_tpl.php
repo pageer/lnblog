@@ -6,7 +6,7 @@
 <?php if (isset($UNAME)) { ?>
 <div>
 <label for="<?php echo $UNAME; ?>">Username</label>
-<input type="text" id="<?php echo $UNAME; ?>" name="<?php echo $UNAME; ?>" <?php if (isset($UNAME_VALUE)) echo 'value="'.$UNAME_VALUE.'" '; ?>/>
+<input type="text" id="<?php echo $UNAME; ?>" name="<?php echo $UNAME; ?>" <?php if (isset($UNAME_VALUE)) { echo 'value="'.$UNAME_VALUE.'" '; } if (isset($DISABLE_UNAME)) { echo 'readonly="readonly" style="background-color: #E0E0E0;"'; } ?> />
 </div>
 <?php } ?>
 <div>
@@ -35,6 +35,12 @@
 </form>
 <script type="text/javascript">
 <!--
-document.forms[0].elements['<?php echo $UNAME; ?>'].focus();
+<?php if (isset($DISABLE_UNAME)) { ?>
+var elem = document.getElementById('<?php echo $PWD; ?>');
+elem.focus();
+<?php } else { ?>
+var elem = document.getElementById('<?php echo $UNAME; ?>');
+elem.focus();
+<?php } ?>
 -->
 </script>
