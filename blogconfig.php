@@ -2,7 +2,7 @@
 
 # Information on the package itself.
 define("PACKAGE_NAME", "LnBlog");
-define("PACKAGE_VERSION", "0.3.2");
+define("PACKAGE_VERSION", "0.3.3");
 define("PACKAGE_URL", "http://www.skepticats.com/lnblog/");
 define("PACKAGE_DESCRIPTION", PACKAGE_NAME.": a simple and (hopefully) elegant weblog");
 define("PACKAGE_COPYRIGHT", "Copyright (c) 2005, Peter A. Geer <pageer@skepticats.com>");
@@ -20,7 +20,7 @@ define("PACKAGE_COPYRIGHT", "Copyright (c) 2005, Peter A. Geer <pageer@skepticat
 define("LOCALPATH_TO_URI_MATCH_RE", "/^\/home\/([^\/]+)\/www(.*)/");
 define("LOCALPATH_TO_URI_REPLACE_RE", "/~$1$2");
 define("URI_TO_LOCALPATH_MATCH_RE", "/^\/~([^\/]+)(.*)/");
-define("URI_TO_LOCALPATH_REPLACE_RE", "$2"); #"/home/$1/www$2");
+define("URI_TO_LOCALPATH_REPLACE_RE", "$2"); 
 
 # The file to save the sitemap link list for the menubar.
 define("SITEMAP_FILE", "sitemap.htm");

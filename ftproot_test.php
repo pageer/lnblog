@@ -135,6 +135,7 @@ indicates that the file was <em>not</em> found, then you will have to try anothe
 <div>
 <label for="ftproot">Document Root</label>
 <input type="text" id="ftproot" name="ftproot" value="<?php echo $ftp_root; ?>" />
+<span>(optional)</span>
 </div>
 <div>
 <input type="submit" value="Test" />
@@ -147,7 +148,7 @@ Test file path: <?php echo $test_file; ?><br />
 FTP path: <?php echo $ftp_path; ?><br />
 The test file was
 <span style="color: <?php echo $test_status ? "green" : "red"; ?>">
-<?php echo $test_status ? "found" : "not found"; ?></span>.</p>
+<?php echo $test_status ? "found" : "not found.  Test failed"; ?></span>.</p>
 </div>
 </body>
 </html>

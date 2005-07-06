@@ -80,9 +80,8 @@ if ($post_complete) {
 		$usr->email(trim(POST($email)));
 		$usr->homepage(trim(POST($homepage)));
 		$usr->save();
-		#$usr->login(POST($password));
-		#redirect("bloglogin.php");
-		redirect("index.php");
+		$usr->login(POST($password));
+		redirect("bloglogin.php");
 		exit;
 	}
 } elseif ($partial_post) {

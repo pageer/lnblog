@@ -1,6 +1,5 @@
 /* Styles for comments. */
 
-@import url(form.css);
 
 #entrycomments {
 	margin-top: 1%;
@@ -44,4 +43,10 @@ div.commentdata {
 div.commentfooter li.commenturl, div.commentfooter li.commentname {
 	display: inline;
 	margin-right: 1%;
+}
+
+@media print {
+	.fullcomment {
+		page-break-inside: avoid;
+	}
 }

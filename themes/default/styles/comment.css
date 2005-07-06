@@ -11,6 +11,7 @@
 
 .fullcomment {
 	border-bottom: thin dotted black;
+	margin-top: 2%;
 }
 
 /*
@@ -49,4 +50,10 @@ div.commentfooter li.commenturl, div.commentfooter li.commentname {
 
 div.commentname li[class~='user'] {
 	font-weight: bold;
+}
+
+@media print {
+	.fullcomment {
+		page-break-inside: avoid;
+	}
 }

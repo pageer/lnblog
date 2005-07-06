@@ -20,6 +20,7 @@
 
 require_once("blogconfig.php");
 require_once("blog.php");
+require_once("user.php");
 
 session_start();
 
@@ -33,8 +34,7 @@ if (! $usr->checkLogin() ) {
 
 # Allow us to use this to create the admin login.
 if (defined("BLOG_ROOT")) {
-	$blog = new Blog;
-	$page_name = $blog->name." - Change Login";
+	$blog = new Blog;	
 	$form_title = "New Login for ".$blog->name;
 	$redir_page = $blog->getURL();
 } else {
@@ -44,6 +44,8 @@ if (defined("BLOG_ROOT")) {
 	$redir_page = "index.php";
 }
 
+$form_title = "Modify User - ".$usr->username();
+$page_name = "Change User Information";
 $user_name = "user";
 $password = "passwd";
 $confirm = "confirm";
@@ -56,7 +58,7 @@ $tpl = new PHPTemplate(CREATE_LOGIN_TEMPLATE);
 $tpl->set("FORM_TITLE", $form_title);
 $tpl->set("FORM_ACTION", current_file());
 $tpl->set("PWD", $password);
-$tpl->set("CONFIRM", $confirm)
+$tpl->set("CONFIRM", $confirm);
 $tpl->set("FULLNAME", $full_name);
 $tpl->set("FULLNAME_VALUE", $usr->name() );
 $tpl->set("EMAIL", $email);
@@ -64,11 +66,11 @@ $tpl->set("EMAIL_VALUE", $usr->email() );
 $tpl->set("HOMEPAGE", $homepage);
 $tpl->set("HOMEPAGE_VALUE", $usr->homepage() );
 
-if (has_post()$) {
+if (has_post()) {
 	
 	if ( trim(POST($password)) && 
 	     trim(POST($password)) == trim(POST($confirm))) {
-		$pwd_change = true
+		$pwd_change = true;
 		$usr->password(trim(POST($password)));
 	} elseif ( trim(POST($password)) && 
 	           trim(POST($password)) == trim(POST($confirm))) {
@@ -82,13 +84,14 @@ if (has_post()$) {
 	$usr->homepage(trim(POST($homepage)));
 	$usr->save();
 	if ($pwd_change) $usr->login(POST($password));
-	redirect("bloglogin.php");
+	redirect("index.php");
 	
 }
 
 $body = $tpl->process();
 $tpl->reset(BASIC_LAYOUT_TEMPLATE);
 if (defined("BLOG_ROOT")) $blog->exportVars($tpl);
+$tpl->set("STYLE_SHEETS", array("form.css") );
 $tpl->set("PAGE_CONTENT", $body);
 $tpl->set("PAGE_TITLE", $page_name);
 

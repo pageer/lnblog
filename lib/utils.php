@@ -312,8 +312,12 @@ function localpath_to_uri($path, $full_uri=true) {
 	if ($full_uri) {
 		# Add the protocol and server.
 		$protocol = "http";
+		if (SERVER("HTTPS") == "on") $protocol = "https";
 		$host = SERVER("SERVER_NAME");
-		$url_path = $protocol."://".$host.$url_path;
+		$port = SERVER("SERVER_PORT");
+		if ($port == 80 || $port == "") $port = "";
+		else $port = ":".$port;
+		$url_path = $protocol."://".$host.$port.$url_path;
 	}
 	return $url_path;
 }
@@ -417,6 +421,7 @@ function create_directory_wrappers($path, $type, $instpath="") {
 			$ret &= $fs->write_file($current."logout.php", $head."bloglogout".$tail);
 			$ret &= $fs->write_file($current."uploadfile.php", $head."fileupload".$tail);
 			$ret &= $fs->write_file($current."map.php", $head."sitemap".$tail);
+			$ret &= $fs->write_file($current."useredit.php", $head."editlogin".$tail);
 			$ret &= $fs->write_file($current."config.php", $config_data);
 			break;
 		case BLOG_ENTRIES:

@@ -1,10 +1,30 @@
-29-Jun-2005:
+05-Jul-2005: Version 0.3.3
+- Fixed bug in URL conversion for comments.
+- fixed localpath_to_uri() to account for non-standard server ports.
+- Added optional citation for LBCode for short and block quotations.
+- Added editor buttons for code and block quote LBCode tags.
+- Moved print media style sheets into the regular CSS files.
+- Updated blog methods that add/modify content to return UPDATE_SUCCESS when
+there is no explicit error set.  While the FTP file writing functions worked
+without this, the native ones did not.
+- Fixed fs_setup.php page so that you can actually set LnBlog to use native
+file writing.  I guess I got too focused on FTP.
+
+03-Jul-2005:
+- Fixed up user edit page and added link to it in sidebar.
+- Small improvements to the style sheets.
+
+01-Jul-2005:
+- Added some explicit version tags to the ChangeLog. ;)
+- Added img-left and img-right LBCode tags for flowing text around images.
+- Added some basic documentation on the theme system.
+
+29-Jun-2005: Version 0.3.2
 - Added non-admin error message to admin page login.
 - Made the new blog path relative to DOCUMENT_ROOT, not current directory.
 - Updated install and readme files.
 - Fixed missing personal info in e-mail notifications for comments by 
 logged-in users.
-- Fixed wrong redirects on some admin pages.
 
 28-Jun-2005:
 - Fixed mangling of double-quotes in comments.
@@ -15,7 +35,7 @@ find_document_root() in lieu of doing the actual search.
 - Added test pages for determining the HTML doc root and the FTP root.
 - Fixed FTP support to allow non-standard ports.
 
-25-Jun-2005:
+25-Jun-2005: Version 0.3.1
 - Fixed bug with putting colons in entry metadata.
 - Fixed bug where ownership was not correctly set on inserted articles.
 - Fixed crashing bug in article preview.
@@ -26,7 +46,7 @@ find_document_root() in lieu of doing the actual search.
 24-Jun-2005:
 - Added keyboard navigation to the entry editor and comment form.
 
-19-Jun-2005:
+19-Jun-2005: Version 0.3.0
 - Fixed bugs in sitemap creation, deleting entries, and deleting comments.
 This will be version 0.3.0.
 
@@ -68,7 +88,7 @@ up in a nicer format.
 - Added a more colorful theme with a different layout.
 - Added recognition of logged-in users to comment class.
 
-22-Apr-2005:
+22-Apr-2005: Version 0.2.2
 - Added Javascript editor.
 - Added "show all entries" page for archives.
 - This will be release 0.2.2.
@@ -81,7 +101,7 @@ property, but still set the template variables appropriately.
 - Changed blog entry display templates to show link to comments 
 all the time, not just when there are comments.
 
-16-Apr-2005:
+16-Apr-2005: Version 0.2.1
 - Fixed bone-head bug in stipping HTML entities.
 - Added rel links for RSS to page headers.  Use blog RSS for main page, use 
 comment RSS for entry, article, and comment pages.
@@ -100,7 +120,7 @@ line at the end and beginning of a list.
 - Added destination name to successful file upload message.
 - Fixed missing license section in Readme.html file.  Oops!
 
-06-Apr-2005:
+06-Apr-2005: Version 0.2.0
 - Fixed bugs and removed debugging code that showed up when attempting to
 post an entry and upload the files for the 0.2.0 release. ;)
 - Fixed missing template variable errors in new blog page.
@@ -110,7 +130,7 @@ when showing entry and comments and ended up linking to entry delete.
 getPath(), which was changed in BlogEntry, but not article.
 - OK, let's make THIS release 0.2.0.
 
-04-Apr-2005:
+04-Apr-2005
 - Fixed several templates so that the HTML actually validates now.
 - Added some styles to make forms slightly nicer.
 - Added ordered and unordered lists to LBCode.
@@ -158,5 +178,5 @@ and directories using native filesystem functions or FTP functions using
 - Changed name from Basic Blog, which was too common and kind of sucked, to
 LnBlog, seems to be fairly uncommon and sucks slightly less.
 
-Version 0.1.0: 02-Mar-2005
+02-Mar-2005: Version 0.1.0
 - Initial public release.

@@ -1,7 +1,5 @@
 /* Site-map menu bar styles. */
 
-@import url(menubar_print.css);
-
 #menubar {
 	width: 100%;
 	background: #cdcdcd;
@@ -26,4 +24,10 @@
 	/*background-color: white;*/
 	margin-left: 1em;
 	margin-right: 1em;
+}
+
+@media print {
+	#menubar {
+		display: none;
+	}
 }

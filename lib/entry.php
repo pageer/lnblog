@@ -49,8 +49,9 @@ class Entry {
 	# links and images from relative to absolute.
 
 	function absolutizeBBCodeURI($data, $current_uri) {
-		$ret = preg_replace("/\[img=([^\/]+)\]/",
-		                    "[img=".$current_uri."$1]", $data);
+		$ret = preg_replace("/\[img(-?\w+)?=([^\/]+)\]/",
+		                    "[img$1=".$current_uri."$2]", $data);
+		#echo "<p>$ret</p>";
 		$ret = preg_replace("/\[url=([^\/:@]+)\]/", 
 		                    "[url=".$current_uri."$1]", $ret);
 		return $ret;
@@ -81,11 +82,11 @@ class Entry {
 		$patterns[1] = '/\r\n\r\n/';
 		$patterns[2] = '/\n\n/';
 		$patterns[3] = '/\n/';
-		$replacements[0] = "<a href=\"\$1\"" .
-			$use_nofollow ?
-			" rel=\"nofollow\"" :
-			"" .
-			">\$1</a>";
+		if ($use_nofollow) {
+			$replacements[0] = '<a href="$1" rel="nofollow">$1</a>';
+		} else {
+			$replacements[0] = '<a href="$1">$1</a>';
+		}
 		$replacements[1] = '</p><p>';
 		$replacements[2] = '</p><p>';
 		$replacements[3] = '<br />';
@@ -103,31 +104,39 @@ class Entry {
 		$patterns[1] = "/\[img=(.+)](.+)\[\/img\]/Usi";
 		$patterns[2] = "/\[ab=(.+)\](.+)\[\/ab\]/Usi";
 		$patterns[3] = "/\[ac=(.+)\](.+)\[\/ac\]/Usi";
-		$patterns[4] = "/\[quote\](.+)[\/quote]/Usi";
-		$patterns[5] = "/\[b\](.+)\[\/b\]/Usi";
-		$patterns[6] = "/\[i\](.+)\[\/i\]/Usi";
-		$patterns[7] = "/\[u\](.+)\[\/u\]/Usi";
-		$patterns[8] = '/\[q\](.+)\[\/q\]/Usi';
-		$patterns[9] = "/(\r?\n\s*)?\[list\]\s*\r?\n(.+)\[\/list\](\s*\r?\n)?/Usi";
-		$patterns[10] = "/(\r?\n\s*)?\[numlist\]\s*\r?\n(.+)\[\/numlist\](\s*\r?\n)?/Usi";
-		$patterns[11] = "/\[\*\](.*)\r?\n/Usi";
-		$patterns[12] = "/\[code\](.*)\[\/code\]/Usi";
-		$patterns[13] = "/\[t\](.*)\[\/t\]/Usi";
+		$patterns[4] = "/\[quote\](.+)\[\/quote\]/Usi";
+		$patterns[5] = "/\[quote=(.+)\](.+)\[\/quote\]/Usi";
+		$patterns[6] = "/\[b\](.+)\[\/b\]/Usi";
+		$patterns[7] = "/\[i\](.+)\[\/i\]/Usi";
+		$patterns[8] = "/\[u\](.+)\[\/u\]/Usi";
+		$patterns[9] = '/\[q\](.+)\[\/q\]/Usi';
+		$patterns[10] = '/\[q=(.+)\](.+)\[\/q\]/Usi';
+		$patterns[11] = "/(\r?\n\s*)?\[list\]\s*\r?\n(.+)\[\/list\](\s*\r?\n)?/Usi";
+		$patterns[12] = "/(\r?\n\s*)?\[numlist\]\s*\r?\n(.+)\[\/numlist\](\s*\r?\n)?/Usi";
+		$patterns[13] = "/\[\*\](.*)\r?\n/Usi";
+		$patterns[14] = "/\[code\](.*)\[\/code\]/Usi";
+		$patterns[15] = "/\[t\](.*)\[\/t\]/Usi";
+		$patterns[16] = "/\[img-left=(.+)\](.+)\[\/img-left\]/Usi";
+		$patterns[17] = "/\[img-right=(.+)\](.+)\[\/img-right\]/Usi";
 		
 		$replacements[0] = '<a href="$1">$2</a>';
 		$replacements[1] = '<img alt="$2" title="$2" src="$1" />';
 		$replacements[2] = '<abbr title="$1">$2</abbr>';
 		$replacements[3] = '<acronym title="$1">$2</acronym>';
 		$replacements[4] = '</p><blockquote><p>$1</p></blockquote><p>';
-		$replacements[5] = '<strong>$1</strong>';
-		$replacements[6] = '<em>$1</em>';
-		$replacements[7] = '<span style="text-decoration: underline;">$1</span>';
-		$replacements[8] = '<q>$1</q>';
-		$replacements[9] = "</p><ul>$2</ul><p>";
-		$replacements[10] = "</p><ol>$2</ol><p>";
-		$replacements[11] = '<li>$1</li>';
-		$replacements[12] = '<code>$1</code>';
-		$replacements[13] = '<tt>$1</tt>';
+		$replacements[5] = '</p><blockquote cite="$1"><p>$2</p></blockquote><p>';
+		$replacements[6] = '<strong>$1</strong>';
+		$replacements[7] = '<em>$1</em>';
+		$replacements[8] = '<span style="text-decoration: underline;">$1</span>';
+		$replacements[9] = '<q>$1</q>';
+		$replacements[10] = '<q cite="$1">$2</q>';
+		$replacements[11] = "</p><ul>$2</ul><p>";
+		$replacements[12] = "</p><ol>$2</ol><p>";
+		$replacements[13] = '<li>$1</li>';
+		$replacements[14] = '<code>$1</code>';
+		$replacements[15] = '<tt>$1</tt>';
+		$replacements[16] = '<img alt="$2" title="$2" style="float: left;" src="$1" />';
+		$replacements[17] = '<img alt="$2" title="$2" style="float: right;" src="$1" />';
 		
 		
 		$whitespace_patterns[0] = '/\r\n\r\n/';

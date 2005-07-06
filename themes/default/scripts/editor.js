@@ -96,3 +96,25 @@ function two_parm(type) {
 
 }
 
+function opt_parm(type) {
+
+	var desc_str = document.getElementById("desc_txt").value;
+	var meta_str = document.getElementById("meta_txt").value;
+	var data_str = '';
+
+	if (desc_str == '') return false;
+
+	data_str = '[' + type;
+	if (meta_str == '') {
+		data_str = '[' + type + ']' + desc_str + '[/' + type + ']'
+	} else {
+		data_str = '[' + type + '=' + meta_str + ']' + desc_str + '[/' + type + ']'
+	}
+	
+	insertAtCursor(
+		document.getElementById("data"), data_str);
+	document.getElementById("desc_txt").value = '';
+	document.getElementById("meta_txt").value = '';
+	return true;
+
+}

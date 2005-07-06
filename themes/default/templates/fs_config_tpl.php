@@ -47,11 +47,11 @@ recommended choice.</p>
 <?php } ?>
 <div>
 <label for="native">Use native functions for file writing</label>
-<input type="radio" name="<?php echo $USE_FTP_ID; ?>" id="native" <?php if (! isset($USE_FTP)) { ?>checked="checked"<?php } ?> />
+<input type="radio" name="<?php echo $USE_FTP_ID; ?>" id="native" <?php if (! isset($USE_FTP)) { ?>checked="checked"<?php } ?> value="nativefs" />
 </div>
 <div>
 <label for="ftpfs">Use FTP file writing</label>
-<input type="radio" name="<?php echo $USE_FTP_ID; ?>" id="ftpfs" <?php if (isset($USE_FTP)) { ?>checked="checked"<?php } ?> value="ftpfs" onclick="deactivate();" />
+<input type="radio" name="<?php echo $USE_FTP_ID; ?>" id="ftpfs" <?php if (isset($USE_FTP)) { ?>checked="checked"<?php } ?> value="ftpfs" />
 </div>
 <div>
 <label for="<?php echo $USER_ID; ?>" title="An FTP user account that can write to the web directories.">Username</label>

@@ -70,18 +70,24 @@ if ( has_post() ) {
 	$tpl->set("PREF", POST($pref) );
 
 	# Check that all required fields have been specified.
-	$vars = array($uid, $pwd, $conf, $host, $root, $docroot);
+	$vars = array($uid, $pwd, $conf, $host, $root);
 	$has_all_data = true;
 	foreach ($vars as $val) {
 		$has_all_data &= ( trim(POST($val)) != "" );
 		#echo "<p>'".POST($val)."'</p>";
 	}
 
-	if ( $has_all_data && trim(POST($pwd)) == trim(POST($conf)) ) {
-
+	if ( trim(POST($docroot)) && 
+	     ( (POST($ftp) == "nativefs") || 
+		    (POST($ftp) == "ftpfs" && $has_all_data && 
+	        trim(POST($pwd)) == trim(POST($conf)) 
+	       )
+	     )
+	   ) {
+	
 		define("DOCUMENT_ROOT", trim(POST($docroot)) );
 
-		if ( POST($ftp) ) {
+		if ( POST($ftp) == "ftpfs" ) {
 			define("FS_PLUGIN", "ftpfs");
 			define("FTPFS_USER", trim(POST($uid)) );
 			define("FTPFS_PASSWORD",trim( POST($pwd)) );
@@ -130,7 +136,7 @@ if ( has_post() ) {
 } else {
 	
 	#$tpl->set("ROOT", realpath(getcwd().PATH_DELIM."..".PATH_DELIM."..") );
-	$tpl->set("HOST", "localhost" );
+	$tpl->set("HOST", "localhost");  #SERVER("SERVER_NAME") );
 	$tpl->set("DOC_ROOT", calculate_document_root() );
 }
 

@@ -118,6 +118,7 @@ if ($usr->checkLogin()) {
 <li><a href="<?php echo $BLOG_URL_ROOTREL; ?>uploadfile.php">Upload file for blog</a></li>
 <li><a href="<?php echo $BLOG_URL_ROOTREL; ?>edit.php">Edit weblog settings</a></li>
 <li><a href="<?php echo $BLOG_URL_ROOTREL; ?>map.php">Edit custom sitemap</a></li>
+<li><a href="<?php echo $BLOG_URL_ROOTREL; ?>useredit.php">Edit User Information</a></li>
 <li><a href="<?php echo $BLOG_URL_ROOTREL; ?>logout.php">Logout <?php echo $usr->username(); ?></a></li>
 </ul>
 <?php 

@@ -1,20 +1,11 @@
 /* Styles for blog entries. */
 
-@import url(blogentry_print.css);
-
 div.blogentry {
 	/*border: thin solid black;*/
 	border-bottom: thin dotted black;
-	margin-bottom: 1%;
+	margin-bottom: 2%;
 	/*width: 50%;*/
 }
-
-/*
-div.blogentryheader {
-	border-bottom: thin solid black;
-	background-color: #c3c3c3;
-}
-*/
 
 div.blogentryheader img {
 	border: none;
@@ -28,6 +19,8 @@ div.blogentryheader h2 {
 
 div.blogentryfooter {
 	font-size: 80%;
+	margin-bottom: 3%;
+	clear: both;
 }
 
 div.blogentryfooter ul {
@@ -54,11 +47,24 @@ div.blogentry  div.blogentrybody {
 	/*white-space: pre;*/
 }
 
-div.blogentry div.blogentrybody p {
+.blogentrybody p {
 	text-indent: 1em;
+	clear: both;
 }
 
 .blogentryfooter h3 {
 	margin-bottom: 0px;
 	margin-top: 0px
+}
+
+@media print {
+	
+	#commentsubmit {
+		display: none;
+	}
+	
+	.blogentry {
+		page-break-inside: avoid;
+	}
+	
 }

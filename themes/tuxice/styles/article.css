@@ -1,7 +1,5 @@
 /* Styles for blog entries. */
 
-@import url(article_print.css);
-
 div.article {
 	/*border: thin solid black;*/
 	border-bottom: thin dotted black;
@@ -46,4 +44,14 @@ div.articlefooter li {
 div.article  div.articlebody {
 	padding: 1%;
 	/*white-space: pre;*/
+}
+
+@media print {
+	#commentsubmit {
+		display: none;
+	}
+
+	.article {
+		page-break-inside: avoid;
+	}
 }

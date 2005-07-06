@@ -1,7 +1,5 @@
 /* Site banner styles. */
 
-@import url(banner_print.css);
-
 #banner {
 	width: 100%;
 	/*height: 100px;*/
@@ -25,4 +23,12 @@
 
 #banner a:hover {
 	text-decoration: underline;
+}
+
+@media print {
+
+	#banner {
+		display: none;
+	}
+
 }

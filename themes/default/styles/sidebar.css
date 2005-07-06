@@ -1,7 +1,5 @@
 /* Sidebar styles. */
 
-@import url(sidebar_print.css);
-
 #sidebar {
 	border: thin solid black;
 	margin-top: 2%;
@@ -75,4 +73,12 @@
 	vertical-align: middle;
 	margin: 1% 0 1% 5%;
 	border: 0px;
+}
+
+@media print {
+
+	#sidebar {
+		display: none;
+	}
+	
 }

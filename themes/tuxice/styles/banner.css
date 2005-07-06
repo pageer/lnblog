@@ -1,7 +1,5 @@
 /* Site banner styles. */
 
-@import url(banner_print.css);
-
 #banner {
 	/*border: thin solid black;*/
 	/*background-color: #f4f4f4;*/
@@ -33,4 +31,10 @@
 
 #banner a:hover {
 	text-decoration: underline;
+}
+
+@media print {
+	#banner {
+		display: none;
+	}
 }

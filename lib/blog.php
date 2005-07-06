@@ -622,6 +622,7 @@ class Blog {
 		if ($ret) {
 			$this->updateRSS1();
 			$this->updateRSS2();
+			$ret = UPDATE_SUCCESS;
 		} else $ret = UPDATE_ENTRY_ERROR;
 		return $ret;
 	}
@@ -636,6 +637,7 @@ class Blog {
 		if ($ret) {
 			$this->updateRSS1();
 			$this->updateRSS2();
+			$ret = UPDATE_SUCCESS;
 		} else $ret = UPDATE_ENTRY_ERROR;
 		return $ret;
 	}
@@ -648,6 +650,7 @@ class Blog {
 		if ($ret) {
 			$this->updateRSS1();
 			$this->updateRSS2();
+			$ret = UPDATE_SUCCESS;
 		} else $ret = UPDATE_ENTRY_ERROR;
 		return $ret;
 
@@ -673,6 +676,7 @@ class Blog {
 		$ret = $ent->insert($branch, $base);
 		if ($ret) {
 			$ent->setSticky();
+			$ret = UPDATE_SUCCESS;
 		} else $ret = UPDATE_ENTRY_ERROR;
 		return $ret;
 	}
@@ -685,6 +689,7 @@ class Blog {
 		if (! $this->canModifyArticle($ent) ) return UPDATE_AUTH_ERROR;
 		$ret = $ent->update();
 		if (! $ret) $ret = UPDATE_ENTRY_ERROR;
+		else $ret = UPDATE_SUCCESS;
 		return $ret;
 	}
 
@@ -694,6 +699,7 @@ class Blog {
 		if (! $this->canModifyEntry($ent) ) return UPDATE_AUTH_ERROR;
 		$ret = $ent->delete();
 		if (! $ret) $ret = UPDATE_ENTRY_ERROR;
+		else $ret = UPDATE_SUCCESS;
 		return $ret;
 
 	}

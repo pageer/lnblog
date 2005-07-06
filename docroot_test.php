@@ -59,7 +59,7 @@ Document root: <?php echo $doc_root; ?><br />
 Path to documentation: <?php echo $documentation_path; ?><br />
 This file 
 <span style="color: <?php echo $documentation_exists ? "green" : "red"; ?>">
-<?php echo $documentation_exists ? "exists" : "does not exist"; ?></span>.</p>
+<?php echo $documentation_exists ? "exists" : "does not exist.  Test failed"; ?></span>.</p>
 <label for="testlink">Test link:</label> <a href="<?php echo $target_url; ?>" onclick="return test_window();"><?php echo $target_url; ?></a>
 </div>
 </form>
