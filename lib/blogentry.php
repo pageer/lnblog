@@ -234,7 +234,9 @@ class BlogEntry extends Entry {
 		}
 	}
 
-	function get() {
+	
+
+	function get($show_edit_controls=false) {
 		$tmp = new PHPTemplate(ENTRY_TEMPLATE);
 		
 		$usr = new User($this->uid);
@@ -243,19 +245,13 @@ class BlogEntry extends Entry {
 		$tmp->set("SUBJECT", $this->subject);
 		$tmp->set("POSTDATE", $this->prettyDate($this->post_ts) );
 		$tmp->set("EDITDATE", $this->prettyDate() );
-		$body_text = $this->data;
-		if ($this->has_html == MARKUP_BBCODE) {
-			$body_text = $this->absolutizeBBCodeURI($body_text, $this->permalink() );
-		}
-		$body_text = $this->markup($body_text);
 		$tmp->set("ABSTRACT", $this->abstract);
-		$tmp->set("BODY", $body_text);
+		$tmp->set("BODY", $this->markup() );
 		$tmp->set("ALLOW_COMMENTS", $this->allow_comment);
 		$tmp->set("PERMALINK", $this->permalink() );
-		$tmp->set("POSTEDIT", $this->permalink()."edit.php");
-		$tmp->set("POSTDELETE", $this->permalink()."delete.php");
 		$tmp->set("COMMENTCOUNT", $this->getCommentCount() );
 		$tmp->set("TRACKBACKCOUNT", $this->getTrackbackCount() );
+		$tmp->set("SHOW_CONTROLS", $show_edit_controls);
 		
 		$ret = $tmp->process();
 		return $ret;

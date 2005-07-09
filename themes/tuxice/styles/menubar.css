@@ -1,15 +1,8 @@
 /* Site-map menu bar styles. */
 
-@import url(menubar_print.css);
-
 #menubar {
 	width: 100%;
 	background: #f4f4f4;
-	/*border: 1px solid black;*/
-	/*position: absolute;
-	top: 0px;
-	left: 0px;
-	float: left;*/
 	border-bottom: thin solid black;
 	margin: 0;
 	padding: 0;
@@ -35,7 +28,6 @@
 #menubar ul li {
 	list-style-type: none;
 	display: inline;
-	/*background-color: white;*/
 	margin-left: 1em;
 	margin-right: 1em;
 }

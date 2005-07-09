@@ -43,12 +43,7 @@ if (GET("send_ping") == "yes" || POST("send_ping") == "yes" ) {
 	$tpl->set("TB_URL_ID", $tburl );
 	$tpl->set("TB_URL", POST($tburl) );
 	$tpl->set("TB_EXCERPT_ID", "excerpt");
-	$body_text = $ent->data;
-	if ($ent->has_html == MARKUP_BBCODE) {
-		$body_text = $ent->absolutizeBBCodeURI($body_text, $ent->permalink() );
-	}
-	$body_text = $ent->markup($body_text);
-	$tpl->set("TB_EXCERPT", $body_text);
+	$tpl->set("TB_EXCERPT", $this->markup() );
 	
 	# If the form has been posted, send the trackback.
 	if (POST($tburl)) {

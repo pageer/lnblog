@@ -49,7 +49,7 @@ if (POST($SUBMIT_ID)) {
 
 # Get the entry AFTER posting the comment so that the comment count is right.
 $title = $ent->subject . " - " . $blg->name;
-$content =  $ent->get();
+$content =  $ent->get( $blg->canModifyEntry() );
 
 # Array for adding style sheets.  We build this as we go so that we don't 
 # end up sending more stylesheets than we need to.

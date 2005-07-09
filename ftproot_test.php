@@ -133,9 +133,9 @@ indicates that the file was <em>not</em> found, then you will have to try anothe
 <input type="text" id="host" name="host" value="<?php echo $hostname; ?>" />
 </div>
 <div>
-<label for="ftproot">Document Root</label>
+<label for="ftproot">FTP Root</label>
 <input type="text" id="ftproot" name="ftproot" value="<?php echo $ftp_root; ?>" />
-<span>(optional)</span>
+<span>(Optional, leave blank to auto-detect.)</span>
 </div>
 <div>
 <input type="submit" value="Test" />

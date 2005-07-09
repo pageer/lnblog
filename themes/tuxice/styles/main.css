@@ -3,10 +3,8 @@ Main style sheet.  This controls the basic page look, including the page header,
 menu bar, and sidebar.  It does not include the blog entries, comments, forums, etc.
 */
 
-@import url(main_print.css);
-
 html, body {
-	background: #0066E3; /*#62a4ff;*/
+	background: #0066E3;
 	height: 100%;
 	width: 100%;
 	margin: 0px;
@@ -39,17 +37,19 @@ a:hover {
 	text-decoration: underline;
 	color: red;
 }
-/*
-#pagecontent a:link {
-	border-bottom: thin dotted blue;
-}
 
-#pagecontent a:visited {
-	border-bottom: thin dotted #8B008B;
-}
-
-#pagecontent a:hover {
-	border-bottom: none;
-}
-*/
 q { font-style: italic; }
+
+@media print {
+
+	#pagecontent {
+		margin: 1% 1% 1% 1%;
+		width: 100%;
+	}
+
+	a:link, a:visited {
+		color: black;
+		text-decoration: underline;
+	}
+
+}

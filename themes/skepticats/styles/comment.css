@@ -1,7 +1,5 @@
 /* Styles for comments. */
 
-@import url(form.css);
-
 #entrycomments {
 	margin-top: 1%;
 }
@@ -31,4 +29,14 @@ div.commentheader li {
 
 div.commentdata {
 	padding: 1%;
+}
+
+@media print {
+	.fullcomment {
+		page-break-inside: avoid;
+	}
+	
+	#commentsubmit {
+		display: none;
+	}
 }

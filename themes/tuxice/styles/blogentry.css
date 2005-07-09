@@ -1,29 +1,17 @@
 /* Styles for blog entries. */
 
-@import url(blogentry_print.css);
-
 .blogentry {
-	/*border: thin solid black;*/
 	border-bottom: thin dotted black;
-	margin-bottom: 1%;
-	/*width: 50%;*/
+	padding-bottom: 2%;
 }
 
 .blogentryheader, .blogentryfooter, .blogentrybody {
 	clear: both;
 }
 
-.blogentryheader img {
-	border: none;
-	float: right;
-	margin: 4px;
-}
-
 .blogentryheader, .blogentryfooter ul, .postdata {
 	margin: 0px;
 	padding: 0px;
-	/*background-color: #c3c3c3;
-	border: 1px solid black;*/
 }
 
 .blogentrybody {
@@ -39,9 +27,7 @@
 
 .blogentrybody img {
 	display: block;
-	text-align: center;
-	margin: 0 auto;
-	padding: 1%;
+	margin: 1em auto;
 }
 
 .blogentryfooter, .postdata {
@@ -59,7 +45,6 @@
 
 .blogentry  div.blogentrybody {
 	padding: 1%;
-	/*white-space: pre;*/
 }
 
 .blogentry div.blogentrybody p {

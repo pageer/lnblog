@@ -47,7 +47,7 @@ if (POST($SUBMIT_ID)) {
 }
 
 $title = $ent->subject . " - " . $blg->name;
-$content =  $ent->get();
+$content =  $ent->get( $blg->canModifyEntry() );
 
 # Extra styles - don't include more than we need to render the page.
 $extra_styles = array("article.css");

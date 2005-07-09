@@ -1,3 +1,15 @@
+08-Jul-2005:
+- Changed MIME type of RSS 1.0 feed to application/xml, as per the spec.
+- Cleaned up CSS.
+- Updated long-neglected skepticats theme.
+
+07-Jul-2005:
+- Fixed bug in article edit form JS editor.
+- Fixed edit, upload, etc. links on entries to respect permissions.
+- Moved absolutizing of LBCode URLs into the markup() method and made it 
+use the internal data and permalink of the object.
+- Added virtual permalink() method to Entry class.
+
 05-Jul-2005: Version 0.3.3
 - Fixed bug in URL conversion for comments.
 - fixed localpath_to_uri() to account for non-standard server ports.

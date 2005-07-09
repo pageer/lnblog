@@ -5,8 +5,8 @@
 	echo $PREVIEW_DATA;
 } ?>
 <fieldset>
-<form id="postform" method="post" action="<?php echo $FORM_ACTION; ?>">
 <?php include("js_editor.php"); ?>
+<form id="postform" method="post" action="<?php echo $FORM_ACTION; ?>">
 <div>
 <label class="basic_form_label" for="<?php echo $ARTICLE_POST_SUBJECT; ?>">Subject</label>
 <input id="<?php echo $ARTICLE_POST_SUBJECT; ?>" name="<?php echo $ARTICLE_POST_SUBJECT; ?>" type="text" <?php if (isset($SUBJECT)) { ?>value="<?php echo $SUBJECT; ?>" <?php } ?>/>

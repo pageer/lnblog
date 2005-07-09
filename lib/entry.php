@@ -45,6 +45,9 @@ class Entry {
 		else return $this->data;
 	}
 
+	# Abstract function.  Child classes MUST over-ride this.
+	function permalink() { return ""; }
+
 	# A function to search BBCode marked-up text and convert the URIs in
 	# links and images from relative to absolute.
 
@@ -135,8 +138,8 @@ class Entry {
 		$replacements[13] = '<li>$1</li>';
 		$replacements[14] = '<code>$1</code>';
 		$replacements[15] = '<tt>$1</tt>';
-		$replacements[16] = '<img alt="$2" title="$2" style="float: left;" src="$1" />';
-		$replacements[17] = '<img alt="$2" title="$2" style="float: right;" src="$1" />';
+		$replacements[16] = '<img alt="$2" title="$2" style="float: left; clear: none;" src="$1" />';
+		$replacements[17] = '<img alt="$2" title="$2" style="float: right; clear: none;" src="$1" />';
 		
 		
 		$whitespace_patterns[0] = '/\r\n\r\n/';
@@ -154,14 +157,16 @@ class Entry {
 		return $ret;
 	}
 
-	function markup($data, $use_nofollow=false) {
+	function markup($data="", $use_nofollow=false) {
+		if (! $data) $data = $this->data;
 		switch ($this->has_html) {
 			case MARKUP_NONE:
 				$ret = $this->stripHTML($data);
 				$ret = $this->addHTML($ret, $use_nofollow);
 				break;
 			case MARKUP_BBCODE:
-				$ret = $this->stripHTML($data);
+				$ret = $this->absolutizeBBCodeURI($data, $this->permalink() );
+				$ret = $this->stripHTML($ret);
 				$ret = $this->bbcodeToHtml($ret);
 				break;
 			case MARKUP_HTML:

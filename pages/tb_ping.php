@@ -45,12 +45,7 @@ if (GET("send_ping") == "yes" || POST("send_ping") == "yes") {
 		$tpl->set("TB_URL", $ent->permalink() );
 		$tpl->set("TB_TITLE", $ent->subject);
 		$tpl->set("TB_BLOG", $blog->name);
-		$body_text = $ent->data;
-		if ($ent->has_html == MARKUP_BBCODE) {
-			$body_text = $ent->absolutizeBBCodeURI($body_text, $ent->permalink() );
-		}
-		$body_text = $ent->markup($body_text);
-		$tpl->set("TB_EXCERPT", $body_text);
+		$tpl->set("TB_EXCERPT", $ent->markup() );
 	} else {
 		$tpl->set("TARGET_PAGE", current_file() );
 		$tpl->set("GET_TB_URL", $tburl);

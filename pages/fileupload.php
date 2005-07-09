@@ -33,12 +33,13 @@ if ( ($ent->isEntry(getcwd()) && $blog->canModifyEntry()) ||
      $blog->canModifyBlog()) {
 
 	$file_name = "filename";
+	$f = new FileUpload($file_name);
 	
 	$tpl->set("TARGET", current_file() );
 	$tpl->set("MAX_SIZE", 2000000); #ini_get("upload_max_filesize"));
 	$tpl->set("FILE", $file_name);
+	$tpl->set("TARGET_URL", localpath_to_uri($f->destdir) );
 
-	$f = new FileUpload($file_name);
 	if ($f->status() == FILEUPLOAD_NOT_INITIALIZED) {
 		$msg = "Select a file to upload to the current directory.  The file size".
 		       " limit is ".ini_get("upload_max_filesize").".";

@@ -7,11 +7,6 @@ div.blogentry {
 	/*width: 50%;*/
 }
 
-div.blogentryheader img {
-	border: none;
-	float: right;
-}
-
 div.blogentryheader h2 {
 	margin: 0px;
 	padding: 0px;
@@ -50,6 +45,11 @@ div.blogentry  div.blogentrybody {
 .blogentrybody p {
 	text-indent: 1em;
 	clear: both;
+}
+
+.blogentrybody img {
+	display: block;
+	margin: 1em auto;
 }
 
 .blogentryfooter h3 {

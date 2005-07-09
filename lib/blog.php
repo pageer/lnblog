@@ -263,7 +263,9 @@ class Blog {
 		$tpl->set("BLOG_URL", $this->getURL() );
 		$ret = "";
 		if (! $this->entrylist) $this->getRecent();
-		foreach ($this->entrylist as $ent) $ret .= $ent->get();
+		foreach ($this->entrylist as $ent) {
+			$ret .= $ent->get($this->canModifyEntry($ent) );
+		}
 		$tpl->set("BODY", $ret);
 		return $ret;
 	}
@@ -284,12 +286,14 @@ class Blog {
 		foreach ($this->entrylist as $ent) 
 			$feed->entrylist[] = new RSS1Entry($ent->permalink(), $ent->subject, $ent->subject);
 		
-		$ret = $feed->writeFile($path);	
-		return $ret;
+		$ret = $feed->writeFile($path);
+		if (! $ret) return UPDATE_RSS1_ERROR;
+		else return UPDATE_SUCCESS;
 	}
 
 	function updateRSS2 () {
 
+		$usr = new User();
 		$feed = new RSS2;
 		$path = $this->home_path.PATH_DELIM.BLOG_FEED_PATH.PATH_DELIM.BLOG_RSS2_NAME;
 		$feed_url = localpath_to_uri($path);
@@ -300,14 +304,21 @@ class Blog {
 		$feed->title = $this->name;
 	
 		if (! $this->entrylist) $this->getRecent($this->max_rss);
-		foreach ($this->entrylist as $ent) 
+		foreach ($this->entrylist as $ent) {
+			$usr->get($ent->uid);
+			$author_data = $usr->email();
+			if ( $author_data ) $author_data .= " (".$usr->displayName().")";
 			$feed->entrylist[] = new RSS2Entry($ent->permalink(), 
 				$ent->subject, 
 				"<![CDATA[".$ent->markup($ent->data)."]]>", 
-				$ent->commentlink() );
+				$ent->commentlink(),
+				$ent->permalink(), 
+				$author_data );
+		}
 		
 		$ret = $feed->writeFile($path);	
-		return $ret;
+		if (! $ret) return  UPDATE_RSS1_ERROR;
+		else return UPDATE_SUCCESS;
 	}
 
 	# This is an upgrade function that will create new config and wrapper 
@@ -435,7 +446,7 @@ class Blog {
 		if (! is_dir($this->home_path.PATH_DELIM.BLOG_DELETED_PATH) )
 			$fs->mkdir_rec($this->home_path.PATH_DELIM.BLOG_DELETED_PATH);
 		$source = $this->home_path.PATH_DELIM.BLOG_CONFIG_PATH;
-		$target = $this->home_path.PATH_DELIM.BLOG_DELETED_PATH.PATH_DELIM.BLOG_CONFIG_PATH."-".date(ENTRY_PATH_FORMAT);
+		$target = $this->home_path.PATH_DELIM.BLOG_DELETED_PATH.PATH_DELIM.BLOG_CONFIG_PATH."-".date(ENTRY_PATH_FORMAT_LONG);
 		$ret = $fs->rename($source, $target);
 		$fs->destruct();
 		return $ret;
@@ -620,9 +631,8 @@ class Blog {
 		if (! $this->canAddEntry() ) return UPDATE_AUTH_ERROR;
 		$ret = $ent->insert();
 		if ($ret) {
-			$this->updateRSS1();
-			$this->updateRSS2();
-			$ret = UPDATE_SUCCESS;
+			$ret = $this->updateRSS1();
+			if ($ret == UPDATE_SUCCESS) $ret = $this->updateRSS2();
 		} else $ret = UPDATE_ENTRY_ERROR;
 		return $ret;
 	}
@@ -635,9 +645,8 @@ class Blog {
 		if (! $this->canModifyEntry($ent) ) return UPDATE_AUTH_ERROR;
 		$ret = $ent->update();
 		if ($ret) {
-			$this->updateRSS1();
-			$this->updateRSS2();
-			$ret = UPDATE_SUCCESS;
+			$ret = $this->updateRSS1();
+			if ($ret == UPDATE_SUCCESS) $ret = $this->updateRSS2();
 		} else $ret = UPDATE_ENTRY_ERROR;
 		return $ret;
 	}
@@ -648,9 +657,8 @@ class Blog {
 		if (! $this->canModifyEntry($ent) ) return UPDATE_AUTH_ERROR;
 		$ret = $ent->delete();
 		if ($ret) {
-			$this->updateRSS1();
-			$this->updateRSS2();
-			$ret = UPDATE_SUCCESS;
+			$ret = $this->updateRSS1();
+			if ($ret == UPDATE_SUCCESS) $ret = $this->updateRSS2();
 		} else $ret = UPDATE_ENTRY_ERROR;
 		return $ret;
 

@@ -100,6 +100,7 @@ class User {
 		if ($this->fullname) $tpl->set("USER_NAME", $this->fullname);
 		if ($this->email) $tpl->set("USER_EMAIL", $this->email);
 		if ($this->homepage) $tpl->set("USER_HOMEPAGE", $this->homepage);
+		$tpl->set("USER_DISPLAY_NAME", $this->displayName() );
 	}
 
 	function get($uname) {
@@ -164,6 +165,14 @@ class User {
 	function name($nm=false) {
 		if (!$nm) return $this->fullname;
 		else $this->fullname = $nm;
+	}
+
+	# Returns a name to display.  If a full name is defined, it uses that.
+	# Otherwise, it reverts to the username.
+
+	function displayName() {
+		if ($this->fullname) return $this->fullname;
+		else return $this->username;
 	}
 
 	function email($mail=false) {

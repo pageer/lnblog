@@ -21,6 +21,9 @@
 require_once("blogconfig.php");
 require_once("utils.php");
 
+# Decide whether to use permalinks as Globally Unique Identifiers.
+define("GUID_IS_PERMALINK", true);
+
 # Entries for RDF Site Summary documents.
 
 class RSS1Entry {
@@ -144,7 +147,11 @@ class RSS2Entry {
 		if ($this->author) $ret .= "<author>".$this->author."</author>\n";
 		if ($this->category) $ret .= "<category>".$this->category."</category>\n";
 		if ($this->comments) $ret .= "<comments>".$this->comments."</comments>\n";
-		if ($this->guid) $ret .= "<guid>".$this->guid."</guid>\n";
+		if ($this->guid) {
+			$ret .= "<guid";
+			if (GUID_IS_PERMALINK) $ret .= ' isPermaLink="true"';
+			$ret .= ">".$this->guid."</guid>\n";
+		}
 		$ret .= "</item>\n";
 		return $ret;
 	}
