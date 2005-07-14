@@ -58,7 +58,7 @@ if (POST($upgrade)) {
 } elseif (POST($update)) {
 	if (is_absolute(POST($update))) $update_path = trim(POST($update));
 	else $update_path = calculate_document_root().PATH_DELIM.trim(POST($update));
-	refresh(htmlentities("updateblog.php?blogpath=".$update_path));
+	redirect(htmlentities("updateblog.php?blogpath=".$update_path));
 } elseif (POST($fixperm)) {
 	if (is_absolute(POST($fixperm))) $fixperm_path = trim(POST($fixperm));
 	else $fixperm_path = calculate_document_root().PATH_DELIM.trim(POST($fixperm));

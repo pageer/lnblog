@@ -28,7 +28,6 @@
 	color: white;
 	display: block;
 	width: 100%;
-	/*padding-left: 5%;*/
 }
 
 #sidebar h3 a:visited {
@@ -47,8 +46,6 @@
 	width: 100%;
 	margin: 0px;
 	padding: 0px;
-	/*padding-right: 1%;
-	padding-left: 2em;*/
 } 
 
 #sidebar ul li a:hover {

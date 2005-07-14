@@ -4,7 +4,6 @@
 	width: 100%;
 	background: #c3c3c3;
 	border: thin solid black;
-	/*margin-bottom: 1em;*/
 }
 
 #menubar h1, #menubar h2 {
@@ -20,7 +19,6 @@
 #menubar ul li {
 	list-style-type: none;
 	display: inline;
-	/*background-color: white;*/
 	margin-left: 1em;
 	margin-right: 1em;
 }

@@ -44,6 +44,10 @@ class PHPTemplate {
 		return $this->vars[$var] = $val;
 	}
 
+	function varSet($var) {
+		return isset($this->vars[$var]);
+	}
+
 	function reset($file="") {
 		$this->file = $file;
 		$this->vars = array();

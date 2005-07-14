@@ -69,51 +69,71 @@ if ( has_post() ) {
 	$tpl->set("ROOT", POST($root) );
 	$tpl->set("PREF", POST($pref) );
 
-	# Check that all required fields have been specified.
-	$vars = array($uid, $pwd, $conf, $host, $root);
-	$has_all_data = true;
-	foreach ($vars as $val) {
-		$has_all_data &= ( trim(POST($val)) != "" );
-		#echo "<p>'".POST($val)."'</p>";
+	$content = '';
+
+	# Note: DOCUMENT_ROOT is not strictly required, as all uses of it should
+	# be wrapped in a document root calculation function for legacy versions.
+
+	if ( POST($ftp) == "nativefs" ) {
+
+		define("FS_PLUGIN", "nativefs");
+		$content = "<?php\n";
+		if ( POST($docroot) ) {
+			define("DOCUMENT_ROOT", trim(POST($docroot)) );
+			$content .= 'define("DOCUMENT_ROOT", "'.DOCUMENT_ROOT."\");\n";
+		}
+		$content .= 'define("FS_PLUGIN", "'.FS_PLUGIN."\");\n?>";
+
+	} elseif ( POST($ftp) == "ftpfs" ) {
+
+		# Check that all required fields have been specified.
+		$vars = array($uid, $pwd, $conf, $host, $root);
+		$has_all_data = true;
+		foreach ($vars as $val) {
+			$has_all_data = $has_all_data && ( trim(POST($val)) != "" );
+		}
+
+		if ($has_all_data) {
+
+			if ( trim(POST($pwd)) == trim(POST($conf)) ) {
+				
+				define("FS_PLUGIN", "ftpfs");
+				define("FTPFS_USER", trim(POST($uid)) );
+				define("FTPFS_PASSWORD",trim( POST($pwd)) );
+				define("FTPFS_HOST", trim(POST($host)) );
+				define("FTP_ROOT", trim(POST($root)) );
+				if (trim(POST($pref)) != '') {
+					define("FTPFS_PATH_PREFIX", trim(POST($pref)) );
+				} 
+				
+				$content = "<?php\n";
+				if (POST($docroot)) {
+					define("DOCUMENT_ROOT", trim(POST($docroot)) );
+					$content .= 'define("DOCUMENT_ROOT", "'.DOCUMENT_ROOT."\");\n";
+				}
+				$content .= 'define("FS_PLUGIN", "'.FS_PLUGIN."\");\n".
+					'define("FTPFS_USER", "'.FTPFS_USER."\");\n".
+					'define("FTPFS_PASSWORD", "'.FTPFS_PASSWORD."\");\n".
+					'define("FTPFS_HOST", "'.FTPFS_HOST."\");\n".
+					'define("FTP_ROOT", "'.FTP_ROOT."\");\n";
+				if ( trim(POST($pref)) != '' ) {
+					$content .= 'define("FTPFS_PATH_PREFIX", "'.FTPFS_PATH_PREFIX."\");\n";
+				}
+				$content .= '?>';
+
+			} else {
+				$tpl->set("FORM_MESSAGE", "Error: Passwords do not match.");
+			}
+		
+		} else {
+			$tpl->set("FORM_MESSAGE", "Error: For FTP file writing, all fields except 'Prefix' are required.");
+		}
+	
+	} else {
+		$tpl->set("FORM_MESSAGE", "Error: No file writing method selected.");
 	}
 
-	if ( trim(POST($docroot)) && 
-	     ( (POST($ftp) == "nativefs") || 
-		    (POST($ftp) == "ftpfs" && $has_all_data && 
-	        trim(POST($pwd)) == trim(POST($conf)) 
-	       )
-	     )
-	   ) {
-	
-		define("DOCUMENT_ROOT", trim(POST($docroot)) );
-
-		if ( POST($ftp) == "ftpfs" ) {
-			define("FS_PLUGIN", "ftpfs");
-			define("FTPFS_USER", trim(POST($uid)) );
-			define("FTPFS_PASSWORD",trim( POST($pwd)) );
-			define("FTPFS_HOST", trim(POST($host)) );
-			define("FTP_ROOT", trim(POST($root)) );
-			if (trim(POST($pref)) != '') {
-				define("FTPFS_PATH_PREFIX", trim(POST($pref)) );
-				#echo "<p>Found prefix</p>";
-			} 
-			$content = "<?php\n".
-				'define("DOCUMENT_ROOT", "'.DOCUMENT_ROOT."\");\n".
-				'define("FS_PLUGIN", "'.FS_PLUGIN."\");\n".
-				'define("FTPFS_USER", "'.FTPFS_USER."\");\n".
-				'define("FTPFS_PASSWORD", "'.FTPFS_PASSWORD."\");\n".
-				'define("FTPFS_HOST", "'.FTPFS_HOST."\");\n".
-				'define("FTP_ROOT", "'.FTP_ROOT."\");\n";
-			if (trim(POST($pref)) != '') {
-				$content .= 'define("FTPFS_PATH_PREFIX", "'.FTPFS_PATH_PREFIX."\");\n";
-			}
-			$content .= '?>';
-		} else {
-			define("FS_PLUGIN", "nativefs");
-			$content = "<?php\n".
-				'define("DOCUMENT_ROOT", "'.DOCUMENT_ROOT."\");\n".
-				'define("FS_PLUGIN", "'.FS_PLUGIN."\");\n?>";
-		}
+	if ($content) {
 	
 		require_once("fs.php");
 	
@@ -127,16 +147,14 @@ if ( has_post() ) {
 			exit;
 		}
 		
-	} elseif ( trim(POST($pwd)) != trim(POST($conf)) ) {
-		$tpl->set("FORM_MESSAGE", "Passwords do not match.");
 	} else {
-		$tpl->set("FORM_MESSAGE", "All fields except prefix are required.");
+		if (! $tpl->varSet("FORM_MESSAGE") ) {
+			$tpl->set("FORM_MESSAGE", "Unexpected error: missing data?");
+		}
 	}
 	
 } else {
-	
-	#$tpl->set("ROOT", realpath(getcwd().PATH_DELIM."..".PATH_DELIM."..") );
-	$tpl->set("HOST", "localhost");  #SERVER("SERVER_NAME") );
+	$tpl->set("HOST", "localhost");  
 	$tpl->set("DOC_ROOT", calculate_document_root() );
 }
 

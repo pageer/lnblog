@@ -425,7 +425,13 @@ text.</p>
 <td>Source code</td>
 <td>[code]Source code[/code]</td>
 <td><code>Source code</code></td>
-<td>&lt;code&gt;Source coden&lt;/code&gt;</td>
+<td>&lt;code&gt;Source code&lt;/code&gt;</td>
+</tr><tr>
+<td>Source code</td>
+<td>[h]Header[/h]</td>
+<td><h3>Header</h3></td>
+<td>&lt;h3&gt;Header&lt;/h3&gt;</td>
+
 </tr><tr>
 <td>Short quotation</td>
 <td>[q]Quote[/q]</td>
@@ -523,7 +529,11 @@ can be distinguished from normal text.</li><li>The
 current LBCode handler does not deal gracefully with multiline
 tags.&nbsp; So if, e.g., you have a multiline block quotation or code block, the
 LBCode handler will still put &lt;br /&gt; tags in for the line
-breaks.&nbsp; </li>
+breaks. <br />
+</li><li>In addition to the [img] tag, there are also [img-left] and
+[img-right] tags.&nbsp; These are exactly the same, except that the
+resulting HTML includes a CSS style to float the image to the left or
+right respectively.&nbsp; This is used to flow text around an image.</li>
 
 </ol>
 
@@ -629,6 +639,7 @@ from one blog to another or to other sections of your
 website.&nbsp; Needless to say, you will want to customize it for
 your own site.<br />
 </p>
+
 
 <p>There are two ways to edit the
 menubar: globally for al LnBlog blogs, or locally to just the current

@@ -1,3 +1,15 @@
+13-Jul-2005: Version 0.3.4
+- Code cleanup and error checking in fs_setup.php.
+
+11-Jul-2005:
+- Added [h] LBCode tag for headers.
+- Changed refreshes to redirects.
+- Added redirect for sitemap editing.
+
+10-Jul-2005:
+- Fixed cosmetic problems in new blog screen.
+- Added link to current URL in file upload page.
+
 08-Jul-2005:
 - Changed MIME type of RSS 1.0 feed to application/xml, as per the spec.
 - Cleaned up CSS.

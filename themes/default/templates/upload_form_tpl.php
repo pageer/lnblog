@@ -1,5 +1,5 @@
 <h2>File Upload</h2>
-<p>Upload file to: <?php echo $TARGET_URL; ?></p>
+<p>Upload file to: <a href="<?php echo $TARGET_URL; ?>"><?php echo $TARGET_URL; ?></a></p>
 <p><?php echo $UPLOAD_MESSAGE; ?></p>
 <fieldset>
 <form enctype="multipart/form-data" action="<?php echo $TARGET; ?>" method="post">

@@ -121,6 +121,7 @@ class Entry {
 		$patterns[15] = "/\[t\](.*)\[\/t\]/Usi";
 		$patterns[16] = "/\[img-left=(.+)\](.+)\[\/img-left\]/Usi";
 		$patterns[17] = "/\[img-right=(.+)\](.+)\[\/img-right\]/Usi";
+		$patterns[18] = "/\[h\](.*)\[\/h\]/Usi";
 		
 		$replacements[0] = '<a href="$1">$2</a>';
 		$replacements[1] = '<img alt="$2" title="$2" src="$1" />';
@@ -140,6 +141,7 @@ class Entry {
 		$replacements[15] = '<tt>$1</tt>';
 		$replacements[16] = '<img alt="$2" title="$2" style="float: left; clear: none;" src="$1" />';
 		$replacements[17] = '<img alt="$2" title="$2" style="float: right; clear: none;" src="$1" />';
+		$replacements[18] = '<h'.LBCODE_HEADER_WEIGHT.'>$1</h'.LBCODE_HEADER_WEIGHT.'>';
 		
 		
 		$whitespace_patterns[0] = '/\r\n\r\n/';

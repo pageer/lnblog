@@ -30,6 +30,9 @@ define("SITEMAP_FILE", "sitemap.htm");
 # directory and terminates when it finds something in the list.
 define("DOCROOT_NAMES", "wwwroot,inetpub,htdocs,htsdocs,httpdocs,httpsdocs,webroot,www,html");
 
+# Defines the level of header used for the [h] LBCode tag.
+define("LBCODE_HEADER_WEIGHT", 3);
+
 # User authentication configuration.
 
 # Use sessions in authentication or just cookies.

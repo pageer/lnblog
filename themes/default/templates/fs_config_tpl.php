@@ -12,15 +12,17 @@ function ftp_test() {
 -->
 </script>
 <h2>File System Configuration</h2>
+<?php if (isset($FORM_MESSAGE)) { ?>
+<p><strong><?php echo $FORM_MESSAGE; ?></strong></p>
+<?php } ?>
 <form method="post" action="<?php echo $FORM_ACTION; ?>">
 <h3>Set Document Root</h3>
 <p>To compute <abbr title="Uniform Resource Locator">URL</abbr>s, 
 <?php echo PACKAGE_NAME; ?> needs to know the full path to your document root
 on the web server.  This is the directory where your web pages are stored.  
 <?php echo PACKAGE_NAME; ?> will guess a location by testing common directory
-names, but you may have to set this manually.  To check if the directory is 
-correct, click the "Test" button and <?php echo PACKAGE_NAME; ?> will try to 
-open its documentation page in a new window.</p>
+names, but you may have to set this manually.  To check verify the document
+root or test a different value, click the "Test Document Root" link below.</p>
 <div>
 <label for="<?php echo $DOC_ROOT_ID; ?>">Web document root directory</label>
 <input type="text" name="<?php echo $DOC_ROOT_ID; ?>" id="<?php echo $DOC_ROOT_ID; ?>" <?php if (isset($DOC_ROOT)) { echo 'value="'.$DOC_ROOT.'"'; } ?> />
@@ -42,9 +44,21 @@ that you have to be able to upload files to the web server through
 <abbr title="File Transfer Protocol">FTP</abbr>.  If this is possible, 
 <abbr title="File Transfer Protocol">FTP</abbr> file writing is the 
 recommended choice.</p>
-<?php if (isset($FORM_MESSAGE)) { ?>
-<p><?php echo $FORM_MESSAGE; ?></p>
-<?php } ?>
+<p>For <abbr title="File Transfer Protocol">FTP</abbr> file writing, you will
+need to supply the information to log in to the 
+<abbr title="File Transfer Protocol">FTP</abbr> server.  In addition to the 
+username and password, you will have to give a hostname and the 
+<abbr title="File Transfer Protocol">FTP</abbr> root directory.  The host 
+name is the name of the server, such as <code>ftp.mysite.com</code> and can
+be <code>localhost</code> if the 
+<abbr title="File Transfer Protocol">FTP</abbr> server is running on the same
+computer as the web server.  The 
+<abbr title="File Transfer Protocol">FTP</abbr> root directory is the full
+path on the server to where your 
+<abbr title="File Transfer Protocol">FTP</abbr> access starts.  To have
+<?php echo PACKAGE_NAME; ?> try to auto-detect this, click the 
+"Test FTP Root" link and enter your username, password, and hostname in the
+form.  You can copy and paste the results back into this form.</p>
 <div>
 <label for="native">Use native functions for file writing</label>
 <input type="radio" name="<?php echo $USE_FTP_ID; ?>" id="native" <?php if (! isset($USE_FTP)) { ?>checked="checked"<?php } ?> value="nativefs" />
@@ -66,12 +80,12 @@ recommended choice.</p>
 <input type="password" name="<?php echo $CONF_ID; ?>" id="<?php echo $CONF_ID; ?>" <?php if (isset($CONF)) { echo 'value="'.$CONF.'"'; } ?> />
 </div>
 <div>
-<label for="<?php echo $HOST_ID; ?>" title="The hostname and/or domain of the FTP server.  If this FTP and HTTP servers are on the same machine, this can be localhost.">Server hostname</label>
+<label for="<?php echo $HOST_ID; ?>" title="The hostname and/or domain of the FTP server.  If the FTP and HTTP servers are on the same machine, this can be localhost.">Server hostname</label>
 <input type="text"  title="The hostname and/or domain of the FTP server.  If this FTP and HTTP servers are on the same machine, this can be localhost." name="<?php echo $HOST_ID; ?>" id="<?php echo $HOST_ID; ?>" <?php if (isset($HOST)) { echo 'value="'.$HOST.'"'; } ?> />
 </div>
 <div>
-<label for="<?php echo $ROOT_ID; ?>" title="The FTP root directory where you start after connecting">Root directory</label>
-<input type="text"  title="The FTP root directory where you start after connecting" name="<?php echo $ROOT_ID; ?>" id="<?php echo $ROOT_ID; ?>" <?php if (isset($ROOT)) { echo 'value="'.$ROOT.'"'; } ?> />
+<label for="<?php echo $ROOT_ID; ?>" title="The full local path to the FTP root directory">Root directory</label>
+<input type="text"  title="The full local path to the FTP root directory" name="<?php echo $ROOT_ID; ?>" id="<?php echo $ROOT_ID; ?>" <?php if (isset($ROOT)) { echo 'value="'.$ROOT.'"'; } ?> />
 <p style="text-align: center; margin: 0">
 <a href="ftproot_test.php" onclick="return ftp_test();">Test FTP Root</a>
 </p>

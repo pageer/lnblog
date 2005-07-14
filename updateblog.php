@@ -33,7 +33,7 @@ $tpl = new PHPTemplate(BLOG_UPDATE_TEMPLATE);
 $blog->exportVars($tpl);
 
 if (! $blog->canModifyBlog() ) {
-	refresh("login.php");
+	redirect("login.php");
 	exit;
 }
 
@@ -88,7 +88,7 @@ if (POST($blogmax)) $blog->max_rss = POST($blogrss);
 if (POST("submit")) {
 	$ret = $blog->update();
 	if (!$ret) $tpl->set("UPDATE_MESSAGE", "Error updating blog.");
-	else refresh($blog->getURL());
+	else redirect($blog->getURL());
 }
 
 $body = $tpl->process();

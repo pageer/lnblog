@@ -1,29 +1,29 @@
 /* Styles for blog entries. */
 
-div.blogentry {
+.blogentry {
 	/*border: thin solid black;*/
 	border-bottom: thin dotted black;
 	margin-bottom: 2%;
 	/*width: 50%;*/
 }
 
-div.blogentryheader h2 {
+.blogentryheader h2 {
 	margin: 0px;
 	padding: 0px;
 }
 
-div.blogentryfooter {
+.blogentryfooter {
 	font-size: 80%;
 	margin-bottom: 3%;
 	clear: both;
 }
 
-div.blogentryfooter ul {
+.blogentryfooter ul {
 	margin: 0px;
 	padding: 0px;
 }
 
-div.blogentryfooter li {
+.blogentryfooter li {
 	list-style-type: none;
 }
 
@@ -37,7 +37,7 @@ li.bloguser, li.bloguserurl {
 	margin-right: 1%;
 }
 
-div.blogentry  div.blogentrybody {
+.blogentry  div.blogentrybody {
 	padding: 1%;
 	/*white-space: pre;*/
 }

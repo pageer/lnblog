@@ -20,7 +20,6 @@
 
 session_start();
 require_once("blogconfig.php");
-#ini_set("include_path", ini_get("include_path").PATH_SEPARATOR.getcwd().PATH_DELIM."templates");
 require_once("blog.php");
 require_once("user.php");
 
@@ -41,18 +40,13 @@ else $path = false;
 
 $blog = new Blog($path);
 if (! $blog->canAddBlog() ) {
-	refresh("login.php");
+	redirect("bloglogin.php");
 	exit;
 }
 $tpl = new PHPTemplate(BLOG_UPDATE_TEMPLATE);
 
 if (POST($blogpath)) $blog->home_path = POST($blogpath);
 else $blog->home_path = "myblog";
-# If the user doesn't give us an absolute path, assume it's relative
-# to the DOCUMENT_ROOT.
-if (! is_absolute($blog->home_path)) {
-	$blog->home_path = calculate_document_root().PATH_DELIM.$blog->home_path;
-}
 
 if (POST($blogname)) $blog->owner = POST($blogowner);
 if (POST($blogname)) $blog->writers(POST($blogwriters) );
@@ -87,10 +81,17 @@ $tpl->set("POST_PAGE", current_file());
 $tpl->set("SUBMIT_ID", $submitid);
 $tpl->set("UPDATE_TITLE", "Create new weblog");
 
+# If the user doesn't give us an absolute path, assume it's relative
+# to the DOCUMENT_ROOT.  We put it down here so that the form data
+# gets displayed as it was entered.
+if (! is_absolute($blog->home_path)) {
+	$blog->home_path = calculate_document_root().PATH_DELIM.$blog->home_path;
+}
+
 if (POST("submit")) {
 	$ret = $blog->insert();
 	if (!$ret) $tpl->set("UPDATE_MESSAGE", "Error creating blog.");
-	else refresh($blog->getURL());
+	else redirect($blog->getURL());
 }
 
 $blog->exportVars($tpl);
@@ -98,5 +99,6 @@ $body = $tpl->process();
 $tpl->file = BASIC_LAYOUT_TEMPLATE;
 $tpl->set("PAGE_CONTENT", $body);
 $tpl->set("PAGE_TITLE", "Create new blog");
+$tpl->set("STYLE_SHEETS", array("form.css"));
 echo $tpl->process();
 ?>

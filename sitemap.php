@@ -57,7 +57,7 @@ if (has_post()) {
 		$tpl->set("SITEMAP_ERROR", "Cannot create file");
 		$tpl->set("ERROR_MESSAGE", "Unable to create file ".$target_file.".");
 		$tpl->set("CURRENT_SITEMAP", $data);
-	}
+	} else redirect("index.php");
 	
 } else {
 
