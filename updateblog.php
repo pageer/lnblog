@@ -20,20 +20,20 @@
 
 session_start();
 require_once("blogconfig.php");
-require_once("blog.php");
-require_once("user.php");
+require_once("lib/creators.php");
+require_once("lib/utils.php");
 
 if (POST("blogpath")) $blog_path = POST("blogpath");
 elseif (GET("blogpath")) $blog_path = GET("blogpath");
 else $blog_path = false;
 
-$blog = new Blog($blog_path);
-$usr = new User;
-$tpl = new PHPTemplate(BLOG_UPDATE_TEMPLATE);
-$blog->exportVars($tpl);
+$blog = NewBlog($blog_path);
+$usr = NewUser();
+$tpl = NewTemplate(BLOG_UPDATE_TEMPLATE);
+$page = NewPage(&$blog);
 
 if (! $blog->canModifyBlog() ) {
-	redirect("login.php");
+	$page->redirect("login.php");
 	exit;
 }
 
@@ -71,7 +71,7 @@ $tpl->set("POST_PAGE", current_file());
 $tpl->set("SUBMIT_ID", $submitid);
 $tpl->set("UPDATE_TITLE", "Update ".$blog->name);
 
-# NOTE: sanitize this input to avoid XSS attacks.
+# NOTE - sanitize this input to avoid XSS attacks.
 
 # Only the site administrator can change a blog owner.
 if ($usr->username() == ADMIN_USER && POST($blogowner) ) {
@@ -88,13 +88,11 @@ if (POST($blogmax)) $blog->max_rss = POST($blogrss);
 if (POST("submit")) {
 	$ret = $blog->update();
 	if (!$ret) $tpl->set("UPDATE_MESSAGE", "Error updating blog.");
-	else redirect($blog->getURL());
+	else $page->redirect($blog->getURL());
 }
 
 $body = $tpl->process();
-$tpl->file = BASIC_LAYOUT_TEMPLATE;
-$tpl->set("PAGE_CONTENT", $body);
-$tpl->set("PAGE_TITLE", "Update blog - ".$blog->name);
-$tpl->set("STYLE_SHEETS", array("form.css") );
-echo $tpl->process();
+$page->title = "Update blog - ".$blog->name;
+$page->addStylesheet("form.css");
+$page->display($body, &$blog);
 ?>

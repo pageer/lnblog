@@ -20,28 +20,12 @@
 
 session_start();
 require_once("config.php");
-require_once("blog.php");
-require_once("blogentry.php");
+require_once("lib/creators.php");
 
-$blog = new Blog;
+$blog = NewBlog();
+$page = NewPage($blog);
 $ret = $blog->getWeblog(); 
-
-$tpl = new PHPTemplate();
-$tpl->file = BASIC_LAYOUT_TEMPLATE;
-$blog->exportVars($tpl);
-if (defined("BLOG_ROOT")) {
-	if (is_file(BLOG_ROOT.PATH_DELIM.BLOG_FEED_PATH.PATH_DELIM.BLOG_RSS2_NAME)) {
-		$tpl->set("XML_FEED", BLOG_ROOT_URL.BLOG_FEED_PATH."/".BLOG_RSS2_NAME);
-		$tpl->set("XML_FEED_TITLE", $blog->name." RSS 2.0 feed");
-	}
-	if (is_file(BLOG_ROOT.PATH_DELIM.BLOG_FEED_PATH.PATH_DELIM.BLOG_RSS1_NAME)) {
-		$tpl->set("RDF_FEED", BLOG_ROOT_URL.BLOG_FEED_PATH."/".BLOG_RSS1_NAME);
-		$tpl->set("RDF_FEED_TITLE", $blog->name." RSS 1.0 feed");
-	}
-}
-$tpl->set("PAGE_TITLE", $blog->name);
-$tpl->set("PAGE_CONTENT", $ret);
-$tpl->set("STYLE_SHEETS", array("blogentry.css") );
-
-echo $tpl->process();
+$page->title = $blog->name;
+$page->addStylesheet("blogentry.css");
+$page->display($ret, &$blog)
 ?>

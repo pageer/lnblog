@@ -20,20 +20,18 @@
 
 session_start();
 
-require_once("template.php");
-require_once("upload.php");
-require_once("blog.php");
-require_once("blogentry.php");
+require_once("lib/creators.php");
 
-$blog = new Blog;
-$ent = new BlogEntry();
-$tpl = new PHPTemplate(UPLOAD_TEMPLATE);
+$blog = NewBlog();
+$ent = NewBlogEntry();
+$tpl = NewTemplate(UPLOAD_TEMPLATE);
+$page = NewPage();
 
-if ( ($ent->isEntry(getcwd()) && $blog->canModifyEntry()) || 
+if ( ($ent->isEntry() && $blog->canModifyEntry()) || 
      $blog->canModifyBlog()) {
 
 	$file_name = "filename";
-	$f = new FileUpload($file_name);
+	$f = NewFileUpload($file_name);
 	
 	$tpl->set("TARGET", current_file() );
 	$tpl->set("MAX_SIZE", 2000000); #ini_get("upload_max_filesize"));
@@ -51,14 +49,12 @@ if ( ($ent->isEntry(getcwd()) && $blog->canModifyEntry()) ||
 	$body = $tpl->process();
 
 } else {
-	$body = "<h2>You do not have permission to upload files to this ".
+	$body = "<h3>You do not have permission to upload files to this ".
 	         ($ent->isEntry()?"entry":"weblog").".</h3>";
 }
 
-$tpl->file = BASIC_LAYOUT_TEMPLATE;
-$blog->exportVars($tpl);
-$tpl->set("PAGE_TITLE", "Upload file");
-$tpl->set("PAGE_CONTENT", $body);
+$page->addStylesheet("form.css");
+$page->title = "Upload file";
+$page->display($body, &$blog);
 
-echo $tpl->process();
 ?>

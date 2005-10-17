@@ -21,19 +21,17 @@
 session_start();
 
 require_once("blogconfig.php");
-require_once("user.php");
-require_once("utils.php");
-require_once("template.php");
+require_once("lib/creators.php");
+require_once("lib/utils.php");
 
 $uid = GET("user_id");
 $uid = $uid ? $uid : POST("user_id");
 
-$usr = new User($uid);
-$tpl = new PHPTemplate(USER_INFO);
+$usr = NewUser($uid);
+$page = NewPage(&$user);
+$tpl = NewTemplate(USER_INFO);
 $usr->exportVars($tpl);
 
-$page = new PHPTemplate(BASIC_LAYOUT_TEMPLATE);
-$page->set("PAGE_CONTENT", $tpl->process() );
-$page->set("PAGE_TITLE", "User Information");
-echo $page->process();
+$page->title = "User Information";
+$page->display($tpl->process());
 ?>

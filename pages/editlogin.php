@@ -17,24 +17,23 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 require_once("blogconfig.php");
-require_once("blog.php");
-require_once("user.php");
+require_once("lib/creators.php");
 
 session_start();
 
-$usr = new User;
+$usr = NewUser();
+$page = NewPage(&$usr);
 
 if (! $usr->checkLogin() ) {
-	redirect("index.php");
+	$page->redirect("index.php");
 	echo "<p>You must be logged in to change your login.</p>";
 	exit;
 }
 
 # Allow us to use this to create the admin login.
 if (defined("BLOG_ROOT")) {
-	$blog = new Blog;	
+	$blog = NewBlog();	
 	$form_title = "New Login for ".$blog->name;
 	$redir_page = $blog->getURL();
 } else {
@@ -54,7 +53,7 @@ $email = "email";
 $homepage = "homepage";
 $reset="reset";  # Set to 1 to reset the password.
 
-$tpl = new PHPTemplate(CREATE_LOGIN_TEMPLATE);
+$tpl = NewTemplate(CREATE_LOGIN_TEMPLATE);
 $tpl->set("FORM_TITLE", $form_title);
 $tpl->set("FORM_ACTION", current_file());
 $tpl->set("PWD", $password);
@@ -89,11 +88,8 @@ if (has_post()) {
 }
 
 $body = $tpl->process();
-$tpl->reset(BASIC_LAYOUT_TEMPLATE);
-if (defined("BLOG_ROOT")) $blog->exportVars($tpl);
-$tpl->set("STYLE_SHEETS", array("form.css") );
-$tpl->set("PAGE_CONTENT", $body);
-$tpl->set("PAGE_TITLE", $page_name);
-
-echo $tpl->process();
+if (! defined("BLOG_ROOT")) $blog = false;;
+$page->addStylesheet("form.css");
+$page->title = $page_name;
+$page->display($body, &$blog);
 ?>

@@ -18,39 +18,91 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-require_once("user.php");
-require_once("utils.php");
+require_once("lib/utils.php");
+require_once("lib/lnblogobject.php");
 
-define("MARKUP_NONE", 0);
-define("MARKUP_BBCODE", 1);
-define("MARKUP_HTML", 2);
+/*
+Class: Entry
+An abstract class representing entries of all types in the blog database.
 
-class Entry {
+Inherits:
+<LnBlogObject>
+*/
 
+class Entry extends LnBlogObject{
+
+	# Property: id
+	# An ID for the object that is unique across the class (not used).
 	var $id;
+	# Property: uid
+	# The user ID of this object's owner.
 	var $uid;
+	# Property: ip
+	# The IP address logged for this object at last modification.
 	var $ip;
+	# Property: date
+	# The human-readable date when the object was last modified.
 	var $date;
+	# Property: timestamp
+	# The UNIX timestamp when the object was last modified.
 	var $timestamp;
+	# Property: post_date
+	# Human-readable date when the object was created.
 	var $post_date;
+	# Property: post_ts
+	# UNIX timestamp when the object was created.
 	var $post_ts;
+	# Property: subject
+	# The subject text associated with this object.
 	var $subject;
+	# Property: abstract
+	# An abstract of the text of this object (not used).
 	var $abstract;
+	# Property: data
+	# The main text data of this object.  May be one of several different 
+	# kinds of markup.
 	var $data;
+	# Property: file
+	# The path to the file that holds data for this entry.  Note that this is
+	# specific to filesystem storage and is for internal use only.
 	var $file;
+	# Property: has_html
+	# Holds the type of markup used in the data property.  This can be one
+	# of several defined constants, includine <MARKUP_NONE>, <MARKUP_BBCODE>, 
+	# and <MARKUP_HTML>.
 	var $has_html = MARKUP_NONE;
 
+	/*
+	Method: data
+	Set or return the data property.  If the optional value parameter is set
+	to a true value (i.e. a non-empty string), then this value is set to the
+	data property.  Otherwise, the data property is returned.
+	*/
 	function data($value=false) {
 		if ($value) $this->data = $value;
 		else return $this->data;
 	}
 
-	# Abstract function.  Child classes MUST over-ride this.
+	/*
+	Method: permalink
+	Abstract function that returns the object's permalink.  
+	Child classes MUST over-ride this.
+	*/
 	function permalink() { return ""; }
 
-	# A function to search BBCode marked-up text and convert the URIs in
-	# links and images from relative to absolute.
+	/*
+	Method: absolutizeBBCodeURI
+	A function to search LBCode marked-up text and convert the URIs in
+	links and images from relative to absolute.
 
+	Parameters:
+	data        - The string containing the LBCode markup to absolutize.
+	current_uri - The URI to which the relative links are relative.
+
+	Returns:
+	A string with the markup in the data parameter, but with relative img and
+	url tags converted to absolute URIs under the current_uri parameter.
+	*/
 	function absolutizeBBCodeURI($data, $current_uri) {
 		$ret = preg_replace("/\[img(-?\w+)?=([^\/]+)\]/",
 		                    "[img$1=".$current_uri."$2]", $data);
@@ -60,8 +112,29 @@ class Entry {
 		return $ret;
 	}
 
+	/*
+	Method: stripHTML
+	Strip HTML code out of a string.  Note that the <UNICODE_ESCAPE_HACK>
+	configuration constant can be used to switch between using the PHP
+	htmlentities() and htmlspecialchars() functions to sanitize input.
+	This is because htmlentities() has a nasty habit of mangling Unicode.
+
+	Parameters:
+	data - The string to strip.
+
+	Returns:
+	A copy of data with HTML special characters such as angle brackets and
+	ampersands converted into their corresponding HTML entities.  This will
+	cause them to display in a web page as characters, not HTML markup.
+	*/
 	function stripHTML($data) {
-		$ret = htmlentities($data);
+		
+		if (UNICODE_ESCAPE_HACK) {
+			$ret = htmlentities($data);
+			$ret = preg_replace("/&amp;(#?\w+);/Usi", "&$1;", $ret);
+		} else {
+			$ret = htmlspecialchars($data);
+		}
 		return $ret;
 	}
 
@@ -70,12 +143,12 @@ class Entry {
 
 	function getPlainText() {
 		if ($this->has_html == MARKUP_HTML) {
-			$patterns = array('/<.+>/Usi', '/<\/.+>/Usi');
+			$ret = strip_tags($this->data);
 		} elseif ($this->has_html == MARKUP_BBCODE) {
 			$patterns = array('/\[.+\]/Usi', '/\[\/.+\]/Usi');
-		}
-		$replacements = array('', '', '', '');
-		$ret = preg_replace($patters, $replacements, $this->data);
+			$replacements = array('', '', '', '');
+			$ret = preg_replace($patters, $replacements, $this->data);
+		} else $ret = $this->data;
 		return $ret;
 	}
 
@@ -219,14 +292,14 @@ class Entry {
 		if (! $data) $file_data = false;
 		else 
 			foreach ($data as $line) {
-				preg_match('/<!--META ([\w|\s]*): (.*) META-->/', $line, $matches);
+				preg_match('/<!--META ([\w|\s|-]*): (.*) META-->/', $line, $matches);
 				if ($matches) $this->addMetadata($matches[1], $matches[2]);
 				$cleanline = preg_replace("/<!--META.*META-->\s\r?\n?\r?/", "", $line);
 				#if (preg_match("/\S/", $cleanline) == 0) $cleanline = "";
 				
 				$file_data .= $cleanline;
 			}
-		if (get_magic_quotes_gpc() ) $file_data = stripslashes($file_data);
+		#if (get_magic_quotes_gpc() ) $file_data = stripslashes($file_data);
 		$this->abstract = $this->getAbstract();
 		$this->data = $file_data;
 		return $file_data;
@@ -271,7 +344,7 @@ class Entry {
 	}
 
 	function writeFileData($file_data="") {
-		$fs = CreateFS();
+		$fs = NewFS();
 		$header = $this->putMetadataFields();
 		$file_data = $header.$this->data;
 		if (! is_dir(dirname($this->file)) ) 

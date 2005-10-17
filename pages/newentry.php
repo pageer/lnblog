@@ -24,15 +24,14 @@
 # breaking anything.
 
 session_start();
-require_once("rss.php");
-require_once("blog.php");
-require_once("blogentry.php");
+require_once("lib/creators.php");
 
-$blg = new Blog();
+$blg = NewBlog();
+$page = NewPage(&$blg);
 
 $submit_id = "submit";
 $preview_id = "preview";
-$tpl = new PHPTemplate(BLOG_EDIT_TEMPLATE);
+$tpl = NewTemplate(BLOG_EDIT_TEMPLATE);
 $tpl->set("FORM_ACTION", current_file() );
 $tpl->set("SUBMIT_ID", $submit_id);
 $tpl->set("PREV_ID", $preview_id);
@@ -41,19 +40,17 @@ $blg->exportVars($tpl);
 
 if (POST($submit_id)) {
 	$ret = $blg->newEntry();
-	if ($ret == UPDATE_SUCCESS) redirect($blg->getURL());
+	if ($ret == UPDATE_SUCCESS) $page->redirect($blg->getURL());
 	else $blg->errorEntry($ret, $tpl);
 } elseif (POST($preview_id)) {
-	$u = new User;
+	$u = NewUser();
 	$u->exportVars($tpl);
 	$blg->previewEntry($tpl);
 }
 
 $body = $tpl->process();
-$tpl->file = BASIC_LAYOUT_TEMPLATE;
-$tpl->set("PAGE_CONTENT", $body);
-$tpl->set("PAGE_TITLE", $blg->name." - New Entry");
-$tpl->set("STYLE_SHEETS", array("form.css", "blogentry.css") );
-$tpl->set("SCRIPTS", array("editor.js") );
-echo $tpl->process();
+$page->title = $blg->name." - New Entry";
+$page->addStylesheet("form.css", "blogentry.css");
+$page->addScript("editor.js");
+$page->display($body, &$blg);
 ?>

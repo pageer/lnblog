@@ -23,9 +23,11 @@
 # This is used to recieve and send TrackBack pings as well as to access
 # locally stored ping data.
 
-require_once("utils.php");
+require_once("lib/utils.php");
+require_once("lib/creators.php");
+require_once("lib/lnblogobject.php");
 
-class Trackback {
+class Trackback extends LnBlogObject {
 
 	# The only required element is the URL
 
@@ -160,7 +162,7 @@ class Trackback {
 	}
 
 	function writeFileData($path) {
-		$fs = CreateFS();
+		$fs = NewFS();
 		if (! is_dir( dirname($path) ) ) {
 			$fs->mkdir_rec(dirname($path));
 		}
@@ -177,7 +179,7 @@ class Trackback {
 	# Put the saved data into a template for display.
 
 	function get() {
-		$tpl = new PHPTemplate(TRACKBACK_TEMPLATE);
+		$tpl = NewTemplate(TRACKBACK_TEMPLATE);
 		$tpl->set("TB_URL", $this->url);
 		if ($this->date) $tpl->set("TB_DATE", $this->date);
 		if ($this->title) $tpl->set("TB_TITLE", $this->title);

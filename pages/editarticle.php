@@ -19,15 +19,15 @@
 */
 
 session_start();
-require_once("blog.php");
-require_once("article.php");
+require_once("lib/creators.php");
 
-$ent = new Article( getcwd() );
-$blg = new Blog();
+$ent = NewArticle();
+$blg = NewBlog();
+$page = NewPage(&$ent);
 
 $submit_id = "submit";
 $preview_id = "preview";
-$tpl = new PHPTemplate(ARTICLE_EDIT_TEMPLATE);
+$tpl = NewTemplate(ARTICLE_EDIT_TEMPLATE);
 $tpl->set("SUBMIT_ID", $submit_id);
 $tpl->set("PREV_ID", $preview_id);
 $blg->exportVars($tpl);
@@ -45,18 +45,15 @@ $tpl->set("HAS_HTML", $ent->has_html);
 
 if (POST($submit_id)) {
 	$ret = $blg->updateArticle();
-	$last_art =& $blg->last_article;
-	if ($ret == UPDATE_SUCCESS) redirect($last_art->permalink());
+	if ($ret == UPDATE_SUCCESS) $page->redirect($ent->permalink());
 	else $blg->errorArticle($ret, $tpl);
 } elseif (POST($preview_id)) {
 	$blg->previewArticle($tpl);
 }	
 
 $body = $tpl->process();
-$tpl->file = BASIC_LAYOUT_TEMPLATE;
-$tpl->set("PAGE_CONTENT", $body);
-$tpl->set("PAGE_TITLE", $blg->name." - New Entry");
-$tpl->set("STYLE_SHEETS", array("form.css", "article.css") );
-$tpl->set("SCRIPTS", array("editor.js") );
-echo $tpl->process();
+$page->title = $blg->name." - New Entry";
+$page->addStylesheet("form.css", "article.css");
+$page->addScript("editor.js");
+$page->display($body, &$blog);
 ?>

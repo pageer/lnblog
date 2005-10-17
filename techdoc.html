@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="en"><head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>LnBlog Technical Overview</title></head>
+<body>
+<h1>LnBlog Technical Overview</h1>
+
+<p>Copyright (C) 2005, Peter A. Geer &lt;<a href="mailto:pageer@skepticats.com">pageer@skepticats.com</a>&gt;<br>
+LnBlog homepage: <a href="http://www.skepticats.com/lnblog/">http://www.skepticats.com/lnblog/</a></p>
+
+<h2>Introduction</h2>
+
+<p>LnBlog is a free (<a href="http://www.gnu.org/philosophy/free-sw.html">as in speech</a>) weblog and "miniature" content management system implemented in object-oriented PHP 4.&nbsp; <br>
+</p>
+
+<p>This document provides an overview of the design and inner workings
+of&nbsp; LnBlog.&nbsp; It is intended to be both a guide for
+programmers who wish to modify LnBlog and as a case study for anyone who wants to learn more about PHP or object
+oriented programming.</p>
+
+<h2>Plugin System</h2>
+
+
+
+<p>LnBlog uses an event-driven
+plugin system.&nbsp; When a plugin is loaded by the plugin manager,
+it is responsible for registering with the event listener.&nbsp;
+This simply means notifying the listener of which events the plugin is
+interested in and telling it which method or function to call when the
+event is fired.&nbsp; Note that plugins are loaded using a call to
+include(), so any code which is not inside a function or class definition will run when the
+plugin is loaded, i.e. at the beginning of the page. <br>
+</p>
+<p>Plugins are located in a directory named "plugins" located in either
+the root of the LnBlog installation or the root of a particular
+weblog.&nbsp; If the same file name exists in both locations, the one
+in the weblog root will take precedence.&nbsp; This is the recommended
+method for disabling system-wide plugins for one particular blog.&nbsp;
+When plugins are first loaded, both these location are scanned for
+files ending in ".php" (subdirectories are ignored) and the results are
+merged into a single list.&nbsp; This list is sorted in alphabetical
+order by file name and each file is then loaded with a call to PHP's
+include() construct.<br>
+</p>
+<p>The recommended way to create plugins is to create a class
+for the plugin which inherits from the abstract Plugin class.&nbsp;
+This will allow you to access the default plugin management
+functionality in that class (<span style="font-weight: bold;">note</span>:
+this has yet to be implemented).&nbsp; To do this, you simply need
+to define a couple of standard member variables and define your
+callback functions (i.e. event handler functions) as methods of the
+class.&nbsp; Then, outside of the class definition, but in the same
+file, you would register your event handlers.&nbsp; Look at some of the
+standard plugins for examples and at the auto-generated documentation
+for available events and interfaces.
+<code style="">
+</code></p>
+
+</body></html>

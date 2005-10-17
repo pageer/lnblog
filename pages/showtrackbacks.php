@@ -20,34 +20,19 @@
 
 session_start();
 require_once("config.php");
-require_once("blog.php");
-require_once("blogentry.php");
-require_once("blogcomment.php");
-require_once("rss.php");
-require_once("tb.php");
+require_once("lib/creators.php");
 
-$SUBMIT_ID = "submit";
-
-$entry_path = dirname(getcwd());
-$ent = new BlogEntry($entry_path);
-$blg = new Blog();
+$ent = NewBlogEntry();
+$blg = NewBlog();
+$page = NewPage(&$ent);
 
 # If there is a POST url, then this is a trackback ping.  Receive it and 
 # exit.  Otherwise, display the page.
 if (POST("url")) {
 	$ret = $ent->getPing();
 } else {			
-
-	$title = $ent->subject . " - " . $blg->name;
-
-	$content = $ent->getTrackbacks(); 
-
-	$tpl = new PHPTemplate(BASIC_LAYOUT_TEMPLATE);
-	$blg->exportVars($tpl);
-	$tpl->set("PAGE_TITLE", $title);
-	$tpl->set("PAGE_CONTENT", $content);
-	$tpl->set("STYLE_SHEETS", array("trackback.css") );
-
-	echo $tpl->process();
+	$page->title = $ent->subject . " - " . $blg->name;
+	$page->addStylesheet("trackback.css");
+	$page->display($ent->getTrackbacks(), &$blog);
 }
 ?>

@@ -1,10 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html lang="en"><head>
-  <title>LnBlog Theme System</title>
-
-
-
-</head>
+  <title>LnBlog Theme System</title></head>
 <body>
 <h1>Understanding the LnBlog Theme System</h1>
 
@@ -157,7 +153,9 @@ If you do not specify a file type, then <code>getlink()</code> will try to guess
 </h3>
 
 
-<p>Let's say you want to change the banner for just a single weblog.&nbsp; Perhaps you want to add a picture to it.&nbsp; You can easily add this without disturbing any other weblog managed by LnBlog.<br />
+<p>Let's say you want to change the banner for just a single
+weblog.&nbsp; Perhaps you want to add a picture to it.&nbsp; You can
+easily add this without disturbing any other weblog managed by LnBlog.<br />
 </p>
 
 
@@ -206,5 +204,21 @@ change from the default theme.&nbsp; If a particular file does not
 exist in your theme directory, then LnBlog will try to use the one
 included in the default theme, which makes it easier to include future bug fixes into your theme.&nbsp; <br />
 </p>
-<p>Once you've changed all the files you care to, you can modify your blog settings and choose your new theme from the list.&nbsp; </p>
+<p>Once you've changed all the files you care to, you can modify your blog settings and choose your new theme from the list. <br />
+</p>
+<h2>Include Chains</h2>
+<p>As previously mentioned, LnBlog uses a series of templates nested inside each other to build
+a page.&nbsp; One consequence of this is that if you want to make any
+significant changes to the layout of a page, you need to change a large
+number of files.&nbsp; To aid this process, this section lists the
+files used to make various pages.&nbsp; You will find all of these
+files in the default theme directory, if you wish to referr to them.<br />
+</p>
+<h3>Basic Page Layout</h3>
+<p>The basic page structure (banner, menu bar, sidebar, and content area) is controlled by the basic_layout_tpl.php file.&nbsp; This file contains the essential HTML elements and adds references for scripts and style sheets.&nbsp; It also uses the <code>include()</code>
+function to pull in the menubar, banner, and sidebar templates.&nbsp;
+These are stored in include_menubar.php, include_banner.php, and
+include_sidebar.php respectively.<br />
+</p>
+
 </body></html>

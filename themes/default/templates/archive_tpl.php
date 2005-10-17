@@ -3,7 +3,7 @@
 <?php } ?>
 <ul>
 <?php foreach ($LINK_LIST as $LINK) { ?>
-<li><a href="<?php echo $LINK["URL"]; ?>"><?php echo $LINK["DESC"]; ?></a></li>
+<li><a href="<?php echo $LINK["link"]; ?>"><?php echo $LINK["title"]; ?></a></li>
 <?php } ?>
 </ul>
 <?php if (isset($SHOW_TEXT)) { ?>

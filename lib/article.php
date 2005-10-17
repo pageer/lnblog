@@ -17,11 +17,26 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-require_once("blogentry.php");
+require_once("lib/creators.php");
+require_once("lib/blogentry.php");
+
+/*
+Class: Article
+Represents a static article.  
+
+Inherits:
+<LNBlogObject>, <Entry>, <BlogEntry>
+
+Events:
+OnInit       - Fired when the object is created.
+InitComplete
+
+*/
 
 class Article extends BlogEntry {
 
 	function Article($path="", $revision=ENTRY_DEFAULT_FILE) {
+		$this->raiseEvent("OnInit");
 		$this->uid = ADMIN_USER;
 		$this->ip = get_ip();
 		$this->date = "";
@@ -29,16 +44,62 @@ class Article extends BlogEntry {
 		$this->subject = "";
 		$this->data = "";
 		$this->has_html = MARKUP_BBCODE;
-		$this->file = $path . ($path ? PATH_DELIM.$revision : "");
 		$this->allow_comment = true;
 		$this->template_file = ARTICLE_TEMPLATE;
+
+		if (! $path) {
+			$this->file = getcwd().PATH_DELIM.$revision;
+			# We might be in a comment or trackback directory, 
+			if (! $this->isEntry() ) {
+				$this->file = dirname(getcwd()).PATH_DELIM.$revision;
+				if (! $this->isEntry() ) {
+					$this->file = getcwd().PATH_DELIM.$revision;
+				}
+			}
+		} else {
+			$this->file = $path.PATH_DELIM.$revision;
+		}
+
 		if ( file_exists($this->file) ) {
 			$this->readFileData();
 		}
+		$this->raiseEvent("InitComplete");
 	}
 
+	/*
+	Method: isArticle
+	Determine if this object is, in fact, an article.  This is based on the
+	internal storage format of the article information, i.e. if the correct
+	storage format is found, then it's an article.
+
+	Parameters:
+	path - *Optional* parameter for the unique ID of the object.  This should
+	       only be used by back-end classes.
+	
+	Returns:
+	True if object is a valid article, false otherwise.
+	*/
+
+	function isArticle($path=false) {
+		return $this->isEntry($path);
+	}
+
+	/*
+	Method: setSticky
+	Set whether or not an article should be considered "featured".
+	Articles not set sticky should be considered archival and not
+	shown on things like front-page article lists.
+
+	Parameters:
+	show - *Optional* boolean parameter to turn stickiness on or off.  
+	       Default is true (stickiness on).
+
+	Returns:
+	True on success, false on failure.
+	*/
+
 	function setSticky($show=true) {
-		$f = CreateFS();
+		$f = NewFS();
 		if ($show) 
 			$ret = $f->write_file(dirname($this->file).PATH_DELIM.STICKY_PATH, $this->subject);
 		else 
@@ -46,6 +107,70 @@ class Article extends BlogEntry {
 		$f->destruct();
 		return $ret;
 	}
+
+	/*
+	Method: isSticky
+	Determines if the article is set as sticky.
+
+	Parameters: 
+	path - *Optional* unique ID for the article.
+
+	Returns:
+	True if the article is sticky, false otherwise.
+	*/
+	
+
+	function isSticky($path=false) {
+		return ($this->isArticle($path) && 
+		        file_exists($path ? $path : 
+				              (dirname($this->file).PATH_DELIM.STICKY_PATH) ) );
+	}
+
+	/*
+	Method: readSticky
+	Get the title and permalink without retreiving the entire article.
+	
+	Parameters:
+	path - The unique ID for the article.
+	
+	Returns:
+	A two-element array, with "link" and "title" for the permalink and
+	subject of the article.
+	*/
+
+	function readSticky($path) {
+	
+		$old_path = $this->file;
+		if (is_dir($path)) $this->file = $path.PATH_DELIM.ENTRY_DEFAULT_FILE;
+		else $this->file = $path;
+		$sticky_file = dirname($this->file).PATH_DELIM.STICKY_PATH;
+		
+		if ( file_exists($sticky_file) ) {
+			$data = file($sticky_file);
+			$desc = "";
+			foreach ($data as $line) { 
+				$desc .= $line; 
+			}
+			$ret = array("title"=>$desc, "link"=>$this->permalink() ); 
+		} else $ret = false;
+		
+		$this->file = $old_path;
+		return $ret;
+	}
+
+	/*
+	Method: getPath
+	Builds a path to store the given article.  This is only meaningful for
+	file-based storage and should only be used internally.
+
+	Parameters:
+	curr_ts     - An *optional* timestamp.
+	just_name   - *Optional* boolean to return just a file name.
+	long_format - *Optional* boolean to use long date format.
+
+	Returns:
+	A string to use for the path to the article.
+	*/
 
 	function getPath($curr_ts=false, $just_name=false, $long_format=false) {
 		if (! $curr_ts) {
@@ -63,10 +188,24 @@ class Article extends BlogEntry {
 		}
 	}
 
+	/*
+	Method: insert
+	Save the object as a new article.
+
+	Parameters:
+	branch    - *Optional* boolean for whether to create a new branch of an
+	            existing article.
+	base_path - *Optional* string to use for the base path to articles.
+
+	Returns:
+	True on success, false on failure.
+	*/
+
 	function insert ($branch=false, $base_path=false) {
 	
-		$usr = new User();
+		$usr = NewUser();
 		if (! $usr->checkLogin()) return false;
+		$this->raiseEvent("OnInsert");
 		$this->uid = $usr->username();
 	
 		$curr_ts = time();
@@ -83,21 +222,30 @@ class Article extends BlogEntry {
 		$this->timestamp = $curr_ts;
 		if (! $this->post_ts) $this->post_ts = $curr_ts;
 		$this->ip = get_ip();
-		
-		if (get_magic_quotes_gpc() ) {
-			$this->subject = stripslashes($this->subject);
-			$this->data = stripslashes($this->data);
-		}
 
 		$ret = $this->writeFileData();
+		$this->raiseEvent("InsertComplete");
 		return $ret;
 		
 	}
 	
-	function get($show_edit_controls=false) {
-		$tmp = new PHPTemplate(ARTICLE_TEMPLATE);
+	/*
+	Method: get
+	Get the HTML code to display the article.
 
-		$usr = new User($this->uid);
+	Parameters:
+	show_edit_controls - *Optional* boolean for whether or not to show the 
+	                     links for modifying the article.  Default is false.
+
+	Returns:
+	A string containing the HTML to dump to the browser for this article.
+	*/
+	
+	function get($show_edit_controls=false) {
+		$this->raiseEvent("OnOutput");
+		$tmp = NewTemplate(ARTICLE_TEMPLATE);
+
+		$usr = NewUser($this->uid);
 		$usr->exportVars($tmp);
 
 		$tmp->set("TITLE", $this->subject);
@@ -108,6 +256,7 @@ class Article extends BlogEntry {
 		$tmp->set("SHOW_CONTROLS", $show_edit_controls);
 		
 		$ret = $tmp->process();
+		$this->raiseEvent("OutputComplete");
 		return $ret;
 	}
 

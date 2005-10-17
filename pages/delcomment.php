@@ -20,23 +20,20 @@
 
 session_start();
 require_once("config.php");
-require_once("blog.php");
-require_once("blogentry.php");
-require_once("blogcomment.php");
+require_once("lib/creators.php");
 
-$blog = new Blog();
-$comm = new BlogComment();
+$blog = NewBlog();
+$page = NewPage();
 
-if (! $blog->canModifyEntry() ) redirect("index.php");
+if (! $blog->canModifyEntry() ) $page->redirect("index.php");
 
 $comm_id = "comment";
 
 $anchor = POST($comm_id);
 if (!$anchor) $anchor = GET($comm_id);
-if (!$anchor) redirect("index.php");
-
-$comm->file = $comm->getFilename($anchor);
-$comm->readFileData();
+if (!$anchor) $page->redirect("index.php");
+$comm = NewBlogComment($anchor);
+$page->display_object = &$comm;
 
 $conf_id = "ok";
 $conf_val = "Yes";
@@ -48,7 +45,7 @@ if (POST($conf_id)) {
 	else $message = "Unable to delete ".$anchor.".  Try again?";
 }
 
-$tpl = new PHPTemplate(CONFIRM_TEMPLATE);
+$tpl = NewTemplate(CONFIRM_TEMPLATE);
 $tpl->set("CONFIRM_TITLE", "Delete comment?");
 $tpl->set("CONFIRM_MESSAGE",$message);
 $tpl->set("CONFIRM_PAGE", current_file() );
@@ -58,13 +55,9 @@ $tpl->set("CANCEL_ID", "cancel");
 $tpl->set("CANCEL_LABEL", "Cancel");
 $tpl->set("PASS_DATA_ID", $comm_id);
 $tpl->set("PASS_DATA", $anchor);
-
 $body = $tpl->process();
 
-$tpl->file = BASIC_LAYOUT_TEMPLATE;
-$blog->exportVars($tpl);
-$tpl->set("PAGE_TITLE", $blog->name." - Delete comment");
-$tpl->set("PAGE_CONTENT", $body);
+$page->title = $blog->name." - Delete comment";
+$page->display($body, $blog);
 
-echo $tpl->process();
 ?>

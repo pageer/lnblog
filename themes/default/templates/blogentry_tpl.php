@@ -1,7 +1,5 @@
 <div class="blogentry">
-<div class="blogentryheader">
-	<h2><a href="<?php echo $PERMALINK; ?>"><?php echo $SUBJECT; ?></a></h2>
-</div>
+	<h2 class="blogentryheader"><a href="<?php echo $PERMALINK; ?>"><?php echo $SUBJECT; ?></a></h2>
 <div class="blogentrybody">
 <?php echo $BODY; ?>
 </div>

@@ -20,31 +20,24 @@
 session_start();
 
 require_once("config.php");
-require_once("blog.php");
-require_once("template.php");
-$blog = new Blog();
+require_once("lib/creators.php");
+$blog = NewBlog();
+$page = NewPage(&$blog);
 
 $year_dir = basename(getcwd());
 $title = $blog->name." - ".$year_dir;
 $year_list = scan_directory(getcwd(), true);
 sort($year_list);
 
-$tpl = new PHPTemplate(ARCHIVE_TEMPLATE);
+$tpl = NewTemplate(ARCHIVE_TEMPLATE);
 $tpl->set("ARCHIVE_TITLE", $blog->name);
 
-$LINK_LIST = array();
-
-foreach ($year_list as $yr) { 
-	$LINK_LIST[] = array("URL"=>$yr, "DESC"=>$yr);
-}
+$LINK_LIST = $blog->getyearList();
+foreach ($LINK_LIST as $key=>$item) $LINK_LIST[$key]["title"] = $item["year"];
 
 $tpl->set("LINK_LIST", $LINK_LIST);
 $body = $tpl->process();
 
-$page_tpl = new PHPTemplate(BASIC_LAYOUT_TEMPLATE);
-$blog->exportVars($page_tpl);
-$page_tpl->set("PAGE_TITLE", $title);
-$page_tpl->set("PAGE_CONTENT", $body);
-echo $page_tpl->process();
-
+$page->title = $title;
+$page->display($body, &$blog);
 ?>

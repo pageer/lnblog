@@ -21,12 +21,7 @@
 # Utility library.  Implements some general purpose functions plus some
 # wrappers that implement functionality available in PHP 5.
 
-require_once("blogconfig.php");
-# This should only be skipped when we're configuring FTP file writing.
-if (empty($EXCLUDE_FS)) {
-	require_once("fs.php");
-}
-require_once("user.php");
+require_once("lib/creators.php");
 
 # Types of directories to create.
 define("BLOG_BASE", 0);
@@ -81,7 +76,7 @@ function is_absolute($path) {
 # same call, the FS interface should be used directly.
 
 function write_file($path, $contents) {
-	$fs = CreateFS();
+	$fs = NewFS();
 	$ret = $fs->write_file($path, $contents);
 	$fs->destruct();
 	return $ret;
@@ -91,7 +86,7 @@ function write_file($path, $contents) {
 # This was also rewritten to use the FS interface.  Same deal.
 
 function mkdir_rec($path, $mode=false) {
-	$fs = CreateFS();
+	$fs = NewFS();
 	# Only pass mode if it is specified.  This lets us default to the
 	# appropriate default mode for the concrete subclass of FS, which is
 	# different between, say, FTPFS and NativeFS.
@@ -268,7 +263,7 @@ function has_get() {
 # Useful for the action attribute in form tags.
 
 function current_uri ($relative=false) {
-	$ret = SERVER("PHP_SELF"); 
+	$ret = SERVER("SCRIPT_NAME"); 
 	if ($relative) $ret = basename($ret);
 	return $ret;
 }
@@ -277,6 +272,20 @@ function current_uri ($relative=false) {
 
 function current_file() {
 	return current_uri(true);
+}
+
+# Returns the absolute URL of the requested script.
+
+function current_url() {
+	$path = SERVER("PHP_SELF");
+	# Add the protocol and server.
+	$protocol = "http";
+	if (SERVER("HTTPS") == "on") $protocol = "https";
+	$host = SERVER("SERVER_NAME");
+	$port = SERVER("SERVER_PORT");
+	if ($port == 80 || $port == "") $port = "";
+	else $port = ":".$port;
+	return $protocol."://".$host.$port.$path;
 }
 
 # Convert a local path to a URI.
@@ -378,7 +387,7 @@ function refresh($path, $delay=0) {
 
 function create_directory_wrappers($path, $type, $instpath="") {
 
-	$fs = CreateFS();
+	$fs = NewFS();
 
 	$head = "<?php\nrequire_once(\"config.php\");\ninclude(\"";
 	$tail = ".php\");\n?>";
@@ -401,8 +410,8 @@ function create_directory_wrappers($path, $type, $instpath="") {
 	$config_data .= 'define("BLOG_ROOT", \''.$blog_root."');\n";
 	$config_data .= 'define("BLOG_ROOT_URL", \''.$blog_url."');\n";
 	
-	$config_data .= 'ini_set(\'include_path\', ini_get(\'include_path\').PATH_SEPARATOR.BLOG_ROOT.PATH_SEPARATOR.INSTALL_ROOT);';
-	#.PATH_SEPARATOR.'.$blog_templ_dir.'.PATH_SEPARATOR.'.$sys_templ_dir.");\n";
+	$config_data .= 'ini_set(\'include_path\', ini_get(\'include_path\').PATH_SEPARATOR.'.
+	                                           'BLOG_ROOT.PATH_SEPARATOR.INSTALL_ROOT);';
 	$config_data .= "\n".'require_once("blogconfig.php");';
 	$config_data .= "\n?>";
 
@@ -413,60 +422,48 @@ function create_directory_wrappers($path, $type, $instpath="") {
 	switch ($type) {
 		case BLOG_BASE:
 			if (!is_dir($instpath)) return false;
-			$ret &= $fs->write_file($current."index.php", $head."showblog".$tail);
-			$ret &= $fs->write_file($current."new.php", $head."newentry".$tail);
-			$ret &= $fs->write_file($current."newart.php", $head."newarticle".$tail);
-			$ret &= $fs->write_file($current."edit.php", $head."updateblog".$tail);
-			$ret &= $fs->write_file($current."login.php", $head."bloglogin".$tail);
-			$ret &= $fs->write_file($current."logout.php", $head."bloglogout".$tail);
-			$ret &= $fs->write_file($current."uploadfile.php", $head."fileupload".$tail);
-			$ret &= $fs->write_file($current."map.php", $head."sitemap".$tail);
-			$ret &= $fs->write_file($current."useredit.php", $head."editlogin".$tail);
+			$filelist = array("index"=>"pages/showblog", "new"=>"pages/newentry", 
+			                  "newart"=>"pages/newarticle", "edit"=>"updateblog",
+			                  "login"=>"bloglogin", "logout"=>"bloglogout",
+			                  "uploadfile"=>"pages/fileupload", "map"=>"sitemap",
+			                  "useredit"=>"pages/editlogin");
 			$ret &= $fs->write_file($current."config.php", $config_data);
 			break;
 		case BLOG_ENTRIES:
-			$ret = $fs->write_file($current."index.php", $head."showarchive".$tail);
-			$ret = $fs->write_file($current."all.php", $head."showall".$tail);
-			$ret &= $fs->copy($parent."config.php", $current."config.php");
+			$filelist = array("index"=>"pages/showarchive", "all"=>"pages/showall");
 			break;
 		case YEAR_ENTRIES:
-			$ret = $fs->write_file($current."index.php", $head."showyear".$tail);
-			$ret &= $fs->copy($parent."config.php", $current."config.php");
+			$filelist = array("index"=>"pages/showyear");
 			break;
 		case MONTH_ENTRIES:
-			$ret = $fs->write_file($current."index.php", $head."showmonth".$tail);
-			$ret &= $fs->copy($parent."config.php", $current."config.php");
+			$filelist = array("index"=>"pages/showmonth", "day"=>"pages/showday");
 			break;
 		case ENTRY_BASE:
-			$ret = $fs->write_file($current."index.php", $head."showentry".$tail);
-			$ret &= $fs->write_file($current."edit.php", $head."editentry".$tail);
-			$ret &= $fs->write_file($current."delete.php", $head."delentry".$tail);
-			$ret &= $fs->write_file($current."uploadfile.php", $head."fileupload".$tail);
-			$ret &= $fs->write_file($current."trackback.php", $head."tb_ping".$tail);
-			$ret &= $fs->copy($parent."config.php", $current."config.php");
+			$filelist = array("index"=>"pages/showentry", "edit"=>"pages/editentry",
+			                  "delete"=>"pages/delentry", "uploadfile"=>"pages/fileupload",
+			                  "trackback"=>"pages/tb_ping");
 			break;
 		case ENTRY_COMMENTS:
-			$ret = $fs->write_file($current."index.php", $head."showcomments".$tail);
-			$ret = $fs->write_file($current."delete.php", $head."delcomment".$tail);
-			$ret &= $fs->copy($parent."config.php", $current."config.php");
+			$filelist = array("index"=>"pages/showcomments", "delete"=>"pages/delcomment");
 			break;
 		case ENTRY_TRACKBACKS:
-			$ret = $fs->write_file($current."index.php", $head."showtrackbacks".$tail);
-			$ret &= $fs->copy($parent."config.php", $current."config.php");
+			$filelist = array("index"=>"pages/showtrackbacks");
 			break;
 		case ARTICLE_BASE:
-			$ret = $fs->write_file($current."index.php", $head."showarticle".$tail);
-			$ret &= $fs->write_file($current."edit.php", $head."editarticle".$tail);
-			$ret &= $fs->write_file($current."uploadfile.php", $head."fileupload".$tail);
-			# Note: since articles are decended from blgo entries, we don't
-			# need a separate page for article trackbacks.
-			$ret &= $fs->write_file($current."trackback.php", $head."tb_ping".$tail);
-			$ret &= $fs->copy($parent."config.php", $current."config.php");
+			# The same as for entries, but for some reason, I never added a delete.
+			$filelist = array("index"=>"pages/showarticle", "edit"=>"pages/editarticle",
+			                  "uploadfile"=>"pages/fileupload",
+			                  "trackback"=>"pages/tb_ping");
 			break;
 		case BLOG_ARTICLES:
-			$ret = $fs->write_file($current."index.php", $head."showarticles".$tail);
-			$ret &= $fs->copy($parent."config.php", $current."config.php");
+			$filelist = array("index"=>"pages/showarticles");
 			break;
+	}
+	foreach ($filelist as $file=>$content) {
+		$ret &= $fs->write_file($current.$file.".php", $head.$content.$tail);
+	}
+	if ($type != BLOG_BASE) {
+		$ret &= $fs->copy($parent."config.php", $current."config.php");
 	}
 	$fs->destruct();
 	return $ret;
@@ -521,7 +518,8 @@ function getlink($name, $type=false) {
 		return BLOG_ROOT_URL.$l_type."/".$name;
 		
 	# Second case: check the current theme directory
-	} elseif ( file_exists(INSTALL_ROOT.PATH_DELIM."themes".PATH_DELIM.THEME_NAME.PATH_DELIM.$l_type.PATH_DELIM.$name) ) {
+	} elseif ( file_exists(INSTALL_ROOT.PATH_DELIM."themes".PATH_DELIM.THEME_NAME.
+	                       PATH_DELIM.$l_type.PATH_DELIM.$name) ) {
 	
 		return INSTALL_ROOT_URL."themes/".THEME_NAME."/".$l_type."/".$name;
 
@@ -532,23 +530,12 @@ function getlink($name, $type=false) {
 
 }
 
-# User authentication functions.  These are just for compatibility with the old code.
-# The functions themselves have been rewritten to use the new User class.
-
-function do_login($uname, $pwd) {
-	if ( trim($uname) == "" || trim($pwd) == "" ) return false;
-	$usr = new User($uname);
-	return $usr->login($pwd);
-}
-
-function do_logout() {
-	$usr = new User();
-	$usr->logout();
-}
-
-function check_login()  {
-	$usr = new User();
-	return $usr->checkLogin();
+function sanitize($str, $pattern="/\W/", $sub="") {
+	if (preg_match($pattern, $str)) {
+		return preg_replace($pattern, $sub, $str);
+	} else {
+		return $str;
+	}
 }
 
 ?>

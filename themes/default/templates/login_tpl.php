@@ -5,12 +5,6 @@
 <form method="post" action="<?php echo $FORM_ACTION; ?>">
 <div><label for="<?php echo $UNAME; ?>">Username</label><input type="text" id="<?php echo $UNAME; ?>" name="<?php echo $UNAME; ?>" <?php if (isset($UNAME_VALUE)) echo 'value="'.$UNAME_VALUE.'" '; ?>/></div>
 <div><label for="<?php echo $PWD; ?>">Password</label><input type="password" id="<?php echo $PWD; ?>" name="<?php echo $PWD; ?>" <?php if (isset($PWD_VALUE)) echo 'value="'.$PWD_VALUE.'" '; ?>/></div>
+<input type="hidden" name="referer" id="referer" value="<?php echo $REF; ?>" />
 <div><span class="basic_form_submit"><input type="submit" value="Submit" /></span><span class="basic_form_clear"><input type="reset" value="Clear" /></span></div>
 </form>
-<script type="text/javascript">
-<!--
-var elem = document.getElementById('<?php echo $UNAME; ?>');
-elem.focus();
--->
-</script>
-

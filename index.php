@@ -21,55 +21,54 @@
 session_start();
 
 require_once("blogconfig.php");
-require_once("utils.php");
-require_once("blog.php");
+require_once("lib/creators.php");
+require_once("lib/utils.php");
 
-if ( ! file_exists(INSTALL_ROOT.PATH_DELIM.FS_PLUGIN_CONFIG) ) {
-	redirect("fs_setup.php");
+$page = NewPage();
+
+if ( ! file_exists(INSTALL_ROOT.PATH_DELIM.USER_DATA.PATH_DELIM.FS_PLUGIN_CONFIG) ) {
+	$page->redirect("fs_setup.php");
 	exit;
 }
 
 $update =  "update";
 $upgrade = "upgrade";
 $fixperm = "fixperm";
-$page_title = PACKAGE_NAME." Administration";
+$page->title = PACKAGE_NAME." Administration";
 
-$tpl = new PHPTemplate(BLOG_ADMIN_TEMPLATE);
+$tpl = NewTemplate(BLOG_ADMIN_TEMPLATE);
 $tpl->set("SHOW_NEW");
 $tpl->set("UPDATE", $update);
 $tpl->set("UPGRADE", $upgrade);
 $tpl->set("PERMS", $fixperm);
 $tpl->set("FORM_ACTION", current_file());
 
-$usr = new User;
-if (! is_file(INSTALL_ROOT.PATH_DELIM."passwd.php")) {
-	redirect("newlogin.php");
+$usr = NewUser();
+if (! is_file(USER_DATA_PATH.PATH_DELIM."passwd.php")) {
+	$page->redirect("newlogin.php");
 	exit;
 } elseif (! $usr->checkLogin() || $usr->username() != ADMIN_USER) {
-	redirect("bloglogin.php");
+	$page->redirect("bloglogin.php");
 	exit;
 }
 
 if (POST($upgrade)) {
 	if (is_absolute(POST($upgrade))) $upgrade_path = trim(POST($upgrade));
 	else $upgrade_path = calculate_document_root().PATH_DELIM.trim(POST($upgrade));
-	$b = new Blog($upgrade_path);
+	$b = NewBlog($upgrade_path);
 	$upgrade_status = $b->upgradeWrappers();
 } elseif (POST($update)) {
 	if (is_absolute(POST($update))) $update_path = trim(POST($update));
 	else $update_path = calculate_document_root().PATH_DELIM.trim(POST($update));
-	redirect(htmlentities("updateblog.php?blogpath=".$update_path));
+	$page->redirect(htmlentities("updateblog.php?blogpath=".$update_path));
 } elseif (POST($fixperm)) {
 	if (is_absolute(POST($fixperm))) $fixperm_path = trim(POST($fixperm));
 	else $fixperm_path = calculate_document_root().PATH_DELIM.trim(POST($fixperm));
-	$b = new Blog(POST($fixperm_path));
+	$b = NewBlog(POST($fixperm_path));
 	#echo "<p>Fix perms</p>";
 	$upgrade_status = $b->fixDirectoryPermissions();
 }
 
 $body = $tpl->process();
-$tpl->reset(BASIC_LAYOUT_TEMPLATE);
-$tpl->set("PAGE_CONTENT", $body);
-$tpl->set("PAGE_TITLE", $page_title);
-echo $tpl->process();
+$page->display($body);
 ?>

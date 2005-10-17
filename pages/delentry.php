@@ -20,12 +20,11 @@
 
 session_start();
 require_once("config.php");
-require_once("blog.php");
-require_once("rss.php");
-require_once("blogentry.php");
+require_once("lib/creators.php");
 
-$blog = new Blog();
-$ent = new BlogEntry(getcwd());
+$blog = NewBlog();
+$ent = NewBlogEntry();
+$page = NewPage(&$ent);
 
 $conf_id = "ok";
 $cancel_id = "cancel";
@@ -33,13 +32,13 @@ $message = "Remove the weblog entry \"".$ent->subject."\"?";
 
 if (POST($conf_id)) {
 	$ret = $blog->deleteEntry();
-	if ($ret == UPDATE_SUCCESS) redirect(BLOG_ROOT_URL);
+	if ($ret == UPDATE_SUCCESS) $page->redirect(BLOG_ROOT_URL);
 	else $message = "Unable to delete \"".$ent->subject."\".  Try again?";
 } elseif (POST($cancel_id)) {
 	redirect("index.php");
 }
 
-$tpl = new PHPTemplate(CONFIRM_TEMPLATE);
+$tpl = NewTemplate(CONFIRM_TEMPLATE);
 $tpl->set("CONFIRM_TITLE", "Remove entry?");
 $tpl->set("CONFIRM_MESSAGE",$message);
 $tpl->set("CONFIRM_PAGE", current_file() );
@@ -50,10 +49,7 @@ $tpl->set("CANCEL_LABEL", "No");
 
 $body = $tpl->process();
 
-$tpl->file = BASIC_LAYOUT_TEMPLATE;
-$blog->exportVars($tpl);
-$tpl->set("PAGE_TITLE", $blog->name." - Delete comment");
-$tpl->set("PAGE_CONTENT", $body);
+$page->title = $blog->name." - Delete comment";
+$page->display($body, &$blog);
 
-echo $tpl->process();
 ?>

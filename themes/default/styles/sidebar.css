@@ -15,7 +15,7 @@
 	margin-left: 1em;
 }
 
-#sidebar h3 {
+#sidebar h3, #sidebar .panelheader {
 	margin-top: 0px;
 	margin-bottom: 0px;
 	width: 95%;
@@ -24,21 +24,26 @@
 	background-color: #6b85b0;
 }
 
-#sidebar h3 a {
+#sidebar h3 a, #sidebar .panelheader a {
 	color: white;
 	display: block;
 	width: 100%;
 }
 
-#sidebar h3 a:visited {
+#sidebar h3 a:visited, #sidebar .panelheader a:visited {
 	color: white;
 }
 
-#sidebar ul {
+#sidebar ul, #sidebar .panel {
 	margin: 0px;
 	padding-left: 0px;
 	margin-top: 1em;
 	margin-bottom: 1em;
+}
+
+#sidebar .panel {
+	padding-left: 8%;
+	width: 92%;
 }
 
 #sidebar ul li {

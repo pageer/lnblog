@@ -19,18 +19,19 @@
 */
 
 require_once("blogconfig.php");
-require_once("blog.php");
+require_once("lib/creators.php");
 
 session_start();
 
-$blog = new Blog;
+$blog = NewBlog();
+$page = NewPage(&$blog);
 
 if (defined("BLOG_ROOT")) {
 	$page_name = $blog->name;
 	$redir_url = $blog->getURL();
 	$admin_login = false;
 } else {
-	ini_set("include_path", ini_get("include_path").PATH_SEPARATOR."templates");
+#	ini_set("include_path", ini_get("include_path").PATH_SEPARATOR."templates");
 	$page_name = "System Administration";
 	$redir_url = "index.php";
 	$admin_login = true;
@@ -39,29 +40,32 @@ if (defined("BLOG_ROOT")) {
 $user_name = "user";
 $password = "passwd";
 
-$tpl = new PHPTemplate(LOGIN_TEMPLATE);
+$tpl = NewTemplate(LOGIN_TEMPLATE);
 $tpl->set("FORM_TITLE", $page_name." Login");
 $tpl->set("FORM_ACTION", current_file());
 $tpl->set("UNAME", $user_name);
 $tpl->set("PWD", $password);
+$tpl->set("REF", SERVER("HTTP_REFERER") );
 
 if ( POST($user_name) && POST($password) ) {
-	$ret = do_login(POST($user_name), POST($password));
+	$usr = NewUser(trim(POST($user_name)));
+	$ret = $usr->login(POST($password));
+	if (POST("referer")) {
+		$tpl->set("REF", POST("referer") );
+		$redir_url = POST("referer");
+	}
 	# Throw up an error if a regular user tries to log in as administrator.
 	if ( $admin_login && (POST($user_name) != ADMIN_USER) ) {
 		$tpl->set("FORM_MESSAGE", "Only the administrator account can log into the administrative pages.");
 	} else {
-		if ($ret) redirect($redir_url);
+		if ($ret) $page->redirect($redir_url);
 		else $tpl->set("FORM_MESSAGE", "Error logging in.  Please check your username and password.");
 	}
 }
 
 $body = $tpl->process();
-$tpl->reset(BASIC_LAYOUT_TEMPLATE);
-$blog->exportVars($tpl);
-$tpl->set("PAGE_CONTENT", $body);
-$tpl->set("PAGE_TITLE", $page_name." - Login");
-$tpl->set("STYLE_SHEETS", array("form.css") );
+$page->title = $page_name." - Login";
+$page->addStylesheet("form.css");
+$page->display($body, $blog);
 
-echo $tpl->process();
 ?>

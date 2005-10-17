@@ -10,7 +10,7 @@
 	width: 30%;
 }
 
-#sidebar h3 {
+#sidebar h3, #sidebar .panelheader {
 	font-size: 100%;
 	color: white;
 	background: black;
@@ -20,23 +20,28 @@
 	border-bottom: 0;
 }
 
-#sidebar h3 a {
+#sidebar h3 a, #sidebar .panelheader a {
 	width: 100%;
 	color: white;
 }
 
-#sidebar h3 a:link {
+#sidebar h3 a:link, #sidebar .panelheader a:link {
 	width: 100%;
 	background: black;
 	color: white;
 }
 
-#sidebar ul {
+#sidebar ul, #sidebar .panel {
 	background: white;
 	margin: 0;
 	padding: 0;
 	border: thin solid black;
 	width: 100%;
+}
+
+#sidebar .panel {
+	padding-left: 8%;
+	width: 92%;
 }
 
 #sidebar ul li {

@@ -1,7 +1,7 @@
 <?php 
 $EXCLUDE_FS = true;
 require_once("blogconfig.php");
-require_once("utils.php");
+require_once("lib/utils.php");
 $curr_dir = getcwd();
 if (POST("docroot")) {
 	$doc_root = POST("docroot");

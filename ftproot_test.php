@@ -1,8 +1,8 @@
 <?php 
 $EXCLUDE_FS = true;
 require_once("blogconfig.php");
-require_once("utils.php");
-require_once("ftpfs.php");
+require_once("lib/utils.php");
+require_once("lib/ftpfs.php");
 
 # Takes an FTPFS instance and tests if a given file can be reached with it.
 

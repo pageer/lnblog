@@ -20,20 +20,16 @@
 
 session_start();
 require_once("config.php");
-require_once("blog.php");
-require_once("blogentry.php");
-require_once("blogcomment.php");
-require_once("rss.php");
-require_once("tb.php");
+require_once("lib/creators.php");
 
-$entry_path = getcwd();
-$ent = new BlogEntry($entry_path);
-$blg = new Blog();
+$ent = NewBlogEntry();
+$blg = NewBlog();
+$page = NewPage(&$ent);
 			
-if (POST(COMMENT_POST_REMEMBER)) {
-	if (POST(COMMENT_POST_NAME)) setcookie(COMMENT_POST_NAME, POST(COMMENT_POST_NAME));
-	if (POST(COMMENT_POST_EMAIL)) setcookie(COMMENT_POST_EMAIL, POST(COMMENT_POST_EMAIL));
-	if (POST(COMMENT_POST_URL)) setcookie(COMMENT_POST_URL, POST(COMMENT_POST_URL));
+if ( POST(COMMENT_POST_REMEMBER) ) {
+	setcookie(COMMENT_POST_NAME, POST(COMMENT_POST_NAME));
+	setcookie(COMMENT_POST_EMAIL, POST(COMMENT_POST_EMAIL));
+	setcookie(COMMENT_POST_URL, POST(COMMENT_POST_URL));
 }
 
 # This code will detect if a comment has been submitted and, if so,
@@ -42,55 +38,35 @@ if (POST(COMMENT_POST_REMEMBER)) {
 
 $SUBMIT_ID = "submit";
 
-$comm = new BlogComment;
+$comm = NewBlogComment();
 if (POST($SUBMIT_ID)) {
-	$ent->addComment(getcwd().PATH_DELIM.ENTRY_COMMENT_DIR);
+	$ent->addComment();
 }
 
 # Get the entry AFTER posting the comment so that the comment count is right.
-$title = $ent->subject . " - " . $blg->name;
+$page->title = $ent->subject . " - " . $blg->name;
 $content =  $ent->get( $blg->canModifyEntry() );
 
 # Array for adding style sheets.  We build this as we go so that we don't 
 # end up sending more stylesheets than we need to.
-$extra_styles = array("blogentry.css");
+$page->addStylesheet("blogentry.css");
 
 # Add TrackBacks for current entry.
 $tmp_content = $ent->getTrackbacks();
 $content .= $tmp_content;
-if ($tmp_content) $extra_styles[] = "trackback.css";
+if ($tmp_content) $page->addStylesheet("trackback.css");
 # Now add the comments.
 $tmp_content = $ent->getComments();
 $content .= $tmp_content;
-if ($tmp_content) $extra_styles[] = "comment.css";
+if ($tmp_content) $page->addStylesheet("comment.css");
 
 # Add comment form if applicable.
 if ($ent->allow_comment) { 
-	$extra_styles[] = "form.css";
-	$comm_tpl = new PHPTemplate;
-	$comm_tpl->file = COMMENT_FORM_TEMPLATE;
+	$page->addStylesheet("form.css");
+	$comm_tpl = NewTemplate(COMMENT_FORM_TEMPLATE);
 	$comm_tpl->set("SUBMIT_ID", $SUBMIT_ID);
 	$content .= $comm_tpl->process();
 }
 
-# Set up template for basic page layout.
-$tpl = new PHPTemplate(BASIC_LAYOUT_TEMPLATE);
-$blg->exportVars($tpl);
-$tpl->set("PAGE_TITLE", $title);
-$tpl->set("PAGE_CONTENT", $content);
-$tpl->set("STYLE_SHEETS", $extra_styles);
-
-# Set RSS feeds for comments, if we have any.
-if (is_file(dirname($ent->file).PATH_DELIM.ENTRY_COMMENT_DIR.PATH_DELIM.COMMENT_RSS2_PATH)) {
-	$tpl->set("ENTRY_RSS2_FEED", $ent->permalink().ENTRY_COMMENT_DIR."/".COMMENT_RSS2_PATH);
-	$tpl->set("XML_FEED", $ent->permalink().ENTRY_COMMENT_DIR."/".COMMENT_RSS2_PATH);
-	$tpl->set("XML_FEED_TITLE", "RSS 2.0 feed for comments on '".$ent->subject."'");
-}
-if (is_file(dirname($ent->file).PATH_DELIM.ENTRY_COMMENT_DIR.PATH_DELIM.COMMENT_RSS1_PATH)) {
-	$tpl->set("ENTRY_RSS1_FEED", $ent->permalink().ENTRY_COMMENT_DIR."/".COMMENT_RSS1_PATH);
-	$tpl->set("RDF_FEED", $ent->permalink().ENTRY_COMMENT_DIR."/".COMMENT_RSS1_PATH);
-	$tpl->set("RDF_FEED_TITLE", "RSS 1.0 feed for comments on '".$ent->subject."'");
-}
-
-echo $tpl->process();
+$page->display($content, &$blog);
 ?>

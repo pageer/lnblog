@@ -20,17 +20,17 @@
 
 session_start();
 require_once("blogconfig.php");
-require_once("blog.php");
+require_once("lib/creators.php");
 
-$blog = new Blog;
+$blog = NewBlog();
+$page = NewPage(&$blog);
 
 $cancel_id = "cancel";
 $cancel_label = "No";
 $ok_id = "ok";
 $ok_label = "Yes";
-$title = $blog->name." - Logout";
 
-$tpl = new PHPTemplate(CONFIRM_TEMPLATE);
+$tpl = NewTemplate(CONFIRM_TEMPLATE);
 $tpl->set("CONFIRM_TITLE", "Logout");
 $tpl->set("CONFIRM_MESSAGE", "Do you really want to log out?");
 $tpl->set("CONFIRM_PAGE", current_file());
@@ -40,18 +40,15 @@ $tpl->set("CANCEL_ID", $cancel_id);
 $tpl->set("CANCEL_LABEL", $cancel_label);
 
 if (POST($ok_id)) {
-	do_logout();
-	redirect($blog->getURL());
+	$usr = NewUser();
+	$usr->logout();
+	$page->redirect($blog->getURL());
 } else if (POST($cancel_id)) {
-	redirect($blog->getURL());
+	$page->redirect($blog->getURL());
 }
 
 $body = $tpl->process();
-
-$tpl->reset(BASIC_LAYOUT_TEMPLATE);
-$blog->exportVars($tpl);
-$tpl->set("PAGE_TITLE", $title);
-$tpl->set("PAGE_CONTENT", $body);
-echo $tpl->process();
+$page->title = $blog->name." - Logout";
+$page->display($body, &$blog);
 
 ?>

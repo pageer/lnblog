@@ -17,19 +17,16 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 session_start();
-require_once("blog.php");
-require_once("blogentry.php");
-require_once("rss.php");
+require_once("lib/creators.php");
 
-$entry_path = getcwd();
-$ent = new BlogEntry($entry_path);
-$blg = new Blog();
+$ent = NewBlogEntry();
+$blg = NewBlog();
+$page = NewPage(&$ent);
 
 $submit_id = "submit";
 $preview_id = "preview";
-$tpl = new PHPTemplate(BLOG_EDIT_TEMPLATE);
+$tpl = NewTemplate(BLOG_EDIT_TEMPLATE);
 $tpl->set("PREV_ID", $preview_id);
 $tpl->set("SUBMIT_ID", $submit_id);
 $blg->exportVars($tpl);
@@ -49,10 +46,8 @@ if (POST($submit_id)) {
 }
 
 $body = $tpl->process();
-$tpl->file = BASIC_LAYOUT_TEMPLATE;
-$tpl->set("PAGE_CONTENT", $body);
-$tpl->set("PAGE_TITLE", $blg->name." - New Entry");
-$tpl->set("STYLE_SHEETS", array("form.css", "blogentry.css") );
-$tpl->set("SCRIPTS", array("editor.js") );
-echo $tpl->process();
+$page->title = $blg->name." - New Entry";
+$page->addStylesheet("form.css", "blogentry.css");
+$page->addScript("editor.js");
+$page->display($body, &$blg);
 ?>

@@ -1,20 +1,33 @@
 <!DOCTYPE webproject>
 <webproject>
-  <project usePreviewPrefix="0" previewPrefix="" type="Local" usePersistentBookmarks="0" name="LnBlog" encoding="iso 8859-1" enableEvents="true" >
+  <project usePreviewPrefix="0" type="Local" previewPrefix="" name="LnBlog" encoding="iso 8859-1" >
     <upload/>
-    <defaultDTD>-//w3c//dtd xhtml 1.0 strict//en</defaultDTD>
+    <author>Peter A. Geer</author>
+    <email>pageer@skepticats.com</email>
+    <defaultDTD>-//W3C//DTD XHTML 1.0 Strict//EN</defaultDTD>
     <item url="lib/" uploadstatus="1" />
     <item url="lib/article.php" uploadstatus="1" />
-    <item url="lib/blog.php" uploadstatus="1" />
     <item url="lib/blogcomment.php" uploadstatus="1" />
     <item url="lib/blogentry.php" uploadstatus="1" />
+    <item url="lib/blog.php" uploadstatus="1" />
+    <item url="lib/constants.php" uploadstatus="1" />
+    <item url="lib/creators.php" uploadstatus="1" />
     <item url="lib/entry.php" uploadstatus="1" />
+    <item url="lib/eventregister.php" uploadstatus="1" />
     <item url="lib/fs.php" uploadstatus="1" />
     <item url="lib/ftpfs.php" uploadstatus="1" />
+    <item url="lib/iniparser.php" uploadstatus="1" />
+    <item url="lib/lbcode.php" uploadstatus="1" />
+    <item url="lib/lnblogobject.php" uploadstatus="1" />
     <item url="lib/nativefs.php" uploadstatus="1" />
+    <item url="lib/pluginmanager.php" uploadstatus="1" />
+    <item url="lib/plugin.php" uploadstatus="1" />
     <item url="lib/rss.php" uploadstatus="1" />
+    <item url="lib/tb.php" uploadstatus="1" />
     <item url="lib/template.php" uploadstatus="1" />
+    <item url="lib/textsearch.php" uploadstatus="1" />
     <item url="lib/upload.php" uploadstatus="1" />
+    <item url="lib/user.php" uploadstatus="1" />
     <item url="lib/utils.php" uploadstatus="1" />
     <item url="pages/" uploadstatus="1" />
     <item url="pages/delcomment.php" uploadstatus="1" />
@@ -25,49 +38,69 @@
     <item url="pages/fileupload.php" uploadstatus="1" />
     <item url="pages/newarticle.php" uploadstatus="1" />
     <item url="pages/newentry.php" uploadstatus="1" />
+    <item url="pages/showall.php" uploadstatus="1" />
     <item url="pages/showarchive.php" uploadstatus="1" />
     <item url="pages/showarticle.php" uploadstatus="1" />
     <item url="pages/showarticles.php" uploadstatus="1" />
     <item url="pages/showblog.php" uploadstatus="1" />
     <item url="pages/showcomments.php" uploadstatus="1" />
+    <item url="pages/showday.php" uploadstatus="1" />
     <item url="pages/showentry.php" uploadstatus="1" />
     <item url="pages/showmonth.php" uploadstatus="1" />
+    <item url="pages/showtrackbacks.php" uploadstatus="1" />
     <item url="pages/showyear.php" uploadstatus="1" />
+    <item url="pages/tb_ping_new.php" uploadstatus="1" />
+    <item url="pages/tb_ping.php" uploadstatus="1" />
+    <item url="plugins/" uploadstatus="1" />
+    <item url="plugins/sidebar/" uploadstatus="1" />
+    <item url="plugins/sidebar/archives.php" uploadstatus="1" />
+    <item url="plugins/sidebar/articles.php" uploadstatus="1" />
+    <item url="plugins/sidebar/calendar.php" uploadstatus="1" />
+    <item url="plugins/sidebar/googlesearch.php" uploadstatus="1" />
+    <item url="plugins/sidebar/login.php" uploadstatus="1" />
+    <item url="plugins/sidebar/news.php" uploadstatus="1" />
+    <item url="plugins/sidebar/recent.php" uploadstatus="1" />
+    <item url="plugins/banner_1_pageheader.php" uploadstatus="1" />
+    <item url="plugins/menubar_1_sitemap.php" uploadstatus="1" />
+    <item url="plugins/sidebar_1_recent.php" uploadstatus="1" />
+    <item url="plugins/sidebar_2_articles.php" uploadstatus="1" />
+    <item url="plugins/sidebar_3_archives.php" uploadstatus="1" />
+    <item url="plugins/sidebar_4_news.php" uploadstatus="1" />
+    <item url="plugins/sidebar_5_googlesearch.php" uploadstatus="1" />
+    <item url="plugins/sidebar_6_loginops.php" uploadstatus="1" />
     <item url="themes/" uploadstatus="1" />
     <item url="themes/default/" uploadstatus="1" />
     <item url="themes/default/images/" uploadstatus="1" />
+    <item url="themes/default/images/google_logo.gif" uploadstatus="1" />
     <item url="themes/default/images/logo.png" uploadstatus="1" />
+    <item url="themes/default/images/rss1_button.png" uploadstatus="1" />
+    <item url="themes/default/images/rss1_comments_button.png" uploadstatus="1" />
+    <item url="themes/default/images/rss2_button.png" uploadstatus="1" />
+    <item url="themes/default/images/rss2_comments_button.png" uploadstatus="1" />
     <item url="themes/default/scripts/" uploadstatus="1" />
+    <item url="themes/default/scripts/editor.js" uploadstatus="1" />
+    <item url="themes/default/scripts/sitemap.js" uploadstatus="1" />
     <item url="themes/default/styles/" uploadstatus="1" />
     <item url="themes/default/styles/article.css" uploadstatus="1" />
-    <item url="themes/default/styles/article_print.css" uploadstatus="1" />
     <item url="themes/default/styles/banner.css" uploadstatus="1" />
-    <item url="themes/default/styles/banner_print.css" uploadstatus="1" />
-    <item url="themes/default/styles/blog.css" uploadstatus="1" />
     <item url="themes/default/styles/blogentry.css" uploadstatus="1" />
-    <item url="themes/default/styles/blogentry_print.css" uploadstatus="1" />
     <item url="themes/default/styles/comment.css" uploadstatus="1" />
-    <item url="themes/default/styles/contact.css" uploadstatus="1" />
     <item url="themes/default/styles/form.css" uploadstatus="1" />
-    <item url="themes/default/styles/login.css" uploadstatus="1" />
     <item url="themes/default/styles/main.css" uploadstatus="1" />
-    <item url="themes/default/styles/main_print.css" uploadstatus="1" />
     <item url="themes/default/styles/menubar.css" uploadstatus="1" />
-    <item url="themes/default/styles/menubar_print.css" uploadstatus="1" />
     <item url="themes/default/styles/sidebar.css" uploadstatus="1" />
-    <item url="themes/default/styles/sidebar_print.css" uploadstatus="1" />
-    <item url="themes/default/styles/update.css" uploadstatus="1" />
+    <item url="themes/default/styles/trackback.css" uploadstatus="1" />
     <item url="themes/default/templates/" uploadstatus="1" />
     <item url="themes/default/templates/archive_tpl.php" uploadstatus="1" />
     <item url="themes/default/templates/article_edit_tpl.php" uploadstatus="1" />
     <item url="themes/default/templates/article_tpl.php" uploadstatus="1" />
     <item url="themes/default/templates/basic_layout_tpl.php" uploadstatus="1" />
     <item url="themes/default/templates/blog_admin_tpl.php" uploadstatus="1" />
-    <item url="themes/default/templates/blog_modify_tpl.php" uploadstatus="1" />
-    <item url="themes/default/templates/blog_tpl.php" uploadstatus="1" />
     <item url="themes/default/templates/blogcomment_tpl.php" uploadstatus="1" />
     <item url="themes/default/templates/blogedit_tpl.php" uploadstatus="1" />
     <item url="themes/default/templates/blogentry_tpl.php" uploadstatus="1" />
+    <item url="themes/default/templates/blog_modify_tpl.php" uploadstatus="1" />
+    <item url="themes/default/templates/blog_tpl.php" uploadstatus="1" />
     <item url="themes/default/templates/comment_form_tpl.php" uploadstatus="1" />
     <item url="themes/default/templates/comment_list_tpl.php" uploadstatus="1" />
     <item url="themes/default/templates/confirm_tpl.php" uploadstatus="1" />
@@ -75,126 +108,113 @@
     <item url="themes/default/templates/include_banner.php" uploadstatus="1" />
     <item url="themes/default/templates/include_menubar.php" uploadstatus="1" />
     <item url="themes/default/templates/include_sidebar.php" uploadstatus="1" />
+    <item url="themes/default/templates/js_editor.php" uploadstatus="1" />
     <item url="themes/default/templates/login_create_tpl.php" uploadstatus="1" />
     <item url="themes/default/templates/login_tpl.php" uploadstatus="1" />
+    <item url="themes/default/templates/send_trackback_tpl_new.php" uploadstatus="1" />
+    <item url="themes/default/templates/send_trackback_tpl.php" uploadstatus="1" />
+    <item url="themes/default/templates/sitemap_config_tpl.php" uploadstatus="1" />
+    <item url="themes/default/templates/trackback_list_tpl.php" uploadstatus="1" />
+    <item url="themes/default/templates/trackback_tpl.php" uploadstatus="1" />
     <item url="themes/default/templates/upload_form_tpl.php" uploadstatus="1" />
+    <item url="themes/default/templates/user_info_tpl.php" uploadstatus="1" />
     <item url="themes/skepticats/" uploadstatus="1" />
     <item url="themes/skepticats/images/" uploadstatus="1" />
     <item url="themes/skepticats/images/logo.png" uploadstatus="1" />
     <item url="themes/skepticats/images/loki-banner.png" uploadstatus="1" />
     <item url="themes/skepticats/scripts/" uploadstatus="1" />
     <item url="themes/skepticats/styles/" uploadstatus="1" />
+    <item url="themes/skepticats/styles/article.css" uploadstatus="1" />
     <item url="themes/skepticats/styles/banner.css" uploadstatus="1" />
-    <item url="themes/skepticats/styles/banner_print.css" uploadstatus="1" />
-    <item url="themes/skepticats/styles/blog.css" uploadstatus="1" />
     <item url="themes/skepticats/styles/blogentry.css" uploadstatus="1" />
-    <item url="themes/skepticats/styles/blogentry_print.css" uploadstatus="1" />
     <item url="themes/skepticats/styles/comment.css" uploadstatus="1" />
-    <item url="themes/skepticats/styles/contact.css" uploadstatus="1" />
-    <item url="themes/skepticats/styles/form.css" uploadstatus="1" />
-    <item url="themes/skepticats/styles/login.css" uploadstatus="1" />
     <item url="themes/skepticats/styles/main.css" uploadstatus="1" />
-    <item url="themes/skepticats/styles/main_print.css" uploadstatus="1" />
     <item url="themes/skepticats/styles/menubar.css" uploadstatus="1" />
-    <item url="themes/skepticats/styles/menubar_print.css" uploadstatus="1" />
     <item url="themes/skepticats/styles/sidebar.css" uploadstatus="1" />
-    <item url="themes/skepticats/styles/sidebar_print.css" uploadstatus="1" />
-    <item url="themes/skepticats/styles/update.css" uploadstatus="1" />
     <item url="themes/skepticats/templates/" uploadstatus="1" />
     <item url="themes/skepticats/templates/article_tpl.php" uploadstatus="1" />
     <item url="themes/skepticats/templates/blogcomment_tpl.php" uploadstatus="1" />
     <item url="themes/skepticats/templates/blogentry_tpl.php" uploadstatus="1" />
-    <item url="themes/skepticats/templates/include_banner.php" uploadstatus="1" />
-    <item url="themes/skepticats/templates/include_sidebar.php" uploadstatus="1" />
-    <item url="ChangeLog" uploadstatus="1" />
-    <item url="Readme.html" uploadstatus="1" />
-    <item url="blogconfig.php" uploadstatus="1" />
-    <item url="bloglogin.php" uploadstatus="1" />
-    <item url="bloglogout.php" uploadstatus="1" />
-    <item url="fs_setup.php" uploadstatus="1" />
-    <item url="index.php" uploadstatus="1" />
-    <item url="install.html" uploadstatus="1" />
-    <item url="newblog.php" uploadstatus="1" />
-    <item url="newlogin.php" uploadstatus="1" />
-    <item url="updateblog.php" uploadstatus="1" />
-    <item url="" uploadstatus="1" />
-    <templates>templates/</templates>
-    <toolbars>toolbars/</toolbars>
-    <item url="quanta_toolbars/" uploadstatus="1" />
-    <item url="themes/default/templates/js_editor.php" uploadstatus="1" />
+    <item url="themes/smooth/" uploadstatus="1" />
+    <item url="themes/smooth/images/" uploadstatus="1" />
+    <item url="themes/smooth/images/background2.png" uploadstatus="1" />
+    <item url="themes/smooth/images/background.png" uploadstatus="1" />
+    <item url="themes/smooth/images/bg.png" uploadstatus="1" />
+    <item url="themes/smooth/scripts/" uploadstatus="1" />
+    <item url="themes/smooth/styles/" uploadstatus="1" />
+    <item url="themes/smooth/styles/article.css" uploadstatus="1" />
+    <item url="themes/smooth/styles/banner.css" uploadstatus="1" />
+    <item url="themes/smooth/styles/blogentry.css" uploadstatus="1" />
+    <item url="themes/smooth/styles/comment.css" uploadstatus="1" />
+    <item url="themes/smooth/styles/form.css" uploadstatus="1" />
+    <item url="themes/smooth/styles/main.css" uploadstatus="1" />
+    <item url="themes/smooth/styles/menubar.css" uploadstatus="1" />
+    <item url="themes/smooth/styles/sidebar.css" uploadstatus="1" />
+    <item url="themes/smooth/styles/trackback.css" uploadstatus="1" />
+    <item url="themes/smooth/templates/" uploadstatus="1" />
+    <item url="themes/smooth/templates/article_tpl.php" uploadstatus="1" />
+    <item url="themes/smooth/templates/basic_layout_tpl.php" uploadstatus="1" />
+    <item url="themes/smooth/templates/blogcomment_tpl.php" uploadstatus="1" />
+    <item url="themes/smooth/templates/blogentry_tpl.php" uploadstatus="1" />
     <item url="themes/tuxice/" uploadstatus="1" />
-    <item url="themes/tuxice/styles/" uploadstatus="1" />
-    <item url="themes/tuxice/styles/article.css" uploadstatus="1" />
-    <item url="themes/tuxice/styles/article_print.css" uploadstatus="1" />
-    <item url="themes/tuxice/styles/banner.css" uploadstatus="1" />
-    <item url="themes/tuxice/styles/banner_print.css" uploadstatus="1" />
-    <item url="themes/tuxice/styles/blog.css" uploadstatus="1" />
-    <item url="themes/tuxice/styles/blogentry.css" uploadstatus="1" />
-    <item url="themes/tuxice/styles/blogentry_print.css" uploadstatus="1" />
-    <item url="themes/tuxice/styles/comment.css" uploadstatus="1" />
-    <item url="themes/tuxice/styles/contact.css" uploadstatus="1" />
-    <item url="themes/tuxice/styles/form.css" uploadstatus="1" />
-    <item url="themes/tuxice/styles/login.css" uploadstatus="1" />
-    <item url="themes/tuxice/styles/main.css" uploadstatus="1" />
-    <item url="themes/tuxice/styles/main_print.css" uploadstatus="1" />
-    <item url="themes/tuxice/styles/menubar.css" uploadstatus="1" />
-    <item url="themes/tuxice/styles/menubar_print.css" uploadstatus="1" />
-    <item url="themes/tuxice/styles/sidebar.css" uploadstatus="1" />
-    <item url="themes/tuxice/styles/sidebar_print.css" uploadstatus="1" />
-    <item url="themes/tuxice/styles/update.css" uploadstatus="1" />
-    <uploadprofiles showtreeviews="true" defaultProfile="@" >
-      <profile remote_host="" remote_port="" remote_path="" remote_protocol="ftp" user="" name="@" />
-    </uploadprofiles>
-    <item url="lib/ftp.php" uploadstatus="1" />
-    <item url="lib/tb.php" uploadstatus="1" />
-    <item url="lib/user.php" uploadstatus="1" />
-    <item url="pages/showall.php" uploadstatus="1" />
-    <item url="pages/showtrackbacks.php" uploadstatus="1" />
-    <item url="pages/tb_ping.php" uploadstatus="1" />
-    <item url="quanta_templates/" uploadstatus="1" />
-    <item url="themes/default/images/rss1_button.png" uploadstatus="1" />
-    <item url="themes/default/images/rss1_comments_button.png" uploadstatus="1" />
-    <item url="themes/default/images/rss2_button.png" uploadstatus="1" />
-    <item url="themes/default/images/rss2_comments_button.png" uploadstatus="1" />
-    <item url="themes/default/styles/trackback.css" uploadstatus="1" />
-    <item url="themes/default/templates/send_trackback_tpl.php" uploadstatus="1" />
-    <item url="themes/default/templates/trackback_list_tpl.php" uploadstatus="1" />
-    <item url="themes/default/templates/trackback_tpl.php" uploadstatus="1" />
     <item url="themes/tuxice/images/" uploadstatus="1" />
-    <item url="themes/tuxice/images/Penguin.png" uploadstatus="1" />
     <item url="themes/tuxice/images/background.png" uploadstatus="1" />
+    <item url="themes/tuxice/images/freecuddling.png" uploadstatus="1" />
     <item url="themes/tuxice/images/logo.png" uploadstatus="1" />
+    <item url="themes/tuxice/images/Penguin.png" uploadstatus="1" />
     <item url="themes/tuxice/images/rss1_button.png" uploadstatus="1" />
     <item url="themes/tuxice/images/rss1_comments_button.png" uploadstatus="1" />
     <item url="themes/tuxice/images/rss2_button.png" uploadstatus="1" />
     <item url="themes/tuxice/images/rss2_comments_button.png" uploadstatus="1" />
     <item url="themes/tuxice/images/tux.png" uploadstatus="1" />
     <item url="themes/tuxice/scripts/" uploadstatus="1" />
+    <item url="themes/tuxice/styles/" uploadstatus="1" />
+    <item url="themes/tuxice/styles/article.css" uploadstatus="1" />
+    <item url="themes/tuxice/styles/banner.css" uploadstatus="1" />
+    <item url="themes/tuxice/styles/blogentry.css" uploadstatus="1" />
+    <item url="themes/tuxice/styles/comment.css" uploadstatus="1" />
+    <item url="themes/tuxice/styles/main.css" uploadstatus="1" />
+    <item url="themes/tuxice/styles/menubar.css" uploadstatus="1" />
+    <item url="themes/tuxice/styles/sidebar.css" uploadstatus="1" />
     <item url="themes/tuxice/styles/trackback.css" uploadstatus="1" />
     <item url="themes/tuxice/templates/" uploadstatus="1" />
+    <item url="themes/tuxice/templates/article_tpl.php" uploadstatus="1" />
     <item url="themes/tuxice/templates/basic_layout_tpl.php" uploadstatus="1" />
-    <item url="themes/tuxice/templates/include_banner.php" uploadstatus="1" />
-    <item url="LICENSE" uploadstatus="1" />
-    <item url="TODO" uploadstatus="1" />
+    <item url="themes/tuxice/templates/blogcomment_tpl.php" uploadstatus="1" />
+    <item url="themes/tuxice/templates/blogentry_tpl.php" uploadstatus="1" />
+    <item url="themes/tuxice/templates/include_menubar.php" uploadstatus="1" />
+    <item url="userdata/" uploadstatus="1" />
+    <item url="userdata/fsconfig.php" uploadstatus="1" />
+    <item url="userdata/passwd.php" uploadstatus="1" />
+    <item url="userdata/sitemap.htm" uploadstatus="1" />
+    <item url="blogconfig.php" uploadstatus="1" />
+    <item url="bloglogin.php" uploadstatus="1" />
+    <item url="bloglogout.php" uploadstatus="1" />
+    <item url="ChangeLog" uploadstatus="1" />
+    <item url="docroot_test.php" uploadstatus="1" />
+    <item url="fs_setup.php" uploadstatus="1" />
+    <item url="ftproot_test.php" uploadstatus="1" />
+    <item url="index.php" uploadstatus="1" />
+    <item url="install.html" uploadstatus="1" />
     <item url="lnblog.webprj" uploadstatus="1" />
-    <item url="passwd.php" uploadstatus="1" />
-    <author>Peter Geer</author>
-    <email>pageer@skepticats.com</email>
-    <debuggerclient>No Debugger</debuggerclient>
-    <exclude cvsignore="false" >.directory;.svn;</exclude>
-    <teamdata>
-      <taskleaders/>
-      <subprojectleaders/>
-      <mailinglist address="" />
-    </teamdata>
-    <events/>
+    <item url="newblog.php" uploadstatus="1" />
+    <item url="newlogin.php" uploadstatus="1" />
+    <item url="plugin_setup.php" uploadstatus="1" />
+    <item url="Readme.html" uploadstatus="1" />
+    <item url="sitemap.php" uploadstatus="1" />
+    <item url="techdoc.html" uploadstatus="1" />
+    <item url="theme_system.html" uploadstatus="1" />
+    <item url="updateblog.php" uploadstatus="1" />
+    <item url="userinfo.php" uploadstatus="1" />
+    <item url="" uploadstatus="1" />
+    <templates>templates/</templates>
+    <toolbars>toolbars/</toolbars>
     <treestatus>
+      <openfolder url="lib" />
+      <openfolder url="pages" />
       <openfolder url="themes" />
       <openfolder url="themes/default" />
       <openfolder url="themes/default/templates" />
-      <openfolder url="themes/tuxice" />
-      <openfolder url="themes/tuxice/styles" />
-      <openfolder url="themes/tuxice/templates" />
     </treestatus>
   </project>
 </webproject>

@@ -30,7 +30,9 @@
 # for different sections of the site and fall back to the default if we
 # don't want to bother.
 
-class PHPTemplate {
+require_once("lib/lnblogobject.php");
+
+class PHPTemplate extends LnBlogObject {
 
 	var $file;   # The name of the template file to use.
 	var $vars;   # An array of variables to register in the template.

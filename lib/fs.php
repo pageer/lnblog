@@ -42,23 +42,4 @@ class FS {
 	function write_file($path, $contents) {}
 
 }
-
-if ( file_exists(INSTALL_ROOT.PATH_DELIM.FS_PLUGIN_CONFIG) ) {
-	require_once(FS_PLUGIN_CONFIG);
-} else {
-	if (!defined("FS_PLUGIN")) define("FS_PLUGIN", "nativefs");
-}
-require_once(FS_PLUGIN.".php");
-
-function CreateFS() {
-	switch (FS_PLUGIN) {
-		case "nativefs":
-			return new NativeFS;
-		case "ftpfs":
-			return new FTPFS;
-		default:
-			return new NativeFS;
-	}
-}
-
 ?>

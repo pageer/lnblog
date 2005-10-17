@@ -18,41 +18,13 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-define("LOGIN_TOKEN", "lToken");
-define("LAST_LOGIN_TIME", "lastLTime");
-define("CURRENT_USER", "uName");
-define("PW_HASH", "uHash");
-
-if (defined("INSTALL_ROOT")) {
-	if ( is_file(INSTALL_ROOT.PATH_DELIM."passwd.php") ) {
-		require_once("passwd.php");
-	} else {
-		$global_user_list = array();
-	}
-}
-
-function create_passwd_file () {
-	global $global_user_list;
-	$data = "<?php\n";
-	$data .= '$global_user_list = array();'."\n";
-	foreach ($global_user_list as $name=>$udat) {
-		$data .= '$global_user_list[\''.$name.'\'] = array(';
-		$tmpdata = '';
-		foreach ($udat as $key=>$val) {
-			$val = str_replace("\\", "\\\\", $val);
-			$val = str_replace("'", "\\'", $val);
-			$tmpdata .= ($tmpdata != '' ? ', ' : '') . "'$key'=>'$val'";
-		}
-		$data .= $tmpdata.");\n";
-	}
-	$data .= "?>";
-	return write_file(INSTALL_ROOT.PATH_DELIM."passwd.php", $data);
-}
-
 # Class to manipulate and authenticate users.  Is designed so that a user's
 # login can be checked in two lines, to keep maintenance overhead low.
 
-class User {
+require_once("lib/utils.php");
+require_once("lib/lnblogobject.php");
+
+class User extends LnBlogObject {
 
 	var $username;
 	var $passwd;
@@ -60,10 +32,23 @@ class User {
 	var $fullname;
 	var $email;
 	var $homepage;
+	var $user_list;
 
 	function User($uname=false, $pw=false) {
-		global $global_user_list;
-	
+
+		if (defined("INSTALL_ROOT")) {
+			if ( is_file(USER_DATA_PATH.PATH_DELIM."passwd.php") ) {
+				global $global_user_list;
+				$old_path = ini_get("include_path");
+				ini_set("include_path", $old_path.PATH_SEPARATOR.USER_DATA_PATH);
+				require_once(USER_DATA_PATH.PATH_DELIM."passwd.php");
+				ini_set("include_path", $old_path);
+				$this->user_list = $global_user_list;
+			} else {
+				$this->user_list = array();
+			}
+		} else $this->user_list = array();
+
 		$this->username = '';
 		$this->passwd = '';
 		$this->salt = '';
@@ -78,20 +63,36 @@ class User {
 				$uname = COOKIE(CURRENT_USER);
 			}
 		}
-		
-		if ($uname && isset($global_user_list[$uname]) ) {
-		#echo "<p>Doing user name</p>";
+		if ($uname && isset($this->user_list[$uname]) ) {
 			$this->username = $uname;
-			$this->passwd = $global_user_list[$uname]["pwd"];
-			$this->salt = $global_user_list[$uname]["salt"];
-			$this->fullname = $global_user_list[$uname]["fullname"];
-			$this->email = $global_user_list[$uname]["email"];
-			$this->homepage = $global_user_list[$uname]["homepage"];
+			$this->passwd = $this->user_list[$uname]["pwd"];
+			$this->salt = $this->user_list[$uname]["salt"];
+			$this->fullname = $this->user_list[$uname]["fullname"];
+			$this->email = $this->user_list[$uname]["email"];
+			$this->homepage = $this->user_list[$uname]["homepage"];
 
 			if ($pw) $this->login($pw);
 
 		}
 	}
+
+	function create_passwd_file () {
+		$data = "<?php\n";
+		$data .= '$global_user_list = array();'."\n";
+		foreach ($this->user_list as $name=>$udat) {
+			$data .= '$global_user_list[\''.$name.'\'] = array(';
+			$tmpdata = '';
+			foreach ($udat as $key=>$val) {
+				$val = str_replace("\\", "\\\\", $val);
+				$val = str_replace("'", "\\'", $val);
+				$tmpdata .= ($tmpdata != '' ? ', ' : '') . "'$key'=>'$val'";
+			}
+			$data .= $tmpdata.");\n";
+		}
+		$data .= "?>";
+		return write_file(USER_DATA_PATH.PATH_DELIM."passwd.php", $data);
+	}
+
 
 	# Convenience function to export relevant user data to a template.
 
@@ -104,20 +105,18 @@ class User {
 	}
 
 	function get($uname) {
-		if ($uname && isset($global_user_list[$uname]) ) {
-			$this->passwd = $global_user_list[$uname]["pwd"];
-			$this->salt = $global_user_list[$uname]["salt"];
-			$this->fullname = $global_user_list[$uname]["fullname"];
-			$this->email = $global_user_list[$uname]["email"];
-			$this->homepage = $global_user_list[$uname]["homepage"];
+		if ($uname && isset($this->user_list[$uname]) ) {
+			$this->passwd = $this->user_list[$uname]["pwd"];
+			$this->salt = $this->user_list[$uname]["salt"];
+			$this->fullname = $this->user_list[$uname]["fullname"];
+			$this->email = $this->user_list[$uname]["email"];
+			$this->homepage = $this->user_list[$uname]["homepage"];
 			return true;
 		} else return false;
 	}
 
 	function checkPassword($pass) {
-	#echo "checking login";
 		$hash = md5($pass.$this->salt);
-		#echo "<p>Hash: $hash</p><p>Pass: $this->passwd</p>";
 		$ret = ($hash == $this->passwd);
 		return $ret;
 	}
@@ -129,14 +128,13 @@ class User {
 	# switch to a database storage backend.
 
 	function save() {
-		global $global_user_list;
 		if (!$this->username ||! $this->passwd) return false;
-		$global_user_list[$this->username]["pwd"] = $this->passwd;
-		$global_user_list[$this->username]["salt"] = $this->salt;
-		$global_user_list[$this->username]["fullname"] = $this->fullname;
-		$global_user_list[$this->username]["email"] = $this->email;
-		$global_user_list[$this->username]["homepage"] = $this->homepage;
-		create_passwd_file();
+		$this->user_list[$this->username]["pwd"] = $this->passwd;
+		$this->user_list[$this->username]["salt"] = $this->salt;
+		$this->user_list[$this->username]["fullname"] = $this->fullname;
+		$this->user_list[$this->username]["email"] = $this->email;
+		$this->user_list[$this->username]["homepage"] = $this->homepage;
+		$this->create_passwd_file();
 	}
 
 	function password($pwd=false) {
@@ -149,7 +147,6 @@ class User {
 			for ($i = 0; $i < $num_chars; $i++) $slt .= chr(mt_rand(65, 90));
 			$this->salt = $slt;
 			$this->passwd = md5($pwd.$this->salt);
-			#echo "<p>$this->salt</p><p>$pwd</p><p>$this->passwd</p>";
 			
 			# Prevent password change from logging out on cookie-only config.
 			if ( $this->username == COOKIE(CURRENT_USER) )
@@ -186,28 +183,23 @@ class User {
 	}
 
 	function login($pwd) {
-		global $global_user_list;
 		
 		# Reject empty usernames or passwords.
 		if ( trim($this->username) == "" || trim($pwd) == "" ) return false;
 		
 		# User does not exist.
-		if ( ! isset($global_user_list[$this->username]) ) return false;
+		if ( ! isset($this->user_list[$this->username]) ) return false;
 
 		if (AUTH_USE_SESSION) {
-		#echo "Do login";
-			#$check_passwd = md5($this->passwd.$this->salt);
 			$ts = gmdate("M d Y H:i:s", time());
 			if ($this->checkPassword($pwd)) {
 				# Create a login token.
-				#echo "<br />login OK";
 				$token = md5(get_ip().$ts);
 				setcookie(CURRENT_USER, $this->username);
 				SESSION(CURRENT_USER, $this->username);
 				SESSION(LOGIN_TOKEN, $token);
 				SESSION(LAST_LOGIN_TIME, $ts);
 				setcookie(LAST_LOGIN_TIME, "$ts");
-		#echo "<p>".COOKIE(LAST_LOGIN_TIME)."</p><p>$token</p><p>".SESSION(LOGIN_TOKEN)."</p><p>".SESSION(LAST_LOGIN_TIME)."</p><p>Curr TS: $ts, ".$_COOKIE[LAST_LOGIN_TIME]."</p>";
 				$ret = true;
 			} else $ret = false;
 			return $ret;
@@ -235,19 +227,13 @@ class User {
 		# not logged in.
 		if (!$this->username) return false;
 		if (AUTH_USE_SESSION) {
-		#echo "<p>Try auth</p>";
 			# Check the stored login token and time against the one for the
 			# current session.  Return false on failure, or if the current
 			# session doesn't belong to the user we want.
 			$cookie_ts = COOKIE(LAST_LOGIN_TIME);
 			$auth_token = md5(get_ip().$cookie_ts);
 			$auth_ok = ($auth_token == SESSION(LOGIN_TOKEN) );
-			#if ($auth_ok) echo "<p>Auth OK 1</p>";
-			#else echo "<p>$auth_token != ".SESSION(LOGIN_TOKEN)."</p>";
 			$auth_ok = $auth_ok && ($cookie_ts == SESSION(LAST_LOGIN_TIME) );
-			#if ($auth_ok) echo "<p>Auth OK 2</p>";
-			#else echo "<p>$cookie_ts != ".SESSION(LAST_LOGIN_TIME)."</p>";
-		#echo "<p>".COOKIE(LAST_LOGIN_TIME)."</p><p>$auth_token</p><p>".SESSION(LOGIN_TOKEN)."</p><p>".SESSION(LAST_LOGIN_TIME)."</p>";
 			if ($auth_ok) return true;
 			else return false;
 		} else {

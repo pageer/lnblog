@@ -21,34 +21,27 @@
 # This file is used to display a blog entry with its comments.
 
 session_start();
-require_once("config.php");
-require_once("blog.php");
-require_once("blogentry.php");
-require_once("template.php");
+require_once("lib/creators.php");
 
-$blog = new Blog();
+$blog = NewBlog();
+$page = NewPage(&$blog);
 
 $title = "all entries for ".$blog->name;
 $blog->getRecent(-1);
 
-$tpl = new PHPTemplate(ARCHIVE_TEMPLATE);
+$tpl = NewTemplate(ARCHIVE_TEMPLATE);
 $tpl->set("ARCHIVE_TITLE", $title);
 
 $LINK_LIST = array();
 
 foreach ($blog->entrylist as $ent) { 
-	$LINK_LIST[] = array("URL"=>$ent->permalink(), "DESC"=>$ent->subject);
+	$LINK_LIST[] = array("link"=>$ent->permalink(), "title"=>$ent->subject);
 }
 
 $tpl->set("LINK_LIST", $LINK_LIST);
 $body = $tpl->process();
-$title = $blog->name." - ".$title;
 
-$page_tpl = new PHPTemplate(BASIC_LAYOUT_TEMPLATE);
-$blog->exportVars($page_tpl);
-$page_tpl->set("PAGE_TITLE", $title);
-$page_tpl->set("PAGE_CONTENT", $body);
-#$page_tpl->set("STYLE_SHEETS", array("blogentry.css") );
-echo $page_tpl->process();
+$page->title = $blog->name." - ".$title;
+$page->display($body, &$blog);
 
 ?>

@@ -1,0 +1,89 @@
+/* 
+Main style sheet.  This controls the basic page look, including the page header, 
+menu bar, and sidebar.  It does not include the blog entries, comments, forums, etc.
+*/
+
+html, body { 
+	/*
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	*/
+	background-color: #b5b5b5;
+	/*background: url(../images/background2.png);*/
+}
+
+div, p, h1, h2, h3, h4  {
+	margin: 0;
+	padding: 0;
+}
+
+/* Styles for the page content area. */
+
+div#container {
+	width: 748px;
+	margin: 0 auto;
+	padding: 0;
+	border: 1px solid black;
+	background-color: #f4f4f4;
+}
+
+#maincontainer {
+	border-top: 1px solid black;
+	background: url(../images/bg.png);
+}
+
+#pagecontent {
+	margin: 0;
+	padding: 0;
+	/*background-color: white;*/
+	width: 498px;
+	height: 100%;
+	border-right: 0px; /*1px solid black;*/
+	position: relative;
+	left: 0px;
+	top: 0px;
+	/*float: left;*/
+}
+
+a:link {
+	text-decoration: none;
+	color: blue;
+}
+
+a:visited {
+	text-decoration: none;
+	color: #8B008B;
+}
+
+a:hover {
+	text-decoration: underline;
+	color: red;
+}
+
+input:focus, textarea:focus {
+	background-color: #ffffe1;
+}
+
+q { font-style: italic; }
+
+@media print {
+
+	div#container {
+		width: 100%;
+		margin: 0 auto;
+	}
+
+	/* Styles for the page content area. */
+
+	#pagecontent {
+		margin: 1% 1% 1% 1%;
+		width: 100%;
+	}
+
+	a:link, a:visited {
+		color: black;
+		text-decoration: underline;
+	}
+
+}

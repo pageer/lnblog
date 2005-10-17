@@ -19,14 +19,12 @@
 */
 
 require_once("blogconfig.php");
-require_once("utils.php");
-
-# Decide whether to use permalinks as Globally Unique Identifiers.
-define("GUID_IS_PERMALINK", true);
+require_once("lib/utils.php");
+require_once("lib/lnblogobject.php");
 
 # Entries for RDF Site Summary documents.
 
-class RSS1Entry {
+class RSS1Entry extends LnBlogObject {
 	
 	var $link;
 	var $title;
@@ -56,7 +54,7 @@ class RSS1Entry {
 
 # Class for generating RDF Site Summary output.
 
-class RSS1 {
+class RSS1 extends LnBlogObject {
 
 	var $url;
 	var $site;
@@ -110,7 +108,7 @@ class RSS1 {
 	}
 
 	function writeFile($path) {
-		$fs = CreateFS();
+		$fs = NewFS();
 		$content = $this->get();
 		$ret = $fs->write_file($path, $content);
 		return $ret;
@@ -118,35 +116,62 @@ class RSS1 {
 
 }
 
-class RSS2Entry {
+class RSS2Entry extends LnBlogObject {
 	
 	var $link;
 	var $title;
 	var $description;
 	var $author;
 	var $category;
+	var $pub_date;
 	var $comments;
+	var $comment_rss;
+	var $comment_count;
 	var $guid;
 	
-	function RSS2Entry($link="", $title="", $desc="", $comm="", $guid="", $auth="", $cat="") {
+	function RSS2Entry($link="", $title="", $desc="", $comm="", $guid="", $auth="", $cat="", $pdate="", $cmtrss="", $cmtcount="") {
 		$this->link = $link;
 		$this->title = $title;
 		if ($desc) $this->description = $desc;
 		else $this->description = $this->title;
 		$this->author = $auth;
 		$this->category = $cat;
+		$this->pub_date = $pdate;
 		$this->comments = $comm;
+		$this->comment_rss = $cmtrss;
+		$this->comment_count = $cmtcount;
 		$this->guid = $guid;
 	}
 
 	function get() {
 		$ret = "<item>\n";
-		if ($this->title) $ret .= "<title>".$this->title."</title>\n";
-		if ($this->link) $ret .= "<link>".$this->link."</link>\n";
-		if ($this->description) $ret .= "<description>\n".$this->description."\n</description>\n";
-		if ($this->author) $ret .= "<author>".$this->author."</author>\n";
-		if ($this->category) $ret .= "<category>".$this->category."</category>\n";
-		if ($this->comments) $ret .= "<comments>".$this->comments."</comments>\n";
+		if ($this->title) {
+			$ret .= "<title>".$this->title."</title>\n";
+		}
+		if ($this->link) {
+			$ret .= "<link>".$this->link."</link>\n";
+		}
+		if ($this->pub_date) {
+			$ret .= "<pubDate>".$this->pub_date."</pubDate>";
+		}
+		if ($this->description) {
+			$ret .= "<description>\n".$this->description."\n</description>\n";
+		}
+		if ($this->author) {
+			$ret .= "<author>".$this->author."</author>\n";
+		}
+		if ($this->category) {
+			$ret .= "<category>".$this->category."</category>\n";
+		}
+		if($this->comment_count) {
+			$ret .= "<slash:comments>".$this->comment_count."</slash:comments>\n";
+		}
+		if ($this->comments) {
+			$ret .= "<comments>".$this->comments."</comments>\n";
+		}
+		if ($this->comment_rss) {
+			$ret .= "<wfw:commentRss>".$this->comment_rss."</wfw:commentRss>";
+		}
 		if ($this->guid) {
 			$ret .= "<guid";
 			if (GUID_IS_PERMALINK) $ret .= ' isPermaLink="true"';
@@ -158,7 +183,7 @@ class RSS2Entry {
 
 }
 
-class RSS2 {
+class RSS2 extends LnBlogObject {
 
 	var $url;
 	var $title;
@@ -197,11 +222,27 @@ class RSS2 {
 	}
 
 	function writeFile($path) {
-		$fs = CreateFS();
+		$fs = NewFS();
 		$content = $this->get();
 		$ret = $fs->write_file($path, $content);
 		$fs->destruct();
 		return $ret;
+	}
+
+}
+
+class AtomEntry extends LnBlogObject {
+
+	var $id;
+	var $title;
+	var $update_time;
+	var $author;
+	var $content;
+	var $link;
+	var $summary;
+
+	function AtomEntry($id="",$title="",$udtime="",$link="",$cont="",$author="",$sum="") {
+		
 	}
 
 }

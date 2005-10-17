@@ -28,6 +28,10 @@ a:hover {
 	color: red;
 }
 
+input:focus, textarea:focus {
+	background-color: #ffffe1;
+}
+
 @media print {
 
 	/* Styles for the page content area. */

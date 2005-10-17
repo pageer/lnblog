@@ -25,13 +25,11 @@
 
 session_start();
 
-require_once("blogentry.php");
-require_once("blog.php");
-require_once("tb.php");
-require_once("template.php");
+require_once("lib/creators.php");
 
-$blog = new Blog;
-$ent = new BlogEntry(getcwd());
+$blog = NewBlog();
+$ent = NewBlogEntry();
+$page = NewPage(&$ent);
 
 if (GET("send_ping") == "yes" || POST("send_ping") == "yes") {
 	
@@ -39,7 +37,7 @@ if (GET("send_ping") == "yes" || POST("send_ping") == "yes") {
 
 	$tburl = "trackback_url";
 
-	$tpl = new PHPTemplate(TRACKBACK_PING_TEMPLATE);
+	$tpl = NewTemplate(TRACKBACK_PING_TEMPLATE);
 	if (POST($tburl)) {
 		$tpl->set("TARGET_PAGE", POST($tburl) );
 		$tpl->set("TB_URL", $ent->permalink() );
@@ -52,13 +50,9 @@ if (GET("send_ping") == "yes" || POST("send_ping") == "yes") {
 	}
 	
 	$body = $tpl->process();
-	$tpl->reset(BASIC_LAYOUT_TEMPLATE);
-	$blog->exportVars($tpl);
-	$tpl->set("PAGE_CONTENT", $body);
-	$tpl->set("PAGE_TITLE", "Send Trackback Ping");
-	$tpl->set("STYLE_SHEETS", array("form.css") );
-	
-	echo $tpl->process();
+	$page->title = "Send Trackback Ping";
+	$page->addStylesheet("form.css");
+	$page->display($body, &$blog);
 	
 } else {
 	$ret = $ent->getPing();

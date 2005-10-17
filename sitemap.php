@@ -20,25 +20,25 @@
 session_start();
 
 require_once("blogconfig.php");
-require_once("blog.php");
-require_once("utils.php");
-require_once("template.php");
-require_once("user.php");
+require_once("lib/creators.php");
+require_once("lib/utils.php");
 
-$u = new User();
+$u = NewUser();
+$page = NewPage();
 
 if (defined("BLOG_ROOT")) {
-	$blog = new Blog();
+	$blog = NewBlog();
+	$page->display_object = &$blog;
 	if (! $blog->canModifyBlog() ) {
-		redirect("index.php");
+		$page->redirect("index.php");
 		exit;
 	}
 } elseif (! $u->checkLogin() && ! $u->isAdministrator() ) {
-	redirect("index.php");
+	$page->redirect("index.php");
 	exit;
 }
 
-$tpl = new PHPTemplate(SITEMAP_TEMPLATE);
+$tpl = NewTemplate(SITEMAP_TEMPLATE);
 $tpl->set("FORM_ACTION", current_file() );
 
 if (has_post()) {
@@ -57,7 +57,7 @@ if (has_post()) {
 		$tpl->set("SITEMAP_ERROR", "Cannot create file");
 		$tpl->set("ERROR_MESSAGE", "Unable to create file ".$target_file.".");
 		$tpl->set("CURRENT_SITEMAP", $data);
-	} else redirect("index.php");
+	} else $page->redirect("index.php");
 	
 } else {
 
@@ -76,12 +76,11 @@ if (has_post()) {
 	
 }
 
-$page_tpl = new PHPTemplate(BASIC_LAYOUT_TEMPLATE);
-if (defined("BLOG_ROOT")) $blog->exportVars($page_tpl);
-$page_tpl->set("PAGE_TITLE", "Edit ".(defined("BLOG_ROOT")?"blog":"site")." menu bar");
-$page_tpl->set("PAGE_CONTENT", $tpl->process() );
-$page_tpl->set("STYLE_SHEETS", array("form.css") );
-$page_tpl->set("SCRIPTS", array("sitemap.js") );
-echo $page_tpl->process();
+if (! defined("BLOG_ROOT")) $blog = false;
+
+$page->title = "Edit ".(defined("BLOG_ROOT")?"blog":"site")." menu bar";
+$page->addStylesheet("form.css");
+$page->addScript("sitemap.js");
+$page->display($tpl->process(), $blog);
 
 ?>

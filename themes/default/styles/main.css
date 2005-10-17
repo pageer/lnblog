@@ -28,6 +28,10 @@ a:hover {
 	color: red;
 }
 
+input:focus, textarea:focus {
+	background-color: #ffffe1;
+}
+
 q { font-style: italic; }
 
 @media print {

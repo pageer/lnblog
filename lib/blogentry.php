@@ -19,10 +19,30 @@
 */
 
 require_once("blogconfig.php");
-require_once("utils.php");
-require_once("template.php");
-require_once("entry.php");
-#require_once("blogcomment.php");
+require_once("lib/utils.php");
+require_once("lib/creators.php");
+require_once("lib/entry.php");
+
+/*
+Class: BlogEntry
+Represents an entry in the weblog.
+
+Inherits:
+<LnBlogObject>, <Entry>
+
+Events:
+OnInit         - Fired when object is first created.
+InitComplete   - Fired at end of constructor.
+OnInsert       - Fired before object is saved to persistent storage.
+InsertComplete - Fired after object has finished saving.
+OnDelete       - Fired before object is deleted.
+DeleteComplete - Fired after object is deleted.
+OnUpdate       - Fired before changes are saved to persistent storage.
+UpdateComplete - Fired after changes to object are saved.
+OnOutput       - Fired before output is generated.
+OutputComplete - Fired after output has finished being generated.
+POSTRetrieved  - Fired after data has been retreived from an HTTP POST.
+*/
 
 class BlogEntry extends Entry {
 	
@@ -35,6 +55,8 @@ class BlogEntry extends Entry {
 
 	function BlogEntry ($path="", $revision=ENTRY_DEFAULT_FILE) {
 		
+		$this->raiseEvent("OnInit");
+	
 		$this->uid = ADMIN_USER;
 		$this->ip = get_ip();
 		$this->date = "";
@@ -47,15 +69,58 @@ class BlogEntry extends Entry {
 		$this->data = "";
 		$this->abstract = "";
 		$this->has_html = MARKUP_BBCODE;
-		# If a directory is specified, set the file path to the given revision.
-		# If no revision is given, use the default.
-		$this->file = $path . ($path ? PATH_DELIM.$revision : "");
 		$this->allow_comment = true;
 		$this->template_file = ENTRY_TEMPLATE;
-		if ( file_exists($this->file) )$this->readFileData();
+		
+		# Auto-detect the current entry.  If no path is given, 
+		# then assume the current directory.
+		if (! $path) {
+			$this->file = getcwd().PATH_DELIM.$revision;
+			# We might be in a comment or trackback directory, 
+			if (! $this->isEntry() ) {
+				$this->file = dirname(getcwd()).PATH_DELIM.$revision;
+				if (! $this->isEntry() ) {
+					$this->file = getcwd().PATH_DELIM.$revision;
+				}
+			}
+		} else {
+			$this->file = $path.PATH_DELIM.$revision;
+		}
+		
+		if ( file_exists($this->file) ) $this->readFileData();
+		
+		$this->raiseEvent("InitComplete");
 	}
 	
-	# Returns a path to use for the 
+	/*
+	Method: getParent
+	Get a copy of the parent of this objcet, i.e. the blog to which it
+	belongs.
+
+	Returns:
+	A Blog object.
+	*/
+	
+	function getParent() {
+		if (! defined("BLOG_ROOT")) return false;
+		return NewBlog();
+	}
+	
+	/*
+	Method: getPath
+	Returns a path to use for the entry.  This is only applicable for 
+	file-based storage and is for *internal use only*.
+
+	Parameters:
+	curr_ts     - The timestamp for this entry.
+	just_name   - *Optional* boolean determining whether to return a full path
+	              or just a file name.  Default is false.
+	long_format - *Optional* boolean for whether to use a long or regular
+	              date format.  Defaults to false.
+
+	Returns:
+	A string with the path to use for this entry.
+	*/
 
 	function getPath($curr_ts, $just_name=false, $long_format=false) {
 		$year = date("Y", $curr_ts);
@@ -114,16 +179,44 @@ class BlogEntry extends Entry {
 	}
 	
 	function isEntry ($path=false) {
-		if (! $path) $path = $this->file;
+		if (! $path) $path = dirname($this->file);
 		return file_exists($path.PATH_DELIM.ENTRY_DEFAULT_FILE);
 	}
 
-	function permalink() {
-		return localpath_to_uri(dirname($this->file));
+	/*
+	Method: localpath
+	Get the path to this entry's directory on the local filesystem.  Note 
+	that this is specific to file-based storage and so should only be c
+	called internally.
+
+	Returns:
+	A string representing a path to the object or false on failure.
+	*/
+	function localpath() {
+		if (! $this->isEntry()) return false;
+		return dirname($this->file);
 	}
 
+	/*
+	Method: permalink
+	Get the permalink to the object.
+
+	Returns:
+	A string containing the full URI to this entry.
+	*/
+	function permalink() {
+		return localpath_to_uri($this->localpath());
+	}
+	
+	/*
+	Method: commentlink
+	Gets the URI of the comments page.
+	
+	Returns:
+	A string holding the permalink to the comments for this entry.
+	*/
 	function commentlink() {
-		return localpath_to_uri(dirname($this->file).PATH_DELIM.ENTRY_COMMENT_DIR);
+		return localpath_to_uri($this->localpath().PATH_DELIM.ENTRY_COMMENT_DIR);
 	}
 	
 	function getByPath ($path, $revision=ENTRY_DEFAULT_FILE) {
@@ -131,18 +224,18 @@ class BlogEntry extends Entry {
 		return $this->readFileData($file_path); 
 	}
 	
-	function validate() {
-		$ret = preg_match("/^\d+$/", $this->id);
-		$ret &= preg_match("/^\d+$/", $this->blogid);
-		$ret &= (trim($this->uid) != "");
-		$ret &= (trim($this->data) != "");
-	}
-	
+	/*
+	Method: update
+	Commit changes to the object.
+
+	Returns:
+	True on success, false on failure.
+	*/
 	function update () {
 		
-		if (! check_login()) return false;
+		$this->raiseEvent("OnUpdate");
 		
-		$fs = CreateFS();
+		$fs = NewFS();
 		$dir_path = dirname($this->file);
 		$this->ip = get_ip();
 		$curr_ts = time();
@@ -154,30 +247,44 @@ class BlogEntry extends Entry {
 		$source = $dir_path.PATH_DELIM.ENTRY_DEFAULT_FILE;
 		$ret = $fs->rename($source, $target);
 		$fs->destruct();
-		if (! $ret) return false;
-		$ret = $this->writeFileData();
+		if ($ret) $ret = $this->writeFileData();
+		$this->raiseEvent("UpdateComplete");
 		return $ret;
 	}
 
+	/* 
+	Method: delete
+	Delete the current object
+
+	Returns:
+	True on success, false on failure.
+	*/
 	function delete () {
 		
-		if (! check_login()) return false;
-		
-		$fs = CreateFS();
+		$fs = NewFS();
 		$curr_ts = time();
 		$dir_path = dirname($this->file);
 		if (! $this->isEntry($dir_path) ) return false;
+		$this->raiseEvent("OnDelete");
 		$source_file = $dir_path.PATH_DELIM.ENTRY_DEFAULT_FILE;
 		$target_file = $dir_path.PATH_DELIM.
 			$this->getPath($curr_ts, true, true).ENTRY_PATH_SUFFIX;
 		$ret = $fs->rename($source_file, $target_file);
 		$fs->destruct();
+		$this->raiseEvent("DeleteComplete");
 		return $ret;
 	}
 
+	/*
+	Method: insert
+	Save the object to persistent storage.
+
+	Returns:
+	True on success, false on failure.
+	*/
 	function insert ($base_path=false) {
 	
-		$usr = new User;
+		$usr = NewUser();
 		if (! $usr->checkLogin() ) return false;
 		$this->uid = $usr->username();
 	
@@ -185,6 +292,10 @@ class BlogEntry extends Entry {
 		if (!$base_path) $basepath = getcwd().PATH_DELIM.BLOG_ENTRY_PATH;
 		else $basepath = $base_path;
 		$dir_path = $basepath.PATH_DELIM.$this->getPath($curr_ts);
+		# If the entry driectory already exists, something is wrong. 
+		if ( is_dir($dir_path) ) return false;
+		
+		$this->raiseEvent("OnInsert");
 
 		# First, check that the year and month directories exist and have
 		# the appropriate wrapper scripts in them.
@@ -192,11 +303,7 @@ class BlogEntry extends Entry {
 		$year_path = dirname($month_path);
 		if (! is_dir($year_path)) $ret = create_directory_wrappers($year_path, YEAR_ENTRIES);
 		if (! is_dir($month_path)) $ret = create_directory_wrappers($month_path, MONTH_ENTRIES);
-
-		# If the entry driectory already exists, something is wrong, so 
-		# bail out.
-		if ( is_dir($dir_path) ) return false;
-		else $ret = create_directory_wrappers($dir_path, ENTRY_BASE);
+		$ret = create_directory_wrappers($dir_path, ENTRY_BASE);
 
 		# Create the comments directory.
 		create_directory_wrappers($dir_path.PATH_DELIM.ENTRY_COMMENT_DIR, ENTRY_COMMENTS);
@@ -211,17 +318,17 @@ class BlogEntry extends Entry {
 		$this->timestamp = $curr_ts;
 		if (! $this->post_ts) $this->post_ts = $curr_ts;
 		$this->ip = get_ip();
-		
-		if (get_magic_quotes_gpc() ) {
-			$this->subject = stripslashes($this->subject);
-			$this->data = stripslashes($this->data);
-		}
 
 		$ret = $this->writeFileData();
+		$this->raiseEvent("InsertComplete");
 		return $ret;
 		
 	}
 
+	/*
+	Method: getPostData
+	Extract data from an HTTP POST and insert it into the object.
+	*/
 	function getPostData() {
 		$this->subject = POST(ENTRY_POST_SUBJECT);
 		$this->abstract = POST(ENTRY_POST_ABSTRACT);
@@ -232,14 +339,26 @@ class BlogEntry extends Entry {
 			$this->subject = stripslashes($this->subject);
 			$this->data = stripslashes($this->data);
 		}
+		$this->raiseEvent("POSTRetreived");
 	}
 
-	
+	/*
+	Method: get
+	Get the HTML to use to display the object.
 
+	Parameters:
+	show_edit_controls - *Optional* boolean determining if the edit, delete,
+	                     etc. links should be displayed.  *Defaults* to false.
+
+	Returns:
+	A string containing the markup.
+	*/
 	function get($show_edit_controls=false) {
-		$tmp = new PHPTemplate(ENTRY_TEMPLATE);
+		$this->raiseEvent("OnOutput");
+	
+		$tmp = NewTemplate(ENTRY_TEMPLATE);
 		
-		$usr = new User($this->uid);
+		$usr = NewUser($this->uid);
 		$usr->exportVars($tmp);
 		
 		$tmp->set("SUBJECT", $this->subject);
@@ -254,80 +373,42 @@ class BlogEntry extends Entry {
 		$tmp->set("SHOW_CONTROLS", $show_edit_controls);
 		
 		$ret = $tmp->process();
+		$this->raiseEvent("OutputComplete");
 		return $ret;
 	}
 
 	# Comment handling functions.
 
-	function updateRSS1() {
-		$feed = new RSS1;
-		$comment_path = dirname($this->file).PATH_DELIM.ENTRY_COMMENT_DIR;
-		$path = $comment_path.PATH_DELIM.COMMENT_RSS1_PATH;
-		$feed_url = localpath_to_uri($path);
+	/*
+	Method: addComment
+	Insert a new comment based on HTTP POST data.
 
-		$feed->url = localpath_to_uri($path);;
-		#$feed->image = $this->image;
-		$feed->title = $this->subject;
-		$feed->description = $this->subject;
-		$feed->site = BLOG_ROOT_URL;
+	Parameters:
+	path - *Optional* path to the comments for this object.  By default,
+	       this will be auto-detected.
 	
-		$comm_list = $this->getCommentArray();
-		foreach ($comm_list as $ent) 
-			$feed->entrylist[] = new RSS1Entry($ent->permalink(), $ent->subject, $ent->subject);
-		
-		$ret = $feed->writeFile($path);	
-		return $ret;
-	}
-
-	function updateRSS2() {
-		$feed = new RSS2;
-		$comment_path = dirname($this->file).PATH_DELIM.ENTRY_COMMENT_DIR;
-		$path = $comment_path.PATH_DELIM.COMMENT_RSS2_PATH;
-		$feed_url = localpath_to_uri($path);
-
-		$feed->url = $feed_url;
-		#$feed->image = $this->image;
-		$feed->description = $this->subject;
-		$feed->title = $this->subject;
-	
-		$comm_list = $this->getCommentArray();
-		foreach ($comm_list as $ent) 
-			$feed->entrylist[] = new RSS2Entry($ent->permalink(), 
-				$ent->subject, 
-				"<![CDATA[".$ent->markup($ent->data)."]]>");
-		
-		$ret = $feed->writeFile($path);	
-		return $ret;
-	}
-
-	function addComment($path) {
+	Returns:
+	True on success, false on failure.
+	*/
+	function addComment($path=false) {
 		if (! $this->allow_comment) return false;
-		$cmt = new BlogComment;
+		if (! $path) $path = $this->localpath().PATH_DELIM.ENTRY_COMMENT_DIR;
+		$cmt = NewBlogComment();
 		$cmt->getPostData();
 		if ($cmt->data) {
 			$ret = $cmt->insert($path);
-			if ($ret) {
-				if ($this->mail_notify) {
-					$u = new User($this->uid);
-					if ($u->email()) {
-						mail($u->email(), "Comment on ".$this->subject,
-						     "A new reader comment has been posted.\n".
-							  "The URL for this comment is: ".$cmt->permalink()."\n\n".
-						     "Name: ".$cmt->name."\n".
-						     "E-mail: ".$cmt->email."\n".
-						     "URL: ".$cmt->url."\n".
-							  "Subject: ".$cmt->subject."\n\n".
-						  	$cmt->data, "From: LnBlog comment notifier");
-					}
-				}
-				$this->updateRSS1();
-				$this->updateRSS2();
-			}
 		}
 		else $ret = false;
 		return $ret;
 	}
 
+	/*
+	Method: getCommentCount
+	Determine the number of comments that belong to this object.
+
+	Returns:
+	A non-negative integer representing the number of comments.
+	*/
 	function getCommentCount() {
 		$dir_path = dirname($this->file);
 		$comment_dir_path = $dir_path.PATH_DELIM.ENTRY_COMMENT_DIR;
@@ -344,6 +425,17 @@ class BlogEntry extends Entry {
 
 	}
 
+	/*
+	Method: getCommentArray
+	Gets all the comment objects for this entry.
+
+	Parameters:
+	sort_asc - *Optional* boolean (true by default) determining whether the
+	           comments should be sorted in ascending order by date.
+	
+	Returns:
+	An array of BlogComment object.
+	*/
 	function getCommentArray($sort_asc=true) {
 		$dir_path = dirname($this->file);
 		$comment_dir_path = $dir_path.PATH_DELIM.ENTRY_COMMENT_DIR;
@@ -361,11 +453,22 @@ class BlogEntry extends Entry {
 
 		$comment_array = array();
 		foreach ($comment_files as $file) 
-			$comment_array[] = new BlogComment($comment_dir_path.PATH_DELIM.$file);
+			$comment_array[] = NewBlogComment($comment_dir_path.PATH_DELIM.$file);
 		
 		return $comment_array;
 	}
 
+	/*
+	Method: getComments
+	Get the HTML markup to display the entire list of comments for this entry.
+
+	Parameters:
+	sort_asc - *Optional* boolean (true by default) determining whether the
+	           comments should be sorted in ascending order by date.
+	
+	Returns:
+	A string of HTML markup.
+	*/
 	function getComments($sort_asc=true) {
 		$comment_files = $this->getCommentArray($sort_asc);	
 		$ret = "";
@@ -375,9 +478,10 @@ class BlogEntry extends Entry {
 			}
 		}
 
-		# Suppress the comment stuff entirely for posts that don't have comments and don't allow them.
+		# Suppress the comment stuff entirely for posts that don't have 
+		# comments and/or don't allow them.
 		if ($ret || $this->allow_comment) {
-			$tpl = new PHPTemplate(COMMENT_LIST_TEMPLATE);
+			$tpl = NewTemplate(COMMENT_LIST_TEMPLATE);
 			$tpl->set("ENTRY_PERMALINK", $this->permalink() );
 			$tpl->set("ENTRY_SUBJECT", $this->subject);
 			$tpl->set("COMMENT_LIST", $ret);
@@ -389,6 +493,13 @@ class BlogEntry extends Entry {
 
 	# TrackBack handling functions.
 
+	/*
+	Method: getTrackbackCount
+	Get the number of TrackBacks for this object.
+
+	Returns:
+	A non-negative integer representing the number of TrackBacks.
+	*/
 	function getTrackbackCount() {
 		$dir_path = dirname($this->file);
 		$tb_path = $dir_path.PATH_DELIM.ENTRY_TRACKBACK_DIR;
@@ -404,9 +515,18 @@ class BlogEntry extends Entry {
 		return $count;
 	}
 
-	# Get an array of Trackback objects that contains all TrackBacks for 
-	# this entry.
+	/*
+	Method: getTrackbackArray
+	Get an array of Trackback objects that contains all TrackBacks for 
+	this entry.
 
+	Parameters:
+	sort_asc - *Optional* boolean (true by default) determining whether the
+	           trackbacks should be sorted in ascending order by date.
+	
+	Returns:
+	An array of Trackback objects.
+	*/
 	function getTrackbackArray($sort_asc=true) {
 		$dir_path = dirname($this->file);
 		$tb_path = $dir_path.PATH_DELIM.ENTRY_TRACKBACK_DIR;
@@ -424,13 +544,22 @@ class BlogEntry extends Entry {
 
 		$tb_array = array();
 		foreach ($tb_files as $file) 
-			$tb_array[] = new Trackback($tb_path.PATH_DELIM.$file);
+			$tb_array[] = NewTrackback($tb_path.PATH_DELIM.$file);
 		
 		return $tb_array;
 	}
 
-	# Get some HTML that displays the TrackBacks for this entry.
+	/*
+	Method: getTrackbacks
+	Get some HTML that displays the TrackBacks for this entry.
 
+	Parameters:
+	sort_asc - *Optional* boolean (true by default) determining whether the
+	           trackbacks should be sorted in ascending order by date.
+	
+	Returns:
+	A string of markup.
+	*/				  
 	function getTrackbacks($sort_asc=true) {
 		$trackbacks = $this->getTrackbackArray($sort_asc);	
 		if (!$trackbacks) return "";
@@ -439,7 +568,7 @@ class BlogEntry extends Entry {
 			$ret .= $tb->get();
 		}
 		
-		$tpl = new PHPTemplate(TRACKBACK_LIST_TEMPLATE);
+		$tpl = NewTemplate(TRACKBACK_LIST_TEMPLATE);
 		$tpl->set("ENTRY_PERMALINK", $this->permalink() );
 		$tpl->set("ENTRY_SUBJECT", $this->subject);
 		$tpl->set("TB_LIST", $ret);
@@ -448,14 +577,35 @@ class BlogEntry extends Entry {
 		return $ret;
 	}
 
+	/*
+	Method: getPing
+	Recieves HTTP POST data containing a TrackBack ping and saves it in 
+	persistent storage.
+
+	Returns:
+	Zero on success, one on failure.
+	*/
 	function getPing() {
-		$tb = new Trackback;
+		$tb = NewTrackback();
 		$ret = $tb->receive(dirname($this->file).PATH_DELIM.ENTRY_TRACKBACK_DIR);
 		return $ret;
 	}
 
+	/*
+	Method: sendPing
+	Send a TrackBack ping for the current entry to another blog.
+
+	Parameters:
+	url     - The TrackBack ping to which to post data.
+	excerpt - *Optional* excerpt of the blog entry text to send. 
+	          No excerpt is sent by default.
+
+	Returns:
+	The return code sent by the remote server.  Normally this is 0 on success
+	and a non-zero value on failure.
+	*/
 	function sendPing($url, $excerpt='') {
-		$tb = new Trackback;
+		$tb = NewTrackback();
 		$tb->title = $this->subject;
 		$tb->blog = BLOG_ROOT_URL;
 		$tb->url = $this->permalink();
@@ -464,5 +614,4 @@ class BlogEntry extends Entry {
 	}
 
 }
-
 ?>

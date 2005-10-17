@@ -13,7 +13,7 @@
 		<li class="commenturl"><a href="<?php echo $URL; ?>"><?php echo $URL; ?></a></li>
 		<?php } ?>
 		<li class="commentdate">Posted <?php echo $DATE; ?></li>
-		<?php if ( check_login() ) { ?>
+		<?php if ($SHOW_CONTROLS) { ?>
 		<li class="admin"><a href="<?php file_exists("delcomment.php") ? "" : ENTRY_COMMENT_PATH; ?>"></a></li>
 		<?php } ?>
 	</ul>

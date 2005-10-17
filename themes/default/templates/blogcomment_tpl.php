@@ -1,11 +1,9 @@
 <li class="fullcomment">
-<div class="commentheader">
 <?php if (isset($SUBJECT)) { ?>
-	<h3><a id="<?php echo $ANCHOR; ?>" href="#<?php echo $ANCHOR; ?>"><?php echo $SUBJECT; ?></a></h3>
+	<h3 class="commentheader"><a id="<?php echo $ANCHOR; ?>" href="#<?php echo $ANCHOR; ?>"><?php echo $SUBJECT; ?></a></h3>
 <?php } else { ?>
 <a id="<?php echo $ANCHOR; ?>" href="#<?php echo $ANCHOR; ?>"></a>
 <?php } ?>
-</div>
 <div class="commentdata">
 <?php echo $BODY; ?>
 </div>
@@ -27,7 +25,7 @@
 	<?php } ?>
 <?php } else { ?>
 		<li class="commentname">By 
-		<?php if ($EMAIL)	{ ?>
+		<?php if ($EMAIL && $SHOW_MAIL) { ?>
 		<a href="mailto:<?php echo $EMAIL; ?>"><?php echo $NAME; ?></a>
 		<?php } else {?>
 		<?php echo $NAME; ?>
@@ -37,7 +35,7 @@
 		<li class="commenturl">(<a href="<?php echo $URL; ?>"><?php echo $URL; ?></a>)</li>
 		<?php } ?>
 <?php } ?>
-		<?php if ( check_login() ) { ?>
+		<?php if ($SHOW_CONTROLS) { ?>
 		<li class="admin"><a href="<?php echo is_dir(ENTRY_COMMENT_DIR) ? ENTRY_COMMENT_DIR."/" : ""; ?>delete.php?comment=<?php echo $ANCHOR; ?>">Delete</a></li>
 		<?php } ?>
 	</ul>

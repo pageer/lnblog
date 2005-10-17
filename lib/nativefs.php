@@ -32,6 +32,7 @@
 */
 
 require_once("blogconfig.php");
+require_once("lib/fs.php");
 
 class NativeFS extends FS {
 

@@ -20,8 +20,9 @@
 
 session_start();
 require_once("blogconfig.php");
-require_once("blog.php");
-require_once("user.php");
+require_once("lib/creators.php");
+
+$page = NewPage();
 
 $blogpath = "blogpath";
 $blogname = "blogname";
@@ -38,12 +39,12 @@ $submitid = "submit";
 if (POST($blogpath)) $path = POST($blogpath);
 else $path = false;
 
-$blog = new Blog($path);
+$blog = NewBlog($path);
 if (! $blog->canAddBlog() ) {
-	redirect("bloglogin.php");
+	$page->redirect("bloglogin.php");
 	exit;
 }
-$tpl = new PHPTemplate(BLOG_UPDATE_TEMPLATE);
+$tpl = NewTemplate(BLOG_UPDATE_TEMPLATE);
 
 if (POST($blogpath)) $blog->home_path = POST($blogpath);
 else $blog->home_path = "myblog";
@@ -90,15 +91,12 @@ if (! is_absolute($blog->home_path)) {
 
 if (POST("submit")) {
 	$ret = $blog->insert();
-	if (!$ret) $tpl->set("UPDATE_MESSAGE", "Error creating blog.");
-	else redirect($blog->getURL());
+	if (!$ret) $tpl->set("UPDATE_MESSAGE", "Error creating blog.  This could be a problem with the file permissions on your server.  Please refer to the <a href=\"http://www.skepticats.com/LnBlog/Readme.html\">documentation</a> for more information.");
+	else $page->redirect($blog->getURL());
 }
 
-$blog->exportVars($tpl);
 $body = $tpl->process();
-$tpl->file = BASIC_LAYOUT_TEMPLATE;
-$tpl->set("PAGE_CONTENT", $body);
-$tpl->set("PAGE_TITLE", "Create new blog");
-$tpl->set("STYLE_SHEETS", array("form.css"));
-echo $tpl->process();
+$page->title = "Create new blog";
+$page->addStylesheet("form.css");
+$page->display($body);
 ?>

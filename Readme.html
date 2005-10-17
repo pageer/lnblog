@@ -41,7 +41,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 along with this program; if not, write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.</p>
 
 
-<h2>Introduction</h2>
+<h2><a name="introduction">Introduction</a></h2>
 
 
 <p>LnBlog is a simple weblog package written in PHP which stores data in text files.
@@ -52,7 +52,7 @@ style and layout.&nbsp; Plus, it's light on requirements and cross-platform.<br 
 </p>
 
 
-<h2>Status</h2>
+<h2><a name="status">Status</a></h2>
 
 
 <p>Currently, LnBlog is in the active development, which just means
@@ -63,7 +63,7 @@ idea of what is currently planned. If you have any comments or suggestions,
 or if you have any problems or find any bugs, feel free to <a href="mailto:pageer@skepticats.com">e-mail me</a>.</p>
 
 
-<h2>Requirements</h2>
+<h2><a name="requirements">Requirements</a></h2>
 
 
 <p>LnBlog is fairly light on
@@ -87,7 +87,7 @@ set on the web server.<br />
 </ol>
 
 
-<h2>Feature List</h2>
+<h2><a name="feature_list">Feature List</a></h2>
 
 
 <ul>
@@ -109,7 +109,7 @@ or raw HTML code.</li>
 </ul>
 
 
-<h2>Initial Setup</h2>
+<h2><a name="initial_setup">Initial Setup</a></h2>
 
 
 <p>For step-by-step instructions, please see the
@@ -141,7 +141,7 @@ administrative functions to
 modify a blog and update a blog (used when upgrading LnBlog).</p>
 
 
-<h2>Upgrading</h2>
+<h2><a name="upgrading">Upgrading</a></h2>
 
 
 <p>Upgrading your LnBlog installation is actually quite easy.&nbsp;
@@ -183,7 +183,7 @@ configuration files for the blog and add any new pages.&nbsp; You
 will have to do this separately for each blog that youhave. </p>
 
 
-<h2>Adding New Users</h2>
+<h2><a name="adding_new_users">Adding New Users</a></h2>
 
 
 <p>In addition to the administrator account, you can create as many new user accounts as you
@@ -204,7 +204,7 @@ note that the user will (obviously) not receive e-mail confirmation of
 comments on his posts if you do not give an e-mail address.</p>
 
 
-<h2>Security</h2>
+<h2><a name="security">Security</a></h2>
 
 
 <p>LnBlog uses a very simple
@@ -236,49 +236,49 @@ what blog you're talking about.&nbsp;The owner of one blog may be just a regular
 <h2><a name="addblog">Adding New Blogs</a></h2>
 
 
-<p><a name="addblog">Adding new blogs is done on the LnBlog administration page. Only the administrator account
-can add new blogs.</a></p>
+<p>Adding new blogs is done on the LnBlog administration page. Only the administrator account
+can add new blogs.</p>
 
 
-<p><a name="addblog">To add a new blog, just click
+<p>To add a new blog, just click
 the "Add new blog" link and fill out the form on the resulting
 page.&nbsp; The fields define various properties of the blog, and
-are as follows:</a></p>
+are as follows:</p>
 
 
 <ol>
 
 
-<li><a name="addblog"><strong>Blog path</strong>:
+<li><strong>Blog path</strong>:
 The path to the blog on the web server machine.&nbsp; You may
 specify either an absolute path or a relative path, in which case the
 path is computed relative to your web root directory.&nbsp; So, if
 you specify the path "myblog", then the web address of the blog will be
 <code>http://www.mysite.com/myblog/</code>
-</a></li>
-<li><a name="addblog"><strong>Blog owner</strong>: The username of whoever owns the blog.
+</li>
+<li><strong>Blog owner</strong>: The username of whoever owns the blog.
 This is the user who will be allowed to change these settings later. By
-default, this is the administrator.</a></li>
-<li><a name="addblog"><strong>Additional allowed writers</strong>:
+default, this is the administrator.</li>
+<li><strong>Additional allowed writers</strong>:
 A comma-separated list of usernames other than the owner who can post new
-entries and articles to this blog.</a></li>
-<li><a name="addblog"><strong>Blog name</strong>: The name of the blog.</a></li>
-<li><a name="addblog"><strong>Description</strong>: A short description of the blog.</a></li>
-<li><a name="addblog"><strong>Theme</strong>: The theme visual used for the blog.</a></li>
-<li><a name="addblog"><strong>Blog name</strong>: The name of the blog.</a></li>
-<li><a name="addblog"><strong>Maximum number of entries</strong>:
+entries and articles to this blog.</li>
+<li><strong>Blog name</strong>: The name of the blog.</li>
+<li><strong>Description</strong>: A short description of the blog.</li>
+<li><strong>Theme</strong>: The theme visual used for the blog.</li>
+<li><strong>Blog name</strong>: The name of the blog.</li>
+<li><strong>Maximum number of entries</strong>:
 The maximum number of entries to display on the homepage of the blog.
 For example, if this is 10, then the main page of the blog will display the
-last 10 entries.</a></li>
-<li><a name="addblog"><strong>Maximum number of entries in RSS feeds</strong>:
-The maximum number of entries that will be put in the main blog RSS feed.</a></li>
+last 10 entries.</li>
+<li><strong>Maximum number of entries in RSS feeds</strong>:
+The maximum number of entries that will be put in the main blog RSS feed.</li>
 </ol>
 
 
-<h2><a name="addblog">Adding Entries</a></h2>
+<h2><a name="adding_entries">Adding Entries</a></h2>
 
 
-<p><a name="addblog">Adding a blog entry is pretty self-explanatory. Just log in and
+<p>Adding a blog entry is pretty self-explanatory. Just log in and
 click on the
 "add entry" link. You will be taken to the entry edit screen, where you
 can
@@ -286,22 +286,22 @@ enter the subject for your entry, the entry text itself, and turn
 comments for
 this entry on or off.&nbsp; Note that in order to add an entry, you
 must either be the owner of the blog you're adding it to, or you must
-be on the allowed writers list for that blog.<br />
-</a></p>
+be on the allowed writers list for that blog.</p>
 
 
-<p><a name="addblog">There are three possible input modes, which you can change between with the
-option buttons below the edit area. They are:</a></p>
+<p>There are three possible input modes, which you can change between with the
+option buttons below the edit area. They are:</p>
 
 
 <ol>
 
 
-<li><a name="addblog"><strong>Auto-markup</strong>: Adds HTML paragraphs and line breaks based on the plain-text input and converts all http:// and ftp:// URLs to links.</a></li>
-<li><a name="addblog"><strong>LBCode</strong>: Use a dialect of the BBCode markup popular in
+<li><strong>Auto-markup</strong>: Adds HTML paragraphs and line breaks based on the plain-text
+ input and converts all http:// and ftp:// URLs to links.</li>
+<li><strong>LBCode</strong>: Use a dialect of the BBCode markup popular in
 web forums to markup your page. Paragraphs and line breaks are inserted like
 with auto-markup, but you can also include other supported tags. See the
-</a><a href="#lbcode">LBCode Syntax</a> section for details.
+<a href="#lbcode">LBCode Syntax</a> section for details.
 </li>
 <li><strong>Raw HTML</strong>: The text you type is treated as raw HTML code.
 No processing is done and there's no guarantee that your page will validate.
@@ -309,7 +309,7 @@ In other words, this is for people who know what they're doing.</li>
 </ol>
 
 
-<h2>User Comments</h2>
+<h2><a name="user_comments">User Comments</a></h2>
 
 
 <p>LnBlog allows anonymous user comments by default.&nbsp; You can turn
@@ -332,7 +332,7 @@ entered by the reader.<br />
 </p>
 
 
-<h2>TrackBacks</h2>
+<h2><a name="trackbacks">TrackBacks</a></h2>
 
 
 <p>LnBlog has some very primitive support for Trackbacks.&nbsp; Each
@@ -431,7 +431,6 @@ text.</p>
 <td>[h]Header[/h]</td>
 <td><h3>Header</h3></td>
 <td>&lt;h3&gt;Header&lt;/h3&gt;</td>
-
 </tr><tr>
 <td>Short quotation</td>
 <td>[q]Quote[/q]</td>
@@ -481,7 +480,7 @@ text.</p>
 </table>
 
 
-<h4>Notes on LBCode</h4>
+<h4><a name="notes_on_lbcode">Notes on LBCode</a></h4>
 
 
 <ol>
@@ -534,11 +533,10 @@ breaks. <br />
 [img-right] tags.&nbsp; These are exactly the same, except that the
 resulting HTML includes a CSS style to float the image to the left or
 right respectively.&nbsp; This is used to flow text around an image.</li>
-
 </ol>
 
 
-<h2>LBCode Editor</h2>
+<h2><a name="lbcode_editor">LBCode Editor</a></h2>
 
 
 <p>When posting using LBCode
@@ -578,11 +576,26 @@ if you enter the abbreviation with the text "GNU" and the attribute
 "GNU's Not UNIX," then if you mention GNU later in your post, you can
 just enter "GNU" for the text and
 leave the attribute blank. When you hit the abbreviation button, the
-attribute "GNU's Not UNIX" will be added automatically.
+attribute "GNU's Not UNIX" will be added automatically.</p>
+<h2>Plugins</h2>
+<p>LnBlog supports a simple, event-driven plugin system.&nbsp; In a
+nutshell, this means that LnBlog supplies hooks that plugins can attach
+to whenever something interesting happens, e.g. when a comment is
+submitted, ablog entry is deleted, or  the page sidebar is
+displayed.&nbsp; So when one of those events occurrs, any plugins that
+are waiting for it will be notifed and run their code.&nbsp; For
+information on writing plugins, consult the <a href="techdoc.html">technical documentation</a>.&nbsp; <br />
+</p>
+<p>Installing and using plugins is quite easy.&nbsp; All you need to do is copy the plugin files to your "plugins" directory.&nbsp; You can use either the system-wide plugins directory under your LnBlog installation folder, or a plugins directory in the root folder of a specific blog.&nbsp; Note that if the same filename exists in both locations, the one for the specific blog will take precedence.&nbsp;
+(Note that you can use this to disable installation-wide plugins for a
+particular blog - just create an empty file with the same name in the
+blog's plugins directory.)&nbsp; As a general rule, there is no
+additional configuration required to make a plugin work, but this will
+depend on the particular plugin.&nbsp; None of theplugins that ship with LnBlog require additional configuration, but some thrid-party plugins might. <br />
 </p>
 
 
-<h2><abbr title="Content Management System">CMS</abbr> Features</h2>
+<h2><a name="cms_features"><abbr title="Content Management System">CMS</abbr> Features</a></h2>
 
 
 <p>While LnBlog is a technically a weblog package, it also includes several
@@ -593,7 +606,7 @@ site and making it slightly easier to manage. The following sections
 describe these.</p>
 
 
-<h3>Adding Articles</h3>
+<h3><a name="adding_articles">Adding Articles</a></h3>
 
 
 <p>An article in LnBlog is just a
@@ -614,7 +627,7 @@ one of the default themes).<br />
 </p>
 
 
-<h3>Uploading Files</h3>
+<h3><a name="uploading_files">Uploading Files</a></h3>
 
 
 <p>LnBlog provides pages to upload
@@ -628,7 +641,7 @@ use Apache) or by modifying
 the system php.ini file.</p>
 
 
-<h3>Sitemap Editing</h3>
+<h3><a name="sitemap_editing">Sitemap Editing</a></h3>
 
 
 <p>Part of LnBlog's basic page
@@ -664,8 +677,7 @@ want to create a more complicated menu layout, you will have to modify
 the menubar template. </p>
 
 
-<h2>License Information<br />
-</h2>
+<h2><a name="license_information">License Information</a></h2>
 
 
 <p>

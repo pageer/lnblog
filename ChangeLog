@@ -1,3 +1,56 @@
+16-Oct-2005:
+- Fixed regular expressions in .htaccess plugin.
+- Fixed bug in comment deletion.
+
+14-Oct-2005:
+- Added error handling to the blog creation code so that failure to create
+or write to the blog directory will result in a semi-useful error message
+instead of a long string of warning and error messages.
+- Fixed incorrect return codes for blog functions to modify entries.
+- Added a plugin to generate Apache .htaccess files for weblogs.  These files
+include mod_rewrite rules to redirect requests for the blog's raw data files.
+
+13-Oct-2005:
+- Fixed problem in fs_setup.php with magic quotes mangling Windows paths.
+(Reported by WGM.)
+- Fixed missing include in nativefs.php.  (Reported by WGM.)
+- Fixed multiple stripslashes() calls when magic_quotes_gpc is turned on.
+
+12-Oct-2005:
+- Separate RSS1 and RSS2 plugins.
+- Add option to make e-mail address visible only when comments are 
+viewed by logged-in users.
+- Fixed bug where e-mail addresses in comments were never visible.
+
+10-Oct-2005:
+- Added ad hoc fix for a bug in Unicode text rendered in LBCode or 
+auto-markup modes. (Reported by WGM.)
+- Fixed path bugs in setup scripts.
+
+07-Oct-2005:
+- Moved RSS feed stuff to a plugin.
+- Added a Page class to handle things like page link elements.
+
+05-Oct-2005:
+- Moved e-mail notification for comments to a plugin.
+- Converted sidebar, menubar, and banner to plugins.
+
+28-Sep-2005:
+- New event-driven plugin system.
+- Added referer redirect to login page.
+
+07-Sep-2005:
+- Increased encapsulation by removing direct references to paths from 
+page scripts.  References to, e.g. getcwd(), are now implicit and handled in
+class constructors.
+
+10-Aug-2005:
+- Wrapped all class creation with functions (for plugin-type mechanism).
+- Moved passwd.php inclusion inside User class.
+
+04-Aug-2005:
+- Made the sidebar modular.
+
 13-Jul-2005: Version 0.3.4
 - Code cleanup and error checking in fs_setup.php.
 

@@ -1,0 +1,86 @@
+/* Sidebar styles. */
+
+#sidebar {
+	/*background-color: #f4f4f4;*/
+	float: right;
+	width: 247px;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	border-left: 0; /*1px solid black;*/
+	position: relative;
+	/*left: 400px;*/
+	top: 0px;
+}
+
+div#maincontainer>div#sidebar {
+	width: 250px;
+}
+
+#sidebar h1, #sidebar h2, #sidebar h4 {
+	font-size: 100%;
+	padding-right: 1em;
+	padding-left: 1em;
+}
+
+#sidebar h3 {
+	margin-top: 0px;
+	margin-bottom: 0px;
+	width: 95%;
+	padding-left: 5%;
+	color: white;
+	background-color: #6b85b0;
+}
+
+#sidebar h3 a {
+	color: white;
+	display: block;
+	width: 100%;
+}
+
+#sidebar h3 a:visited {
+	color: white;
+}
+
+#sidebar ul {
+	margin: 0px;
+	padding-left: 0px;
+	margin-top: 1em;
+	margin-bottom: 1em;
+}
+
+#sidebar ul li {
+	list-style-type: none;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+} 
+
+#sidebar ul li a:hover {
+	background-color: white;
+}
+
+#sidebar ul.imglist li a:hover {
+	background-color: #f4f4f4;  /* Match the normal background. */
+}
+
+#sidebar ul li a {
+	display: block;
+	padding-left: 8%;
+	width: 92%;
+}
+
+#sidebar img {
+	text-align: center;
+	vertical-align: middle;
+	margin: 1% 0 1% 0;
+	border: 0px;
+}
+
+@media print {
+
+	#sidebar {
+		display: none;
+	}
+	
+}

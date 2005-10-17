@@ -22,48 +22,34 @@
 
 session_start();
 require_once("config.php");
-require_once("blog.php");
-require_once("blogentry.php");
-require_once("template.php");
+require_once("lib/creators.php");
 
-$blog = new Blog();
+$blog = NewBlog();
+$page = NewPage(&$blog);
 
-$curr_dir = getcwd();
-$month_dir = basename($curr_dir);
-$year_dir = basename(dirname($curr_dir));
-$current_month = mktime(0, 0, 0, $month_dir, 1, $year_dir);
+$list = $blog->getMonth(); 
 
-$title = strftime("%B %Y", $current_month);
-
-$blog->getMonth();
+$ts = $list[0]->timestamp;
+$title = strftime("%B %Y", $ts);
 
 # Optionally show all the entries as a weblog.
 if (strtolower(GET("show")) == "all") {
 	$body = $blog->getWeblog();
 } else {
 
-	$tpl = new PHPTemplate(ARCHIVE_TEMPLATE);
+	$tpl = NewTemplate(ARCHIVE_TEMPLATE);
 	$tpl->set("ARCHIVE_TITLE", $title);
 	$tpl->set("SHOW_TEXT");
 
-	$LINK_LIST = array();
-
-	foreach ($blog->entrylist as $ent) { 
-		$ts = mktime(0, 0, 0, $ent, 1, $year_dir);
-		$month_name = strftime("%B %Y", $ts);
-		$LINK_LIST[] = array("URL"=>$ent->permalink(), "DESC"=>$ent->subject);
+	foreach ($list as $ent) { 
+		$LINK_LIST[] = array("link"=>$ent->permalink(), "title"=>$ent->subject);
 	}
 
 	$tpl->set("LINK_LIST", $LINK_LIST);
 	$body = $tpl->process();
 }
 
-$title = $blog->name." - ".$title;
-
-$page_tpl = new PHPTemplate(BASIC_LAYOUT_TEMPLATE);
-$blog->exportVars($page_tpl);
-$page_tpl->set("PAGE_TITLE", $title);
-$page_tpl->set("PAGE_CONTENT", $body);
-echo $page_tpl->process();
+$page->title = $blog->name." - ".$title;
+$page->display($body, &$blog);
 
 ?>

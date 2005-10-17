@@ -18,20 +18,10 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-require_once("utils.php");
+require_once("lib/utils.php");
+require_once("lib/lnblogobject.php");
 
-define("FILEUPLOAD_NO_ERROR", 0);
-define("FILEUPLOAD_NO_FILE", 1);
-define("FILEUPLOAD_FILE_EMPTY", 2);
-define("FILEUPLOAD_SERVER_TOO_BIG", 3);
-define("FILEUPLOAD_FORM_TOO_BIG", 4);
-define("FILEUPLOAD_PARTIAL_FILE", 5);
-define("FILEUPLOAD_NOT_UPLOADED", 6);
-define("FILEUPLOAD_NAME_TRUNCATED", 7);
-define("FILEUPLOAD_BAD_NAME", 8);
-define("FILEUPLOAD_NOT_INITIALIZED", 9);
-
-class FileUpload {
+class FileUpload extends LnBlogObject {
 	
 	var $field;
 	var $destdir;
@@ -43,6 +33,7 @@ class FileUpload {
 
 	function FileUpload($field, $dir=false, $index=false) {
 		if (!$dir) $this->destdir = getcwd();
+		else $this->destdir = $dir;
 		$this->field = $field;
 		$this->destname = '';
 		$this->tempname = '';
@@ -136,28 +127,13 @@ class FileUpload {
 	}
 
 	function completed() { 
-		#echo "<p>Status: ".$this->status()."</p>";
-		#echo "<p>";
-		#foreach ($_FILES[$this->field] as $key=>$val) echo "$key = $val <br />";
-		#echo "</p>";
 		return ($this->status() == FILEUPLOAD_NO_ERROR); 
 	}
 
 	function moveFile() {
-	/*
-		if (php_version_at_least("4.0.3")) {
-			$ret = move_uploaded_file($this->tempname, $this->destdir.PATH_DELIM.$this->destname);
-		} else {
-			$tmp_dir = ini_get("upload_tmp_dir");
-			$fs = CreateFS();
-			$ret = $fs->rename($tmp_dir.PATH_DELIM.$this->tempname, 
-			              $this->destdir.PATH_DELIM.$this->destname);
-			$fs->destruct();
-		}
-	*/
+
 		$tmp_dir = ini_get("upload_tmp_dir");
-		#echo "<p>$tmp_dir</p><p>".$this->tempname."</p>";
-		$fs = CreateFS();
+		$fs = NewFS();
 		if (is_file($this->tempname)) $tmp_path = $this->tempname;
 		else $tmp_path = $tmp_dir.PATH_DELIM.$this->tempname;
 		$ret = $fs->copy($tmp_path, $this->destdir.PATH_DELIM.$this->destname);
