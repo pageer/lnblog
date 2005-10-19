@@ -57,6 +57,7 @@ class Page extends LnBlogObject {
 	var $stylesheets;
 	var $scripts;
 	var $metatags;
+	var $headers;
 	
 	function Page($ref=false) {
 	
@@ -70,6 +71,7 @@ class Page extends LnBlogObject {
 		$this->rssfeeds = array();
 		$this->scripts = array();
 		$this->metatags = array();
+		$this->headers = array();
 		
 		$this->title = '';
 
@@ -135,10 +137,21 @@ class Page extends LnBlogObject {
 	name      - *Optional* name attribute.
 	httpequiv - *Optional* http-equiv attribute.
 	*/
-	
 	function addMeta($content, $name=false, $httpequiv=false) {
 		$this->metatags[] = array("content"=>$content, "name"=>$name, 
 		                          "http-equiv"=>$httpequiv);
+	}
+	
+	/*
+	Method: addHeader
+	Add an item to the HTTP header for the page.
+
+	Parameters:
+	name    - The header name.
+	content - The content of the header.
+	*/
+	function addHeader($name, $content) {
+		$this->headers[$name] = $content;
 	}
 	
 	/*
@@ -173,6 +186,10 @@ class Page extends LnBlogObject {
 
 	function display($page_body, $blog=false) {
 		$this->raiseEvent("OnOutput");
+	
+		foreach ($this->headers as $name=>$value) {
+			header($name.": ".$value);
+		}
 	
 		$this->addMeta($this->mime_type."; charset=".$this->charset, false, "Content-type");
 		$this->addMeta(PACKAGE_NAME." ".PACKAGE_VERSION, "generator");

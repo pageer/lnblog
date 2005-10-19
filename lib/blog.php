@@ -674,15 +674,12 @@ class Blog extends LnBlogObject {
 		# directory.  These directories are added to the include_path using
 		# a config file that is copied to all entry directories.
 		# It is assumed that this will only be run from the install directory.
-		
 		if (get_magic_quotes_gpc()) {
-			$this->home_path = stripslashes($this->home_path);
 			$this->name = stripslashes($this->name);
 			$this->description = stripslashes($this->description);
 			$this->image = stripslashes($this->image);
 			$this->theme = stripslashes($this->theme);
 		}
-		
 		$inst_path = getcwd();
 		if ($path) $this->home_path = canonicalize($path);
 		#$this->home_path = realpath(getcwd().PATH_DELIM.$this->home_path);
@@ -721,7 +718,6 @@ class Blog extends LnBlogObject {
 		if (! $this->canModifyBlog() ) return false;
 		$this->raiseEvent("OnUpdate");
 		if (get_magic_quotes_gpc()) {
-			$this->home_path = stripslashes($this->home_path);
 			$this->name = stripslashes($this->name);
 			$this->description = stripslashes($this->description);
 			$this->image = stripslashes($this->image);
@@ -821,7 +817,7 @@ class Blog extends LnBlogObject {
 
 	function previewEntry(&$tpl) {
 		$u = NewUser();
-		$this->last_blogentry =& NewBlogEntry();
+		$this->last_blogentry = NewBlogEntry();
 		# Set the username for the preview.
 		if (!$this->last_blogentry->isEntry()) 
 			$this->last_blogentry->uid = $u->username();
@@ -838,7 +834,7 @@ class Blog extends LnBlogObject {
 
 	function previewArticle(&$tpl) {
 		$u = NewUser();
-		$this->last_article =& NewArticle();
+		$this->last_article = NewArticle();
 		# Set the username for the preview.
 		if (!$this->last_article->isEntry()) 
 			$this->last_article->uid = $u->username();
@@ -854,7 +850,7 @@ class Blog extends LnBlogObject {
 	}
 
 	function errorEntry($error, &$tpl) {
-		$this->last_blogentry =& NewBlogEntry();
+		$this->last_blogentry = NewBlogEntry();
 		if ( has_post() ) $this->last_blogentry->getPostData();
 		else return false;
 		$this->raiseEvent("OnEntryError");
@@ -891,7 +887,7 @@ class Blog extends LnBlogObject {
 	}
 
 	function errorArticle($error, &$tpl) {
-		$this->last_article =& NewArticle();;
+		$this->last_article = NewArticle();;
 		if ( has_post() ) $ent->getPostData();
 		else return false;
 		$this->raiseEvent("OnArticleError");

@@ -306,6 +306,12 @@ class BlogComment extends Entry {
 	A string containing the markup.
 	*/
 	function get($show_edit_controls=false) {
+
+		ob_start();
+		$this->raiseEvent("OnOutput");
+		$ret .= ob_get_contents();
+		ob_end_clean();
+		
 		$t = NewTemplate(COMMENT_TEMPLATE);
 
 		$blog = NewBlog();
@@ -335,7 +341,11 @@ class BlogComment extends Entry {
 		$t->set("SHOW_CONTROLS", $show_edit_controls);
 		$t->set("BODY", $this->markup($this->data, COMMENT_NOFOLLOW) );
 		
-		$ret = $t->process();
+		$ret .= $t->process();
+		ob_start();
+		$ret .= ob_get_contents();
+		ob_end_clean();
+		
 		return $ret;
 	}
 	

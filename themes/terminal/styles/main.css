@@ -3,39 +3,32 @@ Main style sheet.  This controls the basic page look, including the page header,
 menu bar, and sidebar.  It does not include the blog entries, comments, forums, etc.
 */
 
-html, body {
-	background: #0066E3;
-	height: 100%;
-	width: 100%;
-	margin: 0px;
-	padding: 0px;
+html, body { 
+	height: 100%; 
+	background-color: black;
+	color: white;
+	font-family: monospace;
 }
 
 /* Styles for the page content area. */
 
 #pagecontent {
 	margin: 1% 1% 1% 1%;
-	padding: 1% 1% 1% 1%;
-	border: thin solid black;
-	width: 66%;
-	float: right;
-	clear: right;
-	background: #f4f4f4;
+	width: 64%;
+	float: left;
 }
 
 a:link {
-	text-decoration: none;
-	color: blue;
+	color: white;
 }
 
 a:visited {
-	text-decoration: none;
-	color: #8B008B;
+	color: white;
 }
 
 a:hover {
-	text-decoration: underline;
 	color: red;
+	background-color: white;
 }
 
 input:focus, textarea:focus {
@@ -45,6 +38,8 @@ input:focus, textarea:focus {
 q { font-style: italic; }
 
 @media print {
+
+	/* Styles for the page content area. */
 
 	#pagecontent {
 		margin: 1% 1% 1% 1%;

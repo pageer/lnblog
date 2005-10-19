@@ -18,10 +18,12 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-# An abstract class for writing to the filesystem.  We use this to access the
-# concrete subclasses for native filesystem and FTP access.  Maybe one day 
-# there will be some other useful method for filesystem access....
-
+/*
+Class: FS
+An abstract class for writing to the filesystem.  We use this to access the
+concrete subclasses for native filesystem and FTP access.  Maybe one day 
+there will be some other useful method for filesystem access....
+*/
 require_once("blogconfig.php");
 
 class FS {
@@ -34,6 +36,8 @@ class FS {
 	function chdir($dir) {}
 	function mkdir($dir, $mode=0777) {}
 	function mkdir_rec($dir, $mode=0777) {}
+	function rmdir($dir) {}
+	function rmdir_rec($dir) {}
 	function chmod($path, $mode) {}
 	function defaultMode() {}
 	function copy($src, $dest) {}

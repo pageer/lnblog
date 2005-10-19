@@ -27,7 +27,6 @@ $page = NewPage(&$usr);
 
 if (! $usr->checkLogin() ) {
 	$page->redirect("index.php");
-	echo "<p>You must be logged in to change your login.</p>";
 	exit;
 }
 

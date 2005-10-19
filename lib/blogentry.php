@@ -354,7 +354,10 @@ class BlogEntry extends Entry {
 	A string containing the markup.
 	*/
 	function get($show_edit_controls=false) {
+		ob_start();
 		$this->raiseEvent("OnOutput");
+		$ret = ob_get_contents();
+		ob_end_clean();
 	
 		$tmp = NewTemplate(ENTRY_TEMPLATE);
 		
@@ -372,8 +375,11 @@ class BlogEntry extends Entry {
 		$tmp->set("TRACKBACKCOUNT", $this->getTrackbackCount() );
 		$tmp->set("SHOW_CONTROLS", $show_edit_controls);
 		
-		$ret = $tmp->process();
+		$ret .= $tmp->process();
+		ob_start();
 		$this->raiseEvent("OutputComplete");
+		$ret .= ob_get_contents();
+		ob_end_clean();
 		return $ret;
 	}
 

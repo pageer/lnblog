@@ -1,11 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html lang="en"><head>
-  <title>LnBlog Installation</title>
-
-
-
-</head>
-
+  <title>LnBlog Installation</title></head>
 <body>
 <h1>Installing LnBlog</h1>
 
@@ -26,7 +21,7 @@ are not technologically inclined, just follow these step-by-step instructions.</
 downloaded archive is a standard ZIP file format. On Windows you can
 decompress this with WinZip or pretty much any other compression
 program. On
-Linux, you can use your desktop environment's decompression utility,
+Linux and UNIX systems, you can use your desktop environment's decompression utility,
 such as Ark, or run <code>unzip&nbsp;lnblog-version.zip</code> from the command
 line.</p>
 </li>
@@ -50,42 +45,47 @@ visit this page, LnBlog will ask you to set the web document root directory and
 configure file writing.</p>
 <p>The document root is directory on the web server where you put the files for your home page,
 and is used to determine the <abbr title="Uniform Resource Locator">URL</abbr>s
-for your pages. LnBlog will attempt to calculate this based on where it is located.
+for your pages. LnBlog will attempt to guess this based on where it is located.
 In most cases, the default should be correct, but if it isn't you will have to
 set it manually. If you are unsure of what to set, click the link to the test
 page to try out some different values and see the results.</p>
 <p>The second part of this page is the file writing configuration.
-LnBlog provides two ways to write files on the web server. The first way
-is to use the "native" filesystem functions. To configure this, all you need
+LnBlog provides two ways to write files on the web server. The first
+way
+is to use the "native" filesystem functions. To configure this, all you
+need
 do is leave the "use native filesystem functions" option selected and
-hit the submit button. This is
-not recommended, however, because you will need to manually change file
-permissions to make the directories you want to put blogs in writable by
-everyone. Furthermore, your account most likely <em>will not</em> own any files or directories that LnBlog creates,
+hit the submit button. This is not recommended unless you have root
+(i.e. administrator) access on the web server, because you will need to
+manually change file
+permissions to make the directories you want to put blogs in writable
+by
+everyone. Furthermore, your user account most likely <em>will not</em> own any files or directories that LnBlog creates,
 which can cause problems if you want to
-manage your site outside of LnBlog. Also note that you will have to change the file
-permissions on the LnBlog directory to make it writable by everyone <em>before</em> completing this step.
+manage your site outside of LnBlog, e.g. by uploading or moving files with FTP. Also note that you will have to change the file
+permissions on the LnBlog "userdata" directory to make it writable by everyone <em>before</em> completing this step.
 
 If you don't, the native
-file writing functions may not be able to save this setting.</p>
-<p>The second, and recommended,
-method for writing files is to use the FTP
+file writing functions may not be able to save this setting.&nbsp; <strong>Note:</strong> you <strong>must</strong> have PHP's <strong>safe_mode</strong> disabled in order to use native file writing.<br />
+</p>
+<p>The second
+method for writing files, which is recommended for
+shared hosting setups, is to use the FTP
 interface. This requires that you be able to access you web space via
 FTP,
 which you almost certainly can. To configure this, you need to select
 the
 "use FTP" option, enter your username and password, and confirm the FTP
 host name and the path to your FTP root. The FTP host name (which you
-will
-probably have to change) is the server address that you use to upload
+may have to change) is the server address that you use to upload
 files to your site, such as <code>ftp.mysite.com</code>.
-In the (fairly common)
-case where the FTP and web servers are the same system, you can also
+In the fairly common
+case where the FTP and web servers are both running the same machine, you can also
 use 'localhost'. The FTP root path is the path on the web werver where
 your FTP
 access starts. This will vary depending on the server configuration.
 For some
-servers, your FTP root will be the system root, while on others, it
+servers, your FTP root will be the system root directory, while on others, it
 will be the
 "home" directory of your hosting account. If you do not know what
 directory to use,
@@ -115,8 +115,7 @@ the resulting page, you can enter the username, password,
 and so forth, just as you did when creating the administrator
 account.&nbsp; Only the username, password, and password
 confirmation are required, though you will also have to fill in a valid
-e-mail address is you want the user to be able to receive e-mail
-confirmation of comments on his posts.&nbsp; The real name and
+e-mail address is you want the user to be able to receive e-mail notification of comments on his posts.&nbsp; The real name and
 homepage are for purely cosmetic purposes.<br />
 </p>
 </li><li>
@@ -124,28 +123,29 @@ homepage are for purely cosmetic purposes.<br />
 <p>Click
 on the "Add new blog" link to create a new weblog.
 On the new weblog page, you can enter the path to the blog, the owner,
-who can write to it,&nbsp; the name, a
+other users who can post to it,&nbsp; the name, a
 description, the theme to
 use
 (LnBlog ships with three themes: "default", which I think is nice and
 fairly conservative, "tuxice" which is a fairly bright Linux theme, and
-"skepticats", which is the original and somewhat out-of-date theme)
+"skepticats", which is a black and grey theme)
 and the maximum
 number of entries to display on the front page and in RSS feeds. When
 you are done, hit
 submit and you will be taken to the front page of your new blog.</p>
 <p>While most of the fields on this page should be self-explanatory, it is important to understand
-the first three. The blog path is a path on the web server. You can either give an
-absolute path, i.e. the full path on the server, or a relative one. Relative paths will
+the first three. The <strong>blog path</strong> is a path on the web server. You can either give an
+absolute path on the server, but unless you need to do something fancy, it's best to use a relative path. Relative paths will
 be interpreted as relative to the document root you set earlier, so that if you give
 the path as simply "myblog", then LnBlog will create a "myblog" directory in the root
-of your website.</p>
-<p>The blog owner is the username of the account that runs the blog. This person will be
+of your website.&nbsp; <br />
+</p>
+<p>The <strong>blog owner</strong> is the username of the account that runs the blog. This person will be
 able to change blog settings, post new entries, and so forth. This is a required field and
 
 defaults to administrator,
 but should be set to the username of whoever will be the primary user of this blog. The
-allowed additional writers, on the other hand, is an optional comma-separated list of other usernames
+    <strong>allowed additional writers</strong>, on the other hand, is an optional comma-separated list of other usernames
 that are allowed to post new entries to this blog. They cannot change blog settings or edit
 other users' posts - just add and modify their own. This is useful if you want to have something
 like a news page that several people will be updating.</p>

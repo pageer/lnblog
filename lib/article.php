@@ -242,7 +242,10 @@ class Article extends BlogEntry {
 	*/
 	
 	function get($show_edit_controls=false) {
+		ob_start();
 		$this->raiseEvent("OnOutput");
+		$ret= ob_get_contents();
+		ob_end_clean();
 		$tmp = NewTemplate(ARTICLE_TEMPLATE);
 
 		$usr = NewUser($this->uid);
@@ -255,8 +258,11 @@ class Article extends BlogEntry {
 		$tmp->set("PERMALINK", $this->permalink() );
 		$tmp->set("SHOW_CONTROLS", $show_edit_controls);
 		
-		$ret = $tmp->process();
+		$ret .= $tmp->process();
+		ob_start();
 		$this->raiseEvent("OutputComplete");
+		$ret .= ob_get_contents();
+		ob_end_clean();
 		return $ret;
 	}
 

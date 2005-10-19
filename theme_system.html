@@ -183,6 +183,12 @@ to someimage.jpg so that you don't have to worry about the exact
 URL.&nbsp; You can then modify the CSS file to suit your needs.&nbsp;
 Note that if you don't want to change the CSS, you can just skip
 copying the style sheet.</p>
+<p><strong>Note:</strong> As of version 0.4.0, the banner, sidebar, and
+menubar (or sitemap) are all implemented in plugins, so if you wanted
+to change one of these, then the plugins would be the place to
+start.&nbsp; However, there are still templates for these, although
+they pretty much just raise plugin events.</p>
+
 <h3>Creating a new theme</h3>
 <p>Creating a system-wide theme in LnBlog is quite easy.&nbsp; If you
 want to change substantial parts of any of the default themes, then
@@ -209,16 +215,11 @@ included in the default theme, which makes it easier to include future bug fixes
 <h2>Include Chains</h2>
 <p>As previously mentioned, LnBlog uses a series of templates nested inside each other to build
 a page.&nbsp; One consequence of this is that if you want to make any
-significant changes to the layout of a page, you need to change a large
-number of files.&nbsp; To aid this process, this section lists the
-files used to make various pages.&nbsp; You will find all of these
-files in the default theme directory, if you wish to referr to them.<br />
-</p>
-<h3>Basic Page Layout</h3>
-<p>The basic page structure (banner, menu bar, sidebar, and content area) is controlled by the basic_layout_tpl.php file.&nbsp; This file contains the essential HTML elements and adds references for scripts and style sheets.&nbsp; It also uses the <code>include()</code>
-function to pull in the menubar, banner, and sidebar templates.&nbsp;
-These are stored in include_menubar.php, include_banner.php, and
-include_sidebar.php respectively.<br />
-</p>
-
+significant changes to the layout of a page, you may need to change several files.&nbsp; The most important template files are probably the following:</p>
+<ul>
+  <li>article_tpl.php -&nbsp; Controls the display of articles.</li>
+  <li>blogentry_tpl.php - Controls the display of blog entries.</li>
+  <li>blogcomment_tpl.php - Controls the display of comments.</li>
+  <li>trackback_tpl.php - Controls the display of TrackBack entries.</li>
+</ul>
 </body></html>

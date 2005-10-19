@@ -6,8 +6,8 @@ Features to be added:
 * Support for polls.
 * Internationalization support?
 * Multi-page articles?
-* Some kind of plugin API?
 * Option to publish entries as articles?
 * Option to use *just* sessions (no cookies) for login.
 * Ability to create entry from uploaded HTML document.
 * Ability to display an HTML document in the standard page layout.
+* Ability to create draft posts and articles.

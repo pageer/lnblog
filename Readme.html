@@ -2,12 +2,12 @@
 <html lang="en"><head>
 
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-  <title>LnBlog Documentation</title>
+  
 
 
 
 
-  <style type="text/css">
+  <title>LnBlog Documentation</title><style type="text/css">
 td, th {
 border: thin solid black;
 }
@@ -48,7 +48,7 @@ along with this program; if not, write to the Free Software Foundation, Inc., 67
 It is strives to be easy to use, easy to manage, and feature rich while
 maintaining a clean, elegant, and modular design. It is built to create
 sites with a clean, directory-based URL structure and valid XHTML and CSS for
-style and layout.&nbsp; Plus, it's light on requirements and cross-platform.<br />
+style and layout.&nbsp; It is intended to run well on inexpensive web hosting accounts, and so is cross-platform and light on requirements.<br />
 </p>
 
 
@@ -69,7 +69,7 @@ or if you have any problems or find any bugs, feel free to <a href="mailto:pagee
 <p>LnBlog is fairly light on
 requirements. It does not require any particular operating system or
 web server and is known to work on
-Linux/Apache and WinXP/IIS. The only hard and fast requirements are the
+Linux/Apache, Windows/Apache, and Windows/IIS. The only hard and fast requirements are the
 following:</p>
 
 
@@ -87,7 +87,7 @@ set on the web server.<br />
 </ol>
 
 
-<h2><a name="feature_list">Feature List</a></h2>
+<h2><a name="feature_list">Feature List</a></h2>LnBlog's built-in features include:
 
 
 <ul>
@@ -95,9 +95,9 @@ set on the web server.<br />
 
 <li><strong>Works in Safe Mode</strong> when using FTP support.</li>
 <li>Anonymous reader comments.</li>
-<li>Automatically generated RSS feeds for blog entries and comments.</li><li>Send and receive TrackBack pings.</li>
+<li>Send and receive TrackBack pings.</li>
 <li>Create multiple user accounts with basic serucity on entires and blogs.</li>
-<li>E-mail notification when new comments are posted.</li>
+
 <li>Easily create multiple weblogs.</li><li>Create static "articles" in addition to weblog entries.</li>
 <li>Change between multiple themes, each of which can have completely a
 different look and behavior, i.e. different styles, HTML markup, images, and even client-side scripts.</li>
@@ -106,7 +106,13 @@ different look and behavior, i.e. different styles, HTML markup, images, and eve
 on a per-blog basis.</li>
 <li>Support for posting with simple auto-markup, a simple subset of BBcode,
 or raw HTML code.</li>
+</ul>The following features are also supported by the standard set of plugins:<br />
+<ul>
+  <li>Automatically generated RSS feeds for blog entries and comments.</li>
+  <li>E-mail notification when new comments are posted.</li>
+  <li>Automatically created .htaccess file preventing access to raw data files.</li>
 </ul>
+
 
 
 <h2><a name="initial_setup">Initial Setup</a></h2>
@@ -124,16 +130,16 @@ them navigate
 to that directory with your favorite browser to run the configuration
 scripts. The first script configures file writing. If you have FTP
 access to the web server, you
-can use FTP for file writing (this is recommended) by selecting the FTP
+can use FTP for file writing (recommended if you don't have root access) by selecting the FTP
 option and giving the
 appropriate information below. Otherwise, LnBlog will use PHP's
 standard filesystem
 functions, which will require that Safe Mode be turned off and
-appropriate permissions set on the relevant directories.</p>
+appropriate permissions set on the relevant directories (including the userdata directory).</p>
 
 
 <p>After file writing support is
-configured, you must set an administrator login. This will be used to
+configured, you must set an administrator login. This account will be used to
 add new weblogs as well as to log into the ones you create. After
 that's
 set, you can log in and start adding new blogs and/or users. There are also
@@ -144,54 +150,39 @@ modify a blog and update a blog (used when upgrading LnBlog).</p>
 <h2><a name="upgrading">Upgrading</a></h2>
 
 
-<p>Upgrading your LnBlog installation is actually quite easy.&nbsp;
-If you are paranoid, you will want to make backup copies of the
-configuration files in your LnBlog directory.&nbsp; These files are
-named fsconfig.php, passwd.php, and sitemap.htm, and are used to store
-information global to your installation.&nbsp; They are generally
-not affected by upgrades, and they are not hard to recreate if
-destroyed, but I thought I should warn you anyway.</p>
-
-
-<p><strong>Exception 1:</strong> The format of passwd.php has changed between versions 0.2 and 0.3 and you should <strong>delete</strong> the old one and
-let the software create a new one. Version 0.3 adds support for multiple users using a mechanism that is
-incompatible with the previous passwd.php format. After you delete this file, go to your LnBlog administration
-page and you will be prompted to create a new administrator account.</p>
-
-<p><span style="font-weight: bold;">Exception 2:</span> An additional configuration constant, DOCUMENT_ROOT, has been added to fsconfig.php in verion 0.3.2.&nbsp; You
-may upgrade by deleting your fsconfig.php and going to the
-administrative page to recreate it.&nbsp; However, if your site was
-functioning correctly with the old version, it should continue to do so
-with the old fsconfig.php file.</p>
-
-
-<p>To upgrade LnBlog, simply extract the
-new version from the ZIP archive and upload it to your web host into
-the same location as the old version, overwriting the old
-files.&nbsp; Alternatively, you can move or delete the old
-installation folder and put the new one in its place, provided you copy
-the above mentioned configuration files into the new installation
-directory.</p>
-
-
-<p>Once that's done, you may need
+<p>Upgrading your LnBlog installation is generally quite easy.&nbsp;
+First, you must make a backup copy of the files in the "userdata"
+folder in your LnBlog directory.&nbsp; Then, just rename or delete your
+old LnBlog folder and copy the one for the new version in it's
+place.&nbsp; You can then copy the backed-up userdata files into the
+new LnBlog folder.&nbsp; For major releases, you may also need
 to upgrade the files for each individual blog.&nbsp; This is done
 by going to the administration page and using the "upgrade blog"
-option.&nbsp; Simply put the relative path to your blog (e.g. myblog, as described in the <a href="#addblog">"Adding New Blogs" section</a>)
-and click the "Upgrade" button.&nbsp; This will upgrade the
+option.&nbsp; Simply put the relative path to your blog (e.g. myblog, as described in the <a href="Readme.html#addblog">"Adding New Blogs" section</a>)
+into the "upgrade to current version" box and click the "Upgrade" button.&nbsp; This will upgrade the
 configuration files for the blog and add any new pages.&nbsp; You
-will have to do this separately for each blog that youhave. </p>
-
-
-<h2><a name="adding_new_users">Adding New Users</a></h2>
+will have to do this separately for each blog that youhave.</p>
+<p><strong>Note:</strong> If you are upgrading from LnBlog 0.3 to 0.4,
+the locations of the user configuration files have changed.&nbsp; You
+will need to copy the fsconfig.php, passwd.php, and sitemap.htm files
+from the root of your old LnBlog folder into the "userdata" subdirectory of your new LnBlog folder.&nbsp; You will also need to run an upgrade on each of your blogs.</p>
+<p><strong>Note 2:</strong> If you are upgrading to LnBlog 0.4 from
+version 0.3.1 or earlier, it is recommended that you delete your
+fsconfig.php file and go to the LnBlog administration page to recreate
+it, as there was a configuration value added to this file in version
+0.3.2.&nbsp; Your site may, however, continue to function normally with
+the old file.</p>
+<p><strong>Note 3:</strong> If, for some reason, you want to upgrade
+from LnBlog 0.2 to a higher version, you will need to delete your
+passwd.php file and create a new login, because the format of this file
+has changed and is no longer compatible.</p>
+<strong /><h2><a name="adding_new_users">Adding New Users</a></h2>
 
 
 <p>In addition to the administrator account, you can create as many new user accounts as you
-like. (<strong>Disclaimer</strong>: LnBlog was not buit to handle large numbers of users. While there is no
+like. (<strong>Disclaimer</strong>: LnBlog was not buit to handle large numbers of users and has not been tested with such a configuration. While there is no
 <em>inherent</em>
-limit on the number of users, I doubt that the current implementation
-will scale
-well. You have been warned.)&nbsp; To create a new account log in
+limit on the number of users, don't expect it to scale well beyond a couple dozen accounts.)&nbsp; To create a new account log in
 to the LnBlog administration page and click the "Add new user"
 link.&nbsp; Only the administrator account can create new users.</p>
 
@@ -208,7 +199,7 @@ comments on his posts if you do not give an e-mail address.</p>
 
 
 <p>LnBlog uses a very simple
-security based on user ownership.&nbsp; The rules for determining
+security model based on user ownership.&nbsp; The rules for determining
 what each user can do are as follows</p>
 
 
@@ -319,12 +310,15 @@ name, e-mail, and homepage fields.&nbsp; For logged-in users, comments
 will also store the username, so that the up-to-date name, e-mail, and
 homepage can be displayed automatically.&nbsp; Currently, comments
 cannot be edited, but they can be deleted by users with permission to
-modify the entry.</p>
+modify the entry.&nbsp; <br />
+</p>
 
 
 <p>If the owner of a post has an e-mail address specified for his
-username, then he will receive e-mail notification of any new comments
-on his posts.&nbsp; The e-mail is send using PHP's mail() function,
+username, then he can receive e-mail notification of any new comments
+on his posts.&nbsp; This feature is one of the standard plugins and can
+be disabled globally or on a per-blog basis.&nbsp; The e-mail is sent
+using PHP's mail() function,
 so that must be correctly configured for your server.&nbsp; The
 messages themselves are in plain-text format and include the URL of the
 comment, as well as the comment itself and any personal information
@@ -577,7 +571,7 @@ if you enter the abbreviation with the text "GNU" and the attribute
 just enter "GNU" for the text and
 leave the attribute blank. When you hit the abbreviation button, the
 attribute "GNU's Not UNIX" will be added automatically.</p>
-<h2>Plugins</h2>
+<h2><a name="plugins" />Plugins</h2>
 <p>LnBlog supports a simple, event-driven plugin system.&nbsp; In a
 nutshell, this means that LnBlog supplies hooks that plugins can attach
 to whenever something interesting happens, e.g. when a comment is
@@ -586,13 +580,29 @@ displayed.&nbsp; So when one of those events occurrs, any plugins that
 are waiting for it will be notifed and run their code.&nbsp; For
 information on writing plugins, consult the <a href="techdoc.html">technical documentation</a>.&nbsp; <br />
 </p>
-<p>Installing and using plugins is quite easy.&nbsp; All you need to do is copy the plugin files to your "plugins" directory.&nbsp; You can use either the system-wide plugins directory under your LnBlog installation folder, or a plugins directory in the root folder of a specific blog.&nbsp; Note that if the same filename exists in both locations, the one for the specific blog will take precedence.&nbsp;
-(Note that you can use this to disable installation-wide plugins for a
-particular blog - just create an empty file with the same name in the
-blog's plugins directory.)&nbsp; As a general rule, there is no
+<p>Installing and using plugins is quite easy.&nbsp; All you need to do
+is copy the plugin files to your "plugins" directory.&nbsp; You can use
+either the system-wide plugins directory under your LnBlog installation
+folder, or a plugins directory in the root folder of a specific
+blog.&nbsp; Note that if the same filename exists in both locations,
+the one for the specific blog will take precedence.&nbsp;
+As a general rule, there is no
 additional configuration required to make a plugin work, but this will
-depend on the particular plugin.&nbsp; None of theplugins that ship with LnBlog require additional configuration, but some thrid-party plugins might. <br />
+depend on the particular plugin.&nbsp; None of the plugins that ship
+with LnBlog require additional configuration, but some thrid-party
+plugins might.Also, note that the standard plugins are all self-contained, so if you want to turn one off, you can just delete the file. <br />
 </p>
+<p>Note that the precedence of plugins in a blog's plugins directory
+allows you to easily disable plugins on a per-blog basis.&nbsp; All you
+need to do is create an empty file with the same name as the
+system-wide plugin file you want to disable and put it in the plugins
+folder for your blog.&nbsp; One use of this is to turn off certain
+interface elements you don't want, because the sidebar panels, page
+banner, and the sitemap are all done with plugins.&nbsp; So, if you are
+using LnBlog on a local network and want to turn off the Google search
+in the sidebar, you can justcreate an empty file named sidebar_5_googlesearch.php file in your blog's plugins folder. <br />
+</p>
+
 
 
 <h2><a name="cms_features"><abbr title="Content Management System">CMS</abbr> Features</a></h2>

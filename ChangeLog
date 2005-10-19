@@ -1,3 +1,13 @@
+18-Oct-2005:
+- Fixed up documentation a little.
+- Moved sidebar after content in default templates.  This makes things nicer
+for people with screen-readers or browsers that don't do CSS.
+
+17-Oct-2005:
+- Removed stripslashes() mangling of blog home_path.  (Reported by WGM.)
+- Fixed login redirect when referer gets set to same URL.
+- Added (unused) rmdir and rmdir_rec filesystem functions.
+
 16-Oct-2005:
 - Fixed regular expressions in .htaccess plugin.
 - Fixed bug in comment deletion.

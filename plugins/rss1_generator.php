@@ -105,7 +105,6 @@ class RSS1FeedGenerator extends Plugin {
 	function updateCommentRSS1(&$cmt) {
 		$parent = $cmt->getParent();
 		$feed = new RSS1();
-		echo "<p>Parent: ".get_class($parent)."</p>";
 		$comment_path = $parent->localpath().PATH_DELIM.ENTRY_COMMENT_DIR;
 		$path = $comment_path.PATH_DELIM.COMMENT_RSS1_PATH;
 		$feed_url = localpath_to_uri($path);

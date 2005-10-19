@@ -1,15 +1,14 @@
 /* Styles for blog entries. */
 
 .blogentry {
-	/*border: thin solid black;*/
-	border-bottom: thin dotted black;
 	margin-bottom: 2%;
-	/*width: 50%;*/
 }
 
 .blogentryheader h2 {
 	margin: 0px;
 	padding: 0px;
+	background-color: white;
+	color: black;
 }
 
 .blogentryfooter {

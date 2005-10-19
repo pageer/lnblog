@@ -1,9 +1,11 @@
 /* Site-map menu bar styles. */
 
 #menubar {
-	width: 100%;
-	background: #c3c3c3;
-	border: thin solid black;
+	width: 99%;
+	padding-left: 1%;
+	border-top: none;
+	padding-bottom: 1%;
+	border-bottom: medium dashed white;
 }
 
 #menubar h1, #menubar h2 {
@@ -13,7 +15,6 @@
 
 #menubar ul {
 	display: inline;
-	padding-left: 2em;
 }
 
 #menubar ul li {

@@ -162,6 +162,29 @@ class FTPFS extends FS {
 		return $ret;
 	}
 
+	function rmdir($dir) {
+		$dir = $this->localpathToFSPath($dir);
+		if ($this->connected() ) $ret = ftp_rmdir($this->connection, $dir);
+		else $ret = false;
+		return $ret;
+	}
+
+	function rmdir_rec($dir) {
+		if (! is_dir($dir)) return $this->delete($dir);
+		$dirhand = opendir($dir);
+		$ret = true;
+		while ( ( false !== ( $ent = readdir($dirhand) ) ) && $ret ) {
+			if ($ent != "." || $ent != "..") {
+				continue;
+			} else {
+				$ret &= $this->rmdir_rec($dir.PATH_DELIM.$ent);
+			}
+		}
+		if ($ret) $ret &= $this->rmdir($dir);
+		closedir($dirhand);
+		return $dir_list;	
+	}
+
 	function chmod($path, $mode) {
 		if (! $this->connected() ) return false;
 		$path = $this->localpathToFSPath($path);

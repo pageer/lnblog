@@ -2,13 +2,11 @@
 
 #sidebar {
 	border: thin solid black;
-	border-left: 0px;
-	margin-top: 1%;
-	margin-left: 1%;
-	background-color: #f4f4f4;
-	float: left;
-	clear: left;
-	width: 27%;
+	margin-top: 2%;
+	float: right;
+	clear: right;
+	width: 30%;
+	border-left: thin solid white;
 }
 
 #sidebar h1, #sidebar h2, #sidebar h4 {
@@ -18,28 +16,27 @@
 }
 
 #sidebar h3, #sidebar .panelheader {
-	margin-top: 0;
-	margin-bottom: 0;
+	margin-top: 0px;
+	margin-bottom: 0px;
 	width: 95%;
 	padding-left: 5%;
-	color: white;
-	background: url(../images/background.png);
-	background-repeat: repeat-y;
+	color: black;
+	background-color: white;
 }
 
 #sidebar h3 a, #sidebar .panelheader a {
-	color: white;
 	display: block;
+	color: black;
 	width: 100%;
 }
 
-#sidebar h3 a:visited, #sidebar .panelheader a:visited {
-	color: white;
+#sidebar .panelheader a:hover {
+	color: red;
 }
 
 #sidebar ul, #sidebar .panel {
-	margin: 0;
-	padding-left: 0;
+	margin: 0px;
+	padding-left: 0px;
 	margin-top: 1em;
 	margin-bottom: 1em;
 }
@@ -52,16 +49,13 @@
 #sidebar ul li {
 	list-style-type: none;
 	width: 100%;
-	margin: 0;
-	padding: 0;
+	margin: 0px;
+	padding: 0px;
 } 
-
-#sidebar ul.imglist li a:hover {
-	background-color: #f4f4f4;  /* Same as regular background. */
-}
 
 #sidebar ul li a:hover {
 	background-color: white;
+	color: red;
 }
 
 #sidebar ul li a {
@@ -72,12 +66,15 @@
 
 #sidebar img {
 	text-align: center;
+	vertical-align: middle;
 	margin: 1% 0 1% 5%;
-	border: 0;
+	border: 0px;
 }
 
 @media print {
+
 	#sidebar {
 		display: none;
 	}
+	
 }

@@ -51,8 +51,10 @@ if ( POST($user_name) && POST($password) ) {
 	$usr = NewUser(trim(POST($user_name)));
 	$ret = $usr->login(POST($password));
 	if (POST("referer")) {
-		$tpl->set("REF", POST("referer") );
-		$redir_url = POST("referer");
+		if ( basename(POST("referer")) != current_file() ) {
+			$tpl->set("REF", POST("referer") );
+			$redir_url = POST("referer");
+		}
 	}
 	# Throw up an error if a regular user tries to log in as administrator.
 	if ( $admin_login && (POST($user_name) != ADMIN_USER) ) {
