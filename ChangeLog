@@ -1,7 +1,12 @@
+20-Oct-2005:
+- Added better handling of expected errors in blog insert and fs_setup.
+- Added input filtering for trackbacks.
+
 18-Oct-2005:
 - Fixed up documentation a little.
 - Moved sidebar after content in default templates.  This makes things nicer
 for people with screen-readers or browsers that don't do CSS.
+- Added a crappy black and white theme.
 
 17-Oct-2005:
 - Removed stripslashes() mangling of blog home_path.  (Reported by WGM.)

@@ -22,33 +22,18 @@ font-size: 80%;
 
 
 <p>LnBlog: A simple file-based weblog focused on design elegance.<br />
-Copyright (C) 2005 Peter A. Geer &lt;<a href="mailto:pageer@skepticats.com">pageer@skepticats.com</a>&gt;</p>
-
-<p class="license">This program is free software; you can redistribute it and/or modify
-it under the terms of the <a href="http://www.gnu.org/copyleft/gpl.html">GNU General Public License</a> as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.</p>
+Copyright (C) 2005 Peter A. Geer &lt;<a href="mailto:pageer@skepticats.com">pageer@skepticats.com</a>&gt;<br />
+This program is licensed under the <a href="http://www.gnu.org/copyleft/gpl.html">GNU General Public License</a>.&nbsp; See the <a href="#license_information">license information</a> section for details.</p><h2><a name="introduction">Introduction</a></h2>
 
 
-<p class="license">
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-<a href="http://www.gnu.org/copyleft/gpl.html">GNU General Public License</a> for more details.</p>
-
-
-<p class="license">You should have received a copy of the <a href="http://www.gnu.org/copyleft/gpl.html">GNU General Public License</a>
-along with this program; if not, write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.</p>
-
-
-<h2><a name="introduction">Introduction</a></h2>
-
-
-<p>LnBlog is a simple weblog package written in PHP which stores data in text files.
+<p>LnBlog is a simple weblog package written in PHP which stores data
+in text files.
 It is strives to be easy to use, easy to manage, and feature rich while
 maintaining a clean, elegant, and modular design. It is built to create
-sites with a clean, directory-based URL structure and valid XHTML and CSS for
-style and layout.&nbsp; It is intended to run well on inexpensive web hosting accounts, and so is cross-platform and light on requirements.<br />
+sites with a clean, directory-based URL structure and valid XHTML and
+CSS for
+style and layout.&nbsp; It is intended to run well on inexpensive web
+hosting accounts, and so is cross-platform and light on requirements.<br />
 </p>
 
 
@@ -87,8 +72,8 @@ set on the web server.<br />
 </ol>
 
 
-<h2><a name="feature_list">Feature List</a></h2>LnBlog's built-in features include:
-
+<h2><a name="feature_list">Feature List</a></h2>
+LnBlog's built-in features include:
 
 <ul>
 
@@ -106,13 +91,15 @@ different look and behavior, i.e. different styles, HTML markup, images, and eve
 on a per-blog basis.</li>
 <li>Support for posting with simple auto-markup, a simple subset of BBcode,
 or raw HTML code.</li>
-</ul>The following features are also supported by the standard set of plugins:<br />
-<ul>
-  <li>Automatically generated RSS feeds for blog entries and comments.</li>
-  <li>E-mail notification when new comments are posted.</li>
-  <li>Automatically created .htaccess file preventing access to raw data files.</li>
 </ul>
+The following features are also supported by the standard set of plugins:<br />
 
+<ul>
+
+<li>Automatically generated RSS feeds for blog entries and comments.</li>
+<li>E-mail notification when new comments are posted.</li>
+<li>Automatically created .htaccess file preventing access to raw data files.</li>
+</ul>
 
 
 <h2><a name="initial_setup">Initial Setup</a></h2>
@@ -128,14 +115,28 @@ upload the whole LnBlog directory to a location in
 the publicly accessible portion of your web hosting account. You can
 them navigate
 to that directory with your favorite browser to run the configuration
-scripts. The first script configures file writing. If you have FTP
-access to the web server, you
-can use FTP for file writing (recommended if you don't have root access) by selecting the FTP
-option and giving the
-appropriate information below. Otherwise, LnBlog will use PHP's
-standard filesystem
-functions, which will require that Safe Mode be turned off and
-appropriate permissions set on the relevant directories (including the userdata directory).</p>
+scripts. The first script configures file writing. You have two options for file writing:</p>
+
+<ol>
+
+<li>NativeFS: This uses PHP's standard file writing functions to
+create data files.&nbsp; The up side of this is that there is no
+special configuration required.&nbsp; The down side is that, because of
+how PHP works, any files it creates will be owned by a system account,
+i.e. the username under which the web server runs, such as 'apache' or
+'nobody'.&nbsp; This makes it hard to manage the files if you do not
+have root (i.e. administrator) access to the machine, because you will
+not be able to delete or move files.&nbsp; In addition, native file writing requires that PHP's <strong>safe_mode</strong> be disabled.</li>
+<li>FTPFS:&nbsp;
+This filters file writing through FTP.&nbsp; Needless to say, this
+reuqires FTP access to you web server.&nbsp; It is recommended for
+shared hosting accounts and other situations where you do not have root
+(i.e. administrator) access to the web server because it keeps file
+permissions manageable.&nbsp; Also, FTP file writing will work when
+<strong>safe_mode</strong> is turned on.<br />
+</li>
+</ol>
+
 
 
 <p>After file writing support is
@@ -143,8 +144,19 @@ configured, you must set an administrator login. This account will be used to
 add new weblogs as well as to log into the ones you create. After
 that's
 set, you can log in and start adding new blogs and/or users. There are also
-administrative functions to
-modify a blog and update a blog (used when upgrading LnBlog).</p>
+administrative functions to:</p>
+
+<ol>
+
+<li>Modify a blog, i.e. change properties like the name, description, and allowed writers.</li>
+<li>Modify the links in the system-wide menu bar.</li>
+<li>Update blog data, meaning upgrade existing data files to a new format after an upgrade.&nbsp; This is almost never used.</li>
+<li>Upgrade a blog, which simply means replacing replacing the PHP
+wrapper scripts created by LnBlog.&nbsp; This is sometimes required
+after an upgrade.<br />
+</li>
+<li>Fix file permissions on a blog, which is almost never needed.</li>
+</ol>
 
 
 <h2><a name="upgrading">Upgrading</a></h2>
@@ -162,27 +174,36 @@ option.&nbsp; Simply put the relative path to your blog (e.g. myblog, as describ
 into the "upgrade to current version" box and click the "Upgrade" button.&nbsp; This will upgrade the
 configuration files for the blog and add any new pages.&nbsp; You
 will have to do this separately for each blog that youhave.</p>
+
 <p><strong>Note:</strong> If you are upgrading from LnBlog 0.3 to 0.4,
 the locations of the user configuration files have changed.&nbsp; You
 will need to copy the fsconfig.php, passwd.php, and sitemap.htm files
-from the root of your old LnBlog folder into the "userdata" subdirectory of your new LnBlog folder.&nbsp; You will also need to run an upgrade on each of your blogs.</p>
+from the root of your old LnBlog folder into the "userdata"
+subdirectory of your new LnBlog folder.&nbsp; You will also need to run
+an upgrade on each of your blogs.</p>
+
 <p><strong>Note 2:</strong> If you are upgrading to LnBlog 0.4 from
 version 0.3.1 or earlier, it is recommended that you delete your
 fsconfig.php file and go to the LnBlog administration page to recreate
 it, as there was a configuration value added to this file in version
 0.3.2.&nbsp; Your site may, however, continue to function normally with
 the old file.</p>
+
 <p><strong>Note 3:</strong> If, for some reason, you want to upgrade
 from LnBlog 0.2 to a higher version, you will need to delete your
 passwd.php file and create a new login, because the format of this file
 has changed and is no longer compatible.</p>
-<strong /><h2><a name="adding_new_users">Adding New Users</a></h2>
+
+<h2><a name="adding_new_users">Adding New Users</a></h2>
 
 
-<p>In addition to the administrator account, you can create as many new user accounts as you
-like. (<strong>Disclaimer</strong>: LnBlog was not buit to handle large numbers of users and has not been tested with such a configuration. While there is no
+<p>In addition to the
+administrator account, you can create as many new user accounts as you
+like. (Disclaimer: LnBlog was not buit to handle large numbers of users
+and has not been tested with such a configuration. While there is no
 <em>inherent</em>
-limit on the number of users, don't expect it to scale well beyond a couple dozen accounts.)&nbsp; To create a new account log in
+limit on the number of users, don't expect it to scale well beyond a
+couple dozen accounts.)&nbsp; To create a new account log in
 to the LnBlog administration page and click the "Add new user"
 link.&nbsp; Only the administrator account can create new users.</p>
 
@@ -221,6 +242,7 @@ anything with the blog), the other users (can do anything with their
 own posts - provided they <em>can</em> post), and everybody else (can only post comments).&nbsp;
 Which role a particular person will take depends on who they are and
 what blog you're talking about.&nbsp;The owner of one blog may be just a regular reader on another.&nbsp; <br />
+
 </p>
 
 
@@ -228,7 +250,12 @@ what blog you're talking about.&nbsp;The owner of one blog may be just a regular
 
 
 <p>Adding new blogs is done on the LnBlog administration page. Only the administrator account
-can add new blogs.</p>
+can add new blogs.&nbsp; Note that if you are using <a href="#initial_setup">native file writing</a>,
+then the user account under which PHP is running must have write access
+to the location where the blog will be created.&nbsp; This is normally
+not the case, so you may have to create the blog folder beforehand.<br />
+
+</p>
 
 
 <p>To add a new blog, just click
@@ -240,28 +267,28 @@ are as follows:</p>
 <ol>
 
 
-<li><strong>Blog path</strong>:
+<li>Blog path:
 The path to the blog on the web server machine.&nbsp; You may
 specify either an absolute path or a relative path, in which case the
 path is computed relative to your web root directory.&nbsp; So, if
 you specify the path "myblog", then the web address of the blog will be
 <code>http://www.mysite.com/myblog/</code>
 </li>
-<li><strong>Blog owner</strong>: The username of whoever owns the blog.
+<li>Blog owner: The username of whoever owns the blog.
 This is the user who will be allowed to change these settings later. By
 default, this is the administrator.</li>
-<li><strong>Additional allowed writers</strong>:
+<li>Additional allowed writers:
 A comma-separated list of usernames other than the owner who can post new
 entries and articles to this blog.</li>
-<li><strong>Blog name</strong>: The name of the blog.</li>
-<li><strong>Description</strong>: A short description of the blog.</li>
-<li><strong>Theme</strong>: The theme visual used for the blog.</li>
-<li><strong>Blog name</strong>: The name of the blog.</li>
-<li><strong>Maximum number of entries</strong>:
+<li>Blog name: The name of the blog.</li>
+<li>Description: A short description of the blog.</li>
+<li>Theme: The theme visual used for the blog.</li>
+<li>Blog name: The name of the blog.</li>
+<li>Maximum number of entries:
 The maximum number of entries to display on the homepage of the blog.
 For example, if this is 10, then the main page of the blog will display the
 last 10 entries.</li>
-<li><strong>Maximum number of entries in RSS feeds</strong>:
+<li>Maximum number of entries in RSS feeds:
 The maximum number of entries that will be put in the main blog RSS feed.</li>
 </ol>
 
@@ -287,14 +314,14 @@ option buttons below the edit area. They are:</p>
 <ol>
 
 
-<li><strong>Auto-markup</strong>: Adds HTML paragraphs and line breaks based on the plain-text
- input and converts all http:// and ftp:// URLs to links.</li>
-<li><strong>LBCode</strong>: Use a dialect of the BBCode markup popular in
+<li>Auto-markup: Adds HTML paragraphs and line breaks based on the plain-text
+input and converts all http:// and ftp:// URLs to links.</li>
+<li>LBCode: Use a dialect of the BBCode markup popular in
 web forums to markup your page. Paragraphs and line breaks are inserted like
 with auto-markup, but you can also include other supported tags. See the
 <a href="#lbcode">LBCode Syntax</a> section for details.
 </li>
-<li><strong>Raw HTML</strong>: The text you type is treated as raw HTML code.
+<li>Raw HTML: The text you type is treated as raw HTML code.
 No processing is done and there's no guarantee that your page will validate.
 In other words, this is for people who know what they're doing.</li>
 </ol>
@@ -311,6 +338,7 @@ will also store the username, so that the up-to-date name, e-mail, and
 homepage can be displayed automatically.&nbsp; Currently, comments
 cannot be edited, but they can be deleted by users with permission to
 modify the entry.&nbsp; <br />
+
 </p>
 
 
@@ -323,6 +351,7 @@ so that must be correctly configured for your server.&nbsp; The
 messages themselves are in plain-text format and include the URL of the
 comment, as well as the comment itself and any personal information
 entered by the reader.<br />
+
 </p>
 
 
@@ -332,6 +361,7 @@ entered by the reader.<br />
 <p>LnBlog has some very primitive support for Trackbacks.&nbsp; Each
 entry has a trackback URL and will store and display any trackback
 pings it receives. <br />
+
 </p>
 
 
@@ -340,6 +370,7 @@ You can then click on the "Send trackback ping" link for your blog
 entry and start the two-step ping process.&nbsp; The first step is to
 enter the URL you wish to ping.&nbsp; The second is to confirm the ping
 data and send it. <br />
+
 </p>
 
 
@@ -355,9 +386,9 @@ suckiness of this situation, sending a trackback ping will open a new
 browser window so that you don't have to manually go back to your blog.</p>
 
 
-<p>LnBlog currently does not support TrackBack URL
-autodiscovery.&nbsp; There is no bookmarklet to pick up trackback URLs
-for other blogs and there is no RDF section embedded in LnBlog entries.</p>
+<p>As of version 0.4.0, LnBlog supports TrackBack auto-discovery with 
+embedded RDF code using a plugin.  There is not yet a feature for 
+auto-discovering TrackBack URLs in other blogs.</p>
 
 
 <h2><a name="lbcode">LBCode Syntax</a></h2>
@@ -523,6 +554,7 @@ current LBCode handler does not deal gracefully with multiline
 tags.&nbsp; So if, e.g., you have a multiline block quotation or code block, the
 LBCode handler will still put &lt;br /&gt; tags in for the line
 breaks. <br />
+
 </li><li>In addition to the [img] tag, there are also [img-left] and
 [img-right] tags.&nbsp; These are exactly the same, except that the
 resulting HTML includes a CSS style to float the image to the left or
@@ -571,15 +603,18 @@ if you enter the abbreviation with the text "GNU" and the attribute
 just enter "GNU" for the text and
 leave the attribute blank. When you hit the abbreviation button, the
 attribute "GNU's Not UNIX" will be added automatically.</p>
-<h2><a name="plugins" />Plugins</h2>
-<p>LnBlog supports a simple, event-driven plugin system.&nbsp; In a
+
+<h2><a name="plugins">Plugins</a></h2>
+
+<p><a name="plugins">LnBlog supports a simple, event-driven plugin system.&nbsp; In a
 nutshell, this means that LnBlog supplies hooks that plugins can attach
 to whenever something interesting happens, e.g. when a comment is
-submitted, ablog entry is deleted, or  the page sidebar is
+submitted, ablog entry is deleted, or the page sidebar is
 displayed.&nbsp; So when one of those events occurrs, any plugins that
 are waiting for it will be notifed and run their code.&nbsp; For
-information on writing plugins, consult the <a href="techdoc.html">technical documentation</a>.&nbsp; <br />
+information on writing plugins, consult the </a><a href="techdoc.html">technical documentation</a>.&nbsp; <br />
 </p>
+
 <p>Installing and using plugins is quite easy.&nbsp; All you need to do
 is copy the plugin files to your "plugins" directory.&nbsp; You can use
 either the system-wide plugins directory under your LnBlog installation
@@ -590,8 +625,12 @@ As a general rule, there is no
 additional configuration required to make a plugin work, but this will
 depend on the particular plugin.&nbsp; None of the plugins that ship
 with LnBlog require additional configuration, but some thrid-party
-plugins might.Also, note that the standard plugins are all self-contained, so if you want to turn one off, you can just delete the file. <br />
+plugins might.Also, note that the standard plugins are all
+self-contained, so if you want to turn one off, you can just delete the
+file. <br />
+
 </p>
+
 <p>Note that the precedence of plugins in a blog's plugins directory
 allows you to easily disable plugins on a per-blog basis.&nbsp; All you
 need to do is create an empty file with the same name as the
@@ -602,7 +641,6 @@ banner, and the sitemap are all done with plugins.&nbsp; So, if you are
 using LnBlog on a local network and want to turn off the Google search
 in the sidebar, you can justcreate an empty file named sidebar_5_googlesearch.php file in your blog's plugins folder. <br />
 </p>
-
 
 
 <h2><a name="cms_features"><abbr title="Content Management System">CMS</abbr> Features</a></h2>

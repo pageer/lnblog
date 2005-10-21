@@ -49,9 +49,9 @@ class Trackback extends LnBlogObject {
 	}
 
 	function getPostData() {
-		$this->title = POST("title");
-		$this->data = POST("excerpt");
-		$this->blog = POST("blog_name");
+		$this->title = htmlspecialchars(POST("title"));
+		$this->data = htmlspecialchars(strip_tags(POST("excerpt")));
+		$this->blog = htmlspecialchars(POST("blog_name"));
 		$this->url = POST("url");	
 	}
 

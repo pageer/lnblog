@@ -682,10 +682,12 @@ class Blog extends LnBlogObject {
 		}
 		$inst_path = getcwd();
 		if ($path) $this->home_path = canonicalize($path);
-		#$this->home_path = realpath(getcwd().PATH_DELIM.$this->home_path);
 		$this->home_path = canonicalize($this->home_path);
+
+		# Try to create the home path.  Since this may fail due to permissions
+		# problems with nativefs, suppress errors.
 		if (! is_dir($this->home_path)) {
-			$ret = $fs->mkdir_rec($this->home_path);
+			@$ret = $fs->mkdir_rec($this->home_path);
 			if (! $ret) return false;
 		}
 		

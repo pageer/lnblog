@@ -1,6 +1,6 @@
 <h2><?php echo $UPDATE_TITLE; ?></h2>
 <?php if (isset($UPDATE_MESSAGE)) { ?>
-<p><?php echo $UPDATE_MESSAGE; ?></p>
+<p style="color: red"><?php echo $UPDATE_MESSAGE; ?></p>
 <?php } ?>
 <fieldset>
 <form id="addblog" method="post" action="<?php echo $POST_PAGE; ?>">

@@ -538,4 +538,10 @@ function sanitize($str, $pattern="/\W/", $sub="") {
 	}
 }
 
+function stripslashes_smart($str) {
+	$matches = array("/\\'/", '/\\"/', '/\\\+/');
+	$replacements = array("'", '"', "\\");
+	return preg_replace($matches, $replacements, $str);
+}
+
 ?>

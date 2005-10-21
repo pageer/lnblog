@@ -13,7 +13,7 @@ function ftp_test() {
 </script>
 <h2>File System Configuration</h2>
 <?php if (isset($FORM_MESSAGE)) { ?>
-<p><strong><?php echo $FORM_MESSAGE; ?></strong></p>
+<p><strong style="color: red"><?php echo $FORM_MESSAGE; ?></strong></p>
 <?php } ?>
 <form method="post" action="<?php echo $FORM_ACTION; ?>">
 <h3>Set Document Root</h3>

@@ -78,13 +78,13 @@ $tpl->set("PREF_ID", $pref);
 
 if ( has_post() ) {
 
-	$tpl->set("DOC_ROOT", POST($docroot) );
-	$tpl->set("USE_FTP", POST($ftp) );
+	$tpl->set("DOC_ROOT", stripslashes_smart(POST($docroot)) );
+	if (POST($ftp) == "ftpfs") $tpl->set("USE_FTP", POST($ftp) );
 	$tpl->set("USER", POST($uid) );
 	$tpl->set("PASS", POST($pwd) );
 	$tpl->set("CONF", POST($conf) );
 	$tpl->set("HOST", POST($host) );
-	$tpl->set("ROOT", POST($root) );
+	$tpl->set("ROOT", stripslashes_smart(POST($root)) );
 	$tpl->set("PREF", POST($pref) );
 
 	$content = '';
@@ -166,10 +166,25 @@ if ( has_post() ) {
 	
 		$fs = NewFS();
 		$content = str_replace('\\', '\\\\', $content);
-		$ret = $fs->write_file(INSTALL_ROOT.PATH_DELIM.USER_DATA.PATH_DELIM.FS_PLUGIN_CONFIG, $content);
-		$fs->destruct();	
-		if (! $ret) $tpl->set("FORM_MESSAGE", "Could not create file.");
-		else {
+		
+		# Try to create the fsconfig file.  Suppress error messages so users
+		# don't get scared by expected permissions problems.
+		if (! is_dir(INSTALL_ROOT.PATH_DELIM.USER_DATA)) {
+			@$ret = $fs->mkdir_rec(INSTALL_ROOT.PATH_DELIM.USER_DATA);
+		}
+		if (is_dir(INSTALL_ROOT.PATH_DELIM.USER_DATA)) {
+			@$ret = $fs->write_file(INSTALL_ROOT.PATH_DELIM.USER_DATA.PATH_DELIM.FS_PLUGIN_CONFIG, $content);
+			$fs->destruct();
+		}
+		
+		if (! $ret) {
+			$tpl->set("FORM_MESSAGE", "Error: Could not fsconfig.php file.  ".
+				"Make sure that the directory ".
+				INSTALL_ROOT.PATH_DELIM.USER_DATA.
+				" exists on the server and is writable to ".
+				(FS_PLUGIN=="ftpfs" ? "'".FTPFS_USER."'." : "the web server user.")
+			);
+		} else {
 			header("Location: index.php");
 			exit;
 		}
