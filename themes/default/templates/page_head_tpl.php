@@ -12,7 +12,7 @@
 <link rel="stylesheet" type="text/css" href="<?php echo getlink($css, LINK_STYLESHEET); ?>" />
 <?php } ?>
 <?php foreach ($SCRIPTS as $js) { ?>
-<script type="<?php echo getlink($js["type"], LINK_SCRIPT); ?>" src="<?php echo getlink($js["href"], LINK_SCRIPT); ?>"></script>
+<script type="<?php echo $js["type"]; ?>" src="<?php echo getlink($js["href"], LINK_SCRIPT); ?>"></script>
 <?php } ?>
 </head>
 <?php include(BASIC_LAYOUT_TEMPLATE); ?>

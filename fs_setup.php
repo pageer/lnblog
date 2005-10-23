@@ -178,7 +178,7 @@ if ( has_post() ) {
 		}
 		
 		if (! $ret) {
-			$tpl->set("FORM_MESSAGE", "Error: Could not fsconfig.php file.  ".
+			$tpl->set("FORM_MESSAGE", "Error: Could not create fsconfig.php file.  ".
 				"Make sure that the directory ".
 				INSTALL_ROOT.PATH_DELIM.USER_DATA.
 				" exists on the server and is writable to ".

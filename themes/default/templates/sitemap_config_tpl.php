@@ -28,7 +28,7 @@ to work correctly.</p>
 </div>
 <div style="text-align: center">
 <button id="addlink" onclick="addLink();" />Add link</button>
-<button id="clear" onclick="addLink();" />Clear</button>
+<button id="clear" onclick="clearBoxes();" />Clear</button>
 </div>
 <!--
 <div>
@@ -38,6 +38,6 @@ to work correctly.</p>
 -->
 <form method="post" action="<?php echo $FORM_ACTION; ?>">
 <textarea id="output" name="output" rows="10"><?php if (isset($CURRENT_SITEMAP)) echo $CURRENT_SITEMAP; ?></textarea>
-<div><input type="submit" value="Save sitemap" /></div>
+<div><input type="submit" value="Save sitemap" /><input type="reset" value="Reset sitemap" /></div>
 </form>
 </fieldset>

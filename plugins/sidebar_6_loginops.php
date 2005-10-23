@@ -18,11 +18,17 @@ class LoginOps extends Plugin {
 ?>
 <h3>Weblog Administration</h3>
 <ul>
+<?php if ($blg->canAddEntry()) { ?>
 <li><a href="<?php echo $root; ?>new.php">Add new post</a></li>
+<?php } 
+      if ($blg->canAddArticle()) { ?> 
 <li><a href="<?php echo $root; ?>newart.php">Add new article</a></li>
+<?php }
+      if ($blg->canModifyBlog()) { ?>
 <li><a href="<?php echo $root; ?>uploadfile.php">Upload file for blog</a></li>
 <li><a href="<?php echo $root; ?>edit.php">Edit weblog settings</a></li>
 <li><a href="<?php echo $root; ?>map.php">Edit custom sitemap</a></li>
+<?php } ?>
 <li><a href="<?php echo $root; ?>useredit.php">Edit User Information</a></li>
 <li><a href="<?php echo $root; ?>logout.php">Logout <?php echo $usr->username(); ?></a></li>
 </ul>

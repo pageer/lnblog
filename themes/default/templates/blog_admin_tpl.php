@@ -21,5 +21,6 @@
 <p>Upgrade Status: <strong><?php echo $upgrade_status; ?></strong></p>
 <?php } ?>
 </li>
+<li><a href="bloglogout.php">Log out</a></li>
 </ul>
 </form>

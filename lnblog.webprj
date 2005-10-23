@@ -1,10 +1,8 @@
 <!DOCTYPE webproject>
 <webproject>
-  <project usePreviewPrefix="0" type="Local" previewPrefix="" name="LnBlog" encoding="iso 8859-1" >
+  <project usePreviewPrefix="0" type="Local" previewPrefix="" usePersistentBookmarks="0" name="LnBlog" encoding="iso 8859-1" enableEvents="true" >
     <upload/>
-    <author>Peter A. Geer</author>
-    <email>pageer@skepticats.com</email>
-    <defaultDTD>-//W3C//DTD XHTML 1.0 Strict//EN</defaultDTD>
+    <defaultDTD>-//w3c//dtd xhtml 1.0 strict//en</defaultDTD>
     <item url="lib/" uploadstatus="1" />
     <item url="lib/article.php" uploadstatus="1" />
     <item url="lib/blogcomment.php" uploadstatus="1" />
@@ -52,14 +50,6 @@
     <item url="pages/tb_ping_new.php" uploadstatus="1" />
     <item url="pages/tb_ping.php" uploadstatus="1" />
     <item url="plugins/" uploadstatus="1" />
-    <item url="plugins/sidebar/" uploadstatus="1" />
-    <item url="plugins/sidebar/archives.php" uploadstatus="1" />
-    <item url="plugins/sidebar/articles.php" uploadstatus="1" />
-    <item url="plugins/sidebar/calendar.php" uploadstatus="1" />
-    <item url="plugins/sidebar/googlesearch.php" uploadstatus="1" />
-    <item url="plugins/sidebar/login.php" uploadstatus="1" />
-    <item url="plugins/sidebar/news.php" uploadstatus="1" />
-    <item url="plugins/sidebar/recent.php" uploadstatus="1" />
     <item url="plugins/banner_1_pageheader.php" uploadstatus="1" />
     <item url="plugins/menubar_1_sitemap.php" uploadstatus="1" />
     <item url="plugins/sidebar_1_recent.php" uploadstatus="1" />
@@ -186,7 +176,6 @@
     <item url="userdata/" uploadstatus="1" />
     <item url="userdata/fsconfig.php" uploadstatus="1" />
     <item url="userdata/passwd.php" uploadstatus="1" />
-    <item url="userdata/sitemap.htm" uploadstatus="1" />
     <item url="blogconfig.php" uploadstatus="1" />
     <item url="bloglogin.php" uploadstatus="1" />
     <item url="bloglogout.php" uploadstatus="1" />
@@ -207,14 +196,64 @@
     <item url="updateblog.php" uploadstatus="1" />
     <item url="userinfo.php" uploadstatus="1" />
     <item url="" uploadstatus="1" />
-    <templates>templates/</templates>
-    <toolbars>toolbars/</toolbars>
+    <templates>quanta_templates/</templates>
+    <toolbars>quanta_toolbars/</toolbars>
+    <debuggers>
+      <Gubed/>
+    </debuggers>
+    <uploadprofiles showtreeviews="true" defaultProfile="@" >
+      <profile remote_host="" remote_port="" remote_path="" remote_protocol="ftp" user="" name="@" />
+    </uploadprofiles>
+    <author>Peter A. Geer</author>
+    <email>pageer@skepticats.com</email>
+    <debuggerclient>No Debugger</debuggerclient>
+    <exclude cvsignore="true" >.svn;.directory;</exclude>
+    <teamdata>
+      <taskleaders/>
+      <subprojectleaders/>
+      <leader>
+        <name>Peter Geer</name>
+        <email>pageer@skepticats.com</email>
+      </leader>
+      <mailinglist address="" />
+    </teamdata>
+    <events/>
+    <item url="lib/page.php" uploadstatus="1" />
+    <item url="plugins/comment_notify.php" uploadstatus="1" />
+    <item url="plugins/htaccess_generator.php" uploadstatus="1" />
+    <item url="plugins/page_metatags.php" uploadstatus="1" />
+    <item url="plugins/readme.txt" uploadstatus="1" />
+    <item url="plugins/rss1_generator.php" uploadstatus="1" />
+    <item url="plugins/rss2_generator.php" uploadstatus="1" />
+    <item url="plugins/rss_links.php" uploadstatus="1" />
+    <item url="plugins/trackbackrdf.php" uploadstatus="1" />
+    <item url="quanta_templates/" uploadstatus="1" />
+    <item url="quanta_toolbars/" uploadstatus="1" />
+    <item url="themes/default/templates/page_head_tpl.php" uploadstatus="1" />
+    <item url="themes/terminal/" uploadstatus="1" />
+    <item url="themes/terminal/images/" uploadstatus="1" />
+    <item url="themes/terminal/scripts/" uploadstatus="1" />
+    <item documentFolder="true" url="themes/terminal/styles/" uploadstatus="0" />
+    <item url="themes/terminal/styles/article.css" uploadstatus="0" />
+    <item url="themes/terminal/styles/banner.css" uploadstatus="0" />
+    <item url="themes/terminal/styles/blogentry.css" uploadstatus="0" />
+    <item url="themes/terminal/styles/comment.css" uploadstatus="0" />
+    <item url="themes/terminal/styles/form.css" uploadstatus="0" />
+    <item url="themes/terminal/styles/main.css" uploadstatus="0" />
+    <item url="themes/terminal/styles/menubar.css" uploadstatus="0" />
+    <item url="themes/terminal/styles/sidebar.css" uploadstatus="0" />
+    <item url="themes/terminal/styles/trackback.css" uploadstatus="0" />
+    <item url="themes/terminal/templates/" uploadstatus="1" />
+    <item url="themes/terminal/templates/blogentry_tpl.php" uploadstatus="1" />
+    <item url="LICENSE" uploadstatus="1" />
+    <item url="TODO" uploadstatus="1" />
+    <item url="plugins/sidebar_7_poweredby.php" />
     <treestatus>
       <openfolder url="lib" />
-      <openfolder url="pages" />
       <openfolder url="themes" />
-      <openfolder url="themes/default" />
-      <openfolder url="themes/default/templates" />
+      <openfolder url="themes/terminal" />
+      <openfolder url="themes/terminal/styles" />
+      <openfolder url="themes/terminal/templates" />
     </treestatus>
   </project>
 </webproject>

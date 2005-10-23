@@ -33,5 +33,6 @@
 <?php if ( ! empty($TRACKBACKCOUNT) ) { ?>
 <li><a href="<?php echo $PERMALINK.ENTRY_TRACKBACK_DIR; ?>/">TrackBacks (<?php echo $TRACKBACKCOUNT; ?>)</a></li>
 <?php } ?>
+</ul>
 </div>
 </div>
