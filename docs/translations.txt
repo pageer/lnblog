@@ -1,0 +1,47 @@
+Document: Translations
+Information on translating and localizing LnBlog.
+
+Section: Translation Mechanisms
+
+LnBlog supports two distinct translation mechanisms.  The recommended method is to use the PHP 
+module for GNU gettext.  The "fallback" method is an ad hoc function that reads strings from a
+file in a PHP array.  This is provided because gettext, while widely used in the free software 
+community, is not a standard PHP module and so is not available on all web hosts.  If you wish
+to provide a translation to be included with LnBlog, then please try to support both options.  
+Note that, with a little scripting ability, a gettext translation could be automatically 
+converted to the ad hoc format.  Such a tool will probably be included with LnBlog in the future.
+
+Section: Translation Interface
+
+LnBlog uses four key functions to translate strings.  When extracting translatable strings from 
+the source code using xgettext, you will need to account for these.  They are listed below.
+
+_()      - The simple translation marker.  This function simply  returns the translation its 
+           single argument.  If no translation is available, returns the argument.
+p_()     - Print translation.  Like _(), but prints the translation instead of returning it.
+pf_()    - Print formatted translation.  Like p_(), but allows printf() scancodes to be embedded
+           into the string.  Like printf(), this takes a variable number of arguments, with the
+           first being the string to translate.
+spf_()   - Like pf_(), but returns the translation instead of printing it.  This is analogous to
+           sprintf in the same way that pf_() is analogous to printf().
+
+To extract the strings translated by these functions, you can use the --keyword argument to 
+xgettext, which comes with GNU gettext.  The command would look something like this.
+| xgettext -LPHP --keyword=_:1 --keyword=p_:1 --keyword=pf_:1 --keyword=spf_:1 *.php
+
+Section: Ad Hoc Translation Format
+
+The ad hoc translation mechanism used by LnBLog takes the form of a simple PHP array.  The 
+translation file must create the array and populate it.  Each element of the array will be
+indexed by the untranslated US English text and will contain the translated text as its data.  If 
+you are familiat with GNU gettext, the array index is analogous to the msgid and element content
+is analogous to the msgstr.
+The file will, of course, need to be correctly encoded (UTF-8 is recommended).  
+
+Here is a simple example of an ad hoc translation file.  Note that the PHP opening and closing 
+tags are required, as is the array creation on the second line.  Also note that there can be no
+ characters ot whitespace outside the PHP tags.  
+|<?php
+|$strings = array();
+|$strings["My message."] = "Translated message.";
+|?>

@@ -18,7 +18,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-# Functions: creators.php
+# File: creators.php
 # These are a collection of functions that return an object of the 
 # appropriate type based on certain parameters.  
 # The purpose of this is to allow for a plugin-like configuration mechanism.

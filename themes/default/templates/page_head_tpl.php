@@ -1,5 +1,6 @@
-<?php echo $DOCTYPE; ?>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<?php echo $DOCTYPE;
+$xml_lang = str_replace("_", "-", LANGUAGE); ?>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $xml_lang; ?>" lang="<?php echo $xml_lang; ?>">
 <head>
 <title><?php echo $PAGE_TITLE; ?></title>
 <?php foreach ($METADATA as $meta) { ?>

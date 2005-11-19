@@ -18,10 +18,11 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-# This file is used to display a blog entry with its comments.
-# If you want to modify the layout of this page, you should be able to simply
-# change the HTML code and leave the PHP code alone without seriously 
-# breaking anything.
+# File: newarticle.php
+# Used to add a new article.  
+# To edit an existing article, refer to the <editarticle.php> file.
+#
+# This is included by the newart.php wrapper script for blogs.
 
 session_start();
 require_once("lib/creators.php");
@@ -29,37 +30,31 @@ require_once("lib/creators.php");
 $blg = NewBlog();
 $page = NewPage(&$blg);
 
-$url = "art_url";
 $submit_id = "submit";
 $preview_id = "preview";
-$tpl = NewTemplate(ARTICLE_EDIT_TEMPLATE);
-
-$tpl->set("FORM_ACTION", current_file() );
-$tpl->set("ARTICLE_POST_SUBJECT", ENTRY_POST_SUBJECT);
-$tpl->set("ARTICLE_POST_DATA", ENTRY_POST_DATA);
-$tpl->set("ARTICLE_POST_HTML", ENTRY_POST_HTML);
-$tpl->set("ARTICLE_POST_COMMENTS", ENTRY_POST_COMMENTS);
-$tpl->set("ARTICLE_POST_URL", $url);
+$tpl = NewTemplate(ENTRY_EDIT_TEMPLATE);
 
 # Disable comments by default.
 $tpl->set("COMMENTS", 0);
 $tpl->set("SUBMIT_ID", $submit_id);
 $tpl->set("PREV_ID", $preview_id);
 $tpl->set("HAS_HTML", MARKUP_BBCODE);
+$tpl->set("GET_SHORT_PATH");
+$tpl->set("FORM_ACTION", current_file() );
 $blg->exportVars($tpl);
 
 if (POST($submit_id)) {
-	$ret = $blg->newArticle(POST($url));
+	$ret = $blg->newArticle(POST("short_path"));
 	$last_art =& $blg->last_article;
 	if ($ret == UPDATE_SUCCESS) $page->redirect($blg->last_article->permalink());
 	else $blg->errorArticle($ret, $tpl);
 } elseif (POST($preview_id)) {
-	$tpl->set("URL", POST($url));
+	$tpl->set("URL", POST("short_path"));
 	$blg->previewArticle($tpl);
 }
 
 $body = $tpl->process();
-$page->title = $blg->name." - New Article";
+$page->title = spf_("%s - New Article", $blg->name);
 $page->addStylesheet("form.css", "article.css");
 $page->addScript("editor.js");
 $page->display($body, &$blg);

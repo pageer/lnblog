@@ -18,6 +18,15 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+# File: newblog.php
+# Used to create a new weblog.
+#
+# The form is initially populated with a reasonable list of default values,
+# taken from <blogconfig.php>.  The user will probably want to change the 
+# path and will need to set a name and description.  The blog owner
+# may also need to be changed and the list of allowed writers may need to 
+# be set as well.
+
 session_start();
 require_once("blogconfig.php");
 require_once("lib/creators.php");
@@ -80,7 +89,7 @@ $tpl->set("BLOG_PATH_ID", $blogpath);
 $tpl->set("BLOG_PATH", $blog->home_path);
 $tpl->set("POST_PAGE", current_file());
 $tpl->set("SUBMIT_ID", $submitid);
-$tpl->set("UPDATE_TITLE", "Create new weblog");
+$tpl->set("UPDATE_TITLE", _("Create new weblog"));
 
 # If the user doesn't give us an absolute path, assume it's relative
 # to the DOCUMENT_ROOT.  We put it down here so that the form data
@@ -91,12 +100,12 @@ if (! is_absolute($blog->home_path)) {
 
 if (POST("submit")) {
 	$ret = $blog->insert();
-	if (!$ret) $tpl->set("UPDATE_MESSAGE", "Error creating blog.  This could be a problem with the file permissions on your server.  Please refer to the <a href=\"http://www.skepticats.com/LnBlog/Readme.html\">documentation</a> for more information.");
+	if (!$ret) $tpl->set("UPDATE_MESSAGE", _("Error creating blog.  This could be a problem with the file permissions on your server.  Please refer to the <a href=\"http://www.skepticats.com/LnBlog/Readme.html\">documentation</a> for more information."));
 	else $page->redirect($blog->getURL());
 }
 
 $body = $tpl->process();
-$page->title = "Create new blog";
+$page->title = _("Create new blog");
 $page->addStylesheet("form.css");
 $page->display($body);
 ?>

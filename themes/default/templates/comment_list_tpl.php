@@ -1,8 +1,22 @@
-<h2>Comments on <a href="<?php echo $ENTRY_PERMALINK; ?>"><?php echo $ENTRY_SUBJECT; ?></a></h2>
-<ol class="commentlist">
+<h2><?php echo $LIST_TITLE ?></h2>
+<?php if (isset($LIST_HEADER)) { ?>
+<p><?php echo $LIST_HEADER; ?></p>
+<?php }
+	if (!empty($ITEM_LIST)) { 
+?>
+<ol<?php if (isset($LIST_CLASS)) { ?> class="<?php echo $LIST_CLASS; ?>"<?php } ?>>
 <?php 
-if (!empty($COMMENT_LIST)) {
-	echo $COMMENT_LIST; 
-} else {
-?><li>No comments posted yet.</li><?php } ?>
+		foreach ($ITEM_LIST as $ITEM) {
+?>
+<li<?php if (isset($ITEM_CLASS)) { ?> class="<?php echo $ITEM_CLASS; ?>"<?php } ?>>
+<?php echo $ITEM; ?>
+</li>
+<?php 
+		} 
+?>
 </ol>
+<?php } 
+	if (isset($LIST_FOOTER)) { 
+?>
+<p><?php echo $LIST_FOOTER; ?></p>
+<?php }

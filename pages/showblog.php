@@ -18,6 +18,11 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+# File: showblog.php
+# Shows the standard front page of weblog with the most recent entries.
+#
+# This is included by the index.php wrapper script of blogs.
+
 session_start();
 require_once("config.php");
 require_once("lib/creators.php");

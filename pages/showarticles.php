@@ -17,6 +17,13 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
+# File: showarticles.php
+# Show a list of all the articles for a weblog.
+#
+# This is included in the index.php wrapper script in the top-level articles
+# directory of blogs.
+
 session_start();
 
 require_once("config.php");
@@ -30,8 +37,8 @@ $title = $blog->name." - ".$year_dir;
 $list = scan_directory(getcwd(), true);
 sort($list);
 
-$tpl = NewTemplate(ARCHIVE_TEMPLATE);
-$tpl->set("ARCHIVE_TITLE", $blog->name." articles");
+$tpl = NewTemplate(LIST_TEMPLATE);
+$tpl->set("LIST_TITLE", spf_("%s articles", $blog->name));
 
 $LINK_LIST = $blog->getArticleList(false, false);
 

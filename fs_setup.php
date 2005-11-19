@@ -24,6 +24,7 @@ document root for your web server (it will try to auto-detect this).
 It creates the userdata/fsconfig.php file.
 
 There are two options for file writing.
+
 Native FS - Uses PHP's native filesystem functions.  
 FTP FS    - Write files through an FTP connection (usually to localhost).
 
@@ -60,8 +61,8 @@ if ( file_exists(INSTALL_ROOT.PATH_DELIM.USER_DATA.PATH_DELIM.FS_PLUGIN_CONFIG) 
 }
 $page = NewPage();
 
-$page->title = PACKAGE_NAME."  File Writing";
-$form_title = "Configure File Writing Support";
+$page->title = sprintf(_("%s File Writing"), PACKAGE_NAME);
+$form_title = _("Configure File Writing Support");
 $redir_page = "index.php";
 
 $tpl = NewTemplate(FS_CONFIG_TEMPLATE);
@@ -102,6 +103,7 @@ if ( has_post() ) {
 			$webroot = get_magic_quotes_gpc() ? 
 			           stripslashes($webroot) : $webroot;
 			define("DOCUMENT_ROOT", $webroot);
+			echo DOCUMENT_ROOT;
 			$content .= 'define("DOCUMENT_ROOT", "'.DOCUMENT_ROOT."\");\n";
 		}
 		$content .= 'define("FS_PLUGIN", "'.FS_PLUGIN."\");\n?>";
@@ -115,6 +117,67 @@ if ( has_post() ) {
 			$has_all_data = $has_all_data && ( trim(POST($val)) != "" );
 		}
 
+		# Make a vain attempt to guess the FTP root.
+		if ( trim(POST($uid)) && trim(POST($pwd)) && trim(POST($conf)) 
+		     && trim(POST($host)) && trim(POST($pwd)) == trim(POST($conf))
+			  && ! trim(POST($root)) ) {
+			require("lib/ftpfs.php");
+			@$ftp = new FTPFS(trim(POST($host)), 
+			                 trim(POST($uid)), trim(POST($pwd)) );
+			if ($ftp->status !== false) {
+				
+				# Try to calculate the FTP root.
+				ftp_chdir($ftp->connection, "/");
+				$ftp_list = ftp_nlist($ftp->connection, ".");
+				
+				$file = getcwd().PATH_DELIM."fs_setup.php";
+				$drive = substr($file, 0, 2);
+
+				# Get the current path into an array.
+				if (PATH_DELIM != "/") {
+					if (substr($file, 1, 1) == ":") $file = substr($file, 3);
+					$file = str_replace(PATH_DELIM, "/", $file);
+				}
+
+				if (substr($file, 0, 1) == "/") $file = substr($file, 1);
+				$dir_list = explode("/", $file);
+
+				# For each local directory element, loop through contents of 
+				# the FTP root directory.  If the current element is in FTP root,
+				# then the parent of the current element is the root.
+				# $ftp_root starts at root and has the current directory appended
+				# at the end of each outer loop iteration.  Thus, $ftp_root 
+				# always holds the parent of the currently processing directory.
+				# Note that we must account for Windows drive letters.
+				if (PATH_DELIM == "/") {
+					$ftp_root = "/";
+				} else {
+					$ftp_root = $drive.PATH_DELIM;
+				}
+				foreach ($dir_list as $dir) {
+					foreach ($ftp_list as $ftpdir) {
+						if ($dir == $ftpdir && $ftpdir != ".." && $ftpdir != ".") {
+							break 2;
+						}
+					}
+					$ftp_root .= $dir.PATH_DELIM;
+				}
+				
+				# Now check that the result we got is OK.
+				$ftp->ftp_root = $ftp_root;
+				$dir_list = ftp_nlist($ftp->connection, 
+				                      $ftp->localpathToFSPath(getcwd()));
+				if (! is_array($dir_list)) $dir_list = array();
+
+				foreach ($dir_list as $ent) {
+					if ("fs_setup.php" == basename($ent)) {
+						$ftp_root_test_result = $ftp_root;
+						$has_all_data = true;
+					} 
+				}
+			}
+		}
+
 		if ($has_all_data) {
 
 			if ( trim(POST($pwd)) == trim(POST($conf)) ) {
@@ -123,9 +186,13 @@ if ( has_post() ) {
 				define("FTPFS_USER", trim(POST($uid)) );
 				define("FTPFS_PASSWORD",trim( POST($pwd)) );
 				define("FTPFS_HOST", trim(POST($host)) );
-				$ftproot = trim(POST($root));
-				$ftproot = get_magic_quotes_gpc() ? 
-				           stripslashes($ftproot) : $ftproot;
+				if (isset($ftp_root_test_result)) {
+					$ftproot = $ftp_root_test_result;
+				} else {
+					$ftproot = trim(POST($root));
+					$ftproot = get_magic_quotes_gpc() ? 
+					           stripslashes($ftproot) : $ftproot;
+				}
 				define("FTP_ROOT", $ftproot);
 				if (trim(POST($pref)) != '') {
 					define("FTPFS_PATH_PREFIX", trim(POST($pref)) );
@@ -136,8 +203,8 @@ if ( has_post() ) {
 					$webroot = trim(POST($docroot));
 					$webroot = get_magic_quotes_gpc() ? 
 					           stripslashes($webroot) : $webroot;
-
-					define("DOCUMENT_ROOT", trim(POST($docroot)) );
+					
+					define("DOCUMENT_ROOT", $webroot );
 					$content .= 'define("DOCUMENT_ROOT", "'.DOCUMENT_ROOT."\");\n";
 				}
 				$content .= 'define("FS_PLUGIN", "'.FS_PLUGIN."\");\n".
@@ -151,20 +218,23 @@ if ( has_post() ) {
 				$content .= '?>';
 
 			} else {
-				$tpl->set("FORM_MESSAGE", "Error: Passwords do not match.");
+				$tpl->set("FORM_MESSAGE", _("Error: Passwords do not match."));
 			}
-		
+		} elseif (trim(POST($pwd)) != trim(POST($conf))) {
+			$tpl->set("FORM_MESSAGE", _("Error: Passwords do not match."));
+		} elseif (isset($ftp_root)) {
+			$tpl->set("FORM_MESSAGE", spf_("Error: The auto-detected FTP root directory %s was not acceptable.  You will have to set this manually.", $ftp_root));
 		} else {
-			$tpl->set("FORM_MESSAGE", "Error: For FTP file writing, all fields except 'Prefix' are required.");
+			$tpl->set("FORM_MESSAGE", _("Error: For FTP file writing, all fields except 'Prefix' are required."));
 		}
 	
 	} else {
-		$tpl->set("FORM_MESSAGE", "Error: No file writing method selected.");
+		$tpl->set("FORM_MESSAGE", _("Error: No file writing method selected."));
 	}
 
 	if ($content) {
 	
-		$fs = NewFS();
+		@$fs = NewFS();
 		$content = str_replace('\\', '\\\\', $content);
 		
 		# Try to create the fsconfig file.  Suppress error messages so users
@@ -178,12 +248,17 @@ if ( has_post() ) {
 		}
 		
 		if (! $ret) {
-			$tpl->set("FORM_MESSAGE", "Error: Could not create fsconfig.php file.  ".
-				"Make sure that the directory ".
-				INSTALL_ROOT.PATH_DELIM.USER_DATA.
-				" exists on the server and is writable to ".
-				(FS_PLUGIN=="ftpfs" ? "'".FTPFS_USER."'." : "the web server user.")
-			);
+			if (FS_PLUGIN == "ftpfs") {
+				$tpl->set("FORM_MESSAGE", sprintf(
+					_("Error: Could not create fsconfig.php file.  Make sure that 
+					the directory %s exists on the server and is writable to %s."),
+					INSTALL_ROOT.PATH_DELIM.USER_DATA, FTPFS_USER));
+			} else {
+				$tpl->set("FORM_MESSAGE", sprintf(
+					_("Error: Could not create fsconfig.php file.  Make sure that 
+					the directory %s exists on the server and is writable to 
+					the web server user."), INSTALL_ROOT.PATH_DELIM.USER_DATA));
+			}
 		} else {
 			header("Location: index.php");
 			exit;
@@ -191,7 +266,7 @@ if ( has_post() ) {
 		
 	} else {
 		if (! $tpl->varSet("FORM_MESSAGE") ) {
-			$tpl->set("FORM_MESSAGE", "Unexpected error: missing data?");
+			$tpl->set("FORM_MESSAGE", _("Unexpected error: missing data?"));
 		}
 	}
 	

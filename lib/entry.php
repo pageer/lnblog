@@ -86,9 +86,17 @@ class Entry extends LnBlogObject{
 	/*
 	Method: permalink
 	Abstract function that returns the object's permalink.  
-	Child classes MUST over-ride this.
+	Child classes *must* over-ride this.
 	*/
 	function permalink() { return ""; }
+
+	/*
+	Method: queryStringToID
+	Abstract function that converts a query string into a unique identifier 
+	for an object.  
+	Child classes *must* over-ride this function.
+	*/
+	function queryStringToID() { return false; }
 
 	/*
 	Method: absolutizeBBCodeURI
@@ -131,7 +139,8 @@ class Entry extends LnBlogObject{
 		
 		if (UNICODE_ESCAPE_HACK) {
 			$ret = htmlentities($data);
-			$ret = preg_replace("/&amp;(#?\w+);/Usi", "&$1;", $ret);
+			$ret = preg_replace("/&amp;(#\d+);/Usi", "&$1;", $ret);
+			$ret = preg_replace("/&amp;(\w{2,7});/Usi", "&$1;", $ret);
 		} else {
 			$ret = htmlspecialchars($data);
 		}
@@ -214,7 +223,7 @@ class Entry extends LnBlogObject{
 		$replacements[15] = '<tt>$1</tt>';
 		$replacements[16] = '<img alt="$2" title="$2" style="float: left; clear: none;" src="$1" />';
 		$replacements[17] = '<img alt="$2" title="$2" style="float: right; clear: none;" src="$1" />';
-		$replacements[18] = '<h'.LBCODE_HEADER_WEIGHT.'>$1</h'.LBCODE_HEADER_WEIGHT.'>';
+		$replacements[18] = '</p><h'.LBCODE_HEADER_WEIGHT.'>$1</h'.LBCODE_HEADER_WEIGHT.'><p>';
 		
 		
 		$whitespace_patterns[0] = '/\r\n\r\n/';
@@ -228,8 +237,9 @@ class Entry extends LnBlogObject{
 		$ret = preg_replace($patterns, $replacements, $ret);
 		$ret = preg_replace($whitespace_patterns, $whitespace_replacements, $ret);
 		$ret = "<p>".$ret."</p>";
-
-		return $ret;
+	
+		# Strip out extraneous empty paragraphs.
+		return preg_replace('/<p><\/p>/', '', $ret);
 	}
 
 	function markup($data="", $use_nofollow=false) {
@@ -264,7 +274,7 @@ class Entry extends LnBlogObject{
 		# If we don't aren't passed a timestamp and don't already have one,
 		# then just use the current time.
 		if (! $date_ts) $date_ts = time();
-		$print_date = date(ENTRY_DATE_FORMAT, $date_ts);
+		$print_date = fmtdate(ENTRY_DATE_FORMAT, $date_ts);
 		return $print_date;
 	}
 

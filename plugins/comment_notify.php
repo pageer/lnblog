@@ -2,7 +2,7 @@
 class CommentNotifier extends Plugin {
 	
 	function CommentNotifier() {
-		$this->plugin_desc = "Sends an e-mail notification when a comment is submitted.";
+		$this->plugin_desc = _("Sends an e-mail notification when a comment is submitted.");
 		$this->plugin_version = "0.1.0";
 	}
 
@@ -21,13 +21,13 @@ class CommentNotifier extends Plugin {
 						               $cmt_user->username();
 						$param->email = $cmt_user->email();
 					}
-					mail($u->email(), "Comment on ".$parent->subject,
-					     "A new reader comment has been posted.\n".
-						  "The URL for this comment is: ".$param->permalink()."\n\n".
-					     "Name: ".$param->name."\n".
-					     "E-mail: ".$param->email."\n".
-					     "URL: ".$param->url."\n".
-						  "Subject: ".$param->subject."\n\n".
+					mail($u->email(), spf_("Comment on %s", $parent->subject),
+					        _("A new reader comment has been posted.\n").
+						 spf_("The URL for this comment is: $s\n\n", $param->permalink()).
+					     spf_("Name: %s\n", $param->name).
+					     spf_("E-mail: %s\n", $param->email).
+					     spf_("URL: %s\n", $param->url).
+						 spf_("Subject: %s\n\n", $param->subject).
 					  	$param->data, "From: LnBlog comment notifier");
 				}
 			}

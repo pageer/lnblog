@@ -1,0 +1,19 @@
+table.calendar {
+	margin: 1% auto;
+	width: 94%;
+	text-align: center;
+}
+
+table.calendar td a {
+	text-decoration: underline;
+}
+
+table.calendar td:hover {
+	background-color: white;
+}
+
+p.calendar {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+	text-align: center;
+}

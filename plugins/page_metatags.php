@@ -2,7 +2,7 @@
 class MetaData extends Plugin {
 
 	function MetaData() {
-		$this->plugin_desc = "Add some META tags to the page.";
+		$this->plugin_desc = _("Add some META tags to the page.");
 		$this->plugin_version = "0.1.0";
 	}
 

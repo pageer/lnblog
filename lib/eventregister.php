@@ -121,11 +121,12 @@ class EventRegister {
 	 *                  of the catching class, but not necessarily) that will
 	 *                  handle this event.
 	 * static         - *Optional* boolean parameter determing whether the 
-	 *                method is static, i.e. does not need an instance of the
-	 *                class to work.  Defaults to false (instance method).
+	 *                  method is static, i.e. does not need an instance of 
+	 *                  the class to work.  Defaults to false (instance 
+	 *                  method).
 	 */
 
-		function addHandler($raising_class, $name, 
+	function addHandler($raising_class, $name, 
 	                    $catching_class, $handler, $static=false) {
 		$rclass = strtolower($raising_class);
 		$ename = strtolower($name);

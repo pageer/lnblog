@@ -50,7 +50,7 @@ if (GET("send_ping") == "yes" || POST("send_ping") == "yes") {
 	}
 	
 	$body = $tpl->process();
-	$page->title = "Send Trackback Ping";
+	$page->title = _("Send Trackback Ping");
 	$page->addStylesheet("form.css");
 	$page->display($body, &$blog);
 	

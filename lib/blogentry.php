@@ -74,7 +74,31 @@ class BlogEntry extends Entry {
 		
 		# Auto-detect the current entry.  If no path is given, 
 		# then assume the current directory.
-		if (! $path) {
+		if ($path) {
+		
+			$this->file = $path.PATH_DELIM.$revision;
+			
+		} elseif (GET("entry")) {
+
+			# Get the blog path from the query string.
+			if (defined("BLOG_ROOT")) {
+				$blogpath = BLOG_ROOT;
+			} elseif ( defined("INSTALL_ROOT") && sanitize(GET("blog")) ) {
+				$blogpath = calculate_document_root().PATH_DELIM.sanitize(GET("blog"));
+			} else {
+				$blogpath = "";
+			}
+
+			# Get the path from the entry field.  If the entry string is 
+			# malformed, then just empty it.
+			if ( preg_match('/^\d{4}\/\d{2}\/\d{2}_\d{4}\d?\d?$/', trim(GET("entry"))) )
+				$entrypath = preg_replace("/\//", PATH_DELIM, trim(GET("entry")) );
+			else $entrypath = "";
+
+			$this->file = $blogpath.PATH_DELIM.BLOG_ENTRY_PATH.PATH_DELIM.$entrypath.PATH_DELIM.$revision;
+			
+		} else {
+		
 			$this->file = getcwd().PATH_DELIM.$revision;
 			# We might be in a comment or trackback directory, 
 			if (! $this->isEntry() ) {
@@ -83,8 +107,7 @@ class BlogEntry extends Entry {
 					$this->file = getcwd().PATH_DELIM.$revision;
 				}
 			}
-		} else {
-			$this->file = $path.PATH_DELIM.$revision;
+			
 		}
 		
 		if ( file_exists($this->file) ) $this->readFileData();
@@ -198,14 +221,37 @@ class BlogEntry extends Entry {
 	}
 
 	/*
+	Method: queryStringToID
+	Converts the query string into an identifier for a blog entry.
+	For file-based storage, this ID is a path on the filesystem.
+
+	Returns:
+	A string representing a directory path, or false on failure.
+	*/
+	function queryStringToID() {
+		$ret = INSTALL_ROOT.str_replace("/", PATH_DELIM, GET("blog"));
+		
+	}
+
+	/*
 	Method: permalink
 	Get the permalink to the object.
-
+	
 	Returns:
 	A string containing the full URI to this entry.
 	*/
 	function permalink() {
-		return localpath_to_uri($this->localpath());
+		if (! USE_WRAPPER_SCRIPTS && 
+		    ! file_exists(BLOG_ROOT.PATH_DELIM.".htaccess") ) {
+			$path = substr_replace($this->file, "", 0, strlen(INSTALL_ROOT));
+			if (PATH_DELIM != "/") {
+				$path = str_replace(PATH_DELIM, "/", $path);
+			}
+			
+			return $path;
+		} else {
+			return localpath_to_uri($this->localpath());
+		}
 	}
 	
 	/*
@@ -239,7 +285,7 @@ class BlogEntry extends Entry {
 		$dir_path = dirname($this->file);
 		$this->ip = get_ip();
 		$curr_ts = time();
-		$this->date = date(ENTRY_DATE_FORMAT, $curr_ts);
+		$this->date = fmtdate(ENTRY_DATE_FORMAT, $curr_ts);
 		$this->timestamp = $curr_ts;
 
 		$target = $dir_path.PATH_DELIM.
@@ -312,9 +358,9 @@ class BlogEntry extends Entry {
 		$this->file = $dir_path.PATH_DELIM.ENTRY_DEFAULT_FILE;
 		# Set the timestamp and date, plus the ones for the original post, if
 		# this is a new entry.
-		$this->date = date(ENTRY_DATE_FORMAT, $curr_ts);
+		$this->date = fmtdate(ENTRY_DATE_FORMAT, $curr_ts);
 		if (! $this->post_date) 
-			$this->post_date = date(ENTRY_DATE_FORMAT, $curr_ts);
+			$this->post_date = fmtdate(ENTRY_DATE_FORMAT, $curr_ts);
 		$this->timestamp = $curr_ts;
 		if (! $this->post_ts) $this->post_ts = $curr_ts;
 		$this->ip = get_ip();
@@ -328,13 +374,24 @@ class BlogEntry extends Entry {
 	/*
 	Method: getPostData
 	Extract data from an HTTP POST and insert it into the object.
+	The data fields in the POST are described below.
+
+	Fields:
+	subject    - The subject of the entry, in plain text.
+	short_path - The "short path" to access an article.
+	abstract   - An abstract of the entry, with markup.
+	body       - The entry body, with markup.
+	comments   - Boolean representing whether new comments can be posted.
+	input_mode - Tristate variable representing the type of markup used.
+	             Valid values are defined by the constants <MARKUP_NONE>,
+					 <MARKUP_BBCODE>, and <MARKUP_HTML>.
 	*/
 	function getPostData() {
-		$this->subject = POST(ENTRY_POST_SUBJECT);
-		$this->abstract = POST(ENTRY_POST_ABSTRACT);
-		$this->data = POST(ENTRY_POST_DATA);
-		$this->allow_comment = POST(ENTRY_POST_COMMENTS) ? 1 : 0;
-		$this->has_html = POST(ENTRY_POST_HTML);
+		$this->subject = POST("subject");
+		$this->abstract = POST("abstract");
+		$this->data = POST("body");
+		$this->allow_comment = POST("comments") ? 1 : 0;
+		$this->has_html = POST("input_mode");
 		if (get_magic_quotes_gpc()) {
 			$this->subject = stripslashes($this->subject);
 			$this->data = stripslashes($this->data);
@@ -458,7 +515,7 @@ class BlogEntry extends Entry {
 		else rsort($comment_files);
 
 		$comment_array = array();
-		foreach ($comment_files as $file) 
+		foreach ($comment_files as $file)
 			$comment_array[] = NewBlogComment($comment_dir_path.PATH_DELIM.$file);
 		
 		return $comment_array;
@@ -476,21 +533,25 @@ class BlogEntry extends Entry {
 	A string of HTML markup.
 	*/
 	function getComments($sort_asc=true) {
-		$comment_files = $this->getCommentArray($sort_asc);	
+		$comment_files = $this->getCommentArray($sort_asc);
 		$ret = "";
-		if ($comment_files) { 
+		if ($comment_files) {
+			$comments = array();
 			foreach ($comment_files as $file) {
-				$ret .= $file->get();
+				$comments[] = $file->get();
 			}
 		}
 
 		# Suppress the comment stuff entirely for posts that don't have 
-		# comments and/or don't allow them.
-		if ($ret || $this->allow_comment) {
-			$tpl = NewTemplate(COMMENT_LIST_TEMPLATE);
-			$tpl->set("ENTRY_PERMALINK", $this->permalink() );
-			$tpl->set("ENTRY_SUBJECT", $this->subject);
-			$tpl->set("COMMENT_LIST", $ret);
+		# any comments.
+		if (isset($comments)) {
+			$tpl = NewTemplate(LIST_TEMPLATE);
+			$tpl->set("ITEM_CLASS", "fullcomment");
+			$tpl->set("ORDERED");
+			$tpl->set("LIST_TITLE", 
+			          spf_('Comments on <a href="%s">%s</a>', 
+				            $this->permalink(), $this->subject));
+			$tpl->set("ITEM_LIST", $comments);
 			$ret = $tpl->process();
 		}
 
@@ -570,15 +631,24 @@ class BlogEntry extends Entry {
 		$trackbacks = $this->getTrackbackArray($sort_asc);	
 		if (!$trackbacks) return "";
 		$ret = "";
-		foreach ($trackbacks as $tb) {
-			$ret .= $tb->get();
+		if ($trackbacks) {
+			$tbtext = array();
+			foreach ($trackbacks as $tb) {
+				$tbtext[] = $tb->get();
+			}
 		}
 		
-		$tpl = NewTemplate(TRACKBACK_LIST_TEMPLATE);
-		$tpl->set("ENTRY_PERMALINK", $this->permalink() );
-		$tpl->set("ENTRY_SUBJECT", $this->subject);
-		$tpl->set("TB_LIST", $ret);
-		$ret = $tpl->process();
+		if (isset($tbtext)) {
+			$tpl = NewTemplate(LIST_TEMPLATE);
+			$tpl->set("LIST_CLASS", "tblist");
+			$tpl->set("ITEM_CLASS", "trackback");
+			$tpl->set("ORDERED");
+			$tpl->set("LIST_TITLE", 
+			          spf_('TrackBacks for <a href="%s">%s</a>',
+			               $this->permalink(), $this->subject));
+			$tpl->set("ITEM_LIST", $tbtext);
+			$ret = $tpl->process();
+		}
 		
 		return $ret;
 	}

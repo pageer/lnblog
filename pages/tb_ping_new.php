@@ -47,10 +47,10 @@ if (GET("send_ping") == "yes" || POST("send_ping") == "yes" ) {
 	if (POST($tburl)) {
 		$ret = $ent->sendPing( POST($tburl), POST("excerpt") );
 		$tpl->set("ERROR_MESSAGE", $ret);
-	} else echo "<p>Not posted.</p>";
+	} else echo "<p>"._("Not posted")."</p>";
 
 	$body = $tpl->process();
-	$page->title = "Send Trackback Ping";
+	$page->title = _("Send Trackback Ping");
 	$page->display($body, &$body);
 	
 } else {

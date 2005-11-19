@@ -18,6 +18,12 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+# File: userinfo.php
+# Displays the public information for a user.
+#
+# This will display the username, real name, e-mail, and URL for a user.
+# Currently, this is not included in the default interface.
+
 session_start();
 
 require_once("blogconfig.php");
@@ -32,6 +38,6 @@ $page = NewPage(&$user);
 $tpl = NewTemplate(USER_INFO);
 $usr->exportVars($tpl);
 
-$page->title = "User Information";
+$page->title = _("User Information");
 $page->display($tpl->process());
 ?>

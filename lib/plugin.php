@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-/*
+*/
 /*
  * Class: Plugin
  * Abstract class for plugins.  Plugins can inherit from this class to get

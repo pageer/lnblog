@@ -17,6 +17,13 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
+# File: editlogin.php
+# Used to modify user information, including e-mail address and password.
+# To create a new user, refer to the <newlogin.php> file.
+#
+# This is included by the useredit.php wrapper script for blogs.
+
 require_once("blogconfig.php");
 require_once("lib/creators.php");
 
@@ -33,17 +40,17 @@ if (! $usr->checkLogin() ) {
 # Allow us to use this to create the admin login.
 if (defined("BLOG_ROOT")) {
 	$blog = NewBlog();	
-	$form_title = "New Login for ".$blog->name;
+	$page_name = _("Change User Information");
+	$form_title = sprintf(_("New Login for %s"), $blog->name);
 	$redir_page = $blog->getURL();
 } else {
 	# Add the template directory to the include_path.
-	$page_name = "Change Administrator Login";
-	$form_title = "System Aministration Login";
+	$page_name = _("Change Administrator Login");
+	$form_title = _("System Aministration Login");
 	$redir_page = "index.php";
 }
 
-$form_title = "Modify User - ".$usr->username();
-$page_name = "Change User Information";
+$form_title = sprintf(_("Modify User - %s"), $usr->username());
 $user_name = "user";
 $password = "passwd";
 $confirm = "confirm";
@@ -72,7 +79,7 @@ if (has_post()) {
 		$usr->password(trim(POST($password)));
 	} elseif ( trim(POST($password)) && 
 	           trim(POST($password)) == trim(POST($confirm))) {
-		$tpl->set("FORM_MESSAGE", "The passwords you entered do not match.");
+		$tpl->set("FORM_MESSAGE", _("The passwords you entered do not match."));
 	} else {
 		$pwd_change = false;
 	}

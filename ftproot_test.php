@@ -1,6 +1,20 @@
 <?php 
+
+# File: ftproot_test.php
+# This is a one-off script to test values of FTP_ROOT for FTPFS.
+#
+# This page *requires* users to enter a username, password, and host for 
+# the FTP server.  It will then try to guess a value for FTP_ROOT or allow
+# the user to enter a value to test.
+#
+# Like <docroot_test.php>, this file will test for accessibility of the 
+# LnBlog ReadMe file.  It will build a local path and an FTP path using the
+# given FTP_ROOT.  The idea is that if both paths exist, then the 
+# FTP_ROOT is correct.
+
 $EXCLUDE_FS = true;
 require_once("blogconfig.php");
+require_once("lib/creators.php");
 require_once("lib/utils.php");
 require_once("lib/ftpfs.php");
 
@@ -66,15 +80,23 @@ function find_dir($dir, $conn) {
 	
 }
 
+$tpl = NewTemplate(FTPROOT_TEST_TEMPLATE);
+
 $user = trim(POST("uid"));
+$tpl->set("USER", $user);
 $pass = trim(POST("pwd"));
+$tpl->set("PASS", $pass);
 $hostname = trim(POST("host"));
+$tpl->set("HOSTNAME", $hostname);
 $test_file = getcwd().PATH_DELIM."Readme.html";
+$tpl->set("TEST_FILE", $test_file);
+$tpl->set("TARGETPAGE", current_file());
 $ftp_root = "";
 $test_status = false;
 $ftp_path = "";
 $error_message = "";
 $curr_dir = getcwd();
+$tpl->set("CURR_DIR", $curr_dir);
 
 if ($user && $pass && $hostname) {
 
@@ -93,62 +115,13 @@ if ($user && $pass && $hostname) {
 
 		$ftp->destruct();
 
-	} else $error_message = "Unable to connect to FTP server.";
+	} else $error_message = _("Unable to connect to FTP server.");
 }
 
+$tpl->set("FTP_ROOT", $ftp_root);
+$tpl->set("FTP_PATH", $ftp_path);
+$tpl->set("ERROR_MESSAGE", $error_message);
+$tpl->set("TEST_STATUS", $test_status);
+
+echo $tpl->process();
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
-   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html>
-<head>
-<title>Test FTP Root</title>
-</head>
-<body>
-<h3>FTP Root Test</h3>
-<p>This page will attempt to detect your <abbr title="File Transfer Protocol">FTP</abbr> root.  This is
-the root directory for <abbr title="File Transfer Protocol">FTP</abbr> use and is not necessarily the
-same as the real system root.  To run the test, enter your FTP username, password, and host name and
-click the "Test" button to detect the <abbr title="File Transfer Protocol">FTP</abbr> root.  You can 
-also test other <abbr title="File Transfer Protocol">FTP</abbr> root values by filling in the 
-"FTP Root" box.</p>
-<p>To determine success, check the results section below.  If the last line indicates that the test
-file was found, then you can copy the "FTP root" value into the appropriate configuration page.  If it 
-indicates that the file was <em>not</em> found, then you will have to try another value.
-</p>
-<p>Current Directory: <?php echo $curr_dir; ?></p>
-<?php if ($error_message) { ?>
-<h4><?php echo $error_message; ?></h4>
-<?php } ?>
-<form method="post" action="<?php echo current_file(); ?>">
-<div>
-<label for="uid">FTP Username</label>
-<input type="text" id="uid" name="uid" value="<?php echo $user; ?>" />
-</div>
-<div>
-<label for="pwd">FTP Password</label>
-<input type="password" id="pwd" name="pwd" value="<?php echo $pass; ?>" />
-</div>
-<div>
-<label for="host">FTP host</label>
-<input type="text" id="host" name="host" value="<?php echo $hostname; ?>" />
-</div>
-<div>
-<label for="ftproot">FTP Root</label>
-<input type="text" id="ftproot" name="ftproot" value="<?php echo $ftp_root; ?>" />
-<span>(Optional, leave blank to auto-detect.)</span>
-</div>
-<div>
-<input type="submit" value="Test" />
-</form>
-<div>
-<h3>Results</h3>
-<p>
-FTP root: <?php echo $ftp_root; ?><br />
-Test file path: <?php echo $test_file; ?><br />
-FTP path: <?php echo $ftp_path; ?><br />
-The test file was
-<span style="color: <?php echo $test_status ? "green" : "red"; ?>">
-<?php echo $test_status ? "found" : "not found.  Test failed"; ?></span>.</p>
-</div>
-</body>
-</html>

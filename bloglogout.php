@@ -18,6 +18,11 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+# File: bloglogout.php
+# Logs the user out and redirects them to the front page of the current blog.
+# In the stardard setup, this is included by the logout.php wrapper script
+# in each blog.
+
 session_start();
 require_once("blogconfig.php");
 require_once("lib/creators.php");
@@ -26,29 +31,31 @@ $blog = NewBlog();
 $page = NewPage(&$blog);
 
 $cancel_id = "cancel";
-$cancel_label = "No";
 $ok_id = "ok";
-$ok_label = "Yes";
+
+if ($blog->isBlog()) $redir_url = $blog->getURL();
+else                 $redir_url = "index.php";
 
 $tpl = NewTemplate(CONFIRM_TEMPLATE);
-$tpl->set("CONFIRM_TITLE", "Logout");
-$tpl->set("CONFIRM_MESSAGE", "Do you really want to log out?");
+$tpl->set("CONFIRM_TITLE", _("Logout"));
+$tpl->set("CONFIRM_MESSAGE", _("Do you really want to log out?"));
 $tpl->set("CONFIRM_PAGE", current_file());
 $tpl->set("OK_ID", $ok_id);
-$tpl->set("OK_LABEL", $ok_label);
+$tpl->set("OK_LABEL", _("Yes"));
 $tpl->set("CANCEL_ID", $cancel_id);
-$tpl->set("CANCEL_LABEL", $cancel_label);
+$tpl->set("CANCEL_LABEL", _("No"));
 
 if (POST($ok_id)) {
 	$usr = NewUser();
 	$usr->logout();
-	$page->redirect($blog->getURL());
+	$page->redirect($redir_url);
 } else if (POST($cancel_id)) {
-	$page->redirect($blog->getURL());
+	$page->redirect($redir_url);
 }
 
 $body = $tpl->process();
-$page->title = $blog->name." - Logout";
+if ($blog->isBlog()) $page->title = sprintf(_("%s - Logout"), $blog->name);
+else                 $page->title = _("Administration - Logout");
 $page->display($body, &$blog);
 
 ?>

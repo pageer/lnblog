@@ -72,10 +72,18 @@ class Blog extends LnBlogObject {
 		if (defined("BLOG_ROOT")) { 
 			$this->home_path = BLOG_ROOT;
 		} elseif (sanitize(GET("blog")) && defined("INSTALL_ROOT")) {
-			$this->home_path = INSTALL_ROOT.PATH_DELIM.sanitize(GET("blog"));
+			$this->home_path = calculate_document_root().PATH_DELIM.sanitize(GET("blog"));
 		} else {
 			$this->home_path = $path ? realpath($path) : getcwd();
 		}
+		
+		if (! defined("BLOG_ROOT") && is_dir($this->home_path)) {
+			define("BLOG_ROOT", $this->home_path);
+		}
+		if (! defined("BLOG_ROOT_URL")) {
+			define("BLOG_ROOT_URL", $this->getURL());
+		}
+		
 		$this->description = '';
 		$this->image = '';
 		$this->max_entries = BLOG_MAX_ENTRIES;
@@ -92,6 +100,17 @@ class Blog extends LnBlogObject {
 		
 		$this->raiseEvent("InitComplete");
 
+	}
+
+	/*
+	Method: isBlog
+	Determines whether the object represents an existing blog.
+
+	Returns:
+	True if the blog metadata exists, false otherwise.
+	*/
+	function isBlog() {
+		return file_exists($this->home_path.PATH_DELIM.BLOG_CONFIG_PATH);
 	}
 
 	/*
@@ -199,8 +218,8 @@ class Blog extends LnBlogObject {
 	*/
 	function getDay($year, $month, $day) {
 		$fmtday = sprintf("%02d", $day);
-		$month_dir = BLOG_ROOT.PATH_DELIM.BLOG_ENTRY_PATH.PATH_DELIM.$year.
-			PATH_DELIM.sprintf("%02d", $month).PATH_DELIM.$fmtday;
+		$month_dir = mkpath(BLOG_ROOT,BLOG_ENTRY_PATH,
+		                    $year,sprintf("%02d", $month));
 		$day_list = scan_directory($month_dir, true);
 		rsort($day_list);
 		$match_list = array();
@@ -213,6 +232,34 @@ class Blog extends LnBlogObject {
 		}
 		foreach ($match_list as $ent) $this->entrylist[] = $ent;
 		return $match_list;
+	}
+
+	/*
+	Method: getDayCount
+	Get the number of posts made on a given day.
+
+	Parameters:
+	year  - The 4 digit year of the post.
+	month - The month of the post.
+	day   - The day of the post.
+
+	Retruns:
+	An integer representing how many posts were made that day.
+	*/
+	function getDayCount($year, $month, $day) {
+		$fmtday = sprintf("%02d", $day);
+		$month_dir = mkpath(BLOG_ROOT,BLOG_ENTRY_PATH,
+		                    $year,sprintf("%02d", $month),$fmtday);
+		$day_list = scan_directory($month_dir, true);
+		$ent = NewBlogEntry();
+		$ret = 0;
+		foreach ($day_list as $dy) {
+			if (substr($dy, 0, 2) == $fmtday && 
+			    $ent->isEntry($month_dir.PATH_DELIM.$dy) ) {
+				$ret++;
+			}
+		}
+		return $ret;
 	}
 
 	/*
@@ -234,8 +281,7 @@ class Blog extends LnBlogObject {
 		$ent = NewBlogEntry();
 		$curr_dir = getcwd();
 		if ($year && $month) {
-			$curr_dir = $this->home_path.PATH_DELIM.BLOG_ENTRY_PATH.
-			            PATH_DELIM.$year.PATH_DELIM.$month;
+			$curr_dir = mkpath($this->home_path,BLOG_ENTRY_PATH,$year,$month);
 		} elseif (sanitize(GET("month"), "/\D/") && 
 		          sanitize(GET("year"), "/\D/")) {
 			$curr_dir = $this->home_path.PATH_DELIM.BLOG_ENTRY_PATH.
@@ -244,13 +290,17 @@ class Blog extends LnBlogObject {
 		}
 		$ent_list = array();
 		$dir_list = scan_directory($curr_dir, true);
+		
+		if (! $dir_list) return array();
+		
 		foreach ($dir_list as $file) {
 			if ( $ent->isEntry($curr_dir.PATH_DELIM.$file) ) {
 				$ent_list[] = $file;
 			}
 		}
 		rsort($ent_list);
-		foreach ($ent_list as $ent) $this->entrylist[] = NewBlogEntry($ent);
+		foreach ($ent_list as $ent) 
+			$this->entrylist[] = NewBlogEntry(mkpath($curr_dir, $ent));
 		return $this->entrylist;
 	}
 
@@ -573,19 +623,12 @@ class Blog extends LnBlogObject {
 	A string holding the HTML to display.
 	*/
 	function getWeblog () {
-		$tpl = NewTemplate(BLOG_TEMPLATE);
-		$tpl->set("BLOG_NAME", $this->name);
-		$tpl->set("BLOG_DESCRIPTION", $this->description);
-		$tpl->set("BLOG_IMAGE", $this->image);
-		$tpl->set("BLOG_MAX_ENTRIES", $this->max_entries);
-		$tpl->set("BLOG_BASE_DIR", $this->home_path);
-		$tpl->set("BLOG_URL", $this->getURL() );
 		$ret = "";
 		if (! $this->entrylist) $this->getRecent();
 		foreach ($this->entrylist as $ent) {
 			$ret .= $ent->get($this->canModifyEntry($ent) );
 		}
-		$tpl->set("BODY", $ret);
+		if (! $ret) $ret = "<p>"._("There are no entries for this weblog.")."</p>";
 		return $ret;
 	}
 
@@ -865,23 +908,23 @@ class Blog extends LnBlogObject {
 				break;
 			case UPDATE_NO_DATA_ERROR:
 				$tpl->set("HAS_UPDATE_ERROR");
-				$tpl->set("UPDATE_ERROR_MESSAGE", "No data entered.");
+				$tpl->set("UPDATE_ERROR_MESSAGE", _("No data entered."));
 				break;
 			case UPDATE_ENTRY_ERROR:
 				$tpl->set("HAS_UPDATE_ERROR");
-				$tpl->set("UPDATE_ERROR_MESSAGE", "Error updating blog entry.");
+				$tpl->set("UPDATE_ERROR_MESSAGE", _("Error updating blog entry."));
 				break;
 			case UPDATE_RSS1_ERROR:
 				$tpl->set("HAS_UPDATE_ERROR");
-				$tpl->set("UPDATE_ERROR_MESSAGE", "Error updating RSS1 feed.");
+				$tpl->set("UPDATE_ERROR_MESSAGE", _("Error updating RSS1 feed."));
 				break;
 			case UPDATE_RSS2_ERROR:
 				$tpl->set("HAS_UPDATE_ERROR");
-				$tpl->set("UPDATE_ERROR_MESSAGE", "Error updating RSS2 feed.");
+				$tpl->set("UPDATE_ERROR_MESSAGE", _("Error updating RSS2 feed."));
 				break;
 			case UPDATE_AUTH_ERROR:
 				$tpl->set("HAS_UPDATE_ERROR");
-				$tpl->set("UPDATE_ERROR_MESSAGE", "Security error: you can't perform this operation.");
+				$tpl->set("UPDATE_ERROR_MESSAGE", _("Security error: you can't perform this operation."));
 				break;
 		}
 		return true;
@@ -890,7 +933,7 @@ class Blog extends LnBlogObject {
 
 	function errorArticle($error, &$tpl) {
 		$this->last_article = NewArticle();;
-		if ( has_post() ) $ent->getPostData();
+		if ( has_post() ) $this->last_article->getPostData();
 		else return false;
 		$this->raiseEvent("OnArticleError");
 		$tpl->set("SUBJECT", $this->last_article->subject);
@@ -902,15 +945,15 @@ class Blog extends LnBlogObject {
 				break;
 			case UPDATE_NO_DATA_ERROR:
 				$tpl->set("HAS_UPDATE_ERROR");
-				$tpl->set("UPDATE_ERROR_MESSAGE", "No data entered.");
+				$tpl->set("UPDATE_ERROR_MESSAGE", _("No data entered."));
 				break;
 			case UPDATE_ENTRY_ERROR:
 				$tpl->set("HAS_UPDATE_ERROR");
-				$tpl->set("UPDATE_ERROR_MESSAGE", "Error updating blog entry.");
+				$tpl->set("UPDATE_ERROR_MESSAGE", _("Error updating blog entry."));
 				break;
 			case UPDATE_AUTH_ERROR:
 				$tpl->set("HAS_UPDATE_ERROR");
-				$tpl->set("UPDATE_ERROR_MESSAGE", "Security error: you can't perform this operation.");
+				$tpl->set("UPDATE_ERROR_MESSAGE", _("Security error: you can't perform this operation."));
 				break;
 		}
 		return true;

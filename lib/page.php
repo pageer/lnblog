@@ -64,7 +64,7 @@ class Page extends LnBlogObject {
 		$this->raiseEvent("OnInit");
 		#if ($ref !== false) 
 		$this->display_object = &$ref;
-		$this->doctype = XHTML_1_0_Strict;
+		$this->doctype = DEFAULT_DOCTYPE;
 		# Set the default style sheets.
 		$this->stylesheets = array("main.css", "banner.css", "menubar.css", 
 		                           "sidebar.css");
@@ -75,8 +75,8 @@ class Page extends LnBlogObject {
 		
 		$this->title = '';
 
-		$this->mime_type = "text/html";
-		$this->charset = "iso-8859-1";
+		$this->mime_type = DEFAULT_MIME_TYPE;
+		$this->charset = DEFAULT_CHARSET;
 
 		$this->raiseEvent("InitComplete");		
 	}

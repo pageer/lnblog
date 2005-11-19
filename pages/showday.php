@@ -18,7 +18,12 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-# Display a all blog entries posted on a given day.
+# File: showday.php
+# Displays a page showing all blog entries posted on a given day.
+# The day desired must be passed in the query string.
+# 
+# This is included in the day.php wrapper script in the month directories
+# of each year of blog archives.
 
 session_start();
 require_once("config.php");
@@ -39,12 +44,13 @@ if (count($ret) == 1) {
 	$page->redirect( $ret[0]->permalink() );
 	exit;
 } elseif (count($ret) == 0) {
-	$body = "No entry found for ".sprintf("%d-%d-%d", $year, $month, $day);
+	$body = spf_("No entry found for %d-%d-%d", $year, $month, $day);
 } else {
 	$body = $blog->getWeblog();
 }
 
-$page->title = $blog->name." - ".$title;
+$page->title = $blog->name." - ".spf_("Entries for %s", $day);
+$page->addStylesheet("blogentry.css");
 $page->display($body, &$blog);
 
 ?>

@@ -4,19 +4,23 @@ class SiteMap extends Plugin {
 	var $link_file;
 
 	function SiteMap() {
-		$this->plugin_desc = "Show a sitemap in the menubar";
+		$this->plugin_desc = _("Show a sitemap in the menubar");
 		$this->plugin_version = "0.1.0";
 		$this->link_file = SITEMAP_FILE;
-		$this->member_list = array("link_file"=>"Name of link-list file");
+		$this->member_list = array("link_file"=>_("Name of link-list file"));
 	}
 
 	function output($parm=false) {
 		$map_file = '';
-	if (defined("BLOG_ROOT") && is_file(BLOG_ROOT.PATH_DELIM.$this->link_file)) {
-		$map_file = BLOG_ROOT.PATH_DELIM.$this->link_file;
-	} elseif (is_file(INSTALL_ROOT.PATH_DELIM.USER_DATA.PATH_DELIM.$this->link_file)) {
-		$map_file = INSTALL_ROOT.PATH_DELIM.USER_DATA.PATH_DELIM.$this->link_file;
-	}
+		$blog = NewBlog();
+		if ($blog->isBlog() && 
+	   	 is_file(BLOG_ROOT.PATH_DELIM.$this->link_file)) {
+			$map_file = BLOG_ROOT.PATH_DELIM.$this->link_file;
+		} elseif (is_file(INSTALL_ROOT.PATH_DELIM.USER_DATA.
+		                  PATH_DELIM.$this->link_file)) {
+			$map_file = INSTALL_ROOT.PATH_DELIM.USER_DATA.
+			            PATH_DELIM.$this->link_file;
+		}
 ?>
 <h2>Site map</h2>
 <ul>
@@ -30,7 +34,7 @@ if ($map_file) {
 <?php }
 	}
 } else { ?>
-<li><a href="/" title="Site home page">Home</a></li>
+<li><a href="/" title="<?php p_("Site home page"); ?>"><?php p_("Home"); ?></a></li>
 <?php } ?>
 </ul>
 <?php

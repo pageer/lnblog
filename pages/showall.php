@@ -18,7 +18,11 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-# This file is used to display a blog entry with its comments.
+# File: showall.php
+# Displays a list of all entries in a blog, in reverse chronological order.
+#
+# This is included by the all.php wrapper script in the top-level entries 
+# directory for blogs.
 
 session_start();
 require_once("lib/creators.php");
@@ -26,11 +30,11 @@ require_once("lib/creators.php");
 $blog = NewBlog();
 $page = NewPage(&$blog);
 
-$title = "all entries for ".$blog->name;
+$title = spf_("All entries for %s.", $blog->name);
 $blog->getRecent(-1);
 
-$tpl = NewTemplate(ARCHIVE_TEMPLATE);
-$tpl->set("ARCHIVE_TITLE", $title);
+$tpl = NewTemplate(LIST_TEMPLATE);
+$tpl->set("LIST_TITLE", spf_("Archive of %s", $title));
 
 $LINK_LIST = array();
 

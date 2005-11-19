@@ -2,14 +2,14 @@
 class Recent extends Plugin {
 
 	function Recent() {
-		$this->plugin_desc = "Show some of the more recent posts in the sidebar.";
+		$this->plugin_desc = _("Show some of the more recent posts in the sidebar.");
 		$this->plugin_version = "0.1.0";
 	}
 
 	function output($parm=false) {
 		
-		if (! defined("BLOG_ROOT")) return false;
 		$blg = NewBlog();
+		if (! $blg->isBlog()) return false;
 		
 		# Show some of the more recent entries.  If we're on the "front page"
 		# of the blog, then show the next set of entries.  Otherwise, show the 
@@ -26,11 +26,11 @@ class Recent extends Plugin {
 		if ( count($next_list) > 0 ) { 
 			if ($is_index) {
 ?>
-<h3><a href="<?echo $blg->getURL(); ?>">Older Entries</a></h3>
+<h3><a href="<?echo $blg->getURL(); ?>"><?php p_("Older Entries"); ?></a></h3>
 <?php 
 			} else { # !$is_index 
 ?>
-<h3><a href="<?echo $blg->getURL(); ?>">Recent Entries</a></h3>
+<h3><a href="<?echo $blg->getURL(); ?>"><?php p_("Recent Entries"); ?></a></h3>
 <?php 
 			} # End inner if
 ?>

@@ -23,22 +23,21 @@ require_once("config.php");
 require_once("lib/creators.php");
 $blog = NewBlog();
 $page = NewPage(&$blog);
-/*
-$year_dir = basename(getcwd());
-$month_list = scan_directory(getcwd(), true);
-sort($month_list);
-*/
 $month_list = $blog->getMonthList();
 
 foreach ($month_list as $key=>$val) { 
 	$ts = mktime(0, 0, 0, $val["month"], 1, $val["year"]);
 	if (! isset($year)) $year = $val["year"];
-	$month_name = strftime("%B", $ts);
+	if (USE_STRFTIME) {
+		$month_name = fmtdate("%B", $ts);
+	} else {
+		$month_name = fmtdate("F", $ts);
+	}
 	$month_list[$key]["title"] = $month_name;
 }
 
-$tpl = NewTemplate(ARCHIVE_TEMPLATE);
-$tpl->set("ARCHIVE_TITLE", $year);
+$tpl = NewTemplate(LIST_TEMPLATE);
+$tpl->set("LIST_TITLE", spf_("Archive of %s", $year));
 
 $tpl->set("LINK_LIST", $month_list);
 $body = $tpl->process();

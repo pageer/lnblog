@@ -18,6 +18,11 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+# File: bloglogin.php
+# Allows users to log in, then redirects them back to the page they came 
+# from.  In the "standard" setup, this page is included by the login.php
+# wrapper script in each blog.
+
 require_once("blogconfig.php");
 require_once("lib/creators.php");
 
@@ -26,13 +31,15 @@ session_start();
 $blog = NewBlog();
 $page = NewPage(&$blog);
 
-if (defined("BLOG_ROOT")) {
-	$page_name = $blog->name;
+if ($blog->isBlog()) {
+	$page_name = spf_("%s - Login", $blog->name);
+	$form_name = spf_("%s Login", $page_name);
 	$redir_url = $blog->getURL();
 	$admin_login = false;
 } else {
 #	ini_set("include_path", ini_get("include_path").PATH_SEPARATOR."templates");
-	$page_name = "System Administration";
+	$page_name = _("System Administration");
+	$form_name = _("System Administration Login");
 	$redir_url = "index.php";
 	$admin_login = true;
 }
@@ -41,7 +48,7 @@ $user_name = "user";
 $password = "passwd";
 
 $tpl = NewTemplate(LOGIN_TEMPLATE);
-$tpl->set("FORM_TITLE", $page_name." Login");
+$tpl->set("FORM_TITLE", $form_name);
 $tpl->set("FORM_ACTION", current_file());
 $tpl->set("UNAME", $user_name);
 $tpl->set("PWD", $password);
@@ -59,15 +66,15 @@ if ( POST($user_name) && POST($password) ) {
 	}
 	# Throw up an error if a regular user tries to log in as administrator.
 	if ( $admin_login && (POST($user_name) != ADMIN_USER) ) {
-		$tpl->set("FORM_MESSAGE", "Only the administrator account can log into the administrative pages.");
+		$tpl->set("FORM_MESSAGE", _("Only the administrator account can log into the administrative pages."));
 	} else {
 		if ($ret) $page->redirect($redir_url);
-		else $tpl->set("FORM_MESSAGE", "Error logging in.  Please check your username and password.");
+		else $tpl->set("FORM_MESSAGE", _("Error logging in.  Please check your username and password."));
 	}
 }
 
 $body = $tpl->process();
-$page->title = $page_name." - Login";
+$page->title = $page_name;
 $page->addStylesheet("form.css");
 $page->display($body, $blog);
 

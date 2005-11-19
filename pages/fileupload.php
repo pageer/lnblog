@@ -18,6 +18,12 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+# File: fileupload.php
+# Used to upload a file to the web server.
+#
+# This is included by the uploadfile.php wrapper script for weblogs, 
+# blog entries, and articles.
+
 session_start();
 
 require_once("lib/creators.php");
@@ -34,13 +40,16 @@ if ( ($ent->isEntry() && $blog->canModifyEntry()) ||
 	$f = NewFileUpload($file_name);
 	
 	$tpl->set("TARGET", current_file() );
-	$tpl->set("MAX_SIZE", 2000000); #ini_get("upload_max_filesize"));
+	$size = ini_get("upload_max_filesize");
+	$size = str_replace("K", "000", $size);
+	$size = str_replace("M", "000000", $size);
+	$tpl->set("MAX_SIZE", $size);
 	$tpl->set("FILE", $file_name);
 	$tpl->set("TARGET_URL", localpath_to_uri($f->destdir) );
 
 	if ($f->status() == FILEUPLOAD_NOT_INITIALIZED) {
-		$msg = "Select a file to upload to the current directory.  The file size".
-		       " limit is ".ini_get("upload_max_filesize").".";
+		$msg = spf_("Select a file to upload to the current directory.  The file size limit is %s.",
+		               ini_get("upload_max_filesize"));
 		$tpl->set("UPLOAD_MESSAGE", $msg);
 	} else {
 		$tpl->set("UPLOAD_MESSAGE", $f->errorMessage() );
@@ -49,12 +58,14 @@ if ( ($ent->isEntry() && $blog->canModifyEntry()) ||
 	$body = $tpl->process();
 
 } else {
-	$body = "<h3>You do not have permission to upload files to this ".
-	         ($ent->isEntry()?"entry":"weblog").".</h3>";
+	$body = "<h3>";
+	if ($ent->isEntry()) $body .= _("You do not have permission to upload files to this entry.");
+	else $body .= _("You do not have permission to upload files to this weblog.");
+	$body .= "</h3>";
 }
 
 $page->addStylesheet("form.css");
-$page->title = "Upload file";
+$page->title = _("Upload file");
 $page->display($body, &$blog);
 
 ?>

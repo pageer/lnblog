@@ -1,6 +1,6 @@
 <!DOCTYPE webproject>
 <webproject>
-  <project usePreviewPrefix="0" type="Local" previewPrefix="" usePersistentBookmarks="0" name="LnBlog" encoding="iso 8859-1" enableEvents="true" >
+  <project usePreviewPrefix="0" previewPrefix="" type="Local" usePersistentBookmarks="0" name="LnBlog" encoding="iso 8859-1" enableEvents="true" >
     <upload/>
     <defaultDTD>-//w3c//dtd xhtml 1.0 strict//en</defaultDTD>
     <item url="lib/" uploadstatus="1" />
@@ -20,7 +20,6 @@
     <item url="lib/nativefs.php" uploadstatus="1" />
     <item url="lib/pluginmanager.php" uploadstatus="1" />
     <item url="lib/plugin.php" uploadstatus="1" />
-    <item url="lib/rss.php" uploadstatus="1" />
     <item url="lib/tb.php" uploadstatus="1" />
     <item url="lib/template.php" uploadstatus="1" />
     <item url="lib/textsearch.php" uploadstatus="1" />
@@ -81,16 +80,12 @@
     <item url="themes/default/styles/sidebar.css" uploadstatus="1" />
     <item url="themes/default/styles/trackback.css" uploadstatus="1" />
     <item url="themes/default/templates/" uploadstatus="1" />
-    <item url="themes/default/templates/archive_tpl.php" uploadstatus="1" />
-    <item url="themes/default/templates/article_edit_tpl.php" uploadstatus="1" />
     <item url="themes/default/templates/article_tpl.php" uploadstatus="1" />
     <item url="themes/default/templates/basic_layout_tpl.php" uploadstatus="1" />
     <item url="themes/default/templates/blog_admin_tpl.php" uploadstatus="1" />
     <item url="themes/default/templates/blogcomment_tpl.php" uploadstatus="1" />
-    <item url="themes/default/templates/blogedit_tpl.php" uploadstatus="1" />
     <item url="themes/default/templates/blogentry_tpl.php" uploadstatus="1" />
     <item url="themes/default/templates/blog_modify_tpl.php" uploadstatus="1" />
-    <item url="themes/default/templates/blog_tpl.php" uploadstatus="1" />
     <item url="themes/default/templates/comment_form_tpl.php" uploadstatus="1" />
     <item url="themes/default/templates/comment_list_tpl.php" uploadstatus="1" />
     <item url="themes/default/templates/confirm_tpl.php" uploadstatus="1" />
@@ -247,13 +242,25 @@
     <item url="themes/terminal/templates/blogentry_tpl.php" uploadstatus="1" />
     <item url="LICENSE" uploadstatus="1" />
     <item url="TODO" uploadstatus="1" />
-    <item url="plugins/sidebar_7_poweredby.php" />
+    <item url="plugins/sidebar_7_poweredby.php" uploadstatus="1" />
+    <item url="lib/i18n.php" uploadstatus="1" />
+    <item url="locale/" uploadstatus="1" />
+    <item url="pages/config.php" uploadstatus="1" />
+    <item url="plugins/disabled/" uploadstatus="1" />
+    <item url="plugins/disabled/arbitrary_include.php" uploadstatus="1" />
+    <item url="plugins/disabled/cache_html.php" uploadstatus="1" />
+    <item url="plugins/disabled/template.php" uploadstatus="1" />
+    <item url="themes/default/templates/docroot_test_tpl.php" uploadstatus="1" />
+    <item url="themes/default/templates/entry_edit_tpl.php" uploadstatus="1" />
+    <item url="themes/default/templates/ftproot_test_tpl.php" uploadstatus="1" />
+    <item url="themes/default/templates/list_tpl.php" uploadstatus="1" />
     <treestatus>
       <openfolder url="lib" />
+      <openfolder url="pages" />
+      <openfolder url="plugins" />
       <openfolder url="themes" />
-      <openfolder url="themes/terminal" />
-      <openfolder url="themes/terminal/styles" />
-      <openfolder url="themes/terminal/templates" />
+      <openfolder url="themes/default" />
+      <openfolder url="themes/default/templates" />
     </treestatus>
   </project>
 </webproject>

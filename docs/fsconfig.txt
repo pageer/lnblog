@@ -1,0 +1,84 @@
+File: fsconfig.php
+Stores data storage configuration.
+
+Section: File Writing Overview
+
+Currently, LnBlog only stores data by writing it to text file on the webg
+server.  However, it supports two methods for doing this.  One is to use 
+standard file-writing functions and the other is to use FTP.  These are 
+refferred to, respectively, as NteiveFS and FTPFS.  Deciding 
+between these is the first configuration step for LnBlog and is done by
+the <fs_setup.php> script.  This script creates the fsconfig.php file, 
+which should not be present in an initial installation.
+
+The reason for having two types of filesystem writing is that many web hosts
+use PHP's *safe_mode* feature to provide added security.  One of the 
+restrictions this imposes is that scripts can only read files from the disk
+if the owner of the file is the same as the owner of the script.  In a shared
+hosting environment, data files created by PHP scripts are normally owned by
+the system account which PHP runs as, whereas the scripts would be owned by
+the user account of the site owner, so scripts would not be able to read any 
+of the files they created.  This restriction can be bypassed by performing 
+file writing via FTP, as this allows scripts to connect to the FTP server as
+the site owner, not a system user.
+
+Section: Technical Details
+
+Writing to the filesystem is carried out using an abstract interface class.
+This class defines the basic functions of the file-writing subsystem, such 
+as creating directories, deleting files, and writing text data to a file.
+There are NativeFS and FTPFS subclasses which implement this interface.  
+LnBlog writes files by using a wrapper function in the <creators.php> file 
+to instantiate the correct class based on a constant defined in the 
+fsconfig.php file.  
+
+The fsconfig.php file is a simple PHP source code file which contains only 
+a series of constant definitions.  If necessary, these definitions can be 
+changed by hand, although this is not recommended.  Note that which 
+definitions are actually present depends on the type of file writing used.
+If NativeFS is used, there is no extra configuration needed, but FTPFS 
+requires various user authentication details.
+
+Section: Standard Constants
+
+Constant: DOCUMENT_ROOT
+This is the full local path to the web server's document root, 
+i.e. the root directory from which files are served.  This is not to be
+confused with the doc_root setting in the php.ini file.
+
+This setting is used to convert local paths into URLs.  Basically, this
+path is stripped from the full paths to files and directories to get the 
+path component of the URL.
+
+Constant: FS_PLUGIN
+This determines which filesystem writing method to use.
+Currently, there are only two options, "nativefs" and "ftpfs".
+
+Section: FTPFS-only Constants
+
+Constant: FTPFS_USER
+The username to use when establishing an FTP connection.
+Note that this username *must* have write access to the relevant directories
+on the server, or else this obviously will not work.
+
+Constant: FTPFS_PASSWORD
+The password used to log in with <FTPFS_USER>.
+Note that this constant currently uses a plain-text password.
+
+Constant: FTPFS_HOST
+The host and/or domain name of the FTP server to connect to.
+In the fairly common case where the FTP server and web server are both
+running on the same machine, then you can use "localhost" for this value.
+In other cases, it will probably be something like "ftp.myserver.com".
+
+Constant: FTP_ROOT
+The full path on the server to the user's FTP root.
+In other words, this is the highest directory the user can access through 
+FTP.  In some cases, it will be the root directory, or "/".  In other cases,
+it may be something like "/home/username/".  If you are unsure, you can use
+the <ftproot_test.php> script to try different possibilities.
+
+The purpose of this constant is to convert paths on the FTP server into path
+on the web server.  Because FTP servers often restrict users to a certain 
+portion of the filesystem, these paths are not always the same, even when
+both servers are on the same physical machine.

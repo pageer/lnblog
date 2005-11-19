@@ -1,0 +1,59 @@
+Directory: plugins
+
+The plugins directory stores all the plugins that are enabled in an LnBlog installation.  It may
+contain one or more subdirectories with names like "disabled" to store plugins which are not to
+be loaded.
+
+Section: How plugins work
+
+The plugin loading mechanism is quite simple.  Here's how it works.
+1) When a page is loaded, LnBlog loads all files in this directory that end
+   with a ".php" extension via an include() statement.  Files that do not end 
+   with this are ignored by the plugin loader.
+2) Individual files are loaded in alphabetical order by file name.  Note that this means ASCII
+   order, so 
+3) For plugins that write user-visible data, e.g. sidebar panels, the order 
+   in which they are loaded IS IMPORTANT.  For example, the sidebar panels
+   are displayed in the order in which they are loaded.
+4) Subdirectories of this directory are ignored by the plugin loader.  This 
+   means that you can temporarily disable a plugin without deleting it by 
+   moving it to a subdirectory.
+
+
+Section: Adding new plugins
+
+Adding a new plugins is as simple as copying the plugin PHP file into the plugins directory.
+If a plugin requires any additional installation steps, it should be noted in the plugin 
+documentation.  
+
+Since plugins are loaded in "alphabetical" order by filename, you can adjust 
+the order in which theyare loaded by changing the filenames.  For example,
+to have the sdiebar calendar loaded before the other sidebar plugins, you would change its name
+to something like sidebar_0_calendar.php.
+
+Section: Removing plugins
+
+To disable a plugin, just delete it or move it out of the plugins directory.  If you think you 
+might want to re-enable the plugin later, just move it to the "disabled" subdirectory.  Plugins
+are not loaded from subdirectories of the plugins folder.
+
+Section: Writing plugins
+
+LnBlog uses an event-based plugin system.  That means that LnBlog sends out messages when certain 
+things happen, such as a page being displayed or an entry being added.  Plugins work by 
+registering themselves with the event manager and asking to be run when certain events are fired.
+
+The actual coding of a plugin can be done in several ways.  The recommended method is to create
+a class for your plugin which inherits from the abstract Plugin class, as this will allow you
+to inherit certain basic functionality.  Beyond that, it depends on what you want to do.  The 
+back-end classes mostly allow for auto-detection of identifiers, so, for example, you can simply 
+do something like
+| $myblog = NewBlog();
+to get access to information on the current weblog.  The same thing works for entries and 
+articles, although individual comments generally need an explicit identifier.  Of course, it is
+always possible to simply create an instance of the parent entry of a comment and get a list of
+comments that way.
+
+The plugins/disabled directory of the default LnBlog installation includes a template.php file.  This is a heavily commented plugin template which is intended as a learning tool.  Betweem this 
+and the standard set of plugins, it should be possible to get a good idea of how the plugin 
+system works.

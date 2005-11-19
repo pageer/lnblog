@@ -2,13 +2,13 @@
 class PageHeader extends Plugin {
 
 	function PageHeader() {
-		$this->plugin_desc = "Output a banner for the page.";
+		$this->plugin_desc = _("Output a banner for the page.");
 		$this->plugin_version = "0.1.0";
 	}
 
 	function output($parm=false) {
-		if (defined("BLOG_ROOT")) { 
-			$blg = NewBlog();
+		$blg = NewBlog();
+		if ($blg->isBlog()) { 
 			?>
 <h1><a href="<?php echo $blg->getURL(); ?>" title="<?php echo $blg->description; ?>"><?php echo $blg->name; ?></a></h1>
 <?php 

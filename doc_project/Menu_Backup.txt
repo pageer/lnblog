@@ -1,0 +1,106 @@
+Format: 1.35
+
+
+# You can add a title and sub-title to your menu like this:
+# Title: [project name]
+# SubTitle: [subtitle]
+
+# You can add a footer to your documentation like this:
+# Footer: [text]
+# If you want to add a copyright notice, this would be the place to do it.
+
+
+# --------------------------------------------------------------------------
+# 
+# Cut and paste the lines below to change the order in which your files
+# appear on the menu.  Don't worry about adding or removing files, Natural
+# Docs will take care of that.
+# 
+# You can further organize the menu by grouping the entries.  Add a
+# "Group: [name] {" line to start a group, and add a "}" to end it.
+# 
+# You can add text and web links to the menu by adding "Text: [text]" and
+# "Link: [name] ([URL])" lines, respectively.
+# 
+# The formatting and comments are auto-generated, so don't worry about
+# neatness when editing the file.  Natural Docs will clean it up the next
+# time it is run.  When working with groups, just deal with the braces and
+# forget about the indentation and comments.
+# 
+# --------------------------------------------------------------------------
+
+
+Group: Configuration Files  {
+
+   File: blogconfig.php  (blogconfig.php)
+   File: constants.php  (lib\constants.php)
+   File: fsconfig.php  (docs\fsconfig.txt)
+   File: Translations  (docs\translations.txt)
+   File: URL and Directory Structure  (docs\urls.txt)
+   }  # Group: Configuration Files
+
+Group: Libraries  {
+
+   File: Article  (lib\article.php)
+   File: Blog  (lib\blog.php)
+   File: BlogComment  (lib\blogcomment.php)
+   File: BlogEntry  (lib\blogentry.php)
+   File: Creators  (no auto-title, lib\creators.php)
+   File: Entry  (lib\entry.php)
+   File: EventRegister  (lib\eventregister.php)
+   File: FS  (lib\fs.php)
+   File: i18n.php  (lib\i18n.php)
+   File: lbcode.php  (lib\lbcode.php)
+   File: LnBlogObject  (lib\lnblogobject.php)
+   File: Page  (lib\page.php)
+   File: PHPTemplate  (lib\template.php)
+   File: Plugin  (no auto-title, lib\plugin.php)
+   File: PluginManager  (lib\pluginmanager.php)
+   File: User  (lib\user.php)
+   }  # Group: Libraries
+
+Group: Pages  {
+
+   File: delcomment.php  (pages\delcomment.php)
+   File: delentry.php  (pages\delentry.php)
+   File: editarticle.php  (pages\editarticle.php)
+   File: editentry.php  (pages\editentry.php)
+   File: editlogin.php  (pages\editlogin.php)
+   File: fileupload.php  (pages\fileupload.php)
+   File: newarticle.php  (pages\newarticle.php)
+   File: newentry.php  (pages\newentry.php)
+   File: showall.php  (pages\showall.php)
+   File: showarchive.php  (pages\showarchive.php)
+   File: showarticle.php  (pages\showarticle.php)
+   File: showarticles.php  (pages\showarticles.php)
+   File: showblog.php  (pages\showblog.php)
+   File: showcomments.php  (pages\showcomments.php)
+   File: showday.php  (pages\showday.php)
+   }  # Group: Pages
+
+Group: Administration Pages  {
+
+   File: bloglogin.php  (bloglogin.php)
+   File: bloglogout.php  (bloglogout.php)
+   File: docroot_test.php  (docroot_test.php)
+   File: fs_setup.php  (fs_setup.php)
+   File: ftproot_test.php  (ftproot_test.php)
+   File: index.php  (index.php)
+   File: newblog.php  (newblog.php)
+   File: newlogin.php  (newlogin.php)
+   File: plugin_setup.php  (plugin_setup.php)
+   File: sitemap.php  (sitemap.php)
+   File: updateblog.php  (updateblog.php)
+   File: userinfo.php  (userinfo.php)
+   }  # Group: Administration Pages
+
+Group: Index  {
+
+   Index: Everything
+   Class Index: Classes
+   Constant Index: Constants
+   File Index: Files
+   Function Index: Functions
+   Property Index: Properties
+   }  # Group: Index
+

@@ -18,8 +18,13 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-# Class to manipulate and authenticate users.  Is designed so that a user's
-# login can be checked in two lines, to keep maintenance overhead low.
+# Class: User
+# Class to manipulate and authenticate users.  All details of user 
+# management, including checking authentication, should be done through 
+# this class.  
+#
+# Inherits:
+# <LnBlogObject>
 
 require_once("lib/utils.php");
 require_once("lib/lnblogobject.php");
@@ -76,6 +81,12 @@ class User extends LnBlogObject {
 		}
 	}
 
+	# Method: create_passwd_file
+	# Creates an updated user information file.
+	# 
+	# Returns:
+	# A true value on success, false on failure.
+
 	function create_passwd_file () {
 		$data = "<?php\n";
 		$data .= '$global_user_list = array();'."\n";
@@ -94,8 +105,14 @@ class User extends LnBlogObject {
 	}
 
 
+	# Method: exportVars
 	# Convenience function to export relevant user data to a template.
-
+	# Sets the username, full name, e-mail, homepage, and display name in 
+	# template variables USER_ID, USER_NAME, USER_EMAIL, USER_HOMEPAGE,
+	# and USER_DISPLAY_NAME respectively.
+	# 
+	# Parameters: 
+	# tpl - The template to put the data in, passed by reference.
 	function exportVars(&$tpl) {
 		if ($this->username) $tpl->set("USER_ID", $this->username);
 		if ($this->fullname) $tpl->set("USER_NAME", $this->fullname);
@@ -104,6 +121,14 @@ class User extends LnBlogObject {
 		$tpl->set("USER_DISPLAY_NAME", $this->displayName() );
 	}
 
+	# Method: get
+	# Populates the object with data for a given username.
+	# 
+	# Parameters:
+	# uname - The username to get.
+	# 
+	# Returns:
+	# True if the username is found, false otherwise.
 	function get($uname) {
 		if ($uname && isset($this->user_list[$uname]) ) {
 			$this->passwd = $this->user_list[$uname]["pwd"];
@@ -115,18 +140,26 @@ class User extends LnBlogObject {
 		} else return false;
 	}
 
+	# Method: checkPassword
+	# Checks if a password is valid for the current user.
+	# 
+	# Parameters:
+	# pass - The password to check.
+	# 
+	# Returns:
+	# True if the password is correct, false owtherwise.
 	function checkPassword($pass) {
 		$hash = md5($pass.$this->salt);
 		$ret = ($hash == $this->passwd);
 		return $ret;
 	}
 
-	# Save changes to user data.  Note that this function doesn't scale well,
-	# as we cannot guarantee that the another user will not simultaneously
-	# try to write the same file and clobber our changes.
-	# The only real fix to this (that's worth the time to implement) is to 
-	# switch to a database storage backend.
-
+	# Method: save
+	# Save changes to user data.  
+	# Note that this function doesn't scale well, as we cannot guarantee that 
+	# another user will not simultaneously try to write the same file and 
+	# clobber our changes.  The only real fix to this (that's worth the time
+	# to implement) is to switch to a database storage backend.
 	function save() {
 		if (!$this->username ||! $this->passwd) return false;
 		$this->user_list[$this->username]["pwd"] = $this->passwd;
@@ -137,6 +170,15 @@ class User extends LnBlogObject {
 		$this->create_passwd_file();
 	}
 
+	# Method: password
+	# Set or return the user's password>
+	# 
+	# Parameters:
+	# pwd - *Optional* password to set.
+	# 
+	# Returns:
+	# If pwd is false, return the user's password hash.  Otherwise, a new
+	# password is set and there is no return value.
 	function password($pwd=false) {
 		if (!$pwd) return $this->passwd;
 		else {
@@ -154,33 +196,83 @@ class User extends LnBlogObject {
 		}
 	}
 
+	# Method: username
+	# Set or return the username.
+	# 
+	# Parameters:
+	# uid - *Optional* username to set.
+	# 
+	# Returns:
+	# The username if uid is false, otherwise the username is set and
+	# there is no return value.
 	function username($uid=false) {
 		if (!$uid) return $this->username;
 		else $this->username = $uid;
 	}
 
+	# Method: name
+	# Set or return the user's long name.
+	# 
+	# Parameters:
+	# nm - *Optional* name to set.
+	# 
+	# Returns:
+	# The user's full name if nm is false, otherwise the name is set and
+	# there is no return value.
 	function name($nm=false) {
 		if (!$nm) return $this->fullname;
 		else $this->fullname = $nm;
 	}
 
+	# Method: displayName
 	# Returns a name to display.  If a full name is defined, it uses that.
 	# Otherwise, it reverts to the username.
-
+	#
+	# Returns:
+	# A string contianing either the username or full name.
 	function displayName() {
 		if ($this->fullname) return $this->fullname;
 		else return $this->username;
 	}
 
+	# Method: email
+	# Set or return the user's e-mail address.
+	# 
+	# Parameters:
+	# mail - *Optional* e-mail to set.
+	# 
+	# Returns:
+	# The user's e-mail address if mail is false, otherwise the address
+	#  is set and there is no return value.
 	function email($mail=false) {
 		if (!$mail) return $this->email;
 		else $this->email = $mail;
 	}
-
+	
+	# Method: homepage
+	# Set or return the user's homepage.
+	# 
+	# Parameters:
+	# url - *Optional* URL to set as the homepage.
+	# 
+	# Returns:
+	# The user's homepage URL if url is false, otherwise the homepage
+	# is set and there is no return value.
 	function homepage($url=false) {
 		if (!$url) return $this->homepage;
 		else $this->homepage = $url;
 	}
+
+	# Method: login
+	# Logs the user in.
+	# Note that there are two login methods available, with the one used
+	# being determined by the <AUTH_USE_SESSION> configuration constant.
+	#
+	# Parameters:
+	# pwd - The password used to log in.
+	#
+	# Returns:
+	# False if the authentication fails, true otherwise.
 
 	function login($pwd) {
 		
@@ -206,9 +298,13 @@ class User extends LnBlogObject {
 		} else {
 			setcookie(CURRENT_USER, $this->username);
 			setcookie(PW_HASH, $this->passwd);
+			return true;
 		}
 	}
 
+	# Method: logout
+	# Logs the user out and destroys login tokens.
+	# Note that this is also subject to <AUTH_USE_SESSION>
 	function logout() {
 		if (AUTH_USE_SESSION) {
 			SESSION(CURRENT_USER, false);
@@ -222,6 +318,11 @@ class User extends LnBlogObject {
 		}
 	}
 
+	# Method: checkLogin
+	# Checks tokens to determine if the user is logged in.
+	#
+	# Returns:
+	# True if the user has valid login tokens, false otherwise.
 	function checkLogin() {
 		# If the constructor doesn't detect a user name, then we're obviously
 		# not logged in.
@@ -247,6 +348,13 @@ class User extends LnBlogObject {
 		}
 	}
 
+	# Method: isAdministrator
+	# Determines if the user is the system administrator.
+	#
+	# Returns:
+	# True if the username is the same as that of the system administrator, 
+	# false otherwise.  Note that the system administrator's username
+	# is controlled by the <ADMIN_USER> configuration constant.
 	function isAdministrator() {
 		return ($this->username == ADMIN_USER);
 	}

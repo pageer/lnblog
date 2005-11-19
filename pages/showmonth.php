@@ -30,16 +30,22 @@ $page = NewPage(&$blog);
 $list = $blog->getMonth(); 
 
 $ts = $list[0]->timestamp;
-$title = strftime("%B %Y", $ts);
+if (USE_STRFTIME) {
+	$title = fmtdate("%B %Y", $ts);
+} else {
+	$title = fmtdate("F Y", $ts);
+}
 
 # Optionally show all the entries as a weblog.
 if (strtolower(GET("show")) == "all") {
 	$body = $blog->getWeblog();
+	$page->addStylesheet("blogentry.css");
 } else {
 
-	$tpl = NewTemplate(ARCHIVE_TEMPLATE);
-	$tpl->set("ARCHIVE_TITLE", $title);
-	$tpl->set("SHOW_TEXT");
+	$tpl = NewTemplate(LIST_TEMPLATE);
+	$tpl->set("LIST_TITLE", $title);
+	$tpl->set("LIST_FOOTER", 
+	          _('<a href="?show=all">Show all entries at once</a>'));
 
 	foreach ($list as $ent) { 
 		$LINK_LIST[] = array("link"=>$ent->permalink(), "title"=>$ent->subject);

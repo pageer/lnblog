@@ -78,8 +78,8 @@ class Trackback extends LnBlogObject {
 		# Create the HTTP request to be sent to the remote host.
 		$data = "POST ".$path."\r\n".
 		        "Content-Type: application/x-www-form-urlencoded; ".
-				  "charset=utf-8\r\n\r\n".
-				  $query_string;
+		        "charset=utf-8\r\n\r\n".
+		        $query_string;
 
 		# Send the data and then get back any response.
 		fwrite($fp, $query_string);
@@ -106,12 +106,12 @@ class Trackback extends LnBlogObject {
 		$this->getPostData();
 		$error = '';
 		if (! $this->url) {
-			$error = "No URL in ping.";
+			$error = _("No URL in ping.");
 		} else {
 			$ts = time();
 			$this->date = date("Y-m-d H:i:s T", $ts);
 			$ret = $this->writeFileData($save_dir.PATH_DELIM.$ts.".txt");
-			if (! $ret) $error = "Unable to save ping data.";
+			if (! $ret) $error = _("Unable to save ping data.");
 		}
 		$err_code = $error == '' ? "0" : "1";
 		$output = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n".

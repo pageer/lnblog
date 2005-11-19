@@ -18,6 +18,11 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+# File: showarticle.php
+# Displays an article with any associated comments and TrackBacks.
+#
+# This is included in the index.php wrapper script of articles.
+
 session_start();
 require_once("config.php");
 require_once("lib/creators.php");

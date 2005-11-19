@@ -17,6 +17,13 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
+# File: showarchive.php
+# Shows a list of the available years of archives for blog entries.
+#
+# This is included by the index.php wrapper script in the top-level entries
+# directory of blogs.
+
 session_start();
 
 require_once("config.php");
@@ -29,13 +36,16 @@ $title = $blog->name." - ".$year_dir;
 $year_list = scan_directory(getcwd(), true);
 sort($year_list);
 
-$tpl = NewTemplate(ARCHIVE_TEMPLATE);
-$tpl->set("ARCHIVE_TITLE", $blog->name);
+$tpl = NewTemplate(LIST_TEMPLATE);
+$tpl->set("LIST_TITLE", spf_("Archive of %s", $blog->name));
 
 $LINK_LIST = $blog->getyearList();
 foreach ($LINK_LIST as $key=>$item) $LINK_LIST[$key]["title"] = $item["year"];
 
 $tpl->set("LINK_LIST", $LINK_LIST);
+$tpl->set("LIST_FOOTER", 
+          '<a href="'.$blog->getURL().BLOG_ENTRY_PATH.'/all.php">'.
+          _("List all entries"));
 $body = $tpl->process();
 
 $page->title = $title;

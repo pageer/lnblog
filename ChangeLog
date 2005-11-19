@@ -1,3 +1,53 @@
+18-Nov-2005:
+- Fixed various template bugs.
+- Cut way down on verbiage in FS setup.
+- Added FTP root autodetection to fs_setup.php.
+- Fixed error with Windows paths in FTP DOCUMENT_ROOT setup.
+- Started moving old readme file into Natural Docs.
+
+17-Nov-2005:
+- Made sidebar calendar slightly prettier.
+- Removed extra unneeded templates.
+- Fixed comment form not showing right name after post (reported by WGM).
+- Fixed error in updating articles in blog.php.
+
+16-Nov-2005:
+- Added a calendar plugin for the sidebar.
+- Fixed issue with character encoding coming from strftime().  The fix
+depends on setting the SYSTEM_CHARSET constant and the iconv extension
+being loaded. (Reported by WGM.)
+
+15-Nov-2005:
+- Made localpath_to_uri not fail when path does not exist.
+- Finished adding gettext support to templates.
+- Added documentation on internationalization.
+- Added a simplified file format to set configuration constants.
+
+07-Nov-2005:
+- Fixed case-sensitive path problem on Windows.
+
+04-Nov-2005:
+- Added support for GNU gettext extension along with a simple fallback
+mechanism for when gettext is not available.
+
+01-Nov-2005:
+- Added some query string detection to facilitate not using wrapper scripts.
+- Added a config.php to the pages directory to make above work.
+- Added more support for internationalization.
+
+31-Oct-2005:
+- Changed docroot and ftproot test pages to use templates.
+- Changed htaccess_generator plugin to include lines from .htaccess file in
+INSTALL_ROOT if it exists.
+- More NaturalDocs documentation.
+
+28-Oct-2005:
+- Made default MIME type and charset configurable.
+- Changed UNICODE_ESCAPE_HACK default back to true.
+
+27-Oct-2005:
+- Added a NaturalDocs project for auto-generate documentation.
+
 23-Oct-2005: version 0.4.0
 - Added permission checks to sidebar administration plugin.
 - Moved the "powered by" link whoring to a plugin so people can get rid of it.

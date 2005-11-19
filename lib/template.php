@@ -17,18 +17,21 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
-# A PHP-based template class inspired by the example at:
-# http://www.sitepoint.com/print/beyond-template-engine
+# Class: PHPTemplate
+# A PHP-based template class inspired by the example at
+# <http://www.sitepoint.com/print/beyond-template-engine>
 # The idea is to simplify the template engine by just using regular old 
 # PHP source files as template files.  Since the syntax for advanced 
 # templating is not significantly less complicated than regular PHP
 # syntax, we might as well save ourselves some trouble and just use PHP.
-
+#
 # Please note that this class will depend on an appropriately set 
 # include_path.  This will allow us to transparently have different templates
 # for different sections of the site and fall back to the default if we
 # don't want to bother.
+#
+# Ihnerits:
+# <LnBlogObject>
 
 require_once("lib/lnblogobject.php");
 
@@ -42,19 +45,52 @@ class PHPTemplate extends LnBlogObject {
 		$this->vars = array();
 	}
 
+	# Method: set
+	# Sets a template variable.
+	#
+	# Parameters:
+	# var - The name of the variable.
+	# val - *Optional* value for the variable.  *Defaults* to true.
+	#
+	# Returns:
+	# The value passed or true.
 	function set($var, $val=true) {
 		return $this->vars[$var] = $val;
 	}
 
+	# Method: varSet
+	# Determine if a template variable has been set.
+	#
+	# Parameters:
+	# var - The name of a template variable.
+	# 
+	# Returns:
+	# True if var has been set, false otherwise.
 	function varSet($var) {
 		return isset($this->vars[$var]);
 	}
 
+	# Method: reset
+	# Resets a template back to its empty state, clearing all variables and the file.
+	# 
+	# Parameters:
+	# file - An *optional* file name for the reset template.
 	function reset($file="") {
 		$this->file = $file;
 		$this->vars = array();
 	}
 
+	# Method: process
+	# Process the template and get the output.
+	# 
+	# Parameters:
+	# return_results - *Optional* boolean that determines whether the output should be 
+	#                  returned in a string instead of sent straight to the client.  
+	#                  *Default is true.
+	#
+	# Returns:
+	# A string containing the output if return_results is true.  Otherwise, it returns
+	# true on success and false on failure.
 	function process($return_results=true) {
 		ob_start();
 		extract($this->vars, EXTR_OVERWRITE);

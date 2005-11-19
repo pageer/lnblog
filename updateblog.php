@@ -18,6 +18,11 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+# File: updateblog.php
+# Used to update the settings on an existing blog.
+#
+# In the standard setup, this file is included by the per-blog edit.php file.
+
 session_start();
 require_once("blogconfig.php");
 require_once("lib/creators.php");
@@ -69,7 +74,7 @@ $tpl->set("BLOG_RSS_MAX_ID", $blogrss);
 $tpl->set("BLOG_RSS_MAX", $blog->max_rss);
 $tpl->set("POST_PAGE", current_file());
 $tpl->set("SUBMIT_ID", $submitid);
-$tpl->set("UPDATE_TITLE", "Update ".$blog->name);
+$tpl->set("UPDATE_TITLE", sprintf(_("Update %s"), $blog->name));
 
 # NOTE - sanitize this input to avoid XSS attacks.
 
@@ -87,12 +92,12 @@ if (POST($blogmax)) $blog->max_rss = POST($blogrss);
 
 if (POST("submit")) {
 	$ret = $blog->update();
-	if (!$ret) $tpl->set("UPDATE_MESSAGE", "Error updating blog.");
+	if (!$ret) $tpl->set("UPDATE_MESSAGE", _("Error updating blog."));
 	else $page->redirect($blog->getURL());
 }
 
 $body = $tpl->process();
-$page->title = "Update blog - ".$blog->name;
+$page->title = sprintf(_("Update blog - %s"), $blog->name);
 $page->addStylesheet("form.css");
 $page->display($body, &$blog);
 ?>

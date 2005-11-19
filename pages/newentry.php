@@ -18,10 +18,12 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-# This file is used to display a blog entry with its comments.
-# If you want to modify the layout of this page, you should be able to simply
-# change the HTML code and leave the PHP code alone without seriously 
-# breaking anything.
+# File: newentry.php
+# Used to create a new blog entry.  
+# To edit or delete an entry, refer to the <editentry.php> and <delentry.php>
+# files respectively.
+#
+# This is included by the new.php wrapper script for blogs.
 
 session_start();
 require_once("lib/creators.php");
@@ -31,7 +33,7 @@ $page = NewPage(&$blg);
 
 $submit_id = "submit";
 $preview_id = "preview";
-$tpl = NewTemplate(BLOG_EDIT_TEMPLATE);
+$tpl = NewTemplate(ENTRY_EDIT_TEMPLATE);
 $tpl->set("FORM_ACTION", current_file() );
 $tpl->set("SUBMIT_ID", $submit_id);
 $tpl->set("PREV_ID", $preview_id);
@@ -49,7 +51,7 @@ if (POST($submit_id)) {
 }
 
 $body = $tpl->process();
-$page->title = $blg->name." - New Entry";
+$page->title = spf_("%s - New Entry", $blg->name);
 $page->addStylesheet("form.css", "blogentry.css");
 $page->addScript("editor.js");
 $page->display($body, &$blg);

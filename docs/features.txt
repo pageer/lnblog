@@ -1,0 +1,27 @@
+Document: Feature List
+
+Here is a list of the features currently supported by LnBlog.
+
+Section: Basic Features
+
+- Blog entries with comments.
+- Static articles.
+- Send and receive trackbacks.
+- Multiple user accounts.
+- Multiple weblogs with simple user permissions.
+- Upload files to blogs, entries, and articles.
+- Can work in PHP *safe_mode*.
+- Use a dialect of BBCode to post entries.
+- Support for internationalization.
+- Support for themes.
+- Support for plugins.
+
+Section: Standard Plugins
+
+- E-mail notification on user comments.
+- Auto-generated RSS feeds for blogs.
+- Auto-generated RSS feeds for user comments on each entry.
+- Auto-generate Apache .htaccess files when creating and upgrading blogs.
+- Add metadata and RSS links to the page header.
+- Add trackback auto-discovery RDF code to entries.
+- Each section of the sidebar is a plugin.

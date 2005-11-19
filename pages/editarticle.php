@@ -18,6 +18,12 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+# File: editarticle.php
+# Used to edit the content of an existing article.
+# To create a new article, refer to the <newarticle.php> file.
+#
+# This is included by the edit.php wrapper script for articles.
+
 session_start();
 require_once("lib/creators.php");
 
@@ -25,17 +31,12 @@ $ent = NewArticle();
 $blg = NewBlog();
 $page = NewPage(&$ent);
 
-$submit_id = "submit";
-$preview_id = "preview";
-$tpl = NewTemplate(ARTICLE_EDIT_TEMPLATE);
+$submit_id = _("Submit");
+$preview_id = _("Preview");
+$tpl = NewTemplate(ENTRY_EDIT_TEMPLATE);
 $tpl->set("SUBMIT_ID", $submit_id);
 $tpl->set("PREV_ID", $preview_id);
 $blg->exportVars($tpl);
-
-$tpl->set("ARTICLE_POST_SUBJECT", ENTRY_POST_SUBJECT);
-$tpl->set("ARTICLE_POST_DATA", ENTRY_POST_DATA);
-$tpl->set("ARTICLE_POST_COMMENTS", ENTRY_POST_COMMENTS);
-$tpl->set("ARTICLE_POST_HTML", ENTRY_POST_HTML);
 
 $tpl->set("FORM_ACTION", current_file() );
 $tpl->set("SUBJECT", $ent->subject);
@@ -52,7 +53,7 @@ if (POST($submit_id)) {
 }	
 
 $body = $tpl->process();
-$page->title = $blg->name." - New Entry";
+$page->title = spf_("%s - Edit article", $blg->name);
 $page->addStylesheet("form.css", "article.css");
 $page->addScript("editor.js");
 $page->display($body, &$blog);

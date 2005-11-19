@@ -18,6 +18,13 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+# File: delentry.php
+# Used to delete a blog entry.
+# Entries are created and modified with the <newentry.php> and 
+# <editentry.php> files respectively.
+#
+# This is included by the delete.php wrapper script for blog entries.
+
 session_start();
 require_once("config.php");
 require_once("lib/creators.php");
@@ -26,30 +33,30 @@ $blog = NewBlog();
 $ent = NewBlogEntry();
 $page = NewPage(&$ent);
 
-$conf_id = "ok";
-$cancel_id = "cancel";
-$message = "Remove the weblog entry \"".$ent->subject."\"?";
+$conf_id = _("OK");
+$cancel_id = _("Cancel");
+$message = spf_("Do you really want to delete '%s'?", $ent->subject);
 
 if (POST($conf_id)) {
 	$ret = $blog->deleteEntry();
 	if ($ret == UPDATE_SUCCESS) $page->redirect(BLOG_ROOT_URL);
-	else $message = "Unable to delete \"".$ent->subject."\".  Try again?";
+	else $message = spf_("Unable to delete '%s'.  Try again?", $ent->subject);
 } elseif (POST($cancel_id)) {
 	redirect("index.php");
 }
 
 $tpl = NewTemplate(CONFIRM_TEMPLATE);
-$tpl->set("CONFIRM_TITLE", "Remove entry?");
+$tpl->set("CONFIRM_TITLE", _("Remove entry?"));
 $tpl->set("CONFIRM_MESSAGE",$message);
 $tpl->set("CONFIRM_PAGE", current_file() );
 $tpl->set("OK_ID", $conf_id);
-$tpl->set("OK_LABEL", "Yes");
-$tpl->set("CANCEL_ID", "cancel");
-$tpl->set("CANCEL_LABEL", "No");
+$tpl->set("OK_LABEL", _("Yes"));
+$tpl->set("CANCEL_ID", $cancel_id);
+$tpl->set("CANCEL_LABEL", _("No"));
 
 $body = $tpl->process();
 
-$page->title = $blog->name." - Delete comment";
+$page->title = spf_("%s - Delete entry", $blog->name);
 $page->display($body, &$blog);
 
 ?>

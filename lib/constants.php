@@ -21,45 +21,20 @@
 # File: constants.php
 # Holds various constants used by back-end classes.
 
-# Section: Page DOCTYPEs
-# Constant: XHTML_1_1
-# Full doctype for XHTML 1.1
-define("XHTML_1_1", "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"\n\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
-# Constant: XHTML_1_0_Strict
-# Full doctype for XHTML 1.0 Strict
-define("XHTML_1_0_Strict", "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">");
-# Constant: XHTML_1_0_Transitional
-# Full doctype for XHTML 1.0 Transitional
-define("XHTML_1_0_Transitional", "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
-# Constant: XHTML_1_0_Frameset
-# Full doctype for XHTML 1.0 Frameset
-define("XHTML_1_0_Frameset", "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Frameset//EN\"\n\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd\">");
-# Constant: HTML_4_01_Strict
-# Full doctype for HTML 4.01 Strict
-define("HTML_4_01_Strict", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"\n\"http://www.w3.org/TR/html4/strict.dtd\">");
-# Constant: HTML_4_01_Transitional
-# Full doctype for HTML 4.01 Transitional
-define("HTML_4_01_Transitional", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n\"http://www.w3.org/TR/html4/loose.dtd\">");
-# Constant: HTML_4_01_Frameset
-# Full doctype for HTML 4.01 Frameset
-define("HTML_4_01_Frameset", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Frameset//EN\"\n\"http://www.w3.org/TR/html4/frameset.dtd\">");
-# Constant: HTML_3_2
-# Full doctype for HTML 3.2
-define("HTML_3_2", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">");
-
 # Named constants for template files.
 define("BLOG_TEMPLATE_DIR", "templates");
+define("LIST_TEMPLATE", "list_tpl.php");
 define("BASIC_LAYOUT_TEMPLATE", "basic_layout_tpl.php");
 define("PAGE_HEAD_TEMPLATE", "page_head_tpl.php");
-define("ARCHIVE_TEMPLATE", "archive_tpl.php");
-define("BLOG_TEMPLATE", "blog_tpl.php");
+#define("ARCHIVE_TEMPLATE", "archive_tpl.php");
+#define("BLOG_TEMPLATE", "blog_tpl.php");
 define("ENTRY_TEMPLATE", "blogentry_tpl.php");
 define("ARTICLE_TEMPLATE", "article_tpl.php");
 define("COMMENT_TEMPLATE", "blogcomment_tpl.php");
 define("COMMENT_LIST_TEMPLATE", "comment_list_tpl.php");
 define("COMMENT_FORM_TEMPLATE", "comment_form_tpl.php");
-define("BLOG_EDIT_TEMPLATE", "blogedit_tpl.php");
-define("ARTICLE_EDIT_TEMPLATE", "article_edit_tpl.php");
+define("ENTRY_EDIT_TEMPLATE", "entry_edit_tpl.php");
+#define("ARTICLE_EDIT_TEMPLATE", "article_edit_tpl.php");
 define("LOGIN_TEMPLATE", "login_tpl.php");
 define("CREATE_LOGIN_TEMPLATE", "login_create_tpl.php");
 define("CONFIRM_TEMPLATE", "confirm_tpl.php");
@@ -72,9 +47,12 @@ define("TRACKBACK_TEMPLATE", "trackback_tpl.php");
 define("TRACKBACK_LIST_TEMPLATE", "trackback_list_tpl.php");
 define("SITEMAP_TEMPLATE", "sitemap_config_tpl.php");
 define("USER_INFO", "user_info_tpl.php");
+define("FTPROOT_TEST_TEMPLATE", "ftproot_test_tpl.php");
+define("DOCROOT_TEST_TEMPLATE", "docroot_test_tpl.php");
 
 # Section: Markup Types
 # Define types of markup available for entries. 
+
 # Constant: MARKUP_NONE
 # Use auto-markup.  All HTML tags are stripped, line and paragraph breaks 
 # are auto-inserted, and URLs are auto-converted into links.
@@ -86,28 +64,57 @@ define("MARKUP_BBCODE", 1);
 # Treat the markup as raw HTML, leaving it untouched.
 define("MARKUP_HTML", 2);
 
+# Section: BlogEntry Error Codes
 # Update status constants for blog entry modifying.
+
+# Constant: UPDATE_SUCCESS
+# Update succeeded.
 define("UPDATE_SUCCESS", 1);
+# Constant: UPDATE_NO_DATA_ERROR
+# Update failed because entry has no body data.
 define("UPDATE_NO_DATA_ERROR", 0);
+# Constant: UPDATE_ENTRY_ERROR
+# Generic error message.
 define("UPDATE_ENTRY_ERROR", -1);
 define("UPDATE_RSS1_ERROR", -2);
 define("UPDATE_RSS2_ERROR", -3);
+# Constant: UPDATE_AUTH_ERROR
+# The update failed because the user is not logged in 
+# or because he lacks sufficient permissions.
 define("UPDATE_AUTH_ERROR", -4);
 
-# Constants for handling news feeds.
-# Decide whether to use permalinks as Globally Unique Identifiers.
-define("GUID_IS_PERMALINK", true);
+# Section: FileUpload Error Codes
+# Status constants used for file uploading.
 
-# Status constants for the file upload class.
+# Constant: FILEUPLOAD_NO_ERROR
+# Upload succeeded without errors.
 define("FILEUPLOAD_NO_ERROR", 0);
+# Constant: FILEUPLOAD_NO_FILE
+# There was no file uploaded.
 define("FILEUPLOAD_NO_FILE", 1);
+# Constant:FILEUPLOAD_FILE_EMPTY
+# The file was created on the server, but it is empty.
 define("FILEUPLOAD_FILE_EMPTY", 2);
+# Constant:	FILEUPLOAD_SERVER_TOO_BIG
+# The uploaded file is too big for the server.
 define("FILEUPLOAD_SERVER_TOO_BIG", 3);
+# Constant: FILEUPLOAD_FORM_TOO_BIG
+# The file is too big for the suggested size in the form.
 define("FILEUPLOAD_FORM_TOO_BIG", 4);
+# Constant: FILEUPLOAD_PARTIAL_FILE
+# The file was not completely received.
 define("FILEUPLOAD_PARTIAL_FILE", 5);
+# Constant: FILEUPLOAD_NOT_UPLOADED
+# Generic upload failure.
 define("FILEUPLOAD_NOT_UPLOADED", 6);
+# Constant: FILEUPLOAD_NAME_TRUNCATED
+# The file name was too long and has been truncated.
 define("FILEUPLOAD_NAME_TRUNCATED", 7);
+# Constant: FILEUPLOAD_BAD_NAME
+# The file name is not valid for upload.
 define("FILEUPLOAD_BAD_NAME", 8);
+# Constant: FILEUPLOAD_NOT_INITIALIZED
+# Invalid form field name.
 define("FILEUPLOAD_NOT_INITIALIZED", 9);
 
 # Constants used for user login sessions and cookies.

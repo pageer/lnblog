@@ -18,6 +18,14 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+# File: delcomment.php
+# Used to delete a reader comment.
+# Comments are added to entries and articles in the <showentry.php> and
+# <showarticle.php> files respectively.
+#
+# This is included by the delete.php wrapper script in the comments 
+# subdirectory of entries and articles.
+
 session_start();
 require_once("config.php");
 require_once("lib/creators.php");
@@ -27,7 +35,7 @@ $page = NewPage();
 
 if (! $blog->canModifyEntry() ) $page->redirect("index.php");
 
-$comm_id = "comment";
+$comm_id = _("id");
 
 $anchor = POST($comm_id);
 if (!$anchor) $anchor = GET($comm_id);
@@ -35,29 +43,28 @@ if (!$anchor) $page->redirect("index.php");
 $comm = NewBlogComment($anchor);
 $page->display_object = &$comm;
 
-$conf_id = "ok";
-$conf_val = "Yes";
-$message = "Do you really want to delete ".$anchor."?";
+$conf_id = _("OK");
+$message = spf_("Do you really want to delete %s?", $anchor);
 
 if (POST($conf_id)) {
 	$ret = $comm->delete();
 	if ($ret) redirect("index.php");
-	else $message = "Unable to delete ".$anchor.".  Try again?";
+	else $message = spf_("Unable to delete %s.  Try again?", $anchor);
 }
 
 $tpl = NewTemplate(CONFIRM_TEMPLATE);
-$tpl->set("CONFIRM_TITLE", "Delete comment?");
+$tpl->set("CONFIRM_TITLE", _("Delete comment?"));
 $tpl->set("CONFIRM_MESSAGE",$message);
 $tpl->set("CONFIRM_PAGE", current_file() );
 $tpl->set("OK_ID", $conf_id);
-$tpl->set("OK_LABEL", $conf_val);
-$tpl->set("CANCEL_ID", "cancel");
-$tpl->set("CANCEL_LABEL", "Cancel");
+$tpl->set("OK_LABEL", _("Yes"));
+$tpl->set("CANCEL_ID", _("Cancel"));
+$tpl->set("CANCEL_LABEL", _("Cancel"));
 $tpl->set("PASS_DATA_ID", $comm_id);
 $tpl->set("PASS_DATA", $anchor);
 $body = $tpl->process();
 
-$page->title = $blog->name." - Delete comment";
+$page->title = spf_("%s - Delete comment", $blog->name);
 $page->display($body, $blog);
 
 ?>

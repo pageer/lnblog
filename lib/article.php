@@ -25,12 +25,15 @@ Class: Article
 Represents a static article.  
 
 Inherits:
-<LNBlogObject>, <Entry>, <BlogEntry>
+<LnBlogObject>, <Entry>, <BlogEntry>
 
 Events:
-OnInit       - Fired when the object is created.
-InitComplete
-
+OnInit         - Fired when the object is created.
+InitComplete   - Fired at end of constructor.
+OnInsert       - Fired before object is saved to persistent storage.
+InsertComplete - Fired after object has finished saving.
+OnOutput       - Fired before output is generated.
+OutputComplete - Fired after output has finished being generated.
 */
 
 class Article extends BlogEntry {
@@ -217,8 +220,8 @@ class Article extends BlogEntry {
 		$ret = create_directory_wrappers($dir_path, ARTICLE_BASE);
 
 		$this->file = $dir_path.PATH_DELIM.ENTRY_DEFAULT_FILE;
-		$this->date = date(ENTRY_DATE_FORMAT, $curr_ts);
-		if (! $this->post_date) $this->post_date = date(ENTRY_DATE_FORMAT, $curr_ts);
+		$this->date = fmtdate(ENTRY_DATE_FORMAT, $curr_ts);
+		if (! $this->post_date) $this->post_date = fmtdate(ENTRY_DATE_FORMAT, $curr_ts);
 		$this->timestamp = $curr_ts;
 		if (! $this->post_ts) $this->post_ts = $curr_ts;
 		$this->ip = get_ip();

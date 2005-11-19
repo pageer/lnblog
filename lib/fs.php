@@ -31,18 +31,128 @@ class FS {
 	var $default_mode;
 
 	function FS() {}
+	
+	# Method: destruct
+	# An explicitly called destructor because PHP 4 doesn't have proper destructors.
+	# Releases all resources the object is holding.
 	function destruct() {}
+	
+	# Method: getcwd
+	# Get the working directory for the class.
+	#
+	# Returns;
+	# A string with the working directory reported by the filesystem functions.
 	function getcwd() {}
+	
+	# Method: chdir
+	# Change working directory
+	#
+	# Parameters: 
+	# dir - A standard local path to the new directory.
+	#
+	# Returns:
+	# True on success, false on failure.
 	function chdir($dir) {}
+	
+	# Method: mkdir
+	# Create a new directory.  
+	# For this function, the immediate parent directory must exist
+	#
+	# Paremeters:
+	# dir  - The local path to the new directory.
+	# mode - An *optional* umask for file permissions on the new directory.
+	#
+	# Returns:
+	# False on failure, an unspecified non-false value on success.
 	function mkdir($dir, $mode=0777) {}
+	
+	# Method: mkdir_rec
+	# Recursive version of <mkdir>.
+	# This will create all non-existent parents of the target path.
+	#
+	# Parameters:
+	# dir  - The local path to the new directory.
+	# mode - An *optional* umask for file permissions on the new directory.
+	#
+	# Retruns:
+	# False on failure, a non-false value on success.
 	function mkdir_rec($dir, $mode=0777) {}
+	
+	# Method: rmdir
+	# Remove an empty directory.
+	#
+	# Parameters:
+	# dir - The local path of the directory to remove.
+	#
+	# Returns:
+	# True on success, false on failure.
 	function rmdir($dir) {}
+	
+	# Method: rmdir
+	# Recursive version of <rmdir>.
+	# Remove a directory and all files and directories it contains.
+	#
+	# Parameters:
+	# dir - The local path of the directory to remove.
+	#
+	# Returns:
+	# True on success, false on failure.
 	function rmdir_rec($dir) {}
+	
+	# Method: chmod
+	# Change permissions on a file or directory.
+	#
+	# Parameters:
+	# path - The local path to the file to change.
+	# mode - The UNIX octal value to set the permissions to.
+	#
+	# Returns:
+	# False on failure, an unspecified non-false value on success.
 	function chmod($path, $mode) {}
+	
 	function defaultMode() {}
+	
+	# Method: copy
+	# Copy a single file.
+	#
+	# Parameters:
+	# src  - The local path to the file to copy 
+	# dest - The path to copy it to.
+	#
+	# Returns:
+	# True on success, false on failure.
 	function copy($src, $dest) {}
+	
+	# Method: rename
+	# Move or rename a file.
+	#
+	# Parameters:
+	# src  - The local path to the file to move or rename.
+	# dest - The new file path.
+	#
+	# Returns:
+	# True on success, false on failure.
 	function rename($src, $dest) {}
+	
+	# Method: delete
+	# Delete a single file.
+	#
+	# Parameters:
+	# src - The local path to the file to delete.
+	#
+	# Returns:
+	# True on success, false on failure.
 	function delete($src) {}
+	
+	# Method: write_file
+	# Write a string to a new text file.
+	# 
+	# Parameters:
+	# path     - The local path to the file.
+	# contents - A string containing te desired contents of the file.
+	#
+	# Returns:
+	# False on failure, an unspecified non-false value on success.
 	function write_file($path, $contents) {}
 
 }

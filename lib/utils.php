@@ -291,12 +291,22 @@ function current_url() {
 # Convert a local path to a URI.
 
 function localpath_to_uri($path, $full_uri=true) {
-	$full_path = realpath($path);
+
+	if (file_exists($path))	$full_path = realpath($path);
+	else $full_path = $path;
+
 	# Add a trailing slash if the path is a directory.
 	if (is_dir($full_path)) $full_path .= PATH_DELIM;
 	#$root = find_document_root($full_path);
 	$root = calculate_document_root();
-	#$url_path = str_replace($root, "", $full_path);
+
+	# Normalize to lower case on Windows in order to avoid problems
+	# with case-sensitive substring removal.
+	if ( strtoupper( substr(PHP_OS,0,3) ) == 'WIN' ) {
+		$root = strtolower($root);
+		$full_path = strtolower($full_path);
+	}
+
 	# Account for user home directories in path.  Please note that this is 
 	# an ugly, ugly hack to make this function work when I'm testing on my
 	# local workstation, where I use ~/www for by web root.
@@ -306,9 +316,10 @@ function localpath_to_uri($path, $full_uri=true) {
 	} else {
 		$url_path = str_replace($root, "", $full_path);
 	}
+	
 	# Remove any drive letter.
 	if ( strtoupper( substr(PHP_OS,0,3) ) == 'WIN' ) 
-		$url_path = preg_replace("/[A-Z]:(.*)/", "$1", $url_path);
+		$url_path = preg_replace("/[A-Za-z]:(.*)/", "$1", $url_path);
 	# Convert to forward slashes.
 	if (PATH_DELIM != "/") 
 		$url_path = str_replace(PATH_DELIM, "/", $url_path);
@@ -520,7 +531,6 @@ function getlink($name, $type=false) {
 	# Second case: check the current theme directory
 	} elseif ( file_exists(INSTALL_ROOT.PATH_DELIM."themes".PATH_DELIM.THEME_NAME.
 	                       PATH_DELIM.$l_type.PATH_DELIM.$name) ) {
-	
 		return INSTALL_ROOT_URL."themes/".THEME_NAME."/".$l_type."/".$name;
 
 	# Last case: use the default theme
@@ -531,6 +541,7 @@ function getlink($name, $type=false) {
 }
 
 function sanitize($str, $pattern="/\W/", $sub="") {
+	if (! $str) return "";
 	if (preg_match($pattern, $str)) {
 		return preg_replace($pattern, $sub, $str);
 	} else {

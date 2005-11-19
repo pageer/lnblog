@@ -1,4 +1,3 @@
-<li class="fullcomment">
 <?php if (isset($SUBJECT)) { ?>
 	<h3 class="commentheader"><a id="<?php echo $ANCHOR; ?>" href="#<?php echo $ANCHOR; ?>"><?php echo $SUBJECT; ?></a></h3>
 <?php } else { ?>
@@ -9,26 +8,26 @@
 </div>
 <div class="commentfooter">
 	<ul>
-		<li class="commentdate">Comment posted <?php echo $DATE; ?></li>
+		<li class="commentdate"><?php pf_("Comment posted %s", $DATE); ?></li>
 <?php if (isset($USER_ID)) { ?>
 	<?php if ( isset($USER_EMAIL) && isset($USER_NAME) ) { ?>
-		<li class="commentname">By <a href="mailto:<?php echo $USER_EMAIL; ?>"><strong><?php echo $USER_NAME; ?></strong></a></li>
+		<li class="commentname"><?php pf_("By %s", '<a href="mailto:'.$USER_EMAIL.'"><strong>'.$USER_NAME.'</strong></a>'); ?></li>
 	<?php } elseif (isset($USER_EMAIL)) { ?>
-		<li class="commentname">By <a href="mailto:<?php echo $USER_EMAIL; ?>"><strong><?php echo $USER_ID; ?></strong></a></li>
+		<li class="commentname"><?php pf_("By %s", '<a href="mailto:'.$USER_EMAIL.'"><strong>'.$USER_ID.'</strong></a>'); ?></li>
 	<?php } elseif (isset($USER_NAME)) { ?>
-		<li class="commentname">By <strong><?php echo $USER_NAME; ?></strong></li>
+		<li class="commentname"><?php pf_("By %s", '<strong>'.$USER_NAME.'</strong>'); ?></li>
 	<?php } else { ?>
-		<li class="commentname">By <strong><?php echo $USER_ID; ?></strong></li>
+		<li class="commentname"><?php pf_("By %s", '<strong>'.$USER_ID.'</strong>'); ?></li>
 	<?php } ?>
 	<?php if (isset($USER_HOMEPAGE)) { ?>
 		<li class="commenturl">(<a href="<?php echo $USER_HOMEPAGE; ?>"><?php echo $USER_HOMEPAGE; ?></a>)</li>
 	<?php } ?>
 <?php } else { ?>
-		<li class="commentname">By 
+		<li class="commentname">
 		<?php if ($EMAIL && $SHOW_MAIL) { ?>
-		<a href="mailto:<?php echo $EMAIL; ?>"><?php echo $NAME; ?></a>
+		<?php pf_('By %s', '<a href="mailto:'.$EMAIL.'">'.$NAME.'</a>'); ?>
 		<?php } else {?>
-		<?php echo $NAME; ?>
+		<?php pf_('By %s', $NAME); ?>
 		<?php } ?>
 		</li>
 		<?php if ($URL) { ?>
@@ -36,8 +35,7 @@
 		<?php } ?>
 <?php } ?>
 		<?php if ($SHOW_CONTROLS) { ?>
-		<li class="admin"><a href="<?php echo is_dir(ENTRY_COMMENT_DIR) ? ENTRY_COMMENT_DIR."/" : ""; ?>delete.php?comment=<?php echo $ANCHOR; ?>">Delete</a></li>
+		<li class="admin"><a href="<?php echo is_dir(ENTRY_COMMENT_DIR) ? ENTRY_COMMENT_DIR."/" : ""; ?>delete.php?comment=<?php echo $ANCHOR; ?>"><?php p_("Delete"); ?></a></li>
 		<?php } ?>
 	</ul>
 </div>
-</li>

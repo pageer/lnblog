@@ -98,7 +98,7 @@ class RSS1 {
 class RSS1FeedGenerator extends Plugin {
 
 	function RSS1FeedGenerator() {
-		$this->plugin_desc = "Create RSS 1.0 feeds for comments and blog entries.";
+		$this->plugin_desc = _("Create RSS 1.0 feeds for comments and blog entries.");
 		$this->plugin_version = "0.1.0";
 	}
 

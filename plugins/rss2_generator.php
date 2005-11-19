@@ -78,7 +78,7 @@ class RSS2Entry {
 		}
 		if ($this->guid) {
 			$ret .= "<guid";
-			if (GUID_IS_PERMALINK) $ret .= ' isPermaLink="true"';
+			if (RSS2GENERATOR_GUID_IS_PERMALINK) $ret .= ' isPermaLink="true"';
 			$ret .= ">".$this->guid."</guid>\n";
 		}
 		$ret .= "</item>\n";
@@ -138,9 +138,15 @@ class RSS2 {
 
 class RSS2FeedGenerator extends Plugin {
 
+	var $guid_is_permalink;
+
 	function RSS2FeedGenerator() {
-		$this->plugin_desc = "Create RSS 2.0 feeds for comments and blog entries.";
+		$this->plugin_desc = _("Create RSS 2.0 feeds for comments and blog entries.");
 		$this->plugin_version = "0.1.0";
+		$this->guid_is_permalink = true;
+		$this->member_list = array("guid_is_permalink");
+		if (! defined("RSS2GENERATOR_GUID_IS_PERMALINK"))
+			define("RSS2GENERATOR_GUID_IS_PERMALINK", $this->guid_is_permalink);
 	}
 
 	function updateCommentRSS2($cmt) {

@@ -18,6 +18,13 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+# File: newlogin.php
+# Used to create a new user account.  
+#
+# When used to create the administrator account, the username box is locked.
+# To change the administrator username, set the <ADMIN_USER> configuration
+# constant in the userdata/userconfig.php file.
+
 require_once("blogconfig.php");
 require_once("lib/creators.php");
 
@@ -29,11 +36,11 @@ $tpl = NewTemplate(CREATE_LOGIN_TEMPLATE);
 
 # Allow us to use this to create the admin login.
 if (file_exists(USER_DATA_PATH.PATH_DELIM."passwd.php")) {
-	$page_name = "Create New Login";
-	$form_title = "Create New Login";
+	$page_name = _("Create New Login");
+	$form_title = _("Create New Login");
 } else {
-	$page_name = "Create Administrator Login";
-	$form_title = "Create Aministration Login";
+	$page_name = _("Create Administrator Login");
+	$form_title = _("Create Aministration Login");
 	$tpl->set("UNAME_VALUE", ADMIN_USER);
 	$tpl->set("DISABLE_UNAME", true);
 }
@@ -60,7 +67,10 @@ $partial_post = POST($user_name) || POST($password) || POST($confirm);
 
 if ($post_complete) {
 	if ( POST($confirm) != POST($password) ) {
-		$tpl->set("FORM_MESSAGE", "The passwords you entered do not match.");
+		$tpl->set("FORM_MESSAGE", 
+			"<span style=\"color: red\">".
+			_("The passwords you entered do not match.").
+			"</span>");
 	} else {
 		$usr = NewUser();
 		$usr->username(trim(POST($user_name)));
@@ -76,9 +86,18 @@ if ($post_complete) {
 	}
 } elseif ($partial_post) {
 	# Let's do them in reverse, so that the most logical message appears.
-	if (! POST($confirm)) $tpl->set("FORM_MESSAGE", "You must confirm your password.");
-	if (! POST($password)) $tpl->set("FORM_MESSAGE", "You must enter a password.");
-	if (! POST($user_name)) $tpl->set("FORM_MESSAGE", "You must enter a username.");
+	if (! POST($confirm)) $tpl->set("FORM_MESSAGE", 
+			'<span style="color: red">'.
+			_("You must confirm your password.").
+			'</span>');
+	if (! POST($password)) $tpl->set("FORM_MESSAGE", 
+			'<span style="color: red">'.
+			_("You must enter a password.").
+			'</span>');
+	if (! POST($user_name)) $tpl->set("FORM_MESSAGE", 
+			'<span style="color: red">'.
+			_("You must enter a username.").
+			'</span>');
 }
 
 $body = $tpl->process();

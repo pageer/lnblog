@@ -145,34 +145,37 @@ class FileUpload extends LnBlogObject {
 		if (!$err) $err = $this->error;
 		switch ($err) {
 			case FILEUPLOAD_NO_ERROR:
-				$ret = "File '".$this->destname."' successfully uploaded.";
+			#echo "'".mkpath($this->destdir, $this->destname)."'";
+				$ret = spf_("File '<a href=\"%s\">%s</a>' successfully uploaded.", 
+				            localpath_to_uri(mkpath($this->destdir, $this->destname)),
+				            $this->destname);
 				break;
 			case FILEUPLOAD_NO_FILE:
-				$ret = "No file was uploaded.";
+				$ret = _("No file was uploaded.");
 				break;
 			case FILEUPLOAD_FILE_EMPTY:
-				$ret = "File empty.";
+				$ret = _("File empty.");
 				break;
 			case FILEUPLOAD_SERVER_TOO_BIG:
-				$ret = "File too big - rejected by server.";
+				$ret = _("File too big - rejected by server.");
 				break;
 			case FILEUPLOAD_FORM_TOO_BIG:
-				$ret = "File too big - rejected by browser.";
+				$ret = _("File too big - rejected by browser.");
 				break;
 			case FILEUPLOAD_PARTIAL_FILE:
-				$ret = "File only partially uploaded.";
+				$ret = _("File only partially uploaded.");
 				break;
 			case FILEUPLOAD_NOT_UPLOADED:
-				$ret = "Not a valid file upload.";
+				$ret = _("Not a valid file upload.");
 				break;
 			case FILEUPLOAD_NAME_TRUNCATED:
-				$ret = "File name error - possible name truncation.";
+				$ret = _("File name error - possible name truncation.");
 				break;
 			case FILEUPLOAD_BAD_NAME:
-				$ret = "Not a valid file upload - filename error.";
+				$ret = _("Not a valid file upload - filename error.");
 				break;
 			case FILEUPLOAD_NOT_INITIALIZED:
-				$ret = "Invalid field name - upload not initialized.";
+				$ret = _("Invalid field name - upload not initialized.");
 				break;
 		}
 		return $ret;

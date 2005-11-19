@@ -29,6 +29,19 @@ Represents a comment on a blog entry or article.
 
 Inherits:
 <LnBlogObject>, <Entry>
+
+Events:
+OnInit         - Fired when object is first created.
+InitComplete   - Fired at end of constructor.
+OnInsert       - Fired before object is saved to persistent storage.
+InsertComplete - Fired after object has finished saving.
+OnDelete       - Fired before object is deleted.
+DeleteComplete - Fired after object is deleted.
+OnUpdate       - Fired before changes are saved to persistent storage.
+UpdateComplete - Fired after changes to object are saved.
+OnOutput       - Fired before output is generated.
+OutputComplete - Fired after output has finished being generated.
+POSTRetrieved  - Fired after data has been retreived from an HTTP POST.
 */
 class BlogComment extends Entry {
 
@@ -184,7 +197,7 @@ class BlogComment extends Entry {
 		# when updating an entry.
 		if (! $this->file)
 			$this->file = $basepath.PATH_DELIM.$this->getPath($curr_ts).COMMENT_PATH_SUFFIX;
-		$this->date = date(ENTRY_DATE_FORMAT, $curr_ts);
+		$this->date = fmtdate(ENTRY_DATE_FORMAT, $curr_ts);
 		$this->timestamp = $curr_ts;
 		$this->ip = get_ip();
 
@@ -222,6 +235,7 @@ class BlogComment extends Entry {
 		$this->email = $this->stripHTML($this->email);
 		$this->url = $this->stripHTML($this->url);
 		$this->subject = $this->stripHTML($this->subject);
+		$this->raiseEvent("POSTRetreived");
 		# Don't strip HTML from the comment data, because we do that 
 		# when we add in the links and other markup.
 	}
@@ -327,15 +341,19 @@ class BlogComment extends Entry {
 		}
 		
 		$t->set("SUBJECT", $this->subject);
+		if ( strtolower(substr(trim($this->url), 0, 7)) != "http://") {
+			$this->url = "http://".$this->url;
+		}
 		$t->set("URL", $this->url);
 		$t->set("NAME", $this->name);
 		$t->set("DATE", $this->prettyDate($this->post_ts) );
 		$t->set("EDITDATE", $this->prettyDate() );
-		$t->set("EMAIL", $this->email);
 		if (COMMENT_EMAIL_VIEW_PUBLIC || $usr->checkLogin()) {
 			$t->set("SHOW_MAIL", true);
+			$t->set("EMAIL", $this->email);
 		} else {
 			$t->set("SHOW_MAIL", false);
+			$t->set("EMAIL", "");
 		}
 		$t->set("ANCHOR", $this->getAnchor() );
 		$t->set("SHOW_CONTROLS", $show_edit_controls);
@@ -343,6 +361,7 @@ class BlogComment extends Entry {
 		
 		$ret .= $t->process();
 		ob_start();
+		$this->raiseEvent("OutputComplete");
 		$ret .= ob_get_contents();
 		ob_end_clean();
 		
