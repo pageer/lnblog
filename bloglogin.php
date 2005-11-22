@@ -33,7 +33,7 @@ $page = NewPage(&$blog);
 
 if ($blog->isBlog()) {
 	$page_name = spf_("%s - Login", $blog->name);
-	$form_name = spf_("%s Login", $page_name);
+	$form_name = spf_("%s Login", $blog->name);
 	$redir_url = $blog->getURL();
 	$admin_login = false;
 } else {

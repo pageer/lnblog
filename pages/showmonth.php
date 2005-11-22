@@ -29,11 +29,20 @@ $page = NewPage(&$blog);
 
 $list = $blog->getMonth(); 
 
-$ts = $list[0]->timestamp;
+if (isset($list[0])) {
+	$ts = $list[0]->timestamp;
+} elseif ( sanitize(GET("year"), "/\D/") && 
+           sanitize(GET("month"), "/\D/") ) {
+	$ts = strtotime(GET("year")."-".GET("month")."-01");
+} else {
+	$ts = time();
+}
 if (USE_STRFTIME) {
 	$title = fmtdate("%B %Y", $ts);
+	$year = fmtdate("%Y", $ts);
 } else {
 	$title = fmtdate("F Y", $ts);
+	$year = fmtdate("Y", $ts);
 }
 
 # Optionally show all the entries as a weblog.
@@ -45,12 +54,18 @@ if (strtolower(GET("show")) == "all") {
 	$tpl = NewTemplate(LIST_TEMPLATE);
 	$tpl->set("LIST_TITLE", $title);
 	$tpl->set("LIST_FOOTER", 
-	          _('<a href="?show=all">Show all entries at once</a>'));
+	          '<a href="?show=all">'._("Show all entries at once").'</a>'.
+	          '<br /><a href="'.$blog->getURL().BLOG_ENTRY_PATH."/$year/"
+	          .'">'.spf_("Back to archive of %s", $year).'</a>');
 
+	$LINK_LIST = array();
 	foreach ($list as $ent) { 
 		$LINK_LIST[] = array("link"=>$ent->permalink(), "title"=>$ent->subject);
 	}
-
+	
+	if (empty($LINK_LIST)) {
+		$tpl->set("LIST_HEADER", _("There are no entries for this month."));
+	}
 	$tpl->set("LINK_LIST", $LINK_LIST);
 	$body = $tpl->process();
 }

@@ -39,8 +39,8 @@ The setup process for LnBlog is entirely web-based and mostly painless.
      process.
 4) - Pick the type of file writing you want.  If you have PHP *safe_mode* enabled on your web server, 
      then you *must* use FTP.  If you use "native" file writing, make sure that the LnBlug userdata 
-     folder and the folder where you will be creating blogs are writable.  See the <File Writing>
-     section for details.
+     folder and the folder where you will be creating blogs are writable.  See the <fsconfig.php>
+     documentation for details.
 5) - Set the administrator password.
 6) - Log in as the administrator.
 7) - Start creating new users and weblogs.
@@ -48,6 +48,7 @@ The setup process for LnBlog is entirely web-based and mostly painless.
 Section: Upgrading
 
 Upgrading LnBlog is normally pretty simple.
+
 1) - Move or rename your old LnBlog directory on the server.
 2) - Upload the new version in it's place.
 3) - Copy the entire userdata folder from your old version to the new version.
@@ -55,3 +56,18 @@ Upgrading LnBlog is normally pretty simple.
 In some cases, there may be additional steps, but this is not the norm.  For instance, some upgrades
 will require updating wrapper scripts.  Steps like this will be mentioned in the release announcement.
 
+Section: License
+
+LnBlog: A simple file-based weblog focused on design elegance.
+Copyright (C) 2005 Peter A. Geer <pageer@skepticats.com>
+
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU 
+General Public License as published by the Free Software Foundation; either version 2 of the License, 
+or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General 
+Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this program; if not, 
+write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.

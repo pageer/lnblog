@@ -20,7 +20,9 @@ the system account which PHP runs as, whereas the scripts would be owned by
 the user account of the site owner, so scripts would not be able to read any 
 of the files they created.  This restriction can be bypassed by performing 
 file writing via FTP, as this allows scripts to connect to the FTP server as
-the site owner, not a system user.
+the site owner, not a system user.  This also has the beneficial side-effect that 
+the files created by the scripts will be owned by the user account, so that
+they can be more easily managed via an FTP client.
 
 Section: Technical Details
 

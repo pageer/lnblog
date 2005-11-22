@@ -38,6 +38,9 @@ foreach ($month_list as $key=>$val) {
 
 $tpl = NewTemplate(LIST_TEMPLATE);
 $tpl->set("LIST_TITLE", spf_("Archive of %s", $year));
+$tpl->set("LIST_FOOTER", 
+          '<a href="'.$blog->getURL().BLOG_ENTRY_PATH.'/">'.
+          spf_("Back to main archives", $year).'</a>');
 
 $tpl->set("LINK_LIST", $month_list);
 $body = $tpl->process();

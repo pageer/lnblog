@@ -341,7 +341,8 @@ class BlogComment extends Entry {
 		}
 		
 		$t->set("SUBJECT", $this->subject);
-		if ( strtolower(substr(trim($this->url), 0, 7)) != "http://") {
+		if ( strtolower(substr(trim($this->url), 0, 7)) != "http://" &&
+		     $this->url != "" ) {
 			$this->url = "http://".$this->url;
 		}
 		$t->set("URL", $this->url);

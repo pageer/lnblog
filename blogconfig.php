@@ -65,31 +65,6 @@ if (file_exists(mkpath(INSTALL_ROOT,USER_DATA,"userconfig.cfg"))) {
 	}
 }
 
-#########################################
-# Section: Package information
-# Information on the package itself.
-
-# Constant: PACKAGE_NAME
-# The official package name, currently "LnBlog".
-define("PACKAGE_NAME", "LnBlog");
-
-# Constant: PACKAGE_VERSION
-# The version number of the software.  This is a string in the format 
-# "1.2.3".  Note that each number may be more than one digit.
-define("PACKAGE_VERSION", "0.4.0");
-
-# Constant: PACKAGE_URL
-# The full URL of the LnBlog project home page.
-define("PACKAGE_URL", "http://www.skepticats.com/lnblog/");
-
-# Constant: PACKAGE_DESCRIPTION
-# The offical text-blurb description of the software.
-define("PACKAGE_DESCRIPTION", PACKAGE_NAME.": a simple and (hopefully) elegant weblog");
-
-# Constant: PACKAGE_COPYRIGHT
-# The offical LnBlog copyright notice.
-define("PACKAGE_COPYRIGHT", "Copyright (c) 2005, Peter A. Geer <pageer@skepticats.com>");
-
 ###############################################
 # Section: Page DOCTYPEs
 # These are full, valid doctypes to use for pages.  See <DEFAULT_DOCTYPE>.
@@ -164,6 +139,16 @@ if (getenv("LANG")) {
 	@define("LANGUAGE", DEFAULT_LANGUAGE);
 	putenv("LANG=".LANGUAGE);
 }
+
+# Constant: LOCALEDIR
+# Directory to store the localization files.
+# This is used by both GNU gettext and the ad hoc translation system.
+define("LOCALEDIR", "locale");
+
+# I18N support.  The idea is to use GNU gettext if it is available and to
+# fall back to a custom function with the same interface when it is not.
+# Refer to the lib/i18n.php file for details.
+require_once("lib/i18n.php");
 
 # Constant: DEFAULT_DOCTYPE
 # The DOCTYPE used by your markup.  
@@ -294,6 +279,31 @@ The corresponding replacement expression to <URI_TO_LOCALPATH_MATCH_RE>.
 # *Default* is 3.
 @define("LBCODE_HEADER_WEIGHT", 3);
 
+#########################################
+# Section: Package information
+# Information on the package itself.
+
+# Constant: PACKAGE_NAME
+# The official package name, currently "LnBlog".
+define("PACKAGE_NAME", "LnBlog");
+
+# Constant: PACKAGE_VERSION
+# The version number of the software.  This is a string in the format 
+# "1.2.3".  Note that each number may be more than one digit.
+define("PACKAGE_VERSION", "0.5.0");
+
+# Constant: PACKAGE_URL
+# The full URL of the LnBlog project home page.
+define("PACKAGE_URL", "http://www.skepticats.com/lnblog/");
+
+# Constant: PACKAGE_DESCRIPTION
+# The offical text-blurb description of the software.
+define("PACKAGE_DESCRIPTION", _("%s: a simple and (hopefully) elegant weblog", PACKAGE_NAME));
+
+# Constant: PACKAGE_COPYRIGHT
+# The offical LnBlog copyright notice.
+define("PACKAGE_COPYRIGHT", "Copyright (c) 2005, Peter A. Geer <pageer@skepticats.com>");
+
 ########################################
 # Section: User Authentication
 # Constants that relate to user authentication
@@ -309,7 +319,7 @@ The corresponding replacement expression to <URI_TO_LOCALPATH_MATCH_RE>.
 # delete blogs.
 #
 # *Default* is "administrator".
-@define("ADMIN_USER", "administrator");
+@define("ADMIN_USER", _("administrator"));
 
 ##########################################
 # Section: Blog configuration
@@ -490,13 +500,13 @@ The corresponding replacement expression to <URI_TO_LOCALPATH_MATCH_RE>.
 # Default name for users who don't enter a name. 
 #
 # *Default* is "Anonymous Reader". 
-@define("ANON_POST_NAME", "Anonymous Reader");
+@define("ANON_POST_NAME", _("Anonymous Reader"));
 
 # Constant: NO_SUBJECT
 # Default text if the user does not enter a subject.  
 #
 # *Default* is "No Subject".
-@define("NO_SUBJECT", "No Subject");
+@define("NO_SUBJECT", _("No Subject"));
 
 # Constant: COMMENT_PATH_FORMAT
 # Date format string to use for comment file names. 
@@ -586,19 +596,9 @@ ini_set("include_path", ini_get("include_path").PATH_SEPARATOR.
 	(THEME_NAME != "default" ? INSTALL_ROOT.PATH_DELIM.THEME_TEMPLATES.PATH_SEPARATOR:"").
 	INSTALL_ROOT.PATH_DELIM.DEFAULT_THEME_TEMPLATES);
 
-# Constant: LOCALEDIR
-# Directory to store the localization files.
-# This is used by both GNU gettext and the ad hoc translation system.
-define("LOCALEDIR", "locale");
-require_once("lib/i18n.php");
-
 # Now that everything is initialized, we can create the global event register
 # and plugin manager.
 require_once("lib/eventregister.php");
 require_once("lib/pluginmanager.php");
-
-# I18N support.  The idea is to use GNU gettext if it is available and to
-# fall back to a custom function with the same interface when it is not.
-# Refer to the lib/i18n.php file for details.
 
 ?>

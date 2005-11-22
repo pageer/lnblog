@@ -1,4 +1,8 @@
-Features to be added:
+Document: To do list
+
+This is a list of features to be added to later verions.
+Note that not all of these *will* be added - this is just a list of ideas.  The features are 
+presented in no particular order.
 
 * Documentation on how templates get strung together to make a page.
 * Improved user interface for blog settings and administration.

@@ -53,7 +53,6 @@
     <item url="plugins/menubar_1_sitemap.php" uploadstatus="1" />
     <item url="plugins/sidebar_1_recent.php" uploadstatus="1" />
     <item url="plugins/sidebar_2_articles.php" uploadstatus="1" />
-    <item url="plugins/sidebar_3_archives.php" uploadstatus="1" />
     <item url="plugins/sidebar_4_news.php" uploadstatus="1" />
     <item url="plugins/sidebar_5_googlesearch.php" uploadstatus="1" />
     <item url="plugins/sidebar_6_loginops.php" uploadstatus="1" />
@@ -254,13 +253,32 @@
     <item url="themes/default/templates/entry_edit_tpl.php" uploadstatus="1" />
     <item url="themes/default/templates/ftproot_test_tpl.php" uploadstatus="1" />
     <item url="themes/default/templates/list_tpl.php" uploadstatus="1" />
-    <treestatus>
-      <openfolder url="lib" />
-      <openfolder url="pages" />
-      <openfolder url="plugins" />
-      <openfolder url="themes" />
-      <openfolder url="themes/default" />
-      <openfolder url="themes/default/templates" />
-    </treestatus>
+    <item url="doc_project/" />
+    <item url="doc_project/Data/" />
+    <item url="doc_project/Data/ClassHierarchy.nd" />
+    <item url="doc_project/Data/ConfigFileInfo.nd" />
+    <item url="doc_project/Data/FileInfo.nd" />
+    <item url="doc_project/Data/PreviousMenuState.nd" />
+    <item url="doc_project/Data/PreviousSettings.nd" />
+    <item url="doc_project/Data/SymbolTable.nd" />
+    <item url="doc_project/Languages.txt" />
+    <item url="doc_project/Menu_Backup.txt" />
+    <item url="doc_project/Menu.txt" />
+    <item url="doc_project/Topics.txt" />
+    <item url="docs/" />
+    <item url="docs/features.txt" />
+    <item url="docs/fsconfig.txt" />
+    <item url="docs/overview.txt" />
+    <item url="docs/plugins.txt" />
+    <item url="docs/themes.txt" />
+    <item url="docs/translations.txt" />
+    <item url="docs/userconfigphp.txt" />
+    <item url="docs/userconfig.txt" />
+    <item url="plugins/disabled/sidebar_3_archives.php" />
+    <item url="plugins/disabled/sidebar_calendar.php" />
+    <item url="plugins/sidebar_3_calendar.php" />
+    <item url="themes/default/styles/calendar.css" />
+    <item url="userdata/sitemap.htm" />
+    <item url="userdata/userconfig.php" />
   </project>
 </webproject>

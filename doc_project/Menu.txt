@@ -29,10 +29,14 @@ Format: 1.35
 # 
 # --------------------------------------------------------------------------
 
-Group: User Documentation {
+
+Group: User Documentation  {
 
    File: LnBlog User Documentation  (docs\overview.txt)
-
+   File: Feature List  (docs\features.txt)
+   File: To do list  (docs\todo.txt)
+   File: Translations  (docs\translations.txt)
+   File: How plugins work  (docs\plugins.txt)
    }  # Group: User Documentation
 
 Group: Configuration  {
@@ -42,9 +46,6 @@ Group: Configuration  {
    File: fsconfig.php  (docs\fsconfig.txt)
    File: userconfig.cfg  (docs\userconfig.txt)
    File: userconfig.php  (docs\userconfigphp.txt)
-   File: Translations  (docs\translations.txt)
-   File: How plugins work  (docs\plugins.txt)
-
    }  # Group: Configuration
 
 Group: Libraries  {
@@ -53,11 +54,12 @@ Group: Libraries  {
    File: Blog  (lib\blog.php)
    File: BlogComment  (lib\blogcomment.php)
    File: BlogEntry  (lib\blogentry.php)
-   File: creators.php  (lib\creators.php)
+   File: Creator Functions  (no auto-title, lib\creators.php)
    File: Entry  (lib\entry.php)
    File: EventRegister  (lib\eventregister.php)
    File: FS  (lib\fs.php)
    File: Internationalization  (no auto-title, lib\i18n.php)
+   File: lbcode.php  (lib\lbcode.php)
    File: LnBlogObject  (lib\lnblogobject.php)
    File: Page  (lib\page.php)
    File: PHPTemplate  (lib\template.php)

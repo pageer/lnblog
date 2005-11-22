@@ -36,7 +36,6 @@ translation file must create the array and populate it.  Each element of the arr
 indexed by the untranslated US English text and will contain the translated text as its data.  If 
 you are familiat with GNU gettext, the array index is analogous to the msgid and element content
 is analogous to the msgstr.
-The file will, of course, need to be correctly encoded (UTF-8 is recommended).  
 
 Here is a simple example of an ad hoc translation file.  Note that the PHP opening and closing 
 tags are required, as is the array creation on the second line.  Also note that there can be no
@@ -45,3 +44,12 @@ tags are required, as is the array creation on the second line.  Also note that 
 |$strings = array();
 |$strings["My message."] = "Translated message.";
 |?>
+
+Section: Charset issues
+
+All LnBlog templates are encoded as ISO-8859-1 characters in the 7-bit character code range, which 
+(if my understanding is correct) is compatible with UTF-8.  Therefore, if you are working in a 
+language that requires characters outside the 7-bit ASCII range (codes 0-127), then you should use a 
+character set compatible with 7-bit ASCII.  In the Unicode world, this is most often done usig UTF-8.
+If you use a different character encoding, it might be necessary to reencode all the templates using
+that encoding.
