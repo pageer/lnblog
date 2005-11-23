@@ -65,6 +65,71 @@ if (file_exists(mkpath(INSTALL_ROOT,USER_DATA,"userconfig.cfg"))) {
 	}
 }
 
+##############################################
+# Section Internationalization
+# Core configuration for i18n.
+
+# Constant: DEFAULT_LANGUAGE
+# The default language.  
+# If a translation does not exist for your specified language, then
+# this will be used as the "last resort."  This is set to "en_US".
+define("DEFAULT_LANGUAGE", "en_US");
+
+# Constant: LANGUAGE
+# The language to use for text.
+# This setting controls which language is used for the templates and other
+# literal text that LnBlog outputs.
+#
+# The default is to use the value of the LANG environment variable, if it is
+# set.  If not, this is set to the <DEFAULT_LANGUAGE> and the LANG 
+# environment variable is set.
+#
+# Please note that this constant is also used to set the locale, as follows.
+# |setlocale(LC_ALL, LANGUAGE);
+# Because of this, it is important to note that Windows uses different values
+# for languages than UNIX and Linux systems.  In Linux, for example, a
+# German locale might be "de_DE", whereas on Windows it woule be "deu".
+if (getenv("LANG")) {
+	@define("LANGUAGE", getenv("LANG"));
+} else {
+	@define("LANGUAGE", DEFAULT_LANGUAGE);
+	putenv("LANG=".LANGUAGE);
+}
+
+# Constant: LOCALEDIR
+# Directory to store the localization files.
+# This is used by both GNU gettext and the ad hoc translation system.
+define("LOCALEDIR", "locale");
+
+#########################################
+# Section: Package information
+# Information on the package itself.
+
+# Constant: PACKAGE_NAME
+# The official package name, currently "LnBlog".
+define("PACKAGE_NAME", "LnBlog");
+
+# Constant: PACKAGE_VERSION
+# The version number of the software.  This is a string in the format 
+# "1.2.3".  Note that each number may be more than one digit.
+define("PACKAGE_VERSION", "0.5.0");
+
+# Constant: PACKAGE_URL
+# The full URL of the LnBlog project home page.
+define("PACKAGE_URL", "http://www.skepticats.com/lnblog/");
+
+# Add I18N support here, as this is currently the earliest we can do it.
+# Refer to the lib/i18n.php file for details.
+require_once("lib/i18n.php");
+
+# Constant: PACKAGE_DESCRIPTION
+# The offical text-blurb description of the software.
+define("PACKAGE_DESCRIPTION", spf_("%s: a simple and (hopefully) elegant weblog", PACKAGE_NAME));
+
+# Constant: PACKAGE_COPYRIGHT
+# The offical LnBlog copyright notice.
+define("PACKAGE_COPYRIGHT", "Copyright (c) 2005, Peter A. Geer <pageer@skepticats.com>");
+
 ###############################################
 # Section: Page DOCTYPEs
 # These are full, valid doctypes to use for pages.  See <DEFAULT_DOCTYPE>.
@@ -113,48 +178,21 @@ define("HTML_3_2", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">");
 # *Note:* this is not yet implemented.
 @define("USE_WRAPPER_SCRIPTS", true);
 
-# Constant: DEFAULT_LANGUAGE
-# The default language.  
-# If a translation does not exist for your specified language, then
-# this will be used as the "last resort."  This is set to "en_US".
-define("DEFAULT_LANGUAGE", "en_US");
-
-# Constant: LANGUAGE
-# The language to use for text.
-# This setting controls which language is used for the templates and other
-# literal text that LnBlog outputs.
-#
-# The default is to use the value of the LANG environment variable, if it is
-# set.  If not, this is set to the <DEFAULT_LANGUAGE> and the LANG 
-# environment variable is set.
-#
-# Please note that this constant is also used to set the locale, as follows.
-# |setlocale(LC_ALL, LANGUAGE);
-# Because of this, it is important to note that Windows uses different values
-# for languages than UNIX and Linux systems.  In Linux, for example, a
-# German locale might be "de_DE", whereas on Windows it woule be "deu".
-if (getenv("LANG")) {
-	@define("LANGUAGE", getenv("LANG"));
-} else {
-	@define("LANGUAGE", DEFAULT_LANGUAGE);
-	putenv("LANG=".LANGUAGE);
-}
-
-# Constant: LOCALEDIR
-# Directory to store the localization files.
-# This is used by both GNU gettext and the ad hoc translation system.
-define("LOCALEDIR", "locale");
-
-# I18N support.  The idea is to use GNU gettext if it is available and to
-# fall back to a custom function with the same interface when it is not.
-# Refer to the lib/i18n.php file for details.
-require_once("lib/i18n.php");
-
 # Constant: DEFAULT_DOCTYPE
 # The DOCTYPE used by your markup.  
 #
 # The *default* is XHTML 1.0 Strict.
 @define("DEFAULT_DOCTYPE", XHTML_1_0_Strict);
+
+# Constant: LOGIN_EXPIRE_TIME
+# The expiration time for the login cookies.
+#
+# If set to an integer value, the cookies used for user logins will expire
+# that number of seconds from the current time.  So, if you set this to 3600,
+# then the user will be logged out in 1 hour.
+#
+# The *default* is false, which means cookies expire when the session ends.
+@define("LOGIN_EXPIRE_TIME", false);
 
 # Constant: DEFAULT_CHARSET
 # The default character encoding.
@@ -279,30 +317,7 @@ The corresponding replacement expression to <URI_TO_LOCALPATH_MATCH_RE>.
 # *Default* is 3.
 @define("LBCODE_HEADER_WEIGHT", 3);
 
-#########################################
-# Section: Package information
-# Information on the package itself.
 
-# Constant: PACKAGE_NAME
-# The official package name, currently "LnBlog".
-define("PACKAGE_NAME", "LnBlog");
-
-# Constant: PACKAGE_VERSION
-# The version number of the software.  This is a string in the format 
-# "1.2.3".  Note that each number may be more than one digit.
-define("PACKAGE_VERSION", "0.5.0");
-
-# Constant: PACKAGE_URL
-# The full URL of the LnBlog project home page.
-define("PACKAGE_URL", "http://www.skepticats.com/lnblog/");
-
-# Constant: PACKAGE_DESCRIPTION
-# The offical text-blurb description of the software.
-define("PACKAGE_DESCRIPTION", _("%s: a simple and (hopefully) elegant weblog", PACKAGE_NAME));
-
-# Constant: PACKAGE_COPYRIGHT
-# The offical LnBlog copyright notice.
-define("PACKAGE_COPYRIGHT", "Copyright (c) 2005, Peter A. Geer <pageer@skepticats.com>");
 
 ########################################
 # Section: User Authentication

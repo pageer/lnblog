@@ -58,8 +58,8 @@ if ( POST($user_name) && POST($password) ) {
 	$usr = NewUser(trim(POST($user_name)));
 	$ret = $usr->login(POST($password));
 	if (POST("referer")) {
-		if ( basename(POST("referer")) != current_file() && 
-		     strpos(POST("referer"), localpath_to_uri(INSTALL_ROOT)) ) {
+		if ( basename(POST("referer")) != current_file() ) {
+		     #strpos(POST("referer"), localpath_to_uri(INSTALL_ROOT)) !== false 
 			$tpl->set("REF", POST("referer") );
 			$redir_url = POST("referer");
 		}

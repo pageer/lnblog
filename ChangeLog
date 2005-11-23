@@ -1,3 +1,15 @@
+22-Nov-2005:
+- Fixed bad e-mail link in blogentry template.
+- Fixed i18n loading before PACKAGE_NAME defined, which caused errors 
+when gettext is enabled.
+- Changed setcookie() calls in user class to include a time and a path of "/"
+so that you don't have to log back in when switching blogs.
+- Added configuration constant for above cookie expiration.
+- Fixed magic_quotes problem in docroot and ftproot test pages.
+- Fixed broken referer redirect in login page.
+- Changed powered-by image.
+- Fixed missing http:// in user homepages.
+
 21-Nov-2005:
 - Fixed calendar and month archive for non-existent months.
 - Fixed untranslated strings in blogconfig.php.

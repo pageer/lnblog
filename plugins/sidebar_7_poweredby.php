@@ -7,7 +7,7 @@ class LnBlogAd extends Plugin {
 	}
 	
 	function output() { ?>
-<a href="<?php echo PACKAGE_URL; ?>"><img alt="<?php p_("Powered by %s", PACKAGE_NAME); ?>" title="<?php p_("Powered by %s", PACKAGE_NAME); ?>" src="<?php echo getlink("logo.png", LINK_IMAGE); ?>" /></a>
+<a href="<?php echo PACKAGE_URL; ?>"><img alt="<?php pf_("Powered by %s", PACKAGE_NAME); ?>" title="<?php pf_("Powered by %s", PACKAGE_NAME); ?>" src="<?php echo getlink("logo.png", LINK_IMAGE); ?>" /></a>
 <?php 
 	}	
 }

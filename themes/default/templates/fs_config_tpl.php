@@ -92,7 +92,7 @@ PACKAGE_NAME); ?></p>
 <input type="password" name="<?php echo $CONF_ID; ?>" id="<?php echo $CONF_ID; ?>" <?php if (isset($CONF)) { echo 'value="'.$CONF.'"'; } ?> />
 </div>
 <div>
-<label for="<?php echo $HOST_ID; ?>" title="<?php p_('The hostname and/or domain of the FTP server.  If the FTP and HTTP servers are on the same machine, this can be localhost.'); ?>"><?php p_('Server hostname'); ?></label>
+<label for="<?php echo $HOST_ID; ?>" title="<?php p_('The hostname and/or domain of the FTP server.  If the FTP and HTTP servers are on the same machine, this can be localhost.'); ?>"><?php p_('Server name'); ?></label>
 <input type="text"  title="<?php p_('The hostname and/or domain of the FTP server.  If this FTP and HTTP servers are on the same machine, this can be localhost.'); ?>" name="<?php echo $HOST_ID; ?>" id="<?php echo $HOST_ID; ?>" <?php if (isset($HOST)) { echo 'value="'.$HOST.'"'; } ?> />
 </div>
 <div>

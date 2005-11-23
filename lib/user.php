@@ -117,6 +117,10 @@ class User extends LnBlogObject {
 		if ($this->username) $tpl->set("USER_ID", $this->username);
 		if ($this->fullname) $tpl->set("USER_NAME", $this->fullname);
 		if ($this->email) $tpl->set("USER_EMAIL", $this->email);
+		if (strtolower(substr(trim($this->homepage), 0, 7)) != "http://" &&
+		    trim($this->homepage) != "") {
+			$this->homepage = "http://".$this->homepage;
+		}
 		if ($this->homepage) $tpl->set("USER_HOMEPAGE", $this->homepage);
 		$tpl->set("USER_DISPLAY_NAME", $this->displayName() );
 	}
@@ -192,7 +196,8 @@ class User extends LnBlogObject {
 			
 			# Prevent password change from logging out on cookie-only config.
 			if ( $this->username == COOKIE(CURRENT_USER) )
-				setcookie(PW_HASH, $this->passwd);
+				setcookie(PW_HASH, $this->passwd, 
+					(LOGIN_EXPIRE_TIME ? time() + LOGIN_EXPIRE_TIME:false), "/");
 		}
 	}
 
@@ -287,17 +292,22 @@ class User extends LnBlogObject {
 			if ($this->checkPassword($pwd)) {
 				# Create a login token.
 				$token = md5(get_ip().$ts);
-				setcookie(CURRENT_USER, $this->username);
-				SESSION(CURRENT_USER, $this->username);
+				setcookie(CURRENT_USER, $this->username, 
+					(LOGIN_EXPIRE_TIME ? time() + LOGIN_EXPIRE_TIME:false), "/");
+				SESSION(CURRENT_USER, $this->username, 
+					(LOGIN_EXPIRE_TIME ? time() + LOGIN_EXPIRE_TIME:false), "/");
 				SESSION(LOGIN_TOKEN, $token);
 				SESSION(LAST_LOGIN_TIME, $ts);
-				setcookie(LAST_LOGIN_TIME, "$ts");
+				setcookie(LAST_LOGIN_TIME, "$ts", 
+					(LOGIN_EXPIRE_TIME ? time() + LOGIN_EXPIRE_TIME:false), "/");
 				$ret = true;
 			} else $ret = false;
 			return $ret;
 		} else {
-			setcookie(CURRENT_USER, $this->username);
-			setcookie(PW_HASH, $this->passwd);
+			setcookie(CURRENT_USER, $this->username, 
+				(LOGIN_EXPIRE_TIME ? time() + LOGIN_EXPIRE_TIME:false), "/");
+			setcookie(PW_HASH, $this->passwd, 
+				(LOGIN_EXPIRE_TIME ? time() + LOGIN_EXPIRE_TIME:false), "/");
 			return true;
 		}
 	}
@@ -310,11 +320,11 @@ class User extends LnBlogObject {
 			SESSION(CURRENT_USER, false);
 			SESSION(LOGIN_TOKEN, false);
 			SESSION(LAST_LOGIN_TIME, false);
-			setcookie(LOGIN_TOKEN, "");
-			setcookie(LAST_LOGIN_TIME, "");
+			setcookie(LOGIN_TOKEN, "", time() - 3600, "/");
+			setcookie(LAST_LOGIN_TIME, "", time() - 3600, "/");
 		} else {
-			setcookie(CURRENT_USER, "");
-			setcookie(PW_HASH, "");
+			setcookie(CURRENT_USER, "", time() - 3600, "/");
+			setcookie(PW_HASH, "", time() - 3600, "/");
 		}
 	}
 

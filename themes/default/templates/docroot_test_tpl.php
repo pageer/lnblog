@@ -26,7 +26,7 @@ file exists and the documentation appears in a new window when you click the
 test link, then the document root is correct.  If the file does not exist or 
 the popup window shows a page not found error, then you will have to try 
 another value."); ?></p>
-<p><strong><?php p_("Note:"); ?></strong> <?php p_("This page assumes that 
+<p><strong><?php p_("Note:"); ?></strong> <?php pf_("This page assumes that 
 %s is installed in your document root.  JavaScript must be enabled.", PACKAGE_NAME); ?></p>
 <p><?php pf_("Current Directory: %s", $CURR_DIR); ?></p>
 <div>
@@ -44,11 +44,6 @@ another value."); ?></p>
 <span style="color: green"><?php p_("This file exists.  Test passed."); ?></span>
 <?php } else { ?>
 <span style="color: green"><?php p_("This file does not exists.  Test failed."); ?></span>
-<?php } ?>
-<?php if ($DOCUMENTATION_EXISTS) { ?>
-<span style="color: green"><?php p_("This file exists.  Test passed."); ?></span>
-<?php } else { ?>
-<span style="color: red"><?php p_("This file does not exist.  Test failed."); ?></span>
 <?php } ?>
 </p>
 <label for="testlink"><?php p_("Test link"); ?>:</label> <a href="<?php echo $TARGET_URL; ?>" onclick="return test_window();"><?php echo $TARGET_URL; ?></a>

@@ -103,7 +103,6 @@ if ( has_post() ) {
 			$webroot = get_magic_quotes_gpc() ? 
 			           stripslashes($webroot) : $webroot;
 			define("DOCUMENT_ROOT", $webroot);
-			echo DOCUMENT_ROOT;
 			$content .= 'define("DOCUMENT_ROOT", "'.DOCUMENT_ROOT."\");\n";
 		}
 		$content .= 'define("FS_PLUGIN", "'.FS_PLUGIN."\");\n?>";
@@ -225,7 +224,7 @@ if ( has_post() ) {
 		} elseif (isset($ftp_root)) {
 			$tpl->set("FORM_MESSAGE", spf_("Error: The auto-detected FTP root directory %s was not acceptable.  You will have to set this manually.", $ftp_root));
 		} else {
-			$tpl->set("FORM_MESSAGE", _("Error: For FTP file writing, all fields except 'Prefix' are required."));
+			$tpl->set("FORM_MESSAGE", _("Error: For FTP file writing, you must fill in the FTP login information."));
 		}
 	
 	} else {

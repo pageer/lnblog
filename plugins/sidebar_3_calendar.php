@@ -114,7 +114,7 @@ class SidebarCalendar extends Plugin {
 		echo $prev_link;
 		if ( is_dir( mkpath(BLOG_ROOT,BLOG_ENTRY_PATH,$year,$month) ) ) {
 			echo "<a href=\"".$blog->getURL().BLOG_ENTRY_PATH.
-			     "/$year/$month/\">".fmtdate((USE_STRFTIME?"%B":"F"), $ts)."</a> ";
+			     "/$year/$month/\">".fmtdate((USE_STRFTIME?"%B":"F"), $ts)."</a>";
 		} else {
 			echo fmtdate((USE_STRFTIME?"%B":"F"), $ts);
 		}

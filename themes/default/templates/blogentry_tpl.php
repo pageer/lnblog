@@ -7,7 +7,7 @@
 <ul class="postdata">
 	<li class="blogdate"><?php pf_("Posted %s", $POSTDATE); ?></li>
 <?php if ( isset($USER_EMAIL) ) { ?>
-	<li class="bloguser"><?php pf_("By %s", '<a href="'.$USER_EMAIL.'">'.$USER_DISPLAY_NAME.'</a>'); ?></li>
+	<li class="bloguser"><?php pf_("By %s", '<a href="mailto:'.$USER_EMAIL.'">'.$USER_DISPLAY_NAME.'</a>'); ?></li>
 <?php } else { ?>
 	<li class="bloguser"><?php pf_("By %s", $USER_DISPLAY_NAME); ?></li>
 <?php } ?>
