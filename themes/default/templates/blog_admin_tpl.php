@@ -2,6 +2,7 @@
 <form method="post" action="<?php echo $FORM_ACTION; ?>">
 <h3><?php p_('Add Features'); ?></h3>
 <ul>
+<li><a href="plugin_setup.php"><?php p_("Configure site-wide plugins"); ?></a></li>
 <li><a href="sitemap.php"><?php p_("Modify site-wide menubar"); ?></a></li>
 <li><a href="newlogin.php"><?php p_("Add new user"); ?></a></li>
 <?php if (isset($SHOW_NEW)) { ?>

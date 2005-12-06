@@ -142,9 +142,14 @@ class RSS2FeedGenerator extends Plugin {
 
 	function RSS2FeedGenerator() {
 		$this->plugin_desc = _("Create RSS 2.0 feeds for comments and blog entries.");
-		$this->plugin_version = "0.1.0";
+		$this->plugin_version = "0.2.0";
 		$this->guid_is_permalink = true;
-		$this->member_list = array("guid_is_permalink");
+		$this->member_list = array();
+		$this->member_list["guid_is_permalink"] = 
+			array("description"=>_("Use entry permalink as globally unique identifier"),
+			      "default"=>true,
+			      "control"=>"checkbox");
+		$this->getConfig();
 		if (! defined("RSS2GENERATOR_GUID_IS_PERMALINK"))
 			define("RSS2GENERATOR_GUID_IS_PERMALINK", $this->guid_is_permalink);
 	}

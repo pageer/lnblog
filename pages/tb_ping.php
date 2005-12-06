@@ -33,7 +33,7 @@ $page = NewPage(&$ent);
 
 if (GET("send_ping") == "yes" || POST("send_ping") == "yes") {
 	
-	if (! $blog->canModifyEntry() ) redirect("index.php");
+	if (! $blog->canModifyEntry() ) $page->redirect("index.php");
 
 	$tburl = "trackback_url";
 

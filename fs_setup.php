@@ -276,5 +276,6 @@ if ( has_post() ) {
 
 $body = $tpl->process();
 $page->addStylesheet("form.css");
+$page->addScript("fssetup.js");
 $page->display($body, &$blog);
 ?>

@@ -4,7 +4,13 @@ class Articles extends Plugin {
 
 	function Articles() {
 		$this->plugin_desc = _("List the articles for a blog.");
-		$this->plugin_version = "0.1.0";
+		$this->plugin_version = "0.2.0";
+		$this->header = _("Articles");
+		$this->member_list = array();
+		$this->member_list["header"] =
+			array("description"=>_("Sidebar section heading"),
+			      "default"=>_("Articles"));
+		$this->getConfig();
 	}
 	
 	function output($parm=false) {
@@ -14,7 +20,7 @@ class Articles extends Plugin {
 		
 		$art_list = $blg->getArticleList();
 		if (count($art_list) > 0) { ?>
-<h3><a href="<?php echo $blg->getURL(false).BLOG_ARTICLE_PATH; ?>/"><?php p_("Articles"); ?></a></h3>
+<h3><a href="<?php echo $blg->getURL(false).BLOG_ARTICLE_PATH; ?>/"><?php echo $this->header; ?></a></h3>
 <ul>
 <?php	
 			foreach($art_list as $dir) { ?>

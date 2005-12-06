@@ -1,23 +1,3 @@
-<script type="text/javascript">
-<!--
-function doc_test() {
-	window.open("docroot_test.php");
-	return false;
-}
-
-function ftp_test() {
-	window.open("ftproot_test.php");
-	return false;
-}
-/*
-document.onload = function () {
-	var disp = document.getElementById("display");
-	disp.display = 'hidden';
-	window.alert("Done");
-}
-*/
--->
-</script>
 <h2><?php p_("File System Configuration"); ?></h2>
 <?php if (isset($FORM_MESSAGE)) { ?>
 <p><strong style="color: red"><?php echo $FORM_MESSAGE; ?></strong></p>
@@ -42,43 +22,20 @@ support.  You can choose from "native" file writing functions or
 want to use %s with PHP\'s <strong>safe_mode</strong> enabled, then you
 must use <abbr title="File Transfer Protocol">FTP</abbr>.', 
 PACKAGE_NAME, PACKAGE_NAME); ?></p>
-<p><?php p_('Note: the root directory will be auto-detected if you leave it
-blank.  The prefix is normally not required.'); ?></p>
-<!--
-<p><?php pf_('Under native file writing, all files and directories created by 
-%s will be owned by the web server user (typically 
-"nobody" or "apache") and you will have problems trying to access them 
-outside %s.  With <abbr title="File Transfer Protocol">FTP</abbr>
-file writing, you will own all the files and directories.  The only catch is 
-that you have to be able to upload files to the web server through
-<abbr title="File Transfer Protocol">FTP</abbr>.  If this is possible, 
-<abbr title="File Transfer Protocol">FTP</abbr> file writing is the 
-recommended choice.', PACKAGE_NAME, PACKAGE_NAME); ?></p>
-<p><?php pf_('For <abbr title="File Transfer Protocol">FTP</abbr> file writing
-, you will need to supply the information to log in to the 
-<abbr title="File Transfer Protocol">FTP</abbr> server.  In addition to the 
-username and password, you will have to give a hostname and the 
-<abbr title="File Transfer Protocol">FTP</abbr> root directory.  The host 
-name is the name of the server, such as <code>ftp.mysite.com</code> and can
-be <code>localhost</code> if the 
-<abbr title="File Transfer Protocol">FTP</abbr> server is running on the same
-computer as the web server.  The 
-<abbr title="File Transfer Protocol">FTP</abbr> root directory is the full
-path on the server to where your 
-<abbr title="File Transfer Protocol">FTP</abbr> access starts.  To have
-%s try to auto-detect this, click the 
-"Test FTP Root" link and enter your username, password, and hostname in the
-form.  You can copy and paste the results back into this form.', 
-PACKAGE_NAME); ?></p>
--->
 <div>
 <label for="native"><?php p_('Use native functions for file writing'); ?></label>
-<input type="radio" name="<?php echo $USE_FTP_ID; ?>" id="native" <?php if (! isset($USE_FTP)) { ?>checked="checked"<?php } ?> value="nativefs" />
+<input type="radio" name="<?php echo $USE_FTP_ID; ?>" id="native" <?php if (! isset($USE_FTP)) { ?>checked="checked"<?php } ?> value="nativefs" onfocus="show_ftp(false)" />
 </div>
 <div>
 <label for="ftpfs"><?php p_('Use FTP file writing'); ?></label>
-<input type="radio" name="<?php echo $USE_FTP_ID; ?>" id="ftpfs" <?php if (isset($USE_FTP)) { ?>checked="checked"<?php } ?> value="ftpfs" />
+<input type="radio" name="<?php echo $USE_FTP_ID; ?>" id="ftpfs" <?php if (isset($USE_FTP)) { ?>checked="checked"<?php } ?> value="ftpfs" onfocus="show_ftp(true)" />
 </div>
+<div id="ftpoptions">
+<script type="text/javascript">
+show_ftp(document.getElementById('ftpfs').nodeValue == 'ftpfs');
+</script>
+<p><?php p_('Note: the root directory will be auto-detected if you leave it
+blank.  The prefix is normally not required.'); ?></p>
 <div>
 <label for="<?php echo $USER_ID; ?>" title="<?php p_('An FTP user account that can write to the web directories.'); ?>"><?php p_('Username'); ?></label>
 <input type="text"  title="<?php p_('An FTP user account that can write to the web directories.'); ?>" name="<?php echo $USER_ID; ?>" id="<?php echo $USER_ID; ?>"<?php if (isset($USER)) { echo ' value="'.$USER.'"'; } ?> />
@@ -105,6 +62,7 @@ PACKAGE_NAME); ?></p>
 <div>
 <label for="<?php echo $PREF_ID; ?>" title="<?php p_('String prepended to all FTP paths.  Useful for references to ~username.'); ?>"><?php p_('Root directory prefix'); ?></label>
 <input type="text"  title="<?php p_('String prepended to all FTP paths.  Useful for references to ~username.'); ?>" name="<?php echo $PREF_ID; ?>" id="<?php echo $PREF_ID; ?>" <?php if (isset($PREF)) { echo 'value="'.$PREF.'"'; } ?> />
+</div>
 </div>
 <div>
 <span class="basic_form_submit"><input type="submit" value="<?php p_('Submit'); ?>" /></span>

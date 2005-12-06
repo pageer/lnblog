@@ -89,7 +89,7 @@ if (has_post()) {
 	$usr->homepage(trim(POST($homepage)));
 	$usr->save();
 	if ($pwd_change) $usr->login(POST($password));
-	redirect("index.php");
+	$page->redirect("index.php");
 	
 }
 

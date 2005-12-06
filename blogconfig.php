@@ -107,16 +107,16 @@ define("LOCALEDIR", "locale");
 
 # Constant: PACKAGE_NAME
 # The official package name, currently "LnBlog".
-define("PACKAGE_NAME", "LnBlog");
+define("PACKAGE_NAME", _("LnBlog"));
 
 # Constant: PACKAGE_VERSION
 # The version number of the software.  This is a string in the format 
 # "1.2.3".  Note that each number may be more than one digit.
-define("PACKAGE_VERSION", "0.5.0");
+define("PACKAGE_VERSION", _("0.5.0"));
 
 # Constant: PACKAGE_URL
 # The full URL of the LnBlog project home page.
-define("PACKAGE_URL", "http://www.skepticats.com/lnblog/");
+define("PACKAGE_URL", _("http://www.skepticats.com/lnblog/"));
 
 # Add I18N support here, as this is currently the earliest we can do it.
 # Refer to the lib/i18n.php file for details.
@@ -128,7 +128,7 @@ define("PACKAGE_DESCRIPTION", spf_("%s: a simple and (hopefully) elegant weblog"
 
 # Constant: PACKAGE_COPYRIGHT
 # The offical LnBlog copyright notice.
-define("PACKAGE_COPYRIGHT", "Copyright (c) 2005, Peter A. Geer <pageer@skepticats.com>");
+define("PACKAGE_COPYRIGHT", _("Copyright (c) 2005, Peter A. Geer <pageer@skepticats.com>"));
 
 ###############################################
 # Section: Page DOCTYPEs
@@ -356,10 +356,17 @@ The corresponding replacement expression to <URI_TO_LOCALPATH_MATCH_RE>.
 @define("BLOG_DELETED_PATH", "deleted");
 
 # Constant: BLOG_ENTRY_PATH
-# The name of the subdirectory of the blog root URL under which blog entries # are accessed.  This may not necessarily be a real directory on the server.
-# 
+# The name of the subdirectory of the blog root URL under which blog entries 
+# are accessed.  This may not necessarily be a real directory on the server.
+#
 # *Default* is "entries".
 @define("BLOG_ENTRY_PATH", "entries");
+
+# Constant: ENTRY_DRAFT_PATH
+# Directory where draft entries are stored.
+#
+# Default is "drafts".
+@define("ENTRY_DRAFT_PATH", "drafts");
 
 # Constant: BLOG_ARTICLE_PATH
 # Like <BLOG_ENTRY_PATH>, except for static articles.
@@ -582,7 +589,11 @@ if ( defined("BLOG_ROOT") ) {
 # Set constants to make themes work.  Most of these are defaults for when 
 # there is not current blog set up.
 @define("THEME_NAME", "default");
-@define("INSTALL_ROOT_URL", "/".basename(INSTALL_ROOT)."/");
+if (! defined("INSTALL_ROOT_URL")) {
+	require_once("lib/utils.php");
+	define("INSTALL_ROOT_URL", localpath_to_uri(getcwd()));
+}
+#@define("INSTALL_ROOT_URL", "/".basename(INSTALL_ROOT)."/");
 define("THEME_TEMPLATES", mkpath("themes",THEME_NAME,"templates"));
 define("DEFAULT_THEME_TEMPLATES", mkpath("themes","default","templates"));
 

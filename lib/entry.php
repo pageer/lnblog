@@ -242,6 +242,17 @@ class Entry extends LnBlogObject{
 		return preg_replace('/<p><\/p>/', '', $ret);
 	}
 
+	# Method: markup
+	# Apply appropriate markup to the entry data.
+	#
+	# Parameters:
+	# data         - *Optional* data to markup.  If not specified, use the 
+	#                data property of the current object.
+	# use_nofollow - Apply rel="nofollow" to links.  *Default* is false.
+	#
+	# Returns:
+	# A string with markup applied.
+	
 	function markup($data="", $use_nofollow=false) {
 		if (! $data) $data = $this->data;
 		switch ($this->has_html) {
@@ -268,6 +279,15 @@ class Entry extends LnBlogObject{
 		if (strlen($ret) == $numchars) $ret .= "...";
 		return $ret;
 	}
+
+	# Method: prettyDate
+	# Get a human-readable date from a timestamp.
+	#
+	# Parameters:
+	# ts - *Optional* timestamp for the date.  If unset, use time().
+	#
+	# Returns:
+	# A string with a formatted, localized date.
 
 	function prettyDate($ts=false) {
 		$date_ts = $ts ? $ts : $this->timestamp;

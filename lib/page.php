@@ -163,7 +163,7 @@ class Page extends LnBlogObject {
 	*/
 	
 	function redirect($url) {
-		redirect($url);
+		header("Location: ".$url);
 	}
 	
 	/*
@@ -176,7 +176,7 @@ class Page extends LnBlogObject {
 	*/
 	
 	function refresh($url, $delay=0) {
-		refresh($url, $delay);
+		header("Refresh: ".$delay."; ".$path);
 	}
 
 	/*

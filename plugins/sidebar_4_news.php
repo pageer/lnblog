@@ -2,8 +2,14 @@
 class News extends Plugin {
 
 	function News() {
-		$this->plugin_name = _("List the RSS feeds for the current page.");
-		$this->plugin_version = "0.1.0";
+		$this->plugin_desc = _("List the RSS feeds for the current page.");
+		$this->plugin_version = "0.2.0";
+		$this->header = _("News Feeds");
+		$this->member_list = array();
+		$this->member_list["header"] =
+			array("description"=>"Sidebar section heading",
+			      "default"=>_("News Feeds"));
+		$this->getConfig();
 	}
 
 	function output() {
@@ -16,7 +22,7 @@ class News extends Plugin {
 		if (file_exists($blog_feeds.BLOG_RSS1_NAME) ||
 		    file_exists($blog_feeds.BLOG_RSS2_NAME)) {
 ?>
-<h3><?php p_("News Feeds"); ?></h3>
+<h3><?php echo $this->header; ?></h3>
 <ul class="imglist">
 <?php
 			$ent = NewBlogEntry();

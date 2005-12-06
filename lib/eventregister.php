@@ -178,7 +178,7 @@ class EventRegister {
 			}
 			foreach ($handlers['static'] as $hnd) {
 				$methods = get_class_methods($classname);
-				$ret = array_search($hnd,$methods);
+				$ret = array_search(strtolower($hnd),$methods);
 				if ($ret !== false && $ret !== null) {
 					call_user_func(array($classname, $hnd), $param);
 				} else {

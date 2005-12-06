@@ -48,8 +48,13 @@ class PluginManager {
 		$classes = get_declared_classes();
 		$plugin_classes = array();
 		foreach ($classes as $cls) {
-			$obj = new $cls;
-			if (is_subclass_of($obj, "Plugin")) $plugin_classes[] = $cls;
+			if ( class_exists($cls) && 
+			     in_array("updateconfig", get_class_methods($cls)) &&
+			     in_array("showconfig", get_class_methods($cls)) &&
+			     in_array("getconfig", get_class_methods($cls)) ) {
+				$obj = new $cls;
+				if (is_subclass_of($obj, "Plugin")) $plugin_classes[] = $cls;
+			}
 		}
 		return $plugin_classes;
 	}

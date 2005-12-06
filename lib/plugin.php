@@ -22,24 +22,12 @@
  * Abstract class for plugins.  Plugins can inherit from this class to get
  * default configuration functionality.  They can also override the 
  * configuration methods to do custom configuration.
+ * Inherits:
+ * <LnBlogObject>
  */
-/*
-Inherits:
-<LnBlogObject>
-
-1) The plugin class name MUST match the name of the file minus the .php 
-   file extension.  This is simply so that the loader can know what class
-   to instantiate without grepping through the file.
-2) There is a plugins directory where plugins must be installed.  This 
-   directory has several subdirectories which serve to segregate the plugin
-   "namespace," as it were.  The idea is that particular components will 
-	only look in specific directories for their plugins.
-3) Each component has a list of plugins which it runs.  The user can use 
-   this to define which plugins are loaded and in what order they load.
-4) 
-*/
 
 require_once("lib/lnblogobject.php");
+require_once("lib/creators.php");
 
 class Plugin extends LnBlogObject{
 
@@ -47,13 +35,38 @@ class Plugin extends LnBlogObject{
 	A short description of the plugin. */
 	var $plugin_desc;
 	/* Property: plugin_version
-	The version number of the plugin.  This should be in "#.#.#" format. */
+	The version number of the plugin.  This should be in "1.2.3" format. */
 	var $plugin_version;
 	/* Property: member_list
-	An associative array of the form member=>description, where member is 
-	the name of a member variable of your class and description is a 
-	description of the configuration that member controls.  This array is 
-	used by the default configuration show/save methods. */
+	An associative array of arrays, with the form member=>settings, where 
+	member is the name of a member variable of your class and settings is an 
+	associative array of the configuration data for that member.  This array 
+	is used by the default configuration show/save methods. 
+	
+	The following is a list of possible configuration settings for a member
+	variable.  If a setting is not given for a particular control, then the
+	default value will be used.  
+	
+	description - A descriptive string for the variable.  This will be 
+	              displayed on the configuration screen when the user modifies
+	              the setting for this variable.  This element is *required*.
+	control     - The type of control used to display this variable on the 
+	              configuration screen.  For the most part, these map directly
+	              to HTML input element types.  The currently recognized 
+	              values are "text", "checkbox", "radio", and "select".  
+	              The *default* is "text".
+	default     - The default value for this variable.  This value will be 
+	              used if the user does not specify a setting.  Also, if the
+	              user mdoifies other settings, no configuration entry will
+	              be saved for this variable if the value is still the 
+	              default.  This is important because of pre-blog overriding.
+	              The default is the empty string.
+	options     - An array of the form value=>description, where the value
+	              keys are control values and the descriptions describe each
+	              choice for the user.  These are used only for radio button
+	              and selection box controls, with each array element 
+					  representing an option for the user to select .
+	*/
 	var $member_list;
 
 	/* Constructor:
@@ -70,11 +83,8 @@ class Plugin extends LnBlogObject{
 
 	/*
 	Method: showConfig
-	Displays the plugin configuration in an HTML form.  You MUST make sure
+	Displays the plugin configuration in an HTML form.  You *must* make sure
 	to initialize the member_list for this to work.
-	The form provided is a list of simple text input fields.  If you wish
-	to use a more complicated configuration screen, e.g. with check boxes
-	or combo boxes, then you must override this method.
 
 	Parameters:
 	page - A reference to the page which will display the configuration.  
@@ -87,53 +97,101 @@ class Plugin extends LnBlogObject{
 
 	function showConfig(&$page) {
 		if (! $this->member_list) return false;
-?>
-<fieldset>
-<form method="post" action="<?php echo current_page();?>?plugin=<?php echo get_class($this); ?>" name="plugin_config">
-<?php 
-		foreach ($this->member_list as $mem=>$desc) {
-?> <div><label for="<?php echo $mem; ?>"><?php echo $desc; ?></label>
-<input name="<?php echo $mem; ?>" id="<?php echo $mem; ?>" type="text" value="<?php echo $this->$mem; ?>" /></div>
-<?php
+		
+		echo "<fieldset>\n";
+		echo '<form method="post" ';
+		echo 'action="'.current_file().'?plugin='.get_class($this).'" ';
+		echo "name=\"plugin_config\">\n";
+		
+		foreach ($this->member_list as $mem=>$config) {
+			if (isset($config["control"]) && $config["control"] == "checkbox") { 
+				echo '<div>';
+				echo '<label for="'.$mem.'">'.$config["description"].'</label>';
+				echo '<input name="'.$mem.'" id="'.$mem.'" type="checkbox"';
+				if ($this->$mem) echo 'checked="checked" ';
+				echo " /></div>\n";
+			} elseif (isset($config["control"]) && $config["control"] == "radio") {
+				foreach ($config["options"] as $val=>$desc) {
+					echo '<div>';
+					echo '<label for="'.$val.'">'.$desc.'</label>';
+					echo '<input name="'.$mem.'" id="'.$val.'" type="radio" value="'.$val.'"';
+					if ($this->$mem == $val) echo 'checked="checked"';
+					echo ' />';
+					echo "</div>\n";
+				}
+			} elseif (isset($config["control"]) && $config["control"] == "select") {
+				echo '<div>';
+				echo '<label for="'.$mem.'">'.$config["description"]."</label>\n";
+				echo '<select name="'.$mem.'" id="'.$mem."\">\n";
+				foreach ($config["options"] as $val=>$desc) {
+					echo '<option value="'.$val.'"';
+					if ($this->$mem == $val) echo ' selected="selected"';
+					echo '>'.$desc."</option>\n";
+				}
+				echo "</select>\n</div>\n";
+			} else { 
+				echo '<div>';
+				echo '<label for="'.$mem.'">'.$config["description"].'</label>';
+				echo '<input name="'.$mem.'" id="'.$mem.'" type="text" value="'.$this->$mem.'"';
+				echo " /></div>\n";
+			}
 		}
-?>
-<div>
-<input type="hidden" value="<?php echo get_class($this); ?>" />
-<input type="submit" value="Submit" />
-<input type="reset" value="Clear" />
-</div>
-</form>
-</fieldset>
-<?php
+		
+		echo "<div>\n";
+		echo '<input type="hidden" name="plugin" id="plugin" value="'.get_class($this).'" />';
+		echo '<input type="submit" value="Submit" />';
+		echo '<input type="reset" value="Clear" />'."\n";
+		echo "</div>\n";
+		echo "</form>\n";
+		echo "</fieldset>\n";
 		return false;
 	}
 
+	# Method: updateConfig
 	# Retrieves configuration data for the plugin from an HTTP POST and
 	# stores the data in the relevant files.  
-	# If your plugin allows ANY type of user configuration, then you MUST
-	# override this method.  If the plugin doesn't allow any configuration,
-	# then you can safely ignore this.
+	#
+	# Returns: 
+	# True on success, false on failure.
 	
 	function updateConfig() {
 		if (! $this->member_list) return false;
-		$parser = NewINIParser(USER_DATA_PATH.PATH_DELIM."plugins.ini");
-		foreach ($this->member_list as $mem=>$desc) {
-			$this->$mem = POST($mem);
-			$parser->setValue(get_class($this), $mem, $this->$mem);
+		if (defined("BLOG_ROOT")) {
+			$parser = NewINIParser(BLOG_ROOT.PATH_DELIM."plugins.ini");
+		} else {
+			$parser = NewINIParser(USER_DATA_PATH.PATH_DELIM."plugins.ini");
 		}
-		$parser->writeFile();
+		foreach ($this->member_list as $mem=>$config) {
+			if (isset($config["control"]) && $config["control"] == "checkbox") {
+				$this->$mem = (POST($mem) ? "1":"0");
+			} else {
+				$this->$mem = POST($mem);
+			}
+			# Only record the setting if the value is not the default.
+			if ( (! isset($config["default"]) && $this->$mem == "") || 
+			      $this->$mem != $config["default"]) {
+				$parser->setValue(get_class($this), $mem, $this->$mem);
+			}
+		}
+		$ret = $parser->writeFile();
+		return $ret;
 	}
 	
+	# Metod: getConfig
 	# Reads the configuration data for the plugin from a file and stores it
 	# in class variables.  
-	# If your plugin allows ANY type of user configuration, then you MUST
-	# override this method.  If the plugin doesn't allow any configuration,
-	# then you can safely ignore this.
 	
 	function getConfig() {
-		$parser = NewINIParser(USER_DATA_PATH.PATH_DELIM."plugins.ini");
-		foreach ($this->member_list as $mem=>$desc) {
-			$this->$mem = $parser->value(get_class($this), $mem, "");
+		$global_parser = NewIniParser(USER_DATA_PATH.PATH_DELIM."plugins.ini");
+		if (defined("BLOG_ROOT")) {
+			$parser = NewIniParser(BLOG_ROOT.PATH_DELIM."plugins.ini");
+			$parser->merge($global_parser);
+		} else $parser =& $global_parser;
+		foreach ($this->member_list as $mem=>$config) {
+			$this->$mem = (isset($config["default"]) ? $config["default"] : "");
+			$val = $parser->value(get_class($this), $mem, $this->$mem);
+			if ($val == "1" || $val == "0") $this->$mem = intval($val);
+			else $this->$mem = $val;
 		}
 	}
 	

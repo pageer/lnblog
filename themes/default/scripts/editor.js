@@ -54,9 +54,10 @@ function get_acr(shrt) {
 
 function one_parm(type) {
 	var text_str = document.getElementById("desc_txt").value;
+	window.alert(document.getElementById("body").value);
 	if (text_str == '') return false;
 	insertAtCursor(
-		document.getElementById("data"), 
+		document.getElementById("body"), 
 		'[' + type + ']' + text_str + '[/' + type + ']');
 	document.getElementById("desc_txt").value = '';
 	return true;
@@ -87,7 +88,7 @@ function two_parm(type) {
 		meta_str = lookup;
 	} else if (meta_str == '') return false;
 	insertAtCursor(
-		document.getElementById("data"),
+		document.getElementById("body"),
 		'[' + type + '=' + meta_str + ']' +	desc_str + '[/' + type + ']');
 
 	document.getElementById("desc_txt").value = '';
@@ -112,7 +113,7 @@ function opt_parm(type) {
 	}
 	
 	insertAtCursor(
-		document.getElementById("data"), data_str);
+		document.getElementById("body"), data_str);
 	document.getElementById("desc_txt").value = '';
 	document.getElementById("meta_txt").value = '';
 	return true;

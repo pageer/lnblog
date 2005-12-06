@@ -55,9 +55,11 @@ Group: Libraries  {
    File: BlogComment  (lib/blogcomment.php)
    File: BlogEntry  (lib/blogentry.php)
    File: Creator Functions  (no auto-title, lib/creators.php)
+   File: Draft  (lib/draft.php)
    File: Entry  (lib/entry.php)
    File: EventRegister  (lib/eventregister.php)
    File: FS  (lib/fs.php)
+   File: IniParser  (lib/iniparser.php)
    File: Internationalization  (no auto-title, lib/i18n.php)
    File: lbcode.php  (lib/lbcode.php)
    File: LnBlogObject  (lib/lnblogobject.php)
@@ -66,6 +68,7 @@ Group: Libraries  {
    File: Plugin  (lib/plugin.php)
    File: PluginManager  (lib/pluginmanager.php)
    File: User  (lib/user.php)
+   File: Utilities  (lib/utils.php)
    }  # Group: Libraries
 
 Group: Pages  {

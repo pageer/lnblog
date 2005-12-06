@@ -25,19 +25,32 @@
 # Plugins that inherit from the abstract <Plugin> class can inherit a basic
 # form, but others must create their own.
 
+session_start();
+
 require_once("blogconfig.php");
 require_once("lib/creators.php");
-require_once("lib/plugins.php");
+require_once("lib/plugin.php");
 
 $page = NewPage();
 $usr = NewUser();
-if ($usr->uid != ADMIN_USER) {
+
+if (defined("BLOG_ROOT")) {
+	$blg = NewBlog();
+	if (! $blg->canModifyBlog()) {
+		$page->redirect("login.php");
+		exit;
+	}
+} elseif ($usr->username() != ADMIN_USER) {
 	$page->redirect("bloglogin.php");
 	exit;
 }
 
 if (has_post()) {
-
+	$plug_name = sanitize(POST("plugin"));
+	$plug = new $plug_name;
+	$ret = $plug->updateConfig();
+	$page->redirect(current_file());
+	exit;
 } elseif ( sanitize(GET("plugin")) && 
            class_exists(sanitize(GET("plugin"))) ) {
 	$plug_name = sanitize(GET("plugin"));
@@ -51,13 +64,13 @@ if (has_post()) {
 	$buff = ob_get_contents();
 	ob_end_clean();
 	$body .= is_string($ret) ? $ret : $buff;
-
+	$body .= '<p><a href="'.current_file().'">'._("Back to plugin list").'</a></p>';
 } else {
 	global $PLUGIN_MANAGER;
 	$plug_list = $PLUGIN_MANAGER->getPluginList();
 	$body = "<h4>"._('Plugin Configuration')."</h4><ul>";
 	foreach ($plug_list as $plug) {
-		$body .= '<li><a href="?plugin='.$plug.'">'.$plug.'"</a></li>';
+		$body .= '<li><a href="?plugin='.$plug.'">'.$plug.'</a></li>';
 	}
 	$body .= '</ul>';
 }

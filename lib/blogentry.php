@@ -95,7 +95,7 @@ class BlogEntry extends Entry {
 				$entrypath = preg_replace("/\//", PATH_DELIM, trim(GET("entry")) );
 			else $entrypath = "";
 
-			$this->file = $blogpath.PATH_DELIM.BLOG_ENTRY_PATH.PATH_DELIM.$entrypath.PATH_DELIM.$revision;
+			$this->file = mkpath($blogpath,BLOG_ENTRY_PATH,$entrypath,$revision);
 			
 		} else {
 		
@@ -200,7 +200,17 @@ class BlogEntry extends Entry {
 			case "HasHTML": $this->has_html = $val; break;
 		}
 	}
-	
+
+	/*
+	Method: isEntry
+	Determine if the object is a blog entry or not.
+
+	Parameter:
+	path - *Optional* path to the entry.  If not set, use the current object.
+
+	Return:
+	True if the object is an existing entry, false otherwise.
+	*/
 	function isEntry ($path=false) {
 		if (! $path) $path = dirname($this->file);
 		return file_exists($path.PATH_DELIM.ENTRY_DEFAULT_FILE);
@@ -300,7 +310,7 @@ class BlogEntry extends Entry {
 
 	/* 
 	Method: delete
-	Delete the current object
+	Delete the current object.
 
 	Returns:
 	True on success, false on failure.

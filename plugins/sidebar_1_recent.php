@@ -42,6 +42,7 @@ class Recent extends Plugin {
 <?php 
 			}	 # End foreach
 ?>
+<li><a href="<?php echo $blg->getURL();?>"><?php p_("Show home page");?></a></li>
 </ul>
 <?php 
 		}  # End outer if

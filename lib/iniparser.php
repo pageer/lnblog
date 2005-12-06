@@ -18,9 +18,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+# Class: IniParser
 # This is a simple class to parse INI files.
-
-define("INIPARSER_CASE_SENSITIVE", true);
 
 class INIParser {
 	
@@ -31,16 +30,16 @@ class INIParser {
 	
 	function INIParser ($file=false) {
 		$this->current_section = false;
-		$this->case_insensitive = INIPARSER_CASE_SENSITIVE;
-		if ( $file && file_exists($file) ) {
-			$this->filename = $file;
+		$this->case_insensitive = true;
+		if ( $file ) $this->filename = $file;
+		if ( file_exists($this->filename) ) {
 			$this->readFile();
-		} else {
-			$this->filename = false;
 		}
 	}
-
+	
+	# Method: readFile
 	# Read the contents of an INI file into a two-dimensional array.
+	# This method preserves comments in the file.
 
 	function readFile() {
 		$file_content = file($this->filename);
@@ -70,7 +69,11 @@ class INIParser {
 		}
 	}
 
-	# Return the INI file structure as a string that can be written to a file.
+	# Method: getFile
+	# Serializes the INI file into a string.
+	#
+	# Returns:
+	# The INI file structure as a string that can be written to a file.
 
 	function getFile() {
 		$ret = "";
@@ -87,20 +90,42 @@ class INIParser {
 		return $ret;
 	}
 
+	# Method: writeFile
 	# Write the INI file back to the disk.
+	#
+	# Parameters:
+	# file - The filename to write to.  *Defaults* to the filename property.
+	#
+	# Returns:
+	# True if the write succeeds, false otherwise.
 
 	function writeFile($file=false) {
-		if ($file) $this->filename;
+		if ($file) $this->filename = $file;
 		if (! $this->filename) return false;
 		return write_file($this->filename, $this->getFile());
 	}
 
+	# Method: value
+	# Get a value from the INI file.
+	#
+	# Parameters:
+	# Takes up to three parameters.
+	# If one parameter is given, then it is interpreted as a key in the 
+	# current section (last section accessed.
+	# If two are given, the first is a section and the second is a key.
+	# If three, then the first is the section, the second is the key, 
+	# and the third is a default value if the key is not set.
+	#
+	# Returns:
+	# A string containing the value of the given key, or the default value.
+
 	function value($sec, $var=false, $default=false) {
-		if ($var && isset($this->data[$sec]) && 
+		if ($var !== false && isset($this->data[$sec]) && 
 		    isset($this->data[$sec][$var]) ) {
 			$this->current_section = $sec;
 			return $this->data[$sec][$var];
-		} elseif (!$var && isset($this->data[$this->current_section]) && 
+		} elseif ($var === false && 
+		          isset($this->data[$this->current_section]) && 
 		          isset($this->data[$this->current_section][$sec]) ) {
 			return $this->data[$this->current_section][$sec];
 		} else {
@@ -108,6 +133,17 @@ class INIParser {
 		}
 	}
 
+	# Method: valueIsSet
+	# Determine if a particular key has been set.
+	#
+	# Parameters:
+	# This can take one or two parameters.  If one is given, it is a key in
+	# the current section.  If two, the first is a secion and the second is 
+	# a key.
+	#
+	# Returns:
+	# True if the given key has been set, false otherwise.
+	
 	function valueIsSet($sec, $var=false) {
 		if ($var && isset($this->data[$sec]) ) {
 			$this->current_section = $sec;
@@ -119,11 +155,19 @@ class INIParser {
 		}
 	}
 
-	# Set a value.  If the last parameter is not given, the meanings are moved
-	# back one.  This is  a hack because PHP 4 doesn't have function overloading.
-
+	# Method: setValue
+	# Sets a value for a key.  
+	#
+	# Parameters:
+	# Takes two or three parameters.  If two, then the first is a key in the 
+	# current section and the second is a value.  If three, then the first is
+	# a section, the second a key, and the third the value.
+	#
+	# Returns:
+	# The value to which the key was set.
+	
 	function setValue ($sec, $var, $val=false) {
-		if ($val) {
+		if ($val !== false) {
 			if (isset($this->data[$sec]) ) {
 				$this->data[$sec][$var] = $val;
 			} else {
@@ -137,6 +181,31 @@ class INIParser {
 				$this->data[$this->current_section] = array($sec=>$var);
 			}
 			return $this->data[$this->current_section][$sec];
+		}
+	}
+
+	# Method: merge
+	# Merge another INI file into the current one.
+	# If a key from the other file is not set, it will be set with the value 
+	# from the other file.  Keys that are already set will not be modified.
+	#
+	# Parameters:
+	# file - The INIParser object to merge with the current object.
+
+	function merge($file) {
+		if ($file->data && ! $this->data) $this->data = $file->data;
+		elseif (! $file->data) return;
+	
+		foreach ($file->data as $sec=>$keys) {
+			if (isset($this->data[$sec]) ) {
+				foreach ($keys as $key=>$val) {
+					if (! isset($this->data[$sec][$key])) {
+						$this->data[$sec][$key] = $val;
+					}
+				}
+			} else {
+				$this->data[$sec] = $keys;
+			}
 		}
 	}
 

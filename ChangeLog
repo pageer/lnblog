@@ -1,4 +1,31 @@
-22-Nov-2005:
+06-Dec-2005:
+- Changed default back to login link, not form.
+- Fixed error for plugins that didn't define control.
+
+05-Dec-2005:
+- Fixed ~user URLs for admin pages.
+- Added NaturalDocs documentation to utils.php.
+- Fixed bug in comment notifier.
+- Fixed non-admin per-blog plugin config bug.
+- Fixed non-existent file bug in INI parser.
+
+30-Nov-2005:
+- Added Javascript to hide FTP part of fs_setup form when nativefs is 
+selected.
+
+29-Nov-2005:
+- Fixed problem in event register with static class methods.
+- Made plugin configuration page actually work.
+- Added user preference support to many plugins.
+
+28-Nov-2005:
+- Separated login ops in to two plugins.
+- Added option to make login link into an inline form.
+
+25-Nov-2005:
+- Fixed error in LBCode Javascript editor.
+
+22-Nov-2005: 0.5.0
 - Fixed bad e-mail link in blogentry template.
 - Fixed i18n loading before PACKAGE_NAME defined, which caused errors 
 when gettext is enabled.

@@ -46,7 +46,7 @@ $tpl->set("COMMENTS", $ent->allow_comment);
 
 if (POST($submit_id)) {
 	$ret = $blg->updateEntry();
-	if ($ret == UPDATE_SUCCESS) redirect($blg->getURL());
+	if ($ret == UPDATE_SUCCESS) $page->redirect($blg->getURL());
 	else $blg->errorEntry($ret, $tpl);
 } elseif (POST($preview_id)) {
 	$blg->previewEntry($tpl);

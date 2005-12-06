@@ -42,7 +42,7 @@ if (POST($conf_id)) {
 	if ($ret == UPDATE_SUCCESS) $page->redirect(BLOG_ROOT_URL);
 	else $message = spf_("Unable to delete '%s'.  Try again?", $ent->subject);
 } elseif (POST($cancel_id)) {
-	redirect("index.php");
+	$page->redirect("index.php");
 }
 
 $tpl = NewTemplate(CONFIRM_TEMPLATE);

@@ -48,7 +48,7 @@ $message = spf_("Do you really want to delete %s?", $anchor);
 
 if (POST($conf_id)) {
 	$ret = $comm->delete();
-	if ($ret) redirect("index.php");
+	if ($ret) $page->redirect("index.php");
 	else $message = spf_("Unable to delete %s.  Try again?", $anchor);
 }
 
