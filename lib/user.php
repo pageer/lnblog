@@ -331,9 +331,12 @@ class User extends LnBlogObject {
 	# Method: checkLogin
 	# Checks tokens to determine if the user is logged in.
 	#
+	# Parameters:
+	# uname - *Optional* username to check.
+	#
 	# Returns:
 	# True if the user has valid login tokens, false otherwise.
-	function checkLogin() {
+	function checkLogin($uname=false) {
 		# If the constructor doesn't detect a user name, then we're obviously
 		# not logged in.
 		if (!$this->username) return false;
@@ -345,17 +348,17 @@ class User extends LnBlogObject {
 			$auth_token = md5(get_ip().$cookie_ts);
 			$auth_ok = ($auth_token == SESSION(LOGIN_TOKEN) );
 			$auth_ok = $auth_ok && ($cookie_ts == SESSION(LAST_LOGIN_TIME) );
-			if ($auth_ok) return true;
-			else return false;
+			if ($uname) $auth_ok &= ($this->username == $uname);
 		} else {
 			# Check the cookies for the user and password hash and compare to 
 			# the password hash for this user on the server.
 			# This is NOT secure, but it is convenient.
 			$usr = COOKIE(CURRENT_USER);
 			$pwhash = COOKIE(PW_HASH);
-			if ($this->username == $usr && $this->passwd = $pwhash) return true;
-			else return false;
+			$auth_ok = ($this->username == $usr && $this->passwd = $pwhash);
 		}
+		if ($auth_ok) return true;
+		else return false;
 	}
 
 	# Method: isAdministrator

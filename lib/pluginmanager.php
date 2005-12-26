@@ -26,19 +26,70 @@ require_once("lib/plugin.php");
 
 class PluginManager {
 
-	var $config_file;
 	var $plugin_list;
+	var $exclude_list;
+	var $load_first;
+	var $load_list;
 	var $plugin_config;
 
-	function PluginManager($config=false) {
-		if ($config) {
-			$config_file = $config;
-			#$plugin_config = NewINIParser($this->config_file);
+	function PluginManager() {
+	
+		# Merge the global and per-blog config to get a single INI object that
+		# all plugins can access.
+		$this->getConfig();
+		
+		$this->plugin_list = $this->getFileList();
+		# Get various settings to determine which plugins should be loaded and 
+		# in what order.
+		$defexcl = "sidebar_archives.php";
+		$excl = $this->plugin_config->value("Plugin_Manager", "exclude_list", $defexcl);
+		$this->exclude_list = explode(",", $excl);
+		if (! is_array($this->exclude_list)) $this->exclude_list = array();
+		
+		$deflf = "banner_pageheader.php,menubar_sitemap.php,".
+		         "sidebar_loginops.php,sidebar_recent.php,".
+		         "sidebar_articles.php,sidebar_calendar.php,".
+		         "sidebar_news.php,sidebar_googlesearch.php,sidebar_tags.php,".
+		         "sidebar_loginlink.php,sidebar_poweredby.php";
+		$lf = $this->plugin_config->value("Plugin_Manager", "load_first", $deflf);
+		$this->load_first = explode(",", $lf);
+		
+		$this->load_list = array();
+		if (is_array($this->load_first)) {
+			foreach ($this->load_first as $val) {
+				$this->load_list[$val] = $val;
+			}
 		}
+
+		foreach ($this->plugin_list as $val) {
+			if (! isset($this->load_list[$val])) $this->load_list[$val] = $val;
+		}
+		
+		foreach ($this->exclude_list as $val) {
+			if (isset($this->load_list[$val])) {
+				$this->load_list[$val] = false;
+			}
+		}
+		
+	}
+
+	/* Method: getConfig
+	 * Gets configuration data for plugins from INI files.
+	 * Merges the installation wide and per-blog settings if applicable.
+	 */
+
+	function getConfig() {
+		$global_config = NewINIParser(USER_DATA_PATH.PATH_DELIM."plugins.ini");
+		if (defined("BLOG_ROOT")) {
+			$blog_config = NewINIParser(BLOG_ROOT.PATH_DELIM."plugins.ini");
+			$blog_config->merge($global_config);
+			$this->plugin_config =& $blog_config;
+		} else $this->plugin_config =& $global_config;
 	}
 
 	/* Method: getPluginList
-	 * List all the classes that are descended from Plugin.
+	 * List all defined classes that are descended from Plugin.
+	 * This has the effect of getting a list of loaded plugins.
 	 *
 	 * Returns:
 	 * An array of class names.
@@ -59,23 +110,14 @@ class PluginManager {
 		return $plugin_classes;
 	}
 
-	function getClassNameFromFile($filename) {
-		$us_pos = strrpos($filename, "-");
-		if ($us_pos === false) $us_pos = 0;
-		else $us_pos += 1;
-		$dot_pos = strrpos($filename, ".");
-		if ($dot_pos === false) $dot_pos = strlen($filename) - 1;
-		return substr($filename, $us_pos, $dot_pos - $us_pos);
-	}
-
-	/* Method: loadPlugins
-	 * Load all plugins.  In particular, include()s every file in the plugins
-	 * directory then ends with a .php suffix in alphabetical order.  Plugins
-	 * are found in the "plugins" directory under BLOG_ROOT or INSTALL_ROOT.
-	 * Plugins in BLOG_ROOT take precedence.  Subdirectories are not scanned.
+	/* Method: getFileList
+	 * List all the plugin files that get loaded.
+	 *
+	 * Returns:
+	 * An array of strings containing filenames.
 	 */
 
-	function loadPlugins() {
+	function getFileList() {
 		$plugin_dir_list = array();
 		if (defined("BLOG_ROOT")) 
 			$plugin_dir_list[] = BLOG_ROOT.PATH_DELIM."plugins";
@@ -96,8 +138,30 @@ class PluginManager {
 		}
 		$file_list = array_unique($file_list);
 		sort($file_list);
-		foreach ($file_list as $f) {
-			include("plugins/".$f);
+		return $file_list;
+	}
+
+	function getClassNameFromFile($filename) {
+		$us_pos = strrpos($filename, "-");
+		if ($us_pos === false) $us_pos = 0;
+		else $us_pos += 1;
+		$dot_pos = strrpos($filename, ".");
+		if ($dot_pos === false) $dot_pos = strlen($filename) - 1;
+		return substr($filename, $us_pos, $dot_pos - $us_pos);
+	}
+
+	/* Method: loadPlugins
+	 * Load all plugins.  In particular, include()s every file in the plugins
+	 * directory then ends with a .php suffix in alphabetical order.  Plugins
+	 * are found in the "plugins" directory under BLOG_ROOT or INSTALL_ROOT.
+	 * Plugins in BLOG_ROOT take precedence.  Subdirectories are not scanned.
+	 */
+
+	function loadPlugins() {
+		foreach ($this->load_list as $f=>$v) {
+			if ($v) {
+				include("plugins/".$f);
+			}
 		}
 	}
 	

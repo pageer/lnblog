@@ -4,13 +4,7 @@ menu bar, and sidebar.  It does not include the blog entries, comments, forums, 
 */
 
 html, body { 
-	/*
-	height: 100%;
-	margin: 0;
-	padding: 0;
-	*/
 	background-color: #b5b5b5;
-	/*background: url(../images/background2.png);*/
 }
 
 div, p, h1, h2, h3, h4  {
@@ -24,26 +18,34 @@ div#container {
 	width: 748px;
 	margin: 0 auto;
 	padding: 0;
-	border: 1px solid black;
-	background-color: #f4f4f4;
+	margin-bottom: 0;
+	background-image: url(/LnBlog/themes/smooth/images/bg.png);
+	background-repeat: repeat-y;
 }
 
 #maincontainer {
 	border-top: 1px solid black;
-	background: url(../images/bg.png);
+	background-image: url(../images/bg.png);
+	background-repeat: repeat-y;
+	/*background-position: top left;*/
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	clear: both;
 }
 
 #pagecontent {
 	margin: 0;
-	padding: 0;
-	/*background-color: white;*/
-	width: 498px;
+	padding: 3px;
+	width: 492px;
 	height: 100%;
-	border-right: 0px; /*1px solid black;*/
+	border-right: 0;
 	position: relative;
 	left: 0px;
 	top: 0px;
-	/*float: left;*/
+	float: left;
+	background-image: url(../images/bg.png);
+	background-repeat: repeat-y;
 }
 
 a:link {
@@ -66,6 +68,24 @@ input:focus, textarea:focus {
 }
 
 q { font-style: italic; }
+
+.roundtop { 
+	background: url(../images/tr.png) no-repeat top right; 
+	background-color: #6b85b0;
+}
+
+.roundbottom {
+	background: url(../images/br.png) no-repeat top right; 
+	background-color: #f4f4f4;
+	clear: both;
+}
+
+img.corner {
+   width: 15px;
+   height: 15px;
+   border: none;
+   display: block !important;
+}
 
 @media print {
 

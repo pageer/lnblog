@@ -380,18 +380,6 @@ The corresponding replacement expression to <URI_TO_LOCALPATH_MATCH_RE>.
 # *Default* is "feeds".
 @define("BLOG_FEED_PATH", "feeds");
 
-# Constant: BLOG_RSS1_NAME
-# File name for accessing the RSS 1.0 feed.
-#
-# *Default* is "news.rdf".
-@define("BLOG_RSS1_NAME", "news.rdf");
-
-# Constant: BLOG_RSS2_NAME
-# File name for accessing the RSS 2.0 feed.
-#
-# *Default* is "news.xml".
-@define("BLOG_RSS2_NAME", "news.xml");
-
 # Constant: BLOG_MAX_ENTRIES
 # Default number of entries to display on the front page.
 #
@@ -436,6 +424,12 @@ The corresponding replacement expression to <URI_TO_LOCALPATH_MATCH_RE>.
 # The *default* is "current.htm".
 @define("ENTRY_DEFAULT_FILE", "current.htm");
 
+# Constant: TAG_SEPARATOR
+# The character used to separate individual tags entered for entries.
+#
+# The *default* is a comma (",").  
+@define("TAG_SEPARATOR", ",");
+
 # Constant: ENTRY_DATE_FORMAT
 # Format used to display dates for entries and articles.
 # Note that, like <ENTRY_PATH_FORMAT> this string includes strftime() 
@@ -476,18 +470,6 @@ The corresponding replacement expression to <URI_TO_LOCALPATH_MATCH_RE>.
 #
 # The *default* value is "sticky.txt".
 @define("STICKY_PATH", "sticky.txt");
-
-# Constant: COMMENT_RSS1_PATH
-# The name used for RSS 1.0 feeds for comments on an entry or article.
-#
-# *Default* is "comments.rdf".
-@define("COMMENT_RSS1_PATH", "comments.rdf");
-
-# Constant: COMMENT_RSS2_PATH
-# The name used for RSS 2.0 feeds for comments on an entry or article.
-#
-# *Default* is "comments.rdf".
-@define("COMMENT_RSS2_PATH", "comments.xml");
 
 ########################################
 # Section: Trackback configuration
@@ -574,14 +556,18 @@ define("FS_PLUGIN_CONFIG", "fsconfig.php");
 # we'll do it here instead.
 if ( defined("BLOG_ROOT") ) {
 	$cfg_file = BLOG_ROOT.PATH_DELIM.BLOG_CONFIG_PATH;
-	if (is_file($cfg_file)) {
-		$data = file($cfg_file);
-		foreach ($data as $line) {
-			$arr = explode("=", $line);
-			if (strtolower(trim($arr[0])) == "theme") {
-				define("THEME_NAME", trim($arr[1]));
-				break;
-			}
+} elseif (isset($_GET['blog'])) {
+	$cfg_file = DOCUMENT_ROOT.PATH_DELIM.
+		preg_replace("/\W/", "", $_GET['blog']).PATH_DELIM.BLOG_CONFIG_PATH;
+}
+
+if (isset($cfg_file) && is_file($cfg_file)) {
+	$data = file($cfg_file);
+	foreach ($data as $line) {
+		$arr = explode("=", $line);
+		if (strtolower(trim($arr[0])) == "theme") {
+			define("THEME_NAME", trim($arr[1]));
+			break;
 		}
 	}
 }

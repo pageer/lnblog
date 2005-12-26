@@ -38,11 +38,9 @@ if (defined("BLOG_ROOT")) {
 	$blg = NewBlog();
 	if (! $blg->canModifyBlog()) {
 		$page->redirect("login.php");
-		exit;
 	}
-} elseif ($usr->username() != ADMIN_USER) {
+} elseif (! $usr->checkLogin(ADMIN_USER)) {
 	$page->redirect("bloglogin.php");
-	exit;
 }
 
 if (has_post()) {
@@ -68,6 +66,7 @@ if (has_post()) {
 } else {
 	global $PLUGIN_MANAGER;
 	$plug_list = $PLUGIN_MANAGER->getPluginList();
+	sort($plug_list);
 	$body = "<h4>"._('Plugin Configuration')."</h4><ul>";
 	foreach ($plug_list as $plug) {
 		$body .= '<li><a href="?plugin='.$plug.'">'.$plug.'</a></li>';

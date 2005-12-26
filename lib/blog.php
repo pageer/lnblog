@@ -60,6 +60,7 @@ class Blog extends LnBlogObject {
 	var $pass = "";
 	var $owner = ADMIN_USER;
 	var $write_list;
+	var $tag_list;
 	var $entrylist;
 	var $last_blogentry;
 	var $last_article;
@@ -93,9 +94,11 @@ class Blog extends LnBlogObject {
 		$this->pass = "";
 		$this->owner = ADMIN_USER;
 		$this->write_list = array();
+		$this->tag_list = array();
 		$this->entrylist = array();
 		$this->last_blogentry = false;
 		$this->last_article = false;
+		$this->blogid = basename($this->home_path);
 		$this->readBlogData();
 		
 		$this->raiseEvent("InitComplete");
@@ -114,7 +117,7 @@ class Blog extends LnBlogObject {
 	}
 
 	/*
-	Property: writers
+	Method: writers
 	Set and return the list of users who can add posts to the blog.  
 	
 	Parameters:
@@ -177,6 +180,7 @@ class Blog extends LnBlogObject {
 				case "theme": $this->theme = $data; break;
 				case "owner": $this->owner = $data; break;
 				case "write list": $this->write_list = explode(",", $data); break;
+				case "tags": $this->tag_list = explode(TAG_SEPARATOR, $data); break;
 			}
 			
 		}
@@ -198,7 +202,8 @@ class Blog extends LnBlogObject {
 		$str .= "Max RSS = ".$this->max_rss."\n";
 		$str .= "Theme = ".$this->theme."\n";
 		$str .= "Owner = ".$this->owner."\n";
-		$str .= "Write List = ".implode(",", $this->write_list);
+		$str .= "Write List = ".implode(",", $this->write_list)."\n";
+		$str .= "Tags = ".implode(TAG_SEPARATOR, $this->tag_list);
 		$ret = write_file($path, $str);
 		return $ret;
 	}
@@ -496,7 +501,6 @@ class Blog extends LnBlogObject {
 		if ($number == 0) return;
 	
 		$ent_dir = $this->home_path.PATH_DELIM.BLOG_ENTRY_PATH;
-		$dirhand = opendir($ent_dir);
 		$num_scanned = 0;
 		$num_found = 0;
 		
@@ -524,7 +528,68 @@ class Blog extends LnBlogObject {
 				}  # End month loop
 			}  # End year loop
 		}  # End archive loop
+		return $this->entrylist;
+	}
+
+	# Method: getEntriesByTag
+	# Get a list of entries tagged with a given string.  
+	#
+	# Parameter: 
+	# taglist   - An array of tags to search for.
+	# limit     - Maximum number of entries to return.  The *default* is 
+	#             zero, which me !;!/an return *all* matching entries.
+	# match_all - Optional boolean that determines whether the entry must 
+	#             have every tag in taglist to match.  The *default* is false.
+	#
+	# Returns:
+	# An array of entry objects, in reverse chronological order by post date.
+
+	function getEntriesByTag($taglist, $limit=0, $match_all=false) {
+	
+		$entry = NewBlogEntry();
+		$this->entrylist = array();
+	
+		$ent_dir = $this->home_path.PATH_DELIM.BLOG_ENTRY_PATH;
+		$num_found = 0;
 		
+		$year_list = scan_directory($ent_dir, true);
+		rsort($year_list);
+
+		foreach ($year_list as $year) {
+			$month_list = scan_directory($ent_dir.PATH_DELIM.$year, true);
+			rsort($month_list);
+			foreach ($month_list as $month) {
+				$path = $ent_dir.PATH_DELIM.$year.PATH_DELIM.$month;
+				$ents = scan_directory($path, true);
+				rsort($ents);
+				foreach ($ents as $e) {
+					$ent_path = $path.PATH_DELIM.$e;
+					if ( $entry->isEntry($ent_path) ) {
+						$tmp = NewBlogEntry($ent_path);
+						$ent_tags = $tmp->tags();
+						if (empty($ent_tags)) continue;
+						if (! $match_all) {
+							foreach ($taglist as $tag) {
+								if (in_arrayi($tag, $ent_tags)) {
+									$this->entrylist[] = $tmp;
+									$num_found++;
+								}
+							}
+						} else {
+							$hit_count = 0;
+							foreach ($taglist as $tag) 
+								if (in_arrayi($tag, $ent_tags)) $hit_count++;
+							if ($hit_count == count($taglist)) {
+									$this->entrylist[] = $tmp;
+									$num_found++;
+							}
+						}
+						if ($limit > 0 && $num_found == $limit) break 3;
+					}
+				}  # End month loop
+			}  # End year loop
+		}  # End archive loop
+		return $this->entrylist;
 	}
 
 	# Gets the appropriate list of archive links.  This could be a list
@@ -611,8 +676,6 @@ class Blog extends LnBlogObject {
 		$tpl->set("BLOG_BASE_DIR", $this->home_path);
 		$tpl->set("BLOG_URL", $this->getURL() );
 		$tpl->set("BLOG_URL_ROOTREL", $this->getURL(false));
-		$tpl->set("BLOG_RSS1_FEED", $this->getURL().BLOG_FEED_PATH."/".BLOG_RSS1_NAME);
-		$tpl->set("BLOG_RSS2_FEED", $this->getURL().BLOG_FEED_PATH."/".BLOG_RSS2_NAME);
 	}
 
 	/*
@@ -691,9 +754,16 @@ class Blog extends LnBlogObject {
 		return $ret;
 	}
 
+	# Method: fixDirectoryPermissions
 	# A quick utility function to fix the borked permissions from not setting
 	# the correct umask when creating directories.  This resulted in 
 	# directories that I couldn't alter via FTP.
+	#
+	# Parameters:
+	# start_dir - The directory to fix.  *Defaults* to the blog root.
+	#
+	# Returns:
+	# True on success, false otherwise.
 
 	function fixDirectoryPermissions($start_dir=false) {
 		$fs = NewFS();
@@ -708,6 +778,15 @@ class Blog extends LnBlogObject {
 		$fs->destruct();
 		return $ret;
 	}
+
+	# Method: insert
+	# Creates a new weblog.
+	#
+	# Parameters:
+	# path - The path to the blog root.  Defaults to the current directory.
+	# 
+	# Returns:
+	# True on success, false otherwise.
 
 	function insert ($path=false) {
 		if (! $this->canAddBlog() ) return false;
@@ -759,6 +838,12 @@ class Blog extends LnBlogObject {
 		return $ret;
 	}
 	
+	# Method: update
+	# Modify an existing weblog.
+	# 
+	# Returns:
+	# True on success, false otherwise.
+	
 	function update () {
 		if (! $this->canModifyBlog() ) return false;
 		$this->raiseEvent("OnUpdate");
@@ -773,6 +858,12 @@ class Blog extends LnBlogObject {
 		return $ret;
 	}
 	
+	# Method: delete
+	# Removes an existing weblog.
+	# 
+	# Returns:
+	# True on success, false on failure.
+	
 	function delete () {
 		if (! $this->canModifyBlog()) return false;
 		$this->raiseEvent("OnDelete");
@@ -786,12 +877,51 @@ class Blog extends LnBlogObject {
 		$this->raiseEvent("DeleteComplete");
 		return $ret;
 	}
+	
+	# Method: updateTagList
+	# Adds any new tags to the list of tags used in the current blog.
+	# 
+	# Parameters:
+	# tags - An array of strings holding the tags to be added.
+	#        Duplicates are removed.
+	#
+	# Returns:
+	# True on success, false on failure.
+	
+	function updateTagList($tags) {
+		$modified = false;
+		if (! $tags) return false;
+		foreach ($tags as $tag) {
+			if (! in_arrayi($tag, $this->tag_list)) {
+				$this->tag_list[] = $tag;
+				$modified = true;
+			}
+		}
+		$new_list = array();
+		foreach ($this->tag_list as $tag) {
+			if (trim($tag) != "") {
+				$new_list[] = $tag;
+				$modified = true;
+			}
+		}
+		if ($modified) {
+			$this->tag_list = $new_list;
+			return $this->writeBlogData();
+		} else return false;
+	}
 
 #---------------------------------------------------------------------------
-# Security checking functions.
+# Section: Security checking functions.
 
+	# Method: canAddEntry
 	# Determines if the user can add a new entry.  The user must be in the
 	# blog's write list or be the blog owner.
+	#
+	# Parameters:
+	# usr - Optional user ID.  The default is the "current" user.
+	# 
+	# Returns:
+	# True if the user can add, false otherwise.
 
 	function canAddEntry($usr=false) {
 		$u = NewUser($usr);
@@ -803,8 +933,16 @@ class Blog extends LnBlogObject {
 		return false;
 	}
 
+	# Method: canModifyEntry
 	# Determines if the user can edit or delete the entry.  Also applies to
 	# modifying user comments.
+	#
+	# Parameters:
+	# ent - The optional entry to modify.  Default is the "current" entry.
+	# usr - The optional user ID.  Default is the "current" user.
+	#
+	# Returns:
+	# True if the user can modify the entry, false otherwise.
 
 	function canModifyEntry($ent=false, $usr=false) {
 		$u = NewUser($usr);
@@ -816,7 +954,8 @@ class Blog extends LnBlogObject {
 		return false;
 	}
 
-	# Same as canAddEntry(), but for articles.
+	# Method: canAddArticle
+	# Same as <canAddEntry>, but for articles.
 
 	function canAddArticle($usr=false) {
 		$u = NewUser($usr);
@@ -828,7 +967,8 @@ class Blog extends LnBlogObject {
 		return false;
 	}
 
-	# Again, same as camModifyEntry(), but for articles.
+	# Method: canModifyArticle
+	# Same as <canModifyEntry>, but for articles.
 
 	function canModifyArticle($ent=false, $usr=false) {
 		$u = NewUser($usr);
@@ -840,12 +980,32 @@ class Blog extends LnBlogObject {
 		return false;
 	}
 
+	# Method: canAddBlog
+	# Determines if the user can add a new weblog.  
+	# Only the administrator can do this.
+	#
+	# Parameters:
+	# usr - The optional user ID.  Default is to use the "current" user.
+	#
+	# Returns:
+	# True if the user can add a blog, false otherwise.
+
 	function canAddBlog($usr=false) {
 		$u = NewUser($usr);
 		if (! $u->checkLogin() ) return false;
 		if (ADMIN_USER == $u->username() ) return true;
 		return false;
 	}
+	
+	# Method: canModifyBlog
+	# Determines if the user can modify the current weblog.
+	# The user must be the blog owner or the administrator.
+	#
+	# Parameters:
+	# usr - The optional user ID.  Default is to use the "current" user.
+	#
+	# Returns:
+	# True if the user can add a blog, false otherwise.
 
 	function canModifyBlog($usr=false) {
 		$u = NewUser($usr);
@@ -856,9 +1016,17 @@ class Blog extends LnBlogObject {
 	}
 
 #---------------------------------------------------------------------------
-# Interface with BlogEntry and Article classes.  
+# Section: BlogEntry and Article Interface
 
-	# Set data for the preview page.
+	# Method: previewEntry
+	# Set template variables with data for an entry preview page.
+	#
+	# Parameters:
+	# tpl - A template to populate.
+	#
+	# Returns:
+	# True if there is HTTP POST data to use for the preview,
+	# false if there is no POST data.
 
 	function previewEntry(&$tpl) {
 		$u = NewUser();
@@ -876,6 +1044,9 @@ class Blog extends LnBlogObject {
 		$tpl->set("COMMENTS", $this->last_blogentry->allow_comment);
 		return true;
 	}
+
+	# Method: previewArticle
+	# Like <previewEntry>, except for articles.
 
 	function previewArticle(&$tpl) {
 		$u = NewUser();
@@ -932,7 +1103,7 @@ class Blog extends LnBlogObject {
 	}
 
 	function errorArticle($error, &$tpl) {
-		$this->last_article = NewArticle();;
+		$this->last_article = NewArticle();
 		if ( has_post() ) $this->last_article->getPostData();
 		else return false;
 		$this->raiseEvent("OnArticleError");
@@ -967,7 +1138,10 @@ class Blog extends LnBlogObject {
 		if ($ent->data == '') return UPDATE_NO_DATA_ERROR;
 		if (! $this->canAddEntry() ) return UPDATE_AUTH_ERROR;
 		$ret = $ent->insert();
-		if ($ret !== false) $ret = UPDATE_SUCCESS;
+		if ($ret !== false) {
+			$ret = UPDATE_SUCCESS;
+			$this->updateTagList($ent->tags());
+		}
 		else $ret = UPDATE_ENTRY_ERROR;
 		return $ret;
 	}
@@ -979,7 +1153,10 @@ class Blog extends LnBlogObject {
 		if ($ent->data == '') return UPDATE_NO_DATA_ERROR;
 		if (! $this->canModifyEntry($ent) ) return UPDATE_AUTH_ERROR;
 		$ret = $ent->update();
-		if ($ret !== false) $ret = UPDATE_SUCCESS;
+		if ($ret !== false) {
+			$ret = UPDATE_SUCCESS;
+			$this->updateTagList($ent->tags());
+		}
 		else $ret = UPDATE_ENTRY_ERROR;
 		return $ret;
 	}
@@ -1016,6 +1193,7 @@ class Blog extends LnBlogObject {
 		if ($ret) {
 			$ent->setSticky();
 			$ret = UPDATE_SUCCESS;
+			$this->updateTagList($ent->tags());
 		} else $ret = UPDATE_ENTRY_ERROR;
 		return $ret;
 	}
@@ -1028,7 +1206,10 @@ class Blog extends LnBlogObject {
 		if (! $this->canModifyArticle($ent) ) return UPDATE_AUTH_ERROR;
 		$ret = $ent->update();
 		if (! $ret) $ret = UPDATE_ENTRY_ERROR;
-		else $ret = UPDATE_SUCCESS;
+		else {
+			$ret = UPDATE_SUCCESS;
+			$this->updateTagList($ent->tags());
+		}
 		return $ret;
 	}
 

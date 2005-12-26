@@ -1,24 +1,22 @@
 Directory: plugins
 
-The plugins directory stores all the plugins that are enabled in an LnBlog installation.  It may
+The plugins directory stores all the plugins that are present in an LnBlog installation.  It may
 contain one or more subdirectories with names like "disabled" to store plugins which are not to
 be loaded.
 
 Section: How plugins work
 
-The plugin loading mechanism is quite simple.  Here's how it works.
-1) When a page is loaded, LnBlog loads all files in this directory that end
-   with a ".php" extension via an include() statement.  Files that do not end 
-   with this are ignored by the plugin loader.
-2) Individual files are loaded in alphabetical order by file name.  Note that this means ASCII
-   order, so 
-3) For plugins that write user-visible data, e.g. sidebar panels, the order 
-   in which they are loaded IS IMPORTANT.  For example, the sidebar panels
-   are displayed in the order in which they are loaded.
-4) Subdirectories of this directory are ignored by the plugin loader.  This 
-   means that you can temporarily disable a plugin without deleting it by 
-   moving it to a subdirectory.
+The plugin loading mechanism is quite simple.  LnBlog maintains a list of plugins which are 
+disabled (i.e. not loaded) and a list of plugins that should be loaded first.  These lists can 
+be set for the entire installation and can also be overridden for individual blogs.  When a page is 
+loaded, LnBlog lists all the plugins that are present in alphabetical order by file name.  It then 
+removes the plugins in the disabled list and moves the ones in the "load first" list to the front.  
+It then loads the plugins in this list in order.
 
+For plugins that write user-visible data, e.g. sidebar panels, the order in which they are loaded 
+IS IMPORTANT.  For example, the sidebar panels are displayed in the order in which they are loaded.
+Subdirectories of this directory are ignored by the plugin loader.  This means that you can 
+temporarily disable a plugin without deleting it by moving it to a subdirectory.
 
 Section: Adding new plugins
 
@@ -26,16 +24,21 @@ Adding a new plugins is as simple as copying the plugin PHP file into the plugin
 If a plugin requires any additional installation steps, it should be noted in the plugin 
 documentation.  
 
-Since plugins are loaded in "alphabetical" order by filename, you can adjust 
-the order in which theyare loaded by changing the filenames.  For example,
-to have the sdiebar calendar loaded before the other sidebar plugins, you would change its name
-to something like sidebar_0_calendar.php.
+It is also possible to install plugins on a per-blog basis.  To do this, create a directory
+named "plugins" in the blog root directory and copy the plugin file there.
 
 Section: Removing plugins
 
-To disable a plugin, just delete it or move it out of the plugins directory.  If you think you 
-might want to re-enable the plugin later, just move it to the "disabled" subdirectory.  Plugins
-are not loaded from subdirectories of the plugins folder.
+To disable a plugin, use the plugin loading configuration page to add the name of the plugin file 
+to the disabled list.  To uninstall a plugin, just delete the file or move it out of the plugins 
+directory.  
+
+Section: Load order
+
+As previously mentioned, LnBlog has a list of which plugins are loaded first.  You can change this 
+from the plugin loading configuration page.  To make a plugin load before others, add it to this list
+in the desired location.  All enabled plugins that are not on the list will be 
+loaded in alphabetical order by file name after the plugins in the list are loaded.
 
 Section: Writing plugins
 

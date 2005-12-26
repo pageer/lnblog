@@ -40,6 +40,7 @@ $blg->exportVars($tpl);
 
 $tpl->set("FORM_ACTION", current_file() );
 $tpl->set("SUBJECT", $ent->subject);
+$tpl->set("TAGS", $ent->tags);
 $tpl->set("DATA", $ent->data);
 $tpl->set("COMMENTS", $ent->allow_comment);
 $tpl->set("HAS_HTML", $ent->has_html);

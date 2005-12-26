@@ -17,3 +17,17 @@ p.calendar {
 	margin-bottom: 0.5em;
 	text-align: center;
 }
+
+a.llink {
+	font-size: 80%;
+	margin-right: 3%;
+}
+
+a.rlink {
+	font-size: 80%;
+	margin-left: 3%;
+}
+
+.today {
+background-color: #cdcdcd;
+}

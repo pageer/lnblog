@@ -32,12 +32,19 @@ require_once("lib/utils.php");
 
 $uid = GET("user_id");
 $uid = $uid ? $uid : POST("user_id");
+$uid = preg_replace("/\W/", "", $uid);
 
 $usr = NewUser($uid);
-$page = NewPage(&$user);
+$page = NewPage(&$usr);
 $tpl = NewTemplate(USER_INFO);
 $usr->exportVars($tpl);
 
+$ret = $tpl->process();
+$user_file = USER_DATA_PATH.$uid."profile.htm";
+if (file_exists($user_file)) {
+	$ret .= implode("\n", file($user_file));
+}
+
 $page->title = _("User Information");
-$page->display($tpl->process());
+$page->display($ret);
 ?>

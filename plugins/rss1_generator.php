@@ -100,13 +100,18 @@ class RSS1FeedGenerator extends Plugin {
 	function RSS1FeedGenerator() {
 		$this->plugin_desc = _("Create RSS 1.0 feeds for comments and blog entries.");
 		$this->plugin_version = "0.1.0";
+		$this->addOption("feed_file", _("The file name for the blog RSS feed"),
+		                 "news.rdf", "text");
+		$this->addOption("comment_file", _("The file name for comment RSS feeds"),
+		                 "comments.rdf", "text");
 	}
 
 	function updateCommentRSS1(&$cmt) {
 		$parent = $cmt->getParent();
 		$feed = new RSS1();
 		$comment_path = $parent->localpath().PATH_DELIM.ENTRY_COMMENT_DIR;
-		$path = $comment_path.PATH_DELIM.COMMENT_RSS1_PATH;
+		
+		$path = $comment_path.PATH_DELIM.$this->comment_file;
 		$feed_url = localpath_to_uri($path);
 
 		$feed->url = localpath_to_uri($path);
@@ -127,7 +132,7 @@ class RSS1FeedGenerator extends Plugin {
 
 		$feed = new RSS1();
 		$blog = $entry->getParent();
-		$path = $blog->home_path.PATH_DELIM.BLOG_FEED_PATH.PATH_DELIM.BLOG_RSS1_NAME;
+		$path = $blog->home_path.PATH_DELIM.BLOG_FEED_PATH.PATH_DELIM.$this->feed_file;
 		$feed_url = localpath_to_uri($path);
 
 		$feed->url = $feed_url;

@@ -16,12 +16,15 @@
 <?php } else { ?>
 		<li><?php pf_("By %s", $USER_DISPLAY_NAME); ?></li>
 <?php } ?>
+<?php if (! empty($TAGS)) { ?>
+	<li><?php p_("Tags");?>: <?php echo implode(", ", $TAGS); ?></li>
+<?php } ?>
 <?php	if ($SHOW_CONTROLS) { ?>
 		<li class="blogadmin">
-			<a href="<?php echo $PERMALINK; ?>uploadfile.php"><?php p_("Upload File"); ?></a>
+			<a href="<?php echo $UPLOAD_LINK; ?>"><?php p_("Upload File"); ?></a>
 		</li>
 		<li class="blogadmin">
-			<a href="<?php echo $PERMALINK; ?>edit.php"><?php p_("Edit"); ?></a>
+			<a href="<?php echo $EDIT_LINK; ?>"><?php p_("Edit"); ?></a>
 		</li>
 <?php } ?>
 	</ul>

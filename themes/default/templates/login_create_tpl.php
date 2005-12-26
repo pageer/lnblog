@@ -30,7 +30,7 @@
 <input type="text" id="<?php echo $HOMEPAGE; ?>" name="<?php echo $HOMEPAGE; ?>" <?php if (isset($HOMEPAGE_VALUE)) echo 'value="'.$HOMEPAGE_VALUE.'" '; ?>/>
 </div>
 <div>
-<span class="basic_form_submit"><input type="submit" value="<?php p_('Create');?>" /></span>
+<span class="basic_form_submit"><input type="submit" value="<?php p_('Submit');?>" /></span>
 <span class="basic_form_clear"><input type="reset" value="<?php p_('Clear');?>" /></span></div>
 </form>
 <script type="text/javascript">

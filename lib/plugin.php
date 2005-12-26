@@ -81,6 +81,26 @@ class Plugin extends LnBlogObject{
 		if ($this->member_list) $this->getConfig();
 	}
 
+	/* Method: addOption
+	A short-hand way to add configuration options.  Adds the necessary 
+	values to member_list all in one shot.
+
+	Parameters:
+	name        - The name of the option.
+	description - A short description for the user to see.
+	default     - The default value.
+	control     - Optional control to use.  The default is "text".
+	*/
+
+	function addOption($name, $description, $default, $control="text", $options=false) {
+		if (! isset($this->member_list)) $this->member_list = array();
+		$this->$name = $default;
+		$this->member_list[$name] = 
+			array("description"=>$description, 
+			      "default"=>$default, "control"=>$control);
+		if ($options) $this->member_list[$name]["options"] = $options;
+	}
+
 	/*
 	Method: showConfig
 	Displays the plugin configuration in an HTML form.  You *must* make sure
@@ -104,13 +124,14 @@ class Plugin extends LnBlogObject{
 		echo "name=\"plugin_config\">\n";
 		
 		foreach ($this->member_list as $mem=>$config) {
-			if (isset($config["control"]) && $config["control"] == "checkbox") { 
+			if (! isset($config["control"])) $config["control"] = "text";
+			if ($config["control"] == "checkbox") { 
 				echo '<div>';
 				echo '<label for="'.$mem.'">'.$config["description"].'</label>';
 				echo '<input name="'.$mem.'" id="'.$mem.'" type="checkbox"';
 				if ($this->$mem) echo 'checked="checked" ';
 				echo " /></div>\n";
-			} elseif (isset($config["control"]) && $config["control"] == "radio") {
+			} elseif ($config["control"] == "radio") {
 				foreach ($config["options"] as $val=>$desc) {
 					echo '<div>';
 					echo '<label for="'.$val.'">'.$desc.'</label>';
@@ -119,7 +140,7 @@ class Plugin extends LnBlogObject{
 					echo ' />';
 					echo "</div>\n";
 				}
-			} elseif (isset($config["control"]) && $config["control"] == "select") {
+			} elseif ($config["control"] == "select") {
 				echo '<div>';
 				echo '<label for="'.$mem.'">'.$config["description"]."</label>\n";
 				echo '<select name="'.$mem.'" id="'.$mem."\">\n";
@@ -168,8 +189,15 @@ class Plugin extends LnBlogObject{
 				$this->$mem = POST($mem);
 			}
 			# Only record the setting if the value is not the default.
+			# We set the value if there is no default or if the value is
+			# currently the default AND a configuration value has not 
+			# been set.  
+			# In other words, if it's at the default and has never been set,
+			# then don't do anything.
 			if ( (! isset($config["default"]) && $this->$mem == "") || 
-			      $this->$mem != $config["default"]) {
+			     ( $this->$mem != $config["default"] && 
+			       ! $parser->valueIsSet(get_class($this), $mem) ) || 
+			       $parser->valueIsSet(get_class($this), $mem) ) {
 				$parser->setValue(get_class($this), $mem, $this->$mem);
 			}
 		}
@@ -182,11 +210,8 @@ class Plugin extends LnBlogObject{
 	# in class variables.  
 	
 	function getConfig() {
-		$global_parser = NewIniParser(USER_DATA_PATH.PATH_DELIM."plugins.ini");
-		if (defined("BLOG_ROOT")) {
-			$parser = NewIniParser(BLOG_ROOT.PATH_DELIM."plugins.ini");
-			$parser->merge($global_parser);
-		} else $parser =& $global_parser;
+		global $PLUGIN_MANAGER;
+		$parser =& $PLUGIN_MANAGER->plugin_config;
 		foreach ($this->member_list as $mem=>$config) {
 			$this->$mem = (isset($config["default"]) ? $config["default"] : "");
 			$val = $parser->value(get_class($this), $mem, $this->$mem);

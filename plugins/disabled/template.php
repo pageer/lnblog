@@ -45,29 +45,29 @@ class MyPlugin extends Plugin {
 		# Here we will set up the plugin configuration system.
 		# The configuration methods are inherited from the Plugin base class
 		# and provide you with a method to get user input and persist it.
-		# To use the configuration system, you need to define some member 
-		# variables and an array.
-
-		# We will use one member variable, for a user's name.  You should 
-		# *always* provide a default value for member variables.
-		# Note that we enclose the string literal in _() in order to allow for
-		# it to be translated and localized.
-		$this->myname = _("Bob Smith");
-
-		# The member_list array is an array of arrays which *must* contain
-		# an entry for every member variable that can be set by the user.  The
-		# variable name is the key and the value is a variable length array of
-		# settings for the variable.  The only required setting is the 
-		# "description", which will be displayed on the configuration screen.
-		# You should also set "default", which is the default value for the
-		# variable, and the control, which determines what kind of control
-		# will be used to get the value.  You can choose from "text", 
-		# "checkbox", "radio", and "select".
-		$this->member_list = array();
-		$this->member_list["myname"] = 
-			array("description"=>_("The name to display"),
-			      "default"=>_("Bob Smith"),
-			      "control"=>"text");
+		# To use the configuration system, you just need to call the 
+		# addOption method with the appropriate values.
+		
+		# The first argument for addOption is the variable name.  This will 
+		# be the name stored in the plugins.ini file.  It will also be used
+		# as the name of a member variable, so you will be able to access 
+		# this setting through the variable $this->myname.
+		# The second argument is a description of the setting.  This will be 
+		# displayed to the user on the plugin configuration page.  Note that
+		# the text is internationalized using the _() function.
+		# The third argument is a default value.  This is simply the value
+		# assigned to the variable if the user has not set it.
+		# The forth is the optional control type.  This maps directly to HTML
+		# input controls and can be "text" (the default), "checkbox", "option",
+		# or "select".
+		# Last is an optional parameter for the possible values for option and
+		# select controls.  It is an array of the form value=>description.
+		# This is not given in the example, as it only applies to option 
+		# and select controls.
+		$this->addOption("myname", 
+			_("The name to display"),
+			_("Bob Smith"), 
+			"text");
 
 		# Lastly, we load the stored configuration for this plugin.
 		# Note that there is a global configuration for the LnBlog installation

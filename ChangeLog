@@ -1,8 +1,26 @@
-06-Dec-2005:
-- Changed default back to login link, not form.
-- Fixed error for plugins that didn't define control.
+23-Dec-2005: version 0.5.2
+- Fixed bugs in smooth theme.
+- Moved news feed names from constants to plugin variables.
+- Fixed incorrect saving of plugin config value when it is explicitly
+set TO the current default.
+- Added configuration options to most plugins, including options to set
+the caption on the sidebar panel and suppress it if empty.
+- Fixed problem with comment deletion.
+- Fixed warning for adding entries with no tag.
 
-05-Dec-2005:
+20-Dec-2005:
+- Added plugin loading configuration page.
+- Made the smooth theme look presentable.
+
+14-Dec-2005:
+- Added search page and blog methods for dealing with tags.
+- Added plugin for navigating tags.
+- Fixed bug with unset control for plugin not defaulting correctly.
+
+12-Dec-2005:
+- Added support for tags.
+
+05-Dec-2005: version 0.5.1
 - Fixed ~user URLs for admin pages.
 - Added NaturalDocs documentation to utils.php.
 - Fixed bug in comment notifier.
@@ -25,7 +43,7 @@ selected.
 25-Nov-2005:
 - Fixed error in LBCode Javascript editor.
 
-22-Nov-2005: 0.5.0
+22-Nov-2005: version 0.5.0
 - Fixed bad e-mail link in blogentry template.
 - Fixed i18n loading before PACKAGE_NAME defined, which caused errors 
 when gettext is enabled.

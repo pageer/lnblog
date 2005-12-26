@@ -144,11 +144,13 @@ class RSS2FeedGenerator extends Plugin {
 		$this->plugin_desc = _("Create RSS 2.0 feeds for comments and blog entries.");
 		$this->plugin_version = "0.2.0";
 		$this->guid_is_permalink = true;
-		$this->member_list = array();
-		$this->member_list["guid_is_permalink"] = 
-			array("description"=>_("Use entry permalink as globally unique identifier"),
-			      "default"=>true,
-			      "control"=>"checkbox");
+		$this->addOption("guid_is_permalink", 
+			_("Use entry permalink as globally unique identifier"),
+			true, "checkbox");
+		$this->addOption("feed_file", _("File name for blog RSS 2 feed"),
+			"news.xml", "text");
+		$this->addOption("comment_file", _("File name for comment RSS 2 feeds"),
+			"comments.xml", "text");
 		$this->getConfig();
 		if (! defined("RSS2GENERATOR_GUID_IS_PERMALINK"))
 			define("RSS2GENERATOR_GUID_IS_PERMALINK", $this->guid_is_permalink);
@@ -158,7 +160,7 @@ class RSS2FeedGenerator extends Plugin {
 		$parent = $cmt->getParent();
 		$feed = new RSS2();
 		$comment_path = $parent->localpath().PATH_DELIM.ENTRY_COMMENT_DIR;
-		$path = $comment_path.PATH_DELIM.COMMENT_RSS2_PATH;
+		$path = $comment_path.PATH_DELIM.$this->comment_file;
 		$feed_url = localpath_to_uri($path);
 
 		$feed->url = $feed_url;
@@ -181,7 +183,7 @@ class RSS2FeedGenerator extends Plugin {
 		$usr = NewUser();
 		$feed = new RSS2();
 		$blog = $entry->getParent();
-		$path = $blog->home_path.PATH_DELIM.BLOG_FEED_PATH.PATH_DELIM.BLOG_RSS2_NAME;
+		$path = $blog->home_path.PATH_DELIM.BLOG_FEED_PATH.PATH_DELIM.$this->feed_file;
 		$feed_url = localpath_to_uri($path);
 
 		$feed->url = $feed_url;
@@ -201,7 +203,7 @@ class RSS2FeedGenerator extends Plugin {
 				$ent->commentlink(),
 				$ent->permalink(), 
 				$author_data, "", "", 
-				$cmt_count ? $ent->commentlink().COMMENT_RSS2_PATH : "", 
+				$cmt_count ? $ent->commentlink().$this->comment_file : "", 
 				$cmt_count );
 		}
 		

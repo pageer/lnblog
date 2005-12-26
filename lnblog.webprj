@@ -49,12 +49,6 @@
     <item url="pages/tb_ping_new.php" uploadstatus="1" />
     <item url="pages/tb_ping.php" uploadstatus="1" />
     <item url="plugins/" uploadstatus="1" />
-    <item url="plugins/banner_1_pageheader.php" uploadstatus="1" />
-    <item url="plugins/menubar_1_sitemap.php" uploadstatus="1" />
-    <item url="plugins/sidebar_1_recent.php" uploadstatus="1" />
-    <item url="plugins/sidebar_2_articles.php" uploadstatus="1" />
-    <item url="plugins/sidebar_4_news.php" uploadstatus="1" />
-    <item url="plugins/sidebar_5_googlesearch.php" uploadstatus="1" />
     <item url="themes/" uploadstatus="1" />
     <item url="themes/default/" uploadstatus="1" />
     <item url="themes/default/images/" uploadstatus="1" />
@@ -143,7 +137,6 @@
     <item url="themes/tuxice/images/" uploadstatus="1" />
     <item url="themes/tuxice/images/background.png" uploadstatus="1" />
     <item url="themes/tuxice/images/freecuddling.png" uploadstatus="1" />
-    <item url="themes/tuxice/images/logo.png" uploadstatus="1" />
     <item url="themes/tuxice/images/Penguin.png" uploadstatus="1" />
     <item url="themes/tuxice/images/rss1_button.png" uploadstatus="1" />
     <item url="themes/tuxice/images/rss1_comments_button.png" uploadstatus="1" />
@@ -240,7 +233,6 @@
     <item url="themes/terminal/templates/blogentry_tpl.php" uploadstatus="1" />
     <item url="LICENSE" uploadstatus="1" />
     <item url="TODO" uploadstatus="1" />
-    <item url="plugins/sidebar_7_poweredby.php" uploadstatus="1" />
     <item url="lib/i18n.php" uploadstatus="1" />
     <item url="locale/" uploadstatus="1" />
     <item url="pages/config.php" uploadstatus="1" />
@@ -275,20 +267,36 @@
     <item url="docs/userconfig.txt" uploadstatus="1" />
     <item url="plugins/disabled/sidebar_3_archives.php" uploadstatus="1" />
     <item url="plugins/disabled/sidebar_calendar.php" uploadstatus="1" />
-    <item url="plugins/sidebar_3_calendar.php" uploadstatus="1" />
     <item url="themes/default/styles/calendar.css" uploadstatus="1" />
     <item url="userdata/sitemap.htm" uploadstatus="1" />
     <item url="userdata/userconfig.php" uploadstatus="1" />
     <item url="lib/draft.php" uploadstatus="1" />
     <treestatus>
       <openfolder url="lib" />
+      <openfolder url="pages" />
+      <openfolder url="themes" />
+      <openfolder url="themes/default" />
+      <openfolder url="themes/default/templates" />
     </treestatus>
     <item url="docs/todo.txt" />
+    <item url="locale/files.lst" />
+    <item url="locale/messages.po" />
+    <item url="pages/tagsearch.php" />
     <item url="plugins/disabled/sidebar_6_loginops.php" />
-    <item url="plugins/sidebar_1_loginops.php" />
-    <item url="plugins/sidebar_6_loginlink.php" />
+    <item url="plugins/banner_pageheader.php" />
+    <item url="plugins/menubar_sitemap.php" />
+    <item url="plugins/sidebar_articles.php" />
+    <item url="plugins/sidebar_calendar.php" />
+    <item url="plugins/sidebar_googlesearch.php" />
+    <item url="plugins/sidebar_loginlink.php" />
+    <item url="plugins/sidebar_loginops.php" />
+    <item url="plugins/sidebar_news.php" />
+    <item url="plugins/sidebar_poweredby.php" />
+    <item url="plugins/sidebar_recent.php" />
+    <item url="plugins/sidebar_tags.php" />
     <item url="themes/default/images/logo-old.png" />
     <item url="themes/default/scripts/fssetup.js" />
-    <annotations/>
+    <item url="themes/default/templates/plugin_load_config_tpl.php" />
+    <item url="plugin_loading.php" />
   </project>
 </webproject>

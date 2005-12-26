@@ -3,7 +3,7 @@
 .blogentry {
 	/*border: thin solid black;*/
 	border-bottom: 1px dotted black;
-	margin-bottom: 2%;
+	margin-bottom: 0;
 	width: 98%;
 	padding: 1%;
 }
@@ -38,6 +38,7 @@ ul.comments {
 	background-color: #6b85b0;
 	padding: 4px 3px 4px 3px;
 	font-size: 80%;
+	font-family: courier, monospace;
 	width: 98%;
 }
 

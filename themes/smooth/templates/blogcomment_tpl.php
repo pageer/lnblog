@@ -1,4 +1,3 @@
-<li class="fullcomment">
 <?php if (isset($SUBJECT)) { ?>
 	<h3 class="commentheader"><a id="<?php echo $ANCHOR; ?>" href="#<?php echo $ANCHOR; ?>"><?php echo $SUBJECT; ?></a></h3>
 <?php } else { ?>
@@ -40,4 +39,3 @@
 		<?php } ?>
 	</ul>
 </div>
-</li>

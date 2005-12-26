@@ -546,12 +546,15 @@ function create_directory_wrappers($path, $type, $instpath="") {
 	switch ($type) {
 		case BLOG_BASE:
 			if (!is_dir($instpath)) return false;
-			$filelist = array("index"=>"pages/showblog", "new"=>"pages/newentry", 
+			$filelist = array("index"=>"pages/showblog", "new"=>"pages/newentry",
 			                  "newart"=>"pages/newarticle", "edit"=>"updateblog",
 			                  "login"=>"bloglogin", "logout"=>"bloglogout",
 			                  "uploadfile"=>"pages/fileupload", "map"=>"sitemap",
 			                  "useredit"=>"pages/editlogin", 
-			                  "plugins"=>"plugin_setup");
+			                  "plugins"=>"plugin_setup", 
+			                  "tags"=>"pages/tagsearch",
+			                  "pluginload"=>"plugin_loading",
+			                  "profile"=>"userinfo");
 			$ret &= $fs->write_file($current."config.php", $config_data);
 			break;
 		case BLOG_ENTRIES:
@@ -702,6 +705,18 @@ function stripslashes_smart($str) {
 	$matches = array("/\\'/", '/\\"/', '/\\\+/');
 	$replacements = array("'", '"', "\\");
 	return preg_replace($matches, $replacements, $str);
+}
+
+# Function: in_arrayi
+# Like in_array() standard function, except case-insensitive
+# for strings.
+
+function in_arrayi($needle, $haystack) {
+	if (! is_array($haystack)) return false;
+	$lcase_needle = strtolower($needle);
+	foreach ($haystack as $val) 
+		if (strtolower($val) == $lcase_needle) return true;
+	return false;
 }
 
 ?>

@@ -147,7 +147,7 @@ class INIParser {
 	function valueIsSet($sec, $var=false) {
 		if ($var && isset($this->data[$sec]) ) {
 			$this->current_section = $sec;
-			return isset($this->data[$sec][$val]);
+			return isset($this->data[$sec][$var]);
 		} elseif (!$var && isset($this->data[$this->current_section]) ) { 
 			return isset($this->data[$this->current_section][$sec]);
 		} else {

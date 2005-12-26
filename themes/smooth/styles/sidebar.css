@@ -1,16 +1,16 @@
 /* Sidebar styles. */
 
 #sidebar {
-	/*background-color: #f4f4f4;*/
 	float: right;
 	width: 247px;
 	height: 100%;
 	margin: 0;
 	padding: 0;
-	border-left: 0; /*1px solid black;*/
+	border-left: 0;
 	position: relative;
-	/*left: 400px;*/
-	top: 0px;
+	background-image: url(../images/bg.png);
+	background-repeat: repeat-y;
+	background-position: top right;
 }
 
 div#maincontainer>div#sidebar {
@@ -30,6 +30,7 @@ div#maincontainer>div#sidebar {
 	padding-left: 5%;
 	color: white;
 	background-color: #6b85b0;
+	border-right: 1px solid #6b85b0;
 }
 
 #sidebar h3 a {
@@ -45,6 +46,13 @@ div#maincontainer>div#sidebar {
 #sidebar ul {
 	margin: 0px;
 	padding-left: 0px;
+	margin-top: 1em;
+	margin-bottom: 1em;
+}
+
+#sidebar .panel {
+	margin: 0px;
+	padding-left: 5px;
 	margin-top: 1em;
 	margin-bottom: 1em;
 }

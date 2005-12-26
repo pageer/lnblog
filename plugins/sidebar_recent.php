@@ -3,7 +3,17 @@ class Recent extends Plugin {
 
 	function Recent() {
 		$this->plugin_desc = _("Show some of the more recent posts in the sidebar.");
-		$this->plugin_version = "0.1.0";
+		$this->plugin_version = "0.2.0";
+		$this->addOption("old_header", 
+			_("Header for main blog page (entries not on main page)"), 
+			_("Older Entries"));
+		$this->addOption("recent_header", 
+			_("Header for other pages (newest entries)"), 
+			_("Recent Entries"));
+		$this->addOption("show_main",
+			_("Show link to main blog page"),
+			true, "checkbox");
+		$this->getConfig();
 	}
 
 	function output($parm=false) {
@@ -26,11 +36,11 @@ class Recent extends Plugin {
 		if ( count($next_list) > 0 ) { 
 			if ($is_index) {
 ?>
-<h3><a href="<?echo $blg->getURL(); ?>"><?php p_("Older Entries"); ?></a></h3>
+<h3><a href="<?echo $blg->getURL(); ?>"><?php echo $this->old_header ?></a></h3>
 <?php 
 			} else { # !$is_index 
 ?>
-<h3><a href="<?echo $blg->getURL(); ?>"><?php p_("Recent Entries"); ?></a></h3>
+<h3><a href="<?echo $blg->getURL(); ?>"><?php echo $this->recent_header; ?></a></h3>
 <?php 
 			} # End inner if
 ?>
@@ -41,8 +51,9 @@ class Recent extends Plugin {
 <li><a href="<?php echo $ent->permalink(); ?>"><?php echo $ent->subject; ?></a></li>
 <?php 
 			}	 # End foreach
-?>
-<li><a href="<?php echo $blg->getURL();?>"><?php p_("Show home page");?></a></li>
+			if ($this->show_main) { # Link to main page ?>
+<li style="margin-top: 0.5em"><a href="<?php echo $blg->getURL();?>"><?php p_("Show home page");?></a></li><?php 
+			} ?>
 </ul>
 <?php 
 		}  # End outer if

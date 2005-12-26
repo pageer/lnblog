@@ -25,6 +25,12 @@ that the things in the HEAD part of the page are set up correctly.
 
 Inherits:
 <LnBlogObject>
+
+Events:
+OnInit         - Fired when a page object is first created.
+InitComplete   - Fired after object initialization is complete.
+OnOutput       - Fired when processing for HTML output starts.
+OutputComplete - Fired after the HTML output has been performed.
 */
 
 class Page extends LnBlogObject {
@@ -164,6 +170,7 @@ class Page extends LnBlogObject {
 	
 	function redirect($url) {
 		header("Location: ".$url);
+		exit;
 	}
 	
 	/*
@@ -205,9 +212,9 @@ class Page extends LnBlogObject {
 		if (get_class($blog)) $blog->exportVars(&$head);
 		$head->set("PAGE_CONTENT", $page_body);
 
-		$this->raiseEvent("OutputComplete");
-
 		echo $head->process();
+		
+		$this->raiseEvent("OutputComplete");
 		
 	}
 	

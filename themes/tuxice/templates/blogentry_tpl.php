@@ -11,6 +11,14 @@
 <?php if (isset($USER_HOMEPAGE)) { ?>
 	<li class="bloguserurl">(<a href="<?php echo $USER_HOMEPAGE; ?>"><?php echo $USER_HOMEPAGE; ?></a>)</li>
 <?php } ?>
+<?php if (! empty($TAGS)) { ?>
+	<li><?php p_("Topics");?>: <?php 
+		$out = "";
+		foreach ($TAGS as $key=>$tag) 
+			$out .= ($out=="" ? "" : ", ").'<a href="'.$TAG_LINK.'?tag='.$tag.'">'.$tag.'</a>'; 
+		echo $out;
+?></li>
+<?php } ?>
 </ul>
 </div>
 <div class="blogentrybody">

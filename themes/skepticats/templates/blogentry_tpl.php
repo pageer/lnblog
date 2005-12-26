@@ -2,6 +2,14 @@
 <div class="blogentryheader">
 <h2><a href="<?php echo $PERMALINK; ?>"><?php echo $SUBJECT; ?></a></h2>
 <ul>
+<?php if (! empty($TAGS)) { ?>
+	<li><?php p_("Topics");?>: <?php 
+		$out = "";
+		foreach ($TAGS as $key=>$tag) 
+			$out .= ($out=="" ? "" : ", ").'<a href="'.$TAG_LINK.'?tag='.$tag.'">'.$tag.'</a>'; 
+		echo $out;
+?></li>
+<?php } ?>
 	<li class="blogdate"><?php pf_('Posted %s', $POSTDATE); ?></li>
 <?php if ( isset($USER_EMAIL) ) { ?>
 	<li class="bloguser"><?php pf_('By <a href="mailto:%s">%s</a>', $USER_EMAIL, $USER_DISPLAY_NAME); ?></li>

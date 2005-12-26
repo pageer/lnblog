@@ -11,6 +11,10 @@
 <label class="basic_form_label" for="subject"><?php p_("Subject"); ?></label>
 <input id="subject" name="subject" accesskey="s" type="text" <?php if (isset($SUBJECT)) { ?>value="<?php echo $SUBJECT; ?>" <?php } ?>/>
 </div>
+<div>
+<label class="basic_form_label" for="tags"><?php p_("Tags"); ?></label>
+<input id="tags" name="tags" accesskey="t" type="text" <?php if (isset($TAGS)) { ?>value="<?php echo $TAGS; ?>" <?php } ?>/>
+</div>
 <?php if (isset($GET_SHORT_PATH)) { ?>
 <div>
 <label class="basic_form_label" for="short_path"><?php p_("Article path"); ?></label>

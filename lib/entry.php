@@ -58,6 +58,9 @@ class Entry extends LnBlogObject{
 	# Property: abstract
 	# An abstract of the text of this object (not used).
 	var $abstract;
+	# Property: tags
+	# A comma-delimited list of tags applied to this entry.
+	var $tags = "";
 	# Property: data
 	# The main text data of this object.  May be one of several different 
 	# kinds of markup.
@@ -81,6 +84,24 @@ class Entry extends LnBlogObject{
 	function data($value=false) {
 		if ($value) $this->data = $value;
 		else return $this->data;
+	}
+
+	/*
+	Method: tags
+	Set or return an array of tags for this entry.  Each tag is an arbitrary 
+	string entered by the user with no inherent meaning.
+	*/
+	function tags($list=false) {
+		if ($list) {
+			$this->tags = implode(TAG_SEPARATOR, $list);
+		} else {
+			if (! $this->tags) return false;
+			$ret = explode(TAG_SEPARATOR, $this->tags);
+			foreach ($ret as $key=>$val) {
+				$ret[$key] = trim($val);
+			}
+			return $ret;
+		}
 	}
 
 	/*
@@ -312,6 +333,7 @@ class Entry extends LnBlogObject{
 			case "IP":            $this->ip = $val; break;
 			case "Subject":       $this->subject = $val; break;
 			case "HasHTML":       $this->has_html = $val; break;
+			case "Tags":          $this->tags = $val; break;
 		}
 	}
 	
@@ -362,6 +384,7 @@ class Entry extends LnBlogObject{
 		$ret["IP"] = $this->ip;
 		$ret["Subject"] = $this->subject;
 		$ret["HasHTML"] = $this->has_html ? 1 : 0;
+		$ret["Tags"] = $this->tags;
 		return $ret;
 	}
 

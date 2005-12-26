@@ -35,10 +35,8 @@ $page = NewPage();
 
 if (! $blog->canModifyEntry() ) $page->redirect("index.php");
 
-$comm_id = _("id");
-
-$anchor = POST($comm_id);
-if (!$anchor) $anchor = GET($comm_id);
+$anchor = POST("comment");
+if (!$anchor) $anchor = GET("comment");
 if (!$anchor) $page->redirect("index.php");
 $comm = NewBlogComment($anchor);
 $page->display_object = &$comm;
@@ -60,7 +58,7 @@ $tpl->set("OK_ID", $conf_id);
 $tpl->set("OK_LABEL", _("Yes"));
 $tpl->set("CANCEL_ID", _("Cancel"));
 $tpl->set("CANCEL_LABEL", _("Cancel"));
-$tpl->set("PASS_DATA_ID", $comm_id);
+$tpl->set("PASS_DATA_ID", "comment");
 $tpl->set("PASS_DATA", $anchor);
 $body = $tpl->process();
 

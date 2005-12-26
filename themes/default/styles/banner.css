@@ -7,7 +7,7 @@
 	background-repeat: no-repeat;
 }
 
-#banner h1 {
+#banner h1, #banner h2, #banner h3 {
 	text-align: center;
 	vertical-align: middle;
 	color: white;

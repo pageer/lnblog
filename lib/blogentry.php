@@ -66,6 +66,7 @@ class BlogEntry extends Entry {
 		$this->mail_notify = true;
 		$this->sent_ping = true;
 		$this->subject = "";
+		$this->tags = "";
 		$this->data = "";
 		$this->abstract = "";
 		$this->has_html = MARKUP_BBCODE;
@@ -177,6 +178,7 @@ class BlogEntry extends Entry {
 		$ret["Abstract"] = $this->abstract;
 		$ret["AllowComment"] =  $this->allow_comment;
 		$ret["HasHTML"] = $this->has_html;
+		$ret["Tags"] = $this->tags;
 		return $ret;
 	}
 	
@@ -198,6 +200,7 @@ class BlogEntry extends Entry {
 			case "Abstract": $this->abstract = $val; break;
 			case "AllowComment": $this->allow_comment = $val; break;
 			case "HasHTML": $this->has_html = $val; break;
+			case "Tags": $this->tags = $val; break;
 		}
 	}
 
@@ -247,17 +250,24 @@ class BlogEntry extends Entry {
 	Method: permalink
 	Get the permalink to the object.
 	
+	Parameters:
+	html_escape - *Optional* boolean determining whether the URL should use HTML escape sequences
+	              for the ampersands that separate arguments.  *Default* is true.
+	
 	Returns:
 	A string containing the full URI to this entry.
 	*/
-	function permalink() {
+	function permalink($html_escape=true) {
 		if (! USE_WRAPPER_SCRIPTS && 
 		    ! file_exists(BLOG_ROOT.PATH_DELIM.".htaccess") ) {
-			$path = substr_replace($this->file, "", 0, strlen(INSTALL_ROOT));
-			if (PATH_DELIM != "/") {
-				$path = str_replace(PATH_DELIM, "/", $path);
-			}
-			
+			$path = localpath_to_uri(INSTALL_ROOT);
+			$path .= "pages/showentry.php?";
+			$path .= "blog=".basename(dirname(dirname(dirname(dirname($this->file)))));
+			$path .= $html_escape ? "&amp;" : "&";
+			$id = basename(dirname(dirname(dirname($this->file)))); #Year
+			$id .= "/".basename(dirname(dirname($this->file)));     #Month
+			$id .= "/".basename(dirname($this->file));              #Entry
+			$path .= "entry=".$id;
 			return $path;
 		} else {
 			return localpath_to_uri($this->localpath());
@@ -291,7 +301,6 @@ class BlogEntry extends Entry {
 		
 		$this->raiseEvent("OnUpdate");
 		
-		$fs = NewFS();
 		$dir_path = dirname($this->file);
 		$this->ip = get_ip();
 		$curr_ts = time();
@@ -301,8 +310,11 @@ class BlogEntry extends Entry {
 		$target = $dir_path.PATH_DELIM.
 			$this->getPath($curr_ts, true, true).ENTRY_PATH_SUFFIX;
 		$source = $dir_path.PATH_DELIM.ENTRY_DEFAULT_FILE;
-		$ret = $fs->rename($source, $target);
-		$fs->destruct();
+
+			$fs = NewFS();
+			$ret = $fs->rename($source, $target);
+			$fs->destruct();
+			
 		if ($ret) $ret = $this->writeFileData();
 		$this->raiseEvent("UpdateComplete");
 		return $ret;
@@ -349,6 +361,8 @@ class BlogEntry extends Entry {
 		else $basepath = $base_path;
 		$dir_path = $basepath.PATH_DELIM.$this->getPath($curr_ts);
 		# If the entry driectory already exists, something is wrong. 
+		if ( is_dir($dir_path) ) 
+			$dir_path = $basepath.PATH_DELIM.$this->getPath($curr_ts, false, true);
 		if ( is_dir($dir_path) ) return false;
 		
 		$this->raiseEvent("OnInsert");
@@ -390,6 +404,7 @@ class BlogEntry extends Entry {
 	subject    - The subject of the entry, in plain text.
 	short_path - The "short path" to access an article.
 	abstract   - An abstract of the entry, with markup.
+	tags       - A comma-delimited list of free-form tags.
 	body       - The entry body, with markup.
 	comments   - Boolean representing whether new comments can be posted.
 	input_mode - Tristate variable representing the type of markup used.
@@ -399,11 +414,13 @@ class BlogEntry extends Entry {
 	function getPostData() {
 		$this->subject = POST("subject");
 		$this->abstract = POST("abstract");
+		$this->tags = POST("tags");
 		$this->data = POST("body");
 		$this->allow_comment = POST("comments") ? 1 : 0;
 		$this->has_html = POST("input_mode");
 		if (get_magic_quotes_gpc()) {
 			$this->subject = stripslashes($this->subject);
+			$this->tags = stripslashes($this->tags);
 			$this->data = stripslashes($this->data);
 		}
 		$this->raiseEvent("POSTRetreived");
@@ -435,9 +452,16 @@ class BlogEntry extends Entry {
 		$tmp->set("POSTDATE", $this->prettyDate($this->post_ts) );
 		$tmp->set("EDITDATE", $this->prettyDate() );
 		$tmp->set("ABSTRACT", $this->abstract);
+		$tmp->set("TAGS", $this->tags());
 		$tmp->set("BODY", $this->markup() );
 		$tmp->set("ALLOW_COMMENTS", $this->allow_comment);
 		$tmp->set("PERMALINK", $this->permalink() );
+		$tmp->set("PING_LINK", $this->permalink()."trackback.php?send_ping=yes");
+		$tmp->set("TRACKBACK_LINK", $this->permalink()."trackback.php");
+		$tmp->set("UPLOAD_LINK", $this->permalink()."uploadfile.php");
+		$tmp->set("EDIT_LINK", $this->permalink()."edit.php");
+		$tmp->set("DELETE_LINK", $this->permalink()."delete.php");
+		$tmp->set("TAG_LINK", BLOG_ROOT_URL."tags.php");
 		$tmp->set("COMMENTCOUNT", $this->getCommentCount() );
 		$tmp->set("TRACKBACKCOUNT", $this->getTrackbackCount() );
 		$tmp->set("SHOW_CONTROLS", $show_edit_controls);

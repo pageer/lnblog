@@ -23,8 +23,8 @@ Section: Requirements
 The only hard and fast requirements for LnBlog are PHP 4.1 the ability to write files to the web
 server.  LnBlog *does* support running with *safe_mode* enabled by using FTP for file writing.
 You can also choose to use the standard file writing functions.  If you want to use LnBlog in a
-language other than English, then the PHP gettext and iconv extensions are recommended, but not
-required.
+language other than English, then the PHP gettext and iconv extensions are highly recommended, but 
+not strictly required.
 
 You can use any web server or operating system.  LnBlog is tested on Windows XP with IIS and 
 Linux with Apache.  No database is required.
@@ -40,8 +40,8 @@ The setup process for LnBlog is entirely web-based and mostly painless.
 4) - Pick the type of file writing you want.  If you have PHP *safe_mode* enabled on your web server, 
      then you *must* use FTP.  If you use "native" file writing, make sure that the LnBlug userdata 
      folder and the folder where you will be creating blogs are writable.  See the <fsconfig.php>
-     documentation for details.
-5) - Set the administrator password.
+     documentation for details.  If you are using a shared host, FTP is recommended.
+5) - Set the administrator password and account information.
 6) - Log in as the administrator.
 7) - Start creating new users and weblogs.
 
@@ -50,11 +50,14 @@ Section: Upgrading
 Upgrading LnBlog is normally pretty simple.
 
 1) - Move or rename your old LnBlog directory on the server.
-2) - Upload the new version in it's place.
+2) - Upload the new version in it's place (i.e. give the directory the same name).
 3) - Copy the entire userdata folder from your old version to the new version.
 
 In some cases, there may be additional steps, but this is not the norm.  For instance, some upgrades
-will require updating wrapper scripts.  Steps like this will be mentioned in the release announcement.
+will require updating wrapper scripts.  This is done by going to the system administratino page (the
+same one from step 3 of the <Installation> section) and running an "upgrade to current version" 
+on your blog directory.
+
 
 Section: License
 

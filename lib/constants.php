@@ -21,20 +21,17 @@
 # File: constants.php
 # Holds various constants used by back-end classes.
 
-# Named constants for template files.
+# Named constants for template files.  Do I really need constants for these?
 define("BLOG_TEMPLATE_DIR", "templates");
 define("LIST_TEMPLATE", "list_tpl.php");
 define("BASIC_LAYOUT_TEMPLATE", "basic_layout_tpl.php");
 define("PAGE_HEAD_TEMPLATE", "page_head_tpl.php");
-#define("ARCHIVE_TEMPLATE", "archive_tpl.php");
-#define("BLOG_TEMPLATE", "blog_tpl.php");
 define("ENTRY_TEMPLATE", "blogentry_tpl.php");
 define("ARTICLE_TEMPLATE", "article_tpl.php");
 define("COMMENT_TEMPLATE", "blogcomment_tpl.php");
 define("COMMENT_LIST_TEMPLATE", "comment_list_tpl.php");
 define("COMMENT_FORM_TEMPLATE", "comment_form_tpl.php");
 define("ENTRY_EDIT_TEMPLATE", "entry_edit_tpl.php");
-#define("ARTICLE_EDIT_TEMPLATE", "article_edit_tpl.php");
 define("LOGIN_TEMPLATE", "login_tpl.php");
 define("CREATE_LOGIN_TEMPLATE", "login_create_tpl.php");
 define("CONFIRM_TEMPLATE", "confirm_tpl.php");
@@ -49,6 +46,7 @@ define("SITEMAP_TEMPLATE", "sitemap_config_tpl.php");
 define("USER_INFO", "user_info_tpl.php");
 define("FTPROOT_TEST_TEMPLATE", "ftproot_test_tpl.php");
 define("DOCROOT_TEST_TEMPLATE", "docroot_test_tpl.php");
+define("PLUGIN_LOAD_TEMPLATE", "plugin_load_config_tpl.php");
 
 # Section: Markup Types
 # Define types of markup available for entries. 

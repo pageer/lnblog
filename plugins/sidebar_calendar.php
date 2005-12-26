@@ -3,7 +3,9 @@ class SidebarCalendar extends Plugin {
 	
 	function SidebarCalendar() {
 		$this->plugin_desc = _("Provides a link calendar for the sidebar.");
-		$this->plugin_version = "0.1.0";
+		$this->plugin_version = "0.1.1";
+		$this->addOption("caption", _("Title for calendar"), _("Calendar"));
+		$this->getConfig();
 	}
 
 	function add_style(&$param) {
@@ -69,9 +71,7 @@ class SidebarCalendar extends Plugin {
 			}
 		}
 
-		echo "<h3>"._("Calendar")."</h3>";
-		#echo "<p class=\"calendar\">";
-		#echo "</p>";
+		if ($this->caption) echo "<h3>".$this->caption."</h3>\n";
 	
 		$gets = '';
 		if (count($_GET) > 0) {
@@ -81,30 +81,30 @@ class SidebarCalendar extends Plugin {
 		}
 	
 		if ($month == "12") {
-			$next_link = '<a style="margin-left: 10%" '.
+			$next_link = '<a class="rlink" '.
 			             'href="?'.$gets.'year='.($year+1).'&amp;month=01">'.
 			             fmtdate( (USE_STRFTIME?"%b":"M"), 
 							          strtotime(($year+1)."-01-01") ).'&nbsp;&gt;&gt;</a>';
-			$prev_link = '<a style="margin-right: 10%" '.
+			$prev_link = '<a class="llink" '.
 			             'href="?'.$gets.'year='.$year.'&amp;month=11">&lt;&lt;&nbsp;'.
 			             fmtdate( (USE_STRFTIME?"%b":"M"), 
 							          strtotime($year."-11-01") ).'</a>';
 		} elseif ($month == "01") {
-			$next_link = '<a style="margin-left: 10%" '.
+			$next_link = '<a class="rlink" '.
 			             'href="?'.$gets.'year='.$year.'&amp;month=02">'.
 			             fmtdate( (USE_STRFTIME?"%b":"M"), 
 							          strtotime($year."-02-01") ).'&nbsp;&gt;&gt;</a>';
-			$prev_link = '<a style="margin-right: 10%" '.
+			$prev_link = '<a class="llink" '.
 			             'href="?'.$gets.'year='.($year - 1).'&amp;month=12">&lt;&lt;&nbsp;'.
 			             fmtdate( (USE_STRFTIME?"%b":"M"), 
 							          strtotime(($year - 1)."-12-01") ).'</a>';
 		} else {
-			$next_link = '<a style="margin-left: 10%" '.
+			$next_link = '<a class="rlink" '.
 			             'href="?'.$gets.'year='.$year.'&amp;month='.
 			             sprintf("%02d", $month + 1).'">'.
 			             fmtdate( (USE_STRFTIME?"%b":"M"), 
 							          strtotime($year."-".($month + 1)."-01") ).'&nbsp;&gt;&gt;</a>';
-			$prev_link = '<a style="margin-right: 10%" '.
+			$prev_link = '<a class="llink" '.
 			             'href="?'.$gets.'year='.$year.'&amp;month='.
 			             sprintf("%02s", $month - 1).'">&lt;&lt;&nbsp;'.
 			             fmtdate( (USE_STRFTIME?"%b":"M"), 
@@ -133,23 +133,25 @@ class SidebarCalendar extends Plugin {
 		echo "<tr>";
 		foreach ($week_names as $name) echo $name;
 		echo "</tr>";
-		
+	
 		foreach ($weeks as $week) {
 			echo "<tr>\n";
 			for ($i=0; $i<=6; $i++) {
+				$cls = ($week[$i] == date('j') ? ' class="today"' : '');
 				if (isset($links[$week[$i]])) {
-					echo '<td>'.$links[$week[$i]].'</td>';
+					echo '<td'.$cls.'>'.$links[$week[$i]].'</td>';
 				} else {
-					echo '<td>'.$week[$i].'</td>';
+					echo '<td'.$cls.'>'.$week[$i].'</td>';
 				}
 			}
 			echo "</tr>";
 		}
 		echo "</table>";
 		echo '<p class="calendar">'.
-		     '<a style="margin-right: 20%" '.
-			     'href="'.$blog->getURL().BLOG_ENTRY_PATH.'/">'._('Archives').'</a>'.
-		     '<a href="'.$blog->getURL().BLOG_ENTRY_PATH.'/all.php">'._('Show all').'</a>'.
+		     '<a style="margin-right: 5%" '.
+		     'href="'.$blog->getURL().BLOG_ENTRY_PATH.'/">'._('Archives').'</a>'.
+		     '<a style="margin-left: 5%" '.
+		     'href="'.$blog->getURL().BLOG_ENTRY_PATH.'/all.php">'._('Show all').'</a>'.
 		     '</p>';
 		echo "";
 	}

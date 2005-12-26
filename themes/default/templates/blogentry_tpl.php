@@ -5,6 +5,14 @@
 </div>
 <div class="blogentryfooter">
 <ul class="postdata">
+<?php if (! empty($TAGS)) { ?>
+	<li><?php p_("Topics");?>: <?php 
+		$out = "";
+		foreach ($TAGS as $key=>$tag) 
+			$out .= ($out=="" ? "" : ", ").'<a href="'.$TAG_LINK.'?tag='.$tag.'">'.$tag.'</a>'; 
+		echo $out;
+?></li>
+<?php } ?>
 	<li class="blogdate"><?php pf_("Posted %s", $POSTDATE); ?></li>
 <?php if ( isset($USER_EMAIL) ) { ?>
 	<li class="bloguser"><?php pf_("By %s", '<a href="mailto:'.$USER_EMAIL.'">'.$USER_DISPLAY_NAME.'</a>'); ?></li>
@@ -17,13 +25,13 @@
 </ul>
 <?php if ($SHOW_CONTROLS) { ?>
 <ul class="postadmin">
-	<li><a onclick="javascript:window.open('<?php echo $PERMALINK; ?>trackback.php?send_ping=yes'); return false;" href="<?php echo $PERMALINK; ?>trackback.php?send_ping=yes"><?php p_("Send TrackBack Ping"); ?></a></li>
-	<li><a href="<?php echo $PERMALINK; ?>uploadfile.php"><?php p_("Upload file"); ?></a></li>
-	<li><a href="<?php echo $PERMALINK; ?>edit.php"><?php p_("Edit"); ?></a></li>
-	<li><a href="<?php echo $PERMALINK; ?>delete.php"><?php p_("Delete"); ?></a></li>
+	<li><a onclick="javascript:window.open('<?php echo $PING_LINK; ?>'); return false;" href="<?php echo $PING_LINK; ?>"><?php p_("Send TrackBack Ping"); ?></a></li>
+	<li><a href="<?php echo $UPLOAD_LINK; ?>"><?php p_("Upload file"); ?></a></li>
+	<li><a href="<?php echo $EDIT_LINK; ?>"><?php p_("Edit"); ?></a></li>
+	<li><a href="<?php echo $DELETE_LINK; ?>"><?php p_("Delete"); ?></a></li>
 </ul>
 <?php } ?>
-<p><?php p_("TrackBack <abbr title=\"Uniform Resource Locator\">URL</abbr>"); ?>: <a href="<?php echo $PERMALINK; ?>trackback.php"><?php echo $PERMALINK; ?>trackback.php</a></p>
+<p><?php p_("TrackBack <abbr title=\"Uniform Resource Locator\">URL</abbr>"); ?>: <a href="<?php echo $TRACKBACK_LINK; ?>"><?php echo $TRACKBACK_LINK; ?></a></p>
 <?php if ( ! empty($COMMENTCOUNT) ) { ?>
 <h3><a href="<?php echo $PERMALINK.ENTRY_COMMENT_DIR; ?>/"><?php p_("View reader comments"); ?> (<?php echo $COMMENTCOUNT; ?>)</a></h3>
 <?php } elseif ( ! empty($ALLOW_COMMENTS) ) { ?>

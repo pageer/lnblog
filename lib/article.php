@@ -45,12 +45,29 @@ class Article extends BlogEntry {
 		$this->date = "";
 		$this->timestamp = "";
 		$this->subject = "";
+		$this->tags = "";
 		$this->data = "";
 		$this->has_html = MARKUP_BBCODE;
 		$this->allow_comment = true;
 		$this->template_file = ARTICLE_TEMPLATE;
 
-		if (! $path) {
+		if ($path) {
+			$this->file = $path.PATH_DELIM.$revision;
+		} elseif (GET("article")) {
+
+			# Get the blog path from the query string.
+			if (defined("BLOG_ROOT")) {
+				$blogpath = BLOG_ROOT;
+			} elseif ( defined("INSTALL_ROOT") && sanitize(GET("blog")) ) {
+				$blogpath = calculate_document_root().PATH_DELIM.sanitize(GET("blog"));
+			} else {
+				$blogpath = "";
+			}
+
+			$this->file = mkpath($blogpath,BLOG_ARTICLE_PATH,sanitize(GET("article")),$revision);
+
+		} else {
+
 			$this->file = getcwd().PATH_DELIM.$revision;
 			# We might be in a comment or trackback directory, 
 			if (! $this->isEntry() ) {
@@ -59,8 +76,7 @@ class Article extends BlogEntry {
 					$this->file = getcwd().PATH_DELIM.$revision;
 				}
 			}
-		} else {
-			$this->file = $path.PATH_DELIM.$revision;
+
 		}
 
 		if ( file_exists($this->file) ) {
@@ -231,6 +247,47 @@ class Article extends BlogEntry {
 		return $ret;
 		
 	}
+
+	function permalink($html_escape=true) {
+		if (! USE_WRAPPER_SCRIPTS && 
+		    ! file_exists(BLOG_ROOT.PATH_DELIM.".htaccess") ) {
+			$path = localpath_to_uri(INSTALL_ROOT);
+			$path .= "pages/showarticle.php?";
+			$path .= "blog=".basename(dirname(dirname($this->file)));
+			$path .= $html_escape ? "&amp;" : "&";
+			$path .= "article=".basename(dirname($this->file));
+			return $path;
+		} else {
+			return localpath_to_uri($this->localpath());
+		}
+	}
+
+	/*
+	Method: link
+	Gets the correct URL for a particular type of link.
+
+	Parameters:
+	type - The type of link needed.  The allowed types are "upload", "edit", "insert",
+	
+	Returns:
+	A string with the full URL for the given operation or false on failure.
+	*/
+	
+	function link($op) {
+		if (USE_WRAPPER_SCRIPTS) {
+			$perm = $this->permalink();
+			switch ($op) {
+				case "download": return $perm;
+				case "upload":	  return $perm."uploadfile.php";
+				case "edit":     return $perm."edit.php";
+			
+			}
+		} else {
+			switch ($op) {
+				case "upload": return;
+			}
+		}
+	}
 	
 	/*
 	Method: get
@@ -255,10 +312,13 @@ class Article extends BlogEntry {
 		$usr->exportVars($tmp);
 
 		$tmp->set("TITLE", $this->subject);
+		$tmp->set("TAGS", $this->tags());
 		$tmp->set("POSTDATE", $this->prettyDate($this->post_ts) );
 		$tmp->set("EDITDATE", $this->prettyDate() );
 		$tmp->set("BODY", $this->markup() );
 		$tmp->set("PERMALINK", $this->permalink() );
+		$tmp->set("EDIT_LINK", $this->permalink()."edit.php");
+		$tmp->set("UPLOAD_LINK", $this->permalink()."uploadfile.php");
 		$tmp->set("SHOW_CONTROLS", $show_edit_controls);
 		
 		$ret .= $tmp->process();

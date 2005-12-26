@@ -4,15 +4,18 @@ class GoogleSearch extends Plugin {
 
 	function GoogleSearch() {
 		$this->plugin_desc = _("Use Google to search the blog.");
-		$this->plugin_version = "0.1.0";
+		$this->plugin_version = "0.1.1";
+		$this->addOption("caption", _("Caption for search panel"), _("Search"));
+		$this->getConfig();
 	}
 
 	function output() {
 		$blg = NewBlog();
 		if (! $blg->isBlog() ) return false;
 		$blog_url = $blg->getURL();
-?>
-<h3><?php p_("Search"); ?></h3>
+		if ($this->caption) { # Suppress empty header ?>
+<h3><?php echo $this->caption; ?></h3><?php
+		} ?>
 <div class="panel">
 <?php p_('Powered by <a href="http://www.google.com/">Google&reg;</a>', ''); ?>
 <form method="get" action="http://www.google.com/search">
