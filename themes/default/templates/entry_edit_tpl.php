@@ -43,7 +43,7 @@
 <input id="mode_html" name="input_mode" type="radio" <?php if ($HAS_HTML == MARKUP_HTML) { ?>checked="checked"<?php } ?> value="<?php echo MARKUP_HTML; ?>" />
 </div>
 <div>
-<label for="comments">Allow comments</label>
+<label for="comments">Allow comments and trackbacks</label>
 <input id="comments" name="comments" type="checkbox" <?php if (! (isset($COMMENTS) && !$COMMENTS) ) { ?>checked="checked"<?php } ?> />
 </div>
 <div class="threebutton">

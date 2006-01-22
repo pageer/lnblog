@@ -80,8 +80,12 @@ li.bloguser, li.bloguserurl {
 }
 
 @media print {
-	
+
 	#commentsubmit {
+		display: none;
+	}
+	
+	.postadmin {
 		display: none;
 	}
 	

@@ -20,7 +20,7 @@
 require_once("blogentry.php");
 
 # Class: Draft
-# 
+# Create and edit draft entries to be published later.
 
 class Draft extends BlogEntry {
 

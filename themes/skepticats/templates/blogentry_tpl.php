@@ -20,21 +20,23 @@
 	<li class="bloguserurl">(<a href="<?php echo $USER_HOMEPAGE; ?>"><?php echo $USER_HOMEPAGE; ?></a>)</li>
 <?php } ?>
 <?php if ( ! empty($COMMENTCOUNT) ) { ?>
-<li><a href="<?php echo $PERMALINK.ENTRY_COMMENT_DIR; ?>/"><?php p_('Comments ');?>(<?php echo $COMMENTCOUNT; ?>)</a></li>
+<li><a href="<?php echo $COMMENT_LINK; ?>"><?php p_('Comments ');?>(<?php echo $COMMENTCOUNT; ?>)</a></li>
 <?php } elseif ( ! empty($ALLOW_COMMENTS) ) { ?>
-<li><a href="<?php echo $PERMALINK.ENTRY_COMMENT_DIR; ?>/"><?php p_('Post comment'); ?></a></li>
+<li><a href="<?php echo $COMMENT_LINK; ?>"><?php p_('Post comment'); ?></a></li>
 <?php } ?>
 <?php if ( ! empty($TRACKBACKCOUNT) ) { ?>
-<li><a href="<?php echo $PERMALINK.ENTRY_TRACKBACK_DIR; ?>/"><?php p_('View TrackBacks');?> (<?php echo $TRACKBACKCOUNT; ?>)</a></li>
+<li><a href="<?php echo $SHOW_TRACKBACK_LINK; ?>/"><?php p_('View TrackBacks');?> (<?php echo $TRACKBACKCOUNT; ?>)</a></li>
+<?php } 
+if (! empty($ALLOW_TRACKBACKS)) {?>
+<li><?php p_('TrackBack <abbr title="Uniform Resource Locator">URL</abbr>');?>: <a href="<?php echo $PERMALINK; ?>trackback.php"><?php echo $PING_LINK; ?></a></li>
 <?php } ?>
-<li><?php p_('TrackBack <abbr title="Uniform Resource Locator">URL</abbr>');?>: <a href="<?php echo $PERMALINK; ?>trackback.php"><?php echo $PERMALINK; ?>trackback.php</a></li>
 </ul>
 <?php if ($SHOW_CONTROLS) { ?>
 <ul class="postadmin">
-	<li><a onclick="javascript:window.open('<?php echo $PERMALINK; ?>trackback.php?send_ping=yes'); return false;" href="<?php echo $PERMALINK; ?>trackback.php?send_ping=yes"><?php p_('Send TrackBack Ping');?></a></li>
-	<li><a href="<?php echo $PERMALINK; ?>uploadfile.php"><?php p_('Upload file');?></a></li>
-	<li><a href="<?php echo $PERMALINK; ?>edit.php"><?php p_('Edit');?></a></li>
-	<li><a href="<?php echo $PERMALINK; ?>delete.php"><?php p_('Delete');?></a></li>
+	<li><a onclick="javascript:window.open('<?php echo $PING_LINK; ?>'); return false;" href="<?php echo $PING_LINK; ?>"><?php p_('Send TrackBack Ping');?></a></li>
+	<li><a href="<?php echo $UPLOAD_LINK; ?>"><?php p_('Upload file');?></a></li>
+	<li><a href="<?php echo $EDIT_LINK; ?>"><?php p_('Edit');?></a></li>
+	<li><a href="<?php echo $DELETE_LINK; ?>"><?php p_('Delete');?></a></li>
 </ul>
 <?php } ?>
 </div>

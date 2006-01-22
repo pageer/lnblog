@@ -13,9 +13,15 @@
 		<li class="commenturl"><a href="<?php echo $URL; ?>"><?php echo $URL; ?></a></li>
 		<?php } ?>
 		<li class="commentdate"><?php pf_('Posted %s', $DATE); ?></li>
-		<?php if ($SHOW_CONTROLS) { ?>
-		<li class="admin"><a href="<?php file_exists("delcomment.php") ? "" : ENTRY_COMMENT_PATH; ?>"></a></li>
-		<?php } ?>
+		<?php 
+		if ($SHOW_CONTROLS) { 
+			foreach ($CONTROL_BAR as $item) {
+		?>
+		<li class="admin"><?php echo $item; ?></a></li>
+		<?php 
+			} 
+		}
+		?>
 	</ul>
 </div>
 <div class="commentdata">

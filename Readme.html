@@ -2,12 +2,12 @@
 <html lang="en"><head>
 
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-  
+  <title>LnBlog Documentation</title>
 
 
 
 
-  <title>LnBlog Documentation</title><style type="text/css">
+  <style type="text/css">
 td, th {
 border: thin solid black;
 }
@@ -23,7 +23,10 @@ font-size: 80%;
 
 <p>LnBlog: A simple file-based weblog focused on design elegance.<br />
 Copyright (C) 2005 Peter A. Geer &lt;<a href="mailto:pageer@skepticats.com">pageer@skepticats.com</a>&gt;<br />
-This program is licensed under the <a href="http://www.gnu.org/copyleft/gpl.html">GNU General Public License</a>.&nbsp; See the <a href="#license_information">license information</a> section for details.</p><h2><a name="introduction">Introduction</a></h2>
+This program is licensed under the <a href="http://www.gnu.org/copyleft/gpl.html">GNU General Public License</a>.&nbsp; See the <a href="#license_information">license information</a> section for details.</p>
+
+
+<h2><a name="introduction">Introduction</a></h2>
 
 
 <p>LnBlog is a simple weblog package written in PHP which stores data
@@ -61,7 +64,7 @@ following:</p>
 <ol>
 
 
-<li>PHP 4.0 or greater.</li>
+<li>PHP 4.1or greater.</li>
 <li>Support for Perl Compatible Regular Expression (PCRE), which is enabled
 by default in most PHP packages.</li>
 <li>The ability for scripts to read and write files to the server. To do this,
@@ -73,8 +76,9 @@ set on the web server.<br />
 
 
 <h2><a name="feature_list">Feature List</a></h2>
-LnBlog's built-in features include:
 
+
+LnBlog's built-in features include:
 <ul>
 
 
@@ -82,7 +86,6 @@ LnBlog's built-in features include:
 <li>Anonymous reader comments.</li>
 <li>Send and receive TrackBack pings.</li>
 <li>Create multiple user accounts with basic serucity on entires and blogs.</li>
-
 <li>Easily create multiple weblogs.</li><li>Create static "articles" in addition to weblog entries.</li>
 <li>Change between multiple themes, each of which can have completely a
 different look and behavior, i.e. different styles, HTML markup, images, and even client-side scripts.</li>
@@ -92,9 +95,13 @@ on a per-blog basis.</li>
 <li>Support for posting with simple auto-markup, a simple subset of BBcode,
 or raw HTML code.</li>
 </ul>
+
+
 The following features are also supported by the standard set of plugins:<br />
 
+
 <ul>
+
 
 <li>Automatically generated RSS feeds for blog entries and comments.</li>
 <li>E-mail notification when new comments are posted.</li>
@@ -117,7 +124,9 @@ them navigate
 to that directory with your favorite browser to run the configuration
 scripts. The first script configures file writing. You have two options for file writing:</p>
 
+
 <ol>
+
 
 <li>NativeFS: This uses PHP's standard file writing functions to
 create data files.&nbsp; The up side of this is that there is no
@@ -138,7 +147,6 @@ permissions manageable.&nbsp; Also, FTP file writing will work when
 </ol>
 
 
-
 <p>After file writing support is
 configured, you must set an administrator login. This account will be used to
 add new weblogs as well as to log into the ones you create. After
@@ -146,7 +154,9 @@ that's
 set, you can log in and start adding new blogs and/or users. There are also
 administrative functions to:</p>
 
+
 <ol>
+
 
 <li>Modify a blog, i.e. change properties like the name, description, and allowed writers.</li>
 <li>Modify the links in the system-wide menu bar.</li>
@@ -175,12 +185,14 @@ into the "upgrade to current version" box and click the "Upgrade" button.&nbsp; 
 configuration files for the blog and add any new pages.&nbsp; You
 will have to do this separately for each blog that youhave.</p>
 
+
 <p><strong>Note:</strong> If you are upgrading from LnBlog 0.3 to 0.4,
 the locations of the user configuration files have changed.&nbsp; You
 will need to copy the fsconfig.php, passwd.php, and sitemap.htm files
 from the root of your old LnBlog folder into the "userdata"
 subdirectory of your new LnBlog folder.&nbsp; You will also need to run
 an upgrade on each of your blogs.</p>
+
 
 <p><strong>Note 2:</strong> If you are upgrading to LnBlog 0.4 from
 version 0.3.1 or earlier, it is recommended that you delete your
@@ -189,10 +201,12 @@ it, as there was a configuration value added to this file in version
 0.3.2.&nbsp; Your site may, however, continue to function normally with
 the old file.</p>
 
+
 <p><strong>Note 3:</strong> If, for some reason, you want to upgrade
 from LnBlog 0.2 to a higher version, you will need to delete your
 passwd.php file and create a new login, because the format of this file
 has changed and is no longer compatible.</p>
+
 
 <h2><a name="adding_new_users">Adding New Users</a></h2>
 
@@ -242,7 +256,6 @@ anything with the blog), the other users (can do anything with their
 own posts - provided they <em>can</em> post), and everybody else (can only post comments).&nbsp;
 Which role a particular person will take depends on who they are and
 what blog you're talking about.&nbsp;The owner of one blog may be just a regular reader on another.&nbsp; <br />
-
 </p>
 
 
@@ -254,7 +267,6 @@ can add new blogs.&nbsp; Note that if you are using <a href="#initial_setup">nat
 then the user account under which PHP is running must have write access
 to the location where the blog will be created.&nbsp; This is normally
 not the case, so you may have to create the blog folder beforehand.<br />
-
 </p>
 
 
@@ -338,7 +350,6 @@ will also store the username, so that the up-to-date name, e-mail, and
 homepage can be displayed automatically.&nbsp; Currently, comments
 cannot be edited, but they can be deleted by users with permission to
 modify the entry.&nbsp; <br />
-
 </p>
 
 
@@ -351,7 +362,6 @@ so that must be correctly configured for your server.&nbsp; The
 messages themselves are in plain-text format and include the URL of the
 comment, as well as the comment itself and any personal information
 entered by the reader.<br />
-
 </p>
 
 
@@ -361,7 +371,6 @@ entered by the reader.<br />
 <p>LnBlog has some very primitive support for Trackbacks.&nbsp; Each
 entry has a trackback URL and will store and display any trackback
 pings it receives. <br />
-
 </p>
 
 
@@ -370,7 +379,6 @@ You can then click on the "Send trackback ping" link for your blog
 entry and start the two-step ping process.&nbsp; The first step is to
 enter the URL you wish to ping.&nbsp; The second is to confirm the ping
 data and send it. <br />
-
 </p>
 
 
@@ -386,9 +394,8 @@ suckiness of this situation, sending a trackback ping will open a new
 browser window so that you don't have to manually go back to your blog.</p>
 
 
-<p>As of version 0.4.0, LnBlog supports TrackBack auto-discovery with 
-embedded RDF code using a plugin.  There is not yet a feature for 
-auto-discovering TrackBack URLs in other blogs.</p>
+<p>As of version 0.4.0, LnBlog supports TrackBack auto-discovery with
+embedded RDF code using a plugin. There is not yet a feature for auto-discovering TrackBack URLs in other blogs.</p>
 
 
 <h2><a name="lbcode">LBCode Syntax</a></h2>
@@ -452,7 +459,12 @@ text.</p>
 <td><code>Source code</code></td>
 <td>&lt;code&gt;Source code&lt;/code&gt;</td>
 </tr><tr>
-<td>Source code</td>
+<td>Teletype</td>
+<td>[t]Teletype text[/t]</td>
+<td><tt>Teletype text</tt></td>
+<td>&lt;tt&gt;Teletype text&lt;/tt&gt;</td>
+</tr><tr>
+<td>Header</td>
 <td>[h]Header[/h]</td>
 <td><h3>Header</h3></td>
 <td>&lt;h3&gt;Header&lt;/h3&gt;</td>
@@ -461,6 +473,17 @@ text.</p>
 <td>[q]Quote[/q]</td>
 <td><q>Quote</q></td>
 <td>&lt;q&gt;Quote&lt;/q&gt;</td>
+</tr><tr>
+<td>Block quote</td>
+<td>[quote]Block quotation[/quote]</td>
+<td><blockquote>Block quotation</blockquote></td>
+<td>&lt;blockquote&gt;Block quotation&lt;/blockquote&gt;</td>
+
+</tr><tr>
+<td>Block quote with citation</td>
+<td>[quote=http://www.somesite.com/]Block quotation[/quote]</td>
+<td><blockquote cite="http://www.somesite.com/">Block quotation</blockquote></td>
+<td>&lt;blockquote cite="http://www.somesite.com/"&gt;Block quotation&lt;/blockquote&gt;</td>
 </tr><tr>
 <td>Hyperlink</td>
 <td>[url=http://www.google.com]Google[/url]</td>
@@ -471,6 +494,18 @@ text.</p>
 <td>[img=http://www.google.com/images/logo.gif]Google logo[/img]</td>
 <td><img src="http://www.google.com/images/logo.gif" alt="Google logo" title="Google logo" /></td>
 <td>&lt;img src="http://www.google.com/images/logo.gif" alt="Google logo" title="Google logo" /&gt;</td>
+</tr><tr>
+<td>Right-aligned image</td>
+<td>[img-right=http://www.google.com/images/logo.gif]Google logo[/img-right]</td>
+<td><img alt="Google logo" title="Google logo" style="float: right; clear: none;" src="http://www.google.com/images/logo.gif" /></td>
+<td>&lt;img alt="Google logo" title="Google logo" style="float: right;
+clear: none;" src="http://www.google.com/images/logo.gif" /&gt;</td>
+</tr><tr>
+<td>Left-aligned image</td>
+<td>[img-left=http://www.google.com/images/logo.gif]Google logo[/img-left]</td>
+<td><img alt="Google logo" title="Google logo" style="float: left; clear: none;" src="http://www.google.com/images/logo.gif" /></td>
+<td>&lt;img alt="Google logo" title="Google logo" style="float: left;
+clear: none;" src="http://www.google.com/images/logo.gif" /&gt;</td>
 </tr><tr>
 <td>Number list</td>
 <td>[numlist]<br />
@@ -554,7 +589,6 @@ current LBCode handler does not deal gracefully with multiline
 tags.&nbsp; So if, e.g., you have a multiline block quotation or code block, the
 LBCode handler will still put &lt;br /&gt; tags in for the line
 breaks. <br />
-
 </li><li>In addition to the [img] tag, there are also [img-left] and
 [img-right] tags.&nbsp; These are exactly the same, except that the
 resulting HTML includes a CSS style to float the image to the left or
@@ -604,7 +638,9 @@ just enter "GNU" for the text and
 leave the attribute blank. When you hit the abbreviation button, the
 attribute "GNU's Not UNIX" will be added automatically.</p>
 
+
 <h2><a name="plugins">Plugins</a></h2>
+
 
 <p><a name="plugins">LnBlog supports a simple, event-driven plugin system.&nbsp; In a
 nutshell, this means that LnBlog supplies hooks that plugins can attach
@@ -614,6 +650,7 @@ displayed.&nbsp; So when one of those events occurrs, any plugins that
 are waiting for it will be notifed and run their code.&nbsp; For
 information on writing plugins, consult the </a><a href="techdoc.html">technical documentation</a>.&nbsp; <br />
 </p>
+
 
 <p>Installing and using plugins is quite easy.&nbsp; All you need to do
 is copy the plugin files to your "plugins" directory.&nbsp; You can use
@@ -628,8 +665,8 @@ with LnBlog require additional configuration, but some thrid-party
 plugins might.Also, note that the standard plugins are all
 self-contained, so if you want to turn one off, you can just delete the
 file. <br />
-
 </p>
+
 
 <p>Note that the precedence of plugins in a blog's plugins directory
 allows you to easily disable plugins on a per-blog basis.&nbsp; All you

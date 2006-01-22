@@ -71,7 +71,16 @@ class BlogEntry extends Entry {
 		$this->abstract = "";
 		$this->has_html = MARKUP_BBCODE;
 		$this->allow_comment = true;
+		$this->allow_tb = true;
 		$this->template_file = ENTRY_TEMPLATE;
+		$this->metadata_fields = array("id"=>"postid", "uid"=>"userid", 
+			"date"=>"date", "post_date"=>"postdate",
+			"timestamp"=>"timestamp", "post_ts"=>"posttimestamp",
+			"ip"=>"ip", "mail_notify"=>"mail notification",
+			"sent_ping"=>"trackback ping", "subject"=>"subject",
+			"abstract"=>"abstract", "allow_comment"=>"allowcomment",
+			"has_html"=>"hashtml", "tags"=>"tags", 
+			"allow_tb"=>"allowtrackback");
 		
 		# Auto-detect the current entry.  If no path is given, 
 		# then assume the current directory.
@@ -149,59 +158,10 @@ class BlogEntry extends Entry {
 	function getPath($curr_ts, $just_name=false, $long_format=false) {
 		$year = date("Y", $curr_ts);
 		$month = date("m", $curr_ts);
-		#if ($just_name || $long_format) {
-			$fmt = $long_format ? ENTRY_PATH_FORMAT_LONG : ENTRY_PATH_FORMAT;
-			$base = date($fmt, $curr_ts);
-		/*
-		} else {
-			$base = strtolower($this->subject);
-			$base = preg_replace("/\s+/", "_",$base);
-			$base = date("d", $curr_ts)."-".$base;
-		}
-		*/
+		$fmt = $long_format ? ENTRY_PATH_FORMAT_LONG : ENTRY_PATH_FORMAT;
+		$base = date($fmt, $curr_ts);
 		if ($just_name) return $base;
 		else return $year.PATH_DELIM.$month.PATH_DELIM.$base;
-	}
-
-	function metadataFields() {
-		$ret = array();
-		#$ret["PostID"] =  $this->id;
-		$ret["UserID"] =  $this->uid;
-		$ret["Date"] =  $this->date;
-		$ret["PostDate"] = $this->post_date;
-		$ret["Timestamp"] =  $this->timestamp;
-		$ret["PostTimestamp"] = $this->post_ts;
-		$ret["IP"] =  $this->ip;
-		$ret["Mail Notification"] = $this->mail_notify;
-		$ret["TrackBack Ping"] = $this->sent_ping;
-		$ret["Subject"] =  $this->subject;
-		$ret["Abstract"] = $this->abstract;
-		$ret["AllowComment"] =  $this->allow_comment;
-		$ret["HasHTML"] = $this->has_html;
-		$ret["Tags"] = $this->tags;
-		return $ret;
-	}
-	
-	# Note that for some fields, the assignment is conditional.
-	# This is to prevent default values from being over-written by empty ones.
-	
-	function addMetadata($key, $val) {
-		switch ($key) {
-			case "PostID": $this->id = $val; break;
-			case "UserID": if ($val) $this->uid = $val; break;
-			case "Date": $this->date = $val; break;
-			case "PostDate": $this->post_date = $val; break;
-			case "Timestamp": $this->timestamp = $val; break;
-			case "PostTimestamp": $this->post_ts = $val; break;
-			case "IP": $this->ip = $val; break;
-			case "Mail Notification": $this->mail_notify = $val; break;
-			case "TrackBack Ping": $this->sent_ping = $val; break;
-			case "Subject": $this->subject = $val; break;
-			case "Abstract": $this->abstract = $val; break;
-			case "AllowComment": $this->allow_comment = $val; break;
-			case "HasHTML": $this->has_html = $val; break;
-			case "Tags": $this->tags = $val; break;
-		}
 	}
 
 	/*
@@ -234,30 +194,14 @@ class BlogEntry extends Entry {
 	}
 
 	/*
-	Method: queryStringToID
-	Converts the query string into an identifier for a blog entry.
-	For file-based storage, this ID is a path on the filesystem.
-
-	Returns:
-	A string representing a directory path, or false on failure.
-	*/
-	function queryStringToID() {
-		$ret = INSTALL_ROOT.str_replace("/", PATH_DELIM, GET("blog"));
-		
-	}
-
-	/*
 	Method: permalink
 	Get the permalink to the object.
-	
-	Parameters:
-	html_escape - *Optional* boolean determining whether the URL should use HTML escape sequences
-	              for the ampersands that separate arguments.  *Default* is true.
 	
 	Returns:
 	A string containing the full URI to this entry.
 	*/
-	function permalink($html_escape=true) {
+	function permalink() {
+	/*
 		if (! USE_WRAPPER_SCRIPTS && 
 		    ! file_exists(BLOG_ROOT.PATH_DELIM.".htaccess") ) {
 			$path = localpath_to_uri(INSTALL_ROOT);
@@ -272,17 +216,62 @@ class BlogEntry extends Entry {
 		} else {
 			return localpath_to_uri($this->localpath());
 		}
+	*/
+		return $this->uri("page");
+	}
+
+	# Method: baselink
+	# Returns a link to the object's base directory.
+	#
+	# Returns:
+	# A string with the URI.
+
+	function baselink() {
+		return $this->uri("base");
+	}	
+
+	# Method: commentlink
+	# Get the permalink to the object.
+	
+	# Returns:
+	# A string containing the full URI to this entry.
+	
+	function commentlink() {
+		return $this->uri("comment");
 	}
 	
 	/*
-	Method: commentlink
-	Gets the URI of the comments page.
+	Method: uri
+	Gets the URI of the a specified page.
+	
+	Parameters:
+	link - The page for which you want the URI.  Valid values are
+	       "page", "
 	
 	Returns:
-	A string holding the permalink to the comments for this entry.
+	A string holding the relevant URI.
 	*/
-	function commentlink() {
-		return localpath_to_uri($this->localpath().PATH_DELIM.ENTRY_COMMENT_DIR);
+	function uri($type) {
+		$dir_uri = localpath_to_uri($this->localpath());
+		switch ($type) {
+			case "page": 
+				$pretty_file = preg_replace("/\W/", "_", trim($this->subject)).".php";
+				if ( file_exists(dirname($this->localpath()).
+				                         PATH_DELIM.$pretty_file) ) {
+					return localpath_to_uri(dirname($this->localpath())).$pretty_file;
+				} else {
+					return $dir_uri;
+				}
+			case "send_tb":   return $dir_uri."trackback.php?send_ping=yes";
+			case "get_tb":    return $dir_uri."trackback.php";
+			case "trackback": return $dir_uri.ENTRY_TRACKBACK_DIR."/";
+			case "upload":    return $dir_uri."uploadfile.php";
+			case "edit":      return $dir_uri."edit.php";
+			case "delete":    return $dir_uri."delete.php";
+			case "comment":   return $dir_uri.ENTRY_COMMENT_DIR."/";
+			case "base":      return $dir_uri;
+		}
+		return "";
 	}
 	
 	function getByPath ($path, $revision=ENTRY_DEFAULT_FILE) {
@@ -311,11 +300,28 @@ class BlogEntry extends Entry {
 			$this->getPath($curr_ts, true, true).ENTRY_PATH_SUFFIX;
 		$source = $dir_path.PATH_DELIM.ENTRY_DEFAULT_FILE;
 
-			$fs = NewFS();
-			$ret = $fs->rename($source, $target);
-			$fs->destruct();
+		$fs = NewFS();
+		$ret = $fs->rename($source, $target);
 			
 		if ($ret) $ret = $this->writeFileData();
+
+		if (! $ret) {
+			
+			$ret = $fs->rename($target, $source);
+			$fs->destruct();
+			return false;
+			
+		} else {
+		
+			if (! KEEP_EDIT_HISTORY) $fs->delete($target);
+			$subfile = preg_replace("/\W/", "_", trim($this->subject));
+			$subfile = dirname(dirname($this->file)).PATH_DELIM.$subfile.".php";
+			if (! file_exists($subfile)) 
+				write_file($subfile, 
+					"<?php chdir('".basename($dir_path).
+					"'); include('config.php'); include('index.php'); ?>");
+		}
+		$fs->destruct();
 		$this->raiseEvent("UpdateComplete");
 		return $ret;
 	}
@@ -333,13 +339,21 @@ class BlogEntry extends Entry {
 		$curr_ts = time();
 		$dir_path = dirname($this->file);
 		if (! $this->isEntry($dir_path) ) return false;
+		
 		$this->raiseEvent("OnDelete");
-		$source_file = $dir_path.PATH_DELIM.ENTRY_DEFAULT_FILE;
-		$target_file = $dir_path.PATH_DELIM.
-			$this->getPath($curr_ts, true, true).ENTRY_PATH_SUFFIX;
-		$ret = $fs->rename($source_file, $target_file);
+		
+		if (KEEP_EDIT_HISTORY) {
+			$source_file = $dir_path.PATH_DELIM.ENTRY_DEFAULT_FILE;
+			$target_file = $dir_path.PATH_DELIM.
+				$this->getPath($curr_ts, true, true).ENTRY_PATH_SUFFIX;
+			$ret = $fs->rename($source_file, $target_file);
+		} else {
+			$ret = $fs->rmdir_rec($this->localpath());
+		}
 		$fs->destruct();
+		
 		$this->raiseEvent("DeleteComplete");
+		
 		return $ret;
 	}
 
@@ -390,6 +404,12 @@ class BlogEntry extends Entry {
 		$this->ip = get_ip();
 
 		$ret = $this->writeFileData();
+		# Add a wrapper file to make the link prettier.
+		if ($ret) {
+			$subfile = preg_replace("/\W/", "_", trim($this->subject));
+			$subfile = $month_path.PATH_DELIM.$subfile.".php";
+			write_file($subfile, "<?php chdir('".basename($dir_path)."'); include('config.php'); include('index.php'); ?>");
+		}
 		$this->raiseEvent("InsertComplete");
 		return $ret;
 		
@@ -417,11 +437,18 @@ class BlogEntry extends Entry {
 		$this->tags = POST("tags");
 		$this->data = POST("body");
 		$this->allow_comment = POST("comments") ? 1 : 0;
+		$this->allow_tb = POST("comments") ? 1 : 0;
 		$this->has_html = POST("input_mode");
+		foreach ($this->custom_fields as $fld=>$desc) {
+			$this->$fld = POST($fld);
+		}
 		if (get_magic_quotes_gpc()) {
 			$this->subject = stripslashes($this->subject);
 			$this->tags = stripslashes($this->tags);
 			$this->data = stripslashes($this->data);
+			foreach ($this->custom_fields as $fld=>$desc) {
+				$this->$fld = stripslashes($this->$fld);
+			}
 		}
 		$this->raiseEvent("POSTRetreived");
 	}
@@ -455,16 +482,24 @@ class BlogEntry extends Entry {
 		$tmp->set("TAGS", $this->tags());
 		$tmp->set("BODY", $this->markup() );
 		$tmp->set("ALLOW_COMMENTS", $this->allow_comment);
+		$tmp->set("ALLOW_TRACKBACKS", $this->allow_tb);
 		$tmp->set("PERMALINK", $this->permalink() );
-		$tmp->set("PING_LINK", $this->permalink()."trackback.php?send_ping=yes");
-		$tmp->set("TRACKBACK_LINK", $this->permalink()."trackback.php");
-		$tmp->set("UPLOAD_LINK", $this->permalink()."uploadfile.php");
-		$tmp->set("EDIT_LINK", $this->permalink()."edit.php");
-		$tmp->set("DELETE_LINK", $this->permalink()."delete.php");
+		$tmp->set("PING_LINK", $this->uri("send_tb"));
+		$tmp->set("TRACKBACK_LINK", $this->uri("get_tb"));
+		$tmp->set("UPLOAD_LINK", $this->uri("upload"));
+		$tmp->set("EDIT_LINK", $this->uri("edit"));
+		$tmp->set("DELETE_LINK", $this->uri("delete"));
 		$tmp->set("TAG_LINK", BLOG_ROOT_URL."tags.php");
 		$tmp->set("COMMENTCOUNT", $this->getCommentCount() );
+		$tmp->set("COMMENT_LINK", $this->uri("comment"));
 		$tmp->set("TRACKBACKCOUNT", $this->getTrackbackCount() );
+		$tmp->set("SHOW_TRACKBACK_LINK", $this->uri("trackback"));
 		$tmp->set("SHOW_CONTROLS", $show_edit_controls);
+
+		foreach ($this->custom_fields as $fld=>$desc) {
+			$tmp->set(strtoupper($fld), isset($this->$fld) ? $this->$fld : '');
+			$tmp->set(strtoupper($fld)."_DESC", $desc);
+		}
 		
 		$ret .= $tmp->process();
 		ob_start();
@@ -494,8 +529,7 @@ class BlogEntry extends Entry {
 		$cmt->getPostData();
 		if ($cmt->data) {
 			$ret = $cmt->insert($path);
-		}
-		else $ret = false;
+		} else $ret = false;
 		return $ret;
 	}
 
@@ -696,6 +730,7 @@ class BlogEntry extends Entry {
 	Zero on success, one on failure.
 	*/
 	function getPing() {
+		if (! $this->allow_tb) return 1;
 		$tb = NewTrackback();
 		$ret = $tb->receive(dirname($this->file).PATH_DELIM.ENTRY_TRACKBACK_DIR);
 		return $ret;

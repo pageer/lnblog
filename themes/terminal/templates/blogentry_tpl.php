@@ -24,14 +24,16 @@
 </ul>
 <?php } ?>
 <ul>
+<?php if (! empty($ALLOW_TRACKBACKS)) { ?>
 <li>TrackBack <abbr title="Uniform Resource Locator">URL</abbr>: <a href="<?php echo $PERMALINK; ?>trackback.php"><?php echo $PERMALINK; ?>trackback.php</a></li>
-<?php if ( ! empty($COMMENTCOUNT) ) { ?>
-<li><a href="<?php echo $PERMALINK.ENTRY_COMMENT_DIR; ?>/">View comments (<?php echo $COMMENTCOUNT; ?>)</a></li>
+<?php }
+if ( ! empty($COMMENTCOUNT) ) { ?>
+<li><a href="<?php echo $COMMENT_LINK; ?>">View comments (<?php echo $COMMENTCOUNT; ?>)</a></li>
 <?php } elseif ( ! empty($ALLOW_COMMENTS) ) { ?>
-<li><a href="<?php echo $PERMALINK.ENTRY_COMMENT_DIR; ?>/">Post comment</a></li>
+<li><a href="<?php echo $COMMENT_LINK; ?>">Post comment</a></li>
 <?php } ?>
 <?php if ( ! empty($TRACKBACKCOUNT) ) { ?>
-<li><a href="<?php echo $PERMALINK.ENTRY_TRACKBACK_DIR; ?>/">TrackBacks (<?php echo $TRACKBACKCOUNT; ?>)</a></li>
+<li><a href="<?php echo $SHOW_TRACKBACK_LINK; ?>">TrackBacks (<?php echo $TRACKBACKCOUNT; ?>)</a></li>
 <?php } ?>
 </ul>
 </div>

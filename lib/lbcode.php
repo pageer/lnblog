@@ -132,7 +132,7 @@ class Tokenizer {
 		# If the token starts a tag, try to get the whole tag.
 		} elseif ($char == "[") {
 			
-			
+			if 
 			
 		}
 	}

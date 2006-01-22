@@ -14,7 +14,7 @@ class SidebarCalendar extends Plugin {
 
 	function put_calendar() {
 		$blog = NewBlog();
-		if (! $blog->blogExists() ) return false;
+		if (! $blog->isBlog() ) return false;
 	
 		$year = GET("year");
 		$month = GET("month");

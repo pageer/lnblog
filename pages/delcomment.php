@@ -44,7 +44,7 @@ $page->display_object = &$comm;
 $conf_id = _("OK");
 $message = spf_("Do you really want to delete %s?", $anchor);
 
-if (POST($conf_id)) {
+if (POST($conf_id) || GET("conf") == "yes") {
 	$ret = $comm->delete();
 	if ($ret) $page->redirect("index.php");
 	else $message = spf_("Unable to delete %s.  Try again?", $anchor);

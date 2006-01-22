@@ -30,22 +30,18 @@ require_once("lib/creators.php");
 $ent = NewArticle();
 $blg = NewBlog();
 $page = NewPage(&$ent);
-			
-if (POST(COMMENT_POST_REMEMBER)) {
-	if (POST(COMMENT_POST_NAME)) setcookie(COMMENT_POST_NAME, POST(COMMENT_POST_NAME));
-	if (POST(COMMENT_POST_EMAIL)) setcookie(COMMENT_POST_EMAIL, POST(COMMENT_POST_EMAIL));
-	if (POST(COMMENT_POST_URL)) setcookie(COMMENT_POST_URL, POST(COMMENT_POST_URL));
-}
-
-# This code will detect if a comment has been submitted and, if so,
-# will add it.  We do this before printing the comments so that a 
-# new comment will be displayed on the page.
 
 $SUBMIT_ID = "submit";
 
-$comm = NewBlogComment();
 if (POST($SUBMIT_ID)) {
-	$ent->addComment(getcwd().PATH_DELIM.ENTRY_COMMENT_DIR);
+	$cmt_added = $ent->addComment(getcwd().PATH_DELIM.ENTRY_COMMENT_DIR);
+	if ($cmt_added) {
+		# We add the random template here so that the "remember me" cookies
+		# are set.  This should definitely be fixed.
+		$t = NewTemplate("comment_form_tpl.php");
+		$ret = $t->process();
+		$page->redirect(current_file());
+	}
 }
 
 $title = $ent->subject . " - " . $blg->name;
@@ -69,6 +65,7 @@ if ($ent->allow_comment) {
 }
 
 # Set up template for basic page layout.
+$page->addScript("entry.js");
 $page->title = $title;
 $page->display($content, &$blog);
 

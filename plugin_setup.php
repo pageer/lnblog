@@ -68,10 +68,13 @@ if (has_post()) {
 	$plug_list = $PLUGIN_MANAGER->getPluginList();
 	sort($plug_list);
 	$body = "<h4>"._('Plugin Configuration')."</h4><ul>";
+	$body .= '<table><tr><th>Plugin</th><th>Version</th><th>Description</th></tr>';
 	foreach ($plug_list as $plug) {
-		$body .= '<li><a href="?plugin='.$plug.'">'.$plug.'</a></li>';
+		$p = new $plug;
+		$body .= '<tr><td><a href="?plugin='.$plug.'">'.$plug.'</a></td>';
+		$body .= '<td style="text-align: center">'.$p->plugin_version.'</td><td>'.$p->plugin_desc.'</td></tr>';
 	}
-	$body .= '</ul>';
+	$body .= '</table>';
 }
 $page->title = spf_("%s Plugin Configuration", PACKAGE_NAME);
 $page->display($body);

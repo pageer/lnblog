@@ -1,10 +1,13 @@
 Document: Feature List
 
-Here is a list of the features currently supported by LnBlog.
+Here is a list of the features currently supported by LnBlog.  These features are spread out between the core of LnBlog and the standard plugins.  Plugins can be disabled, so if you don't want a feature that is implemented in a plugin, you can just turn it off.  Also, all elements of the sidebar (as well as the menubar/sitemap and page banner) are implemented as plugins, and so can be configured and turned off just like other plugins.
 
-Section: Basic Features
+Section: Features
 
 - Blog entries with comments.
+- Add tags (topics) to entries.
+- Blacklist comment and trackback spammers by IP address or subnet.
+- RSS feeds for entries and for comments on each entry.
 - Static articles.
 - Send and receive trackbacks.
 - Multiple user accounts.
@@ -18,10 +21,21 @@ Section: Basic Features
 
 Section: Standard Plugins
 
+The following are a list of the standard plugins that come with LnBlog.  
+
 - E-mail notification on user comments.
-- Auto-generated RSS feeds for blogs.
-- Auto-generated RSS feeds for user comments on each entry.
+- E-mail notification for trackback pings.
+- Auto-generated RSS feeds (RSS1 headlines and/or RSS2 full text) for blog entries.
+- Auto-generated RSS feeds (RSS1 headlines and/or RSS2 full text) for user comments on each entry.
 - Auto-generate Apache .htaccess files when creating and upgrading blogs.
-- Add metadata and RSS links to the page header.
+- Add metadata (keywords, description, author) and RSS links to the HTML page head.
 - Add trackback auto-discovery RDF code to entries.
-- Each section of the sidebar is a plugin.
+- Turn off comments and trackbacks for an entire blog, or allow comments from only logged-in users.
+- Ban IP addresses and subnets from posting comments or trackback pings.
+- Page header plugin to control display of the blog description.
+- Site map with global or per-blog customization.
+- Sidebar RSS feed links with customizable section header.
+- Sidebar static article list with customizable section header and optional list of custom links.
+- Sidebar calendar with customizable section header.
+- Sidebar form to search your blog with Google (assuming Google has spidered it).
+- Sidebar list of tags used in the blog and links to show entries by tag.

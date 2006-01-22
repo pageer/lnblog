@@ -10,9 +10,10 @@ class Recent extends Plugin {
 		$this->addOption("recent_header", 
 			_("Header for other pages (newest entries)"), 
 			_("Recent Entries"));
+		$this->addOption("num_entries", 
+			_("Number of entries to show"), "Blog default", "text");
 		$this->addOption("show_main",
-			_("Show link to main blog page"),
-			true, "checkbox");
+			_("Show link to main blog page"), true, "checkbox");
 		$this->getConfig();
 	}
 
@@ -20,6 +21,7 @@ class Recent extends Plugin {
 		
 		$blg = NewBlog();
 		if (! $blg->isBlog()) return false;
+		if ( !($this->num_entries > 0) ) $this->num_entries = false; 
 		
 		# Show some of the more recent entries.  If we're on the "front page"
 		# of the blog, then show the next set of entries.  Otherwise, show the 
@@ -28,9 +30,9 @@ class Recent extends Plugin {
 		              current_url() == BLOG_ROOT_URL."index.php");
 
 		if ($is_index) {
-			$next_list = $blg->getNextMax();
+			$next_list = $blg->getNextMax($this->num_entries);
 		} else {
-			$next_list = $blg->getRecent();
+			$next_list = $blg->getRecent($this->num_entries);
 		}
 
 		if ( count($next_list) > 0 ) { 

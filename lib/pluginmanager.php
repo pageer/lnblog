@@ -41,7 +41,7 @@ class PluginManager {
 		$this->plugin_list = $this->getFileList();
 		# Get various settings to determine which plugins should be loaded and 
 		# in what order.
-		$defexcl = "sidebar_archives.php";
+		$defexcl = "sidebar_archives.php,htaccess_generator.php";
 		$excl = $this->plugin_config->value("Plugin_Manager", "exclude_list", $defexcl);
 		$this->exclude_list = explode(",", $excl);
 		if (! is_array($this->exclude_list)) $this->exclude_list = array();
@@ -80,8 +80,9 @@ class PluginManager {
 
 	function getConfig() {
 		$global_config = NewINIParser(USER_DATA_PATH.PATH_DELIM."plugins.ini");
-		if (defined("BLOG_ROOT")) {
-			$blog_config = NewINIParser(BLOG_ROOT.PATH_DELIM."plugins.ini");
+		$blog_path = get_blog_path();
+		if ($blog_path) {
+			$blog_config = NewINIParser($blog_path.PATH_DELIM."plugins.ini");
 			$blog_config->merge($global_config);
 			$this->plugin_config =& $blog_config;
 		} else $this->plugin_config =& $global_config;
@@ -119,8 +120,9 @@ class PluginManager {
 
 	function getFileList() {
 		$plugin_dir_list = array();
-		if (defined("BLOG_ROOT")) 
-			$plugin_dir_list[] = BLOG_ROOT.PATH_DELIM."plugins";
+		$blog_path = get_blog_path();
+		if ($blog_path) 
+			$plugin_dir_list[] = $blog_path.PATH_DELIM."plugins";
 		$plugin_dir_list[] = INSTALL_ROOT.PATH_DELIM."plugins";
 		$file_list = array();
 		foreach ($plugin_dir_list as $dir) {

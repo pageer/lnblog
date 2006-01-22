@@ -74,6 +74,20 @@ class Entry extends LnBlogObject{
 	# of several defined constants, includine <MARKUP_NONE>, <MARKUP_BBCODE>, 
 	# and <MARKUP_HTML>.
 	var $has_html = MARKUP_NONE;
+	# Property: custom_fields
+	# An array of custom fields for the entry, with keys being the field name
+	# for use in the data structure and configuration files and the value
+	# being a short description to display to the user.
+	var $custom_fields = array();
+	# Property: metadata_fields
+	# An array of property->var pairs.  These are the object member 
+	# variable names and the data file variable names respectively.
+	# They are used to retreive data from persistent storage.
+	var $metadata_fields = array("id"=>"PostID", "uid"=>"UserID",
+		"date"=>"Date", "post_date"=>"PostDate", 
+		"timestamp"=>"Timestamp", "post_ts"=>"PostTimeStemp", 
+		"ip"=>"IP", "subject"=>"Subject", "has_html"=>"HasHTML",
+		"tags"=>"Tags", "custom"=>"Custom");
 
 	/*
 	Method: data
@@ -111,6 +125,16 @@ class Entry extends LnBlogObject{
 	*/
 	function permalink() { return ""; }
 
+	/*
+	Method: baselink
+	Gets a link to the object's base directory, to use for converting relative
+	to absolute paths.  I some cases, this is just the permalink.
+
+	Returns:
+	An absolute URI.
+	*/
+	function baselink() { return $this->permalink(); }
+	
 	/*
 	Method: queryStringToID
 	Abstract function that converts a query string into a unique identifier 
@@ -282,7 +306,7 @@ class Entry extends LnBlogObject{
 				$ret = $this->addHTML($ret, $use_nofollow);
 				break;
 			case MARKUP_BBCODE:
-				$ret = $this->absolutizeBBCodeURI($data, $this->permalink() );
+				$ret = $this->absolutizeBBCodeURI($data, $this->baselink() );
 				$ret = $this->stripHTML($ret);
 				$ret = $this->bbcodeToHtml($ret);
 				break;
@@ -319,35 +343,21 @@ class Entry extends LnBlogObject{
 		return $print_date;
 	}
 
-	# Add metadata from the file to the object.  Unknown metadata will be 
-	# ignored, while recognized data will be set to class properties.
-	
-	function addMetadata($key, $val) {
-		switch ($key) {
-			case "PostID":        $this->id = $val; break;
-			case "UserID":        $this->uid = $val; break;
-			case "Date":          $this->date = $val; break;
-			case "PostDate":      $this->post_date = $val; break;
-			case "Timestamp":     $this->timestamp = $val; break;
-			case "PostTimestamp": $this->post_ts = $val; break;
-			case "IP":            $this->ip = $val; break;
-			case "Subject":       $this->subject = $val; break;
-			case "HasHTML":       $this->has_html = $val; break;
-			case "Tags":          $this->tags = $val; break;
-		}
-	}
-	
 	function readFileData() {
 		#$data = file($this->store_path . "/" . $this->datafile);
 		$data = file($this->file);
 		$file_data = "";
 		if (! $data) $file_data = false;
 		else 
+			foreach ($this->custom_fields as $fld=>$desc) {
+				$this->metadata_fields[$fld] = $fld;
+			}
+			$lookup = array_flip($this->metadata_fields);
+			#$lookup = $this->metadata_fields;
 			foreach ($data as $line) {
 				preg_match('/<!--META ([\w|\s|-]*): (.*) META-->/', $line, $matches);
-				if ($matches) $this->addMetadata($matches[1], $matches[2]);
+				if ($matches) $this->$lookup[strtolower($matches[1])] = $matches[2];
 				$cleanline = preg_replace("/<!--META.*META-->\s\r?\n?\r?/", "", $line);
-				#if (preg_match("/\S/", $cleanline) == 0) $cleanline = "";
 				
 				$file_data .= $cleanline;
 			}
@@ -365,40 +375,28 @@ class Entry extends LnBlogObject{
 		$has_data = true;
 		if (! $fh) return false;
 		else 
+			foreach ($this->custom_fields as $fld=>$desc) {
+				$this->metadata_fields[$fld] = $fld;
+			}
+			$lookup = array_flip($this->metadata_fields);
 			while (! feof($fh) && $has_data) {
 				$line = fgets($fh);
 				preg_match('/<!--META (.*): (.*) META-->/', $line, $matches);
-				if ($matches) $this->addMetadata($matches[1], $matches[2]);
+				if ($matches) $this->$lookup[$matches[1]] = $matches[2];
 				else $has_data = false;
 			}
 	}
 	
-	function metadataFields() {
-		$ret = array();
-		$ret["PostID"] = $this->id;
-		$ret["UserID"] = $this->uid;
-		$ret["Date"] = $this->date;
-		$ret["PostDate"] = $this->post_date;
-		$ret["Timestamp"] =  $this->timestamp;
-		$ret["PostTimestamp"] = $this->post_ts;
-		$ret["IP"] = $this->ip;
-		$ret["Subject"] = $this->subject;
-		$ret["HasHTML"] = $this->has_html ? 1 : 0;
-		$ret["Tags"] = $this->tags;
-		return $ret;
-	}
-
-	function putMetadataFields() {
-		$fields = $this->metadataFields();
-		$ret = "";
-		foreach ($fields as $key=>$val) 
-			$ret .= "<!--META ".$key.": ".$val." META-->\n";
-		return $ret;
-	}
-
 	function writeFileData($file_data="") {
 		$fs = NewFS();
-		$header = $this->putMetadataFields();
+		$header = '';
+		foreach ($this->custom_fields as $fld=>$desc) {
+			$this->metadata_fields[$fld] = $fld;
+		}
+		foreach ($this->metadata_fields as $mem=>$fvar) {
+			$header .= "<!--META ".$fvar.": ".
+				(isset($this->$mem) ? $this->$mem : "")." META-->\n";
+		}
 		$file_data = $header.$this->data;
 		if (! is_dir(dirname($this->file)) ) 
 			$fs->mkdir_rec(dirname($this->file)); 

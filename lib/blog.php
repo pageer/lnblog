@@ -64,6 +64,7 @@ class Blog extends LnBlogObject {
 	var $entrylist;
 	var $last_blogentry;
 	var $last_article;
+	var $custom_fields;
 
 	function Blog($path="") {
 		
@@ -99,6 +100,7 @@ class Blog extends LnBlogObject {
 		$this->last_blogentry = false;
 		$this->last_article = false;
 		$this->blogid = basename($this->home_path);
+		$this->custom_fields = array();
 		$this->readBlogData();
 		
 		$this->raiseEvent("InitComplete");
@@ -135,20 +137,6 @@ class Blog extends LnBlogObject {
 		} else {
 			$this->write_list = explode(",", $list);
 		}
-	}
-
-	/*
-	Method: blogExists
-	Determines whether or not the object represents a saved blog.
-
-	Returns:
-	True if the blog exists, false if it doesn't.
-	*/
-
-	function blogExists() {
-		if (is_file($this->home_path.PATH_DELIM.BLOG_CONFIG_PATH))
-			return true;
-		else return false;
 	}
 	
 	/*
@@ -592,13 +580,6 @@ class Blog extends LnBlogObject {
 		return $this->entrylist;
 	}
 
-	# Gets the appropriate list of archive links.  This could be a list
-	# of years, months, or entries, depending on the circumstances.
-
-	function getArchive() {
-
-	}
-
 	/*
 	Method: getArticles
 	Returns a list of all articles, in no particular order.
@@ -1039,6 +1020,7 @@ class Blog extends LnBlogObject {
 		$this->raiseEvent("OnEntryPreview");
 		$tpl->set("PREVIEW_DATA", $this->last_blogentry->get() );
 		$tpl->set("SUBJECT", $this->last_blogentry->subject);
+		$tpl->set("TAGS", $this->last_blogentry->tags);
 		$tpl->set("DATA", $this->last_blogentry->data);
 		$tpl->set("HAS_HTML", $this->last_blogentry->has_html);
 		$tpl->set("COMMENTS", $this->last_blogentry->allow_comment);
@@ -1059,6 +1041,7 @@ class Blog extends LnBlogObject {
 		$this->raiseEvent("OnArticlePreview");
 		$tpl->set("PREVIEW_DATA", $this->last_article->get() );
 		$tpl->set("SUBJECT", $this->last_article->subject);
+		$tpl->set("TAGS", $this->last_blogentry->tags);
 		$tpl->set("DATA", $this->last_article->data);
 		$tpl->set("HAS_HTML", $this->last_article->has_html);
 		$tpl->set("COMMENTS", $this->last_article->allow_comment);

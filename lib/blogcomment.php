@@ -33,7 +33,9 @@ Inherits:
 Events:
 OnInit         - Fired when object is first created.
 InitComplete   - Fired at end of constructor.
-OnInsert       - Fired before object is saved to persistent storage.
+OnInsert       - Fired before object is saved to persistent storage.  This is
+                 run *after* the insertion setup is done, but *before* 
+                 anything is actually saved to disk.
 InsertComplete - Fired after object has finished saving.
 OnDelete       - Fired before object is deleted.
 DeleteComplete - Fired after object is deleted.
@@ -62,6 +64,12 @@ class BlogComment extends Entry {
 		$this->email = "";
 		$this->name = ANON_POST_NAME;
 		$this->has_html = MARKUP_NONE;
+		$this->metadata_fields = array("id"=>"postid", "uid"=>"userid",
+			"name"=>"name", "email"=>"e-mail", "url"=>"url",
+			"date"=>"date", "post_date"=>"postdate",
+			"timestamp"=>"timestamp", "post_ts"=>"posttimestamp",
+			"ip"=>"ip", "subject"=>"subject");
+		
 		if ( file_exists($this->file) ) {
 			$this->readFileData();
 		} elseif ( file_exists( $this->getFilename($path) ) ) {
@@ -112,7 +120,7 @@ class BlogComment extends Entry {
 		$ret["Subject"] =  $this->subject;
 		return $ret;
 	}
-
+		
 	function addMetadata($key, $val) {
 		switch ($key) {
 			case "PostID": $this->id = $val; break;
@@ -128,7 +136,6 @@ class BlogComment extends Entry {
 			case "IP": $this->ip = $val; break;
 			case "Subject": $this->subject = $val; break;
 		}
-		#echo "<p>Meta: $key, $val</p>";
 	}
 		
 	/*
@@ -140,7 +147,8 @@ class BlogComment extends Entry {
 	*/
 	function update () {
 		$this->raiseEvent("OnUpdate");
-		$ret = $this->delete();
+		if (KEEP_COMMENT_HISTORY) $ret = $this->delete();
+		else $ret = true;
 		if ($ret) {
 			$base_path = dirname($this->file); 
 			$ret = $this->insert($base_path);
@@ -158,15 +166,19 @@ class BlogComment extends Entry {
 	function delete () {
 		$this->raiseEvent("OnDelete");
 		$fs = NewFS();
-		$curr_ts = time();
-		$dir_path = dirname($this->file);
-		if (! is_dir($dir_path.PATH_DELIM.COMMENT_DELETED_PATH) )
-			$fs->mkdir_rec($dir_path.PATH_DELIM.COMMENT_DELETED_PATH);
-		$source_file = $this->file;
-		$target_file = basename($this->file)."-".$this->getPath($curr_ts);
-		$target_file = $dir_path.PATH_DELIM.COMMENT_DELETED_PATH.
-			PATH_DELIM.$target_file;
-		$ret = $fs->rename($source_file, $target_file);
+		if (KEEP_COMMENT_HISTORY) {
+			$curr_ts = time();
+			$dir_path = dirname($this->file);
+			if (! is_dir($dir_path.PATH_DELIM.COMMENT_DELETED_PATH) )
+				$fs->mkdir_rec($dir_path.PATH_DELIM.COMMENT_DELETED_PATH);
+			$source_file = $this->file;
+			$target_file = basename($this->file)."-".$this->getPath($curr_ts);
+			$target_file = $dir_path.PATH_DELIM.COMMENT_DELETED_PATH.
+				PATH_DELIM.$target_file;
+			$ret = $fs->rename($source_file, $target_file);
+		} else {
+			$ret = $fs->delete($this->file);
+		}
 		$fs->destruct();
 		$this->raiseEvent("DeleteComplete");
 		return $ret;
@@ -187,7 +199,6 @@ class BlogComment extends Entry {
 	*/
 	function insert($basepath) {
 	
-		$this->raiseEvent("OnInsert");
 	
 		$curr_ts = time();
 		$usr = NewUser();
@@ -201,14 +212,15 @@ class BlogComment extends Entry {
 		$this->timestamp = $curr_ts;
 		$this->ip = get_ip();
 
+		# Initial setup complete, start writing things to disk.
+		$this->raiseEvent("OnInsert");
+		# If there is no data for this comment, then abort.
+		if (! $this->data) return false;
 		if (! is_dir($basepath) ) {
 			$ret = create_directory_wrappers($basepath, ENTRY_COMMENTS);
 			if (! $ret) return false;
 		}
 		
-		# If there is no data for this comment, then abort.
-		if (! $this->data) return false;
-
 		$ret = $this->writeFileData();
 		$this->raiseEvent("InsertComplete");
 		return $ret;
@@ -219,17 +231,24 @@ class BlogComment extends Entry {
 	Pulls data out of the HTTP POST headers and into the object.
 	*/
 	function getPostData() {
-		$this->name = POST(COMMENT_POST_NAME);
-		$this->email = POST(COMMENT_POST_EMAIL);
-		$this->url = POST(COMMENT_POST_URL);
-		$this->subject = POST(COMMENT_POST_SUBJECT);
-		$this->data = POST(COMMENT_POST_DATA);
+		$this->name = POST("username");
+		$this->email = POST("email");
+		$this->url = POST("homepage");
+		$this->subject = POST("subject");
+		$this->data = POST("data");
+		foreach ($this->custom_fields as $fld=>$desc) {
+			$this->$fld = POST($fld);
+			$this->$fld = $this->stripHTML($this->$fld);
+		}
 		if (get_magic_quotes_gpc()) {
 			$this->name = stripslashes($this->name);
 			$this->email = stripslashes($this->email);
 			$this->url = stripslashes($this->url);
 			$this->subject = stripslashes($this->subject);
 			$this->data = stripslashes($this->data);
+			foreach ($this->custom_fields as $fld=>$desc) {
+				$this->$fld = stripslashes($this->$fld);
+			}
 		}
 		$this->name = $this->stripHTML($this->name);
 		$this->email = $this->stripHTML($this->email);
@@ -321,6 +340,16 @@ class BlogComment extends Entry {
 	*/
 	function get($show_edit_controls=false) {
 
+		# An array of the form label=>URL which holds the list of 
+		# administrative items, such as the delete link.
+		$this->control_bar = array();
+		# Add the delete link.
+		$this->control_bar[] = '<a href="'.
+			(is_dir(ENTRY_COMMENT_DIR) ? ENTRY_COMMENT_DIR : "").
+			"delete.php?comment=".$this->getAnchor().
+			'" onclick="return comm_del(this,\''.$this->getAnchor()
+			.'\');">'._("Delete").'</a>';
+
 		ob_start();
 		$this->raiseEvent("OnOutput");
 		$ret .= ob_get_contents();
@@ -359,6 +388,7 @@ class BlogComment extends Entry {
 		$t->set("ANCHOR", $this->getAnchor() );
 		$t->set("SHOW_CONTROLS", $show_edit_controls);
 		$t->set("BODY", $this->markup($this->data, COMMENT_NOFOLLOW) );
+		$t->set("CONTROL_BAR", $this->control_bar);
 		
 		$ret .= $t->process();
 		ob_start();

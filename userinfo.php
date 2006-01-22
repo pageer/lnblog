@@ -40,7 +40,8 @@ $tpl = NewTemplate(USER_INFO);
 $usr->exportVars($tpl);
 
 $ret = $tpl->process();
-$user_file = USER_DATA_PATH.$uid."profile.htm";
+$user_file = mkpath(USER_DATA_PATH,$uid,"profile.htm");
+
 if (file_exists($user_file)) {
 	$ret .= implode("\n", file($user_file));
 }

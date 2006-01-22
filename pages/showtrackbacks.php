@@ -31,8 +31,16 @@ $page = NewPage(&$ent);
 if (POST("url")) {
 	$ret = $ent->getPing();
 } else {			
+	if (GET("delete") && $blg->canModifyEntry()) {
+		$tb = NewTrackback(sanitize(GET("delete")));
+		$tb->delete();
+	}
 	$page->title = $ent->subject . " - " . $blg->name;
 	$page->addStylesheet("trackback.css");
-	$page->display($ent->getTrackbacks(), &$blog);
+	$body = $ent->getTrackbacks();
+	if (! $body) $body = '<p>'.
+		spf_('There are no trackbacks for <a href="%s">\'%s\'</a>',
+		     $ent->permalink(), $ent->subject).'</p>';
+	$page->display($body, &$blog);
 }
 ?>

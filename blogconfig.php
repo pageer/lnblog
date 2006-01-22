@@ -33,6 +33,29 @@ function mkpath() {
 	return implode(PATH_DELIM, $args);
 }
 
+# Function: get_blog_path
+# A quick global function to define get the path to the current blog even
+# if the BLOG_ROOT constant is not defined.
+#
+# Returns:
+# The full path to the blog.
+function get_blog_path() {
+	if ( defined("BLOG_ROOT") ) {
+		return BLOG_ROOT;
+	} elseif (isset($_GET['blog'])) {
+		if (PATH_DELIM != "/") {
+			$path = preg_replace("/\//", PATH_DELIM, $_GET["blog"]);
+		}
+		#if (PATH_DELIM == "\\") {
+		#	$path = preg_replace("/[^\w|\\]/", "", $path);
+		#} else 
+		$path = preg_replace("/[^\w|"."\\".PATH_DELIM."]/", "", $path);
+		return DOCUMENT_ROOT.PATH_DELIM.$path;
+	} else {
+		return false;
+	}
+}
+
 # Define the installation root, if it's not already defined.
 @define("INSTALL_ROOT", getcwd());
 
@@ -112,7 +135,7 @@ define("PACKAGE_NAME", _("LnBlog"));
 # Constant: PACKAGE_VERSION
 # The version number of the software.  This is a string in the format 
 # "1.2.3".  Note that each number may be more than one digit.
-define("PACKAGE_VERSION", _("0.5.0"));
+define("PACKAGE_VERSION", _("0.5.3"));
 
 # Constant: PACKAGE_URL
 # The full URL of the LnBlog project home page.
@@ -393,6 +416,15 @@ The corresponding replacement expression to <URI_TO_LOCALPATH_MATCH_RE>.
 ###############################################
 # Section: Blog entry and Article configuration
 
+# Constant: KEEP_EDIT_HISTORY
+# Controls whether deleted and modified entries are kept archived, or if
+# they are just permanently deleted.
+#
+# The *default* is false, which mean that deleted items are gone forever.
+# In previous versions, the default behavior was to save these, despite
+# the fact that there was no interface for dealing with them.
+@define("KEEP_EDIT_HISTORY", false);
+
 # Constant: ENTRY_PATH_FORMAT
 # The date format used directories for blog entries.
 #
@@ -481,13 +513,6 @@ The corresponding replacement expression to <URI_TO_LOCALPATH_MATCH_RE>.
 # The *default* is ".txt".
 @define("TRACKBACK_PATH_SUFFIX", ".txt");     # File suffix for saved pings.
 
-# These are constants for the entry submission form.  
-#@define("ENTRY_POST_SUBJECT", "subject");
-#@define("ENTRY_POST_ABSTRACT", "abstract");
-#@define("ENTRY_POST_COMMENTS", "allow_comments");
-#@define("ENTRY_POST_DATA", "data");
-#@define("ENTRY_POST_HTML", "usehtml");
-
 #############################################
 # Section: Comment configuration
 # Configuration constants used for controlling reader comments.
@@ -499,6 +524,13 @@ The corresponding replacement expression to <URI_TO_LOCALPATH_MATCH_RE>.
 #
 #*Default* is true. 
 @define("COMMENT_NOFOLLOW", true);
+
+# Constant: KEEP_COMMENT_HISTORY
+# Like <KEEP_EDIT_HISTORY>, except for comments.
+#
+# *Default* is false
+# Again, this was previously on my default, but is now off.
+@define("KEEP_COMMENT_HISTORY", false);
 
 # Constant: ANON_POST_NAME
 # Default name for users who don't enter a name. 
@@ -537,19 +569,21 @@ The corresponding replacement expression to <URI_TO_LOCALPATH_MATCH_RE>.
 # see e-mail addresses. 
 @define("COMMENT_EMAIL_VIEW_PUBLIC", false);
 
-# More form constants.  Same deal as for entries.
-@define("COMMENT_POST_SUBJECT", "subject");
-@define("COMMENT_POST_NAME", "username");
-@define("COMMENT_POST_EMAIL", "e-mail");
-@define("COMMENT_POST_URL", "url");
-@define("COMMENT_POST_DATA", "data");
-@define("COMMENT_POST_REMEMBER", "remember");
-
 #----------------------------------------------------------------------------
 # This section should not normally need to be changed.
 
 # Define config files for various parts of the plugin framework.
 define("FS_PLUGIN_CONFIG", "fsconfig.php");
+
+# Set the path for system-wide user data files.
+@define("USER_DATA_PATH", INSTALL_ROOT.PATH_DELIM.USER_DATA);
+
+# We bother to set DOCUMENT_ROOT in the setup, maybe we should actually use 
+# it consistently.  Just a thought....
+
+if (file_exists(USER_DATA_PATH.PATH_DELIM.FS_PLUGIN_CONFIG)) {
+	require_once(USER_DATA."/".FS_PLUGIN_CONFIG);
+}
 
 # Get the theme for the blog.  I'd like to do this in the Blog class, but 
 # we need to set the constant even when we don't have a current blog, so 
@@ -582,16 +616,6 @@ if (! defined("INSTALL_ROOT_URL")) {
 #@define("INSTALL_ROOT_URL", "/".basename(INSTALL_ROOT)."/");
 define("THEME_TEMPLATES", mkpath("themes",THEME_NAME,"templates"));
 define("DEFAULT_THEME_TEMPLATES", mkpath("themes","default","templates"));
-
-@define("THEME_STYLES", INSTALL_ROOT_URL."themes/".THEME_NAME."/styles");
-@define("THEME_IMAGES", INSTALL_ROOT_URL."themes/".THEME_NAME."/images");
-@define("THEME_SCRIPTS", INSTALL_ROOT_URL."themes/".THEME_NAME."/scripts");
-@define("DEFAULT_STYLES", INSTALL_ROOT_URL."themes/default/styles");
-@define("DEFAULT_IMAGES", INSTALL_ROOT_URL."themes/default/images");
-@define("DEFAULT_SCRIPTS", INSTALL_ROOT_URL."themes/default/scripts");
-
-# Set the path for system-wide user data files.
-@define("USER_DATA_PATH", INSTALL_ROOT.PATH_DELIM.USER_DATA);
 
 # Include constants for classes.
 require_once("lib/constants.php");

@@ -34,72 +34,86 @@ require_once("blogconfig.php");
 require_once("lib/creators.php");
 require_once("lib/utils.php");
 
-global $PLUGIN_MANAGER;
+$file = GETPOST("file");
+if (get_magic_quotes_gpc()) $file = stripslashes($file);
+if (PATH_DELIM  != '/') $file = str_replace('/', PATH_DELIM, $file);
+
 $u = NewUser();
 $page = NewPage();
 $blog = NewBlog();
+$ent = NewBlogEntry();
 
-if ($blog->isBlog()) {
+$edit_ok = false;
+$relpath = INSTALL_ROOT;
+
+if ($ent->isEntry() ) {
+	$page->display_object = &$ent;
+	$relpath = $ent->localpath();
+	if ($ent->canModifyEntry() ) $edit_ok = true;
+} elseif ($blog->isBlog() ) {
 	$page->display_object = &$blog;
-	if (! $blog->canModifyBlog() ) {
-		$page->redirect("index.php");
-		exit;
-	}
-} elseif (! $u->checkLogin() && ! $u->isAdministrator() ) {
-	$page->redirect("index.php");
+	$relpath = $blog->home_path;
+	if ($blog->canModifyBlog() ) $edit_ok = true;
+} elseif ($u->isAdministrator() ) {
+	$edit_ok = true;
+}
+if (! $u->checkLogin()) $edit_ok = false;
+
+if (! $edit_ok) {
+	if (SERVER("referer")) $page->redirect(SERVER("referer"));
+	else $page->redirect("index.php");
 	exit;
 }
 
 $tpl = NewTemplate("file_edit_tpl.php");
-$tpl->set("PAGE_TITLE", _("Create site map"));
-$tpl->set("FORM_MESSAGE", spf_('This page will help you create a site map to display in the navigation bar at the top of your blog.  This file is stored under the name %s in the root directory of your weblog for a personal sitemap or in the %s installation directory for the system default.  This file in simply a series of <abbr title="Hypertext Markup Language">HTML</abbr> links, each on it\'s own line, which the template will process into a list.  If you require a more complicated menu bar, you will have to create a custom template.',
-SITEMAP_FILE, PACKAGE_NAME));
-$tpl->set("FORM_ACTION", current_file() );
-$tpl->set("SHOW_LINK_EDITOR");
+$query_string = (isset($_GET["blog"]) ? "?blog=".$_GET["blog"] : "");
+
+# Prepare template for link list display.
+if (isset($_GET["list"])) {
+	$tpl->set("SHOW_LINK_EDITOR");
+	$page->addScript("sitemap.js");
+	$query_string .= ($query_string ? "&amp;" : "?")."list=yes";
+}
+$tpl->set("FORM_ACTION", current_file().$query_string);
+if (isset($_GET["list"])) $tpl->set("PAGE_TITLE", "Edit Link List");
+else $tpl->set("PAGE_TITLE", "Edit Text File");
+
+if (! isset($_POST["file"])) $file = $relpath.PATH_DELIM.$file;
 
 if (has_post()) {
 
-	if ($blog->isBlog()) {
-		$target_file = BLOG_ROOT.PATH_DELIM.
-			$PLUGIN_MANAGER->plugin_config;
-	} else {
-		$target_file = USER_DATA_PATH.PATH_DELIM.SITEMAP_FILE;
-	}
-
 	if (get_magic_quotes_gpc()) $data = stripslashes(POST("output"));
 	else $data = POST("output");
-	$ret = write_file($target_file, $data);
+	$ret = write_file($file, $data);
 
 	if (! $ret) {
 		$tpl->set("EDIT_ERROR", _("Cannot create file"));
 		$tpl->set("ERROR_MESSAGE", 
-		          spf_("Unable to create file %s.", $target_file));
-		$tpl->set("FILE_TEXT", $data);
-	} else $page->redirect("index.php");
+		          spf_("Unable to create file %s.", $file));
+		$tpl->set("FILE_TEXT", htmlentities($data));
+	} #else $page->redirect("index.php");
 	
 } else {
 
-	if ($blog->isBlog() && is_file(BLOG_ROOT.PATH_DELIM.SITEMAP_FILE) ) {
-		$target_file = BLOG_ROOT.PATH_DELIM.SITEMAP_FILE;
-	} elseif (is_file(USER_DATA_PATH.PATH_DELIM.SITEMAP_FILE) ) {
-		$target_file = USER_DATA_PATH.PATH_DELIM.SITEMAP_FILE;
+	if (file_exists($file)) {
+		$data = implode("", file($file));	
 	} else {
-		$target_file = false;
+		$data = "";
+		$tpl->set("EDIT_ERROR", _("Create new file"));
+		$tpl->set("ERROR_MESSAGE", _("The selected file does not exist.  It will be created."));
 	}
-
-	if ($target_file) {
-		$data = implode("", file($target_file) );
-		$tpl->set("FILE_TEXT", $data);
-	}
-	
 }
+
+$tpl->set("FILE_TEXT", htmlentities($data));
+$tpl->set("FILE_PATH", $file);
+$tpl->set("FILE_SIZE", file_exists($file)?filesize($file):0);
+$tpl->set("FILE_URL", localpath_to_uri($file));	
+$tpl->set("FILE", $file);
 
 if (! defined("BLOG_ROOT")) $blog = false;
 
-if ($blog->isBlog()) $page->title = _("Edit blog menu bar");
-else $page->title = _("Edit site menu bar");
+$page->title = _("Edit file");
 $page->addStylesheet("form.css");
-$page->addScript("sitemap.js");
 $page->display($tpl->process(), $blog);
 
 ?>

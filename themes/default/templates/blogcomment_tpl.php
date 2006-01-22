@@ -34,8 +34,14 @@
 		<li class="commenturl">(<a href="<?php echo $URL; ?>"><?php echo $URL; ?></a>)</li>
 		<?php } ?>
 <?php } ?>
-		<?php if ($SHOW_CONTROLS) { ?>
-		<li class="admin"><a href="<?php echo is_dir(ENTRY_COMMENT_DIR) ? ENTRY_COMMENT_DIR."/" : ""; ?>delete.php?comment=<?php echo $ANCHOR; ?>"><?php p_("Delete"); ?></a></li>
-		<?php } ?>
+		<?php 
+		if ($SHOW_CONTROLS) { 
+			foreach ($CONTROL_BAR as $item) {
+		?>
+		<li class="admin"><?php echo $item; ?></li>
+		<?php 
+			}
+		} 
+		?>
 	</ul>
 </div>

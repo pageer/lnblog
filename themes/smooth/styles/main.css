@@ -89,9 +89,19 @@ img.corner {
 
 @media print {
 
-	div#container {
+	html, body { 
+		background-color: white;
+	}
+
+	div#container, #maincontainer, #pagecontent {
 		width: 100%;
 		margin: 0 auto;
+		background-image: none;
+		background-color: white;
+	}
+
+	.roundtop, .roundbottom { 
+		display: none; 
 	}
 
 	/* Styles for the page content area. */

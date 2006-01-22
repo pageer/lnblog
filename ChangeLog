@@ -1,3 +1,64 @@
+14-Jan-2006: version 0.5.3 "No Need for Spam"
+- Fixed redirect used after posting a comment.
+- Fixed default value for comment disabling plugin.
+- Removed extraneous images for tuxice theme.
+- Made the .htaccess plugin disabled by default, as it can cause problems
+on some configurations (like Ubuntu Breezy default).
+
+13-Jan-2006:
+- Fixed "allow comment" checkbox to also refer to trackbacks.
+- Added a "global ban" link to ipbanning plugin when the administrator is
+logged in.
+
+12-Jan-2006:
+- Added option to allow comments only from logged-in users.
+- Added recent entry option to customize number of entries shown.
+- Added missing LBCode and standard plugin documentation.
+- Fixed "remember me" function for comments (again).
+
+11-Jan-2006:
+- Fixed sitemap edit page to respect the plugin setting.
+- Added setting (now default) to turn off saving of deleted comments.
+- Added a Javascript prompt for confirming comment deletion.
+- Added redirect after comment post to prevent duplicates on refresh.
+
+10-Jan-2006:
+- Fixed missing security check in editfile.php.
+- Consolidated the sitemap template and file editing template.
+- Added option to sidebar articles plugin to append a list of custom links to
+the end of the article list.
+- Fixed blog settings detection from query string.
+- Fixed path problem in sitemap config.
+
+09-Jan-2006:
+- Added property and template logic to turn off trackbacks.  Made the setting
+synchronous with the analogous comment setting.
+- Added plugins to disable trackbacks or comments on an entire blog.
+- Fixed tags not being shown after a preview.
+- Fixed problem with incorrect base link for relative URLs in entries.
+
+08-Jan-2006:
+- Fixed IP banning plugin.  Now uses regular expressions to allow banning
+of entire subnets.
+
+06-Jan-2006:
+- Added plugins events for trackbacks.
+- Added e-mail notificaiton for trackbacks.
+- Added trackbacks to the IP banning plugin.
+
+04-Jan-2006:
+- Added IP banning plugin for comment spam.
+
+30-Dec-2005:
+- Improved plugin configuration listing.
+- Created arbitrary file editing page.
+- Added pretty links for entries.
+- Fixed broken calculate_document_root() function.
+- Made the BlogEntry object determine URIs for its all links.
+
+24-Dec-2005:
+- Started removing legacy support for PHP < 4.1.
+
 23-Dec-2005: version 0.5.2
 - Fixed bugs in smooth theme.
 - Moved news feed names from constants to plugin variables.

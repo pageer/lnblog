@@ -49,7 +49,15 @@ class Article extends BlogEntry {
 		$this->data = "";
 		$this->has_html = MARKUP_BBCODE;
 		$this->allow_comment = true;
-		$this->template_file = ARTICLE_TEMPLATE;
+		$this->allow_tb = true;
+		$this->metadata_fields = array("id"=>"postid", "uid"=>"userid", 
+			"date"=>"date", "post_date"=>"postdate",
+			"timestamp"=>"timestamp", "post_ts"=>"posttimestamp",
+			"ip"=>"ip", "mail_notify"=>"mail notification",
+			"sent_ping"=>"trackback ping", "subject"=>"subject",
+			"abstract"=>"abstract", "allow_comment"=>"allowcomment",
+			"has_html"=>"hashtml", "tags"=>"tags", 
+			"allow_tb"=>"allowtrackback");
 
 		if ($path) {
 			$this->file = $path.PATH_DELIM.$revision;
@@ -262,33 +270,6 @@ class Article extends BlogEntry {
 		}
 	}
 
-	/*
-	Method: link
-	Gets the correct URL for a particular type of link.
-
-	Parameters:
-	type - The type of link needed.  The allowed types are "upload", "edit", "insert",
-	
-	Returns:
-	A string with the full URL for the given operation or false on failure.
-	*/
-	
-	function link($op) {
-		if (USE_WRAPPER_SCRIPTS) {
-			$perm = $this->permalink();
-			switch ($op) {
-				case "download": return $perm;
-				case "upload":	  return $perm."uploadfile.php";
-				case "edit":     return $perm."edit.php";
-			
-			}
-		} else {
-			switch ($op) {
-				case "upload": return;
-			}
-		}
-	}
-	
 	/*
 	Method: get
 	Get the HTML code to display the article.

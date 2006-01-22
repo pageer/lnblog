@@ -30,15 +30,17 @@
 	<li><a href="<?php echo $EDIT_LINK; ?>"><?php p_("Edit"); ?></a></li>
 	<li><a href="<?php echo $DELETE_LINK; ?>"><?php p_("Delete"); ?></a></li>
 </ul>
-<?php } ?>
+<?php } 
+if (! empty($ALLOW_TRACKBACKS)) { ?>
 <p><?php p_("TrackBack <abbr title=\"Uniform Resource Locator\">URL</abbr>"); ?>: <a href="<?php echo $TRACKBACK_LINK; ?>"><?php echo $TRACKBACK_LINK; ?></a></p>
-<?php if ( ! empty($COMMENTCOUNT) ) { ?>
-<h3><a href="<?php echo $PERMALINK.ENTRY_COMMENT_DIR; ?>/"><?php p_("View reader comments"); ?> (<?php echo $COMMENTCOUNT; ?>)</a></h3>
+<?php } 
+if ( ! empty($COMMENTCOUNT) ) { ?>
+<h3><a href="<?php echo $COMMENT_LINK; ?>"><?php p_("View reader comments"); ?> (<?php echo $COMMENTCOUNT; ?>)</a></h3>
 <?php } elseif ( ! empty($ALLOW_COMMENTS) ) { ?>
-<h3><a href="<?php echo $PERMALINK.ENTRY_COMMENT_DIR; ?>/"><?php p_("Post a comment"); ?></a></h3>
+<h3><a href="<?php echo $COMMENT_LINK; ?>"><?php p_("Post a comment"); ?></a></h3>
 <?php } ?>
 <?php if ( ! empty($TRACKBACKCOUNT) ) { ?>
-<h3><a href="<?php echo $PERMALINK.ENTRY_TRACKBACK_DIR; ?>/"><?php p_("View TrackBacks"); ?> (<?php echo $TRACKBACKCOUNT; ?>)</a></h3>
+<h3><a href="<?php echo $SHOW_TRACKBACK_LINK; ?>"><?php p_("View TrackBacks"); ?> (<?php echo $TRACKBACKCOUNT; ?>)</a></h3>
 <?php } ?>
 </div>
 </div>

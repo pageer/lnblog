@@ -33,14 +33,16 @@ echo $list;
 <?php } ?>
 <ul class="comments">
 <?php if ( ! empty($COMMENTCOUNT) ) { ?>
-<li><a href="<?php echo $PERMALINK.ENTRY_COMMENT_DIR; ?>/"><?php p_("Comments");?> (<?php echo $COMMENTCOUNT; ?>)</a></li>
+<li><a href="<?php echo $COMMENT_LINK; ?>"><?php p_("Comments");?> (<?php echo $COMMENTCOUNT; ?>)</a></li>
 <?php } elseif ( ! empty($ALLOW_COMMENTS) ) { ?>
-<li><a href="<?php echo $PERMALINK.ENTRY_COMMENT_DIR; ?>/"><?php p_("Post comment");?></a></li>
+<li><a href="<?php echo $COMMENT_LINK; ?>"><?php p_("Post comment");?></a></li>
 <?php } ?>
 <?php if ( ! empty($TRACKBACKCOUNT) ) { ?>
-<li><a href="<?php echo $PERMALINK.ENTRY_TRACKBACK_DIR; ?>/"><?php p_("TrackBacks");?> (<?php echo $TRACKBACKCOUNT; ?>)</a></li>
-<?php } ?>
+<li><a href="<?php echo $SHOW_TRACKBACK_LINK; ?>"><?php p_("TrackBacks");?> (<?php echo $TRACKBACKCOUNT; ?>)</a></li>
+<?php } 
+if (! empty($ALLOW_TRACKBACKS)) {?>
 <li><a href="<?php echo $TRACKBACK_LINK; ?>"><?php p_('TrackBack <abbr title="Uniform Resource Locator">URL</abbr>');?></a></li>
+<?php } ?>
 </ul>
 </div>
 </div>

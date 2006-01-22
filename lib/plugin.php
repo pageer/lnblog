@@ -90,6 +90,7 @@ class Plugin extends LnBlogObject{
 	description - A short description for the user to see.
 	default     - The default value.
 	control     - Optional control to use.  The default is "text".
+	options     - An array of options for radio and select controls.
 	*/
 
 	function addOption($name, $description, $default, $control="text", $options=false) {
@@ -121,7 +122,7 @@ class Plugin extends LnBlogObject{
 		echo "<fieldset>\n";
 		echo '<form method="post" ';
 		echo 'action="'.current_file().'?plugin='.get_class($this).'" ';
-		echo "name=\"plugin_config\">\n";
+		echo "id=\"plugin_config\">\n";
 		
 		foreach ($this->member_list as $mem=>$config) {
 			if (! isset($config["control"])) $config["control"] = "text";
@@ -132,14 +133,15 @@ class Plugin extends LnBlogObject{
 				if ($this->$mem) echo 'checked="checked" ';
 				echo " /></div>\n";
 			} elseif ($config["control"] == "radio") {
+				echo '<fieldset style="margin: 1%; padding: 1%">';
+				echo '<legend>'.$config["description"].'</legend>';
 				foreach ($config["options"] as $val=>$desc) {
-					echo '<div>';
 					echo '<label for="'.$val.'">'.$desc.'</label>';
 					echo '<input name="'.$mem.'" id="'.$val.'" type="radio" value="'.$val.'"';
 					if ($this->$mem == $val) echo 'checked="checked"';
-					echo ' />';
-					echo "</div>\n";
+					echo ' /><br />';
 				}
+				echo "</fieldset>\n";
 			} elseif ($config["control"] == "select") {
 				echo '<div>';
 				echo '<label for="'.$mem.'">'.$config["description"]."</label>\n";

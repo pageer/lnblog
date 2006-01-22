@@ -27,20 +27,22 @@
 <div class="blogentryfooter">
 <?php if ($SHOW_CONTROLS) { ?>
 <ul class="postadmin">
-	<li><a onclick="javascript:window.open('<?php echo $PERMALINK; ?>trackback.php?send_ping=yes'); return false;" href="<?php echo $PERMALINK; ?>trackback.php?send_ping=yes">Send TrackBack Ping</a></li>
-	<li><a href="<?php echo $PERMALINK; ?>uploadfile.php"><?php p_('Upload file');?></a></li>
-	<li><a href="<?php echo $PERMALINK; ?>edit.php"><?php p_('Edit');?></a></li>
-	<li><a href="<?php echo $PERMALINK; ?>delete.php"><?php p_('Delete');?></a></li>
+	<li><a onclick="javascript:window.open('<?php echo $PING_LINK;?>'); return false;" href="<?php echo $PING_LINK; ?>"><?php p_("Send TrackBack Ping");?></a></li>
+	<li><a href="<?php echo $UPLOAD_LINK; ?>"><?php p_('Upload file');?></a></li>
+	<li><a href="<?php echo $EDIT_LINK; ?>"><?php p_('Edit');?></a></li>
+	<li><a href="<?php echo $DELETE_LINK; ?>"><?php p_('Delete');?></a></li>
 </ul>
 <?php } ?>
 <ul>
-<li><a href="<?php echo $PERMALINK.ENTRY_COMMENT_DIR; ?>/">
+<li><a href="<?php echo $COMMENT_LINK; ?>">
 <?php if ( ! empty($COMMENTCOUNT) ) { p_('View reader comments');?> (<?php echo $COMMENTCOUNT; ?>)
 <?php } else { p_('Post a comment'); } ?></a></li>
 <?php if ( ! empty($TRACKBACKCOUNT) ) { ?>
-<li><a href="<?php echo $PERMALINK.ENTRY_TRACKBACK_DIR; ?>/"><?php p_('View TrackBacks');?> (<?php echo $TRACKBACKCOUNT; ?>)</a></li>
+<li><a href="<?php echo $SHOW_TRACKBACK_LINK; ?>"><?php p_('View TrackBacks');?> (<?php echo $TRACKBACKCOUNT; ?>)</a></li>
+<?php } 
+if (! empty($ALLOW_TRACKBACKS)) { ?>
+<li><?php p_('TrackBack <abbr title="Uniform Resource Locator">URL</abbr>');?>: <a href="<?php echo $TRACKBACK_LINK; ?>"><?php echo $TRACKBACK_LINK; ?></a></li>
 <?php } ?>
-<li><?php p_('TrackBack <abbr title="Uniform Resource Locator">URL</abbr>');?>: <a href="<?php echo $PERMALINK; ?>trackback.php"><?php echo $PERMALINK; ?>trackback.php</a></li>
 </ul>
 </div>
 </div>

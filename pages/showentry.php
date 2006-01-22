@@ -26,21 +26,21 @@ $ent = NewBlogEntry();
 $blg = NewBlog();
 $page = NewPage(&$ent);
 			
-if ( POST(COMMENT_POST_REMEMBER) ) {
-	setcookie(COMMENT_POST_NAME, POST(COMMENT_POST_NAME));
-	setcookie(COMMENT_POST_EMAIL, POST(COMMENT_POST_EMAIL));
-	setcookie(COMMENT_POST_URL, POST(COMMENT_POST_URL));
-}
-
 # This code will detect if a comment has been submitted and, if so,
 # will add it.  We do this before printing the comments so that a 
 # new comment will be displayed on the page.
 
 $SUBMIT_ID = "submit";
 
-$comm = NewBlogComment();
 if (POST($SUBMIT_ID)) {
-	$ent->addComment();
+	$ret = $ent->addComment();
+	if ($ret) {
+		# We add the random template here so that the "remember me" cookies
+		# are set.  This should definitely be fixed.
+		$t = NewTemplate("comment_form_tpl.php");
+		$ret = $t->process();
+		$page->redirect($ent->permalink());
+	}
 }
 
 # Get the entry AFTER posting the comment so that the comment count is right.
@@ -68,5 +68,6 @@ if ($ent->allow_comment) {
 	$content .= $comm_tpl->process();
 }
 
+$page->addScript("entry.js");
 $page->display($content, &$blog);
 ?>

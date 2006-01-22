@@ -193,10 +193,11 @@ function find_document_root($path=false) {
 function calculate_document_root() {
 	# Bail out if DOCUMENT_ROOT is already defined.
 	if ( defined("DOCUMENT_ROOT") ) return DOCUMENT_ROOT;
-	
+
 	# Get the current URL and the path to the file.
 	$curr_uri = current_uri();
 	$curr_file = getcwd().PATH_DELIM.basename($curr_uri);
+	if (! file_exists($curr_file)) $curr_file = getcwd();
 	if (PATH_DELIM != "/") $curr_uri = str_replace("/", PATH_DELIM, $curr_uri);
 
 	if ( preg_match(URI_TO_LOCALPATH_MATCH_RE, $curr_uri) ) {
@@ -205,30 +206,12 @@ function calculate_document_root() {
 
 	# Find the location 
 	$pos = strpos($curr_file, $curr_uri);
+	while (! $pos && strlen($curr_uri) > 1) {
+		$curr_uri = dirname($curr_uri);
+		$pos = strpos($curr_file, $curr_uri);
+	}
 	return substr($curr_file, 0, $pos + 1);
 	
-}
-
-# Function: compare_standard_version
-# Version comparison function, since we want this to work with PHP 4.0 as
-# well as version 4.1, which is when version_compare() was introduced.
-#
-# Parameters:
-# ver1 - First version number.
-# ver2 - Second version number.
-#
-# Returns:
-# 1 if ver1 is greater, -1 if ver1 is less, and 0 if they're equal.
-
-function compare_standard_version($ver1, $ver2) {
-	if (function_exists("version_compare"))
-		return version_compare($ver1, $ver2);
-	$ver1_arr = explode(".", $ver1);
-	$ver2_arr = explode(".", $ver2);
-	for ($i=0; $i < 3; $i++)  
-		if ($ver1_arr[$i] != $ver2_arr[$i]) 
-			return $ver1_arr[$i] > $ver2_arr[$i] ? 1 : -1;
-	return 0;
 }
 
 # Function: php_version_at_least
@@ -241,152 +224,124 @@ function compare_standard_version($ver1, $ver2) {
 # True if that current PHP version is at least ver, false otherwise.
 
 function php_version_at_least($ver) {
-	$res = compare_standard_version(phpversion(), $ver);
+	$res = version_compare(phpversion(), $ver);
 	if ($res < 0) return false;
 	else return true;
 }
 
+# Function: SESSION
+# A wrapper for the $_SESSION superglobal.  Provides a handy 
+# way to avoid undefined variable warnings without explicitly calling
+# isset() or empty() every time.
+#
+# Parameters:
+# key - The key for the superglobal index.
+# val - The *optional* value to set to the superglobal.
+#
+# Returns:
+# The value of the superglobal at index key, false if index is not set.
 
-if (php_version_at_least("4.1.0")) {
+function SESSION($key, $val="") {
+	if ($val) return $_SESSION[$key] = $val;
+	elseif (isset($_SESSION[$key])) return $_SESSION[$key];
+	else return false;
+}
+
+# Function: SERVER
+#
+# Parameters:
+# key - The key for the superglobal index.
+# val - The *optional* value to set to the superglobal.
+#
+# Returns:
+# The value of the superglobal at index key, false if index is not set.
+
+function SERVER($key, $val="") {
+	if ($val) return $_SERVER[$key] = $val;
+	elseif (isset($_SERVER[$key])) return $_SERVER[$key];
+	else return false;
+}
+
+# Function: COOKIE
+#
+# Parameters:
+# key - The key for the superglobal index.
+# val - The *optional* value to set to the superglobal.
+#
+# Returns:
+# The value of the superglobal at index key, false if index is not set.
+
+function COOKIE($key, $val="") {
+	if ($val) return $_COOKIE[$key] = $val;
+	elseif (isset($_COOKIE[$key])) return $_COOKIE[$key];
+	else return false;
+}
 	
-	# Function: SESSION
-	# A wrapper for the $_SESSION superglobal.  Provides a handy 
-	# way to avoid undefined variable warnings without explicitly calling
-	# isset() or empty() every time.
-	#
-	# Parameters:
-	# key - The key for the superglobal index.
-	# val - The *optional* value to set to the superglobal.
-	#
-	# Returns:
-	# The value of the superglobal at index key, false if index is not set.
+# Function: POST
+#
+# Parameters:
+# key - The key for the superglobal index.
+# val - The *optional* value to set to the superglobal.
+#
+# Returns:
+# The value of the superglobal at index key, false if index is not set.
 
-	function SESSION($key, $val="") {
-		if ($val) return $_SESSION[$key] = $val;
-		elseif (isset($_SESSION[$key])) return $_SESSION[$key];
-		else return false;
-	}
-	
-	# Function: SERVER
-	#
-	# Parameters:
-	# key - The key for the superglobal index.
-	# val - The *optional* value to set to the superglobal.
-	#
-	# Returns:
-	# The value of the superglobal at index key, false if index is not set.
+function POST($key, $val="") {
+	if ($val) return $_POST[$key] = $val;
+	elseif (isset($_POST[$key])) return $_POST[$key];
+	else return false;
+}
 
-	function SERVER($key, $val="") {
-		if ($val) return $_SERVER[$key] = $val;
-		elseif (isset($_SERVER[$key])) return $_SERVER[$key];
-		else return false;
-	}
-	
-	# Function: SERVER
-	#
-	# Parameters:
-	# key - The key for the superglobal index.
-	# val - The *optional* value to set to the superglobal.
-	#
-	# Returns:
-	# The value of the superglobal at index key, false if index is not set.
+# Function: GET
+#
+# Parameters:
+# key - The key for the superglobal index.
+# val - The *optional* value to set to the superglobal.
+#
+# Returns:
+# The value of the superglobal at index key, false if index is not set.
 
-	function COOKIE($key, $val="") {
-		if ($val) return $_COOKIE[$key] = $val;
-		elseif (isset($_COOKIE[$key])) return $_COOKIE[$key];
-		else return false;
-	}
-	
-	# Function: SERVER
-	#
-	# Parameters:
-	# key - The key for the superglobal index.
-	# val - The *optional* value to set to the superglobal.
-	#
-	# Returns:
-	# The value of the superglobal at index key, false if index is not set.
+function GET($key, $val="") {
+	if ($val) return $_GET[$key] = $val;
+	elseif (isset($_GET[$key])) return $_GET[$key];
+	else return false;
+}
 
-	function POST($key, $val="") {
-		if ($val) return $_POST[$key] = $val;
-		elseif (isset($_POST[$key])) return $_POST[$key];
-		else return false;
-	}
+# Function: GETPOST
+# Like $_REQUEST.  This is the same as checking <POST> and then <GET>
+# and returning the first result.
+#
+# Parameters:
+# key - The key to return.
+#
+# Returns:
+# The value of $_POST[$key] if it is set, else $_GET[$key].  Returns false
+# if neither one is set.
 
-	# Function: SERVER
-	#
-	# Parameters:
-	# key - The key for the superglobal index.
-	# val - The *optional* value to set to the superglobal.
-	#
-	# Returns:
-	# The value of the superglobal at index key, false if index is not set.
+function GETPOST($key) {
+	if (isset($_POST[$key])) return $_POST[$key];
+	elseif (isset($_GET[$key])) return $_GET[$key];
+	else return false;
+}
 
-	function GET($key, $val="") {
-		if ($val) return $_GET[$key] = $val;
-		elseif (isset($_GET[$key])) return $_GET[$key];
-		else return false;
-	}
+# Function: has_post
+# Determine if there is any POST data.
+#
+# Returns:
+# True if $_POST has any members, false otherwise.
 
-	# Function: has_post
-	# Determine if there is any POST data.
-	#
-	# Returns:
-	# True if $_POST has any members, false otherwise.
-	
-	function has_post() {
-		return count($_POST);
-	}
+function has_post() {
+	return count($_POST);
+}
 
-	# Function: has_post
-	# Determine if there is any GET data.
-	#
-	# Returns:
-	# True if $_GET has any members, false otherwise.
-	
-	function has_get() {
-		return count($_GET);
-	}
+# Function: has_post
+# Determine if there is any GET data.
+#
+# Returns:
+# True if $_GET has any members, false otherwise.
 
-} else {
-	
-	function SERVER($key, $val="") {
-		if ($val) return $HTTP_SESSION_VARS[$key] = $val;
-		elseif (isset($HTTP_SESSION_VARS[$key])) return $HTTP_SESSION_VARS[$key];
-		else return false;
-	}
-
-	function SERVER($key, $val="") {
-		if ($val) return $HTTP_SERVER_VARS[$key] = $val;
-		elseif (isset($HTTP_SERVER_VARS[$key])) return $HTTP_SERVER_VARS[$key];
-		else return false;
-	}
-
-	function COOKIE($key, $val="") {
-		if ($val) return $HTTP_COOKIE_VARS[$key] = $val;
-		elseif (isset($HTTP_COOKIE_VARS[$key])) return $HTTP_COOKIE_VARS[$key];
-		else return false;
-	}
-
-	function POST($key, $val="") {
-		if ($val) return $HTTP_POST_VARS[$key] = $val;
-		elseif (isset($HTTP_POST_VARS[$key])) return $HTTP_POST_VARS[$key];
-		else return false;
-	}
-
-	function GET($key, $val="") {
-		if ($val) return $HTTP_GET_VARS[$key] = $val;
-		elseif (isset($HTTP_GET_VARS[$key])) return $HTTP_GET_VARS[$key];
-		else return false;
-	}
-
-	function has_post() {
-		return count($HTTP_POST_VARS);
-	}
-
-	function has_get() {
-		return count($HTTP_GET_VARS);
-	}
-
+function has_get() {
+	return count($_GET);
 }
 
 # Function: current_uri
@@ -450,7 +405,6 @@ function localpath_to_uri($path, $full_uri=true) {
 	if (is_dir($full_path)) $full_path .= PATH_DELIM;
 	#$root = find_document_root($full_path);
 	$root = calculate_document_root();
-
 	# Normalize to lower case on Windows in order to avoid problems
 	# with case-sensitive substring removal.
 	if ( strtoupper( substr(PHP_OS,0,3) ) == 'WIN' ) {
@@ -640,7 +594,7 @@ function getlink($name, $type=false) {
 				$ltype = LINK_SCRIPT;
 				break;
 			case "css":
-				$l_type = LINE_STYLESHEET;
+				$l_type = LINK_STYLESHEET;
 				break;
 		}
 	}
