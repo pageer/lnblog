@@ -1,3 +1,6 @@
+18-Jan-2006: version 0.5.4 "No Need for Testing"
+- Fixed crashing bug for systems without gettext.
+
 14-Jan-2006: version 0.5.3 "No Need for Spam"
 - Fixed redirect used after posting a comment.
 - Fixed default value for comment disabling plugin.

@@ -130,16 +130,16 @@ define("LOCALEDIR", "locale");
 
 # Constant: PACKAGE_NAME
 # The official package name, currently "LnBlog".
-define("PACKAGE_NAME", _("LnBlog"));
+define("PACKAGE_NAME", "LnBlog");
 
 # Constant: PACKAGE_VERSION
 # The version number of the software.  This is a string in the format 
 # "1.2.3".  Note that each number may be more than one digit.
-define("PACKAGE_VERSION", _("0.5.3"));
+define("PACKAGE_VERSION", "0.5.4");
 
 # Constant: PACKAGE_URL
 # The full URL of the LnBlog project home page.
-define("PACKAGE_URL", _("http://www.skepticats.com/lnblog/"));
+define("PACKAGE_URL", "http://www.skepticats.com/lnblog/");
 
 # Add I18N support here, as this is currently the earliest we can do it.
 # Refer to the lib/i18n.php file for details.
