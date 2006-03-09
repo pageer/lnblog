@@ -9,7 +9,8 @@
 <form id="postform" method="post" action="<?php echo $FORM_ACTION; ?>">
 <div>
 <label class="basic_form_label" for="subject"><?php p_("Subject"); ?></label>
-<input id="subject" name="subject" accesskey="s" type="text" <?php if (isset($SUBJECT)) { ?>value="<?php echo $SUBJECT; ?>" <?php } ?>/>
+<input id="subject" name="subject" accesskey="s" type="text" <?php if (isset($SUBJECT)) { ?>value="<?php echo $SUBJECT; ?> " <?php } ?><?php
+if (isset($GET_SHORT_PATH)) { ?>onblur="set_article_path();"<?php } ?>/>
 </div>
 <div>
 <label class="basic_form_label" for="tags"><?php p_("Tags"); ?></label>
@@ -43,8 +44,12 @@
 <input id="mode_html" name="input_mode" type="radio" <?php if ($HAS_HTML == MARKUP_HTML) { ?>checked="checked"<?php } ?> value="<?php echo MARKUP_HTML; ?>" />
 </div>
 <div>
-<label for="comments">Allow comments and trackbacks</label>
+<label for="comments">Allow comments</label>
 <input id="comments" name="comments" type="checkbox" <?php if (! (isset($COMMENTS) && !$COMMENTS) ) { ?>checked="checked"<?php } ?> />
+</div>
+<div>
+<label for="trackbacks">Allow trackbacks</label>
+<input id="trackbacks" name="trackbacks" type="checkbox" <?php if (! (isset($TRACKBACKS) && !$TRACKBACKS) ) { ?>checked="checked"<?php } ?> />
 </div>
 <div class="threebutton">
 <input name="<?php echo $SUBMIT_ID; ?>" id="<?php echo $SUBMIT_ID; ?>" type="submit" value="Submit" />

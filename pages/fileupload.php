@@ -26,20 +26,36 @@
 
 session_start();
 
+require_once("config.php");
 require_once("lib/creators.php");
 
 $blog = NewBlog();
 $ent = NewBlogEntry();
+$usr = NewUser();
 $tpl = NewTemplate(UPLOAD_TEMPLATE);
 $page = NewPage();
 
-if ( ($ent->isEntry() && $blog->canModifyEntry()) || 
-     $blog->canModifyBlog()) {
+$target = false;
+if ( isset($_GET["profile"]) && $usr->checkLogin() && 
+     ($_GET["profile"] == $usr->username() || $usr->isAdministrator()) ) {
+	$target = USER_DATA_PATH.PATH_DELIM.$usr->username();
+} elseif ($ent->isEntry() && $blog->canModifyEntry()) {
+	$target = $ent->localpath();
+} elseif ($blog->canModifyBlog()) {
+	$target = $blog->home_path;
+}
+
+if ($target) {
 
 	$file_name = "filename";
-	$f = NewFileUpload($file_name);
+	$f = NewFileUpload($file_name, $target);
 	
-	$tpl->set("TARGET", current_file() );
+	$query_string = isset($_GET["blog"])?"?blog=".$_GET["blog"]:'';
+	$query_string .= isset($_GET["profile"]) ?
+	                 ($query_string?"&amp;":"?")."profile=".$_GET["profile"] :
+	                 "";
+	
+	$tpl->set("TARGET", current_file().$query_string);
 	$size = ini_get("upload_max_filesize");
 	$size = str_replace("K", "000", $size);
 	$size = str_replace("M", "000000", $size);

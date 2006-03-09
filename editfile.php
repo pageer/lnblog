@@ -46,7 +46,10 @@ $ent = NewBlogEntry();
 $edit_ok = false;
 $relpath = INSTALL_ROOT;
 
-if ($ent->isEntry() ) {
+if ( GET("profile") == $u->username() ) {
+	$edit_ok = true;
+	$relpath = USER_DATA_PATH.PATH_DELIM.$u->username();
+} elseif ($ent->isEntry() ) {
 	$page->display_object = &$ent;
 	$relpath = $ent->localpath();
 	if ($ent->canModifyEntry() ) $edit_ok = true;
@@ -67,6 +70,9 @@ if (! $edit_ok) {
 
 $tpl = NewTemplate("file_edit_tpl.php");
 $query_string = (isset($_GET["blog"]) ? "?blog=".$_GET["blog"] : "");
+if (isset($_GET["profile"])) {
+	$query_string .= ($query_string?"&amp;":"?")."profile=".$_GET["profile"];
+}
 
 # Prepare template for link list display.
 if (isset($_GET["list"])) {

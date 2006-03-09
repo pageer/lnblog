@@ -66,6 +66,8 @@ li.bloguser, li.bloguserurl {
 
 .blogentrybody p {
 	text-indent: 1em;
+	margin-bottom: 0.7em;
+	margin-top: 0.3em;
 	/*clear: both;*/
 }
 

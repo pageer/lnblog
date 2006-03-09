@@ -26,4 +26,5 @@ class TrackbackRDF extends Plugin {
 }
 $plug = new TrackbackRDF();
 $plug->registerEventHandler("blogentry", "OnOutput", "add_rdf");
+$plug->registerEventHandler("article", "OnOutput", "add_rdf");
 ?>

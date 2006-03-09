@@ -33,7 +33,7 @@ $page = NewPage(&$ent);
 
 $SUBMIT_ID = "submit";
 
-if (POST($SUBMIT_ID)) {
+if (has_post()) {
 	$cmt_added = $ent->addComment(getcwd().PATH_DELIM.ENTRY_COMMENT_DIR);
 	if ($cmt_added) {
 		# We add the random template here so that the "remember me" cookies

@@ -35,7 +35,7 @@ $redir_page = "index.php";
 $tpl = NewTemplate(CREATE_LOGIN_TEMPLATE);
 
 # Allow us to use this to create the admin login.
-if (file_exists(USER_DATA_PATH.PATH_DELIM."passwd.php")) {
+if (file_exists(mkpath(USER_DATA_PATH,ADMIN_USER,"passwd.php"))) {
 	$page_name = _("Create New Login");
 	$form_title = _("Create New Login");
 } else {
@@ -62,6 +62,11 @@ $tpl->set("FULLNAME", $full_name);
 $tpl->set("EMAIL", $email);
 $tpl->set("HOMEPAGE", $homepage);
 
+$cust_path = mkpath(USER_DATA_PATH,CUSTOM_PROFILE);
+$cust_ini = NewINIParser($cust_path);
+$section = $cust_ini->getSection(CUSTOM_PROFILE_SECTION);
+$tpl->set("CUSTOM_FIELDS", $section);
+
 $post_complete = POST($user_name) && POST($password) && POST($confirm);
 $partial_post = POST($user_name) || POST($password) || POST($confirm);
 
@@ -78,9 +83,10 @@ if ($post_complete) {
 		$usr->name(trim(POST($full_name)));
 		$usr->email(trim(POST($email)));
 		$usr->homepage(trim(POST($homepage)));
+		foreach ($section as $key=>$val) {
+			$usr->custom[$key] = POST($key);
+		}
 		$usr->save();
-		#$usr->login(POST($password));
-		#redirect("bloglogin.php");
 		$page->redirect("index.php");
 		exit;
 	}

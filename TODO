@@ -1,13 +1,11 @@
 Features to be added:
 
-* User "home" directories for personal files and data.
 * Allow use of query strings and .htaccess rules in place of wrapper scripts.
 * Ability to create draft posts and articles.
 * Ability to create entry from uploaded HTML document.
 * Ability to display an HTML document in the standard page layout.
 * Documentation on how templates get strung together to make a page.
 * Improved user interface for blog settings and administration.
-* Add native search capability.
 * Support for polls?
 * Multi-page articles?
 * Option to publish entries as articles?

@@ -1,3 +1,71 @@
+17-Feb-2006: version 0.6.0 "No need for passwd.php"
+- Fixed string length error in setting blog ID.
+- Fixed JavaScript but in post editor.
+- Added some padding to entry paragraphs in the smooth theme.
+
+16-Feb-2006:
+- Made fileupload.php and editfile.php understand user profile directories.
+- Added links to profile edit page to upload file and edit profile.htm.
+- Fixed blogid property of blog object to be semi-intelligent.
+
+15-Feb-2006:
+- Added support for actually adding and displaying comments on articles.
+- Changed templates to use user profile page as user name link target.
+
+14-Feb-2006:
+- Added separate setting for allowing trackbacks per-entry.
+- Added per-blog setting for default markup mode for new entries.
+- Fixed comment link problem with tuxice theme.
+- Removed ill-considered filename truncation check form upload class.
+This was preventing uploading of files without dots in the filename.
+- Fixed redirection bug in bloglogin.php on initial login.
+- Turn off trackbacks by default for articles (although the article templates
+currently have no trackback interface elements anyway).
+- Make article sidebar "show all" link text configurable.
+
+13-Feb-2006:
+- Added JavaScript to set article path from subject.
+- Fixes to new blogdata.ini reading and writing.
+- Fixed misdetection of old passwd.php on initial page load.
+
+08-Feb-2006:
+- Converted blogdata.txt file to INI format.  Reading from old version 
+is still supported.
+- Fixed JavaScript editor so that highlighting some text and clicking a 
+button will have the same effect as entering that text in the popup window.
+Also added configuration constants to turn off edit boxes (now hidden by
+default) and the math symbols.
+
+07-Feb-2006:
+- Added custom fields for user profiles, with descriptions stored in
+the userdata/profile.ini file.
+
+31-Jan-2006:
+- Added collapsable sections to Javascript editor as well as special HTML
+entities for mathematical symbols.
+- Fixed article sidebar plugin to include edit link when there are no
+articles for the entry.
+
+26-Jan-2006:
+- Fixed undefined variable problem in get_blog_path() in blogconfig.php.
+Started improvements to JavaScript post editor.
+
+25-Jan-2006:
+- Fixed stray character in comment_form_tpl.php that broke validation.
+- Added a simple native search plugin.
+
+24-Jan-2006:
+- Moved user profiles over to personal user directories.  Maintained 
+compatibility for old passwd.php file.
+- Fixed JS bug in login_create_tpl.php
+
+18-Jan-2006:
+- Wrapped object data in htmlentities() calls when previewing or editing
+articles or entries.  Otherwise, we can end up injecting invalid HTML into
+the edit fields and messing up the page.
+- Added uri() method to blog class in preparation for shift to allowing
+query strings and/or .htaccess URLs.
+
 18-Jan-2006: version 0.5.4 "No Need for Testing"
 - Fixed crashing bug for systems without gettext.
 

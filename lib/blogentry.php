@@ -48,6 +48,7 @@ class BlogEntry extends Entry {
 	
 	var $blogid;
 	var $allow_comment = true;
+	var $allow_tb = true;
 	var $has_html;
 	var $mail_notify = true;
 	var $sent_ping = true;
@@ -254,6 +255,8 @@ class BlogEntry extends Entry {
 	function uri($type) {
 		$dir_uri = localpath_to_uri($this->localpath());
 		switch ($type) {
+			case "permalink":
+			case "entry":
 			case "page": 
 				$pretty_file = preg_replace("/\W/", "_", trim($this->subject)).".php";
 				if ( file_exists(dirname($this->localpath()).
@@ -271,7 +274,7 @@ class BlogEntry extends Entry {
 			case "comment":   return $dir_uri.ENTRY_COMMENT_DIR."/";
 			case "base":      return $dir_uri;
 		}
-		return "";
+		return $dir_uri;
 	}
 	
 	function getByPath ($path, $revision=ENTRY_DEFAULT_FILE) {
@@ -304,6 +307,19 @@ class BlogEntry extends Entry {
 		$ret = $fs->rename($source, $target);
 			
 		if ($ret) $ret = $this->writeFileData();
+
+		# Create wrappers for comments and trackbacks if they do not exist.
+		# This is done here for the article subclass, as it did not previously 
+		# create these wrappers.
+		if ($this->allow_comment && 
+		    ! is_dir($dir_path.PATH_DELIM.ENTRY_COMMENT_DIR) ) {
+			create_directory_wrappers($dir_path.PATH_DELIM.ENTRY_COMMENT_DIR, ENTRY_COMMENTS);
+		}
+		if ($this->allow_tb &&
+		    ! is_dir($dir_path.PATH_DELIM.ENTRY_TRACKBACK_DIR) ) {
+			create_directory_wrappers($dir_path.PATH_DELIM.ENTRY_TRACKBACK_DIR, ENTRY_TRACKBACKS);
+		}
+
 
 		if (! $ret) {
 			
@@ -437,7 +453,7 @@ class BlogEntry extends Entry {
 		$this->tags = POST("tags");
 		$this->data = POST("body");
 		$this->allow_comment = POST("comments") ? 1 : 0;
-		$this->allow_tb = POST("comments") ? 1 : 0;
+		$this->allow_tb = POST("trackbacks") ? 1 : 0;
 		$this->has_html = POST("input_mode");
 		foreach ($this->custom_fields as $fld=>$desc) {
 			$this->$fld = POST($fld);
@@ -471,7 +487,7 @@ class BlogEntry extends Entry {
 		ob_end_clean();
 	
 		$tmp = NewTemplate(ENTRY_TEMPLATE);
-		
+		$blog = NewBlog();
 		$usr = NewUser($this->uid);
 		$usr->exportVars($tmp);
 		
@@ -495,6 +511,9 @@ class BlogEntry extends Entry {
 		$tmp->set("TRACKBACKCOUNT", $this->getTrackbackCount() );
 		$tmp->set("SHOW_TRACKBACK_LINK", $this->uri("trackback"));
 		$tmp->set("SHOW_CONTROLS", $show_edit_controls);
+		$tmp->set("PROFILE_LINK", INSTALL_ROOT_URL."userinfo.php?user=".
+		                          $usr->username().
+		                          "&amp;blog=".$blog->blogid);
 
 		foreach ($this->custom_fields as $fld=>$desc) {
 			$tmp->set(strtoupper($fld), isset($this->$fld) ? $this->$fld : '');

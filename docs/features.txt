@@ -27,7 +27,7 @@ The following are a list of the standard plugins that come with LnBlog.
 - E-mail notification for trackback pings.
 - Auto-generated RSS feeds (RSS1 headlines and/or RSS2 full text) for blog entries.
 - Auto-generated RSS feeds (RSS1 headlines and/or RSS2 full text) for user comments on each entry.
-- Auto-generate Apache .htaccess files when creating and upgrading blogs.
+- Auto-generate Apache .htaccess files when creating and upgrading blogs (disabled by default).
 - Add metadata (keywords, description, author) and RSS links to the HTML page head.
 - Add trackback auto-discovery RDF code to entries.
 - Turn off comments and trackbacks for an entire blog, or allow comments from only logged-in users.
@@ -37,5 +37,6 @@ The following are a list of the standard plugins that come with LnBlog.
 - Sidebar RSS feed links with customizable section header.
 - Sidebar static article list with customizable section header and optional list of custom links.
 - Sidebar calendar with customizable section header.
-- Sidebar form to search your blog with Google (assuming Google has spidered it).
+- Sidebar form to search your blog with Google (assuming Google has spidered it, disabled by default).
+- Sidebar form to search your blog for a set of words or a regular expression.  Unlike the Google search plugins, this one runs entirely on your server.
 - Sidebar list of tags used in the blog and links to show entries by tag.

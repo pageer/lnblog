@@ -32,16 +32,17 @@ Format: 1.35
 
 Group: User Documentation  {
 
-   File: LnBlog User Documentation  (docs/overview.txt)
+   File: Overview and Setup  (docs/overview.txt)
    File: Feature List  (docs/features.txt)
    File: To do list  (docs/todo.txt)
    File: Translations  (docs/translations.txt)
-   File: How plugins work  (docs/plugins.txt)
+   File: Using Plugins  (docs/plugins.txt)
+   File: User Profiles  (docs/userprofiles.txt)
    }  # Group: User Documentation
 
 Group: Configuration  {
 
-   File: blogconfig.php  (no auto-title, blogconfig.php)
+   File: blogconfig.php  (blogconfig.php)
    File: constants.php  (lib/constants.php)
    File: fsconfig.php  (docs/fsconfig.txt)
    File: userconfig.cfg  (docs/userconfig.txt)

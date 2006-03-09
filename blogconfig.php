@@ -43,12 +43,10 @@ function get_blog_path() {
 	if ( defined("BLOG_ROOT") ) {
 		return BLOG_ROOT;
 	} elseif (isset($_GET['blog'])) {
+		$path = $_GET["blog"];
 		if (PATH_DELIM != "/") {
-			$path = preg_replace("/\//", PATH_DELIM, $_GET["blog"]);
+			$path = preg_replace("/\//", PATH_DELIM, $path);
 		}
-		#if (PATH_DELIM == "\\") {
-		#	$path = preg_replace("/[^\w|\\]/", "", $path);
-		#} else 
 		$path = preg_replace("/[^\w|"."\\".PATH_DELIM."]/", "", $path);
 		return DOCUMENT_ROOT.PATH_DELIM.$path;
 	} else {
@@ -135,7 +133,7 @@ define("PACKAGE_NAME", "LnBlog");
 # Constant: PACKAGE_VERSION
 # The version number of the software.  This is a string in the format 
 # "1.2.3".  Note that each number may be more than one digit.
-define("PACKAGE_VERSION", "0.5.4");
+define("PACKAGE_VERSION", "0.6.0");
 
 # Constant: PACKAGE_URL
 # The full URL of the LnBlog project home page.
@@ -340,7 +338,17 @@ The corresponding replacement expression to <URI_TO_LOCALPATH_MATCH_RE>.
 # *Default* is 3.
 @define("LBCODE_HEADER_WEIGHT", 3);
 
+# Constant: EDITOR_HIDE_INLINE_BOXES
+# Shows the inline boxes used for old version of the JavaScript editor
+#
+# *Default* is false.
+@define("EDITOR_SHOW_INLINE_BOXES", false);
 
+# Constant: EDITOR_HIDE_SYMBOLS
+# Shows the the buttons to add entities for mathamatical symbols.
+#
+# *Default* is true.
+@define("EDITOR_SHOW_SYMBOLS", true);
 
 ########################################
 # Section: User Authentication
@@ -359,6 +367,17 @@ The corresponding replacement expression to <URI_TO_LOCALPATH_MATCH_RE>.
 # *Default* is "administrator".
 @define("ADMIN_USER", _("administrator"));
 
+# Constant: CUSTOM_PROFILE
+# File name use to store custom fields that will be listed in user profiles.
+# This file is in INI format, with key names corresponding to the custom
+# field names and values being the label displayed for the field.
+@define("CUSTOM_PROFILE", "profile.ini");
+
+# Constant: CUSTOM_PROFILE_SECTION
+# The INI section of the <CUSTOM_PROFILE> file that holds the list
+# of custom fields.
+@define("CUSTOM_PROFILE_SECTION", "profile fields");
+
 ##########################################
 # Section: Blog configuration
 # Configuration constants regarding date formats and file names. 
@@ -368,8 +387,8 @@ The corresponding replacement expression to <URI_TO_LOCALPATH_MATCH_RE>.
 # Note that this is specific to file-based storage and should not be used
 # for database storage.  
 #
-# *Default* is "blogdata.txt".
-@define("BLOG_CONFIG_PATH", "blogdata.txt");
+# *Default* is "blogdata.ini".
+@define("BLOG_CONFIG_PATH", "blogdata.ini");
 
 # Constant: BLOG_DELETED_PATH
 # Directory name used to store old blog settings.
@@ -595,6 +614,11 @@ if ( defined("BLOG_ROOT") ) {
 		preg_replace("/\W/", "", $_GET['blog']).PATH_DELIM.BLOG_CONFIG_PATH;
 }
 
+if (isset($cfg_file) && ! is_file($cfg_file)) {
+	$cfg_file = substr_replace($cfg_file, "blogdata.txt", 
+	                           strlen($cfg_file) - strlen(BLOG_CONFIG_PATH));
+}
+
 if (isset($cfg_file) && is_file($cfg_file)) {
 	$data = file($cfg_file);
 	foreach ($data as $line) {
@@ -611,7 +635,8 @@ if (isset($cfg_file) && is_file($cfg_file)) {
 @define("THEME_NAME", "default");
 if (! defined("INSTALL_ROOT_URL")) {
 	require_once("lib/utils.php");
-	define("INSTALL_ROOT_URL", localpath_to_uri(getcwd()));
+	#define("INSTALL_ROOT_URL", localpath_to_uri(getcwd()));
+	define("INSTALL_ROOT_URL", localpath_to_uri(INSTALL_ROOT));
 }
 #@define("INSTALL_ROOT_URL", "/".basename(INSTALL_ROOT)."/");
 define("THEME_TEMPLATES", mkpath("themes",THEME_NAME,"templates"));

@@ -30,14 +30,22 @@ require_once("blogconfig.php");
 require_once("lib/creators.php");
 require_once("lib/utils.php");
 
-$uid = GET("user_id");
-$uid = $uid ? $uid : POST("user_id");
+$uid = GET("user");
+$uid = $uid ? $uid : POST("user");
 $uid = preg_replace("/\W/", "", $uid);
 
 $usr = NewUser($uid);
 $page = NewPage(&$usr);
-$tpl = NewTemplate(USER_INFO);
+$tpl = NewTemplate("user_info_tpl.php");
 $usr->exportVars($tpl);
+
+$priv_path = mkpath(USER_DATA_PATH,$usr->username(),"profile.ini");
+$cust_path = mkpath(USER_DATA_PATH,"profile.ini");
+$cust_ini = NewINIParser($priv_path);
+$cust_ini->merge(NewINIParser($cust_path));
+
+$tpl->set("CUSTOM_FIELDS", $cust_ini->getSection("profile fields"));
+$tpl->set("CUSTOM_VALUES", $usr->custom);
 
 $ret = $tpl->process();
 $user_file = mkpath(USER_DATA_PATH,$uid,"profile.htm");

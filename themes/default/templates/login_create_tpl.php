@@ -29,13 +29,25 @@
 <label for="<?php echo $HOMEPAGE; ?>"><?php p_('Homepage');?></label>
 <input type="text" id="<?php echo $HOMEPAGE; ?>" name="<?php echo $HOMEPAGE; ?>" <?php if (isset($HOMEPAGE_VALUE)) echo 'value="'.$HOMEPAGE_VALUE.'" '; ?>/>
 </div>
+<?php foreach ($CUSTOM_FIELDS as $key=>$val) { ?>
+<div>
+<label for="<?php echo $key;?>"><?php echo $val;?></label>
+<input type="text" id="<?php echo $key;?>" name="<?php echo $key;?>" <?php if (isset($CUSTOM_VALUES[$key])) echo 'value="'.$CUSTOM_VALUES[$key].'" '; ?>/>
+</div>
+<?php } ?>
+<?php if ( isset($UPLOAD_LINK) && isset($PROFILE_EDIT_LINK) ) { ?>
+<p style="text-align: center">
+<a href="<?php echo $PROFILE_EDIT_LINK;?>"><?php echo $PROFILE_EDIT_DESC;?></a><br />
+<a href="<?php echo $UPLOAD_LINK;?>"><?php echo $UPLOAD_DESC;?></a>
+</p>
+<?php } ?>
 <div>
 <span class="basic_form_submit"><input type="submit" value="<?php p_('Submit');?>" /></span>
 <span class="basic_form_clear"><input type="reset" value="<?php p_('Clear');?>" /></span></div>
 </form>
 <script type="text/javascript">
 <!--
-<?php if (isset($DISABLE_UNAME)) { ?>
+<?php if (! isset($UNAME)) { ?>
 var elem = document.getElementById('<?php echo $PWD; ?>');
 elem.focus();
 <?php } else { ?>

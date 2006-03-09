@@ -41,7 +41,7 @@ class PluginManager {
 		$this->plugin_list = $this->getFileList();
 		# Get various settings to determine which plugins should be loaded and 
 		# in what order.
-		$defexcl = "sidebar_archives.php,htaccess_generator.php";
+		$defexcl = "sidebar_archives.php,htaccess_generator.php,sidebar_googlesearch.php";
 		$excl = $this->plugin_config->value("Plugin_Manager", "exclude_list", $defexcl);
 		$this->exclude_list = explode(",", $excl);
 		if (! is_array($this->exclude_list)) $this->exclude_list = array();
@@ -49,7 +49,7 @@ class PluginManager {
 		$deflf = "banner_pageheader.php,menubar_sitemap.php,".
 		         "sidebar_loginops.php,sidebar_recent.php,".
 		         "sidebar_articles.php,sidebar_calendar.php,".
-		         "sidebar_news.php,sidebar_googlesearch.php,sidebar_tags.php,".
+		         "sidebar_news.php,sidebar_search.php,sidebar_tags.php,".
 		         "sidebar_loginlink.php,sidebar_poweredby.php";
 		$lf = $this->plugin_config->value("Plugin_Manager", "load_first", $deflf);
 		$this->load_first = explode(",", $lf);

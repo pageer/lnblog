@@ -4,7 +4,7 @@ class Articles extends Plugin {
 
 	function Articles() {
 		$this->plugin_desc = _("List the articles for a blog.");
-		$this->plugin_version = "0.2.2";
+		$this->plugin_version = "0.2.3";
 		$this->header = _("Articles");
 		$this->static_link = true;
 		$this->custom_links = "links.htm";
@@ -13,6 +13,9 @@ class Articles extends Plugin {
 		$this->addOption("static_link", 
 			_("Show link to list of static articles"),
 			true, "checkbox");
+		$this->addOption("showall_text",
+			_("Text for link to all static articles"),
+			_("All static pages"), "text");
 		$this->addOption("custom_links", 
 			_("File where additional links to display are stored"),
 			"links.htm", "true");
@@ -42,7 +45,7 @@ class Articles extends Plugin {
 				}
 			}
 			if ($this->static_link) { # Optionally show link to article index ?>
-<li style="margin-top: 0.5em"><a href="<?php echo $blg->getURL(false).BLOG_ARTICLE_PATH; ?>/"><?php p_("All static pages");?></a></li><?php
+<li style="margin-top: 0.5em"><a href="<?php echo $blg->getURL(false).BLOG_ARTICLE_PATH; ?>/"><?php echo $this->showall_text;?></a></li><?php
 			} 
 			if ($blg->canModifyBlog()) {
 ?><li style="margin-top: 0.5em"><a href="<?php echo INSTALL_ROOT_URL;?>editfile.php?blog=<?php echo $blg->blogid;?>&amp;list=yes&amp;file=<?php echo $this->custom_links;?>"><?php p_("Add custom links");?></a></li>
@@ -50,6 +53,8 @@ class Articles extends Plugin {
 			}?>
 </ul>
 <?php 	
+		} elseif ($blg->canModifyBlog()) { ?>
+<ul><li style="margin-top: 0.5em"><a href="<?php echo INSTALL_ROOT_URL;?>editfile.php?blog=<?php echo $blg->blogid;?>&amp;list=yes&amp;file=<?php echo $this->custom_links;?>"><?php p_("Add custom links");?></a></li></ul><?php
 		} # End if block 
 	}  # End function
 	

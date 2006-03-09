@@ -3,7 +3,7 @@
 #menubar {
 	width: 100%;
 	background: #cdcdcd;
-	border: thin solid black;
+	border: 1px solid black;
 	border-top: none;
 }
 

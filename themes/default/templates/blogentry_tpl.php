@@ -14,6 +14,9 @@
 ?></li>
 <?php } ?>
 	<li class="blogdate"><?php pf_("Posted %s", $POSTDATE); ?></li>
+<?php if (! isset($NO_USER_PROFILE)) { # Display profile link or not ?>
+	<li class="bloguser"><?php pf_("By %s", '<a href="'.$PROFILE_LINK.'">'.$USER_DISPLAY_NAME.'</a>');?></li>
+<?php } else { # Use old e-mail link for user name ?>
 <?php if ( isset($USER_EMAIL) ) { ?>
 	<li class="bloguser"><?php pf_("By %s", '<a href="mailto:'.$USER_EMAIL.'">'.$USER_DISPLAY_NAME.'</a>'); ?></li>
 <?php } else { ?>
@@ -22,6 +25,7 @@
 <?php if (isset($USER_HOMEPAGE)) { ?>
 	<li class="bloguserurl">(<a href="<?php echo $USER_HOMEPAGE; ?>"><?php echo $USER_HOMEPAGE; ?></a>)</li>
 <?php } ?>
+<?php } # End user if block ?>
 </ul>
 <?php if ($SHOW_CONTROLS) { ?>
 <ul class="postadmin">
@@ -36,7 +40,7 @@ if (! empty($ALLOW_TRACKBACKS)) { ?>
 <?php } 
 if ( ! empty($COMMENTCOUNT) ) { ?>
 <h3><a href="<?php echo $COMMENT_LINK; ?>"><?php p_("View reader comments"); ?> (<?php echo $COMMENTCOUNT; ?>)</a></h3>
-<?php } elseif ( ! empty($ALLOW_COMMENTS) ) { ?>
+<?php } elseif ($ALLOW_COMMENTS) { ?>
 <h3><a href="<?php echo $COMMENT_LINK; ?>"><?php p_("Post a comment"); ?></a></h3>
 <?php } ?>
 <?php if ( ! empty($TRACKBACKCOUNT) ) { ?>

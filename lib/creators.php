@@ -114,7 +114,7 @@ function NewUser($usr=false, $pwd=false) {
 # index - The *optional* index of this upload for file upload arrays.
 function NewFileUpload($field, $dir=false, $index=false) {
 	require_once("upload.php");
-	return new FileUpload($field, $dir=false, $index=false);
+	return new FileUpload($field, $dir, $index);
 }
 
 # Function: NewTrackback

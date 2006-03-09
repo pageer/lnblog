@@ -42,6 +42,7 @@ $blogimage = "image";
 $blogtheme = "theme";
 $blogmax = "maxent";
 $blogrssmax = "maxrss";
+$blogmarkup = "blogmarkup";
 $blogpath = "blogpath";
 $submitid = "submit";
 
@@ -58,14 +59,16 @@ $tpl = NewTemplate(BLOG_UPDATE_TEMPLATE);
 if (POST($blogpath)) $blog->home_path = POST($blogpath);
 else $blog->home_path = "myblog";
 
-if (POST($blogname)) $blog->owner = POST($blogowner);
-if (POST($blogname)) $blog->writers(POST($blogwriters) );
-if (POST($blogname)) $blog->name = POST($blogname);
-if (POST($blogdesc)) $blog->description = POST($blogdesc);
-if (POST($blogimage)) $blog->image = POST($blogimage);
-if (POST($blogtheme)) $blog->theme = POST($blogtheme);
-if (POST($blogmax)) $blog->max_entries = POST($blogmax);
-if (POST($blogrssmax)) $blog->max_rss = POST($blogrssmax);
+if (has_post()) {
+	$blog->owner = POST($blogowner);
+	$blog->writers(POST($blogwriters) );
+	$blog->name = POST($blogname);
+	$blog->description = POST($blogdesc);
+	$blog->image = POST($blogimage);
+	$blog->theme = POST($blogtheme);
+	$blog->max_entries = POST($blogmax);
+	$blog->max_rss = POST($blogrssmax);
+}
 
 $tpl->set("BLOG_PATH_ID", $blogpath);
 $tpl->set("BLOG_PATH_REL", $blog->home_path);
@@ -85,6 +88,8 @@ $tpl->set("BLOG_MAX_ID", $blogmax);
 $tpl->set("BLOG_MAX", $blog->max_entries);
 $tpl->set("BLOG_RSS_MAX_ID", $blogrssmax);
 $tpl->set("BLOG_RSS_MAX", $blog->max_rss);
+$tpl->set("BLOG_DEFAULT_MARKUP_ID", $blogmarkup);
+$tpl->set("BLOG_DEFAULT_MARKUP", $blog->default_markup);
 $tpl->set("BLOG_PATH_ID", $blogpath);
 $tpl->set("BLOG_PATH", $blog->home_path);
 $tpl->set("POST_PAGE", current_file());

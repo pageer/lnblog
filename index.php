@@ -82,7 +82,7 @@ $tpl->set("PERMS", $fixperm);
 $tpl->set("FORM_ACTION", current_file());
 
 $usr = NewUser();
-if (! is_file(USER_DATA_PATH.PATH_DELIM."passwd.php")) {
+if (! is_file(mkpath(USER_DATA_PATH,ADMIN_USER,"passwd.php"))) {
 	$page->redirect("newlogin.php");
 	exit;
 } elseif (! $usr->checkLogin() || $usr->username() != ADMIN_USER) {

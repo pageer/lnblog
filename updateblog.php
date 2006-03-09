@@ -49,6 +49,7 @@ $blogimage = "image";
 $blogtheme = "theme";
 $blogmax = "maxent";
 $blogrss = "maxrss";
+$blogmarkup = "blogmarkup";
 $blogwriters = "writelist";
 $submitid = "submit";
 
@@ -72,6 +73,8 @@ $tpl->set("BLOG_MAX_ID", $blogmax);
 $tpl->set("BLOG_MAX", $blog->max_entries);
 $tpl->set("BLOG_RSS_MAX_ID", $blogrss);
 $tpl->set("BLOG_RSS_MAX", $blog->max_rss);
+$tpl->set("BLOG_DEFAULT_MARKUP_ID", $blogmarkup);
+$tpl->set("BLOG_DEFAULT_MARKUP", $blog->default_markup);
 $tpl->set("POST_PAGE", current_file());
 $tpl->set("SUBMIT_ID", $submitid);
 $tpl->set("UPDATE_TITLE", sprintf(_("Update %s"), $blog->name));
@@ -82,13 +85,16 @@ $tpl->set("UPDATE_TITLE", sprintf(_("Update %s"), $blog->name));
 if ($usr->username() == ADMIN_USER && POST($blogowner) ) {
 	$blog->owner = POST($blogowner);
 }
-if (POST($blogname)) $blog->name = POST($blogname);
-if (POST($blogwriters)) $blog->writers(POST($blogwriters) );
-if (POST($blogdesc)) $blog->description = POST($blogdesc);
-if (POST($blogimage)) $blog->image = POST($blogimage);
-if (POST($blogtheme)) $blog->theme = POST($blogtheme);
-if (POST($blogmax)) $blog->max_entries = POST($blogmax);
-if (POST($blogmax)) $blog->max_rss = POST($blogrss);
+if (has_post()) {
+	$blog->name = POST($blogname);
+	$blog->writers(POST($blogwriters) );
+	$blog->description = POST($blogdesc);
+	$blog->image = POST($blogimage);
+	$blog->theme = POST($blogtheme);
+	$blog->max_entries = POST($blogmax);
+	$blog->max_rss = POST($blogrss);
+	$blog->default_markup = POST($blogmarkup);
+}
 
 if (POST("submit")) {
 	$ret = $blog->update();

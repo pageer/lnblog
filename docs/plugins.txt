@@ -1,22 +1,26 @@
-Directory: plugins
+Document: Using Plugins
 
+LnBlog stores all its plugins in a "plugins" directory.
 The plugins directory stores all the plugins that are present in an LnBlog installation.  It may
 contain one or more subdirectories with names like "disabled" to store plugins which are not to
 be loaded.
 
 Section: How plugins work
 
-The plugin loading mechanism is quite simple.  LnBlog maintains a list of plugins which are 
-disabled (i.e. not loaded) and a list of plugins that should be loaded first.  These lists can 
-be set for the entire installation and can also be overridden for individual blogs.  When a page is 
-loaded, LnBlog lists all the plugins that are present in alphabetical order by file name.  It then 
-removes the plugins in the disabled list and moves the ones in the "load first" list to the front.  
-It then loads the plugins in this list in order.
+The plugin mechanism is really quite simple.  LnBlog maintains two lists of plugins: disabled plugins 
+(i.e. those that should not loaded) and plugins to should be loaded first.  These lists can 
+be set for the entire installation and can also be overridden for individual blogs.  You can edit these
+lists through the "configure plugin loading" link.  
+
+When a page is loaded, LnBlog looks at the plugins directory to get a list of all the plugins that are 
+present and sorts them in alphabetical order by file name.  It then removes the plugins in the disabled 
+list and moves the ones in the "load first" list to the front.  It then loads the plugins in the resulting
+list in order.
 
 For plugins that write user-visible data, e.g. sidebar panels, the order in which they are loaded 
-IS IMPORTANT.  For example, the sidebar panels are displayed in the order in which they are loaded.
-Subdirectories of this directory are ignored by the plugin loader.  This means that you can 
-temporarily disable a plugin without deleting it by moving it to a subdirectory.
+*is important*.  For example, the sidebar panels are displayed in the order in which they are loaded.
+If you want to change the order in which the sidebar panels appear, then you should change the 
+order in which those plugins are loaded.
 
 Section: Adding new plugins
 
@@ -57,6 +61,6 @@ articles, although individual comments generally need an explicit identifier.  O
 always possible to simply create an instance of the parent entry of a comment and get a list of
 comments that way.
 
-The plugins/disabled directory of the default LnBlog installation includes a template.php file.  This is a heavily commented plugin template which is intended as a learning tool.  Betweem this 
+The plugins/disabled directory of the default LnBlog installation includes a template.php file.  This is a heavily commented plugin template which is intended as a learning tool.  Between this 
 and the standard set of plugins, it should be possible to get a good idea of how the plugin 
 system works.

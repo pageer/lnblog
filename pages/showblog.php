@@ -32,5 +32,5 @@ $page = NewPage($blog);
 $ret = $blog->getWeblog(); 
 $page->title = $blog->name;
 $page->addStylesheet("blogentry.css");
-$page->display($ret, &$blog)
+$page->display($ret, &$blog);
 ?>

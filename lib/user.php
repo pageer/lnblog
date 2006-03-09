@@ -37,29 +37,10 @@ class User extends LnBlogObject {
 	var $fullname;
 	var $email;
 	var $homepage;
+	var $custom;
 	var $user_list;
 
 	function User($uname=false, $pw=false) {
-
-		if (defined("INSTALL_ROOT")) {
-			if ( is_file(USER_DATA_PATH.PATH_DELIM."passwd.php") ) {
-				global $global_user_list;
-				$old_path = ini_get("include_path");
-				ini_set("include_path", $old_path.PATH_SEPARATOR.USER_DATA_PATH);
-				require_once(USER_DATA_PATH.PATH_DELIM."passwd.php");
-				ini_set("include_path", $old_path);
-				$this->user_list = $global_user_list;
-			} else {
-				$this->user_list = array();
-			}
-		} else $this->user_list = array();
-
-		$this->username = '';
-		$this->passwd = '';
-		$this->salt = '';
-		$this->fullname = '';
-		$this->email = '';
-		$this->homepage = '';
 
 		if (!$uname && ( SESSION(CURRENT_USER) || COOKIE(CURRENT_USER) ) ) {
 			if ( SESSION(CURRENT_USER) == COOKIE(CURRENT_USER) ||
@@ -68,42 +49,70 @@ class User extends LnBlogObject {
 				$uname = COOKIE(CURRENT_USER);
 			}
 		}
-		if ($uname && isset($this->user_list[$uname]) ) {
+
+		$this->username = $uname ? $uname : '';
+		$this->passwd = '';
+		$this->salt = '';
+		$this->fullname = '';
+		$this->email = '';
+		$this->homepage = '';
+		$this->custom = array();
+
+		if (isset($_SESSION["user-".$uname])) {
+
+			$this = unserialize($_SESSION["user-".$uname]);
+		
+		} elseif ($uname && realpath(mkpath(USER_DATA_PATH,$uname,"passwd.php"))) {
+		
+			global $pwd;
+			global $salt;
+			include_once(USER_DATA."/".$uname."/passwd.php");
 			$this->username = $uname;
-			$this->passwd = $this->user_list[$uname]["pwd"];
-			$this->salt = $this->user_list[$uname]["salt"];
-			$this->fullname = $this->user_list[$uname]["fullname"];
-			$this->email = $this->user_list[$uname]["email"];
-			$this->homepage = $this->user_list[$uname]["homepage"];
-
-			if ($pw) $this->login($pw);
-
-		}
-	}
-
-	# Method: create_passwd_file
-	# Creates an updated user information file.
-	# 
-	# Returns:
-	# A true value on success, false on failure.
-
-	function create_passwd_file () {
-		$data = "<?php\n";
-		$data .= '$global_user_list = array();'."\n";
-		foreach ($this->user_list as $name=>$udat) {
-			$data .= '$global_user_list[\''.$name.'\'] = array(';
-			$tmpdata = '';
-			foreach ($udat as $key=>$val) {
-				$val = str_replace("\\", "\\\\", $val);
-				$val = str_replace("'", "\\'", $val);
-				$tmpdata .= ($tmpdata != '' ? ', ' : '') . "'$key'=>'$val'";
+			$this->passwd = $pwd;
+			$this->salt = $salt;
+				
+			$inifile = realpath(mkpath(USER_DATA_PATH,$uname,"user.ini"));
+			if ($inifile) {
+				$ini = NewIniParser($inifile);
+				$this->fullname = $ini->value("userdata", "name", "");
+				$this->email    = $ini->value("userdata", "email", "");
+				$this->homepage = $ini->value("userdata", "homepage", "");
+				$this->custom = $ini->getSection("customdata");
 			}
-			$data .= $tmpdata.");\n";
+			$_SESSION["user-".$uname] = serialize($this);
+			
+		} else {
+		# THIS IS OBSELETE.
+		# This is support for the old global passwd.php file.  It will
+		# eventually be removed, but will probably stick around until 
+		# version 1.0 at least.
+		
+			if (defined("INSTALL_ROOT")) {
+				if ( is_file(USER_DATA_PATH.PATH_DELIM."passwd.php") ) {
+					global $global_user_list;
+					$old_path = ini_get("include_path");
+					ini_set("include_path", $old_path.PATH_SEPARATOR.USER_DATA_PATH);
+					require_once(USER_DATA_PATH.PATH_DELIM."passwd.php");
+					ini_set("include_path", $old_path);
+					require_once(USER_DATA_PATH.PATH_DELIM."passwd.php");
+					$this->user_list = $global_user_list;
+				} else {
+					$this->user_list = array();
+				}
+			} else $this->user_list = array();
+			if ($uname && isset($this->user_list[$uname]) ) {
+				$this->username = $uname;
+				$this->passwd = $this->user_list[$uname]["pwd"];
+				$this->salt = $this->user_list[$uname]["salt"];
+				$this->fullname = $this->user_list[$uname]["fullname"];
+				$this->email = $this->user_list[$uname]["email"];
+				$this->homepage = $this->user_list[$uname]["homepage"];
+			}
 		}
-		$data .= "?>";
-		return write_file(USER_DATA_PATH.PATH_DELIM."passwd.php", $data);
-	}
 
+		if ($pw) $this->login($pw);
+	
+	}
 
 	# Method: exportVars
 	# Convenience function to export relevant user data to a template.
@@ -160,18 +169,28 @@ class User extends LnBlogObject {
 
 	# Method: save
 	# Save changes to user data.  
-	# Note that this function doesn't scale well, as we cannot guarantee that 
-	# another user will not simultaneously try to write the same file and 
-	# clobber our changes.  The only real fix to this (that's worth the time
-	# to implement) is to switch to a database storage backend.
 	function save() {
 		if (!$this->username ||! $this->passwd) return false;
-		$this->user_list[$this->username]["pwd"] = $this->passwd;
-		$this->user_list[$this->username]["salt"] = $this->salt;
-		$this->user_list[$this->username]["fullname"] = $this->fullname;
-		$this->user_list[$this->username]["email"] = $this->email;
-		$this->user_list[$this->username]["homepage"] = $this->homepage;
-		$this->create_passwd_file();
+		$fs = NewFS();
+		
+		$data = "<?php\n".
+		        '$pwd = "'.$this->passwd.'";'."\n".
+		        '$salt = "'.$this->salt.'";'."\n?>";
+		if (! is_dir(USER_DATA_PATH.PATH_DELIM.$this->username)) {
+			$ret = $fs->mkdir(USER_DATA_PATH.PATH_DELIM.$this->username);
+			if (! $ret) return $ret;
+		}
+		$ret = write_file(mkpath(USER_DATA_PATH,$this->username,"passwd.php"), $data);
+
+		$ini = NewINIParser(mkpath(USER_DATA_PATH,$this->username,"user.ini"));
+		$ini->setValue("userdata", "name", $this->fullname);
+		$ini->setValue("userdata", "email", $this->email);
+		$ini->setValue("userdata", "homepage", $this->homepage);
+		foreach ($this->custom as $key=>$val) {
+			$ini->setValue("customdata", $key, $val);
+		}
+		$ret = $ini->writeFile();
+		if ($ret) $_SESSION["user-".$this->username] = serialize($this);
 	}
 
 	# Method: password
@@ -285,7 +304,7 @@ class User extends LnBlogObject {
 		if ( trim($this->username) == "" || trim($pwd) == "" ) return false;
 		
 		# User does not exist.
-		if ( ! isset($this->user_list[$this->username]) ) return false;
+		#if ( ! isset($this->user_list[$this->username]) ) return false;
 
 		if (AUTH_USE_SESSION) {
 			$ts = gmdate("M d Y H:i:s", time());

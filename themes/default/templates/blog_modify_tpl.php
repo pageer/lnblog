@@ -55,6 +55,14 @@ foreach ($dir as $theme) { ?>
 <input id="<?php echo $BLOG_RSS_MAX_ID; ?>" name="<?php echo $BLOG_RSS_MAX_ID; ?>" value="<?php echo $BLOG_RSS_MAX; ?>" />
 </div>
 <div>
+<label for="<?php echo $BLOG_DEFAULT_MARKUP_ID; ?>"><?php p_("Default markup mode for entries and articles"); ?></label>
+<select id="<?php echo $BLOG_DEFAULT_MARKUP_ID; ?>" name="<?php echo $BLOG_DEFAULT_MARKUP_ID; ?>" value="<?php echo $BLOG_DEFAULT_MARKUP; ?>">
+<option value="<?php echo MARKUP_NONE;?>"<?php if ($BLOG_DEFAULT_MARKUP == MARKUP_NONE) { echo ' selected="selected"'; } ?>><?php p_("Auto-markup");?></option>
+<option value="<?php echo MARKUP_BBCODE;?>"<?php if ($BLOG_DEFAULT_MARKUP == MARKUP_BBCODE) { echo ' selected="selected"'; } ?>><?php p_("LBCode");?></option>
+<option value="<?php echo MARKUP_HTML?>"<?php if ($BLOG_DEFAULT_MARKUP == MARKUP_HTML) { echo ' selected="selected"'; } ?>><?php p_("HTML");?></option>
+</select>
+</div>
+<div>
 <span class="basic_form_submit"><input name="<?php echo $SUBMIT_ID; ?>" id="<?php echo $SUBMIT_ID; ?>" type="submit" value="<?php p_("Submit"); ?>" /></span>
 <span class="basic_form_clear"><input name="clear" id="clear" type="reset" value="<?php p_("Clear"); ?>" /></span>
 </div>

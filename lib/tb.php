@@ -88,50 +88,82 @@ class Trackback extends LnBlogObject {
 	#
 	# Returns: 
 	# The trackback response code, or false on failure.
-
-	function send($url) {
-		$this->raiseEvent("OnSend");
-		# Extract the host name and path from the URL.
-		$proto_pos = strpos($url, "://");
-		$slash_pos = strpos($url, "/", $proto_pos + 3);
-		if ($proto_pos == false || $slash_pos == false) return false;
-		$host = substr($url, $proto_pos + 3, $slash_pos - ($proto_pos + 3));
-		$path = substr($url, $slash_pos);
-
-		# Open a socket.
-		$fp = fsockopen($host, 80);
-		if (!$fp) return false;
-
-		# Build the query string, ignoring missing elements.
-		$query_string = "url=".urlencode($this->url);
-		if ($this->title) $query_string .= "&title=".urlencode($this->title);
-		if ($this->blog) $query_string .= "&blog_name=".urlencode($this->blog);
-		if ($this->data) $query_string .= "&excerpt=".urlencode($this->data);
-		
-		# Create the HTTP request to be sent to the remote host.
-		$data = "POST ".$path."\r\n".
-		        "Content-Type: application/x-www-form-urlencoded; ".
-		        "charset=utf-8\r\n\r\n".
-		        $query_string;
-
-		# Send the data and then get back any response.
-		fwrite($fp, $query_string);
-		$response = '';
 	
-		while (! feof($fp)) {
-			$response .= fgets($fp);
-		}
-		fclose($fp);
+	function send($url) {
+		if (extension_loaded("curl")) {
+	
+			$this->raiseEvent("OnSend");
+			
+			# Set up the POST data.
+			$query_string = "url=".urlencode($this->url);
+			if ($this->title) $query_string .= "&title=".urlencode($this->title);
+			if ($this->blog) $query_string .= "&blog_name=".urlencode($this->blog);
+			if ($this->data) $query_string .= "&excerpt=".urlencode($this->data);
 
-		# Get the error code
-		$start_tag_pos = strpos($response, "<error>");
-		$end_tag_pos = strpos($response, "</error>");
-		$ret_code = substr($response, 
-		                   $start_tag_pos + strlen("<error>"),
-		                   $end_tag_pos - ($start_tag_pos + strlen("<error>")) );
-								 
-		$this->raiseEvent("SendComplete");
-		return $ret_code;
+			# Initialize CURL and POST to the target URL.
+			$hnd = curl_init();
+			curl_setopt($hnd, CURLOPT_URL, $url);
+			curl_setopt($hnd, CURLOPT_POST, 1);
+			curl_setopt($hnd, CURLOPT_FOLLOWLOCATION, 1);
+			curl_setopt($hnd, CURLOPT_RETURNTRANSFER, 1);
+			curl_setopt($hnd, CURLOPT_POSTFIELDS, $query_string);
+			$ret = curl_exec($hnd);
+
+			# Get the error code
+			$start_tag_pos = strpos($response, "<error>");
+			$end_tag_pos = strpos($response, "</error>");
+			$ret_code = substr($response, 
+			                   $start_tag_pos + strlen("<error>"),
+			                   $end_tag_pos - ($start_tag_pos + strlen("<error>")) );
+									 
+			$this->raiseEvent("SendComplete");
+			return $ret_code;
+
+		} else {	
+
+			$this->raiseEvent("OnSend");
+			# Extract the host name and path from the URL.
+			$proto_pos = strpos($url, "://");
+			$slash_pos = strpos($url, "/", $proto_pos + 3);
+			if ($proto_pos == false || $slash_pos == false) return false;
+			$host = substr($url, $proto_pos + 3, $slash_pos - ($proto_pos + 3));
+			$path = substr($url, $slash_pos);
+
+			# Open a socket.
+			$fp = fsockopen($host, 80);
+			if (!$fp) return false;
+
+			# Build the query string, ignoring missing elements.
+			$query_string = "url=".urlencode($this->url);
+			if ($this->title) $query_string .= "&title=".urlencode($this->title);
+			if ($this->blog) $query_string .= "&blog_name=".urlencode($this->blog);
+			if ($this->data) $query_string .= "&excerpt=".urlencode($this->data);
+			
+			# Create the HTTP request to be sent to the remote host.
+			$data = "POST ".$path."\r\n".
+			        "Content-Type: application/x-www-form-urlencoded; ".
+		   	     "charset=utf-8\r\n\r\n".
+		      	  $query_string;
+
+			# Send the data and then get back any response.
+			fwrite($fp, $query_string);
+			$response = '';
+	
+			while (! feof($fp)) {
+				$response .= fgets($fp);
+			}
+			fclose($fp);
+
+			# Get the error code
+			$start_tag_pos = strpos($response, "<error>");
+			$end_tag_pos = strpos($response, "</error>");
+			$ret_code = substr($response, 
+			                   $start_tag_pos + strlen("<error>"),
+			                   $end_tag_pos - ($start_tag_pos + strlen("<error>")) );
+									 
+			$this->raiseEvent("SendComplete");
+			return $ret_code;
+		}
 	}
 
 	# Method: receive

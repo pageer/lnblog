@@ -30,29 +30,28 @@ require_once("lib/creators.php");
 $blog = NewBlog();
 $ent = NewBlogEntry();
 $page = NewPage(&$ent);
+$tburl = "trackback_url";
 
-if (GET("send_ping") == "yes" || POST("send_ping") == "yes") {
+if (GET("send_ping") == "yes" || POST("send_ping") == "yes" ) {
 	
 	if (! $blog->canModifyEntry() ) $page->redirect("index.php");
 
-	$tburl = "trackback_url";
+	$tpl = NewTemplate("send_trackback_tpl_new.php");
 
-	$tpl = NewTemplate(TRACKBACK_PING_TEMPLATE);
-	if (POST($tburl)) {
-		$tpl->set("TARGET_PAGE", POST($tburl) );
-		$tpl->set("TB_URL", $ent->permalink() );
-		$tpl->set("TB_TITLE", $ent->subject);
-		$tpl->set("TB_BLOG", $blog->name);
-		$tpl->set("TB_EXCERPT", $ent->markup() );
-	} else {
-		$tpl->set("TARGET_PAGE", current_file() );
-		$tpl->set("GET_TB_URL", $tburl);
-	}
+	$tpl->set("TB_URL_ID", $tburl );
+	$tpl->set("TB_URL", POST($tburl) );
+	$tpl->set("TB_EXCERPT_ID", "excerpt");
+	$tpl->set("TB_EXCERPT", $ent->markup() );
 	
+	# If the form has been posted, send the trackback.
+	if (POST($tburl)) {
+		$ret = $ent->sendPing( POST($tburl), POST("excerpt") );
+		$tpl->set("ERROR_MESSAGE", $ret);
+	} #else echo "<p>"._("Not posted")."</p>";
+
 	$body = $tpl->process();
 	$page->title = _("Send Trackback Ping");
-	$page->addStylesheet("form.css");
-	$page->display($body, &$blog);
+	$page->display($body, &$body);
 	
 } else {
 	$ret = $ent->getPing();

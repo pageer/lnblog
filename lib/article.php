@@ -48,8 +48,8 @@ class Article extends BlogEntry {
 		$this->tags = "";
 		$this->data = "";
 		$this->has_html = MARKUP_BBCODE;
-		$this->allow_comment = true;
-		$this->allow_tb = true;
+		$this->allow_comment = false;
+		$this->allow_tb = false;
 		$this->metadata_fields = array("id"=>"postid", "uid"=>"userid", 
 			"date"=>"date", "post_date"=>"postdate",
 			"timestamp"=>"timestamp", "post_ts"=>"posttimestamp",
@@ -243,6 +243,14 @@ class Article extends BlogEntry {
 		else $dir_path = $basepath.PATH_DELIM.$branch;
 		$ret = create_directory_wrappers($dir_path, ARTICLE_BASE);
 
+		# Create directories for comments and trackbacks.
+		if ($this->allow_comment) {
+			create_directory_wrappers($dir_path.PATH_DELIM.ENTRY_COMMENT_DIR, ENTRY_COMMENTS);
+		}
+		if ($this->allow_tb) {
+			create_directory_wrappers($dir_path.PATH_DELIM.ENTRY_TRACKBACK_DIR, ENTRY_TRACKBACKS);
+		}
+
 		$this->file = $dir_path.PATH_DELIM.ENTRY_DEFAULT_FILE;
 		$this->date = fmtdate(ENTRY_DATE_FORMAT, $curr_ts);
 		if (! $this->post_date) $this->post_date = fmtdate(ENTRY_DATE_FORMAT, $curr_ts);
@@ -287,8 +295,9 @@ class Article extends BlogEntry {
 		$this->raiseEvent("OnOutput");
 		$ret= ob_get_contents();
 		ob_end_clean();
-		$tmp = NewTemplate(ARTICLE_TEMPLATE);
 
+		$tmp = NewTemplate(ARTICLE_TEMPLATE);
+		$blog = NewBlog();
 		$usr = NewUser($this->uid);
 		$usr->exportVars($tmp);
 
@@ -297,10 +306,23 @@ class Article extends BlogEntry {
 		$tmp->set("POSTDATE", $this->prettyDate($this->post_ts) );
 		$tmp->set("EDITDATE", $this->prettyDate() );
 		$tmp->set("BODY", $this->markup() );
+		$tmp->set("ALLOW_COMMENTS", $this->allow_comment);
+		$tmp->set("ALLOW_TRACKBACKS", $this->allow_tb);
 		$tmp->set("PERMALINK", $this->permalink() );
-		$tmp->set("EDIT_LINK", $this->permalink()."edit.php");
-		$tmp->set("UPLOAD_LINK", $this->permalink()."uploadfile.php");
+		$tmp->set("EDIT_LINK", $this->uri("edit"));
+		$tmp->set("UPLOAD_LINK", $this->uri("upload"));
 		$tmp->set("SHOW_CONTROLS", $show_edit_controls);
+		$tmp->set("PING_LINK", $this->uri("send_tb"));
+		$tmp->set("TRACKBACK_LINK", $this->uri("get_tb"));
+		$tmp->set("TAG_LINK", BLOG_ROOT_URL."tags.php");
+		$tmp->set("COMMENTCOUNT", $this->getCommentCount() );
+		$tmp->set("COMMENT_LINK", $this->uri("comment"));
+		$tmp->set("TRACKBACKCOUNT", $this->getTrackbackCount() );
+		$tmp->set("SHOW_TRACKBACK_LINK", $this->uri("trackback"));
+		$tmp->set("SHOW_CONTROLS", $show_edit_controls);
+		$tmp->set("PROFILE_LINK", 
+		          INSTALL_ROOT_URL."userinfo.php?user=".$usr->username().
+		          "&amp;blog=".$blog->blogid);
 		
 		$ret .= $tmp->process();
 		ob_start();

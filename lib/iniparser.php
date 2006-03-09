@@ -42,6 +42,13 @@ class INIParser {
 	# This method preserves comments in the file.
 
 	function readFile() {
+		# Allow an option to use the built-in PHP INI file parser.
+		# Note that this DOES NOT PRESERVE COMMENTS in the INI file.
+		# Whether or not that's a problem depends on your point of view.
+		if (defined("USE_PARSE_INI_FILE")) {
+			$this->data = parse_ini_file($this->filename, true);
+			return;
+		}
 		$file_content = file($this->filename);
 		$this->data = array();
 		$cur_sec = false;
@@ -111,7 +118,7 @@ class INIParser {
 	# Parameters:
 	# Takes up to three parameters.
 	# If one parameter is given, then it is interpreted as a key in the 
-	# current section (last section accessed.
+	# current section (last section accessed).
 	# If two are given, the first is a section and the second is a key.
 	# If three, then the first is the section, the second is the key, 
 	# and the third is a default value if the key is not set.
@@ -182,6 +189,27 @@ class INIParser {
 			}
 			return $this->data[$this->current_section][$sec];
 		}
+	}
+
+	# Method: getSection
+	# Returns the given section as an array.  Removes any comments from 
+	# that section of the file.
+	#
+	# Parameters:
+	# sec - The section of the file to get.
+	#
+	# Returns an array of the section with variables as keys and 
+	# values as elements.
+
+	function getSection($sec) {
+		$ret = array();
+		if (isset($this->data[$sec])) {
+			foreach ($this->data[$sec] as $key=>$val) {
+				# Filter out numeric keys, which are used by comments.
+				if (! is_int($key)) $ret[$key] = $val;
+			}
+		}
+		return $ret;
 	}
 
 	# Method: merge

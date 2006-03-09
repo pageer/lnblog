@@ -49,7 +49,7 @@ if (POST("e-mail")) {
 </div>
 <div>
 <label for="remember"><?php p_("Remember me"); ?></label>
-<input id="remember>" name="remember" type="checkbox" checked="checked" />
+<input id="remember" name="remember" type="checkbox" checked="checked" />
 </div>
 <?php 
 # Do the cookie-setting here, because it's just eaiser.

@@ -381,6 +381,9 @@ class BlogComment extends Entry {
 		if (COMMENT_EMAIL_VIEW_PUBLIC || $usr->checkLogin()) {
 			$t->set("SHOW_MAIL", true);
 			$t->set("EMAIL", $this->email);
+			$t->set("PROFILE_LINK", 
+			        INSTALL_ROOT_URL."userinfo.php?user=".$usr->username().
+			        "&amp;blog=".$blog->blogid);
 		} else {
 			$t->set("SHOW_MAIL", false);
 			$t->set("EMAIL", "");

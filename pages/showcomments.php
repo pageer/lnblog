@@ -40,7 +40,7 @@ $page->title = $ent->subject . " - " . $blg->name;
 # This code will detect if a comment has been submitted and, if so,
 # will add it.  We do this before printing the comments so that a 
 # new comment will be displayed on the page.
-if (POST($SUBMIT_ID)) {
+if (has_post()) {
 	$ret = $ent->addComment();
 	if ($ret) {
 		# We add the random template here so that the "remember me" cookies

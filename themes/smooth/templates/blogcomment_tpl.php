@@ -9,8 +9,10 @@
 <div class="commentfooter">
 	<ul>
 		<li class="commentdate">Comment posted <?php echo $DATE; ?></li>
-<?php if (isset($USER_ID)) { ?>
-	<?php if ( isset($USER_EMAIL) && isset($USER_NAME) ) { ?>
+<?php if (isset($USER_ID)) { 
+	if (! isset($NO_USER_PROFILE)) { # Display profile link or not ?>
+		<li class="bloguser"><?php pf_("By %s", '<a href="'.$PROFILE_LINK.'">'.$USER_DISPLAY_NAME.'</a>');?></li>
+	<?php } elseif ( isset($USER_EMAIL) && isset($USER_NAME) ) { ?>
 		<li class="commentname">By <a href="mailto:<?php echo $USER_EMAIL; ?>"><strong><?php echo $USER_NAME; ?></strong></a></li>
 	<?php } elseif (isset($USER_EMAIL)) { ?>
 		<li class="commentname">By <a href="mailto:<?php echo $USER_EMAIL; ?>"><strong><?php echo $USER_ID; ?></strong></a></li>

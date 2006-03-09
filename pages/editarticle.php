@@ -39,10 +39,11 @@ $tpl->set("PREV_ID", $preview_id);
 $blg->exportVars($tpl);
 
 $tpl->set("FORM_ACTION", current_file() );
-$tpl->set("SUBJECT", $ent->subject);
-$tpl->set("TAGS", $ent->tags);
-$tpl->set("DATA", $ent->data);
+$tpl->set("SUBJECT", htmlentities($ent->subject));
+$tpl->set("TAGS", htmlentities($ent->tags));
+$tpl->set("DATA", htmlentities($ent->data));
 $tpl->set("COMMENTS", $ent->allow_comment);
+$tpl->set("TRACKBACKS", $ent->allow_tb);
 $tpl->set("HAS_HTML", $ent->has_html);
 
 if (POST($submit_id)) {

@@ -35,7 +35,8 @@ $preview_id = "preview";
 $tpl = NewTemplate(ENTRY_EDIT_TEMPLATE);
 
 # Disable comments by default.
-$tpl->set("COMMENTS", 0);
+$tpl->set("COMMENTS", false);
+$tpl->set("TRACKBACKS", false);
 $tpl->set("SUBMIT_ID", $submit_id);
 $tpl->set("PREV_ID", $preview_id);
 $tpl->set("HAS_HTML", MARKUP_BBCODE);

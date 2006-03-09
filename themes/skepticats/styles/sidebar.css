@@ -1,7 +1,7 @@
 /* Sidebar styles. */
 
 #sidebar {
-	border: thin solid black;
+	border: 1px solid black;
 	background: #c3c3c3;
 	float: right;
 	clear: right;

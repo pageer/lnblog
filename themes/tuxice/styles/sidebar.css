@@ -1,7 +1,7 @@
 /* Sidebar styles. */
 
 #sidebar {
-	border: thin solid black;
+	border: 1px solid black;
 	border-left: 0px;
 	margin-top: 1%;
 	margin-left: 1%;

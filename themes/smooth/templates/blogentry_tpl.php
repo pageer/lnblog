@@ -5,12 +5,14 @@
 </div>
 <div class="blogentryfooter">
 <p><?php p_("Posted by");?> 
-<?php if ( isset($USER_EMAIL) ) { ?>
-<a href="mailto:<?php echo $USER_EMAIL; ?>"><?php echo $USER_DISPLAY_NAME; ?></a>
-<?php } else { ?>
-<?php echo $USER_DISPLAY_NAME; ?>
-<?php } ?>
-<?php if (isset($USER_HOMEPAGE)) { ?>
+<?php if (! isset($NO_USER_PROFILE)) { # Display profile link or not ?>
+<li class="bloguser"><?php pf_("By %s", '<a href="'.$PROFILE_LINK.'">'.$USER_DISPLAY_NAME.'</a>');?></li><?php 
+} elseif ( isset($USER_EMAIL) ) { ?>
+<a href="mailto:<?php echo $USER_EMAIL; ?>"><?php echo $USER_DISPLAY_NAME; ?></a><?php 
+} else { 
+	echo $USER_DISPLAY_NAME;
+}
+if (isset($USER_HOMEPAGE)) { ?>
 (<a href="<?php echo $USER_HOMEPAGE; ?>"><?php echo $USER_HOMEPAGE; ?></a>)
 <?php } ?> at <?php echo $POSTDATE; ?></p>
 <?php if ($TAGS) { ?>

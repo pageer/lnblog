@@ -209,7 +209,7 @@ class Entry extends LnBlogObject{
 	function addHTML($data, $use_nofollow=false) {
 		$ret = $data;
 		$patterns[0] = "/((http|https|ftp):\/\/\S*)/i";
-		$patterns[1] = '/\r\n\r\n/';
+		$patterns[1] = '/\r\n(\r\n)+/';
 		$patterns[2] = '/\n\n/';
 		$patterns[3] = '/\n/';
 		if ($use_nofollow) {

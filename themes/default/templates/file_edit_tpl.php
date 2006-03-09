@@ -6,9 +6,18 @@
 if (isset($FORM_MESSAGE)) { ?>
 <p><?php echo $FORM_MESSAGE;?></p>
 <?php } ?>
+<?php if (isset($FILE_URL)) { ?>
+<p><strong><?php p_('File URL');?></strong>: <?php echo $FILE_URL;?></p>
+<?php }
+if (isset($FILE_PATH)) { ?>
+<p><strong><?php p_('Local path');?></strong>: <?php echo $FILE_PATH;?></p>
+<?php }
+if (isset($FILE_SIZE)) { ?>
+<p><strong><?php p_('File size');?></strong>: <?php echo $FILE_SIZE;?></p>
+<?php } ?>
 <?php if (isset($SHOW_LINK_EDITOR)) { ?>
 <p><?php p_('<strong>Note:</strong> You must have Javascript enabled to use the edit boxes.');?></p>
-<fieldset>
+<fieldset class="formbox">
 <div>
 <label for="linktext"><?php p_('Regular text');?></label>
 <input type="text" id="linktext" name="linktext" />
@@ -25,15 +34,6 @@ if (isset($FORM_MESSAGE)) { ?>
 <button id="addlink" onclick="addLink();" /><?php p_('Add link');?></button>
 <button id="clear" onclick="clearBoxes();" /><?php p_('Clear');?></button>
 </div>
-<?php } 
-if (isset($FILE_URL)) { ?>
-<p><strong><?php p_('File URL');?></strong>: <?php echo $FILE_URL;?></p>
-<?php }
-if (isset($FILE_PATH)) { ?>
-<p><strong><?php p_('Local path');?></strong>: <?php echo $FILE_PATH;?></p>
-<?php }
-if (isset($FILE_SIZE)) { ?>
-<p><strong><?php p_('File size');?></strong>: <?php echo $FILE_SIZE;?></p>
 <?php } ?>
 <fieldset>
 <form method="post" action="<?php echo $FORM_ACTION; ?>">

@@ -56,8 +56,7 @@ class Blog extends LnBlogObject {
 	var $theme;
 	var $max_entries = BLOG_MAX_ENTRIES;
 	var $max_rss = BLOG_MAX_ENTRIES;
-	var $user = "";
-	var $pass = "";
+	var $default_markup = MARKUP_BBCODE;
 	var $owner = ADMIN_USER;
 	var $write_list;
 	var $tag_list;
@@ -73,7 +72,7 @@ class Blog extends LnBlogObject {
 		$this->name = '';
 		if (defined("BLOG_ROOT")) { 
 			$this->home_path = BLOG_ROOT;
-		} elseif (sanitize(GET("blog")) && defined("INSTALL_ROOT")) {
+		} elseif (isset($_GET["blog"]) && defined("INSTALL_ROOT")) {
 			$this->home_path = calculate_document_root().PATH_DELIM.sanitize(GET("blog"));
 		} else {
 			$this->home_path = $path ? realpath($path) : getcwd();
@@ -90,16 +89,15 @@ class Blog extends LnBlogObject {
 		$this->image = '';
 		$this->max_entries = BLOG_MAX_ENTRIES;
 		$this->max_rss = BLOG_MAX_ENTRIES;
+		$this->default_markup = MARKUP_BBCODE;
 		$this->theme = "default";
-		$this->user = "";
-		$this->pass = "";
 		$this->owner = ADMIN_USER;
 		$this->write_list = array();
 		$this->tag_list = array();
 		$this->entrylist = array();
 		$this->last_blogentry = false;
 		$this->last_article = false;
-		$this->blogid = basename($this->home_path);
+		$this->blogid = substr($this->home_path, strlen(DOCUMENT_ROOT) );
 		$this->custom_fields = array();
 		$this->readBlogData();
 		
@@ -115,7 +113,8 @@ class Blog extends LnBlogObject {
 	True if the blog metadata exists, false otherwise.
 	*/
 	function isBlog() {
-		return file_exists($this->home_path.PATH_DELIM.BLOG_CONFIG_PATH);
+		return file_exists($this->home_path.PATH_DELIM.BLOG_CONFIG_PATH) ||
+		       file_exists($this->home_path.PATH_DELIM.'blogdata.txt');
 	}
 
 	/*
@@ -147,9 +146,27 @@ class Blog extends LnBlogObject {
 	*/
 	function readBlogData() {
 		$path = $this->home_path.PATH_DELIM.BLOG_CONFIG_PATH;
-		if (is_file($path)) $config_data = file($path);
-		else return false;
-		if (! $config_data) return false;
+		if (is_file($path)) {
+			$ini = NewINIParser($path);
+			$data = $ini->getSection("blog");
+			foreach ($data as $key=>$val) {
+				if (is_array($this->$key)) {
+					$this->$key = explode(",", $val);
+					if (! $this->$key) $this->$key = array();
+				} else {
+					$this->$key = $val;
+				}
+			}
+		} elseif (is_file($this->home_path.PATH_DELIM.'blogdata.txt')) {
+			$path = $this->home_path.PATH_DELIM.'blogdata.txt';
+			$config_data = file($path);
+		}
+		
+		# If we aren't using the old-style ad hoc storage format, then 
+		# we will exit here.
+		# THIS IS OBSELETE.  Code below here should be removed in a
+		# future release.
+		if (empty($config_data)) return false;
 
 		foreach ($config_data as $line) {
 			# Split the string on the equal sign.  We skip the limit 
@@ -183,16 +200,18 @@ class Blog extends LnBlogObject {
 	*/
 	function writeBlogData() {
 		$path = $this->home_path.PATH_DELIM.BLOG_CONFIG_PATH;
-		$str = "Name = ".$this->name."\n";
-		$str .= "Description = ".$this->description."\n";
-		$str .= "Image = ".$this->image."\n";
-		$str .= "Max Entries = ".$this->max_entries."\n";
-		$str .= "Max RSS = ".$this->max_rss."\n";
-		$str .= "Theme = ".$this->theme."\n";
-		$str .= "Owner = ".$this->owner."\n";
-		$str .= "Write List = ".implode(",", $this->write_list)."\n";
-		$str .= "Tags = ".implode(TAG_SEPARATOR, $this->tag_list);
-		$ret = write_file($path, $str);
+		$ini = NewINIParser($path);
+		$props = array("name", "description", "image", "max_entries", 
+		               "max_rss", "theme", "owner", "default_markup",
+		               "write_list", "tag_list");
+		foreach ($props as $key) {
+			if (is_array($this->$key)) {
+				$ini->setValue("blog", $key, implode(",", $this->$key));
+			} else {
+				$ini->setValue("blog", $key, $this->$key);
+			}
+		}
+		$ret = $ini->writeFile();
 		return $ret;
 	}
 
@@ -423,6 +442,35 @@ class Blog extends LnBlogObject {
 	function getURL($full_uri=true) {
 		return localpath_to_uri($this->home_path, $full_uri);
 	}
+
+	/* Method: uri
+	   Get the URI of the designated resource.
+		
+		Parameters:
+		type - The type of URI to get, e.g. permalink.
+
+		Returns:
+		A string with the permalink. 
+	*/
+	function uri($type) {
+		$dir_uri = localpath_to_uri($this->home_path);
+		switch ($type) {
+			case "permalink":
+			case "blog":
+			case "page":
+			case "base":
+				return $dir_uri;
+			case "addentry":   return $dir_uri."new.php";
+			case "addarticle": return $dir_uri."newart.php";
+			case "upload":     return $dir_uri."uploadfile.php";
+			case "edit":       return $dir_uri."edit.php";
+			case "login":      return $dir_uri."login.php";
+			case "logout":     return $dir_uri."logout.php";
+			case "editfile":
+				return localpath_to_uri(INSTALL_ROOT)."editfile.php?blog=".$this->blogid;
+		}
+		return $dir_uri;
+	}
 	
 	/*
 	Method: getRecent
@@ -475,7 +523,8 @@ class Blog extends LnBlogObject {
 	and get a given number of them.
 
 	Parameters:
-	number - The number of entries to return.
+	number - The number of entries to return.  If set to -1, then returns all 
+	         entries.
 	offset - *Optional* number of entries from the beginning of the list to 
 	         skip.  The default is 0, i.e. start at the beginning.
 
@@ -834,7 +883,11 @@ class Blog extends LnBlogObject {
 			$this->image = stripslashes($this->image);
 			$this->theme = stripslashes($this->theme);
 		}
-		$ret = $this->delete() && $this->writeBlogData();
+		if (KEEP_EDIT_HISTORY) {
+			$ret = $this->delete() && $this->writeBlogData();
+		} else {
+			$ret = $this->writeBlogData();
+		}
 		$this->raiseEvent("UpdateComplete");
 		return $ret;
 	}
@@ -849,11 +902,15 @@ class Blog extends LnBlogObject {
 		if (! $this->canModifyBlog()) return false;
 		$this->raiseEvent("OnDelete");
 		$fs = NewFS();
-		if (! is_dir($this->home_path.PATH_DELIM.BLOG_DELETED_PATH) )
-			$fs->mkdir_rec($this->home_path.PATH_DELIM.BLOG_DELETED_PATH);
 		$source = $this->home_path.PATH_DELIM.BLOG_CONFIG_PATH;
-		$target = $this->home_path.PATH_DELIM.BLOG_DELETED_PATH.PATH_DELIM.BLOG_CONFIG_PATH."-".date(ENTRY_PATH_FORMAT_LONG);
-		$ret = $fs->rename($source, $target);
+		if (KEEP_EDIT_HISTORY) {
+			if (! is_dir($this->home_path.PATH_DELIM.BLOG_DELETED_PATH) )
+				$fs->mkdir_rec($this->home_path.PATH_DELIM.BLOG_DELETED_PATH);
+			$target = $this->home_path.PATH_DELIM.BLOG_DELETED_PATH.PATH_DELIM.BLOG_CONFIG_PATH."-".date(ENTRY_PATH_FORMAT_LONG);
+			$ret = $fs->rename($source, $target);
+		} else {
+			$fs->delete($source);
+		}
 		$fs->destruct();
 		$this->raiseEvent("DeleteComplete");
 		return $ret;
@@ -1019,9 +1076,9 @@ class Blog extends LnBlogObject {
 		else return false;
 		$this->raiseEvent("OnEntryPreview");
 		$tpl->set("PREVIEW_DATA", $this->last_blogentry->get() );
-		$tpl->set("SUBJECT", $this->last_blogentry->subject);
-		$tpl->set("TAGS", $this->last_blogentry->tags);
-		$tpl->set("DATA", $this->last_blogentry->data);
+		$tpl->set("SUBJECT", htmlentities($this->last_blogentry->subject));
+		$tpl->set("TAGS", htmlentities($this->last_blogentry->tags));
+		$tpl->set("DATA", htmlentities($this->last_blogentry->data));
 		$tpl->set("HAS_HTML", $this->last_blogentry->has_html);
 		$tpl->set("COMMENTS", $this->last_blogentry->allow_comment);
 		return true;
@@ -1040,9 +1097,9 @@ class Blog extends LnBlogObject {
 		else return false;
 		$this->raiseEvent("OnArticlePreview");
 		$tpl->set("PREVIEW_DATA", $this->last_article->get() );
-		$tpl->set("SUBJECT", $this->last_article->subject);
-		$tpl->set("TAGS", $this->last_blogentry->tags);
-		$tpl->set("DATA", $this->last_article->data);
+		$tpl->set("SUBJECT", htmlentities($this->last_article->subject));
+		$tpl->set("TAGS", htmlentities($this->last_blogentry->tags));
+		$tpl->set("DATA", htmlentities($this->last_article->data));
 		$tpl->set("HAS_HTML", $this->last_article->has_html);
 		$tpl->set("COMMENTS", $this->last_article->allow_comment);
 		return true;

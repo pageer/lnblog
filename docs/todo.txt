@@ -6,7 +6,6 @@ presented in no particular order.
 
 * Documentation on how templates get strung together to make a page.
 * Improved user interface for blog settings and administration.
-* Add native search capability.
 * Support for polls.
 * Multi-page articles?
 * Option to publish entries as articles?

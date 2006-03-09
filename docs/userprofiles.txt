@@ -1,0 +1,49 @@
+Document: User Profiles
+
+As of version 0.6.0, LnBlog supports independant, customizable user profiles.  You can add custom 
+fields to user profiles using configuration files, which will then automatically show up on the
+profile editing pages.  You can also add custom fields on a per-user basis.
+
+Section: Essential Files
+
+Each user profile lives under the LnBlug/userdata directory in a directory named for the user.  So, for 
+example, the profile for the username bobsmith would be in the LnBlog/userdata/bobsmith directory.  Note
+that, because of this, your usernames will have to be valid file paths.  If you stick to the common 
+convention of user ASCII alphanumeric usernames, such as are used for e-mail, then this will not be 
+a problem.
+
+The profile directory will contain two critical files.  The first is passwd.php, which holds the 
+password hash for this user.  This is a data file and is recreated whenever the user changes his
+password.  It uses a .php extension so that the contents will never be sent to a browser (a minor 
+security measure).  It simply initializes two variables: $salt, which is a randomly chosen value that
+is appended to your password, and $pwd, which is an MD5 hash of your password with the salt concatenated
+to it.  
+
+The other file is user.ini, which stores field names and values for the user profile.  The format of
+this is a standard INI file, with a single [userdata] section.  This file stores all metadata on a user, 
+including the standard fields (real name, e-mail, and homepage) and any custom fields.
+
+Section: Custom Profile Fields
+
+In addition to the standard name, e-mail, and homepage fields, you can add as many custom profile fields
+as you like.  To do this, you must create a profile.ini file in your LnBlog/userdata directory.  This
+file should have a single [profile fields] section and a list of field=description lines for each 
+custom field.  Here is an example:
+
+|[profile fields]
+|location=Location
+|bday=Birthday
+|lang=Favorite programming language
+|pubkey=Link to public GPG key
+
+In addition, you can create a profile.ini file inside the profile directory of a particular user.
+So, for example, if I want to have the above fields in my profile, but not foist them on other users,
+I could simply create the above file in the profile directory for my username, rather than the 
+LnBlog/userdata directory.
+
+Section: Adding Custom Markup
+
+If you want a substantial profile, then it's entirely likely that custom fields won't be enough for you.
+In that case, you can create a profile.htm file and put it in your user profile directory.  This file
+should contain HTML markup.  It will be appended to your profile after the custom fields, so be sure 
+that your markup is valid.  

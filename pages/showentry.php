@@ -32,7 +32,7 @@ $page = NewPage(&$ent);
 
 $SUBMIT_ID = "submit";
 
-if (POST($SUBMIT_ID)) {
+if (has_post()) {
 	$ret = $ent->addComment();
 	if ($ret) {
 		# We add the random template here so that the "remember me" cookies

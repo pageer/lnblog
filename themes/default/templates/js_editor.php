@@ -1,21 +1,51 @@
-<div class="button_row">
-<button id="bold" accesskey="b" onclick="one_parm('b');"><?php p_('Bold'); ?></button>
-<button id="italic" accesskey="i" onclick="one_parm('i');"><?php p_('Italic'); ?></button>
-<button id="underline" accesskey="u" onclick="one_parm('u');"><?php p_('Underline'); ?></button>
-<button id="qt" accesskey="q" onclick="opt_parm('q');"><?php p_('Short Quote'); ?></button>
-<button id="bq" accesskey="k" onclick="opt_parm('quote');"><?php p_('Blockquote'); ?></button>
+<h4 onclick="toggle_show('editorbox', this);"><?php p_("LBCode Markup");?><a href="#" >(-)</a></h4>
+<div id="editorbox">
+<button id="bold" accesskey="b" title="<?php p_('Bold');?>" onclick="one_parm('b', '<?php p_('Enter text to bold.');?>');"><strong><?php p_("B");?></strong></button>
+<button id="italic" accesskey="i" title="<?php p_('Italic');?>" onclick="one_parm('i', '<?php p_('Enter text to italicize.');?>');"><em><?php p_("I");?></em></button>
+<button id="underline" accesskey="u" title="<?php p_('Underline');?>" onclick="one_parm('u', '<?php p_('Enter text to underline.');?>');"><span style="text-decoration: underline"><?php p_("U");?></span></button>
+<button id="qt" accesskey="q" title="<?php p_('Short Quote');?>" onclick="opt_parm('q', '<?php p_('Enter quotation text.');?>', '<?php p_("Enter optional citation");?>');">"<?php p_("quote");?>"</button>
+<button id="bq" accesskey="k" title="<?php p_('Blockquote'); ?>" onclick="opt_parm('quote', '<?php p_('Enter block quotation text.');?>', '<?php p_("Enter optional citation");?>');">"<?php p_("bq");?>"</button>
+<button id="abr" accesskey="a" title="<?php p_('Abbreviation');?>" onclick="two_parm('ab', '<?php p_("Enter the abbreviation");?>', '<?php p_("Enter the full phrase it stands for");?>');"><?php p_('abbr');?></button>
+<button id="acr" accesskey="c" title="<?php p_('Acronym'); ?>" onclick="two_parm('ac', '<?php p_("Enter the acronym");?>', '<?php p_("Enter the full phrase it stands for");?>');"><?php p_('ac'); ?></button>
+<button id="url" accesskey="l" title="<?php p_('Hyperlink'); ?>" onclick="two_parm('url', '<?php p_("Enter the link text");?>', '<?php p_("Enter the link URL");?>');"><span style="color: blue; text-decoration: underline"><?php p_('link');?></span></button>
+<button id="img" accesskey="m" title="<?php p_('Image'); ?>" onclick="two_parm('img', '<?php p_("Enter the image title");?>', '<?php p_("Enter the image URL");?>);"><?php p_('img');?></button>
+<button id="code" accesskey="o" title="<?php p_('Code');?>" onclick="one_parm('code', '<?php p_("Enter text to mark as code");?>');"><code><?php p_('code');?></code></button>
 </div>
-<div class="button_row">
-<button id="abr" accesskey="a" onclick="two_parm('ab');"><?php p_('Abbreviation'); ?></button>
-<button id="acr" accesskey="c" onclick="two_parm('ac');"><?php p_('Acronym'); ?></button>
-<button id="url" accesskey="l" onclick="two_parm('url');"><?php p_('Link'); ?></button>
-<button id="img" accesskey="m" onclick="two_parm('img');"><?php p_('Image'); ?></button>
-<button id="code" accesskey="o" onclick="one_parm('code');"><?php p_('Code'); ?></button>
+<?php if (EDITOR_SHOW_INLINE_BOXES) { # Hide the edit boxes. ?>
+<h4 onclick="toggle_show('editboxes', this);"><?php p_("Inline editor boxes");?><a href="#" >(+)</a></h4>
+<div id="editboxes">
+<label for="desc_txt" title="<?php p_('Text to be displayed on page'); ?>"><?php p_('Text'); ?></label>
+<input type="text" id="desc_txt" accesskey="t" title="<?php p_('Text to be displayed on page'); ?>" />
+<label for="meta_txt" title="<?php p_('Link/image URL or abbreviation title'); ?>"><?php p_('Attribute'); ?></label>
+<input type="text" id="meta_txt" accesskey="r" title="<?php p_('Link/image URL or abbreviation title'); ?>" />
 </div>
-<div class="editorbox">
-<div><label for="desc_txt" title="<?php p_('Text to be displayed on page'); ?>"><?php p_('Text'); ?></label>
-<input type="text" id="desc_txt" accesskey="t" title="<?php p_('Text to be displayed on page'); ?>" /></div>
-<div><label for="meta_txt" title="<?php p_('Link/image URL or abbreviation title'); ?>"><?php p_('Attribute'); ?></label>
-<input type="text" id="meta_txt" accesskey="r" title="<?php p_('Link/image URL or abbreviation title'); ?>" /></div>
+<?php } # End edit box hiding ?>
+<?php if (EDITOR_SHOW_SYMBOLS) { # Hide the math entity buttons. ?>
+<h4 onclick="toggle_show('mathent', this);"><?php p_("Special symbols");?><a href="#" >(+)</a></h4>
+<div id="mathent">
+<?php
+$math_entities = array();
+$math_entities[_("Set Theory")] = array("weierp"=>_("Power set"), "isin"=>_("Set element"), 
+	"notin"=>_("Not set element"), "ni"=>_("Contains element"), "sub"=>_("Proper subset"), 
+	"sube"=>_("Subset"), "sup"=>_("Proper superset"), "supe"=>_("Superset"),
+	"nsub"=>_("Not subset"), "cap"=>_("Intersection"), "cup"=>_("Union"), "empty"=>_("Empty set"));
+$math_entities[_("Predicate Logic")] = array("and"=>_("And"), "or"=>_("Or"), "rArr"=>_("Implies"),
+	"equiv"=>_("Equivalence"), "there4"=>_("Therefore symbol"), "forall"=>_("Universal quantification"),
+	"exist"=>_("Existential quantification"), "mu"=>_("Mu"), "lambda"=>_("Lambda"));
+$math_entities[_("Comparison")] = array("cong"=>_("Approximately equal"), "ne"=>_("Not equal"), 
+	"le"=>_("Less than or equal to"), "ge"=>_("Greater than or equal to")); 
+$math_entities[_("General")] = array("bull"=>_("Bullet"), "sdot"=>_("Dot operator"), 
+	"lceil"=>_("Left ceiling"), "rceil"=>_("Right ceiling"), 
+	"lfloor"=>_("Left floor"), "rfloor"=>_("Right floor"));
+
+foreach ($math_entities as $type=>$vals) { ?>
+<p><strong><?php echo $type;?>:</strong>
+<?php	foreach ($vals as $ent=>$desc) { ?>
+<input type="button" title="<?php echo $desc;?>" onclick="insertEntity('<?php echo $ent;?>')" value="&<?php echo $ent;?>;" />
+<?php	} ?>
+</p>
+<?php } ?>
+</div>
+<?php } # End math entity hiding ?>
 <hr />
-</div>
+

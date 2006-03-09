@@ -1,4 +1,4 @@
-Document: LnBlog User Documentation
+Document: Overview and Setup
 
 Section: Overview
 
@@ -34,13 +34,14 @@ Section: Installation
 The setup process for LnBlog is entirely web-based and mostly painless.
 
 1) - Unzip the LnBlog archive into a directory on your hard drive.
-2) - Upload the LnBlog directory to web site.
+2) - Upload the LnBlog directory to your web server.
 3) - Point your web browser to the LnBlog directory on your web server.  This will start the setup 
      process.
 4) - Pick the type of file writing you want.  If you have PHP *safe_mode* enabled on your web server, 
-     then you *must* use FTP.  If you use "native" file writing, make sure that the LnBlug userdata 
+     then you *must* use FTP.  If you use "native" file writing, make sure that the LnBlog "userdata" 
      folder and the folder where you will be creating blogs are writable.  See the <fsconfig.php>
-     documentation for details.  If you are using a shared host, FTP is recommended.
+     documentation for details.  If you are using a shared hosting account or if you don't have 
+     root/administrator access to the server, FTP is recommended.
 5) - Set the administrator password and account information.
 6) - Log in as the administrator.
 7) - Start creating new users and weblogs.

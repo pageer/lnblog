@@ -20,6 +20,10 @@
 
 # File: editlogin.php
 # Used to modify user information, including e-mail address and password.
+# You can also add custom fields to the profile that will appear on this 
+# page by creating a profile.ini file.  See the <userprofiles.txt> 
+# documentation for details.
+#
 # To create a new user, refer to the <newlogin.php> file.
 #
 # This is included by the useredit.php wrapper script for blogs.
@@ -31,6 +35,7 @@ session_start();
 
 $usr = NewUser();
 $page = NewPage(&$usr);
+$blog = NewBlog();
 
 if (! $usr->checkLogin() ) {
 	$page->redirect("index.php");
@@ -38,8 +43,7 @@ if (! $usr->checkLogin() ) {
 }
 
 # Allow us to use this to create the admin login.
-if (defined("BLOG_ROOT")) {
-	$blog = NewBlog();	
+if ($blog->isBlog()) {
 	$page_name = _("Change User Information");
 	$form_title = sprintf(_("New Login for %s"), $blog->name);
 	$redir_page = $blog->getURL();
@@ -59,7 +63,7 @@ $email = "email";
 $homepage = "homepage";
 $reset="reset";  # Set to 1 to reset the password.
 
-$tpl = NewTemplate(CREATE_LOGIN_TEMPLATE);
+$tpl = NewTemplate("login_create_tpl.php");
 $tpl->set("FORM_TITLE", $form_title);
 $tpl->set("FORM_ACTION", current_file());
 $tpl->set("PWD", $password);
@@ -70,6 +74,25 @@ $tpl->set("EMAIL", $email);
 $tpl->set("EMAIL_VALUE", $usr->email() );
 $tpl->set("HOMEPAGE", $homepage);
 $tpl->set("HOMEPAGE_VALUE", $usr->homepage() );
+
+$blog_qs = ($blog->isBlog() ? "blog=".$blog->blogid."&amp;" : "");
+$tpl->set("UPLOAD_LINK", 
+          INSTALL_ROOT_URL."pages/fileupload.php?".
+          $blog_qs."profile=".$usr->username() );
+$tpl->set("PROFILE_EDIT_LINK", INSTALL_ROOT_URL."editfile.php?".
+          $blog_qs."profile=".$usr->username()."&amp;file=profile.htm" );
+$tpl->set("PROFILE_EDIT_DESC", _("Edit extra profile data") );
+$tpl->set("UPLOAD_DESC", _("Upload file to profile") );
+
+# Populate the form with custom profile fields.
+$priv_path = mkpath(USER_DATA_PATH,$usr->username(),CUSTOM_PROFILE);
+$cust_path = mkpath(USER_DATA_PATH,CUSTOM_PROFILE);
+$cust_ini = NewINIParser($priv_path);
+$cust_ini->merge(NewINIParser($cust_path));
+
+$section = $cust_ini->getSection(CUSTOM_PROFILE_SECTION);
+$tpl->set("CUSTOM_FIELDS", $section);
+$tpl->set("CUSTOM_VALUES", $usr->custom);
 
 if (has_post()) {
 	
@@ -87,6 +110,11 @@ if (has_post()) {
 	$usr->name(trim(POST($full_name)));
 	$usr->email(trim(POST($email)));
 	$usr->homepage(trim(POST($homepage)));
+	
+	foreach ($section as $key=>$val) {
+		$usr->custom[$key] = trim(POST($key));
+	}
+	
 	$usr->save();
 	if ($pwd_change) $usr->login(POST($password));
 	$page->redirect("index.php");

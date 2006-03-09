@@ -37,7 +37,7 @@ $tpl = NewTemplate(ENTRY_EDIT_TEMPLATE);
 $tpl->set("FORM_ACTION", current_file() );
 $tpl->set("SUBMIT_ID", $submit_id);
 $tpl->set("PREV_ID", $preview_id);
-$tpl->set("HAS_HTML", MARKUP_BBCODE);
+$tpl->set("HAS_HTML", $blg->default_markup);
 $blg->exportVars($tpl);
 
 if (POST($submit_id)) {

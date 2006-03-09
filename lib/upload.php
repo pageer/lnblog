@@ -107,8 +107,8 @@ class FileUpload extends LnBlogObject {
 		
 		# Simple filename truncation test.  Returns an error if there is 
 		# no dot in the filename.
-		if ( $ret == FILEUPLOAD_NO_ERROR && ! strstr($this->destname, ".") )
-			$ret = FILEUPLOAD_NAME_TRUNCATED;
+		#if ( $ret == FILEUPLOAD_NO_ERROR && ! strstr($this->destname, ".") )
+		#	$ret = FILEUPLOAD_NAME_TRUNCATED;
 			
 		if (php_version_at_least("4.0.3")) {
 			$is_up = is_uploaded_file($this->tempname);
