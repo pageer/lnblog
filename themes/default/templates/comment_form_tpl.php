@@ -9,7 +9,7 @@ http:// or ftp:// will be automatically converted to hyperlinks."); ?>
 <?php if(!COMMENT_EMAIL_VIEW_PUBLIC){ p_("Your e-mail address will not be displayed."); } ?></p>
 
 <fieldset>
-<form id="commentform" method="post" action="index.php">
+<form id="commentform" method="post" action="<?php echo $FORM_TARGET;?>">
 <div>
 <label class="basic_form_label" for="subject"><?php p_("Subject"); ?></label>
 <input style="width: 70%" id="subject" name="subject" accesskey="s" type="text" />
@@ -42,7 +42,7 @@ if (POST("url")) {
 <input id="e-mail" name="e-mail" accesskey="e" type="text" <?php 
 if (POST("e-mail")) {
 	echo 'value="'.POST("e-mail").'" '; 
-} elseif (COOKIE("email")) {
+} elseif (COOKIE("e-mail")) {
 	echo 'value="'.COOKIE("e-mail").'" '; 
 }
 ?>/>
@@ -51,16 +51,8 @@ if (POST("e-mail")) {
 <label for="remember"><?php p_("Remember me"); ?></label>
 <input id="remember" name="remember" type="checkbox" checked="checked" />
 </div>
-<?php 
-# Do the cookie-setting here, because it's just eaiser.
-if (POST("remember")) {
-	if (POST("username")) setcookie("username", POST("username"));
-	if (POST("e-mail")) setcookie("e-mail", POST("e-mail"));
-	if (POST("url")) setcookie("url", POST("url"));
-}
-?>
 <div>
-<span class="basic_form_submit"><input name="<?php echo $SUBMIT_ID; ?>" id="<?php echo $SUBMIT_ID; ?>" type="submit" value="<?php p_("Submit"); ?>" /></span>
+<span class="basic_form_submit"><input name="submit" id="submit" type="submit" value="<?php p_("Submit"); ?>" /></span>
 <span class="basic_form_clear"><input name="clear" id="clear" type="reset" value="<?php p_("Clear"); ?>" /></span>
 </div>
 </form>

@@ -30,15 +30,9 @@ $page = NewPage(&$ent);
 # will add it.  We do this before printing the comments so that a 
 # new comment will be displayed on the page.
 
-$SUBMIT_ID = "submit";
-
 if (has_post()) {
 	$ret = $ent->addComment();
 	if ($ret) {
-		# We add the random template here so that the "remember me" cookies
-		# are set.  This should definitely be fixed.
-		$t = NewTemplate("comment_form_tpl.php");
-		$ret = $t->process();
 		$page->redirect($ent->permalink());
 	}
 }
@@ -64,7 +58,7 @@ if ($tmp_content) $page->addStylesheet("comment.css");
 if ($ent->allow_comment) { 
 	$page->addStylesheet("form.css");
 	$comm_tpl = NewTemplate(COMMENT_FORM_TEMPLATE);
-	$comm_tpl->set("SUBMIT_ID", $SUBMIT_ID);
+	$comm_tpl->set("FORM_TARGET", $ent->uri("basepage"));
 	$content .= $comm_tpl->process();
 }
 

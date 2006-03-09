@@ -133,7 +133,7 @@ define("PACKAGE_NAME", "LnBlog");
 # Constant: PACKAGE_VERSION
 # The version number of the software.  This is a string in the format 
 # "1.2.3".  Note that each number may be more than one digit.
-define("PACKAGE_VERSION", "0.6.0");
+define("PACKAGE_VERSION", "0.6.1");
 
 # Constant: PACKAGE_URL
 # The full URL of the LnBlog project home page.

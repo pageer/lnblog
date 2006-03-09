@@ -29,8 +29,6 @@ session_start();
 require_once("config.php");
 require_once("lib/creators.php");
 
-$SUBMIT_ID = "submit";
-
 $ent = NewBlogEntry();
 $blg = NewBlog();
 $page = NewPage(&$ent);
@@ -43,10 +41,6 @@ $page->title = $ent->subject . " - " . $blg->name;
 if (has_post()) {
 	$ret = $ent->addComment();
 	if ($ret) {
-		# We add the random template here so that the "remember me" cookies
-		# are set.  This should definitely be fixed.
-		$t = NewTemplate("comment_form_tpl.php");
-		$ret = $t->process();
 		$page->redirect($ent->commentlink());
 	}
 }
@@ -60,7 +54,7 @@ $page->addStylesheet("comment.css");
 if ($ent->allow_comment) { 
 	$page->addStylesheet("form.css");
 	$comm_tpl = NewTemplate(COMMENT_FORM_TEMPLATE);
-	$comm_tpl->set("SUBMIT_ID", "submit");
+	$comm_tpl->set("FORM_TARGET", $ent->uri("commentpage"));
 	if (! $content) 
 		$comm_tpl->set("PARENT_TITLE", 
 		              '<a href="'.$ent->permalink().'">'.$ent->subject.'</a>');

@@ -31,16 +31,10 @@ $ent = NewArticle();
 $blg = NewBlog();
 $page = NewPage(&$ent);
 
-$SUBMIT_ID = "submit";
-
 if (has_post()) {
 	$cmt_added = $ent->addComment(getcwd().PATH_DELIM.ENTRY_COMMENT_DIR);
 	if ($cmt_added) {
-		# We add the random template here so that the "remember me" cookies
-		# are set.  This should definitely be fixed.
-		$t = NewTemplate("comment_form_tpl.php");
-		$ret = $t->process();
-		$page->redirect(current_file());
+		$page->redirect($ent->commentlink());
 	}
 }
 
@@ -60,7 +54,7 @@ if ($ent->allow_comment) {
 	$page->addStylesheet("form.css");
 	$comm_tpl = NewTemplate();
 	$comm_tpl->file = COMMENT_FORM_TEMPLATE;
-	$comm_tpl->set("SUBMIT_ID", $SUBMIT_ID);
+	$comm_tpl->set("FORM_TARGET", $ent->uri("basepage"));
 	$content .= $comm_tpl->process();
 }
 

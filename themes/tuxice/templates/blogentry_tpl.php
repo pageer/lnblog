@@ -42,8 +42,8 @@ if (! empty($TAGS)) { ?>
 <ul>
 <?php if ( ! empty($COMMENTCOUNT) ) { ?>
 <li><a href="<?php echo $COMMENT_LINK; ?>"><?php p_('View reader comments');?> (<?php echo $COMMENTCOUNT; ?>)</a></li>
-<?php } elseif (! empty($ALLOW_COMMENT)) { ?> 
-<li><a href="<?php echo $COMMENT_LINK; ?>"><?php p_('Post a comment');?>)</a></li>
+<?php } elseif (empty($ALLOW_COMMENT)) { ?> 
+<li><a href="<?php echo $COMMENT_LINK; ?>"><?php p_('Post a comment');?></a></li>
 <?php } ?>
 <?php if ( ! empty($TRACKBACKCOUNT) ) { ?>
 <li><a href="<?php echo $SHOW_TRACKBACK_LINK; ?>"><?php p_('View TrackBacks');?> (<?php echo $TRACKBACKCOUNT; ?>)</a></li>

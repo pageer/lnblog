@@ -265,14 +265,16 @@ class BlogEntry extends Entry {
 				} else {
 					return $dir_uri;
 				}
-			case "send_tb":   return $dir_uri."trackback.php?send_ping=yes";
-			case "get_tb":    return $dir_uri."trackback.php";
-			case "trackback": return $dir_uri.ENTRY_TRACKBACK_DIR."/";
-			case "upload":    return $dir_uri."uploadfile.php";
-			case "edit":      return $dir_uri."edit.php";
-			case "delete":    return $dir_uri."delete.php";
-			case "comment":   return $dir_uri.ENTRY_COMMENT_DIR."/";
-			case "base":      return $dir_uri;
+			case "send_tb":     return $dir_uri."trackback.php?send_ping=yes";
+			case "get_tb":      return $dir_uri."trackback.php";
+			case "trackback":   return $dir_uri.ENTRY_TRACKBACK_DIR."/";
+			case "upload":      return $dir_uri."uploadfile.php";
+			case "edit":        return $dir_uri."edit.php";
+			case "delete":      return $dir_uri."delete.php";
+			case "comment":     return $dir_uri.ENTRY_COMMENT_DIR."/";
+			case "commentpage": return $dir_uri.ENTRY_COMMENT_DIR."/index.php";
+			case "base":        return $dir_uri;
+			case "basepage":    return $dir_uri."index.php";
 		}
 		return $dir_uri;
 	}
@@ -549,6 +551,21 @@ class BlogEntry extends Entry {
 		if ($cmt->data) {
 			$ret = $cmt->insert($path);
 		} else $ret = false;
+		
+		# Set the "remember me" cookies.  This is probably the best place
+		# to do it, since this is where we're actually processing the post.
+		# Cookies expire after 30 days.
+		if (POST("remember")) {
+			$blog = NewBlog();
+			$path = localpath_to_uri($blog->home_path, false);
+			if (POST("username"))
+				setcookie("username", POST("username"), time()+2592000, $path);
+			if (POST("e-mail"))
+				setcookie("e-mail", POST("e-mail"), time()+2592000, $path);
+			if (POST("url"))
+				setcookie("url", POST("url"), time()+2592000, $path);
+		}
+		
 		return $ret;
 	}
 

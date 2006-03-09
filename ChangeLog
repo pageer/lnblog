@@ -1,3 +1,9 @@
+22-Feb-2006: version 0.6.1
+- Fixed bad profile links in comments.
+- Fixed comments not being added when posting from pretty permalink page.
+- Fixed "post a comment" link not showing up in tuxice theme.
+- Finally made the comment "remember me" function actually work right.
+
 17-Feb-2006: version 0.6.0 "No need for passwd.php"
 - Fixed string length error in setting blog ID.
 - Fixed JavaScript but in post editor.
