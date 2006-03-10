@@ -58,11 +58,7 @@ class User extends LnBlogObject {
 		$this->homepage = '';
 		$this->custom = array();
 
-		if (isset($_SESSION["user-".$uname])) {
-
-			$this = unserialize($_SESSION["user-".$uname]);
-		
-		} elseif ($uname && realpath(mkpath(USER_DATA_PATH,$uname,"passwd.php"))) {
+		if ($uname && realpath(mkpath(USER_DATA_PATH,$uname,"passwd.php"))) {
 		
 			global $pwd;
 			global $salt;

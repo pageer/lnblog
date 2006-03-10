@@ -136,10 +136,41 @@ class BlogEntry extends Entry {
 	*/
 	
 	function getParent() {
-		if (! defined("BLOG_ROOT")) return false;
+		if (! defined("BLOG_ROOT")) {
+			
+		}
 		return NewBlog();
 	}
-	
+
+	# Method: entryID
+	# Gets an identifier for the current entry.
+	#
+	# Returns:
+	# For file-based storage, string containing the last part of the path.
+	# Normally, this is in the form ##/##/##_####
+
+	function entryID() {
+		$temp = dirname($this->file);
+		$ret = basename($temp);  # Add day component.
+		$temp = dirname($temp);
+		$ret = basename($temp)."/".$ret;  # Add month component.
+		$temp = dirname($temp);
+		$ret = basename($temp)."/".$ret;  # Add year component.
+		return $ret;
+	}
+
+	# Method: parentID
+	# Gets an identifier for the entry's parent blog.
+	#
+	# Returns:
+	# For file-based storage, returns the webroot-relative path to the blog.
+
+	function parentID() {
+		$path = dirname($this->file);
+		for ($i = 0; $i < 4; $i++) $path = dirname($path);
+		return substr($path, strlen(DOCUMENT_ROOT));
+	}
+
 	/*
 	Method: getPath
 	Returns a path to use for the entry.  This is only applicable for 
@@ -270,7 +301,13 @@ class BlogEntry extends Entry {
 			case "trackback":   return $dir_uri.ENTRY_TRACKBACK_DIR."/";
 			case "upload":      return $dir_uri."uploadfile.php";
 			case "edit":        return $dir_uri."edit.php";
-			case "delete":      return $dir_uri."delete.php";
+			case "delete":     
+				if (KEEP_EDIT_HISTORY) {
+					return $dir_uri."delete.php";
+				} else {
+					return INSTALL_ROOT_URL."pages/delentry.php?".
+						"blog=".$this->parentID()."&amp;entry=".$this->entryID();
+				}
 			case "comment":     return $dir_uri.ENTRY_COMMENT_DIR."/";
 			case "commentpage": return $dir_uri.ENTRY_COMMENT_DIR."/index.php";
 			case "base":        return $dir_uri;
@@ -322,7 +359,6 @@ class BlogEntry extends Entry {
 			create_directory_wrappers($dir_path.PATH_DELIM.ENTRY_TRACKBACK_DIR, ENTRY_TRACKBACKS);
 		}
 
-
 		if (! $ret) {
 			
 			$ret = $fs->rename($target, $source);
@@ -332,7 +368,7 @@ class BlogEntry extends Entry {
 		} else {
 		
 			if (! KEEP_EDIT_HISTORY) $fs->delete($target);
-			$subfile = preg_replace("/\W/", "_", trim($this->subject));
+			$subfile = preg_replace("/\W*/", "_", trim($this->subject));
 			$subfile = dirname(dirname($this->file)).PATH_DELIM.$subfile.".php";
 			if (! file_exists($subfile)) 
 				write_file($subfile, 
@@ -359,6 +395,10 @@ class BlogEntry extends Entry {
 		if (! $this->isEntry($dir_path) ) return false;
 		
 		$this->raiseEvent("OnDelete");
+		
+		$subfile = preg_replace("/\W+/", "_", trim($this->subject));
+		$subfile = dirname($dir_path).PATH_DELIM.$subfile.".php";
+		if (file_exists($subfile)) $fs->delete($subfile);
 		
 		if (KEEP_EDIT_HISTORY) {
 			$source_file = $dir_path.PATH_DELIM.ENTRY_DEFAULT_FILE;

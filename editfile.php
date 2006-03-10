@@ -80,7 +80,7 @@ if (isset($_GET["list"])) {
 	$page->addScript("sitemap.js");
 	$query_string .= ($query_string ? "&amp;" : "?")."list=yes";
 }
-$tpl->set("FORM_ACTION", current_file().$query_string);
+$tpl->set("FORM_ACTION", current_file(true).$query_string);
 if (isset($_GET["list"])) $tpl->set("PAGE_TITLE", "Edit Link List");
 else $tpl->set("PAGE_TITLE", "Edit Text File");
 

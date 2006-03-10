@@ -1,3 +1,22 @@
+10-Mar-2006: version 0.6.2
+- Fixed entry deletion when history is disabled.  The rmdir() and rmdir_rec()
+functions for the FS classes were trying to delete a directory that was still
+in use.  Also, we apparently can't delete the directory the script is being
+run from, so the entry delete.php wrappers can't be used.  Instead, adjusted
+deletion links to use the pages/delentry.php directly.  This required 
+adjustments to current_file() and current_uri() to maintain query strings
+and addition of a couple of methods to blogentry class.
+
+08-Mar-2006: 
+- Fixed conditional inversion error in rmdir_rec() in nativefs.  This caused calls to the
+function to completely fail.
+- Adjusted pretty-permalink regex to remove extraneous underscores.
+- Fixed incorrect variables in terminal theme.
+
+07-Mar-2006:
+- Fixed unset DOCUMENT_ROOT errors on initial setup.
+- Fixed user object caching that broke PHP5 support.
+
 22-Feb-2006: version 0.6.1
 - Fixed bad profile links in comments.
 - Fixed comments not being added when posting from pretty permalink page.

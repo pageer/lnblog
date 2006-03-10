@@ -97,7 +97,11 @@ class Blog extends LnBlogObject {
 		$this->entrylist = array();
 		$this->last_blogentry = false;
 		$this->last_article = false;
-		$this->blogid = substr($this->home_path, strlen(DOCUMENT_ROOT) );
+		if (defined("DOCUMENT_ROOT")) {
+			$this->blogid = substr($this->home_path, strlen(DOCUMENT_ROOT) );
+		} else {
+			$this->blogid = '';
+		}
 		$this->custom_fields = array();
 		$this->readBlogData();
 		

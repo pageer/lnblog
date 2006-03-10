@@ -163,6 +163,13 @@ class FTPFS extends FS {
 	}
 
 	function rmdir($dir) {
+		# This condition accounts for the possibility that we are trying to 
+		# delete the current directory with history saving disabled.  
+		# We need to chdir() before doing that because the current directory 
+		# is, by definition, in use.
+		if ( realpath($dir) == getcwd() ) {
+			chdir("..");
+		}
 		$dir = $this->localpathToFSPath($dir);
 		if ($this->connected() ) $ret = ftp_rmdir($this->connection, $dir);
 		else $ret = false;
@@ -174,15 +181,15 @@ class FTPFS extends FS {
 		$dirhand = opendir($dir);
 		$ret = true;
 		while ( ( false !== ( $ent = readdir($dirhand) ) ) && $ret ) {
-			if ($ent != "." || $ent != "..") {
+			if ($ent == "." || $ent == "..") {
 				continue;
 			} else {
 				$ret &= $this->rmdir_rec($dir.PATH_DELIM.$ent);
 			}
 		}
+		closedir($dirhand);  # Close $dirhand before trying to delete it.
 		if ($ret) $ret &= $this->rmdir($dir);
-		closedir($dirhand);
-		return $dir_list;	
+		return $ret;	
 	}
 
 	function chmod($path, $mode) {

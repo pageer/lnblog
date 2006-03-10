@@ -95,7 +95,7 @@ if (POST($upgrade)) {
 	else $upgrade_path = calculate_document_root().PATH_DELIM.trim(POST($upgrade));
 	$b = NewBlog($upgrade_path);
 	$upgrade_status = $b->upgradeWrappers();
-	$page->redirect(current_file());
+	$page->redirect(current_file(true));
 } elseif (POST($update)) {
 	if (is_absolute(POST($update))) $update_path = trim(POST($update));
 	else $update_path = calculate_document_root().PATH_DELIM.trim(POST($update));

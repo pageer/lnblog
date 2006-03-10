@@ -102,7 +102,18 @@ function NewTemplate($tpl="") {
 # pwd - The *optional* associated password.
 function NewUser($usr=false, $pwd=false) {
 	require_once("user.php");
-	return new User($usr, $pwd);
+	if (!$usr && ( SESSION(CURRENT_USER) || COOKIE(CURRENT_USER) ) ) {
+			if ( SESSION(CURRENT_USER) == COOKIE(CURRENT_USER) ||
+			    (SESSION(CURRENT_USER) == '' && COOKIE(CURRENT_USER) ) 
+			   ) {
+				$usr = COOKIE(CURRENT_USER);
+			}
+		}
+	if ($usr && isset($_SESSION["user-".$usr])) {
+		return unserialize($_SESSION["user-".$usr]);
+	} else {
+		return new User($usr, $pwd);
+	}
 }
 
 # Function: NewFileUpload

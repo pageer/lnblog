@@ -355,17 +355,23 @@ function has_get() {
 # Returns:
 # A string with the URI.
 
-function current_uri ($relative=false) {
+function current_uri ($relative=false, $query_string=false, $no_escape=false) {
 	$ret = SERVER("SCRIPT_NAME"); 
 	if ($relative) $ret = basename($ret);
+	if ($query_string) {
+		$ret .= "?".$query_string;
+	} elseif ($query_string === false && isset($_SERVER['QUERY_STRING']) ) {
+		if ($no_escape) $ret .= "?".$_SERVER["QUERY_STRING"];
+		else $ret .= "?".str_replace("&", "&amp;", $_SERVER["QUERY_STRING"]);
+	}
 	return $ret;
 }
 
 # Function: current_file
 # An alias for current_uri(true).
 
-function current_file() {
-	return current_uri(true);
+function current_file($no_escape=false) {
+	return current_uri(true, false, $no_escape);
 }
 
 # Function: current_url

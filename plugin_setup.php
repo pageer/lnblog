@@ -47,7 +47,7 @@ if (has_post()) {
 	$plug_name = sanitize(POST("plugin"));
 	$plug = new $plug_name;
 	$ret = $plug->updateConfig();
-	$page->redirect(current_file());
+	$page->redirect(current_file(true));
 	exit;
 } elseif ( sanitize(GET("plugin")) && 
            class_exists(sanitize(GET("plugin"))) ) {

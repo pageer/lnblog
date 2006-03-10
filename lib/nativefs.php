@@ -66,6 +66,10 @@ class NativeFS extends FS {
 	}
 
 	function rmdir($dir) {
+		# We can't delete the current directory because we're still using it.
+		if ( realpath($dir) == getcwd() ) {
+			chdir("..");
+		}
 		return rmdir($dir);
 	}
 
@@ -74,14 +78,14 @@ class NativeFS extends FS {
 		$dirhand = opendir($dir);
 		$ret = true;
 		while ( ( false !== ( $ent = readdir($dirhand) ) ) && $ret ) {
-			if ($ent != "." || $ent != "..") {
+			if ($ent == "." || $ent == "..") {
 				continue;
 			} else {
 				$ret &= $this->rmdir_rec($dir.PATH_DELIM.$ent);
 			}
 		}
-		if ($ret) $ret &= $this->rmdir($dir);
 		closedir($dirhand);
+		if ($ret) $ret &= $this->rmdir($dir);
 		return $ret;	
 	}
 
