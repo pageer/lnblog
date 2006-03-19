@@ -25,6 +25,29 @@ session_start();
 require_once("blogconfig.php");
 require_once("lib/creators.php");
 
+function plug_sort($a, $b) {
+	if (is_numeric($a["order"]) && ! is_numeric($b["order"])) {
+		return -1;
+	} elseif (! is_numeric($a["order"]) && is_numeric($b["order"])) {
+		return 1;
+	} elseif ($a["order"] > $b["order"]) {
+		return 1;
+	} elseif ($a["order"] < $b["order"]) {
+		return -1;
+	} elseif ($a["enabled"] && ! $b["enabled"]) {
+		return -11;
+	} elseif (! $a["enabled"] && $b["enabled"]) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+# Quick fix for name mangling on forms
+function namefix($pg) {
+	return preg_replace("/\W/", "_", $pg);
+}
+
 $page = NewPage();
 $user = NewUser();
 
@@ -43,19 +66,28 @@ $tpl = NewTemplate(PLUGIN_LOAD_TEMPLATE);
 
 if (has_post()) {
 
-	$disabled = POST("exclude_list");
-	$disabled = preg_replace("/(\s|,)+/", ",", $disabled);
-	$first = POST("load_first");
-	$first = preg_replace("/(\s|,)+/", ",", $first);
-	$PLUGIN_MANAGER->exclude_list = explode(",", $disabled);
-	$PLUGIN_MANAGER->load_first = explode(",", $first);
+	$disabled = array();
+	$first = array();
+	
+	foreach ($PLUGIN_MANAGER->plugin_list as $plug) {
+		#echo "<p>En: $plug, ".POST(namefix($plug)."_en").", ".POST(namefix($plug)."_ord")."</p>";
+		if (! POST(namefix($plug)."_en")) $disabled[] = $plug;
+		if (is_numeric(POST(namefix($plug)."_ord"))) 
+			$first[$plug] = POST(namefix($plug)."_ord");
+	}
+	asort($first);
+	$lfirst = array();
+	foreach ($first as $key=>$val) $lfirst[] = $key;
+	
+	$PLUGIN_MANAGER->exclude_list = $disabled; #implode(",", $disabled);
+	$PLUGIN_MANAGER->load_first = $lfirst; #implode(",", $first);
 	
 	if (defined("BLOG_ROOT")) $file = BLOG_ROOT.PATH_DELIM."plugins.ini";
 	else $file = USER_DATA_PATH.PATH_DELIM."plugins.ini";
 	
 	$parser = NewINIParser($file);
-	$parser->setValue("Plugin_Manager", "exclude_list", $disabled);
-	$parser->setValue("Plugin_Manager", "load_first", $first);
+	$parser->setValue("Plugin_Manager", "exclude_list", implode(",",$disabled));
+	$parser->setValue("Plugin_Manager", "load_first", implode(",",$lfirst));
 	$ret = $parser->writeFile();
 	
 	if (! $ret) {
@@ -63,9 +95,25 @@ if (has_post()) {
 	}
 }
 
-$tpl->set("PLUGIN_LIST", implode("\n", $PLUGIN_MANAGER->plugin_list));
-$tpl->set("EXCLUDE_LIST", implode("\n", $PLUGIN_MANAGER->exclude_list));
-$tpl->set("LOAD_FIRST", implode("\n", $PLUGIN_MANAGER->load_first));
+# Create an array of arrays to send to the template for display.
+
+$disp_list = array();
+foreach ($PLUGIN_MANAGER->plugin_list as $plug) {
+	$disp_list[namefix($plug)] = 
+		array("order"=>_("Unspecified"), 
+		      "enabled"=> !in_array($plug, $PLUGIN_MANAGER->exclude_list),
+		      "file"=>$plug);
+}
+
+$i=1;
+foreach ($PLUGIN_MANAGER->load_first as $plug) {
+	if (isset($disp_list[namefix($plug)])) 
+		$disp_list[namefix($plug)]["order"] = $i++;
+}
+
+uasort($disp_list, "plug_sort");
+
+$tpl->set("PLUGIN_LIST", $disp_list);
 
 $page->title = spf_("%s Plugin Loading Configuration", PACKAGE_NAME);
 $page->display($tpl->process());

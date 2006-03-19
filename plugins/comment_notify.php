@@ -24,9 +24,9 @@ class CommentNotifier extends Plugin {
 					@mail($u->email(), spf_("Comment on %s", $parent->subject),
 					        _("A new reader comment has been posted.\n").
 						 spf_("The URL for this comment is: %s\n\n", $param->permalink()).
-					     spf_("Name: %s\n", $param->name).
-					     spf_("E-mail: %s\n", $param->email).
-					     spf_("URL: %s\n", $param->url).
+					    spf_("Name: %s\n", $param->name).
+					    spf_("E-mail: %s\n", $param->email).
+					    spf_("URL: %s\n", $param->url).
 						 spf_("Subject: %s\n\n", $param->subject).
 					  	$param->data, "From: LnBlog comment notifier");
 				}

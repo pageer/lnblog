@@ -233,22 +233,6 @@ class BlogEntry extends Entry {
 	A string containing the full URI to this entry.
 	*/
 	function permalink() {
-	/*
-		if (! USE_WRAPPER_SCRIPTS && 
-		    ! file_exists(BLOG_ROOT.PATH_DELIM.".htaccess") ) {
-			$path = localpath_to_uri(INSTALL_ROOT);
-			$path .= "pages/showentry.php?";
-			$path .= "blog=".basename(dirname(dirname(dirname(dirname($this->file)))));
-			$path .= $html_escape ? "&amp;" : "&";
-			$id = basename(dirname(dirname(dirname($this->file)))); #Year
-			$id .= "/".basename(dirname(dirname($this->file)));     #Month
-			$id .= "/".basename(dirname($this->file));              #Entry
-			$path .= "entry=".$id;
-			return $path;
-		} else {
-			return localpath_to_uri($this->localpath());
-		}
-	*/
 		return $this->uri("page");
 	}
 

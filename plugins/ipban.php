@@ -3,7 +3,7 @@ class IPBan extends Plugin {
 	
 	function IPBan() {
 		$this->plugin_desc = _("Allows you to ban IP addresses from adding comments or trackbacks.");
-		$this->plugin_version = "0.2.0";
+		$this->plugin_version = "0.2.1";
 		$this->addOption("ban_list", _("File to store list of banned IPs."),
 			"ip_ban.txt", "text");
 		$this->getConfig();
@@ -25,6 +25,7 @@ class IPBan extends Plugin {
 		else $list = array();
 		$list = array_merge($list, $add_list);
 		$list = array_unique($list);
+		sort($list);
 		$content = '';
 		foreach ($list as $ip) {
 			if ($content != '') $content .= "\n";

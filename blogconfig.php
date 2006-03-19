@@ -133,7 +133,7 @@ define("PACKAGE_NAME", "LnBlog");
 # Constant: PACKAGE_VERSION
 # The version number of the software.  This is a string in the format 
 # "1.2.3".  Note that each number may be more than one digit.
-define("PACKAGE_VERSION", "0.6.2");
+define("PACKAGE_VERSION", "0.6.3");
 
 # Constant: PACKAGE_URL
 # The full URL of the LnBlog project home page.
@@ -269,14 +269,14 @@ don't use ~user directories, you can probably ignore this.
 
 *Default* is "/^\/home\/([^\/]+)\/www(.*)/i".
 */
-@define("LOCALPATH_TO_URI_MATCH_RE", "/^\/home\/([^\/]+)\/www(.*)/i");
+@define("LOCALPATH_TO_URI_MATCH_RE", "/^\/home\/([^\/]+)\/(www|public_html)\/(.*)/i");
 
 /* Constant: LOCALPATH_TO_URI_REPLACE_RE
 The corresponding replacement pattern to <LOCALPATH_TO_URI_MATCH_RE>. 
 
 *Default* is "/~$1$2".
 */
-@define("LOCALPATH_TO_URI_REPLACE_RE", "/~$1$2");
+@define("LOCALPATH_TO_URI_REPLACE_RE", "/~$1/$2");
 
 /* Constant: URI_TO_LOCALPATH_MATCH_RE
 The reverse of <LOCALPATH_TO_URI_MATCH_RE>.  This is the regular expression 

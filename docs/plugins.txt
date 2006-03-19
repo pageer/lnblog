@@ -13,7 +13,7 @@ be set for the entire installation and can also be overridden for individual blo
 lists through the "configure plugin loading" link.  
 
 When a page is loaded, LnBlog looks at the plugins directory to get a list of all the plugins that are 
-present and sorts them in alphabetical order by file name.  It then removes the plugins in the disabled 
+present and sorts them in alphabetical order by file name.  It removes the plugins in the disabled 
 list and moves the ones in the "load first" list to the front.  It then loads the plugins in the resulting
 list in order.
 
@@ -33,16 +33,19 @@ named "plugins" in the blog root directory and copy the plugin file there.
 
 Section: Removing plugins
 
-To disable a plugin, use the plugin loading configuration page to add the name of the plugin file 
-to the disabled list.  To uninstall a plugin, just delete the file or move it out of the plugins 
-directory.  
+To disable a plugin, go to the plugin loading configuration page and uncheck the "enabled"
+box for that plugin file.  To uninstall a plugin, just delete the file or move it out of the 
+plugins directory.
 
 Section: Load order
 
-As previously mentioned, LnBlog has a list of which plugins are loaded first.  You can change this 
-from the plugin loading configuration page.  To make a plugin load before others, add it to this list
-in the desired location.  All enabled plugins that are not on the list will be 
-loaded in alphabetical order by file name after the plugins in the list are loaded.
+As previously noted, load order is important for plugins that add segments to 
+the page, such as sidebar plugins.  To change this order, go to the plugin
+loading configuration page and change the numbers in the load order column to
+reflect your desired order.  Note that these numbers are relative to each other
+and will be normalized when the list is saved, so they do not need to be 
+continuous, i.e. missing or doubled numbers are not necessarily an error.
+Entering a non-numeric value will be interpreted as an unspecified load order.
 
 Section: Writing plugins
 
@@ -61,6 +64,6 @@ articles, although individual comments generally need an explicit identifier.  O
 always possible to simply create an instance of the parent entry of a comment and get a list of
 comments that way.
 
-The plugins/disabled directory of the default LnBlog installation includes a template.php file.  This is a heavily commented plugin template which is intended as a learning tool.  Between this 
-and the standard set of plugins, it should be possible to get a good idea of how the plugin 
-system works.
+The plugins/disabled directory of the default LnBlog installation includes a template.php file.  This is a heavily commented plugin 
+template which is intended as a learning tool.  Between this and the standard set of plugins, it should be possible to get a good 
+idea of how the plugin system works.

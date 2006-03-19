@@ -1,3 +1,13 @@
+17-Mar-2006: version 0.6.3
+- Made the plugin loading configuration page not suck.
+- Added uri() function to trackback and blogcomment classes.
+- Made LOCALPATH_TO_URI_MATCH_RE more general, so that it can now account
+for all variations on /home/user/whatever as the LnBlog doucment root.
+
+12-Mar-2006:
+- Fixed wrong file name in sitemap.php.
+- Sort IP addresses when saving sitemap.
+
 10-Mar-2006: version 0.6.2
 - Fixed entry deletion when history is disabled.  The rmdir() and rmdir_rec()
 functions for the FS classes were trying to delete a directory that was still
@@ -8,8 +18,8 @@ adjustments to current_file() and current_uri() to maintain query strings
 and addition of a couple of methods to blogentry class.
 
 08-Mar-2006: 
-- Fixed conditional inversion error in rmdir_rec() in nativefs.  This caused calls to the
-function to completely fail.
+- Fixed conditional inversion error in rmdir_rec() in nativefs.  This caused 
+calls to the function to completely fail.
 - Adjusted pretty-permalink regex to remove extraneous underscores.
 - Fixed incorrect variables in terminal theme.
 

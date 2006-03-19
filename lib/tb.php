@@ -67,6 +67,21 @@ class Trackback extends LnBlogObject {
 		}
 	}
 
+	# Method: uri
+	# Get the URI for various functions
+
+	function uri($type) {
+		switch ($type) {
+			case "permalink":
+			case "trackback":
+				return localpath_to_uri(dirname($this->file)).
+				       "#".$this->getAnchor();
+			case "delete":
+				return localpath_to_uri(dirname($this->file)).
+				       "?delete=".$this->getAnchor();
+		}
+	}
+
 	# Method: getPostData
 	# Pulls the trackback data out of the POST and into the object.
 
@@ -290,8 +305,7 @@ class Trackback extends LnBlogObject {
 		$blog = NewBlog();
 		$tpl = NewTemplate(TRACKBACK_TEMPLATE);
 		$anchor = $this->getAnchor();
-		$del_link = localpath_to_uri(dirname($this->file)).
-			"?delete=".$anchor;
+		$del_link = $this->uri("delete");
 
 		$this->control_bar = array();
 		$this->control_bar[] = 
@@ -338,7 +352,7 @@ class Trackback extends LnBlogObject {
 	# A permalink to the trackback entry.
 	
 	function permalink() {
-		return localpath_to_uri(dirname($this->file))."#".$this->getAnchor();
+		return $this->uri("permalink");
 	}
 
 	# Method: getAnchor

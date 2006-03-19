@@ -59,11 +59,15 @@ $tpl->set("SHOW_LINK_EDITOR");
 
 if (has_post()) {
 
+	if (class_exists("sitemap")) {
+		$smap = new SiteMap();
+		$target_file = $smap->link_file;
+	} else $target_file = SITEMAP_FILE;
+	
 	if ($blog->isBlog()) {
-		$target_file = BLOG_ROOT.PATH_DELIM.
-			$PLUGIN_MANAGER->plugin_config;
+		$target_file = BLOG_ROOT.PATH_DELIM.$target_file;
 	} else {
-		$target_file = USER_DATA_PATH.PATH_DELIM.SITEMAP_FILE;
+		$target_file = USER_DATA_PATH.PATH_DELIM.$target_file;
 	}
 
 	if (get_magic_quotes_gpc()) $data = stripslashes(POST("output"));

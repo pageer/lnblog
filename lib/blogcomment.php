@@ -88,6 +88,20 @@ class BlogComment extends Entry {
 		$this->raiseEvent("InitComplete");
 	}
 		
+	# Method: uri
+	# Get the URI for various functions.
+
+	function uri($type) {
+		switch ($type) {
+			case "permalink":
+			case "comment":
+				return localpath_to_uri(dirname($this->file))."#".$this->getAnchor();
+			case "delete":
+				return localpath_to_uri(dirname($this->file)).
+				       "delete.php?comment=".$this->getAnchor();
+		}
+	}
+		
 	/*
 	Method: getPath
 	Get the path to use for to store the comment.  This is specific to 
@@ -299,7 +313,7 @@ class BlogComment extends Entry {
 	The full URI to the object's permalink, including page anchor.
 	*/
 	function permalink() {
-		return localpath_to_uri(dirname($this->file))."#".$this->getAnchor();
+		return $this->uri("permalink");
 	}
 
 	function isComment($path=false) {
@@ -344,9 +358,7 @@ class BlogComment extends Entry {
 		# administrative items, such as the delete link.
 		$this->control_bar = array();
 		# Add the delete link.
-		$this->control_bar[] = '<a href="'.
-			(is_dir(ENTRY_COMMENT_DIR) ? ENTRY_COMMENT_DIR : "").
-			"delete.php?comment=".$this->getAnchor().
+		$this->control_bar[] = '<a href="'.$this->uri("delete").
 			'" onclick="return comm_del(this,\''.$this->getAnchor()
 			.'\');">'._("Delete").'</a>';
 
