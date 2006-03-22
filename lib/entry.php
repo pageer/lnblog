@@ -133,7 +133,7 @@ class Entry extends LnBlogObject{
 	Returns:
 	An absolute URI.
 	*/
-	function baselink() { return $this->permalink(); }
+	function baselink() { return $this->uri(); }
 	
 	/*
 	Method: queryStringToID
@@ -154,14 +154,30 @@ class Entry extends LnBlogObject{
 
 	Returns:
 	A string with the markup in the data parameter, but with relative img and
-	url tags converted to absolute URIs under the current_uri parameter.
+	url tags converted to absolute URIs.  If the relative URI contains no 
+	slashes, colons, or ampersands, the relative URI given will be interpreted
+	as under the under the current_uri parameter.  If it contains slashes, but
+	no colons or ampersands, it will interpreted as relative to the
+	BLOG_ROOT_URL, if it is set, and if the given URI starts with a slash, it
+	will be interpreted as relative to the DOCUMENT_ROOT, if it is set.
 	*/
 	function absolutizeBBCodeURI($data, $current_uri) {
-		$ret = preg_replace("/\[img(-?\w+)?=([^\/]+)\]/",
+		$ret = preg_replace("/\[img(-?\w+)?=([^\/\:]+)\]/",
 		                    "[img$1=".$current_uri."$2]", $data);
-		#echo "<p>$ret</p>";
-		$ret = preg_replace("/\[url=([^\/:@]+)\]/", 
+		$ret = preg_replace("/\[url=([^\/\:@]+)\]/", 
 		                    "[url=".$current_uri."$1]", $ret);
+		if (defined("DOCUMENT_ROOT")) {
+			$ret = preg_replace("/\[img(-?\w+)?=\/([^\:]+)\]/",
+			          "[img$1=".localpath_to_uri(DOCUMENT_ROOT)."$2]", $ret);
+			$ret = preg_replace("/\[url=\/([^\:@]+)\]/", 
+			          "[url=".localpath_to_uri(DOCUMENT_ROOT)."$1]", $ret);
+		}
+		if (defined("BLOG_ROOT_URL")) {
+			$ret = preg_replace("/\[img(-?\w+)?=([^\:]+)\]/",
+			                    "[img$1=".BLOG_ROOT_URL."$2]", $ret);
+			$ret = preg_replace("/\[url=([^\:@]+)\]/", 
+			                    "[url=".BLOG_ROOT_URL."$1]", $ret);
+		}
 		return $ret;
 	}
 
@@ -241,8 +257,8 @@ class Entry extends LnBlogObject{
 		$patterns[8] = "/\[u\](.+)\[\/u\]/Usi";
 		$patterns[9] = '/\[q\](.+)\[\/q\]/Usi';
 		$patterns[10] = '/\[q=(.+)\](.+)\[\/q\]/Usi';
-		$patterns[11] = "/(\r?\n\s*)?\[list\]\s*\r?\n(.+)\[\/list\](\s*\r?\n)?/Usi";
-		$patterns[12] = "/(\r?\n\s*)?\[numlist\]\s*\r?\n(.+)\[\/numlist\](\s*\r?\n)?/Usi";
+		$patterns[11] = "/(\r?\n\s*)?\[list\]\s*\r?\n(.+)\[\/list\](\s*\r?\n)?/si";
+		$patterns[12] = "/(\r?\n\s*)?\[numlist\]\s*\r?\n(.+)\[\/numlist\](\s*\r?\n)?/si";
 		$patterns[13] = "/\[\*\](.*)\r?\n/Usi";
 		$patterns[14] = "/\[code\](.*)\[\/code\]/Usi";
 		$patterns[15] = "/\[t\](.*)\[\/t\]/Usi";

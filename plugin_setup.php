@@ -62,7 +62,7 @@ if (has_post()) {
 	$buff = ob_get_contents();
 	ob_end_clean();
 	$body .= is_string($ret) ? $ret : $buff;
-	$body .= '<p><a href="'.current_file().'">'._("Back to plugin list").'</a></p>';
+	$body .= '<p><a href="'.current_uri(true,'').'">'._("Back to plugin list").'</a></p>';
 } else {
 	global $PLUGIN_MANAGER;
 	$plug_list = $PLUGIN_MANAGER->getPluginList();

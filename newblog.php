@@ -103,10 +103,16 @@ if (! is_absolute($blog->home_path)) {
 	$blog->home_path = calculate_document_root().PATH_DELIM.$blog->home_path;
 }
 
-if (POST("submit")) {
-	$ret = $blog->insert();
-	if (!$ret) $tpl->set("UPDATE_MESSAGE", _("Error creating blog.  This could be a problem with the file permissions on your server.  Please refer to the <a href=\"http://www.skepticats.com/LnBlog/Readme.html\">documentation</a> for more information."));
-	else $page->redirect($blog->getURL());
+if ( has_post() ) {
+echo "<p>".realpath($blog->home_path)."</p><p>".realpath(INSTALL_ROOT)."</p><p>".strcasecmp(realpath($blog->home_path), realpath(INSTALL_ROOT))."</p>";
+	$ret = false;
+	if (strcasecmp(realpath($blog->home_path), realpath(INSTALL_ROOT)) == 0) {
+		$tpl->set("UPDATE_MESSAGE", spf_("The blog path you specified is the same as your %s installation path.  This is not allowed, as it will break your installation.  Please choose a different path for your blog.", PACKAGE_NAME));
+	} else {
+		$ret = $blog->insert();
+		if (!$ret) $tpl->set("UPDATE_MESSAGE", _("Error creating blog.  This could be a problem with the file permissions on your server.  Please refer to the <a href=\"http://www.skepticats.com/LnBlog/Readme.html\">documentation</a> for more information."));
+		else $page->redirect($blog->getURL());
+	}
 }
 
 $body = $tpl->process();

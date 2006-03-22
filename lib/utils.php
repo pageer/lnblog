@@ -349,8 +349,12 @@ function has_get() {
 # Useful for the action attribute in form tags.
 #
 # Parameters:
-# relative - *Optionally* get the URI relative to the current directory, i.e.
-#            just the file name.  *Default* is false.
+# relative     - *Optionally* get the URI relative to the current directory, i.e.
+#                just the file name.  *Default* is false.
+# query_string - Query string to append to URI.  *Default* is  false, which mean
+#                that the current query string will be used.
+# no_escape    - Indicates whether or not ampersands in the query string should
+#                be escaped as &amp;, which is needed for XHTML compliance.
 #
 # Returns:
 # A string with the URI.
@@ -368,7 +372,7 @@ function current_uri ($relative=false, $query_string=false, $no_escape=false) {
 }
 
 # Function: current_file
-# An alias for current_uri(true).
+# An alias for current_uri(true, false, $no_escape).
 
 function current_file($no_escape=false) {
 	return current_uri(true, false, $no_escape);

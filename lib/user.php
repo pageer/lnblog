@@ -158,6 +158,7 @@ class User extends LnBlogObject {
 	# Returns:
 	# True if the password is correct, false owtherwise.
 	function checkPassword($pass) {
+		if (!trim($pass)) return false;
 		$hash = md5($pass.$this->salt);
 		$ret = ($hash == $this->passwd);
 		return $ret;
@@ -302,29 +303,29 @@ class User extends LnBlogObject {
 		# User does not exist.
 		#if ( ! isset($this->user_list[$this->username]) ) return false;
 
-		if (AUTH_USE_SESSION) {
-			$ts = gmdate("M d Y H:i:s", time());
-			if ($this->checkPassword($pwd)) {
-				# Create a login token.
-				$token = md5(get_ip().$ts);
+		$ts = gmdate("M d Y H:i:s", time());
+		if ($this->checkPassword($pwd)) {
+			if (AUTH_USE_SESSION) {
+					# Create a login token.
+					$token = md5(get_ip().$ts);
+					setcookie(CURRENT_USER, $this->username, 
+						(LOGIN_EXPIRE_TIME ? time()+LOGIN_EXPIRE_TIME:false), "/");
+					SESSION(CURRENT_USER, $this->username, 
+						(LOGIN_EXPIRE_TIME ? time()+LOGIN_EXPIRE_TIME:false), "/");
+					SESSION(LOGIN_TOKEN, $token);
+					SESSION(LAST_LOGIN_TIME, $ts);
+					setcookie(LAST_LOGIN_TIME, "$ts", 
+						(LOGIN_EXPIRE_TIME ? time()+LOGIN_EXPIRE_TIME:false), "/");
+					$ret = true;
+			} else {
 				setcookie(CURRENT_USER, $this->username, 
 					(LOGIN_EXPIRE_TIME ? time() + LOGIN_EXPIRE_TIME:false), "/");
-				SESSION(CURRENT_USER, $this->username, 
-					(LOGIN_EXPIRE_TIME ? time() + LOGIN_EXPIRE_TIME:false), "/");
-				SESSION(LOGIN_TOKEN, $token);
-				SESSION(LAST_LOGIN_TIME, $ts);
-				setcookie(LAST_LOGIN_TIME, "$ts", 
+				setcookie(PW_HASH, $this->passwd, 
 					(LOGIN_EXPIRE_TIME ? time() + LOGIN_EXPIRE_TIME:false), "/");
 				$ret = true;
-			} else $ret = false;
-			return $ret;
-		} else {
-			setcookie(CURRENT_USER, $this->username, 
-				(LOGIN_EXPIRE_TIME ? time() + LOGIN_EXPIRE_TIME:false), "/");
-			setcookie(PW_HASH, $this->passwd, 
-				(LOGIN_EXPIRE_TIME ? time() + LOGIN_EXPIRE_TIME:false), "/");
-			return true;
-		}
+			}
+		} else $ret = false;
+		return $ret;
 	}
 
 	# Method: logout

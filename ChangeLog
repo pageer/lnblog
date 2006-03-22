@@ -1,3 +1,16 @@
+21-Mar-2006: version 0.6.4
+- Fixed missing password check when cookie-only login is enabled.
+- Adjusted the LBCode regexes for lists to fix the trailing newline bug.
+- Changed LBCode URI conversion so that img and url tags auto-convert URIs 
+with no /, :, or @ characters into absolute URIs relative to the current 
+path, while ones with / but no : or @ are relative to the blog root.
+
+20-Mar-2006:
+- Fixes broken "back to plugin list" link.
+- Removed broken default banner when plugin is disabled.
+- Added warning about setting the blog path to the install path when creating
+a new blog.
+
 17-Mar-2006: version 0.6.3
 - Made the plugin loading configuration page not suck.
 - Added uri() function to trackback and blogcomment classes.

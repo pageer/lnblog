@@ -121,7 +121,7 @@ class Plugin extends LnBlogObject{
 		
 		echo "<fieldset>\n";
 		echo '<form method="post" ';
-		echo 'action="'.current_file().'?plugin='.get_class($this).'" ';
+		echo 'action="'.current_uri(true,'').'?plugin='.get_class($this).'" ';
 		echo "id=\"plugin_config\">\n";
 		
 		foreach ($this->member_list as $mem=>$config) {
