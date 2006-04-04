@@ -468,6 +468,39 @@ function get_ip() {
 	return $_SERVER["REMOTE_ADDR"];
 }
 
+# Returns the string to use for a config.php file.  The levels parameter
+# indicates how many levels down the directory containing this script is 
+# from the blog root.  Note that this should account for situations where
+# the entries or content directory is set to the empty string, although I 
+# don't think anything else accounts for this yet.
+
+function config_php_string($levels) {
+	$ret  = "<?php\n";
+	$ret .= 'if (! defined("PATH_SEPARATOR") ) define("PATH_SEPARATOR", strtoupper(substr(PHP_OS,0,3)==\'WIN\')?\';\':\':\');'."\n";
+	if ($levels > 0) {
+		$ret .= '$blogrootpath = getcwd();'."\n";
+		$ret .= 'for ($i=1; $i<='.$levels.'; $i++) $blogrootpath = dirname($blogrootpath);'."\n";
+	} else {
+		$ret .= 'if(! defined("BLOG_ROOT")) define("BLOG_ROOT", getcwd());'."\n";
+	}
+	$ret .= 'if (! defined("BLOG_ROOT")) define("BLOG_ROOT", $blogrootpath);'."\n";
+	$ret .= 'ini_set(\'include_path\', ini_get(\'include_path\').PATH_SEPARATOR.BLOG_ROOT);'."\n";
+	$ret .= 'require_once("pathconfig.php");'."\n";
+	$ret .= 'require_once("blogconfig.php");'."\n";
+	$ret .= '?>';
+	return $ret;
+}
+
+function pathconfig_php_string($inst_root, $inst_url, $blog_url) {
+	$config_data = "<?php\n";
+	$config_data .= '@define("INSTALL_ROOT", \''.$inst_root."');\n";
+	$config_data .= '@define("INSTALL_ROOT_URL", \''.$inst_url."');\n";
+	$config_data .= '@define("BLOG_ROOT_URL", \''.$blog_url."');\n";
+	$config_data .= 'ini_set(\'include_path\', ini_get(\'include_path\').PATH_SEPARATOR.INSTALL_ROOT);';
+	$config_data .= "\n?>";
+	return $config_data;
+}
+
 # Create the required wrapper scripts for a directory.  Note that
 # the instpath parameter is for the software installation path 
 # and is only required for the BLOG_BASE type, as it is used 
@@ -484,24 +517,6 @@ function create_directory_wrappers($path, $type, $instpath="") {
 	$sys_templ_dir = "INSTALL_ROOT.'".PATH_DELIM.BLOG_TEMPLATE_DIR."'";
 
 	if (! is_dir($path)) $ret = $fs->mkdir_rec($path);
-	$config_data = "<?php\n";
-	$config_data .= "if (! defined(\"PATH_SEPARATOR\") ) ".
-		"define(\"PATH_SEPARATOR\", strtoupper(substr(PHP_OS,0,3)=='WIN')?';':':');\n";
-		
-	$inst_root = realpath($instpath);
-	$blog_root = realpath($path);
-	$inst_url = localpath_to_uri($inst_root);
-	$blog_url = localpath_to_uri($blog_root);
-	
-	$config_data .= 'define("INSTALL_ROOT", \''.$inst_root."');\n";
-	$config_data .= 'define("INSTALL_ROOT_URL", \''.$inst_url."');\n";
-	$config_data .= 'define("BLOG_ROOT", \''.$blog_root."');\n";
-	$config_data .= 'define("BLOG_ROOT_URL", \''.$blog_url."');\n";
-	
-	$config_data .= 'ini_set(\'include_path\', ini_get(\'include_path\').PATH_SEPARATOR.'.
-	                                           'BLOG_ROOT.PATH_SEPARATOR.INSTALL_ROOT);';
-	$config_data .= "\n".'require_once("blogconfig.php");';
-	$config_data .= "\n?>";
 
 	$current = $path.PATH_DELIM;
 	$parent = dirname($path).PATH_DELIM;
@@ -519,46 +534,60 @@ function create_directory_wrappers($path, $type, $instpath="") {
 			                  "tags"=>"pages/tagsearch",
 			                  "pluginload"=>"plugin_loading",
 			                  "profile"=>"userinfo");
-			$ret &= $fs->write_file($current."config.php", $config_data);
+			$ret &= $fs->write_file($current."config.php", config_php_string(0));
+			if (! file_exists($current."pathconfig.php")) {
+				$inst_root = realpath($instpath);
+				$blog_root = realpath($path);
+				$inst_url = localpath_to_uri($inst_root);
+				$blog_url = localpath_to_uri($blog_root);
+				$config_data = pathconfig_php_string($inst_root, $inst_url, $blog_url);
+				$ret &= $fs->write_file($current."pathconfig.php", $config_data);
+			}
 			break;
 		case BLOG_ENTRIES:
 			$filelist = array("index"=>"pages/showarchive", "all"=>"pages/showall");
+			$ret &= $fs->write_file($current."config.php", config_php_string(1));
 			break;
 		case YEAR_ENTRIES:
 			$filelist = array("index"=>"pages/showyear");
+			$ret &= $fs->write_file($current."config.php", config_php_string(2));
 			break;
 		case MONTH_ENTRIES:
 			$filelist = array("index"=>"pages/showmonth", "day"=>"pages/showday");
+			$ret &= $fs->write_file($current."config.php", config_php_string(3));
 			break;
 		case ENTRY_BASE:
 			$filelist = array("index"=>"pages/showentry", "edit"=>"pages/editentry",
 			                  "delete"=>"pages/delentry", "uploadfile"=>"pages/fileupload",
 			                  "trackback"=>"pages/tb_ping");
+			$ret &= $fs->write_file($current."config.php", config_php_string(4));
 			break;
 		case ENTRY_COMMENTS:
 			$filelist = array("index"=>"pages/showcomments", "delete"=>"pages/delcomment");
+			$ret &= $fs->write_file($current."config.php", config_php_string(5));
 			break;
 		case ENTRY_TRACKBACKS:
 			$filelist = array("index"=>"pages/showtrackbacks");
+			$ret &= $fs->write_file($current."config.php", config_php_string(5));
 			break;
 		case ARTICLE_BASE:
 			# The same as for entries, but for some reason, I never added a delete.
 			$filelist = array("index"=>"pages/showarticle", "edit"=>"pages/editarticle",
 			                  "uploadfile"=>"pages/fileupload",
 			                  "trackback"=>"pages/tb_ping");
+			$ret &= $fs->write_file($current."config.php", config_php_string(2));
 			break;
 		case BLOG_ARTICLES:
 			$filelist = array("index"=>"pages/showarticles");
+			$ret &= $fs->write_file($current."config.php", config_php_string(1));
 			break;
 		case ENTRY_DRAFTS:
 			$filelist = array("index"=>"pages/showdraft");
+			$ret &= $fs->write_file($current."config.php", config_php_string(1));
 			break;
 	}
 	foreach ($filelist as $file=>$content) {
 		$ret &= $fs->write_file($current.$file.".php", $head.$content.$tail);
-	}
-	if ($type != BLOG_BASE) {
-		$ret &= $fs->copy($parent."config.php", $current."config.php");
 	}
 	$fs->destruct();
 	return $ret;
@@ -576,7 +605,8 @@ function create_directory_wrappers($path, $type, $instpath="") {
 #        constants LINK_IMAGE, LINK_SCRIPT, of LINK_STYLESHEET.
 #
 # Returns:
-# The root-relative path to the item.
+# The root-relative path to the item.  If no item is found in any path, 
+# returns an empty string.
 
 function getlink($name, $type=false) {
 	if ($type) {
@@ -626,11 +656,15 @@ function getlink($name, $type=false) {
 	                       PATH_DELIM.$l_type.PATH_DELIM.$name) ) {
 		return INSTALL_ROOT_URL."themes/".THEME_NAME."/".$l_type."/".$name;
 
-	# Last case: use the default theme
-	} else {
+	# Thrid case: try the default theme
+	} elseif ( file_exists(
+	             mkpath(INSTALL_ROOT,"themes","default",$l_type,$name) ) ) {
 		return INSTALL_ROOT_URL."themes/default/".$l_type."/".$name;
-	}
 
+	# Last case: nothing found, so return the empty string.
+	} else {
+		return "";
+	}
 }
 
 # Function: sanitize

@@ -1,11 +1,36 @@
 <?php 
+
+# Plugin: IPBan
+# Bans certain IP addresses from posting comments or trackbacks.
+#
+# This plugin works by merging two lists of IP addresses.  Both of these 
+# files have the same name (which is configurable as an option for the 
+# plugin), but one is located in the root of the blog and the other is in
+# the LnBlog userdata folder.  The file format is one IP address per line.
+# When the plugin runs, it reads both of these files (if they exist) and
+# merges their contents.  It then rejects attempts to post comments or 
+# trackbacks from any of the IP addresses in this list.
+#
+# Note that the IP addresses are actually interpreted as Perl-Compatible
+# Regular Expressions.  This means that you can use regular expression syntax
+# to ban ranges of IP addresses with a single entry.  One example might be to
+# ban a subnet with an entry like this
+# | 12.34.56.*
+#
+# There are two ways to add IP addresses to the ban list.  One is through 
+# links in the footers of comments and trackbacks.  Clicking these links will
+# add the exact IP address of the comment/trackback to the ban list.
+# The other method is by directly editing the files using the sidebar links.
+# This is the method required if you want to ban ranges of IP addresses.
+
 class IPBan extends Plugin {
 	
 	function IPBan() {
 		$this->plugin_desc = _("Allows you to ban IP addresses from adding comments or trackbacks.");
-		$this->plugin_version = "0.2.1";
+		$this->plugin_version = "0.2.2";
 		$this->addOption("ban_list", _("File to store list of banned IPs."),
 			"ip_ban.txt", "text");
+		$this->addOption("admin_local", _("Show per-blog ban link when administrator"), false, "checkbox");
 		$this->getConfig();
 	}
 
@@ -39,17 +64,28 @@ class IPBan extends Plugin {
 		$usr = NewUser();
 		if ($blog->canModifyBlog()) {
 			$cb_link = 
-				spf_("IP: %s", $cmt->ip).
+				spf_("IP: %s", $cmt->ip);
+			$cb_link_loc =
 				' (<a href="?banip='.$cmt->ip.'" '.
 				'onclick="return window.confirm(\''.
 				spf_("Ban IP address %s will from submitting comments or trackbacks to this blog?", $cmt->ip).
 				'\');">'._("Ban IP").'</a>) ';
-				if ($usr->checkLogin() && $usr->isAdministrator()) {
-					$cb_link .= '(<a href="?banip='.$cmt->ip.'&amp;global=yes" '.
-					'onclick="return window.confirm(\''.
-					spf_("Ban IP address %s will from submitting comments or trackbacks to this entire site?", $cmt->ip).
+			$cb_link_glob = ' (<a href="?banip='.$cmt->ip.
+				'&amp;global=yes" '.
+				'onclick="return window.confirm(\''.
+				spf_("Ban IP address %s will from submitting comments or trackbacks to this entire site?", $cmt->ip).
 				'\');">'._("Global Ban").'</a>)';
+
+			if ($usr->checkLogin() && $usr->isAdministrator()) {
+				if ($this->admin_local) {
+					$cb_link .= $cb_link_loc.$cb_link_glob;
+				} else {
+					$cb_link .= $cb_link_glob;
 				}
+			} else {
+				$cb_link .= $cb_link_loc;
+			}
+			
 			$cmt->control_bar[] = $cb_link;
 		}
 	}
@@ -111,6 +147,21 @@ class IPBan extends Plugin {
 		}
 	}
 
+	function sidebarLink($param) {
+		global $PLUGIN_MANAGER;
+		$blg = NewBlog();
+		$usr = NewUser();
+		$banfile = $PLUGIN_MANAGER->plugin_config->value("ipban", 
+		                                 "ban_list", "ip_ban.txt");
+		echo '<li><a href="'.INSTALL_ROOT_URL.'editfile.php?blog='.
+			$blg->blogid.'&amp;file='.$banfile.'">'._("Blog IP blacklist").
+			'</a></li>';
+		if ($usr->isAdministrator()) {
+			echo '<li><a href="'.INSTALL_ROOT_URL.'editfile.php?file=userdata/'.
+				$banfile.'">'._("Global IP blacklist").'</a></li>';
+		}
+	}
+
 }
 
 $ban = new IPBan();
@@ -118,5 +169,6 @@ $ban->registerEventHandler("blogcomment", "OnOutput", "addBanLink");
 $ban->registerEventHandler("blogcomment", "OnInsert", "clearData");
 $ban->registerEventHandler("trackback", "OnOutput", "addBanLink");
 $ban->registerEventHandler("trackback", "POSTRetreived", "clearTBData");
+$ban->registerEventHandler("loginops", "PluginOutput", "sidebarLink");
 $ban->registerEventHandler("page", "OnOutput", "banIP");
 ?>

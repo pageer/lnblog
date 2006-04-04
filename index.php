@@ -104,7 +104,6 @@ if (POST($upgrade)) {
 	if (is_absolute(POST($fixperm))) $fixperm_path = trim(POST($fixperm));
 	else $fixperm_path = calculate_document_root().PATH_DELIM.trim(POST($fixperm));
 	$b = NewBlog(POST($fixperm_path));
-	#echo "<p>Fix perms</p>";
 	$upgrade_status = $b->fixDirectoryPermissions();
 }
 

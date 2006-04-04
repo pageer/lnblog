@@ -38,6 +38,7 @@ Group: User Documentation  {
    File: Translations  (docs/translations.txt)
    File: Using Plugins  (docs/plugins.txt)
    File: User Profiles  (docs/userprofiles.txt)
+   File: LBCode Markup  (docs/lbcode.txt)
    }  # Group: User Documentation
 
 Group: Configuration  {
@@ -45,6 +46,7 @@ Group: Configuration  {
    File: blogconfig.php  (blogconfig.php)
    File: constants.php  (lib/constants.php)
    File: fsconfig.php  (docs/fsconfig.txt)
+   File: pathconfig.php  (docs/pathconfig.txt)
    File: userconfig.cfg  (docs/userconfig.txt)
    File: userconfig.php  (docs/userconfigphp.txt)
    }  # Group: Configuration
@@ -56,13 +58,13 @@ Group: Libraries  {
    File: BlogComment  (lib/blogcomment.php)
    File: BlogEntry  (lib/blogentry.php)
    File: Creator Functions  (no auto-title, lib/creators.php)
+   File: disabled/lbcode.php  (lib/disabled/lbcode.php)
    File: Draft  (lib/draft.php)
    File: Entry  (lib/entry.php)
    File: EventRegister  (lib/eventregister.php)
    File: FS  (lib/fs.php)
    File: IniParser  (lib/iniparser.php)
    File: Internationalization  (no auto-title, lib/i18n.php)
-   File: lbcode.php  (lib/lbcode.php)
    File: LnBlogObject  (lib/lnblogobject.php)
    File: Page  (lib/page.php)
    File: PHPTemplate  (lib/template.php)
@@ -96,6 +98,7 @@ Group: Administration Pages  {
 
    File: bloglogin.php  (bloglogin.php)
    File: bloglogout.php  (bloglogout.php)
+   File: blogpaths.php  (blogpaths.php)
    File: docroot_test.php  (docroot_test.php)
    File: fs_setup.php  (fs_setup.php)
    File: ftproot_test.php  (ftproot_test.php)
@@ -110,6 +113,12 @@ Group: Administration Pages  {
    File: userinfo.php  (userinfo.php)
    }  # Group: Administration Pages
 
+Group: Plugins  {
+
+      File: ContentBan  (plugins/content_ban.php)
+      File: IPBan  (plugins/ipban.php)
+      }  # Group: Plugins
+		
 Group: Index  {
 
    Index: Everything
@@ -118,5 +127,6 @@ Group: Index  {
    File Index: Files
    Function Index: Functions
    Property Index: Properties
+   Plugin Index: Plugins
    }  # Group: Index
 

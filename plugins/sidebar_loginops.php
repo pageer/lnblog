@@ -34,20 +34,6 @@ class LoginOps extends Plugin {
       if ($blg->canModifyBlog()) { ?>
 <li><a href="<?php echo $root; ?>uploadfile.php"><?php p_("Upload file for blog"); ?></a></li>
 <li><a href="<?php echo $root; ?>edit.php"><?php p_("Edit weblog settings"); ?></a></li>
-<?php if (class_exists("sitemap")) { ?>
-<li><a href="<?php echo $root; ?>map.php"><?php p_("Edit custom sitemap"); ?></a></li>
-<?php } ?>
-<?php if (class_exists("ipban")) { 
-	global $PLUGIN_MANAGER;
-	$banfile = $PLUGIN_MANAGER->plugin_config->value("ipban", "ban_list", "ip_ban.txt");
-?><li><a href="<?php echo INSTALL_ROOT_URL; ?>editfile.php?blog=<?php echo $blg->blogid; ?>&amp;file=<?php echo $banfile; ?>"><?php p_("Edit IP blacklist"); ?></a></li><?php
-	if ($usr->isAdministrator()) { ?>
-<li><a href="<?php echo INSTALL_ROOT_URL; ?>editfile.php?file=userdata/<?php echo $banfile; ?>"><?php p_("Edit global blacklist"); ?></a></li>
-<?php 
-	} 
-}?>
-<li><a href="<?php echo $root; ?>plugins.php"><?php p_("Configure plugins"); ?></a></li>
-<li><a href="<?php echo $root; ?>pluginload.php"><?php p_("Configure plugin loading"); ?></a></li>
 <?php } ?>
 <li><a href="<?php echo $root; ?>useredit.php"><?php p_("Edit User Information"); ?></a></li>
 <?php if ($usr->username() == ADMIN_USER) { ?>
@@ -55,11 +41,20 @@ class LoginOps extends Plugin {
 <?php } ?>
 <li><a href="<?php echo $root; ?>logout.php"><?php pf_("Logout %s", $usr->username());; ?></a></li>
 </ul>
+<?php if ($blg->canModifyBlog()) { ?>
+<h3>Plugin Configuration</h3>
+<ul>
+<li><a href="<?php echo $root; ?>plugins.php"><?php p_("Configure plugins"); ?></a></li>
+<li><a href="<?php echo $root; ?>pluginload.php"><?php p_("Plugin loading"); ?></a></li>
+<?php $this->raiseEvent("PluginOutput"); ?>
+</ul>
+<?php } ?>
 <?php 
 	}   # End function
 	
 }
 
 $login = new LoginOps();
+#$login->addEvent
 $login->registerEventHandler("sidebar", "OnOutput", "output");
 ?>

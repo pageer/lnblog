@@ -48,11 +48,16 @@ The setup process for LnBlog is entirely web-based and mostly painless.
 
 Section: Upgrading
 
-Upgrading LnBlog is normally pretty simple.
+Upgrading LnBlog is normally pretty simple.  Assuming your LnBlog installation is in a folder named
+"LnBlog", then you would do the following:
 
-1) - Move or rename your old LnBlog directory on the server.
-2) - Upload the new version in it's place (i.e. give the directory the same name).
-3) - Copy the entire userdata folder from your old version to the new version.
+1) - Rename your old LnBlog directory on the server to LnBlog-old.
+2) - Upload the new version into a folder named LnBlog.
+3) - Copy the contents of your LnBlog-old/userdata folder into LnBlog/userdata.
+4) - Copy any customized or non-standard plugins or themes from LnBlog-old to the corresponding
+     location in the new LnBlog folder.
+5) - Try out the new version.  If everything works, then you can delete LnBlog-old.  If not, then
+     you can revert to the old version by removing the newer one and renameing LnBlog-old to LnBlog.
 
 In some cases, there may be additional steps, but this is not the norm.  For instance, some upgrades
 will require updating wrapper scripts.  This is done by going to the system administratino page (the

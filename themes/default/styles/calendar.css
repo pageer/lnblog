@@ -1,13 +1,21 @@
+/* 
+This style sheet is used for the calendar sidebar plugin. 
+It will only be linked into the page if the calendar plugin is loaded, 
+so you should use this only for changes that are particular to the calendar.
+*/
+
 table.calendar {
 	margin: 1% auto;
 	width: 94%;
 	text-align: center;
 }
 
+/* Underline dates that are links so that they stand out. */
 table.calendar td a {
 	text-decoration: underline;
 }
 
+/* Make the date the mouse is over white. */
 table.calendar td:hover {
 	background-color: white;
 }
@@ -20,14 +28,15 @@ p.calendar {
 
 a.llink {
 	font-size: 80%;
-	margin-right: 3%;
+	padding-right: 3%;
 }
 
 a.rlink {
 	font-size: 80%;
-	margin-left: 3%;
+	padding-left: 3%;
 }
 
+/* Set the color in which the current date should be highlighted. */
 .today {
-background-color: #cdcdcd;
+	background-color: #cdcdcd;
 }

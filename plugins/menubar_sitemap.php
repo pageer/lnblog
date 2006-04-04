@@ -1,4 +1,22 @@
 <?php
+
+# Plugin: SiteMap
+# Shows a user-defined site map in the menu bar.
+#
+# This plugin allows you to put a simple site map in the menubar of your 
+# blogs.  The site map itself is stored in a file that you must edit by hand.
+#
+# Note that there are two formats for the site map.  The default format is
+# simply a list of hyperlinks with one link per line.  When the page is 
+# displayed, these will be converted to an HTML unordered list, with 
+# a customizable label in front of it. 
+#
+# The second format, which is enabled by an option, is to treat the sitemap
+# file as raw HTML to be included directly in the page.  This does not 
+# create an automatic list for you or, in fact, do any processing on the
+# file at all.  This option is used if you want to do anything fancy with 
+# the menubar, such as adding drop-down menus with JavaScript or CSS.
+
 class SiteMap extends Plugin {
 
 	var $link_file;
@@ -20,8 +38,8 @@ class SiteMap extends Plugin {
 	function output($parm=false) {
 		$map_file = '';
 		$blog = NewBlog();
-		if ($blog->isBlog() && 
-	   	 file_exists(BLOG_ROOT.PATH_DELIM.$this->link_file)) {
+		if ( $blog->isBlog() && 
+		     file_exists(BLOG_ROOT.PATH_DELIM.$this->link_file) ) {
 			$map_file = BLOG_ROOT.PATH_DELIM.$this->link_file;
 		} elseif (is_file(mkpath(USER_DATA_PATH,$this->link_file))) {
 			$map_file = mkpath(USER_DATA_PATH,$this->link_file);
@@ -51,7 +69,15 @@ class SiteMap extends Plugin {
 <?php
 		}
 	}
+	
+	function showLink($param) {
+		$blog = NewBlog();
+		echo '<li><a href="'.$blog->getURL().'map.php">'.
+			_("Edit custom sitemap").'</a></li>';
+	}
+
 }
 $map = new SiteMap();
 $map->registerEventHandler("menubar", "OnOutput", "output");
+$map->registerEventHandler("loginops", "PluginOutput", "showLink");
 ?>

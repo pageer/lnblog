@@ -33,20 +33,7 @@ require_once("lib/creators.php");
 
 $page = NewPage();
 
-$blogpath = "blogpath";
-$blogname = "blogname";
-$blogowner = "blogowner";
-$blogwriters = "blogwriters";
-$blogdesc = "desc";
-$blogimage = "image";
-$blogtheme = "theme";
-$blogmax = "maxent";
-$blogrssmax = "maxrss";
-$blogmarkup = "blogmarkup";
-$blogpath = "blogpath";
-$submitid = "submit";
-
-if (POST($blogpath)) $path = POST($blogpath);
+if (POST("blogpath")) $path = POST("blogpath");
 else $path = false;
 
 $blog = NewBlog($path);
@@ -54,46 +41,37 @@ if (! $blog->canAddBlog() ) {
 	$page->redirect("bloglogin.php");
 	exit;
 }
-$tpl = NewTemplate(BLOG_UPDATE_TEMPLATE);
+$tpl = NewTemplate("blog_modify_tpl.php");
 
-if (POST($blogpath)) $blog->home_path = POST($blogpath);
+if (POST("blogpath")) $blog->home_path = POST("blogpath");
 else $blog->home_path = "myblog";
 
 if (has_post()) {
-	$blog->owner = POST($blogowner);
-	$blog->writers(POST($blogwriters) );
-	$blog->name = POST($blogname);
-	$blog->description = POST($blogdesc);
-	$blog->image = POST($blogimage);
-	$blog->theme = POST($blogtheme);
-	$blog->max_entries = POST($blogmax);
-	$blog->max_rss = POST($blogrssmax);
+
+	$blog->owner = POST("owner");
+	$blog->name = POST("blogname");
+	$blog->writers(POST("writelist") );
+	$blog->description = POST("desc");
+	$blog->image = POST("image");
+	$blog->theme = POST("theme");
+	$blog->max_entries = POST("maxent");
+	$blog->max_rss = POST("maxrss");
+	$blog->default_markup = POST("blogmarkup");
 }
 
-$tpl->set("BLOG_PATH_ID", $blogpath);
+$tpl->set("SHOW_BLOG_PATH");
 $tpl->set("BLOG_PATH_REL", $blog->home_path);
-$tpl->set("BLOG_NAME_ID", $blogname);
-$tpl->set("BLOG_OWNER_ID", $blogowner);
 $tpl->set("BLOG_OWNER", $blog->owner);
-$tpl->set("BLOG_WRITERS_ID", $blogwriters);
 $tpl->set("BLOG_WRITERS", implode(",", $blog->writers()) );
 $tpl->set("BLOG_NAME", $blog->name);
-$tpl->set("BLOG_DESC_ID", $blogdesc);
 $tpl->set("BLOG_DESC", $blog->description);
-$tpl->set("BLOG_IMAGE_ID", $blogimage);
 $tpl->set("BLOG_IMAGE", $blog->image);
-$tpl->set("BLOG_THEME_ID", $blogtheme);
 $tpl->set("BLOG_THEME", $blog->theme);
-$tpl->set("BLOG_MAX_ID", $blogmax);
 $tpl->set("BLOG_MAX", $blog->max_entries);
-$tpl->set("BLOG_RSS_MAX_ID", $blogrssmax);
 $tpl->set("BLOG_RSS_MAX", $blog->max_rss);
-$tpl->set("BLOG_DEFAULT_MARKUP_ID", $blogmarkup);
 $tpl->set("BLOG_DEFAULT_MARKUP", $blog->default_markup);
-$tpl->set("BLOG_PATH_ID", $blogpath);
 $tpl->set("BLOG_PATH", $blog->home_path);
 $tpl->set("POST_PAGE", current_file());
-$tpl->set("SUBMIT_ID", $submitid);
 $tpl->set("UPDATE_TITLE", _("Create new weblog"));
 
 # If the user doesn't give us an absolute path, assume it's relative
@@ -104,7 +82,6 @@ if (! is_absolute($blog->home_path)) {
 }
 
 if ( has_post() ) {
-echo "<p>".realpath($blog->home_path)."</p><p>".realpath(INSTALL_ROOT)."</p><p>".strcasecmp(realpath($blog->home_path), realpath(INSTALL_ROOT))."</p>";
 	$ret = false;
 	if (strcasecmp(realpath($blog->home_path), realpath(INSTALL_ROOT)) == 0) {
 		$tpl->set("UPDATE_MESSAGE", spf_("The blog path you specified is the same as your %s installation path.  This is not allowed, as it will break your installation.  Please choose a different path for your blog.", PACKAGE_NAME));

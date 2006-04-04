@@ -1,4 +1,12 @@
-<?php 
+<?php
+
+# Plugin: HTAccessGenerator
+# Creates Apache .htaccess files in blog root directories.
+#
+# When blogs are created or updated, this plugin creates a .htaccess file
+# with rewrite rules to redirect attempts to directly access data files or 
+# other incorrect URLs.
+
 class HTAccessGenerator extends Plugin {
 
 	function HTAccessGenerator() {

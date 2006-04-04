@@ -18,40 +18,9 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-define("TOKEN_OPENTAG", 0);
-define("TOKEN_CLOSETAG", 1);
-define("TOKEN_TEXT", 2);
-define("TOKEN_LBREAK", 3);
-define("TOKEN_PBREAK", 4);
-
-class LBToken {
-
-	var $type;
-	var $text;
-	var $attrib;
-
-	function LBToken($type=false, $text=false, $attrib=false) {
-		$this->type = $type;
-		$this->text = $text;
-		$this->attrib = $attrib;
-	}
-
-}
-
-/* A scanner/tokenizer for LBCode.  The types of tokens are as follows:
-   1) Open tag
-   2) Close tag
-   3) Text
-	4) Line break
-	5) Paragraph break
-*/
-
-class Tokenizer {
-
-	var $data;
-	var $pos;
-
-	function Tokenizer($file=false) {
+class TextReadBuffer {
+	
+	function TextReadBuffer($file = false) {
 		if ($file && file_exists($file)) {
 			if (function_exists("file_get_contents")) {
 				$this->data = file_get_contents($file);
@@ -62,8 +31,18 @@ class Tokenizer {
 			$this->data = $file;
 		}
 		$this->pos = 0;
+		$this->buff_len = strlen($this->data);
 	}
 
+	# Method: eof()
+	# Determines whether there is still input left.
+	#
+	# Returns:
+	# True if the current position is at the end of the buffer, false otherwise.
+	function eof() {
+		return $this->pos < $this->buff_len;
+	}
+	
 	# Method: getch
 	# Gets the next character in the input streatm.
 	# This also increments the internal position pointer.
@@ -71,7 +50,7 @@ class Tokenizer {
 	# Returns:
 	# A single-character string.
 	function getch() {
-		return $this->data[$this->pos++];
+		return substr($this->data,$this->pos++,1);
 	}
 
 	# Method: ungetch
@@ -83,10 +62,6 @@ class Tokenizer {
 	function ungetch($num=1) {
 		$this->pos = $this->pos - $num;
 	}
-
-	# Method: skip
-	# Skips all input of a specified type.
-	
 
 	# Method: seek
 	# Gets characters until it finds a certain input.
@@ -105,7 +80,74 @@ class Tokenizer {
 	# On success, a string containing all characters from the starting point
 
 	function seek($target, $to_line_end=true) {
+		# We want to work with arrays, so if the parameter is a singleton, 
+		# let's just make it an array.
+		if (! is_array($target)) $target = array($target);
+		if ($to_line_end) $target[] = "\n";
+		
+		$ret = '';
+		$char = $this->getch();
+		while (! in_array($char, $target)) {
+			$ret .= $char;
+			$char = $this->getch();
+		}
+		
+	}
 
+	# Method: skip
+	# Skips all input of a specified type.
+
+	function skip() {
+		
+	}
+}
+
+class LBToken {
+
+	var $type;
+	var $text;
+	var $attrib;
+
+	function LBToken($type=false, $text=false, $attrib=false) {
+		$this->type = $type;
+		$this->text = $text;
+		$this->attrib = $attrib;
+	}
+	
+	function get
+
+}
+
+/* A scanner/tokenizer for LBCode.  The types of tokens are as follows:
+   1) Open tag
+   2) Close tag
+   3) Text
+   4) Line break
+   5) Paragraph break
+*/
+
+class Tokenizer {
+
+	var $token_list;
+	
+	var $data;
+	var $pos;
+
+	function Tokenizer($file=false) {
+		
+		$this->token_list = array("whitespace","text","open_bracket",
+		                          "close_bracket", "equal"
+		
+		if ($file && file_exists($file)) {
+			if (function_exists("file_get_contents")) {
+				$this->data = file_get_contents($file);
+			} else {
+				$this->data = implode("", file($file));
+			}
+		} elseif ($file) {
+			$this->data = $file;
+		}
+		$this->pos = 0;
 	}
 
 	# Method: get
@@ -114,10 +156,27 @@ class Tokenizer {
 	# Returns:
 	# An LBToken object for the next token in the input.
 	function get() {
+		
 		$char = $this->getch();
+		$tok = $char;
 
-		# If the token is a newline, check to see if it's doubled.
-		if ($char == "\n") {
+		if ($char == "\n") {  # Newline tokens
+		
+			# Check if there's a line feed in addition to the carriage return.
+			$char = $this->getch();
+			if ($char == "\l") $tok .= $char;
+			else $this->ungetch();
+			
+		} elseif (preg_match("/^\s$/", $char)) {  # Whitespace tokens
+			
+			$char = $this->getch();
+			while ( preg_match("/^\s$/", $char) ) {
+				$tok .= $char;
+				$char = $this->getch();
+			}
+			$this->ungetch();  # Unget the terminating token.
+			
+		} elseif () {
 
 			# First, skip any whitespace.
 			$num_spaces = 0;
@@ -132,7 +191,9 @@ class Tokenizer {
 		# If the token starts a tag, try to get the whole tag.
 		} elseif ($char == "[") {
 			
-			if 
+			if () {
+				
+			}
 			
 		}
 	}

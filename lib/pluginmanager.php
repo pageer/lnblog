@@ -41,7 +41,8 @@ class PluginManager {
 		$this->plugin_list = $this->getFileList();
 		# Get various settings to determine which plugins should be loaded and 
 		# in what order.
-		$defexcl = "sidebar_archives.php,htaccess_generator.php,sidebar_googlesearch.php";
+		$defexcl = "sidebar_archives.php,htaccess_generator.php,".
+			"sidebar_googlesearch.php,private_blog.php";
 		$excl = $this->plugin_config->value("Plugin_Manager", "exclude_list", $defexcl);
 		$this->exclude_list = explode(",", $excl);
 		if (! is_array($this->exclude_list)) $this->exclude_list = array();

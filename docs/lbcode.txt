@@ -1,0 +1,100 @@
+Document: LBCode Markup
+
+Section: Markup Types
+LnBlog allows you to write your blog entries and articles in any of three formats.  The simplest is 
+auto-markup, which automatically inserts HTML code for line breaks, paragraph breaks, and converts
+text URLs into hyperlinks.  The most complex is, of course, raw HTML code.  In this format, LnBlog 
+will not do anything to your text at all and will simply output it as HTML code.  The default format
+is called LBCode and is a dialect of the BBCode-style markup used by many popular web forum systems.
+The name LBCode is used to distinguish it from the markup used by other systems, because LnBlog 
+makes absolutely no attempt to be compatible with other software in this regard.
+
+Section: Tag Chart
+Most LBCode constructs map directly so some HTML code.  The following table summarizes the available
+LBCode statements.  As with the auto-markup mode, line breaks are converted to HTML BR tags and 
+double line breaks are converted to new paragraphs.
+(start code)
+[b]bold[/b]                       =>  <strong>bold</strong>
+
+[i]italic[/i]                     =>  <em>italic</em>
+
+[u]underline[/u]                  =>  <span style="text-decoration: underline">underline</span>
+
+[ab=Full phrase]abbreviation[/ab] =>  <abbr title="Full phrase">abbreviation</abbr>
+
+[ac=Full phrase]acronym[/ac]      =>  <acronym title="Full phrase">acronym</acronym>
+
+[code]Source code[/code]          =>  <code>Source code</code>
+
+[t]Teletype text[/t]              =>  <tt>Teletype text</tt>
+
+[h]Header[/h]                     =>  <h3>Header</h3>
+
+[q]Quote[/q]                      =>  [q]Quote[/q]
+
+[quote]Block quotation[/quote]    =>  <blockquote>Block quotation</blockquote>
+
+[quote=http://www.somesite.com/]Block quotation[/quote]    =>
+                   <blockquote cite="http://www.somesite.com/">Block quotation</blockquote>
+
+[url=http://www.google.com]Google[/url]    =>
+                   <a href="http://www.google.com">Google</a>
+
+[img=http://www.google.com/images/logo.gif]Google logo[/img]   =>
+                   <img src="http://www.google.com/images/logo.gif" alt="Google logo" title="Google logo" />
+
+[img-right=http://www.google.com/images/logo.gif]Google logo[/img-right]   =>
+                   <img alt="Google logo" title="Google logo" style="float: right; clear: none;" src="http://www.google.com/images/logo.gif" />
+
+[img-left=http://www.google.com/images/logo.gif]Google logo[/img-left]  =>
+                   <img alt="Google logo" title="Google logo" style="float: left; clear: none;" src="http://www.google.com/images/logo.gif" />
+
+[numlist]                       <ol>
+[*]First item         =>        <li>First item</li>
+[*]Second item                  <li>Second item</li>
+[/numlist]                      </ol> 
+ 
+[list]                          <ul>
+[*]First item         =>        <li>First item</li>
+[*]Second item                  <li>Second item</li>
+[/list]                         </ul> 
+(end code)
+
+Section: A Note on URLs
+
+LBCode includes a feature to automatically absolutize URLs.  Basically, if you do not enter a relative URL, such as 
+"myimage.jpg", it will automatically be converted to an absolute URL, such as "http://somehost/somepath/myimage.jpg".  
+The conversion is done automatically at run-time and will show up in the HTML code sent to the browser.
+This is provided for because an absolute URL is required in order to properly display a blog entry on the front page or in
+RSS feeds, and because you will not know the final URL until _after_ you post the entry.  Plus it's a conventient shortcut.
+
+The rules are as follows.
+- URLs that do not contain any slashes (/), colons (:), or at signs (@), such as "myimage.jpg", will be treated as relative 
+  to the current blog entry.  So the URL "myimage.jpg" will be converted to something like
+  "http://www.myhost.com/myblog/entries/2006/03/02/1234_56/myimage.jpg".
+- URLs that contain slashes but no at signs or colons, *and* do not start with a slash, will be treated as relative to the 
+  current blog root.  So, for example, "content/article/myfile.zip" will be converted to something like 
+  "http://www.myhost.com/myblog/content/article/myfile.zip".
+- Lastly, URLs that start with a slash, but do not contain colons or at signs, will be interpreted as relative to the 
+  root of the web site.  So "/otherblog/somefile.txt" will be converted to something like 
+  "http://www.myhost.com/otherblog/somefile.txt".
+
+Section: Other Notes
+
+There are several other things to note with regard to the various LBCode statements.
+- The line breaks between items in numbered lists and unordered lists are not optional. You must put each item on a single 
+  line and you must put the beginning and ending tags on their own line. 
+- In Mozilla-based browser, [ac] and [ab] both do the same thing. They are both provided because there is a semantic 
+  difference, i.e. that an abbreviation is simply a shortening of a phrase using the initial letters, whereas an acronym is 
+  such a shortening that actually spells a pronounceable word. However, while the <abbr> tag is often the semantically 
+  correct one, Internet Explorer 6 doesn't support it, so you should use this tag with care. 
+- In the [img] tag, the text between the opening and closing tags is required. This is because it is used as the text for 
+  both the ALT attribute, which is required in XHTML, and the TITLE attribute, which gives you the tooltips in Mozilla-based 
+  browsers. Since Internet Explorer incorrectly uses the ALT text for tooltips, you'll actually get the same tooltip in all 
+  browsers. 
+- In Mozilla-based browsers, the <q> tag renders quotation marks automatically. However, this depends on the CSS2 :before and 
+  :after pseudo-elements, which are not supported by Internet Explorer, so use this with care. Note that in the default 
+  LnBlog stylsheets, the <q> tag is rendered with italic text, so that even in Internet Explorer, it can be distinguished 
+  from normal text.
+- The current LBCode handler does not deal gracefully with multiline tags.  So if, e.g., you have a multiline block quotation 
+  or code block, the LBCode handler will still put <br /> tags in for the line breaks.  This may or may not be what you want.

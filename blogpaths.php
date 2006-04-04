@@ -18,10 +18,9 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-# File: updateblog.php
-# Used to update the settings on an existing blog.
-#
-# In the standard setup, this file is included by the per-blog edit.php file.
+# File: blogpaths.php
+# Used to update the INSTALL_ROOT, INSTALL_ROOT_URL, and BLOG_ROOT_URL for a 
+# particular blog.  This is basically an editor for the pathconfig.php file.
 
 session_start();
 require_once("blogconfig.php");
@@ -34,8 +33,12 @@ else $blog_path = false;
 
 $blog = NewBlog($blog_path);
 $usr = NewUser();
-$tpl = NewTemplate("blog_modify_tpl.php");
+$tpl = NewTemplate("blog_path_tpl.php");
 $page = NewPage(&$blog);
+
+$inst_root = INSTALL_ROOT;
+$inst_url = INSTALL_ROOT_URL;
+$blog_url = BLOG_ROOT_URL;
 
 if (! $blog->canModifyBlog() ) {
 	$page->redirect("login.php");
@@ -46,40 +49,23 @@ if (! $blog->canModifyBlog() ) {
 # since this page is not publicly accessible, is that needed?
 
 if (has_post()) {
-	# Only the site administrator can change a blog owner.
-	if ($usr->username() == ADMIN_USER && POST("blogowner") ) {
-		$blog->owner = POST("blogowner");
-	}
-	$blog->name = POST("blogname");
-	$blog->writers(POST("writelist") );
-	$blog->description = POST("desc");
-	$blog->image = POST("image");
-	$blog->theme = POST("theme");
-	$blog->max_entries = POST("maxent");
-	$blog->max_rss = POST("maxrss");
-	$blog->default_markup = POST("blogmarkup");
-
-	$ret = $blog->update();
-	if (!$ret) $tpl->set("UPDATE_MESSAGE", _("Error updating blog."));
-	else $page->redirect($blog->getURL());
+	$inst_root = POST("installroot");
+	$inst_url = POST("installrooturl");
+	$blog_url = POST("blogrooturl");
+	$ret = write_file(mkpath(BLOG_ROOT,"pathconfig.php"), 
+	                  pathconfig_php_string($inst_root, $inst_url, $blog_url));
+	if (!$ret) $tpl->set("UPDATE_MESSAGE", _("Error updating blog paths."));
+	else $page->redirect($blog_url);
 }
 
-if ($usr->username() == ADMIN_USER) {
-	$tpl->set("BLOG_OWNER", $blog->owner);
-}
-$tpl->set("BLOG_NAME", $blog->name);
-$tpl->set("BLOG_WRITERS", implode(",", $blog->writers() ) );
-$tpl->set("BLOG_DESC", $blog->description);
-$tpl->set("BLOG_IMAGE", $blog->image);
-$tpl->set("BLOG_THEME", $blog->theme);
-$tpl->set("BLOG_MAX", $blog->max_entries);
-$tpl->set("BLOG_RSS_MAX", $blog->max_rss);
-$tpl->set("BLOG_DEFAULT_MARKUP", $blog->default_markup);
+$tpl->set("BLOG_URL", $blog_url);
+$tpl->set("INST_URL", $inst_url);
+$tpl->set("INST_ROOT", $inst_root);
 $tpl->set("POST_PAGE", current_file());
-$tpl->set("UPDATE_TITLE", sprintf(_("Update %s"), $blog->name));
+$tpl->set("UPDATE_TITLE", sprintf(_("Update paths for %s"), $blog->name));
 
 $body = $tpl->process();
-$page->title = sprintf(_("Update blog - %s"), $blog->name);
+$page->title = sprintf(_("Update blog paths - %s"), $blog->name);
 $page->addStylesheet("form.css");
 $page->display($body, &$blog);
 ?>

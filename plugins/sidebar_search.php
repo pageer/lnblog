@@ -17,7 +17,7 @@ $do_output = false;
 if ($files !== true) {
 	session_start();
 	$instdir = dirname(getcwd());
-	define("INSTALL_ROOT", $instdir);
+	#define("INSTALL_ROOT", $instdir);
 	if (! defined("PATH_SEPARATOR") ) 
 		define("PATH_SEPARATOR", strtoupper(substr(PHP_OS,0,3)=='WIN')?';':':');
 	ini_set("include_path", ini_get("include_path").PATH_SEPARATOR.$instdir);
@@ -50,7 +50,7 @@ class SidebarSearch extends Plugin {
 		} ?>
 <div class="panel">
 <label for="sb_search_terms" title="<?php echo $tooltip;?>"><?php p_('Search this weblog');?></label>
-<form method="post" action="<?php echo INSTALL_ROOT_URL;?>/plugins/sidebar_search.php?blog=<?php echo $blg->blogid;?>&amp;show=sb_search_results">
+<form method="post" action="<?php echo INSTALL_ROOT_URL;?>plugins/sidebar_search.php?blog=<?php echo $blg->blogid;?>&amp;show=sb_search_results">
 <fieldset style="border: 0">
 <input type="text" id="sb_search_terms" name="sb_search_terms" title="<?php echo $tooltip; ?>" />
 <input type="submit" id="sb_search_submit" name="sb_search_submit" value="<?php p_("Search"); ?>" />

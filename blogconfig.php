@@ -54,16 +54,37 @@ function get_blog_path() {
 	}
 }
 
-# Define the installation root, if it's not already defined.
-@define("INSTALL_ROOT", getcwd());
+# Define config files for various parts of the plugin framework.
+define("FS_PLUGIN_CONFIG", "fsconfig.php");
+
+# Since we were able to include this file, we must already have the installation
+# directory in the path.  So we can just include userdata/fsconfig.php and not
+# have to worry about the exact path.
+@include_once(USER_DATA."/".FS_PLUGIN_CONFIG);
+
+# If we do not have the INSTALL_ROOT defined from a previously included
+# pathconfig.php, then we need to take care of that.  We'll try to get the
+# blog's pathconfig.php file, and failing that, we'll just use the cwd.
+if (! defined("INSTALL_ROOT")) {
+	
+	if ( get_blog_path() ) {
+		$temp = ini_get('include_path');
+		ini_set('include_path', get_blog_path());
+		require_once('pathconfig.php');
+		ini_set('include_path', $temp);
+	}
+
+	if (! defined("INSTALL_ROOT")) define("INSTALL_ROOT", getcwd());
+
+}
+
+# Set the path for system-wide user data files.
+define("USER_DATA_PATH", INSTALL_ROOT.PATH_DELIM.USER_DATA);
 
 # Check for the file's existence first, because it turns out this is 
 # actually faster when the file doesn't exist.
-if (defined("INSTALL_ROOT") && 
-    file_exists(mkpath(INSTALL_ROOT,USER_DATA,"userconfig.php")) ) {
+if (file_exists(mkpath(INSTALL_ROOT,USER_DATA,"userconfig.php")) ) {
 	include(USER_DATA."/userconfig.php");
-} elseif (! defined("INSTALL_ROOT") ) {
-	@include(USER_DATA."/userconfig.php");
 }
 
 # Look for the userconfig.cfg and define any variables in it.
@@ -133,7 +154,7 @@ define("PACKAGE_NAME", "LnBlog");
 # Constant: PACKAGE_VERSION
 # The version number of the software.  This is a string in the format 
 # "1.2.3".  Note that each number may be more than one digit.
-define("PACKAGE_VERSION", "0.6.4");
+define("PACKAGE_VERSION", "0.6.5");
 
 # Constant: PACKAGE_URL
 # The full URL of the LnBlog project home page.
@@ -276,7 +297,7 @@ The corresponding replacement pattern to <LOCALPATH_TO_URI_MATCH_RE>.
 
 *Default* is "/~$1$2".
 */
-@define("LOCALPATH_TO_URI_REPLACE_RE", "/~$1/$2");
+@define("LOCALPATH_TO_URI_REPLACE_RE", "/~$1/$3");
 
 /* Constant: URI_TO_LOCALPATH_MATCH_RE
 The reverse of <LOCALPATH_TO_URI_MATCH_RE>.  This is the regular expression 
@@ -591,19 +612,6 @@ The corresponding replacement expression to <URI_TO_LOCALPATH_MATCH_RE>.
 #----------------------------------------------------------------------------
 # This section should not normally need to be changed.
 
-# Define config files for various parts of the plugin framework.
-define("FS_PLUGIN_CONFIG", "fsconfig.php");
-
-# Set the path for system-wide user data files.
-@define("USER_DATA_PATH", INSTALL_ROOT.PATH_DELIM.USER_DATA);
-
-# We bother to set DOCUMENT_ROOT in the setup, maybe we should actually use 
-# it consistently.  Just a thought....
-
-if (file_exists(USER_DATA_PATH.PATH_DELIM.FS_PLUGIN_CONFIG)) {
-	require_once(USER_DATA."/".FS_PLUGIN_CONFIG);
-}
-
 # Get the theme for the blog.  I'd like to do this in the Blog class, but 
 # we need to set the constant even when we don't have a current blog, so 
 # we'll do it here instead.
@@ -635,10 +643,9 @@ if (isset($cfg_file) && is_file($cfg_file)) {
 @define("THEME_NAME", "default");
 if (! defined("INSTALL_ROOT_URL")) {
 	require_once("lib/utils.php");
-	#define("INSTALL_ROOT_URL", localpath_to_uri(getcwd()));
 	define("INSTALL_ROOT_URL", localpath_to_uri(INSTALL_ROOT));
 }
-#@define("INSTALL_ROOT_URL", "/".basename(INSTALL_ROOT)."/");
+
 define("THEME_TEMPLATES", mkpath("themes",THEME_NAME,"templates"));
 define("DEFAULT_THEME_TEMPLATES", mkpath("themes","default","templates"));
 

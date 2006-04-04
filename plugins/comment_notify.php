@@ -1,4 +1,14 @@
 <?php 
+
+# Plugin: CommentNotifier
+# Sends e-mail notification when a comment is posted.
+#
+# This plugin will send an e-mail to the user who posted an entry whenever
+# a comment on that entry is posted.  Note that this only works if the 
+# user has an e-mail address defined in his profile.
+#
+# No e-mail is sent for comments posted by the entry owner.
+
 class CommentNotifier extends Plugin {
 	
 	function CommentNotifier() {
@@ -28,7 +38,7 @@ class CommentNotifier extends Plugin {
 					    spf_("E-mail: %s\n", $param->email).
 					    spf_("URL: %s\n", $param->url).
 						 spf_("Subject: %s\n\n", $param->subject).
-					  	$param->data, "From: LnBlog comment notifier");
+					  	$param->data, "From: LnBlog comment notifier <>");
 				}
 			}
 		}

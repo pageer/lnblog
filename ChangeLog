@@ -1,3 +1,43 @@
+04-Apr-2006: 0.6.5
+- Fixed blogpath.php link showing up when creating blogs.
+- Added option to show only global ban link in ipban plugin.
+- Added working contentban plugin based on ipban.
+- Added NaturalDocs documentaiton to some plugins, as well as converting
+older ones to use the addOption method.
+- Changed calendar margins to paddings, which makes things look right
+in Konqueror.
+
+31-Mar-2006:
+- When saving blog data, run the values through htmlentities() first in order
+to prevent invalid characters from getting into the title or description.  
+This breaks the RSS feeds and XHTML compliance (reported by Ben Schorr).
+
+30-Mar-2006:
+- Reworked include mechanism AGAIN so that blogconfig and pathconfig will work.
+- Added a privateblog plugin.  This allows you to deny access to a blog to 
+all but a certain list of usernames.
+
+27-Mar-2006: 
+- Reworked blogconfig.php to work with pathconfig.php.
+- Added documentation on pathconfig.php.
+- Moved LBCode documentation to NaturalDocs.
+
+27-Mar-2006: 
+- Moved install and blog paths and URLs out of the individual config.php 
+scripts in each directory.  Now, the config.php files calculate the blog root
+based on how many levels deep the directory is under the blog.  The install
+root and install and blog URLs are then included from a new pathconfig.php
+file in the blog root.
+- Cleaned up newblog.php, updateblog.php, and blog_modify_tpl.php to remove all
+those unneeded variables.
+- Added blogpaths.php and blog_path_tpl.php to update the install root and the
+install root URL and blog root URL.
+
+22-Mar-2006:
+- Fixed getlink() and page header template to not link in stylesheets or
+scripts that are not found.
+- Added timed comment/trackback close to DisableComments plugin.
+
 21-Mar-2006: version 0.6.4
 - Fixed missing password check when cookie-only login is enabled.
 - Adjusted the LBCode regexes for lists to fix the trailing newline bug.

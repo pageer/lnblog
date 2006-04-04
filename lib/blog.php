@@ -70,21 +70,28 @@ class Blog extends LnBlogObject {
 		$this->raiseEvent("OnInit");
 	
 		$this->name = '';
-		if (defined("BLOG_ROOT")) { 
+		if ($path) {
+			if (is_dir($path)) $this->home_path = realpath($path);
+			else $this->home_path = $path;
+
+		} elseif (defined("BLOG_ROOT")) { 
 			$this->home_path = BLOG_ROOT;
 		} elseif (isset($_GET["blog"]) && defined("INSTALL_ROOT")) {
 			$this->home_path = calculate_document_root().PATH_DELIM.sanitize(GET("blog"));
+			if (is_dir($this->home_path)) 
+				$this->home_path = realpath($this->home_path);
 		} else {
-			$this->home_path = $path ? realpath($path) : getcwd();
+			$this->home_path = getcwd();
 		}
-		
+
+		# Set the blog root here.  
+		# We do it in the blog object so that it can be auto-detected and
+		# so that we only end up defining it when we need it.
+		# Also note that the check is necessary to avoid duplicate definitions.
 		if (! defined("BLOG_ROOT") && is_dir($this->home_path)) {
 			define("BLOG_ROOT", $this->home_path);
 		}
-		if (! defined("BLOG_ROOT_URL")) {
-			define("BLOG_ROOT_URL", $this->getURL());
-		}
-		
+
 		$this->description = '';
 		$this->image = '';
 		$this->max_entries = BLOG_MAX_ENTRIES;
@@ -98,7 +105,7 @@ class Blog extends LnBlogObject {
 		$this->last_blogentry = false;
 		$this->last_article = false;
 		if (defined("DOCUMENT_ROOT")) {
-			$this->blogid = substr($this->home_path, strlen(DOCUMENT_ROOT) );
+			$this->blogid = substr($this->home_path, strlen(DOCUMENT_ROOT));
 		} else {
 			$this->blogid = '';
 		}
@@ -444,7 +451,11 @@ class Blog extends LnBlogObject {
 	A string holding the URI to the blog root directory.
 	*/
 	function getURL($full_uri=true) {
-		return localpath_to_uri($this->home_path, $full_uri);
+		if (defined("BLOG_ROOT_URL")) {
+			return BLOG_ROOT_URL;
+		} else {
+			return localpath_to_uri($this->home_path, $full_uri);
+		}
 	}
 
 	/* Method: uri
@@ -836,6 +847,9 @@ class Blog extends LnBlogObject {
 			$this->image = stripslashes($this->image);
 			$this->theme = stripslashes($this->theme);
 		}
+		$this->name = htmlentities($this->name);
+		$this->description = htmlentities($this->description);
+		
 		$inst_path = getcwd();
 		if ($path) $this->home_path = canonicalize($path);
 		$this->home_path = canonicalize($this->home_path);
@@ -887,6 +901,8 @@ class Blog extends LnBlogObject {
 			$this->image = stripslashes($this->image);
 			$this->theme = stripslashes($this->theme);
 		}
+		$this->name = htmlentities($this->name);
+		$this->description = htmlentities($this->description);
 		if (KEEP_EDIT_HISTORY) {
 			$ret = $this->delete() && $this->writeBlogData();
 		} else {
@@ -910,7 +926,8 @@ class Blog extends LnBlogObject {
 		if (KEEP_EDIT_HISTORY) {
 			if (! is_dir($this->home_path.PATH_DELIM.BLOG_DELETED_PATH) )
 				$fs->mkdir_rec($this->home_path.PATH_DELIM.BLOG_DELETED_PATH);
-			$target = $this->home_path.PATH_DELIM.BLOG_DELETED_PATH.PATH_DELIM.BLOG_CONFIG_PATH."-".date(ENTRY_PATH_FORMAT_LONG);
+			$target = $this->home_path.PATH_DELIM.BLOG_DELETED_PATH.PATH_DELIM.
+			          BLOG_CONFIG_PATH."-".date(ENTRY_PATH_FORMAT_LONG);
 			$ret = $fs->rename($source, $target);
 		} else {
 			$fs->delete($source);
@@ -998,28 +1015,22 @@ class Blog extends LnBlogObject {
 
 	# Method: canAddArticle
 	# Same as <canAddEntry>, but for articles.
-
+	#
+	# Because Article inherits BlogEntry, this is currently an alias
+	# for <canAddEntry>.
+	
 	function canAddArticle($usr=false) {
-		$u = NewUser($usr);
-		if (! $u->checkLogin() ) return false;
-		if (ADMIN_USER == $u->username() ||
-		    $this->owner == $u->username() ) return true;
-		foreach ($this->write_list as $writer)
-			if ($u->username() == $writer) return true;
-		return false;
+		return $this->canAddEntry($usr);
 	}
 
 	# Method: canModifyArticle
 	# Same as <canModifyEntry>, but for articles.
-
+	#
+	# Because Article inherits BlogEntry, this is currently an alias
+	# for <canModifyEntry>.
+	
 	function canModifyArticle($ent=false, $usr=false) {
-		$u = NewUser($usr);
-		if (! $u->checkLogin() ) return false;
-		if (!$ent) $ent = NewBlogEntry();
-		if (ADMIN_USER == $u->username() ||
-		    $this->owner == $u->username() ||
-		    $ent->uid == $u->username() ) return true;
-		return false;
+		return $this->canModifyEntry($ent,$usr);
 	}
 
 	# Method: canAddBlog
@@ -1267,6 +1278,15 @@ class Blog extends LnBlogObject {
 		return $ret;
 
 	}
-
+	
+	function entryDelete($path=false) {
+		$ent = NewBlogEntry($path);
+		$this->last_blogentry =& $ent;
+		if (! $this->canModifyEntry($ent) ) return UPDATE_AUTH_ERROR;
+		$ret = $ent->delete();
+		if ($ret !== false) $ret == UPDATE_SUCCESS;
+		else $ret = UPDATE_ENTRY_ERROR;
+		return $ret;
+	}
 }
 ?>
