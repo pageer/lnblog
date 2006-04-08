@@ -45,7 +45,7 @@ foreach ($LINK_LIST as $key=>$item) $LINK_LIST[$key]["title"] = $item["year"];
 $tpl->set("LINK_LIST", $LINK_LIST);
 $tpl->set("LIST_FOOTER", 
           '<a href="'.$blog->getURL().BLOG_ENTRY_PATH.'/all.php">'.
-          _("List all entries"));
+          _("List all entries")."</a>");
 $body = $tpl->process();
 
 $page->title = $title;
