@@ -41,6 +41,9 @@ function set_template(&$tpl, &$ent) {
 	$tpl->set("HAS_HTML", $ent->has_html);
 	$tpl->set("COMMENTS", $ent->allow_comment);
 	$tpl->set("TRACKBACKS", $ent->allow_tb);
+	if (is_a($ent, 'Article')) {
+		$tpl->set("STICKY", $ent->isSticky());
+	}
 }
 
 global $PAGE;
@@ -70,6 +73,7 @@ if (POST('submit')) {
 		
 		if ($ent->data) {
 			$ret = $ent->update();
+			if ($is_art) $ent->setSticky(POST('sticky'));
 			$blg->updateTagList($ent->tags());
 			
 			if ($ret) {

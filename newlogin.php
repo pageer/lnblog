@@ -30,6 +30,16 @@ require_once("lib/creators.php");
 
 session_start();
 
+function populate_fields(&$tpl) {
+	global $user_name, $password, $confirm, $full_name, $email, $homepage;
+	$tpl->set("UNAME_VALUE", trim(POST($user_name)));
+	$tpl->set("PWD_VALUE", trim(POST($password)));
+	$tpl->set("CONFIRM_VALUE", trim(POST($confirm)));
+	$tpl->set("FULLNAME_VALUE", trim(POST($full_name)));
+	$tpl->set("EMAIL_VALUE", trim(POST($email)));
+	$tpl->set("HOMEPAGE_VALUE", trim(POST($homepage)));
+}
+
 global $PAGE;
 $redir_page = "index.php";
 $tpl = NewTemplate(CREATE_LOGIN_TEMPLATE);
@@ -87,6 +97,7 @@ if ($post_complete) {
 			"<span style=\"color: red\">".
 			_("The passwords you entered do not match.").
 			"</span>");
+		populate_fields($tpl);
 	} else {
 		$usr = NewUser();
 		$usr->username(trim(POST($user_name)));
@@ -105,10 +116,12 @@ if ($post_complete) {
 			if (!$ret) {
 				$tpl->set("FORM_MESSAGE", 
 				          _("Error: Failed to make this user an administrator."));
+				populate_fields($tpl);
 			}
 		} else {
 			$tpl->set("FORM_MESSAGE", 
 			          _("Error: Failed to save user information."));
+			populate_fields($tpl);
 		}
 		
 		if ($ret) {
@@ -130,6 +143,7 @@ if ($post_complete) {
 			'<span style="color: red">'.
 			_("You must enter a username.").
 			'</span>');
+	populate_fields($tpl);
 }
 
 $body = $tpl->process();

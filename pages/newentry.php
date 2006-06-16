@@ -56,6 +56,7 @@ $PAGE->setDisplayObject($blg);
 $tpl = NewTemplate(ENTRY_EDIT_TEMPLATE);
 if ($is_art) {
 	$tpl->set("GET_SHORT_PATH");
+	$tpl->set("STICKY", true);
 	$tpl->set("COMMENTS", false);
 	$tpl->set("TRACKBACKS", false);
 }
@@ -78,7 +79,7 @@ if (POST('submit')) {
 			if ($is_art) $ret = $ent->insert($blg, POST('short_path'));
 			else $ret = $ent->insert($blg);
 			$blg->updateTagList($ent->tags());
-			if ($is_art) $ent->setSticky(true);
+			if ($is_art && POST('sticky')) $ent->setSticky(true);
 			
 			if ($ret) {
 				$num_uploads = $SYSTEM->sys_ini->value("entryconfig",	"AllowInitUpload",1);

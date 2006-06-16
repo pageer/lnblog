@@ -1,8 +1,5 @@
-<h2>Paths and URLs</h2>
-<p>Use this page to adjust the path and URL for the LnBlog installation, as
-well as the URL for the blog.  Use this is you want to make a blog use a 
-different version of LnBlog, if you want to use a URL that does not map directly
-to the blog path, or if you did the initial setup on the localhost.</p>
+<h2><?php p_("Paths and URLs");?></h2>
+<p><?php p_("Use this page to adjust the path and URL for the LnBlog installation.  Use this is you want to make a blog use a different version of LnBlog, if you want to use a URL that does not map directly to the install path, or if you did the initial setup on a different server.");?></p>
 <?php if (isset($UPDATE_MESSAGE)) { ?>
 <p style="color: red"><?php echo $UPDATE_MESSAGE;?></p>
 <?php } ?>

@@ -33,9 +33,9 @@ require_once("lib/plugin.php");
 
 global $PAGE;
 $usr = NewUser();
+$blg = NewBlog();
 
-if (defined("BLOG_ROOT")) {
-	$blg = NewBlog();
+if ($blg->isBlog()) {
 	if (! $SYSTEM->canModify($blg, $usr) || !$usr->checkLogin()) {
 		$PAGE->redirect($blg->uri('login'));
 		exit;

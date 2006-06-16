@@ -25,10 +25,13 @@
 <?php } # End user profile block ?>
 <?php	if ($SHOW_CONTROLS) { ?>
 		<li class="blogadmin">
-			<a href="<?php echo $PERMALINK; ?>uploadfile.php"><?php p_('Upload File');?></a>
+			<a href="<?php echo $UPLOAD_LINK; ?>uploadfile.php"><?php p_('Upload File');?></a>
 		</li>
 		<li class="blogadmin">
-			<a href="<?php echo $PERMALINK; ?>edit.php"><?php p_('Edit');?></a>
+			<a href="<?php echo $EDIT_LINK; ?>edit.php"><?php p_('Edit');?></a>
+		</li>
+		<li class="blogadmin">
+			<a href="<?php echo $DELETE_LINK; ?>"><?php p_("Delete");?></a>
 		</li>
 <?php } 
 if (! empty($ALLOW_TRACKBACKS)) { ?>

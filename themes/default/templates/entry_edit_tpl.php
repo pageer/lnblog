@@ -13,7 +13,7 @@ if ($EVENT_REGISTER->hasHandlers("posteditor", "ShowControls")) {
 	include("js_editor.php");
 }
 global $SYSTEM;
-if ($SYSTEM->sys_ini->value("entryconfig", "AllowInitUpload", 1)) {
+if ($SYSTEM->sys_ini->value("entryconfig", "AllowInitUpload", 1) > 0) {
 	$enctype = 'multipart/form-data';
 } else {
 	$enctype = 'application/x-www-form-urlencoded';
@@ -56,6 +56,12 @@ for ($i=1; $i<=$num_uploads; $i++) { ?>
 <div>
 <label for="upload<?php echo $i;?>"><?php p_("Upload file");?></label>
 <input type="file" name="upload<?php echo $i;?>" id="upload<?php echo $i;?>" />
+</div>
+<?php } ?>
+<?php if (isset($STICKY)) { ?>
+<div>
+<label for="sticky"><?php p_("Make sticky (show in sidebar)"); ?></label>
+<input id="sticky" name="sticky" type="checkbox" <?php if ($STICKY) { ?> checked="checked" <?php } ?> />
 </div>
 <?php } ?>
 <div>

@@ -46,7 +46,8 @@ if (POST($conf_id)) {
 	$err = false;
 	if ($SYSTEM->canDelete($ent, $usr) && $usr->checkLogin()) {
 		$ret = $ent->delete();
-		if (!$ret) $message = spf_("Error: Unable to delete '%s'.  Try again?", $ent->subject);
+		if (!$ret) $message = spf_("Error: Unable to delete '%s'.  Try again?",
+$ent->subject);
 		else $PAGE->redirect($blog->getURL());
 	} else {
 		$message = _("Error: user ".$usr->username()." does not have permission to delete this entry.");

@@ -98,7 +98,7 @@ if (has_post()) {
 	
 }
 
-if (! defined("BLOG_ROOT")) $blog = false;
+#if (! defined("BLOG_ROOT")) $blog = false;
 
 if ($blog->isBlog()) $PAGE->title = _("Edit blog menu bar");
 else $PAGE->title = _("Edit site menu bar");

@@ -195,7 +195,8 @@ class BlogEntry extends Entry {
 
 	function parentID() {
 		$path = dirname($this->file);
-		for ($i = 0; $i < 4; $i++) $path = dirname($path);
+		$num_levels = is_a($this, 'Article') ? 2 : 4;
+		for ($i = 0; $i < $num_levels; $i++) $path = dirname($path);
 		return substr($path, strlen(DOCUMENT_ROOT));
 	}
 	
@@ -346,9 +347,10 @@ class BlogEntry extends Entry {
 				if (KEEP_EDIT_HISTORY) {
 					return $dir_uri."delete.php";
 				} else {
+					$entry_type = is_a($this, 'Article') ? 'article' : 'entry';
 					return make_uri(INSTALL_ROOT_URL."pages/delentry.php", 
-					                array("blog"=>$this->parentID(), 
-					                      "entry"=>$this->entryID()));
+					                array("blog"     =>$this->parentID(), 
+					                      $entry_type=>$this->entryID()));
 				}
 			case "comment":     return $dir_uri.ENTRY_COMMENT_DIR."/";
 			case "commentpage": return $dir_uri.ENTRY_COMMENT_DIR."/index.php";

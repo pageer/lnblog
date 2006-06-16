@@ -1,3 +1,12 @@
+12-Jun-2006: version 0.7.2
+- Added checkbox to set sticky state when editing articles.
+- Fixed redirects on changing the installation path in blogpaths.php.
+
+11-Jun-2006:
+- Fixed sitemap editing page.
+- Fixed plugin configuration not showing in PHP5.
+- Added delete link for articles.
+
 06-Jun-2006: verison 0.7.1
 - Added a command-line Python utility to make MetaWeblog API calls.  This is a
 simple client program for testing and automation.

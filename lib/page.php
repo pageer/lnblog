@@ -229,7 +229,7 @@ class Page extends LnBlogObject {
 	*/
 	
 	function refresh($url, $delay=0) {
-		header("Refresh: ".$delay."; ".$path);
+		header("Refresh: ".$delay."; ".$url);
 	}
 
 	/*

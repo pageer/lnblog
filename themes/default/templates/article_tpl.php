@@ -35,6 +35,9 @@ if ($SHOW_CONTROLS) { ?>
 		<li class="blogadmin">
 			<a href="<?php echo $EDIT_LINK; ?>"><?php p_("Edit");?></a>
 		</li>
+		<li class="blogadmin">
+			<a href="<?php echo $DELETE_LINK; ?>"><?php p_("Delete");?></a>
+		</li>
 <?php } 
 if (! empty($ALLOW_TRACKBACKS)) { ?>
 <li><a href="<?php echo $TRACKBACK_LINK; ?>"><?php p_("TrackBack <abbr title=\"Uniform Resource Locator\">URL</abbr>");?></a></li>

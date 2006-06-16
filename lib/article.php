@@ -60,9 +60,11 @@ class Article extends BlogEntry {
 			"has_html"=>"hashtml", "tags"=>"tags", 
 			"allow_tb"=>"allowtrackback");
 
-		if ($path) {
+		if ($path && file_exists($path)) {
 			$this->file = $path.PATH_DELIM.$revision;
-		} elseif (GET("article")) {
+		} elseif (GET("article") || $path) {
+		
+			$entrypath = trim($path ? $path : sanitize(GET("entry")));
 
 			# Get the blog path from the query string.
 			if (defined("BLOG_ROOT")) {
@@ -73,7 +75,7 @@ class Article extends BlogEntry {
 				$blogpath = "";
 			}
 
-			$this->file = mkpath($blogpath,BLOG_ARTICLE_PATH,sanitize(GET("article")),$revision);
+			$this->file = mkpath($blogpath,BLOG_ARTICLE_PATH,$entrypath,$revision);
 
 		} else {
 
@@ -109,12 +111,12 @@ class Article extends BlogEntry {
 	*/
 
 	function isArticle($path=false) {
-		if (!$path) $path = $this->file;
-		return $this->isEntry($path) && strpos($path, BLOG_ARTICLE_PATH);
+		if (!$path) $path = dirname($this->file);
+		return $this->isEntry($path) && strpos($path, BLOG_ARTICLE_PATH) !== false;
 	}
 
 	/*
-	Method: setSticky
+	Method: setticky
 	Set whether or not an article should be considered "featured".
 	Articles not set sticky should be considered archival and not
 	shown on things like front-page article lists.
@@ -185,6 +187,18 @@ class Article extends BlogEntry {
 		
 		$this->file = $old_path;
 		return $ret;
+	}
+
+	/*
+	Method: entryID
+	Gets the ID of the article, which is normally just the last portion 
+	of the path.
+	
+	Returns:
+	A string containing the unique ID of this article.
+	*/
+	function entryID() {
+		return basename(dirname($this->file));
 	}
 
 	/*

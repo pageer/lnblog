@@ -40,7 +40,7 @@ $PAGE->setDisplayObject($blog);
 
 $inst_root = INSTALL_ROOT;
 $inst_url = INSTALL_ROOT_URL;
-$blog_url = ''; #BLOG_ROOT_URL;
+$blog_url = $blog->getURL(); #BLOG_ROOT_URL;
 
 if (! $SYSTEM->canModify($blog, $usr) && ! $usr->checkLogin() ) {
 	$PAGE->redirect("login.php");
@@ -53,14 +53,17 @@ if (! $SYSTEM->canModify($blog, $usr) && ! $usr->checkLogin() ) {
 if (has_post()) {
 	$inst_root = POST("installroot");
 	$inst_url = POST("installrooturl");
-	$blog_url = POST("blogrooturl");
+	#$blog_url = POST("blogrooturl");
 	$ret = write_file(mkpath(BLOG_ROOT,"pathconfig.php"), 
 	                  pathconfig_php_string($inst_root, $inst_url, $blog_url));
 	if (!$ret) $tpl->set("UPDATE_MESSAGE", _("Error updating blog paths."));
-	else $PAGE->redirect($blog_url);
+	else {
+		$PAGE->redirect($blog_url);
+		exit;
+	}
 }
 
-$tpl->set("BLOG_URL", $blog_url);
+#$tpl->set("BLOG_URL", $blog_url);
 $tpl->set("INST_URL", $inst_url);
 $tpl->set("INST_ROOT", $inst_root);
 $tpl->set("POST_PAGE", current_file());
