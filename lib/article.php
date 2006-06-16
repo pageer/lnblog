@@ -50,6 +50,7 @@ class Article extends BlogEntry {
 		$this->has_html = MARKUP_BBCODE;
 		$this->allow_comment = false;
 		$this->allow_tb = false;
+		$this->template_file = ARTICLE_TEMPLATE;
 		$this->metadata_fields = array("id"=>"postid", "uid"=>"userid", 
 			"date"=>"date", "post_date"=>"postdate",
 			"timestamp"=>"timestamp", "post_ts"=>"posttimestamp",
@@ -108,7 +109,8 @@ class Article extends BlogEntry {
 	*/
 
 	function isArticle($path=false) {
-		return $this->isEntry($path);
+		if (!$path) $path = $this->file;
+		return $this->isEntry($path) && strpos($path, BLOG_ARTICLE_PATH);
 	}
 
 	/*
@@ -220,27 +222,27 @@ class Article extends BlogEntry {
 	Save the object as a new article.
 
 	Parameters:
-	branch    - *Optional* boolean for whether to create a new branch of an
-	            existing article.
-	base_path - *Optional* string to use for the base path to articles.
-
+	blog     - The blog object into which the article should be inserted.
+	dir_path - *Optional* directory name to use for the article.
+	
 	Returns:
 	True on success, false on failure.
 	*/
 
-	function insert ($branch=false, $base_path=false) {
-	
-		$usr = NewUser();
-		if (! $usr->checkLogin()) return false;
+	function insert ($blog, $dir_path=false) {
+
 		$this->raiseEvent("OnInsert");
-		$this->uid = $usr->username();
+		if (!$this->uid) {
+			$usr = NewUser();
+			$this->uid = $usr->username();
+		}
 	
 		$curr_ts = time();
-		if (!$base_path) $basepath = getcwd().PATH_DELIM.BLOG_ARTICLE_PATH;
-		else $basepath = $base_path;
+		$basepath = $blog->home_path.PATH_DELIM.BLOG_ARTICLE_PATH;
+		
 		if (! is_dir($basepath)) create_directory_wrappers($basepath, BLOG_ARTICLES);
-		if (! $branch) $dir_path = $basepath.PATH_DELIM.$this->getPath();
-		else $dir_path = $basepath.PATH_DELIM.$branch;
+		if (!$dir_path) $dir_path = $this->getPath();
+		$dir_path = $basepath.PATH_DELIM.$dir_path;
 		$ret = create_directory_wrappers($dir_path, ARTICLE_BASE);
 
 		# Create directories for comments and trackbacks.
@@ -263,6 +265,10 @@ class Article extends BlogEntry {
 		return $ret;
 		
 	}
+	
+	# This is to allow inheritance of update and delete methods without 
+	# creating wrapper scripts.
+	function calcPrettyPermalink($use_broken_regex=false) { return false; }
 
 	function permalink($html_escape=true) {
 		if (! USE_WRAPPER_SCRIPTS && 
@@ -278,58 +284,5 @@ class Article extends BlogEntry {
 		}
 	}
 
-	/*
-	Method: get
-	Get the HTML code to display the article.
-
-	Parameters:
-	show_edit_controls - *Optional* boolean for whether or not to show the 
-	                     links for modifying the article.  Default is false.
-
-	Returns:
-	A string containing the HTML to dump to the browser for this article.
-	*/
-	
-	function get($show_edit_controls=false) {
-		ob_start();
-		$this->raiseEvent("OnOutput");
-		$ret= ob_get_contents();
-		ob_end_clean();
-
-		$tmp = NewTemplate(ARTICLE_TEMPLATE);
-		$blog = NewBlog();
-		$usr = NewUser($this->uid);
-		$usr->exportVars($tmp);
-
-		$tmp->set("TITLE", $this->subject);
-		$tmp->set("TAGS", $this->tags());
-		$tmp->set("POSTDATE", $this->prettyDate($this->post_ts) );
-		$tmp->set("EDITDATE", $this->prettyDate() );
-		$tmp->set("BODY", $this->markup() );
-		$tmp->set("ALLOW_COMMENTS", $this->allow_comment);
-		$tmp->set("ALLOW_TRACKBACKS", $this->allow_tb);
-		$tmp->set("PERMALINK", $this->permalink() );
-		$tmp->set("EDIT_LINK", $this->uri("edit"));
-		$tmp->set("UPLOAD_LINK", $this->uri("upload"));
-		$tmp->set("SHOW_CONTROLS", $show_edit_controls);
-		$tmp->set("PING_LINK", $this->uri("send_tb"));
-		$tmp->set("TRACKBACK_LINK", $this->uri("get_tb"));
-		$tmp->set("TAG_LINK", BLOG_ROOT_URL."tags.php");
-		$tmp->set("COMMENTCOUNT", $this->getCommentCount() );
-		$tmp->set("COMMENT_LINK", $this->uri("comment"));
-		$tmp->set("TRACKBACKCOUNT", $this->getTrackbackCount() );
-		$tmp->set("SHOW_TRACKBACK_LINK", $this->uri("trackback"));
-		$tmp->set("SHOW_CONTROLS", $show_edit_controls);
-		$tmp->set("PROFILE_LINK", 
-		          INSTALL_ROOT_URL."userinfo.php?user=".$usr->username().
-		          "&amp;blog=".$blog->blogid);
-		
-		$ret .= $tmp->process();
-		ob_start();
-		$this->raiseEvent("OutputComplete");
-		$ret .= ob_get_contents();
-		ob_end_clean();
-		return $ret;
-	}
-
 }
+?>

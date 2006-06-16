@@ -30,19 +30,30 @@ require_once("lib/creators.php");
 
 session_start();
 
-$page = NewPage();
+global $PAGE;
 $redir_page = "index.php";
 $tpl = NewTemplate(CREATE_LOGIN_TEMPLATE);
 
-# Allow us to use this to create the admin login.
-if (file_exists(mkpath(USER_DATA_PATH,ADMIN_USER,"passwd.php"))) {
+# Check if there is at least one administrator.  
+# If not, then we need to create one.
+if ($SYSTEM->hasAdministrator()) {
 	$page_name = _("Create New Login");
 	$form_title = _("Create New Login");
+	$first_user = false;
 } else {
 	$page_name = _("Create Administrator Login");
 	$form_title = _("Create Aministration Login");
 	$tpl->set("UNAME_VALUE", ADMIN_USER);
-	$tpl->set("DISABLE_UNAME", true);
+	#$tpl->set("DISABLE_UNAME", true);
+	$first_user = true;
+}
+
+# If there is an administrator, then we want to restrict creating new accounts.
+$u = NewUser();
+if ($SYSTEM->hasAdministrator() && 
+    (! $u->checkLogin() || ! $u->isAdministrator()) ) {
+	$PAGE->redirect("index.php");
+	exit;
 }
 
 $user_name = "user";
@@ -86,9 +97,24 @@ if ($post_complete) {
 		foreach ($section as $key=>$val) {
 			$usr->custom[$key] = POST($key);
 		}
-		$usr->save();
-		$page->redirect("index.php");
-		exit;
+		
+		$ret = $usr->save();
+		
+		if ($ret) {
+			if ($first_user) $ret = $usr->addToGroup('administrators');
+			if (!$ret) {
+				$tpl->set("FORM_MESSAGE", 
+				          _("Error: Failed to make this user an administrator."));
+			}
+		} else {
+			$tpl->set("FORM_MESSAGE", 
+			          _("Error: Failed to save user information."));
+		}
+		
+		if ($ret) {
+			$PAGE->redirect("index.php");
+			exit;
+		}
 	}
 } elseif ($partial_post) {
 	# Let's do them in reverse, so that the most logical message appears.
@@ -107,7 +133,7 @@ if ($post_complete) {
 }
 
 $body = $tpl->process();
-$page->title = $page_name;
-$page->addStylesheet("form.css");
-$page->display($body);
+$PAGE->title = $page_name;
+$PAGE->addStylesheet("form.css");
+$PAGE->display($body);
 ?>

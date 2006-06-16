@@ -39,6 +39,15 @@
 <select id="theme" name="theme">
 <?php 
 $dir = scan_directory(INSTALL_ROOT.PATH_DELIM."themes", true);
+if (is_dir(USER_DATA_PATH.PATH_DELIM."themes")) {
+	$user_dir = scan_directory(USER_DATA_PATH.PATH_DELIM."themes", true);
+	if ($user_dir) $dir = array_merge($dir, $user_dir);
+}
+if (defined("BLOG_ROOT") && is_dir(BLOG_ROOT.PATH_DELIM."themes")) {
+	$blog_dir = scan_directory(BLOG_ROOT.PATH_DELIM."themes", true);
+	if ($blog_dir) $dir = array_merge($dir, $blog_dir);
+}
+$dir = array_unique($dir);
 sort($dir);
 foreach ($dir as $theme) { ?>
 <option value="<?php echo $theme; ?>"<?php if (isset($BLOG_THEME) && $theme == $BLOG_THEME) { ?> selected="selected"<?php } ?>>

@@ -124,6 +124,7 @@ class PluginManager {
 		$blog_path = get_blog_path();
 		if ($blog_path) 
 			$plugin_dir_list[] = $blog_path.PATH_DELIM."plugins";
+		$plugin_dir_list[] = USER_DATA_PATH.PATH_DELIM."plugins";
 		$plugin_dir_list[] = INSTALL_ROOT.PATH_DELIM."plugins";
 		$file_list = array();
 		foreach ($plugin_dir_list as $dir) {
@@ -161,11 +162,18 @@ class PluginManager {
 	 */
 
 	function loadPlugins() {
+		$path = USER_DATA_PATH.PATH_SEPARATOR.INSTALL_ROOT;
+		if (get_blog_path()) {
+			$path = get_blog_path().PATH_SEPARATOR.$path;
+		}
+		$old_path = ini_get('include_path');
+		ini_set('include_path', $path);
 		foreach ($this->load_list as $f=>$v) {
 			if ($v) {
 				include("plugins/".$f);
 			}
 		}
+		ini_set('include_path', $old_path);
 	}
 	
 }

@@ -66,6 +66,37 @@ function NewBlog($param=false) {
 	return new Blog($param);
 }
 
+function NewEntry($param=false) {
+	$artid = false;
+	$entid = false;
+	
+	if ( isset($_GET['article']) || isset($_GET['entry']) ) {
+		if (isset($_GET['article'])) $artid = $_GET['article'];
+		elseif (isset($_GET['entry'])) $entid = $_GET['entry'];
+	} else {
+		if (! $param) $param = getcwd();
+		if (strpos($param, BLOG_ARTICLE_PATH) !== false) {
+			$artid = $param;
+			if (basename($artid) == ENTRY_COMMENT_DIR) 
+				$artid = dirname($artid);
+		}
+		elseif (strpos($param, BLOG_ENTRY_PATH) !== false) {
+			$entid = $param;
+			if (basename($entid) == ENTRY_COMMENT_DIR) 
+				$entid = dirname($entid);
+		}
+	}
+	
+	if ($entid) {
+		require_once("blogentry.php");
+		return new BlogEntry($entid);
+	} elseif ($artid) {
+		require_once("article.php");
+		return new Article($artid);
+	}
+	return false;
+}
+
 # Function: NewBlogEntry
 # Creates a new blog entry object.
 function NewBlogEntry($param=false) {
@@ -102,11 +133,11 @@ function NewTemplate($tpl="") {
 # pwd - The *optional* associated password.
 function NewUser($usr=false, $pwd=false) {
 	require_once("user.php");
-	if (!$usr && ( SESSION(CURRENT_USER) || COOKIE(CURRENT_USER) ) ) {
-		if ( SESSION(CURRENT_USER) == COOKIE(CURRENT_USER) ||
-		    (SESSION(CURRENT_USER) == '' && COOKIE(CURRENT_USER) ) 
-		   ) {
-			$usr = COOKIE(CURRENT_USER);
+	$s_usr = SESSION(CURRENT_USER);
+	$c_usr = COOKIE(CURRENT_USER);
+	if (!$usr && $c_usr) {
+		if ($s_usr == $c_usr || (! AUTH_USE_SESSION && $s_usr == '') ) {
+			$usr = $c_usr;
 		}
 	}
 	if ($usr && isset($_SESSION["user-".$usr])) {
@@ -121,7 +152,7 @@ function NewUser($usr=false, $pwd=false) {
 #
 # Parameters:
 # field - The form field that this object represents.
-# dir   - The *optional* target directory.
+# dir   - Thfile:///home/Tallgeese/pageer/www/LnBlog/lib/creators.phpe *optional* target directory.
 # index - The *optional* index of this upload for file upload arrays.
 function NewFileUpload($field, $dir=false, $index=false) {
 	require_once("upload.php");

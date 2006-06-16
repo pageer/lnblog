@@ -24,8 +24,8 @@ require_once("lib/creators.php");
 require_once("lib/lnblogobject.php");
 
 /* Class: Blog
- * The "master" class which represents a weblog.  Nearly all functions are performed through this object.
- * This is the object that handles user security.
+ * The "master" class which represents a weblog.  Nearly all functions are 
+ * performed through this object. This is the object that handles user security.
  *
  * Inherits:
  * <LnBlogObject>
@@ -72,26 +72,27 @@ class Blog extends LnBlogObject {
 		$this->name = '';
 		if ($path) {
 			if (is_dir($path)) $this->home_path = realpath($path);
-			else $this->home_path = $path;
+			else $this->home_path = calculate_document_root().PATH_DELIM.$path;
 
 		} elseif (defined("BLOG_ROOT")) { 
 			$this->home_path = BLOG_ROOT;
 		} elseif (isset($_GET["blog"]) && defined("INSTALL_ROOT")) {
 			$this->home_path = calculate_document_root().PATH_DELIM.sanitize(GET("blog"));
-			if (is_dir($this->home_path)) 
-				$this->home_path = realpath($this->home_path);
 		} else {
 			$this->home_path = getcwd();
 		}
-
-		# Set the blog root here.  
-		# We do it in the blog object so that it can be auto-detected and
-		# so that we only end up defining it when we need it.
-		# Also note that the check is necessary to avoid duplicate definitions.
-		if (! defined("BLOG_ROOT") && is_dir($this->home_path)) {
-			define("BLOG_ROOT", $this->home_path);
+		
+		# Canonicalize the home path.
+		if (is_dir($this->home_path)) {
+			$this->home_path = realpath($this->home_path);
 		}
 
+		# System configuration information.
+		$this->sw_version = '';
+		$this->last_upgrade = '';
+		$this->url_method = '';
+		
+		# Various default blog properties go here.
 		$this->description = '';
 		$this->image = '';
 		$this->max_entries = BLOG_MAX_ENTRIES;
@@ -104,6 +105,7 @@ class Blog extends LnBlogObject {
 		$this->entrylist = array();
 		$this->last_blogentry = false;
 		$this->last_article = false;
+		
 		if (defined("DOCUMENT_ROOT")) {
 			$this->blogid = substr($this->home_path, strlen(DOCUMENT_ROOT));
 		} else {
@@ -115,7 +117,7 @@ class Blog extends LnBlogObject {
 		$this->raiseEvent("InitComplete");
 
 	}
-
+	
 	/*
 	Method: isBlog
 	Determines whether the object represents an existing blog.
@@ -168,6 +170,11 @@ class Blog extends LnBlogObject {
 					$this->$key = $val;
 				}
 			}
+			
+			$this->sw_version = $ini->value('system','SoftwareVersion','0.7pre');
+			$this->last_upgrade = $ini->value('system','LastUpgrade','');
+			$this->url_method = $ini->value('system','URLMethod','wrapper');
+			
 		} elseif (is_file($this->home_path.PATH_DELIM.'blogdata.txt')) {
 			$path = $this->home_path.PATH_DELIM.'blogdata.txt';
 			$config_data = file($path);
@@ -222,6 +229,11 @@ class Blog extends LnBlogObject {
 				$ini->setValue("blog", $key, $this->$key);
 			}
 		}
+		
+		$ini->setValue('system','SoftwareVersion',$this->sw_version);
+		$ini->setValue('system','LastUpgrade',$this->last_upgrade);
+		$ini->setValue('system','URLMethod',$this->url_method);
+		
 		$ret = $ini->writeFile();
 		return $ret;
 	}
@@ -451,38 +463,108 @@ class Blog extends LnBlogObject {
 	A string holding the URI to the blog root directory.
 	*/
 	function getURL($full_uri=true) {
-		if (defined("BLOG_ROOT_URL")) {
-			return BLOG_ROOT_URL;
-		} else {
-			return localpath_to_uri($this->home_path, $full_uri);
-		}
+		return $this->uri('blog');
+		#if (URI_TYPE == "querystring") {
+		#	return INSTALL_ROOT_URL."pages/showblog.php?blog=".$this->blogid;
+		#} elseif (URI_TYPE == "htaccess") {
+		#	
+		#} else {
+		#	if (defined("BLOG_ROOT_URL")) {
+		#		return BLOG_ROOT_URL;
+		#	} else {
+		#		return localpath_to_uri($this->home_path, $full_uri);
+		#	}
+		#}
 	}
 
 	/* Method: uri
 	   Get the URI of the designated resource.
 		
 		Parameters:
-		type - The type of URI to get, e.g. permalink.
+		type  - The type of URI to get, e.g. permalink, edit link, etc.
+		data parameters - All other parameters after the first are interpreted 
+		                  as additional data for the URL.
 
 		Returns:
 		A string with the permalink. 
 	*/
 	function uri($type) {
 		$dir_uri = localpath_to_uri($this->home_path);
+		$qs_arr = array('blog'=>$this->blogid);
+		$qs_uri = make_uri(INSTALL_ROOT_URL."pages/showblog.php", $qs_arr);
+	
 		switch ($type) {
+			case "base":
+				return $dir_uri;
 			case "permalink":
 			case "blog":
 			case "page":
-			case "base":
-				return $dir_uri;
-			case "addentry":   return $dir_uri."new.php";
-			case "addarticle": return $dir_uri."newart.php";
-			case "upload":     return $dir_uri."uploadfile.php";
-			case "edit":       return $dir_uri."edit.php";
-			case "login":      return $dir_uri."login.php";
-			case "logout":     return $dir_uri."logout.php";
+				return (URI_TYPE == "querystring" ? $qs_uri : $dir_uri);
+			case 'articles':
+				if (URI_TYPE == 'querystring')
+					return make_uri(INSTALL_ROOT_URL."pages/showarticles.php",$qs_arr);
+				elseif (URI_TYPE == 'htaccess') return '';
+				else return $dir_uri.BLOG_ARTICLE_PATH."/";
+			case 'listyear':
+				if (URI_TYPE == 'querystring') 
+					return '';
+				elseif (URI_TYPE == 'htaccess') return '';
+				else return $dir_uri.BLOG_ENTRY_PATH."/all.php";
+			case 'listall':
+				if (URI_TYPE == 'querystring')
+					return make_uri(INSTALL_ROOT_URL."pages/showall.php",$qs_arr);
+				elseif (URI_TYPE == 'htaccess') return '';
+				else return $dir_uri.BLOG_ENTRY_PATH."/all.php";
+			case 'showday':
+				if (URI_TYPE == 'querystring')
+					return make_uri(INSTALL_ROOT_URL."pages/showday.php",
+					                array('blog'=>$this->blogid,
+					                      'year'=>func_get_arg(2),
+					                      'month'=>func_get_arg(3),
+					                      'day'=>func_get_arg(4)));
+				elseif (URI_TYPE == 'htaccess') return '';
+				else return make_uri($dir_uri.BLOG_ENTRY_PATH."/day.php",
+				                     array('day'=>func_get_arg(2)));
+			case "addentry":
+				if (URI_TYPE == "querystring") 	
+					return make_uri(INSTALL_ROOT_URL."pages/newentry.php", $qs_arr);
+				elseif (URI_TYPE == "htaccess") return '';
+				else return $dir_uri."new.php";
+			case "addarticle":
+				$qs_arr['type'] = 'article';
+				return make_uri(INSTALL_ROOT_URL.'pages/newentry.php',$qs_arr);
+			case "upload":
+				if (URI_TYPE == 'querystring')
+					return make_uri(INSTALL_ROOT_URL.'pages/fileupload.php',$qs_arr);
+				elseif (URI_TYPE == 'htaccess') return '';
+				else return $dir_uri."uploadfile.php";
+			case "edit":
+				if (URI_TYPE == 'querystring')
+					return make_uri(INSTALL_ROOT_URL.'updateblog.php', $qs_arr);
+				elseif (URI_TYPE == 'htaccess') return '';
+				return $dir_uri."edit.php";
+			case "login":
+				if (URI_TYPE == 'querystring')
+					return make_uri(INSTALL_ROOT_URL.'bloglogin.php', $qs_arr);
+				elseif (URI_TYPE == 'htaccess') return '';
+				return $dir_uri."login.php";
+			case "logout":
+				if (URI_TYPE == 'querystring')
+					return make_uri(INSTALL_ROOT_URL.'bloglogout.php', $qs_arr);
+				elseif (URI_TYPE == 'htaccess') return '';
+				return $dir_uri."logout.php";
 			case "editfile":
-				return localpath_to_uri(INSTALL_ROOT)."editfile.php?blog=".$this->blogid;
+				$arr = array('blog'=>$this->blogid, 'file'=>func_get_arg(1));	
+				if (func_num_args() > 2) $arr['list'] = func_get_arg(2);
+				return make_uri(INSTALL_ROOT_URL.'editfile.php', $arr);
+			case "edituser":
+				return make_uri(INSTALL_ROOT_URL.'pages/editlogin.php', $qs_arr);
+			case "pluginconfig":
+				return make_uri(INSTALL_ROOT_URL.'plugin_setup.php', $qs_arr);
+			case "pluginload":
+				return make_uri(INSTALL_ROOT_URL.'plugin_loading.php', $qs_arr);
+			case "tags":
+				return make_uri($dir_uri.'tags.php');
 		}
 		return $dir_uri;
 	}
@@ -691,6 +773,7 @@ class Blog extends LnBlogObject {
 				if ($sticky_test) {
 					$ret[] = $sticky_test;
 				} else {
+					
 					$a = NewArticle($art_path.$dir);
 					$ret[] = array("title"=>$a->subject, "link"=>$a->permalink());
 				}
@@ -699,6 +782,7 @@ class Blog extends LnBlogObject {
 				$ret[] = $art->readSticky($art_path.$dir);
 				$count++;
 			}
+			
 			if ($number && $count >= $number) break;
 		}
 		return $ret;
@@ -731,10 +815,13 @@ class Blog extends LnBlogObject {
 	A string holding the HTML to display.
 	*/
 	function getWeblog () {
+		global $SYSTEM;
 		$ret = "";
+		$u = NewUser();
 		if (! $this->entrylist) $this->getRecent();
 		foreach ($this->entrylist as $ent) {
-			$ret .= $ent->get($this->canModifyEntry($ent) );
+			$show_ctl = $SYSTEM->canModify($ent, $u) && $u->checkLogin();
+			$ret .= $ent->get($show_ctl);
 		}
 		if (! $ret) $ret = "<p>"._("There are no entries for this weblog.")."</p>";
 		return $ret;
@@ -795,6 +882,9 @@ class Blog extends LnBlogObject {
 			$ret &= create_directory_wrappers($ar_path, ARTICLE_BASE);
 			$ret &= create_directory_wrappers($cmt_path, ENTRY_COMMENTS);
 		}
+		$this->sw_version = PACKAGE_VERSION;
+		$this->last_upgrade = date('r');
+		$ret &= $this->writeBlogData();
 		$this->raiseEvent("UpgradeComplete");
 		return $ret;
 	}
@@ -834,7 +924,7 @@ class Blog extends LnBlogObject {
 	# True on success, false otherwise.
 
 	function insert ($path=false) {
-		if (! $this->canAddBlog() ) return false;
+		
 		$this->raiseEvent("OnInsert");
 		$fs = NewFS();
 		# Get the installation directory, then create and get the blog
@@ -859,6 +949,13 @@ class Blog extends LnBlogObject {
 		if (! is_dir($this->home_path)) {
 			@$ret = $fs->mkdir_rec($this->home_path);
 			if (! $ret) return false;
+		}
+		
+		# Now that we have the path, set the blogid.
+		if (defined("DOCUMENT_ROOT")) {
+			$this->blogid = substr($this->home_path, strlen(DOCUMENT_ROOT));
+		} else {
+			$this->blogid = '';
 		}
 		
 		chdir($this->home_path);
@@ -893,7 +990,6 @@ class Blog extends LnBlogObject {
 	# True on success, false otherwise.
 	
 	function update () {
-		if (! $this->canModifyBlog() ) return false;
 		$this->raiseEvent("OnUpdate");
 		if (get_magic_quotes_gpc()) {
 			$this->name = stripslashes($this->name);
@@ -919,7 +1015,6 @@ class Blog extends LnBlogObject {
 	# True on success, false on failure.
 	
 	function delete () {
-		if (! $this->canModifyBlog()) return false;
 		$this->raiseEvent("OnDelete");
 		$fs = NewFS();
 		$source = $this->home_path.PATH_DELIM.BLOG_CONFIG_PATH;
@@ -969,324 +1064,5 @@ class Blog extends LnBlogObject {
 		} else return false;
 	}
 
-#---------------------------------------------------------------------------
-# Section: Security checking functions.
-
-	# Method: canAddEntry
-	# Determines if the user can add a new entry.  The user must be in the
-	# blog's write list or be the blog owner.
-	#
-	# Parameters:
-	# usr - Optional user ID.  The default is the "current" user.
-	# 
-	# Returns:
-	# True if the user can add, false otherwise.
-
-	function canAddEntry($usr=false) {
-		$u = NewUser($usr);
-		if (! $u->checkLogin() ) return false;
-		if (ADMIN_USER == $u->username() ||
-		    $this->owner == $u->username() ) return true;
-		foreach ($this->write_list as $writer)
-			if ($u->username() == $writer) return true;
-		return false;
-	}
-
-	# Method: canModifyEntry
-	# Determines if the user can edit or delete the entry.  Also applies to
-	# modifying user comments.
-	#
-	# Parameters:
-	# ent - The optional entry to modify.  Default is the "current" entry.
-	# usr - The optional user ID.  Default is the "current" user.
-	#
-	# Returns:
-	# True if the user can modify the entry, false otherwise.
-
-	function canModifyEntry($ent=false, $usr=false) {
-		$u = NewUser($usr);
-		if (! $u->checkLogin() ) return false;
-		if (!$ent) $ent = NewBlogEntry();
-		if (ADMIN_USER == $u->username() ||
-		    $this->owner == $u->username() ||
-		    $ent->uid == $u->username() ) return true;
-		return false;
-	}
-
-	# Method: canAddArticle
-	# Same as <canAddEntry>, but for articles.
-	#
-	# Because Article inherits BlogEntry, this is currently an alias
-	# for <canAddEntry>.
-	
-	function canAddArticle($usr=false) {
-		return $this->canAddEntry($usr);
-	}
-
-	# Method: canModifyArticle
-	# Same as <canModifyEntry>, but for articles.
-	#
-	# Because Article inherits BlogEntry, this is currently an alias
-	# for <canModifyEntry>.
-	
-	function canModifyArticle($ent=false, $usr=false) {
-		return $this->canModifyEntry($ent,$usr);
-	}
-
-	# Method: canAddBlog
-	# Determines if the user can add a new weblog.  
-	# Only the administrator can do this.
-	#
-	# Parameters:
-	# usr - The optional user ID.  Default is to use the "current" user.
-	#
-	# Returns:
-	# True if the user can add a blog, false otherwise.
-
-	function canAddBlog($usr=false) {
-		$u = NewUser($usr);
-		if (! $u->checkLogin() ) return false;
-		if (ADMIN_USER == $u->username() ) return true;
-		return false;
-	}
-	
-	# Method: canModifyBlog
-	# Determines if the user can modify the current weblog.
-	# The user must be the blog owner or the administrator.
-	#
-	# Parameters:
-	# usr - The optional user ID.  Default is to use the "current" user.
-	#
-	# Returns:
-	# True if the user can add a blog, false otherwise.
-
-	function canModifyBlog($usr=false) {
-		$u = NewUser($usr);
-		if (! $u->checkLogin() ) return false;
-		if (ADMIN_USER == $u->username() ||
-		    $this->owner == $u->username() ) return true;
-		return false;
-	}
-
-#---------------------------------------------------------------------------
-# Section: BlogEntry and Article Interface
-
-	# Method: previewEntry
-	# Set template variables with data for an entry preview page.
-	#
-	# Parameters:
-	# tpl - A template to populate.
-	#
-	# Returns:
-	# True if there is HTTP POST data to use for the preview,
-	# false if there is no POST data.
-
-	function previewEntry(&$tpl) {
-		$u = NewUser();
-		$this->last_blogentry = NewBlogEntry();
-		# Set the username for the preview.
-		if (!$this->last_blogentry->isEntry()) 
-			$this->last_blogentry->uid = $u->username();
-		if ( has_post() ) $this->last_blogentry->getPostData();
-		else return false;
-		$this->raiseEvent("OnEntryPreview");
-		$tpl->set("PREVIEW_DATA", $this->last_blogentry->get() );
-		$tpl->set("SUBJECT", htmlentities($this->last_blogentry->subject));
-		$tpl->set("TAGS", htmlentities($this->last_blogentry->tags));
-		$tpl->set("DATA", htmlentities($this->last_blogentry->data));
-		$tpl->set("HAS_HTML", $this->last_blogentry->has_html);
-		$tpl->set("COMMENTS", $this->last_blogentry->allow_comment);
-		return true;
-	}
-
-	# Method: previewArticle
-	# Like <previewEntry>, except for articles.
-
-	function previewArticle(&$tpl) {
-		$u = NewUser();
-		$this->last_article = NewArticle();
-		# Set the username for the preview.
-		if (!$this->last_article->isEntry()) 
-			$this->last_article->uid = $u->username();
-		if ( has_post() ) $this->last_article->getPostData();
-		else return false;
-		$this->raiseEvent("OnArticlePreview");
-		$tpl->set("PREVIEW_DATA", $this->last_article->get() );
-		$tpl->set("SUBJECT", htmlentities($this->last_article->subject));
-		$tpl->set("TAGS", htmlentities($this->last_blogentry->tags));
-		$tpl->set("DATA", htmlentities($this->last_article->data));
-		$tpl->set("HAS_HTML", $this->last_article->has_html);
-		$tpl->set("COMMENTS", $this->last_article->allow_comment);
-		return true;
-	}
-
-	function errorEntry($error, &$tpl) {
-		$this->last_blogentry = NewBlogEntry();
-		if ( has_post() ) $this->last_blogentry->getPostData();
-		else return false;
-		$this->raiseEvent("OnEntryError");
-		$tpl->set("SUBJECT", $this->last_blogentry->subject);
-		$tpl->set("DATA", $this->last_blogentry->data);
-		$tpl->set("HAS_HTML", $this->last_blogentry->has_html);
-		$tpl->set("COMMENTS", $this->last_blogentry->allow_comment);
-		switch ($error) {
-			case UPDATE_SUCCESS:
-				break;
-			case UPDATE_NO_DATA_ERROR:
-				$tpl->set("HAS_UPDATE_ERROR");
-				$tpl->set("UPDATE_ERROR_MESSAGE", _("No data entered."));
-				break;
-			case UPDATE_ENTRY_ERROR:
-				$tpl->set("HAS_UPDATE_ERROR");
-				$tpl->set("UPDATE_ERROR_MESSAGE", _("Error updating blog entry."));
-				break;
-			case UPDATE_RSS1_ERROR:
-				$tpl->set("HAS_UPDATE_ERROR");
-				$tpl->set("UPDATE_ERROR_MESSAGE", _("Error updating RSS1 feed."));
-				break;
-			case UPDATE_RSS2_ERROR:
-				$tpl->set("HAS_UPDATE_ERROR");
-				$tpl->set("UPDATE_ERROR_MESSAGE", _("Error updating RSS2 feed."));
-				break;
-			case UPDATE_AUTH_ERROR:
-				$tpl->set("HAS_UPDATE_ERROR");
-				$tpl->set("UPDATE_ERROR_MESSAGE", _("Security error: you can't perform this operation."));
-				break;
-		}
-		return true;
-
-	}
-
-	function errorArticle($error, &$tpl) {
-		$this->last_article = NewArticle();
-		if ( has_post() ) $this->last_article->getPostData();
-		else return false;
-		$this->raiseEvent("OnArticleError");
-		$tpl->set("SUBJECT", $this->last_article->subject);
-		$tpl->set("DATA", $this->last_article->data);
-		$tpl->set("HAS_HTML", $this->last_article->has_html);
-		$tpl->set("COMMENTS", $this->last_article->allow_comment);
-		switch ($error) {
-			case UPDATE_SUCCESS:
-				break;
-			case UPDATE_NO_DATA_ERROR:
-				$tpl->set("HAS_UPDATE_ERROR");
-				$tpl->set("UPDATE_ERROR_MESSAGE", _("No data entered."));
-				break;
-			case UPDATE_ENTRY_ERROR:
-				$tpl->set("HAS_UPDATE_ERROR");
-				$tpl->set("UPDATE_ERROR_MESSAGE", _("Error updating blog entry."));
-				break;
-			case UPDATE_AUTH_ERROR:
-				$tpl->set("HAS_UPDATE_ERROR");
-				$tpl->set("UPDATE_ERROR_MESSAGE", _("Security error: you can't perform this operation."));
-				break;
-		}
-		return true;
-
-	}
-
-	function newEntry() {
-		$ent = NewBlogEntry();
-		$this->last_blogentry =& $ent;
-		$ent->getPostData();
-		if ($ent->data == '') return UPDATE_NO_DATA_ERROR;
-		if (! $this->canAddEntry() ) return UPDATE_AUTH_ERROR;
-		$ret = $ent->insert();
-		if ($ret !== false) {
-			$ret = UPDATE_SUCCESS;
-			$this->updateTagList($ent->tags());
-		}
-		else $ret = UPDATE_ENTRY_ERROR;
-		return $ret;
-	}
-
-	function updateEntry($path=false) {
-		$ent = NewBlogEntry($path);
-		$this->last_blogentry =& $ent;
-		$ent->getPostData();
-		if ($ent->data == '') return UPDATE_NO_DATA_ERROR;
-		if (! $this->canModifyEntry($ent) ) return UPDATE_AUTH_ERROR;
-		$ret = $ent->update();
-		if ($ret !== false) {
-			$ret = UPDATE_SUCCESS;
-			$this->updateTagList($ent->tags());
-		}
-		else $ret = UPDATE_ENTRY_ERROR;
-		return $ret;
-	}
-
-	function deleteEntry($path=false) {
-		$ent = NewBlogEntry($path);
-		$this->last_blogentry =& $ent;
-		if (! $this->canModifyEntry($ent) ) return UPDATE_AUTH_ERROR;
-		$ret = $ent->delete();
-		if ($ret !== false) $ret == UPDATE_SUCCESS;
-		else $ret = UPDATE_ENTRY_ERROR;
-		return $ret;
-
-	}
-
-	function newArticle($path=false) {
-		$ent = NewArticle();
-		$this->last_article =& $ent;
-		$ent->getPostData();
-		if ($ent->data == '') return UPDATE_NO_DATA_ERROR;
-		if (! $this->canAddArticle() ) return UPDATE_AUTH_ERROR;
-		# Set the branch and base path where the article will live.
-		$base = false;
-		$branch = false;
-		if ($path) {
-			if (strstr($path, "/")) {
-				$base = dirname($path);
-				$branch = basename($path);
-			} else {
-				$branch = $path;
-			}
-		}
-		$ret = $ent->insert($branch, $base);
-		if ($ret) {
-			$ent->setSticky();
-			$ret = UPDATE_SUCCESS;
-			$this->updateTagList($ent->tags());
-		} else $ret = UPDATE_ENTRY_ERROR;
-		return $ret;
-	}
-
-	function updateArticle($path=false) {
-		$ent = NewArticle($path);
-		$this->last_article =& $ent;
-		$ent->getPostData();
-		if ($ent->data == '') return UPDATE_NO_DATA_ERROR;
-		if (! $this->canModifyArticle($ent) ) return UPDATE_AUTH_ERROR;
-		$ret = $ent->update();
-		if (! $ret) $ret = UPDATE_ENTRY_ERROR;
-		else {
-			$ret = UPDATE_SUCCESS;
-			$this->updateTagList($ent->tags());
-		}
-		return $ret;
-	}
-
-	function deleteArticle($path=false) {
-		$ent = NewArticle($path);
-		$this->last_article =& $ent;
-		if (! $this->canModifyEntry($ent) ) return UPDATE_AUTH_ERROR;
-		$ret = $ent->delete();
-		if (! $ret) $ret = UPDATE_ENTRY_ERROR;
-		else $ret = UPDATE_SUCCESS;
-		return $ret;
-
-	}
-	
-	function entryDelete($path=false) {
-		$ent = NewBlogEntry($path);
-		$this->last_blogentry =& $ent;
-		if (! $this->canModifyEntry($ent) ) return UPDATE_AUTH_ERROR;
-		$ret = $ent->delete();
-		if ($ret !== false) $ret == UPDATE_SUCCESS;
-		else $ret = UPDATE_ENTRY_ERROR;
-		return $ret;
-	}
 }
 ?>

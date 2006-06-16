@@ -28,8 +28,9 @@ require_once("lib/creators.php");
 
 session_start();
 
+global $PAGE;
+$PAGE->setDisplayObject($blog);
 $blog = NewBlog();
-$page = NewPage(&$blog);
 
 if ($blog->isBlog()) {
 	$page_name = spf_("%s - Login", $blog->name);
@@ -66,17 +67,17 @@ if ( POST($user_name) && POST($password) ) {
 		}
 	}
 	# Throw up an error if a regular user tries to log in as administrator.
-	if ( $admin_login && (POST($user_name) != ADMIN_USER) ) {
+	if ( $admin_login && ! $usr->isAdministrator() ) {
 		$tpl->set("FORM_MESSAGE", _("Only the administrator account can log into the administrative pages."));
 	} else {
-		if ($ret) $page->redirect($redir_url);
+		if ($ret) $PAGE->redirect($redir_url);
 		else $tpl->set("FORM_MESSAGE", _("Error logging in.  Please check your username and password."));
 	}
 }
 
 $body = $tpl->process();
-$page->title = $page_name;
-$page->addStylesheet("form.css");
-$page->display($body, $blog);
+$PAGE->title = $page_name;
+$PAGE->addStylesheet("form.css");
+$PAGE->display($body, $blog);
 
 ?>

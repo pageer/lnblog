@@ -25,7 +25,7 @@ class News extends Plugin {
 		if (! $blg->isBlog() ) return false;
 		
 		$blog_feeds = BLOG_ROOT.PATH_DELIM.BLOG_FEED_PATH.PATH_DELIM;
-		$blog_feeds_url = $blg->getURL().BLOG_FEED_PATH."/";
+		$blog_feeds_url = $blg->uri('base').BLOG_FEED_PATH."/";
 		
 		if (file_exists($blog_feeds.$rss1_file) ||
 		    file_exists($blog_feeds.$rss2_file)) {

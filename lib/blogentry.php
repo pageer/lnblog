@@ -46,7 +46,6 @@ POSTRetrieved  - Fired after data has been retreived from an HTTP POST.
 
 class BlogEntry extends Entry {
 	
-	var $blogid;
 	var $allow_comment = true;
 	var $allow_tb = true;
 	var $has_html;
@@ -58,7 +57,7 @@ class BlogEntry extends Entry {
 		
 		$this->raiseEvent("OnInit");
 	
-		$this->uid = ADMIN_USER;
+		$this->uid = '';
 		$this->ip = get_ip();
 		$this->date = "";
 		$this->post_date = false;
@@ -85,12 +84,14 @@ class BlogEntry extends Entry {
 		
 		# Auto-detect the current entry.  If no path is given, 
 		# then assume the current directory.
-		if ($path) {
+		if ($path && file_exists($path)) {
 		
 			$this->file = $path.PATH_DELIM.$revision;
 			
-		} elseif (GET("entry")) {
+		} elseif (GET("entry") || $path) {
 
+			$entrypath = trim($path ? $path : GET("entry"));
+			
 			# Get the blog path from the query string.
 			if (defined("BLOG_ROOT")) {
 				$blogpath = BLOG_ROOT;
@@ -102,8 +103,8 @@ class BlogEntry extends Entry {
 
 			# Get the path from the entry field.  If the entry string is 
 			# malformed, then just empty it.
-			if ( preg_match('/^\d{4}\/\d{2}\/\d{2}_\d{4}\d?\d?$/', trim(GET("entry"))) )
-				$entrypath = preg_replace("/\//", PATH_DELIM, trim(GET("entry")) );
+			if ( preg_match('/^\d{4}\/\d{2}\/\d{2}_\d{4}\d?\d?$/', $entrypath) )
+				$entrypath = str_replace("/", PATH_DELIM, $entrypath );
 			else $entrypath = "";
 
 			$this->file = mkpath($blogpath,BLOG_ENTRY_PATH,$entrypath,$revision);
@@ -136,10 +137,18 @@ class BlogEntry extends Entry {
 	*/
 	
 	function getParent() {
-		if (! defined("BLOG_ROOT")) {
-			
-		}
-		return NewBlog();
+		if (file_exists($this->file)) {
+			$dir = $this->file;
+			# If this is an article, the blog is 3 levels up.
+			for ($i=0; $i<3; $i++) $dir = dirname($dir);
+			$ret = NewBlog($dir);
+			if (!$ret->isBlog()) {
+				# If the entry is a BlogEntry, then the parent will be 2 more levels up
+				for ($i=0; $i<2; $i++) $dir = dirname($dir);
+				$ret = NewBlog($dir);
+			}
+		} else $ret = NewBlog();
+		return $ret;
 	}
 
 	# Method: entryID
@@ -273,12 +282,18 @@ class BlogEntry extends Entry {
 			case "permalink":
 			case "entry":
 			case "page": 
-				$pretty_file = preg_replace("/\W/", "_", trim($this->subject)).".php";
-				if ( file_exists(dirname($this->localpath()).
-				                         PATH_DELIM.$pretty_file) ) {
-					return localpath_to_uri(dirname($this->localpath())).$pretty_file;
+				$pretty_file = $this->calcPrettyPermalink();
+				$pretty_file = dirname($this->localpath()).PATH_DELIM.$pretty_file;
+				if ( file_exists($pretty_file) ) {
+					return localpath_to_uri($pretty_file);
 				} else {
-					return $dir_uri;
+					$pretty_file = $this->calcPrettyPermalink(true);
+					$pretty_file = dirname($this->localpath()).PATH_DELIM.$pretty_file;
+					if ( file_exists($pretty_file) ) {
+						return localpath_to_uri($pretty_file);
+					} else {
+						return $dir_uri;
+					}
 				}
 			case "send_tb":     return $dir_uri."trackback.php?send_ping=yes";
 			case "get_tb":      return $dir_uri."trackback.php";
@@ -289,8 +304,9 @@ class BlogEntry extends Entry {
 				if (KEEP_EDIT_HISTORY) {
 					return $dir_uri."delete.php";
 				} else {
-					return INSTALL_ROOT_URL."pages/delentry.php?".
-						"blog=".$this->parentID()."&amp;entry=".$this->entryID();
+					return make_uri(INSTALL_ROOT_URL."pages/delentry.php", 
+					                array("blog"=>$this->parentID(), 
+					                      "entry"=>$this->entryID()));
 				}
 			case "comment":     return $dir_uri.ENTRY_COMMENT_DIR."/";
 			case "commentpage": return $dir_uri.ENTRY_COMMENT_DIR."/index.php";
@@ -352,12 +368,12 @@ class BlogEntry extends Entry {
 		} else {
 		
 			if (! KEEP_EDIT_HISTORY) $fs->delete($target);
-			$subfile = preg_replace("/\W*/", "_", trim($this->subject));
-			$subfile = dirname(dirname($this->file)).PATH_DELIM.$subfile.".php";
-			if (! file_exists($subfile)) 
-				write_file($subfile, 
-					"<?php chdir('".basename($dir_path).
-					"'); include('config.php'); include('index.php'); ?>");
+			
+			$subfile = $this->calcPrettyPermalink();
+			if ($subfile) {
+				$subfile = dirname(dirname($this->file)).PATH_DELIM.$subfile;
+				if (! file_exists($subfile)) $this->makePrettyPermalink();
+			}
 		}
 		$fs->destruct();
 		$this->raiseEvent("UpdateComplete");
@@ -380,9 +396,13 @@ class BlogEntry extends Entry {
 		
 		$this->raiseEvent("OnDelete");
 		
-		$subfile = preg_replace("/\W+/", "_", trim($this->subject));
-		$subfile = dirname($dir_path).PATH_DELIM.$subfile.".php";
-		if (file_exists($subfile)) $fs->delete($subfile);
+		$subfile = $this->calcPrettyPermalink();
+		if (file_exists($subfile)) {
+			$fs->delete($subfile);
+		} else {
+			$subfile = $this->calcPrettyPermalink(true);
+			if (file_exists($subfile)) $fs->delete($subfile);
+		}
 		
 		if (KEEP_EDIT_HISTORY) {
 			$source_file = $dir_path.PATH_DELIM.ENTRY_DEFAULT_FILE;
@@ -402,20 +422,25 @@ class BlogEntry extends Entry {
 	/*
 	Method: insert
 	Save the object to persistent storage.
+	
+	Parameters:
+	blog - The blog into which the entry will be inserted.
 
 	Returns:
 	True on success, false on failure.
 	*/
-	function insert ($base_path=false) {
+	function insert (&$blog) {
 	
-		$usr = NewUser();
-		if (! $usr->checkLogin() ) return false;
-		$this->uid = $usr->username();
+		if (! $this->uid) {
+			$usr = NewUser();
+			$this->uid = $usr->username();
+		}
 	
 		$curr_ts = time();
-		if (!$base_path) $basepath = getcwd().PATH_DELIM.BLOG_ENTRY_PATH;
-		else $basepath = $base_path;
+		
+		$basepath = $blog->home_path.PATH_DELIM.BLOG_ENTRY_PATH;
 		$dir_path = $basepath.PATH_DELIM.$this->getPath($curr_ts);
+		
 		# If the entry driectory already exists, something is wrong. 
 		if ( is_dir($dir_path) ) 
 			$dir_path = $basepath.PATH_DELIM.$this->getPath($curr_ts, false, true);
@@ -448,13 +473,55 @@ class BlogEntry extends Entry {
 		$ret = $this->writeFileData();
 		# Add a wrapper file to make the link prettier.
 		if ($ret) {
-			$subfile = preg_replace("/\W/", "_", trim($this->subject));
-			$subfile = $month_path.PATH_DELIM.$subfile.".php";
-			write_file($subfile, "<?php chdir('".basename($dir_path)."'); include('config.php'); include('index.php'); ?>");
+			$this->makePrettyPermalink();
 		}
 		$this->raiseEvent("InsertComplete");
+
 		return $ret;
 		
+	}
+	
+	/*
+	Method: calcPrettyPermalink
+	Calculates a file name for a "pretty" permalink wrapper script.
+	
+	Parameters:
+	use_broken_regex - *Optional* parameter to calculate the URI based on the
+	                   ugly regex used in LnBlog < 0.7.  *Defaults* to false.
+	
+	Returns:
+	The string to be used for the file name.
+	*/
+	function calcPrettyPermalink($use_broken_regex=false) {
+		$ret = trim($this->subject);
+		if (!$use_broken_regex) {
+			$ret = str_replace(array("'", '"'), "_", $ret);
+			$ret = preg_replace("/[\W_]+/", "_", $ret);
+		} else {
+			$ret = preg_replace("/\W/", "_", $ret);
+		}
+		if ($ret) $ret .= ".php";
+		return $ret;
+	}
+	
+	/*
+	Method: makePrettyPermalink
+	Creates a wrapper script that makes a "pretty" permalink to the entry
+	directory based on the subject text of the entry.
+	
+	Returns:
+	True on success, false on failure.
+	*/
+	function makePrettyPermalink() {
+		$subfile = $this->calcPrettyPermalink();
+		if ($subfile) {
+			# Put the wrapper in the parent of the entry directory.
+			$path = dirname(dirname($this->file));
+			$dir_path = basename(dirname($this->file));
+			$path .= PATH_DELIM.$subfile;
+			$ret = write_file($path, "<?php chdir('".$dir_path."'); include('config.php'); include('index.php'); ?>");
+		} else $ret = false;
+		return $ret;
 	}
 
 	/*
@@ -474,6 +541,7 @@ class BlogEntry extends Entry {
 					 <MARKUP_BBCODE>, and <MARKUP_HTML>.
 	*/
 	function getPostData() {
+		if (! has_post()) return false;
 		$this->subject = POST("subject");
 		$this->abstract = POST("abstract");
 		$this->tags = POST("tags");
@@ -491,6 +559,10 @@ class BlogEntry extends Entry {
 			foreach ($this->custom_fields as $fld=>$desc) {
 				$this->$fld = stripslashes($this->$fld);
 			}
+		}
+		if (! $this->uid) {
+			$u = NewUser();
+			$this->uid = $u->username();
 		}
 		$this->raiseEvent("POSTRetreived");
 	}
@@ -512,14 +584,17 @@ class BlogEntry extends Entry {
 		$ret = ob_get_contents();
 		ob_end_clean();
 	
-		$tmp = NewTemplate(ENTRY_TEMPLATE);
-		$blog = NewBlog();
+		$tmp = NewTemplate($this->template_file);
+		$blog = $this->getParent();
 		$usr = NewUser($this->uid);
 		$usr->exportVars($tmp);
 		
 		$tmp->set("SUBJECT", $this->subject);
+		$tmp->set("TITLE", $this->subject);  # For article compatibility.
 		$tmp->set("POSTDATE", $this->prettyDate($this->post_ts) );
+		$tmp->set("POST_TIMESTAMP", $this->post_ts);
 		$tmp->set("EDITDATE", $this->prettyDate() );
+		$tmp->set("EDIT_TIMESTAMP", $this->timestamp);
 		$tmp->set("ABSTRACT", $this->abstract);
 		$tmp->set("TAGS", $this->tags());
 		$tmp->set("BODY", $this->markup() );
@@ -531,15 +606,12 @@ class BlogEntry extends Entry {
 		$tmp->set("UPLOAD_LINK", $this->uri("upload"));
 		$tmp->set("EDIT_LINK", $this->uri("edit"));
 		$tmp->set("DELETE_LINK", $this->uri("delete"));
-		$tmp->set("TAG_LINK", BLOG_ROOT_URL."tags.php");
+		$tmp->set("TAG_LINK", $blog->uri('tags'));
 		$tmp->set("COMMENTCOUNT", $this->getCommentCount() );
 		$tmp->set("COMMENT_LINK", $this->uri("comment"));
 		$tmp->set("TRACKBACKCOUNT", $this->getTrackbackCount() );
 		$tmp->set("SHOW_TRACKBACK_LINK", $this->uri("trackback"));
 		$tmp->set("SHOW_CONTROLS", $show_edit_controls);
-		$tmp->set("PROFILE_LINK", INSTALL_ROOT_URL."userinfo.php?user=".
-		                          $usr->username().
-		                          "&amp;blog=".$blog->blogid);
 
 		foreach ($this->custom_fields as $fld=>$desc) {
 			$tmp->set(strtoupper($fld), isset($this->$fld) ? $this->$fld : '');
@@ -555,43 +627,6 @@ class BlogEntry extends Entry {
 	}
 
 	# Comment handling functions.
-
-	/*
-	Method: addComment
-	Insert a new comment based on HTTP POST data.
-
-	Parameters:
-	path - *Optional* path to the comments for this object.  By default,
-	       this will be auto-detected.
-	
-	Returns:
-	True on success, false on failure.
-	*/
-	function addComment($path=false) {
-		if (! $this->allow_comment) return false;
-		if (! $path) $path = $this->localpath().PATH_DELIM.ENTRY_COMMENT_DIR;
-		$cmt = NewBlogComment();
-		$cmt->getPostData();
-		if ($cmt->data) {
-			$ret = $cmt->insert($path);
-		} else $ret = false;
-		
-		# Set the "remember me" cookies.  This is probably the best place
-		# to do it, since this is where we're actually processing the post.
-		# Cookies expire after 30 days.
-		if (POST("remember")) {
-			$blog = NewBlog();
-			$path = localpath_to_uri($blog->home_path, false);
-			if (POST("username"))
-				setcookie("username", POST("username"), time()+2592000, $path);
-			if (POST("e-mail"))
-				setcookie("e-mail", POST("e-mail"), time()+2592000, $path);
-			if (POST("url"))
-				setcookie("url", POST("url"), time()+2592000, $path);
-		}
-		
-		return $ret;
-	}
 
 	/*
 	Method: getCommentCount
@@ -779,43 +814,6 @@ class BlogEntry extends Entry {
 		}
 		
 		return $ret;
-	}
-
-	/*
-	Method: getPing
-	Recieves HTTP POST data containing a TrackBack ping and saves it in 
-	persistent storage.
-
-	Returns:
-	Zero on success, one on failure.
-	*/
-	function getPing() {
-		if (! $this->allow_tb) return 1;
-		$tb = NewTrackback();
-		$ret = $tb->receive(dirname($this->file).PATH_DELIM.ENTRY_TRACKBACK_DIR);
-		return $ret;
-	}
-
-	/*
-	Method: sendPing
-	Send a TrackBack ping for the current entry to another blog.
-
-	Parameters:
-	url     - The TrackBack ping to which to post data.
-	excerpt - *Optional* excerpt of the blog entry text to send. 
-	          No excerpt is sent by default.
-
-	Returns:
-	The return code sent by the remote server.  Normally this is 0 on success
-	and a non-zero value on failure.
-	*/
-	function sendPing($url, $excerpt='') {
-		$tb = NewTrackback();
-		$tb->title = $this->subject;
-		$tb->blog = BLOG_ROOT_URL;
-		$tb->url = $this->permalink();
-		$tb->data = $excerpt;
-		return $tb->send($url);
 	}
 
 }

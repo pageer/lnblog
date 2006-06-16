@@ -26,8 +26,8 @@ class Recent extends Plugin {
 		# Show some of the more recent entries.  If we're on the "front page"
 		# of the blog, then show the next set of entries.  Otherwise, show the 
 		# most recent entries.
-		$is_index = ( current_url() == BLOG_ROOT_URL || 
-		              current_url() == BLOG_ROOT_URL."index.php");
+		$is_index = ( current_url() == $blg->uri('blog') || 
+		              current_url() == $blg->uri('blog')."index.php");
 
 		if ($is_index) {
 			$next_list = $blg->getNextMax($this->num_entries);

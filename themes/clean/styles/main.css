@@ -1,0 +1,46 @@
+/* 
+Main style sheet.  This controls the basic page look, including the page header, 
+menu bar, and sidebar.  It does not include the blog entries, comments, forums, etc.
+*/
+
+html, body { height: 100%; }
+
+/* Styles for the page content area. */
+
+#pagecontent {
+	margin: 1% 1% 1% 1%;
+	width: 65%;
+	float: left;
+}
+
+a:link {
+	color: blue;
+}
+
+a:visited {
+	color: #8B008B;
+}
+
+a:hover {
+	color: red;
+}
+
+input[type='checkbox']:focus,
+input[type='text']:focus,
+input[type='radio']:focus,
+textarea:focus {
+	background-color: #ffffe1;
+}
+
+q { font-style: italic; }
+
+@media print {
+
+	/* Styles for the page content area. */
+
+	#pagecontent {
+		margin: 1% 1% 1% 1%;
+		width: 100%;
+	}
+
+}

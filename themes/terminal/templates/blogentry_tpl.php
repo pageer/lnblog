@@ -21,7 +21,7 @@
 </ul>
 <?php if ($SHOW_CONTROLS) { ?>
 <ul class="postadmin">
-	<li><a onclick="javascript:window.open('<?php echo $PING_LINK; ?>'); return false;" href="<?php echo $PING_LINK; ?>">Send TrackBack Ping</a></li>
+	<li><a href="<?php echo $PING_LINK; ?>">Send TrackBack Ping</a></li>
 	<li><a href="<?php echo $UPLOAD_LINK; ?>">Upload file</a></li>
 	<li><a href="<?php echo $EDIT_LINK; ?>">Edit</a></li>
 	<li><a href="<?php echo $DELETE_LINK; ?>">Delete</a></li>

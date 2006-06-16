@@ -10,18 +10,19 @@ class PrivateBlog extends Plugin {
 	}
 
 	function check_allow(&$param) {
+		global $SYSTEM;
 		$blog = NewBlog();
 		$usr = NewUser();
 		if (! $blog->isBlog() || 
-		    $blog->canModifyBlog() ||
+		    $SYSTEM->canModify($blog, $usr) ||
 			! $this->userlist ||
 			current_file() == "login.php") return false;
-		if (! $usr->checkLogin()) $param->redirect(BLOG_ROOT_URL."login.php");
+		if (! $usr->checkLogin()) $param->redirect($blog->uri('login'));
 		$users = explode(",",$this->userlist);
 		foreach ($users as $item) {
 			if ($usr->username() == trim($item)) return true;
 		}
-		$param->redirect(BLOG_ROOT_URL."login.php");
+		$param->redirect($blog->uri('login'));
 	}
 }
 

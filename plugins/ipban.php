@@ -37,9 +37,10 @@ class IPBan extends Plugin {
 	# Write the ban list to disk.
 
 	function updateList($add_list, $do_global=false) {
+		global $SYSTEM;
 		$blog = NewBlog();
 		$usr = NewUser();
-		if ( $blog->isBlog() && $blog->canModifyBlog() && !$do_global) {
+		if ( $blog->isBlog() && $SYSTEM->canModify($blog, $usr) && !$do_global) {
 			$file = $blog->home_path.PATH_DELIM.$this->ban_list;
 		} elseif ( $usr->checkLogin() && $usr->isAdministrator() ) {
 			$file = USER_DATA_PATH.PATH_DELIM.$this->ban_list;
@@ -60,17 +61,19 @@ class IPBan extends Plugin {
 	}
 
 	function addBanLink(&$cmt) {
+		global $SYSTEM;
 		$blog = NewBlog();
 		$usr = NewUser();
-		if ($blog->canModifyBlog()) {
+		if ($SYSTEM->canModify($blog, $usr) && $usr->checkLogin()) {
 			$cb_link = 
 				spf_("IP: %s", $cmt->ip);
 			$cb_link_loc =
-				' (<a href="?banip='.$cmt->ip.'" '.
+				' (<a href="'.make_uri(false, array('banip'=>$cmt->ip)).'" '.
 				'onclick="return window.confirm(\''.
 				spf_("Ban IP address %s will from submitting comments or trackbacks to this blog?", $cmt->ip).
 				'\');">'._("Ban IP").'</a>) ';
-			$cb_link_glob = ' (<a href="?banip='.$cmt->ip.
+			$cb_link_glob = ' (<a href="'.
+				make_uri(false,array('banip'=>$cmt->ip, 'global'=>'yes')).
 				'&amp;global=yes" '.
 				'onclick="return window.confirm(\''.
 				spf_("Ban IP address %s will from submitting comments or trackbacks to this entire site?", $cmt->ip).
@@ -93,10 +96,11 @@ class IPBan extends Plugin {
 	# Ban an IP based on a query string.
 
 	function banIP(&$param) {
+		global $SYSTEM;
 		if (isset($_GET["banip"])) {
 			$blog = NewBlog();
-			#$this->cacheList();
-			if ($blog->canModifyBlog()) {
+			$usr = NewUser();
+			if ($SYSTEM->canModify($blog, $usr) && $usr->checkLogin()) {
 				$ip = trim($_GET["banip"]);
 				$global = isset($_GET["global"]);
 				$this->updateList(array($ip), $global);
@@ -153,12 +157,13 @@ class IPBan extends Plugin {
 		$usr = NewUser();
 		$banfile = $PLUGIN_MANAGER->plugin_config->value("ipban", 
 		                                 "ban_list", "ip_ban.txt");
-		echo '<li><a href="'.INSTALL_ROOT_URL.'editfile.php?blog='.
-			$blg->blogid.'&amp;file='.$banfile.'">'._("Blog IP blacklist").
-			'</a></li>';
+		echo '<li><a href="'.$blg->uri('editfile', $banfile).'">'.
+			_("Blog IP blacklist").'</a></li>';
 		if ($usr->isAdministrator()) {
-			echo '<li><a href="'.INSTALL_ROOT_URL.'editfile.php?file=userdata/'.
-				$banfile.'">'._("Global IP blacklist").'</a></li>';
+			echo '<li><a href="'.
+				make_uri(INSTALL_ROOT_URL.'editfile.php',
+				         array('file'=>'userdata/'.$banfile)).
+				'">'._("Global IP blacklist").'</a></li>';
 		}
 	}
 

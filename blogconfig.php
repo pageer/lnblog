@@ -43,9 +43,9 @@ function get_blog_path() {
 	if ( defined("BLOG_ROOT") ) {
 		return BLOG_ROOT;
 	} elseif (isset($_GET['blog'])) {
-		$path = $_GET["blog"];
+		$path = $_GET['blog'];
 		if (PATH_DELIM != "/") {
-			$path = preg_replace("/\//", PATH_DELIM, $path);
+			$path = str_replace("/", PATH_DELIM, $path);
 		}
 		$path = preg_replace("/[^\w|"."\\".PATH_DELIM."]/", "", $path);
 		return DOCUMENT_ROOT.PATH_DELIM.$path;
@@ -66,7 +66,7 @@ define("FS_PLUGIN_CONFIG", "fsconfig.php");
 # pathconfig.php, then we need to take care of that.  We'll try to get the
 # blog's pathconfig.php file, and failing that, we'll just use the cwd.
 if (! defined("INSTALL_ROOT")) {
-	
+
 	if ( get_blog_path() ) {
 		$temp = ini_get('include_path');
 		ini_set('include_path', get_blog_path());
@@ -77,6 +77,10 @@ if (! defined("INSTALL_ROOT")) {
 	if (! defined("INSTALL_ROOT")) define("INSTALL_ROOT", getcwd());
 
 }
+/*if (! defined("BLOG_ROOT") && 
+      file_exists(get_blog_path().PATH_DELIM."pathconfig.php")) {
+	require_once("pathconfig.php");
+}*/
 
 # Set the path for system-wide user data files.
 define("USER_DATA_PATH", INSTALL_ROOT.PATH_DELIM.USER_DATA);
@@ -106,6 +110,21 @@ if (file_exists(mkpath(INSTALL_ROOT,USER_DATA,"userconfig.cfg"))) {
 		}
 	}
 }
+
+# Put this definition after we initialize userconfig.cfg, so that it can be
+# changed.
+
+# Constant: URI_TYPE
+# Tells the system what kind of URIs to generate.
+# The available values are as follows.
+# directory   - Convert local directory paths directly into URIs using the old
+#               wrapper script method.
+# querystring - Use ugly old query string URIs.
+# htaccess    - Use query strings made pretty with Apache rewrite rules.
+#               Note that this only works on Apache servers with support for
+#               mod_rewrite and .htaccess files.
+# The *default* mode is "directory".
+@define("URI_TYPE", "directory");
 
 ##############################################
 # Section Internationalization
@@ -154,7 +173,7 @@ define("PACKAGE_NAME", "LnBlog");
 # Constant: PACKAGE_VERSION
 # The version number of the software.  This is a string in the format 
 # "1.2.3".  Note that each number may be more than one digit.
-define("PACKAGE_VERSION", "0.6.5");
+define("PACKAGE_VERSION", "0.7.0");
 
 # Constant: PACKAGE_URL
 # The full URL of the LnBlog project home page.
@@ -242,11 +261,11 @@ define("HTML_3_2", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">");
 #
 # There are two defaults for this setting.  If the *default_charset*
 # INI variable is set, then that value is used.  If it is not set, then
-# the default is to use "ISO-8859-1", also known as Latin-1.
+# the default is to use "utf-8", which is an ASCII-compatible Unicode encoding.
 if (ini_get("default_charset")) {
 	@define("DEFAULT_CHARSET", ini_get("default_charset"));
 } elseif (! defined("DEFAULT_CHARSET")) {
-	define("DEFAULT_CHARSET", "ISO-8859-1");
+	define("DEFAULT_CHARSET", "utf-8");
 }
 
 # Constant: DEFAULT_MIME_TYPE
@@ -342,16 +361,6 @@ The corresponding replacement expression to <URI_TO_LOCALPATH_MATCH_RE>.
 # 
 # *Default* is "sitemap.htm".
 @define("SITEMAP_FILE", "sitemap.htm");
-
-# Constant: DOCROOT_NAMES
-# The list of directory names that can be the document root.  The 
-# find_document_root() function searches up the tree from its starting
-# directory and terminates when it finds something in the list.
-# If you define a DOCUMENT_ROOT when configuring file writing, then 
-# find_document_root() uses that and this constant is ignored.
-# 
-# *Default* is "wwwroot,inetpub,htdocs,htsdocs,httpdocs,httpsdocs,webroot,www,html"
-@define("DOCROOT_NAMES", "wwwroot,inetpub,htdocs,htsdocs,httpdocs,httpsdocs,webroot,www,html");
 
 # Constant: LBCODE_HEADER_WEIGHT
 # Defines the level of header used for the [h] LBCode tag.
@@ -517,7 +526,7 @@ The corresponding replacement expression to <URI_TO_LOCALPATH_MATCH_RE>.
 # *Default* is "comments".
 @define("ENTRY_COMMENT_DIR", "comments");
 
-# Constant: ENTRY_COMMENT_DIR
+# Constant: ENTRY_TRACKBACK_DIR
 # Directory name to access trackbacks on entries and articles.
 #
 # *Default* is "trackback".
@@ -603,14 +612,19 @@ The corresponding replacement expression to <URI_TO_LOCALPATH_MATCH_RE>.
 @define("COMMENT_DELETED_PATH", "deleted");
 
 # Constant: COMMENT_EMAIL_VIEW_PUBLIC
-# Control if e-mail addresses in comments are visible to everybody.  
+# Controls the default setting for whether e-mail addresses in comments are
+# visible to everybody.  
 #
 # The *default* is false, which means only logged-in users can 
-# see e-mail addresses. 
+# see e-mail addresses specified as non-public.
 @define("COMMENT_EMAIL_VIEW_PUBLIC", false);
 
 #----------------------------------------------------------------------------
 # This section should not normally need to be changed.
+
+if (! defined("BLOG_ROOT") && get_blog_path() ) {
+	define("BLOG_ROOT", get_blog_path());
+}
 
 # Get the theme for the blog.  I'd like to do this in the Blog class, but 
 # we need to set the constant even when we don't have a current blog, so 
@@ -639,34 +653,54 @@ if (isset($cfg_file) && is_file($cfg_file)) {
 }
 
 # Set constants to make themes work.  Most of these are defaults for when 
-# there is not current blog set up.
+# there is no current blog set up.
 @define("THEME_NAME", "default");
 if (! defined("INSTALL_ROOT_URL")) {
 	require_once("lib/utils.php");
-	define("INSTALL_ROOT_URL", localpath_to_uri(INSTALL_ROOT));
+	define("INSTALL_ROOT_URL", localpath_to_uri(INSTALL_ROOT, false));
 }
 
-define("THEME_TEMPLATES", mkpath("themes",THEME_NAME,"templates"));
-define("DEFAULT_THEME_TEMPLATES", mkpath("themes","default","templates"));
+$theme_templates = PATH_DELIM.mkpath("themes",THEME_NAME,"templates");
 
 # Include constants for classes.
 require_once("lib/constants.php");
+
+$inc_path = ini_get('include_path');
+# Add the INSTALL_ROOT to the include path, if it's not already there.
+if (strpos($inc_path, INSTALL_ROOT) === false) {
+	$inc_path .= PATH_SEPARATOR.INSTALL_ROOT;
+}
 # Add the theme and other templates from the blog directory.  These will 
 # override the defaults if they exist.
-if (defined("BLOG_ROOT")) 
-	ini_set("include_path", ini_get("include_path").
-		PATH_SEPARATOR.BLOG_ROOT.PATH_DELIM.THEME_TEMPLATES.
-		PATH_SEPARATOR.BLOG_ROOT.PATH_DELIM."templates");
+if (defined("BLOG_ROOT")) {
+	if (is_dir(BLOG_ROOT.PATH_DELIM.$theme_templates)) {
+		$inc_path .= PATH_SEPARATOR.BLOG_ROOT.$theme_templates;
+	}
+	if (is_dir(BLOG_ROOT.PATH_DELIM."templates")) {
+		$inc_path .= PATH_SEPARATOR.BLOG_ROOT.PATH_DELIM."templates";
+	}
+}
+
 # Add the installation-wide theme and default theme to the include path.  
 # This will be the fall-back if the user theme does not exist.
-ini_set("include_path", ini_get("include_path").PATH_SEPARATOR.
-	INSTALL_ROOT.PATH_SEPARATOR.
-	(THEME_NAME != "default" ? INSTALL_ROOT.PATH_DELIM.THEME_TEMPLATES.PATH_SEPARATOR:"").
-	INSTALL_ROOT.PATH_DELIM.DEFAULT_THEME_TEMPLATES);
+if (THEME_NAME != "default") {
+	$inc_path .= PATH_SEPARATOR.INSTALL_ROOT.$theme_templates;
+}
+if (is_dir(USER_DATA_PATH.PATH_DELIM.$theme_templates)) {
+	$inc_path .= PATH_SEPARATOR.USER_DATA_PATH.$theme_templates;
+}
+# Add the default theme template to the include path.  This is for fall-back 
+# when a template doesn't exist in a theme.
+$inc_path .= PATH_SEPARATOR.mkpath(INSTALL_ROOT,"themes","default","templates");
+
+# Finally, we actuall set the include_path.
+ini_set('include_path', $inc_path);
 
 # Now that everything is initialized, we can create the global event register
-# and plugin manager.
+# and plugin manager and create a top-level page for handling output..
 require_once("lib/eventregister.php");
+require_once("lib/page.php");
+require_once('lib/system.php');
 require_once("lib/pluginmanager.php");
 
 ?>

@@ -27,8 +27,10 @@ session_start();
 require_once("blogconfig.php");
 require_once("lib/creators.php");
 
+global $PAGE;
+
 $blog = NewBlog();
-$page = NewPage(&$blog);
+$PAGE->setDisplayObject($blog);
 
 $cancel_id = "cancel";
 $ok_id = "ok";
@@ -48,14 +50,14 @@ $tpl->set("CANCEL_LABEL", _("No"));
 if (POST($ok_id)) {
 	$usr = NewUser();
 	$usr->logout();
-	$page->redirect($redir_url);
+	$PAGE->redirect($redir_url);
 } else if (POST($cancel_id)) {
-	$page->redirect($redir_url);
+	$PAGE->redirect($redir_url);
 }
 
 $body = $tpl->process();
-if ($blog->isBlog()) $page->title = sprintf(_("%s - Logout"), $blog->name);
-else                 $page->title = _("Administration - Logout");
-$page->display($body, &$blog);
+if ($blog->isBlog()) $PAGE->title = sprintf(_("%s - Logout"), $blog->name);
+else                 $PAGE->title = _("Administration - Logout");
+$PAGE->display($body, &$blog);
 
 ?>

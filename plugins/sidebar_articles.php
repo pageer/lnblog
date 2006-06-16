@@ -1,5 +1,7 @@
 <?php
 
+# Plugin: 
+
 class Articles extends Plugin {
 
 	function Articles() {
@@ -23,14 +25,17 @@ class Articles extends Plugin {
 	}
 	
 	function output($parm=false) {
+		global $SYSTEM;
 		
 		$blg = NewBlog();
+		$u = NewUser();
 		if (! $blg->isBlog()) return false;
 		
 		$art_list = $blg->getArticleList();
+		
 		if (count($art_list) > 0) { 
-			if ($this->header) { # Suppress empty header ?>
-<h3><a href="<?php echo $blg->getURL(false).BLOG_ARTICLE_PATH; ?>/"><?php echo $this->header; ?></a></h3><?php
+			if ($this->header) { /* Suppress empty header */ ?>
+<h3><a href="<?php echo $blg->uri('articles'); ?>/"><?php echo $this->header; ?></a></h3><?php
 			} ?>
 <ul>
 <?php	
@@ -44,17 +49,18 @@ class Articles extends Plugin {
 ?><li><?php echo $line;?></li><?php
 				}
 			}
-			if ($this->static_link) { # Optionally show link to article index ?>
-<li style="margin-top: 0.5em"><a href="<?php echo $blg->getURL(false).BLOG_ARTICLE_PATH; ?>/"><?php echo $this->showall_text;?></a></li><?php
+			if ($this->static_link) { /*Optionally show link to article index*/?>
+<li style="margin-top: 0.5em"><a href="<?php echo $blg->uri('articles'); ?>"><?php echo $this->showall_text;?></a></li><?php
 			} 
-			if ($blg->canModifyBlog()) {
-?><li style="margin-top: 0.5em"><a href="<?php echo INSTALL_ROOT_URL;?>editfile.php?blog=<?php echo $blg->blogid;?>&amp;list=yes&amp;file=<?php echo $this->custom_links;?>"><?php p_("Add custom links");?></a></li>
+			if ($SYSTEM->canModify($blg, $u)) {
+?><li style="margin-top: 0.5em"><a href="<?php echo $blg->uri('editfile', $this->custom_links, 'yes');?>"><?php p_("Add custom links");?></a></li>
 <?php
 			}?>
 </ul>
 <?php 	
-		} elseif ($blg->canModifyBlog()) { ?>
-<ul><li style="margin-top: 0.5em"><a href="<?php echo INSTALL_ROOT_URL;?>editfile.php?blog=<?php echo $blg->blogid;?>&amp;list=yes&amp;file=<?php echo $this->custom_links;?>"><?php p_("Add custom links");?></a></li></ul><?php
+		} elseif ($SYSTEM->canModify($blg, $u)) { ?>
+<ul><li style="margin-top: 0.5em"><a href="<?php 
+	echo $blg->uri('editfile', $this->custom_links, 'yes');?>"><?php p_("Add custom links");?></a></li></ul><?php
 		} # End if block 
 	}  # End function
 	

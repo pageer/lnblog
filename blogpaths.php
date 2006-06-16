@@ -27,6 +27,8 @@ require_once("blogconfig.php");
 require_once("lib/creators.php");
 require_once("lib/utils.php");
 
+global $PAGE;
+
 if (POST("blogpath")) $blog_path = POST("blogpath");
 elseif (GET("blogpath")) $blog_path = GET("blogpath");
 else $blog_path = false;
@@ -34,14 +36,14 @@ else $blog_path = false;
 $blog = NewBlog($blog_path);
 $usr = NewUser();
 $tpl = NewTemplate("blog_path_tpl.php");
-$page = NewPage(&$blog);
+$PAGE->setDisplayObject($blog);
 
 $inst_root = INSTALL_ROOT;
 $inst_url = INSTALL_ROOT_URL;
-$blog_url = BLOG_ROOT_URL;
+$blog_url = ''; #BLOG_ROOT_URL;
 
-if (! $blog->canModifyBlog() ) {
-	$page->redirect("login.php");
+if (! $SYSTEM->canModify($blog, $usr) && ! $usr->checkLogin() ) {
+	$PAGE->redirect("login.php");
 	exit;
 }
 
@@ -55,7 +57,7 @@ if (has_post()) {
 	$ret = write_file(mkpath(BLOG_ROOT,"pathconfig.php"), 
 	                  pathconfig_php_string($inst_root, $inst_url, $blog_url));
 	if (!$ret) $tpl->set("UPDATE_MESSAGE", _("Error updating blog paths."));
-	else $page->redirect($blog_url);
+	else $PAGE->redirect($blog_url);
 }
 
 $tpl->set("BLOG_URL", $blog_url);
@@ -65,7 +67,7 @@ $tpl->set("POST_PAGE", current_file());
 $tpl->set("UPDATE_TITLE", sprintf(_("Update paths for %s"), $blog->name));
 
 $body = $tpl->process();
-$page->title = sprintf(_("Update blog paths - %s"), $blog->name);
-$page->addStylesheet("form.css");
-$page->display($body, &$blog);
+$PAGE->title = sprintf(_("Update blog paths - %s"), $blog->name);
+$PAGE->addStylesheet("form.css");
+$PAGE->display($body, &$blog);
 ?>

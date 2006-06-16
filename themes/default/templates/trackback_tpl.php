@@ -4,10 +4,9 @@
 	?></a>
 <?php if (isset($TB_DATA)) { ?>
 <p><?php echo $TB_DATA; ?></p>
+<?php } ?>
 <?php if ($SHOW_EDIT_CONTROLS) { ?>
 <ul><?php foreach ($CONTROL_BAR as $item) { ?>
 <li><?php echo $item; ?></li>
 <?php } ?></ul>
-<?php 
-	}
-} ?>
+<?php } ?>

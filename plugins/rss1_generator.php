@@ -108,6 +108,7 @@ class RSS1FeedGenerator extends Plugin {
 
 	function updateCommentRSS1(&$cmt) {
 		$parent = $cmt->getParent();
+		$blog = $parent->getParent();
 		$feed = new RSS1();
 		$comment_path = $parent->localpath().PATH_DELIM.ENTRY_COMMENT_DIR;
 		
@@ -118,7 +119,7 @@ class RSS1FeedGenerator extends Plugin {
 		#$feed->image = $this->image;
 		$feed->title = $parent->subject;
 		$feed->description = $parent->subject;
-		$feed->site = BLOG_ROOT_URL;
+		$feed->site = $blog->uri('blog');
 	
 		$comm_list = $parent->getCommentArray();
 		foreach ($comm_list as $ent) 

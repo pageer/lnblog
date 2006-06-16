@@ -1,11 +1,84 @@
+20-May-2006: version 0.7.0
+- More authentication fixes.
+- Fixed receiving trackback excerpts.
+- Fixed e-mail notification for trackbacks.
+
+19-May-2006:
+- Added option to sitemap plugin to auto-generate the sitemap from the
+registered blog list.
+- Fixed up the authentication code in various files.
+- Removed the BLOG_ROOT_URL constant, which was almost certainly a stupid idea
+in the first place.  Maybe something like it can come back in a different
+incarnation, if it's even needed.
+
+18-May-2006:
+- Fixes to login, logout, and blog registration.
+- Removed more deprecated methods from blog object.
+
+16-May-2006:
+- Allow the user to create an initial account with any name and automatically
+add it to the administrators group.
+
+15-May-2006:
+- Users now have option of displaying their e-mail address in comments.
+- Added stripslashes() calls to TrackBack receiving.
+
+12-May-2006:
+- Fixed small bug in trackback_notify plugin.
+- Made sending trackbacks not suck.
+- Improved the admin page.
+
+11-May-2006:
+- Full Blogger 1.0 API support is now working.  However, the getTemplate and
+setTemplate methods are not implemented, as they are not relevant to LnBlog.
+- Revamped trackback pinging to not suck so much.
+- Changed default character encoding to UTF-8.
+
+10-May-2006:
+- Fixed pretty permalinks for entries.
+- Lots of code cleanup and consolidation.
+- Finally made the newPost and editPost methods of the Blogger API 1.0 work.
+
+05-May-2006:
+- Added some events and template variables to the comment form template.
+- Consolidation of entry and article pages.
+
+03-May-2006: 
+- Massive changes since last entry, including lots of clean-up to back-end code.
+- Added a "clean" theme that attempts to be a cleaned-up, more readable version
+of the standard default theme.
+- Can now install plugins in LnBlog/userdata/plugins.
+- Moved lots of the "intelligence" out of back-end classes.  The blog class, in 
+particular, was turning into a god class.
+
+14-Apr-2006:
+- Updated the old sidebar archives plugin.
+- Added ability to put themes in LnBlog/userdata/themes.
+- Fixed up  messy include_path.
+
+12-Apr-2006:
+- Added setInlineStylesheet() method to page class.
+- Added plugin for using FCKeditor as WYSIWYG post editor.
+- Added support for URI absolutizing to raw HTML markup mode.
+- Added support for putting plugins in LnBlog/userdata/plugins.
+
+11-Apr-2006:
+- Moved to global page object.
+- Added setDisplayObject() and addInlineScript() methods to page class.
+- Changed getlink() back to passing unfound files on verbatim, rather than 
+returning an empty string.
+- Added a plugin to support using TinyMCE as a rich text area for post and 
+article editing.
+
+06-Apr-2006:
+- Fixed missing </a> tag in showarchive.php.
+
 04-Apr-2006: 0.6.5
 - Fixed blogpath.php link showing up when creating blogs.
 - Added option to show only global ban link in ipban plugin.
 - Added working contentban plugin based on ipban.
 - Added NaturalDocs documentaiton to some plugins, as well as converting
 older ones to use the addOption method.
-- Changed calendar margins to paddings, which makes things look right
-in Konqueror.
 
 31-Mar-2006:
 - When saving blog data, run the values through htmlentities() first in order

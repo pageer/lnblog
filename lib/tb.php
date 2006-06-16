@@ -67,6 +67,16 @@ class Trackback extends LnBlogObject {
 		}
 	}
 
+	# Method: getParent
+	# Gets a copy of the parent object.
+	#
+	# Returns:
+	# A BlogEntry or Article object, depending on the context.
+	
+	function getParent() {
+		return NewEntry();
+	}
+	
 	# Method: uri
 	# Get the URI for various functions
 
@@ -84,12 +94,26 @@ class Trackback extends LnBlogObject {
 
 	# Method: getPostData
 	# Pulls the trackback data out of the POST and into the object.
+	#
+	# As per the TrackBack specification located at
+	# <http://www.sixapart.com/pronet/docs/trackback_spec>, the interface for 
+	# POSTs is as follows.
+	# title     - The title of the pinging post.
+	# excerpt   - An excerpt from the text of the pinging post.
+	# blog_name - The name of the blog to which the pinging post belongs.
+	# url       - The URL of the pinging post.  This is the only required field.
 
 	function getPostData() {
 		$this->title = htmlspecialchars(POST("title"));
-		$this->data = htmlspecialchars(strip_tags(POST("excerpt")));
+		$this->data = htmlspecialchars(POST("excerpt"));
 		$this->blog = htmlspecialchars(POST("blog_name"));
 		$this->url = POST("url");
+		if (get_magic_quotes_gpc()) {
+			$this->title = stripslashes($this->title);
+			$this->data = stripslashes(strip_tags($this->data));
+			$this->blog = stripslashes($this->blog);
+			$this->url = stripslashes($this->url);
+		}
 		$this->ip = get_ip();
 		$this->ping_date = date('r');
 		$this->raiseEvent("POSTRetreived");
@@ -102,18 +126,22 @@ class Trackback extends LnBlogObject {
 	# url - The URL to which the trackback ping will be sent.
 	#
 	# Returns: 
-	# The trackback response code, or false on failure.
+	# An associative array with 'error' and 'message' elements.  The error
+	# element contains the trackback return code from the remote server.
+	# The message element contains the error message if there was one.
+	# Note that a return code of 0 indicates success, while other values
+	# indicate an error.
 	
 	function send($url) {
+		$this->raiseEvent("OnSend");
+		
+		# Build the query string, ignoring missing elements.
+		$query_string = "url=".urlencode($this->url);
+		if ($this->title) $query_string .= "&title=".urlencode($this->title);
+		if ($this->blog) $query_string .= "&blog_name=".urlencode($this->blog);
+		if ($this->data) $query_string .= "&excerpt=".urlencode($this->data);
+		
 		if (extension_loaded("curl")) {
-	
-			$this->raiseEvent("OnSend");
-			
-			# Set up the POST data.
-			$query_string = "url=".urlencode($this->url);
-			if ($this->title) $query_string .= "&title=".urlencode($this->title);
-			if ($this->blog) $query_string .= "&blog_name=".urlencode($this->blog);
-			if ($this->data) $query_string .= "&excerpt=".urlencode($this->data);
 
 			# Initialize CURL and POST to the target URL.
 			$hnd = curl_init();
@@ -122,21 +150,10 @@ class Trackback extends LnBlogObject {
 			curl_setopt($hnd, CURLOPT_FOLLOWLOCATION, 1);
 			curl_setopt($hnd, CURLOPT_RETURNTRANSFER, 1);
 			curl_setopt($hnd, CURLOPT_POSTFIELDS, $query_string);
-			$ret = curl_exec($hnd);
-
-			# Get the error code
-			$start_tag_pos = strpos($response, "<error>");
-			$end_tag_pos = strpos($response, "</error>");
-			$ret_code = substr($response, 
-			                   $start_tag_pos + strlen("<error>"),
-			                   $end_tag_pos - ($start_tag_pos + strlen("<error>")) );
-									 
-			$this->raiseEvent("SendComplete");
-			return $ret_code;
+			$response = curl_exec($hnd);
 
 		} else {	
 
-			$this->raiseEvent("OnSend");
 			# Extract the host name and path from the URL.
 			$proto_pos = strpos($url, "://");
 			$slash_pos = strpos($url, "/", $proto_pos + 3);
@@ -147,17 +164,11 @@ class Trackback extends LnBlogObject {
 			# Open a socket.
 			$fp = fsockopen($host, 80);
 			if (!$fp) return false;
-
-			# Build the query string, ignoring missing elements.
-			$query_string = "url=".urlencode($this->url);
-			if ($this->title) $query_string .= "&title=".urlencode($this->title);
-			if ($this->blog) $query_string .= "&blog_name=".urlencode($this->blog);
-			if ($this->data) $query_string .= "&excerpt=".urlencode($this->data);
 			
 			# Create the HTTP request to be sent to the remote host.
 			$data = "POST ".$path."\r\n".
 			        "Content-Type: application/x-www-form-urlencoded; ".
-		   	     "charset=utf-8\r\n\r\n".
+		   	        "charset=utf-8\r\n\r\n".
 		      	  $query_string;
 
 			# Send the data and then get back any response.
@@ -169,37 +180,57 @@ class Trackback extends LnBlogObject {
 			}
 			fclose($fp);
 
-			# Get the error code
-			$start_tag_pos = strpos($response, "<error>");
-			$end_tag_pos = strpos($response, "</error>");
+		}
+		
+		# Get the error code
+		$start_tag_pos = strpos($response, "<error>");
+		$end_tag_pos = strpos($response, "</error>");
+		if ($start_tag_pos && $end_tag_pos) {
 			$ret_code = substr($response, 
 			                   $start_tag_pos + strlen("<error>"),
 			                   $end_tag_pos - ($start_tag_pos + strlen("<error>")) );
-									 
-			$this->raiseEvent("SendComplete");
-			return $ret_code;
+		} else {
+			$ret_code = 1;
 		}
+						   
+		$start_tag_pos = strpos($response, "<message>");
+		$end_tag_pos = strpos($response, "</message>");
+		if ($start_tag_pos && $end_tag_pos) {
+			$ret_msg = substr($response, 
+			                  $start_tag_pos + strlen("<message>"),
+			                  $end_tag_pos - ($start_tag_pos + strlen("<message>")) );
+		} elseif ($ret_code != 0) {
+			$ret_msg = _('Malformed response');
+		} else {
+			$ret_msg = '';
+		}
+		
+		$this->raiseEvent("SendComplete");
+		return array('error'=>$ret_code, 'message'=>$ret_msg);
 	}
 
 	# Method: receive
 	# Receive a TrackBack ping and store the data in a file.
-	#
-	# Parameters:
-	# save_dir - The directory where the ping will be saved.
+	# This method also outputs a response in XML for the pinger.
 	#
 	# Returns:
-	# Zero on success, 1 on failure.
+	# Zero on success, 1 on failure.  Note that these are the same return 
+	# codes described in the TrackBack specificaiton.
 
-	function receive($save_dir) {
+	function receive() {
 		$this->raiseEvent("OnReceive");
 		$this->getPostData();
+		$parent = $this->getParent();
 		$error = '';
 		if (! $this->url) {
 			$error = _("No URL in ping.");
+		} elseif (! $parent->allow_tb) {
+			$error = _("This entry does not accept trackbacks.");
 		} else {
 			$ts = time();
 			$this->ping_date = date("Y-m-d H:i:s T", $ts);
-			$ret = $this->writeFileData($save_dir.PATH_DELIM.$ts.".txt");
+			$path = mkpath($parent->localpath(), ENTRY_TRACKBACK_DIR, $ts.".txt");
+			$ret = $this->writeFileData($path);
 			if (! $ret) $error = _("Unable to save ping data.");
 		}
 		$err_code = $error == '' ? "0" : "1";
@@ -302,7 +333,9 @@ class Trackback extends LnBlogObject {
 	# The data to be sent to the client.
 
 	function get() {
+		global $SYSTEM;
 		$blog = NewBlog();
+		$u = NewUser();
 		$tpl = NewTemplate(TRACKBACK_TEMPLATE);
 		$anchor = $this->getAnchor();
 		$del_link = $this->uri("delete");
@@ -315,7 +348,7 @@ class Trackback extends LnBlogObject {
 			._("Delete").'</a>';
 		
 		$this->raiseEvent("OnOutput");
-		$tpl->set("SHOW_EDIT_CONTROLS", $blog->canModifyEntry());
+		$tpl->set("SHOW_EDIT_CONTROLS", $SYSTEM->canModify($this->getParent(), $u) && $u->checkLogin() );
 		$tpl->set("TB_URL", $this->url);
 		$tpl->set("CONTROL_BAR", $this->control_bar);
 		$tpl->set("TB_PERMALINK", $this->permalink());
@@ -387,3 +420,4 @@ class Trackback extends LnBlogObject {
 	}
 
 }
+?>

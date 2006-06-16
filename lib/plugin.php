@@ -57,7 +57,7 @@ class Plugin extends LnBlogObject{
 	              The *default* is "text".
 	default     - The default value for this variable.  This value will be 
 	              used if the user does not specify a setting.  Also, if the
-	              user mdoifies other settings, no configuration entry will
+	              user modifies other settings, no configuration entry will
 	              be saved for this variable if the value is still the 
 	              default.  This is important because of pre-blog overriding.
 	              The default is the empty string.
@@ -65,7 +65,7 @@ class Plugin extends LnBlogObject{
 	              keys are control values and the descriptions describe each
 	              choice for the user.  These are used only for radio button
 	              and selection box controls, with each array element 
-					  representing an option for the user to select .
+	              representing an option for the user to select .
 	*/
 	var $member_list;
 
@@ -121,7 +121,7 @@ class Plugin extends LnBlogObject{
 		
 		echo "<fieldset>\n";
 		echo '<form method="post" ';
-		echo 'action="'.current_uri(true,'').'?plugin='.get_class($this).'" ';
+		echo 'action="'.current_uri(true).'" ';
 		echo "id=\"plugin_config\">\n";
 		
 		foreach ($this->member_list as $mem=>$config) {

@@ -35,18 +35,18 @@ require_once("lib/creators.php");
 require_once("lib/utils.php");
 
 global $PLUGIN_MANAGER;
+global $PAGE;
 $u = NewUser();
-$page = NewPage();
 $blog = NewBlog();
 
 if ($blog->isBlog()) {
-	$page->display_object = &$blog;
-	if (! $blog->canModifyBlog() ) {
-		$page->redirect("index.php");
+	$PAGE->setDisplayObject($blog);
+	if (! $SYSTEM->canModify($blog, $u) || ! $u->checkLogin() ) {
+		$PAGE->redirect("index.php");
 		exit;
 	}
 } elseif (! $u->checkLogin() && ! $u->isAdministrator() ) {
-	$page->redirect("index.php");
+	$PAGE->redirect("index.php");
 	exit;
 }
 
@@ -79,7 +79,7 @@ if (has_post()) {
 		$tpl->set("ERROR_MESSAGE", 
 		          spf_("Unable to create file %s.", $target_file));
 		$tpl->set("FILE_TEXT", $data);
-	} else $page->redirect("index.php");
+	} else $PAGE->redirect("index.php");
 	
 } else {
 
@@ -100,10 +100,10 @@ if (has_post()) {
 
 if (! defined("BLOG_ROOT")) $blog = false;
 
-if ($blog->isBlog()) $page->title = _("Edit blog menu bar");
-else $page->title = _("Edit site menu bar");
-$page->addStylesheet("form.css");
-$page->addScript("sitemap.js");
-$page->display($tpl->process(), $blog);
+if ($blog->isBlog()) $PAGE->title = _("Edit blog menu bar");
+else $PAGE->title = _("Edit site menu bar");
+$PAGE->addStylesheet("form.css");
+$PAGE->addScript("sitemap.js");
+$PAGE->display($tpl->process(), $blog);
 
 ?>

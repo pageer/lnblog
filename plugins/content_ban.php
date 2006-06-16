@@ -92,12 +92,13 @@ class ContentBan extends Plugin {
 		$blg = NewBlog();
 		$usr = NewUser();
 		$banfile = $this->ban_list;
-		echo '<li><a href="'.INSTALL_ROOT_URL.'editfile.php?blog='.
-			$blg->blogid.'&amp;file='.$banfile.'">'._("Blog RegEx blacklist").
-			'</a></li>';
+		echo '<li><a href="'.$blg->uri('editfile', $banfile).'">'.
+			_("Blog RegEx blacklist").'</a></li>';
 		if ($usr->isAdministrator()) {
-			echo '<li><a href="'.INSTALL_ROOT_URL.'editfile.php?file=userdata/'.
-				$banfile.'">'._("Global RegEx blacklist").'</a></li>';
+			echo '<li><a href="'.
+				make_uri(INSTALL_ROOT_URL.'editfile.php',
+				         array('file'=>'userdata/'.$banfile)).'">'.
+				_("Global RegEx blacklist").'</a></li>';
 		}
 	}
 

@@ -7,10 +7,12 @@ to the blog path, or if you did the initial setup on the localhost.</p>
 <p style="color: red"><?php echo $UPDATE_MESSAGE;?></p>
 <?php } ?>
 <form method="post" action="<?php echo $POST_PAGE;?>">
+<?php if (0) { /*Comment out BLOG_ROOT_URL section. */ ?>
 <div>
 <label for="blogrooturl"><?php p_("Blog root URL"); ?></label>
 <input id="blogrooturl" name="blogrooturl" size="30" value="<?php echo $BLOG_URL;?>" />
 </div>
+<?php } ?>
 <div>
 <label for="installroot"><?php p_("LnBlog installation root"); ?></label>
 <input id="installroot" name="installroot" size="30" value="<?php echo $INST_ROOT;?>" />

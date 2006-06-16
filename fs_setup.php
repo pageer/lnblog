@@ -46,6 +46,8 @@ require_once("lib/utils.php");
 
 session_start();
 
+global $PAGE;
+
 $docroot = "documentroot";
 $ftp = "use_ftp";
 $uid = "ftp_user";
@@ -59,9 +61,8 @@ if ( file_exists(INSTALL_ROOT.PATH_DELIM.USER_DATA.PATH_DELIM.FS_PLUGIN_CONFIG) 
 	header("Location: index.php");
 	exit;
 }
-$page = NewPage();
 
-$page->title = sprintf(_("%s File Writing"), PACKAGE_NAME);
+$PAGE->title = sprintf(_("%s File Writing"), PACKAGE_NAME);
 $form_title = _("Configure File Writing Support");
 $redir_page = "index.php";
 
@@ -275,7 +276,7 @@ if ( has_post() ) {
 }
 
 $body = $tpl->process();
-$page->addStylesheet("form.css");
-$page->addScript("fssetup.js");
-$page->display($body, &$blog);
+$PAGE->addStylesheet("form.css");
+$PAGE->addScript("fssetup.js");
+$PAGE->display($body, &$blog);
 ?>

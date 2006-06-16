@@ -31,17 +31,19 @@ session_start();
 require_once("blogconfig.php");
 require_once("lib/creators.php");
 
-$page = NewPage();
+global $PAGE;
 
 if (POST("blogpath")) $path = POST("blogpath");
 else $path = false;
 
 $blog = NewBlog($path);
-if (! $blog->canAddBlog() ) {
-	$page->redirect("bloglogin.php");
+$usr = NewUser();
+if (! $usr->isAdministrator() && $usr->checkLogin()) {
+	$PAGE->redirect("bloglogin.php");
 	exit;
 }
 $tpl = NewTemplate("blog_modify_tpl.php");
+$blog->owner = $usr->username();
 
 if (POST("blogpath")) $blog->home_path = POST("blogpath");
 else $blog->home_path = "myblog";
@@ -87,13 +89,21 @@ if ( has_post() ) {
 		$tpl->set("UPDATE_MESSAGE", spf_("The blog path you specified is the same as your %s installation path.  This is not allowed, as it will break your installation.  Please choose a different path for your blog.", PACKAGE_NAME));
 	} else {
 		$ret = $blog->insert();
-		if (!$ret) $tpl->set("UPDATE_MESSAGE", _("Error creating blog.  This could be a problem with the file permissions on your server.  Please refer to the <a href=\"http://www.skepticats.com/LnBlog/Readme.html\">documentation</a> for more information."));
-		else $page->redirect($blog->getURL());
+		if ($ret) {
+			$ret = $SYSTEM->registerBlog($blog->blogid);
+			if ($ret) {
+				$PAGE->redirect($blog->getURL());
+			} else {
+				$tpl->set("UPDATE_MESSAGE", _("Blog create but not registered.  This means the system will not list it on the admin pages.  Please try registering this blog by hand from the administration page."));
+			}
+		} else {
+			$tpl->set("UPDATE_MESSAGE", _("Error creating blog.  This could be a problem with the file permissions on your server.  Please refer to the <a href=\"http://www.skepticats.com/LnBlog/Readme.html\">documentation</a> for more information."));
+		}
 	}
 }
 
 $body = $tpl->process();
-$page->title = _("Create new blog");
-$page->addStylesheet("form.css");
-$page->display($body);
+$PAGE->title = _("Create new blog");
+$PAGE->addStylesheet("form.css");
+$PAGE->display($body);
 ?>

@@ -51,6 +51,7 @@ class BlogComment extends Entry {
 	var $name;
 	var $email;
 	var $url;
+	var $show_email;
 		
 	function BlogComment ($path="", $revision="") {
 		$this->raiseEvent("OnInit");
@@ -64,9 +65,10 @@ class BlogComment extends Entry {
 		$this->email = "";
 		$this->name = ANON_POST_NAME;
 		$this->has_html = MARKUP_NONE;
+		$this->show_email = COMMENT_EMAIL_VIEW_PUBLIC;
 		$this->metadata_fields = array("id"=>"postid", "uid"=>"userid",
 			"name"=>"name", "email"=>"e-mail", "url"=>"url",
-			"date"=>"date", "post_date"=>"postdate",
+			"show_email"=>"show_email", "date"=>"date", "post_date"=>"postdate",
 			"timestamp"=>"timestamp", "post_ts"=>"posttimestamp",
 			"ip"=>"ip", "subject"=>"subject");
 		
@@ -200,28 +202,25 @@ class BlogComment extends Entry {
 	
 	/* 
 	Method: insert
-	Add a new comment.  Note that this should normally be called internally
-	by a BlogEntry or Article object, as a comment is logically a child of 
-	an entry (or, by inheritance, an article).
+	Add a new comment on an entry or article.
 
 	Parameters:
-	basepath - The storage identifier (e.g. directory) for comments belonging
-	           to the parent object.
+	Entry - The entry to which this comment will belong.  This determines where
+	        the comment is stored.
 
 	Returns:
 	True on success, false on failure.
 	*/
-	function insert($basepath) {
+	function insert($entry) {
 	
 	
 		$curr_ts = time();
 		$usr = NewUser();
-		if ($usr->checkLogin()) $this->uid = $usr->username();
+		if (!$this->uid) $this->uid = $usr->username();
 	
-		# Check if the file path is NULL so that we can re-use this routine
-		# when updating an entry.
-		if (! $this->file)
-			$this->file = $basepath.PATH_DELIM.$this->getPath($curr_ts).COMMENT_PATH_SUFFIX;
+		$basepath = mkpath($entry->localpath(), ENTRY_COMMENT_DIR);
+		
+		$this->file = mkpath($basepath, $this->getPath($curr_ts).COMMENT_PATH_SUFFIX);
 		$this->date = fmtdate(ENTRY_DATE_FORMAT, $curr_ts);
 		$this->timestamp = $curr_ts;
 		$this->ip = get_ip();
@@ -243,13 +242,25 @@ class BlogComment extends Entry {
 	/*
 	Method: getPostData
 	Pulls data out of the HTTP POST headers and into the object.
+	
+	The interface for this uses pre-defined POST field names they are as
+	follows.  If the poster is an authenticated user, then the userid is also
+	recorded automatically from the HTTP session.
+	username  - The name of the poster.
+	email     - The poster's e-mail address.
+	url       - The poster's homepage.
+	showemail - If not empty, show the poster's e-mail address publically.
+	subject   - The subject of the post.
+	data      - The post content.  This cannot be empty.
 	*/
 	function getPostData() {
+		if (! has_post()) return false;
 		$this->name = POST("username");
 		$this->email = POST("email");
-		$this->url = POST("homepage");
+		$this->url = POST("url");
 		$this->subject = POST("subject");
 		$this->data = POST("data");
+		$this->show_email = POST("showemail") ? true : false;
 		foreach ($this->custom_fields as $fld=>$desc) {
 			$this->$fld = POST($fld);
 			$this->$fld = $this->stripHTML($this->$fld);
@@ -264,13 +275,19 @@ class BlogComment extends Entry {
 				$this->$fld = stripslashes($this->$fld);
 			}
 		}
+		# Note: Don't strip HTML from the comment data, because we do that 
+		# when we add in the links and other markup.
 		$this->name = $this->stripHTML($this->name);
 		$this->email = $this->stripHTML($this->email);
 		$this->url = $this->stripHTML($this->url);
 		$this->subject = $this->stripHTML($this->subject);
+		
+		if (! $this->uid) {
+			$u = NewUser();
+			$this->uid = $u->username();
+		}
+		
 		$this->raiseEvent("POSTRetreived");
-		# Don't strip HTML from the comment data, because we do that 
-		# when we add in the links and other markup.
 	}
 
 	/*
@@ -331,14 +348,15 @@ class BlogComment extends Entry {
 	*/
 	function getParent() {
 		if (! file_exists($this->file)) return NewBlogEntry();
-		$par_path = dirname(dirname($this->file));
-		if (substr($par_path, BLOG_ENTRY_PATH)) {
-			return NewBlogEntry($par_path);
-		} elseif (substr($par_path, BLOG_ARTICLE_PATH)) {
-			return NewArticle($par_path);
-		} else {
-			return false;
-		}
+		return NewEntry();
+		#$par_path = dirname(dirname($this->file));
+		#if (strpos($par_path, BLOG_ENTRY_PATH)) {
+		#	return NewBlogEntry($par_path);
+		#} elseif (strpos($par_path, BLOG_ARTICLE_PATH)) {
+		#	return NewArticle($par_path);
+		#} else {
+		#	return false;
+		#}
 	}
 
 	/*
@@ -354,6 +372,8 @@ class BlogComment extends Entry {
 	*/
 	function get($show_edit_controls=false) {
 
+		global $SYSTEM;
+		
 		# An array of the form label=>URL which holds the list of 
 		# administrative items, such as the delete link.
 		$this->control_bar = array();
@@ -371,9 +391,8 @@ class BlogComment extends Entry {
 
 		$blog = NewBlog();
 		$usr = NewUser();
-		$show_edit_controls = $blog->canModifyEntry();
+		$show_edit_controls = $SYSTEM->canModify($this->getParent());
 
-		#$t->set("ID", $this->id);
 		if (! $this->name) $this->name = ANON_POST_NAME;
 		if (! $this->subject) $this->subject = NO_SUBJECT;
 		if ($this->uid) {
@@ -390,18 +409,15 @@ class BlogComment extends Entry {
 		$t->set("NAME", $this->name);
 		$t->set("DATE", $this->prettyDate($this->post_ts) );
 		$t->set("EDITDATE", $this->prettyDate() );
-		if (COMMENT_EMAIL_VIEW_PUBLIC || $usr->checkLogin()) {
+		if ($this->show_email || $usr->checkLogin()) {
 			$t->set("SHOW_MAIL", true);
 			$t->set("EMAIL", $this->email);
-			$t->set("PROFILE_LINK", 
-			        INSTALL_ROOT_URL."userinfo.php?user=".$usr->username().
-			        "&amp;blog=".$blog->blogid);
 		} else {
 			$t->set("SHOW_MAIL", false);
 			$t->set("EMAIL", "");
 		}
 		$t->set("PROFILE_LINK", INSTALL_ROOT_URL."userinfo.php?user=".
-		                        $usr->username().
+		                        $this->uid.
 		                        "&amp;blog=".$blog->blogid);
 		$t->set("ANCHOR", $this->getAnchor() );
 		$t->set("SHOW_CONTROLS", $show_edit_controls);

@@ -126,6 +126,15 @@ class Entry extends LnBlogObject{
 	function permalink() { return ""; }
 
 	/*
+	Method: getParent
+	Abstract function to return the parent object of the current object.
+	This will be a Blog object for BlogEntry or Article objects, and a 
+	BlogEntry or Article for BlogComment or TrackBack objects.
+	Child classes *must* over-ride this method.
+	*/
+	function getParent() { return false; }
+	
+	/*
 	Method: baselink
 	Gets a link to the object's base directory, to use for converting relative
 	to absolute paths.  I some cases, this is just the permalink.
@@ -158,10 +167,11 @@ class Entry extends LnBlogObject{
 	slashes, colons, or ampersands, the relative URI given will be interpreted
 	as under the under the current_uri parameter.  If it contains slashes, but
 	no colons or ampersands, it will interpreted as relative to the
-	BLOG_ROOT_URL, if it is set, and if the given URI starts with a slash, it
-	will be interpreted as relative to the DOCUMENT_ROOT, if it is set.
+	blog root, if there is a current blog, and if the given URI starts with a 
+	slash, it will be interpreted as relative to the DOCUMENT_ROOT, if it is set.
 	*/
 	function absolutizeBBCodeURI($data, $current_uri) {
+		$blog = $this->getParent();
 		$ret = preg_replace("/\[img(-?\w+)?=([^\/\:]+)\]/",
 		                    "[img$1=".$current_uri."$2]", $data);
 		$ret = preg_replace("/\[url=([^\/\:@]+)\]/", 
@@ -172,11 +182,44 @@ class Entry extends LnBlogObject{
 			$ret = preg_replace("/\[url=\/([^\:@]+)\]/", 
 			          "[url=".localpath_to_uri(DOCUMENT_ROOT)."$1]", $ret);
 		}
-		if (defined("BLOG_ROOT_URL")) {
+		if (is_a($blog, 'Blog')) {
 			$ret = preg_replace("/\[img(-?\w+)?=([^\:]+)\]/",
-			                    "[img$1=".BLOG_ROOT_URL."$2]", $ret);
+			                    "[img$1=".$blog->uri('base')."$2]", $ret);
 			$ret = preg_replace("/\[url=([^\:@]+)\]/", 
-			                    "[url=".BLOG_ROOT_URL."$1]", $ret);
+			                    "[url=".$blog->uri('base')."$1]", $ret);
+		}
+		return $ret;
+	}
+
+	/*
+	Method: absolutizeHTMLURI
+	A version of <absolutizeBBCodeURI> that works with HTML markup.
+
+	Parameters:
+	data        - The string containing the HTML markup to absolutize.
+	current_uri - The URI to which the relative links are relative.
+
+	Returns:
+	The markup in the data parameter with href and src attributes absolutized
+	according to the same rules as apply with <absolutizeBBCodeURI>.
+	*/
+	function absolutizeHTMLURI($data, $current_uri) {
+		$blog = $this->getParent();
+		$ret = preg_replace("/src=['\"]([^\/\:]+)['\"]/",
+		                    "src=\"".$current_uri."$1\"", $data);
+		$ret = preg_replace("/href=['\"]([^\/\:@]+)['\"]/",
+		                    "href=\"".$current_uri."$1\"", $ret);
+		if (defined("DOCUMENT_ROOT")) {
+			$ret = preg_replace("/src=['\"]\/([^\:]+)['\"]/", 
+		                    "src=\"".localpath_to_uri(DOCUMENT_ROOT)."$1\"", $ret);
+			$ret = preg_replace("/href=['\"]\/([^\:@]+)['\"]/", 
+		                    "href=\"".localpath_to_uri(DOCUMENT_ROOT)."$1\"", $ret);
+		}
+		if (is_a($blog, 'Blog')) {
+			$ret = preg_replace("/src=['\"]([^\:]+)['\"]/",
+			                    "src=\"".$blog->uri('base')."$1\"", $ret);
+			$ret = preg_replace("/href=['\"]([^\:@]+)['\"]/", 
+			                    "href=\"".$blog->uri('base')."$1\"", $ret);
 		}
 		return $ret;
 	}
@@ -243,7 +286,18 @@ class Entry extends LnBlogObject{
 		return $ret;
 	}
 
-	function bbcodeToHTML($data) {
+	# Method: bbcodeToHTML
+	# Converts LBCode markup into HTML.
+	#
+	# Parameters:
+	# data  - The data string to convert.
+	# strip - *Optional* boolean indicating if the LBCode should just be
+	#         stripped rather than converted.  Defaults to false.
+	#
+	# Returns:
+	# A string with the converted text.
+	
+	function bbcodeToHTML($data, $strip=false) {
 		$ret = $data;
 		
 		$patterns[0] = "/\[url=(\S+)\](.+)\[\/url\]/Usi";
@@ -265,42 +319,73 @@ class Entry extends LnBlogObject{
 		$patterns[16] = "/\[img-left=(.+)\](.+)\[\/img-left\]/Usi";
 		$patterns[17] = "/\[img-right=(.+)\](.+)\[\/img-right\]/Usi";
 		$patterns[18] = "/\[h\](.*)\[\/h\]/Usi";
-		
-		$replacements[0] = '<a href="$1">$2</a>';
-		$replacements[1] = '<img alt="$2" title="$2" src="$1" />';
-		$replacements[2] = '<abbr title="$1">$2</abbr>';
-		$replacements[3] = '<acronym title="$1">$2</acronym>';
-		$replacements[4] = '</p><blockquote><p>$1</p></blockquote><p>';
-		$replacements[5] = '</p><blockquote cite="$1"><p>$2</p></blockquote><p>';
-		$replacements[6] = '<strong>$1</strong>';
-		$replacements[7] = '<em>$1</em>';
-		$replacements[8] = '<span style="text-decoration: underline;">$1</span>';
-		$replacements[9] = '<q>$1</q>';
-		$replacements[10] = '<q cite="$1">$2</q>';
-		$replacements[11] = "</p><ul>$2</ul><p>";
-		$replacements[12] = "</p><ol>$2</ol><p>";
-		$replacements[13] = '<li>$1</li>';
-		$replacements[14] = '<code>$1</code>';
-		$replacements[15] = '<tt>$1</tt>';
-		$replacements[16] = '<img alt="$2" title="$2" style="float: left; clear: none;" src="$1" />';
-		$replacements[17] = '<img alt="$2" title="$2" style="float: right; clear: none;" src="$1" />';
-		$replacements[18] = '</p><h'.LBCODE_HEADER_WEIGHT.'>$1</h'.LBCODE_HEADER_WEIGHT.'><p>';
-		
-		
+
 		$whitespace_patterns[0] = '/\r\n\r\n/';
 		$whitespace_patterns[1] = '/\n\n/';
 		$whitespace_patterns[2] = '/\n/';
-		$whitespace_replacements[0] = '</p><p>';
-		$whitespace_replacements[1] = '</p><p>';
-		$whitespace_replacements[2] = '<br />';
+		
+		if ($strip) {
+			$replacements[0] = '$2';
+			$replacements[1] = '';
+			$replacements[2] = '$2';
+			$replacements[3] = '$2';
+			$replacements[4] = '$1';
+			$replacements[5] = '$2';
+			$replacements[6] = '$1';
+			$replacements[7] = '$1';
+			$replacements[8] = '$1';
+			$replacements[9] = '$1';
+			$replacements[10] = '$2';
+			$replacements[11] = '$2';
+			$replacements[12] = '$2';
+			$replacements[13] = '$1';
+			$replacements[14] = '$1';
+			$replacements[15] = '$1';
+			$replacements[16] = '';
+			$replacements[17] = '';
+			$replacements[18] = '$1';
+			
+			$whitespace_replacements[0] = "\r\n\r\n";
+			$whitespace_replacements[1] = "\n\n";
+			$whitespace_replacements[2] = "\n";
+		} else {
+			$replacements[0] = '<a href="$1">$2</a>';
+			$replacements[1] = '<img alt="$2" title="$2" src="$1" />';
+			$replacements[2] = '<abbr title="$1">$2</abbr>';
+			$replacements[3] = '<acronym title="$1">$2</acronym>';
+			$replacements[4] = '</p><blockquote><p>$1</p></blockquote><p>';
+			$replacements[5] = '</p><blockquote cite="$1"><p>$2</p></blockquote><p>';
+			$replacements[6] = '<strong>$1</strong>';
+			$replacements[7] = '<em>$1</em>';
+			$replacements[8] = '<span style="text-decoration: underline;">$1</span>';
+			$replacements[9] = '<q>$1</q>';
+			$replacements[10] = '<q cite="$1">$2</q>';
+			$replacements[11] = '</p><ul>$2</ul><p>';
+			$replacements[12] = '</p><ol>$2</ol><p>';
+			$replacements[13] = '<li>$1</li>';
+			$replacements[14] = '<code>$1</code>';
+			$replacements[15] = '<tt>$1</tt>';
+			$replacements[16] = '<img alt="$2" title="$2" style="float: left; clear: none;" src="$1" />';
+			$replacements[17] = '<img alt="$2" title="$2" style="float: right; clear: none;" src="$1" />';
+			$replacements[18] = '</p><h'.LBCODE_HEADER_WEIGHT.'>$1</h'.LBCODE_HEADER_WEIGHT.'><p>';
+			
+			$whitespace_replacements[0] = '</p><p>';
+			$whitespace_replacements[1] = '</p><p>';
+			$whitespace_replacements[2] = '<br />';
+		}
+		
 		ksort($patterns);
 		ksort($replacements);
 		$ret = preg_replace($patterns, $replacements, $ret);
 		$ret = preg_replace($whitespace_patterns, $whitespace_replacements, $ret);
-		$ret = "<p>".$ret."</p>";
+		
+		if (! $strip) {
+			$ret = "<p>".$ret."</p>";
+			# Strip out extraneous empty paragraphs.
+			$ret = preg_replace('/<p><\/p>/', '', $ret);
+		}
 	
-		# Strip out extraneous empty paragraphs.
-		return preg_replace('/<p><\/p>/', '', $ret);
+		return $ret;
 	}
 
 	# Method: markup
@@ -327,18 +412,40 @@ class Entry extends LnBlogObject{
 				$ret = $this->bbcodeToHtml($ret);
 				break;
 			case MARKUP_HTML:
-				$ret = $data;
+				$ret = $this->absolutizeHTMLURI($data, $this->baselink());
 				break;
 		}
 		return $ret;
 	}
 
-	# A quick function to get an abstract by grabbing the first N characters.
+	# Method: getAbstract
+	# A quick function to get a plain text abstract of the entry data
+	# by grabbing the first paragraph of text or the first N characters,
+	# whichever comes first.  Markup is removed in the process.
+	# Note that it attempts to do word wrapping to avoid cutting words off in 
+	# the middle.
+	#
+	# Parameters:
+	# nuchars - *Optional* number of characters.  *Defaults* to 500.
+	#
+	# A string containing the abstract text, with all markup stripped out.
 
 	function getAbstract($numchars=500) {
-		$ret = substr($this->data, 0, $numchars);
-		if (strlen($ret) == $numchars) $ret .= "...";
-		return $ret;
+		if (!$this->data || $numchars < 1) return '';
+		if ($this->has_html == MARKUP_BBCODE) {
+			$data = $this->bbcodeToHTML($this->data, true);
+		} elseif ($this->has_html == MARKUP_HTML) {
+			$data = strip_tags($this->data);
+		} else {
+			$data = $this->stripHTML($this->data);
+		}
+		
+		$data = explode("\n", $data);
+		if (strlen($data[0]) > $numchars) {
+			return wordwrap($data[0],$numchars);
+		} else {
+			return $data[0];
+		}
 	}
 
 	# Method: prettyDate
@@ -359,8 +466,25 @@ class Entry extends LnBlogObject{
 		return $print_date;
 	}
 
+	# Method: readFileData
+	# Reads entry data from a file.  File metadata is enclosed in META tags
+	# which are HTML comments, in one-per-line format.  Here is an example.
+	# |<!--META Subject: This is a subject META-->
+	# Variables are created for every such line which is referenced in the 
+	# metadata_fields property of the object.  The metadata_fields property is
+	# an associative array where the element key is the propery of the object to
+	# which the value is assigned and the element valueis the case-insensitive 
+	# variable used in the file, as with "Subject" in the example above.
+	#
+	# There is also a custom_fields property.  This is an associative array, 
+	# just as metadata_fields.  If custom_fields is populated, its members are
+	# merged into metadata_fields, in effect adding elements to the standard
+	# metadata fields.
+	#
+	# Returns:
+	# The body of the entry as a string.
+	
 	function readFileData() {
-		#$data = file($this->store_path . "/" . $this->datafile);
 		$data = file($this->file);
 		$file_data = "";
 		if (! $data) $file_data = false;
@@ -369,7 +493,6 @@ class Entry extends LnBlogObject{
 				$this->metadata_fields[$fld] = $fld;
 			}
 			$lookup = array_flip($this->metadata_fields);
-			#$lookup = $this->metadata_fields;
 			foreach ($data as $line) {
 				preg_match('/<!--META ([\w|\s|-]*): (.*) META-->/', $line, $matches);
 				if ($matches) $this->$lookup[strtolower($matches[1])] = $matches[2];
@@ -377,33 +500,23 @@ class Entry extends LnBlogObject{
 				
 				$file_data .= $cleanline;
 			}
-		#if (get_magic_quotes_gpc() ) $file_data = stripslashes($file_data);
-		$this->abstract = $this->getAbstract();
+		if (! $this->abstract) $this->abstract = $this->getAbstract();
 		$this->data = $file_data;
 		return $file_data;
 	}
 
-	# Read just the metadata for the entry into the class properties.
-	# Hopefully, this will save us a little time reading large files.
-
-	function readFileMetadata() {
-		$fh = fopen($this->file, "r");
-		$has_data = true;
-		if (! $fh) return false;
-		else 
-			foreach ($this->custom_fields as $fld=>$desc) {
-				$this->metadata_fields[$fld] = $fld;
-			}
-			$lookup = array_flip($this->metadata_fields);
-			while (! feof($fh) && $has_data) {
-				$line = fgets($fh);
-				preg_match('/<!--META (.*): (.*) META-->/', $line, $matches);
-				if ($matches) $this->$lookup[$matches[1]] = $matches[2];
-				else $has_data = false;
-			}
-	}
+	# Method: writeFileData
+	# Write entry data to a file.  The contents of the file are determined by
+	# the properties of the object and the contents of the metadata_fields and 
+	# custom_fields properties, just as with <readFileData>.  This function
+	# writes the metadata to HTML comments, as mentioned above, while the body
+	# data is written at the end of the file.  Note that, in order for the file
+	# to be written, the file property of the object must be set.
+	#
+	# Returns:
+	# True if the file write is successful, false otherwise.
 	
-	function writeFileData($file_data="") {
+	function writeFileData() {
 		$fs = NewFS();
 		$header = '';
 		foreach ($this->custom_fields as $fld=>$desc) {

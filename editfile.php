@@ -34,12 +34,13 @@ require_once("blogconfig.php");
 require_once("lib/creators.php");
 require_once("lib/utils.php");
 
+global $PAGE;
+
 $file = GETPOST("file");
 if (get_magic_quotes_gpc()) $file = stripslashes($file);
 if (PATH_DELIM  != '/') $file = str_replace('/', PATH_DELIM, $file);
 
 $u = NewUser();
-$page = NewPage();
 $blog = NewBlog();
 $ent = NewBlogEntry();
 
@@ -50,21 +51,22 @@ if ( GET("profile") == $u->username() ) {
 	$edit_ok = true;
 	$relpath = USER_DATA_PATH.PATH_DELIM.$u->username();
 } elseif ($ent->isEntry() ) {
-	$page->display_object = &$ent;
+	$PAGE->setDisplayObject($ent);
 	$relpath = $ent->localpath();
-	if ($ent->canModifyEntry() ) $edit_ok = true;
+	if ($SYSTEM->canModify($ent, $u) ) $edit_ok = true;
 } elseif ($blog->isBlog() ) {
-	$page->display_object = &$blog;
+	$PAGE->setDisplayObject($blog);
 	$relpath = $blog->home_path;
-	if ($blog->canModifyBlog() ) $edit_ok = true;
+	if ($SYSTEM->canModify($blog, $u) ) $edit_ok = true;
 } elseif ($u->isAdministrator() ) {
 	$edit_ok = true;
 }
+
 if (! $u->checkLogin()) $edit_ok = false;
 
 if (! $edit_ok) {
-	if (SERVER("referer")) $page->redirect(SERVER("referer"));
-	else $page->redirect("index.php");
+	if (SERVER("referer")) $PAGE->redirect(SERVER("referer"));
+	else $PAGE->redirect("index.php");
 	exit;
 }
 
@@ -77,7 +79,7 @@ if (isset($_GET["profile"])) {
 # Prepare template for link list display.
 if (isset($_GET["list"])) {
 	$tpl->set("SHOW_LINK_EDITOR");
-	$page->addScript("sitemap.js");
+	$PAGE->addScript("sitemap.js");
 	$query_string .= ($query_string ? "&amp;" : "?")."list=yes";
 }
 $tpl->set("FORM_ACTION", current_file(true).$query_string);
@@ -97,7 +99,7 @@ if (has_post()) {
 		$tpl->set("ERROR_MESSAGE", 
 		          spf_("Unable to create file %s.", $file));
 		$tpl->set("FILE_TEXT", htmlentities($data));
-	} #else $page->redirect("index.php");
+	} #else $PAGE->redirect("index.php");
 	
 } else {
 
@@ -118,8 +120,8 @@ $tpl->set("FILE", $file);
 
 if (! defined("BLOG_ROOT")) $blog = false;
 
-$page->title = _("Edit file");
-$page->addStylesheet("form.css");
-$page->display($tpl->process(), $blog);
+$PAGE->title = _("Edit file");
+$PAGE->addStylesheet("form.css");
+$PAGE->display($tpl->process(), $blog);
 
 ?>

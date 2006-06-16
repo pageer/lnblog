@@ -193,7 +193,7 @@ class RSS2FeedGenerator extends Plugin {
 	
 		if (! $blog->entrylist) $blog->getRecent($blog->max_rss);
 		foreach ($blog->entrylist as $ent) {
-			$usr->get($ent->uid);
+			$usr = NewUser($ent->uid);
 			$author_data = $usr->email();
 			if ( $author_data ) $author_data .= " (".$usr->displayName().")";
 			$cmt_count = $ent->getCommentCount();

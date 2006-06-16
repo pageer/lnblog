@@ -28,15 +28,15 @@ p.calendar {
 
 a.llink {
 	font-size: 80%;
-	padding-right: 3%;
+	margin-right: 3%;
 }
 
 a.rlink {
 	font-size: 80%;
-	padding-left: 3%;
+	margin-left: 3%;
 }
 
 /* Set the color in which the current date should be highlighted. */
 .today {
-	background-color: #cdcdcd;
+background-color: #cdcdcd;
 }

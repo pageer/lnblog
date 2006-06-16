@@ -156,7 +156,7 @@ class FTPFS extends FS {
 		if (! $this->connected() ) return false;
 		$parent = dirname($dir);
 		if ($parent == $dir) return false;
-		if (! is_dir($parent) ) $ret = $this->mkdir_ret($dir);
+		if (! is_dir($parent) ) $ret = $this->mkdir_rec($dir);
 		else $ret = true;
 		if ($ret) $ret = $this->mkdir($dir, $mode);
 		return $ret;

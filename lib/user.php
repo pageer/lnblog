@@ -37,18 +37,12 @@ class User extends LnBlogObject {
 	var $fullname;
 	var $email;
 	var $homepage;
+	var $default_group;
 	var $custom;
 	var $user_list;
 
 	function User($uname=false, $pw=false) {
-
-		if (!$uname && ( SESSION(CURRENT_USER) || COOKIE(CURRENT_USER) ) ) {
-			if ( SESSION(CURRENT_USER) == COOKIE(CURRENT_USER) ||
-			    (SESSION(CURRENT_USER) == '' && COOKIE(CURRENT_USER) ) 
-			   ) {
-				$uname = COOKIE(CURRENT_USER);
-			}
-		}
+		global $SYSTEM;
 
 		$this->username = $uname ? $uname : '';
 		$this->passwd = '';
@@ -56,6 +50,7 @@ class User extends LnBlogObject {
 		$this->fullname = '';
 		$this->email = '';
 		$this->homepage = '';
+		$this->default_group = '';
 		$this->custom = array();
 
 		if ($uname && realpath(mkpath(USER_DATA_PATH,$uname,"passwd.php"))) {
@@ -73,6 +68,11 @@ class User extends LnBlogObject {
 				$this->fullname = $ini->value("userdata", "name", "");
 				$this->email    = $ini->value("userdata", "email", "");
 				$this->homepage = $ini->value("userdata", "homepage", "");
+				$this->default_group = 
+					$ini->value('userdata','default_group',
+					            $SYSTEM->sys_ini->value('security',
+					                                    'NewUserDefaultGroup',
+					                                    ''));
 				$this->custom = $ini->getSection("customdata");
 			}
 			$_SESSION["user-".$uname] = serialize($this);
@@ -122,31 +122,27 @@ class User extends LnBlogObject {
 		if ($this->username) $tpl->set("USER_ID", $this->username);
 		if ($this->fullname) $tpl->set("USER_NAME", $this->fullname);
 		if ($this->email) $tpl->set("USER_EMAIL", $this->email);
+		if ($this->default_group) $tpl->set("DEFAULT_GROUP",$this->defaultGroup());
+		$tpl->set("GROUPS", $this->groups());
 		if (strtolower(substr(trim($this->homepage), 0, 7)) != "http://" &&
 		    trim($this->homepage) != "") {
 			$this->homepage = "http://".$this->homepage;
 		}
 		if ($this->homepage) $tpl->set("USER_HOMEPAGE", $this->homepage);
 		$tpl->set("USER_DISPLAY_NAME", $this->displayName() );
-	}
-
-	# Method: get
-	# Populates the object with data for a given username.
-	# 
-	# Parameters:
-	# uname - The username to get.
-	# 
-	# Returns:
-	# True if the username is found, false otherwise.
-	function get($uname) {
-		if ($uname && isset($this->user_list[$uname]) ) {
-			$this->passwd = $this->user_list[$uname]["pwd"];
-			$this->salt = $this->user_list[$uname]["salt"];
-			$this->fullname = $this->user_list[$uname]["fullname"];
-			$this->email = $this->user_list[$uname]["email"];
-			$this->homepage = $this->user_list[$uname]["homepage"];
-			return true;
-		} else return false;
+		
+		$blog = NewBlog();
+		if (file_exists(mkpath(USER_DATA_PATH,$this->username,"index.php"))) {
+			if ($blog->isBlog()) $qs = array('blog'=>$blog->blogid);
+			else $qs = false;
+			$tpl->set("PROFILE_LINK", 
+				make_uri(INSTALL_ROOT_URL.USER_DATA."/".$this->username."/", $qs));
+		} else {
+			$qs = array("user"=>$this->username);
+			if ($blog->isBlog()) $qs['blog'] = $blog->blogid;
+			$tpl->set("PROFILE_LINK", 
+			          make_uri(INSTALL_ROOT_URL."userinfo.php", $qs));
+		}
 	}
 
 	# Method: checkPassword
@@ -166,6 +162,9 @@ class User extends LnBlogObject {
 
 	# Method: save
 	# Save changes to user data.  
+	#
+	# Returns:
+	# True if the changes were successfully saved, false otherwise.
 	function save() {
 		if (!$this->username ||! $this->passwd) return false;
 		$fs = NewFS();
@@ -183,11 +182,14 @@ class User extends LnBlogObject {
 		$ini->setValue("userdata", "name", $this->fullname);
 		$ini->setValue("userdata", "email", $this->email);
 		$ini->setValue("userdata", "homepage", $this->homepage);
+		$ini->setValue("userdata", "default_group", $this->defaultGroup());
+
 		foreach ($this->custom as $key=>$val) {
 			$ini->setValue("customdata", $key, $val);
 		}
 		$ret = $ini->writeFile();
 		if ($ret) $_SESSION["user-".$this->username] = serialize($this);
+		return $ret;
 	}
 
 	# Method: password
@@ -283,7 +285,48 @@ class User extends LnBlogObject {
 		if (!$url) return $this->homepage;
 		else $this->homepage = $url;
 	}
+	
+	# Method: groups
+	# Lists the groups to which the user belongs.
+	#
+	# Returns: 
+	# An array of group names to which the user belongs.
+	
+	function groups() {
+		global $SYSTEM;
+		#return $_GLOBALS['SYSTEM']->getGroups($this->username);
+		return $SYSTEM->getGroups($this->username);
+	}
 
+	# Method: defaultGroup
+	# Gets or sets the default group for this user.  This is the group to which 
+	# all of the user's creations will belong by default.
+	#
+	# Parameters:
+	# Val - If set, the value to which the default group should be changed.
+	#
+	# Returns:
+	# A string with the name of the group.
+
+	function defaultGroup($val=false) {
+		if ($val) $this->default_group = $val;
+		else return $this->default_group;
+	}
+	
+	# Method: addToGroup
+	# Adds the user to the specified group.
+	#
+	# Parameters:
+	# groupname - The name of the group.
+	#
+	# Returns:
+	# True on success, false on failure.
+	
+	function addToGroup($groupname) {
+		global $SYSTEM;
+		return $SYSTEM->addToGroup($this, $groupname);
+	}
+	
 	# Method: login
 	# Logs the user in.
 	# Note that there are two login methods available, with the one used
@@ -308,13 +351,14 @@ class User extends LnBlogObject {
 			if (AUTH_USE_SESSION) {
 					# Create a login token.
 					$token = md5(get_ip().$ts);
+					$_SESSION[CURRENT_USER] = $this->username; 
+					$_SESSION[LOGIN_TOKEN] = $token;
+					$_SESSION[LAST_LOGIN_TIME] = $ts;
+					setcookie(LAST_LOGIN_TIME, "$ts", 
+						(LOGIN_EXPIRE_TIME ? time()+LOGIN_EXPIRE_TIME:false), "/");
 					setcookie(CURRENT_USER, $this->username, 
 						(LOGIN_EXPIRE_TIME ? time()+LOGIN_EXPIRE_TIME:false), "/");
-					SESSION(CURRENT_USER, $this->username, 
-						(LOGIN_EXPIRE_TIME ? time()+LOGIN_EXPIRE_TIME:false), "/");
-					SESSION(LOGIN_TOKEN, $token);
-					SESSION(LAST_LOGIN_TIME, $ts);
-					setcookie(LAST_LOGIN_TIME, "$ts", 
+					setcookie(LOGIN_TOKEN, $token, 
 						(LOGIN_EXPIRE_TIME ? time()+LOGIN_EXPIRE_TIME:false), "/");
 					$ret = true;
 			} else {
@@ -333,9 +377,10 @@ class User extends LnBlogObject {
 	# Note that this is also subject to <AUTH_USE_SESSION>
 	function logout() {
 		if (AUTH_USE_SESSION) {
-			SESSION(CURRENT_USER, false);
-			SESSION(LOGIN_TOKEN, false);
-			SESSION(LAST_LOGIN_TIME, false);
+			unset($_SESSION[CURRENT_USER]);
+			unset($_SESSION[LOGIN_TOKEN]);
+			unset($_SESSION[LAST_LOGIN_TIME]);
+			setcookie(CURRENT_USER, "", time() - 3600, "/");
 			setcookie(LOGIN_TOKEN, "", time() - 3600, "/");
 			setcookie(LAST_LOGIN_TIME, "", time() - 3600, "/");
 		} else {
@@ -385,7 +430,9 @@ class User extends LnBlogObject {
 	# false otherwise.  Note that the system administrator's username
 	# is controlled by the <ADMIN_USER> configuration constant.
 	function isAdministrator() {
-		return ($this->username == ADMIN_USER);
+		global $SYSTEM;
+		return ($this->username == ADMIN_USER || 
+		        $SYSTEM->inGroup($this->username, 'administrators'));
 	}
 
 }

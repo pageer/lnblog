@@ -16,7 +16,9 @@ class LnBlogAd extends Plugin {
 	}
 	
 	function output() { ?>
+<div class="panel">
 <a href="<?php echo PACKAGE_URL; ?>"><img alt="<?php pf_("Powered by %s", PACKAGE_NAME); ?>" title="<?php pf_("Powered by %s", PACKAGE_NAME); ?>" src="<?php echo getlink("logo.png", LINK_IMAGE); ?>" /></a>
+</div>
 <?php 
 	}	
 

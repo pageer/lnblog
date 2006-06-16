@@ -31,6 +31,7 @@ class INIParser {
 	function INIParser ($file=false) {
 		$this->current_section = false;
 		$this->case_insensitive = true;
+		$this->data = array();
 		if ( $file ) $this->filename = $file;
 		if ( file_exists($this->filename) ) {
 			$this->readFile();
@@ -198,7 +199,8 @@ class INIParser {
 	# Parameters:
 	# sec - The section of the file to get.
 	#
-	# Returns an array of the section with variables as keys and 
+	# Returns:
+	# An array of the section with variables as keys and 
 	# values as elements.
 
 	function getSection($sec) {
@@ -212,6 +214,20 @@ class INIParser {
 		return $ret;
 	}
 
+	# Method: getSectionNames
+	# Gets a list of the section names available in the file.
+	#
+	# Returns:
+	# An array of strings, each of which is the name of a section.
+
+	function getSectionNames() {
+		$ret = array();
+		foreach ($this->data as $sec=>$vals) {
+			$ret[] = $sec;
+		}
+		return $ret;
+	}
+	
 	# Method: merge
 	# Merge another INI file into the current one.
 	# If a key from the other file is not set, it will be set with the value 

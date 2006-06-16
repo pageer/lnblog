@@ -4,7 +4,7 @@ class LoginLink extends Plugin {
 
 	function LoginLink() {
 		$this->plugin_desc = _("Adds login panel to the sidebar.");
-		$this->plugin_version = "0.2.0";
+		$this->plugin_version = "0.3.0";
 		$this->use_form = false;
 		$this->admin_link = false;
 		$this->member_list = array();
@@ -32,7 +32,7 @@ class LoginLink extends Plugin {
 ?>
 <h3><?php p_("Login"); ?></h3>
 <fieldset style="border: 0">
-<form method="post" action="<?php echo $root."login.php"; ?>">
+<form method="post" action="<?php echo $blg->uri('login'); ?>">
 <div>
 <label for="user"><?php p_("Username"); ?></label>
 <input name="user" id="user" type="text" />
@@ -47,7 +47,7 @@ class LoginLink extends Plugin {
 <?php 
 		} else {
 ?>
-<p style="margin: 5%"><strong><a href="<?php echo $root; ?>login.php"><?php p_("User Login"); ?></a></strong></p>
+<p style="margin: 5%"><strong><a href="<?php echo $blg->uri('login'); ?>"><?php p_("User Login"); ?></a></strong></p>
 <?php
 		}
 		if ($this->admin_link) {

@@ -141,7 +141,7 @@ function mkdir_rec($path, $mode=false) {
 # An array of directory entry names, removing "." and ".." entries.
 
 function scan_directory($path, $dirs_only=false) {
-	if (! is_dir($path)) return false;
+	if (! is_dir($path)) return array();
 	$dirhand = opendir($path);
 	$dir_list = array();
 	while ( false !== ($ent = readdir($dirhand)) ) {
@@ -152,33 +152,6 @@ function scan_directory($path, $dirs_only=false) {
 	}
 	closedir($dirhand);
 	return $dir_list;
-}
-
-# Function: find_document_root
-# Finds the document root by checking common directory names.
-# This assumes that we are, in fact, currently somewhere under it.
-#
-# Parameters:
-# path - The *optional* path to start at.  *Default* is the current dir.
-#
-# Returns:
-# The absolute path to the calculated document root, or false if the 
-# calculation fails.
-
-function find_document_root($path=false) {
-	# Check if we have a DOCUMENT_ROOT defined.  This is set at setup time
-	# and stored in the fsconfig.php file.
-	if ( defined("DOCUMENT_ROOT") ) return DOCUMENT_ROOT;
-	# Get list of common document root names.
-	$doc_roots = explode(",", DOCROOT_NAMES);
-	$curr_path = $path ? realpath($path) : getcwd();
-	$parent_dir = dirname($curr_path);
-	$base_dir = basename($curr_path);
-	# If we've hit the beginning of the hierarchy, return failure.
-	if ($parent_dir == $curr_path) return false;
-	foreach ($doc_roots as $root)
-		if ( strcasecmp($base_dir, $root) == 0 ) return $curr_path;
-	return find_document_root($parent_dir);
 }
 
 # Function: calculate_document_root
@@ -413,7 +386,6 @@ function localpath_to_uri($path, $full_uri=true) {
 
 	# Add a trailing slash if the path is a directory.
 	if (is_dir($full_path)) $full_path .= PATH_DELIM;
-	#$root = find_document_root($full_path);
 	$root = calculate_document_root();
 	# Normalize to lower case on Windows in order to avoid problems
 	# with case-sensitive substring removal.
@@ -495,7 +467,7 @@ function pathconfig_php_string($inst_root, $inst_url, $blog_url) {
 	$config_data = "<?php\n";
 	$config_data .= '@define("INSTALL_ROOT", \''.$inst_root."');\n";
 	$config_data .= '@define("INSTALL_ROOT_URL", \''.$inst_url."');\n";
-	$config_data .= '@define("BLOG_ROOT_URL", \''.$blog_url."');\n";
+	#$config_data .= '@define("BLOG_ROOT_URL", \''.$blog_url."');\n";
 	$config_data .= 'ini_set(\'include_path\', ini_get(\'include_path\').PATH_SEPARATOR.INSTALL_ROOT);';
 	$config_data .= "\n?>";
 	return $config_data;
@@ -526,7 +498,7 @@ function create_directory_wrappers($path, $type, $instpath="") {
 		case BLOG_BASE:
 			if (!is_dir($instpath)) return false;
 			$filelist = array("index"=>"pages/showblog", "new"=>"pages/newentry",
-			                  "newart"=>"pages/newarticle", "edit"=>"updateblog",
+			                  "newart"=>"pages/newentry", "edit"=>"updateblog",
 			                  "login"=>"bloglogin", "logout"=>"bloglogout",
 			                  "uploadfile"=>"pages/fileupload", "map"=>"sitemap",
 			                  "useredit"=>"pages/editlogin", 
@@ -572,7 +544,7 @@ function create_directory_wrappers($path, $type, $instpath="") {
 			break;
 		case ARTICLE_BASE:
 			# The same as for entries, but for some reason, I never added a delete.
-			$filelist = array("index"=>"pages/showarticle", "edit"=>"pages/editarticle",
+			$filelist = array("index"=>"pages/showentry", "edit"=>"pages/editentry",
 			                  "uploadfile"=>"pages/fileupload",
 			                  "trackback"=>"pages/tb_ping");
 			$ret &= $fs->write_file($current."config.php", config_php_string(2));
@@ -606,7 +578,7 @@ function create_directory_wrappers($path, $type, $instpath="") {
 #
 # Returns:
 # The root-relative path to the item.  If no item is found in any path, 
-# returns an empty string.
+# returns the name parameter as-is.
 
 function getlink($name, $type=false) {
 	if ($type) {
@@ -645,25 +617,32 @@ function getlink($name, $type=false) {
 	# Find the file using a search-path metaphor.  This isn't actually 
 	# configurable, though.
 	
+	$blog = NewBlog();
+	
 	# First case: check the blog directory
-	if ( defined("BLOG_ROOT") && defined("BLOG_ROOT_URL") &&
+	if ( defined("BLOG_ROOT") && 
 	     file_exists(BLOG_ROOT.PATH_DELIM.$l_type.PATH_DELIM.$name) ) {
 		
-		return BLOG_ROOT_URL.$l_type."/".$name;
+		return $blog->uri('base').$l_type."/".$name;
 		
-	# Second case: check the current theme directory
+	# Second case: Try the userdata directory
+	} elseif ( file_exists(USER_DATA_PATH.PATH_DELIM."themes".PATH_DELIM.THEME_NAME.
+	                       PATH_DELIM.$l_type.PATH_DELIM.$name) ) {
+		return INSTALL_ROOT_URL.USER_DATA."/themes/".THEME_NAME."/".$l_type."/".$name;
+
+	# Third case: check the current theme directory
 	} elseif ( file_exists(INSTALL_ROOT.PATH_DELIM."themes".PATH_DELIM.THEME_NAME.
 	                       PATH_DELIM.$l_type.PATH_DELIM.$name) ) {
 		return INSTALL_ROOT_URL."themes/".THEME_NAME."/".$l_type."/".$name;
 
-	# Thrid case: try the default theme
+	# Fourth case: try the default theme
 	} elseif ( file_exists(
 	             mkpath(INSTALL_ROOT,"themes","default",$l_type,$name) ) ) {
 		return INSTALL_ROOT_URL."themes/default/".$l_type."/".$name;
 
 	# Last case: nothing found, so return the empty string.
 	} else {
-		return "";
+		return $name;
 	}
 }
 
@@ -715,6 +694,76 @@ function in_arrayi($needle, $haystack) {
 	foreach ($haystack as $val) 
 		if (strtolower($val) == $lcase_needle) return true;
 	return false;
+}
+
+# Function: make_uri
+# Builds a correct URI with query string.  This is an all-purpose kind of 
+# function designed to handle most contingencies.  
+#
+# Parameters:
+# base         - The base URI to use.  If not given, the current URI is used.
+# query_string - An associative array representing the query string.
+# no_get       - A boolean set to true to suppress automatic importing of the
+#                $_GET superglobal into the query_string parameter.
+# link_sep     - Character to separate query string parameters.  *Default*
+#                value is '&amp;' for link hrefs.  Use '&' for redirects.
+# add_host     - If set to true, adds a host and protocol to the returned
+#                URI if they are not already present.
+#
+# Returns:
+# A string containing the resulting URI.
+
+function make_uri($base=false, $query_string=false, $no_get=true, 
+                  $link_sep='&amp;', $add_host=false) {
+	if ($no_get) $qs = array();
+	else $qs = $_GET;
+	
+	if ($query_string) $qs = array_merge($qs, $query_string); 
+	
+	if ( ! $base ) $base = $_SERVER['SCRIPT_NAME'];
+	elseif (strpos($base, '?') !== false) {
+		$url_parms = substr($base, strpos($base, '?')+1);
+		$url_parms = str_replace('&amp;', '&', $base);
+		$parms = explode('&', $url_parms);
+		foreach ($parms as $p) {
+			$tmp = explode('=', $p);
+			$qs[$tmp[0]] = $tmp[1];
+		}
+	}
+	
+	$ret = '';
+	if (count($qs) > 0) {
+		foreach ($qs as $key=>$val) {
+			if ($ret) $ret .= $link_sep.$key.'='.$val;
+			else      $ret = $key.'='.$val;
+		}
+		$ret = "?".$ret;
+	}
+	
+	# Note that it's OK to not check for ===false because we don't want the 
+	# needle to be at the beginning of the string, so 0 is unacceptable.
+	if ( ! strpos($base, "://") && $add_host) {
+		$protocol = "http";
+		if (SERVER("HTTPS") == "on") $protocol = "https";
+		$host = SERVER("SERVER_NAME");
+		$port = SERVER("SERVER_PORT");
+		if ($port == 80 || $port == "") $port = "";
+		else $port = ":".$port;
+		if (substr($base,0,1) != '/') $base = '/'.$base;
+		$base = $protocol."://".$host.$port.$base;
+	}
+	
+	$ret = $base.$ret;
+	
+	return $ret;
+}
+
+if (! function_exists('is_a')) {
+	function is_a($obj, $class) {
+		$cls = strtolower(get_class($obj));
+		$class = strtolower(trim($class));
+		return ($cls == $class);
+	}
 }
 
 ?>

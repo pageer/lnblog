@@ -1,22 +1,33 @@
 <?php
 
+# Plugin: Archives
+# A sidebar plugin to display months of archives.
+#
+# This plugin provides quick, easy access to blog archives.  It produces a
+# sidebar panel with a link for each month for which there are entries, up
+# to a configurable maximum.
+
 class Archives extends Plugin {
 
 	function Archives() {
 		$this->plugin_name = _("List the months of archives for a blog.");
-		$this->plugin_version = "0.1.0";
+		$this->plugin_version = "0.2.0";
+		$this->addOption("max_months", _("Number of months to show"), 6, "text");
+		$this->addOption("title", _("Sidebar section title"), 
+		                 _("Archives"), "text");
+		$this->getConfig();
 	}
 
 	function output($parm=false) {
 		$blg = NewBlog();
 		if (! $blg->isBlog()) return false;
 		
-		$MAX_MONTHS = 6;
-		
 		$root = $blg->getURL();
-		$month_list = $blg->getRecentMonthList($MAX_MONTHS);
+		$month_list = $blg->getRecentMonthList($this->max_months);
 ?>
-<h3><a href="<?php echo $root.BLOG_ENTRY_PATH; ?>/"><?php p_("Archives"); ?></a></h3>
+<?php if ($this->title) { ?>
+<h3><a href="<?php echo $root.BLOG_ENTRY_PATH; ?>/"><?php echo $this->title; ?></a></h3>
+<?php } ?>
 <ul>
 <?php
 		foreach ($month_list as $month) {
@@ -28,7 +39,7 @@ class Archives extends Plugin {
 <?php 
 		}  # End of foreach loop.
 ?>
-<li><a href="<?php echo $root.BLOG_ENTRY_PATH."/all.php"; ?>"><?php p_("Show all entries"); ?></a></li>
+<li><a href="<?php echo $blg->uri('listall'); ?>"><?php p_("Show all entries"); ?></a></li>
 </ul><?php
 	}  # End of function
 }

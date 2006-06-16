@@ -62,51 +62,71 @@ require_once("blogconfig.php");
 require_once("lib/creators.php");
 require_once("lib/utils.php");
 
-$page = NewPage();
+global $PAGE;
 
 if ( ! file_exists(INSTALL_ROOT.PATH_DELIM.USER_DATA.PATH_DELIM.FS_PLUGIN_CONFIG) ) {
-	$page->redirect("fs_setup.php");
+	$PAGE->redirect("fs_setup.php");
 	exit;
 }
 
 $update =  "update";
 $upgrade = "upgrade";
-$fixperm = "fixperm";
-$page->title = sprintf(_("%s Administration"), PACKAGE_NAME);
+$PAGE->title = sprintf(_("%s Administration"), PACKAGE_NAME);
 
-$tpl = NewTemplate(BLOG_ADMIN_TEMPLATE);
+$tpl = NewTemplate('blog_admin_tpl.php');
 $tpl->set("SHOW_NEW");
-$tpl->set("UPDATE", $update);
-$tpl->set("UPGRADE", $upgrade);
-$tpl->set("PERMS", $fixperm);
 $tpl->set("FORM_ACTION", current_file());
 
+# Check if there is at least one administrator.  
+# If not, then we need to create one.
+
 $usr = NewUser();
-if (! is_file(mkpath(USER_DATA_PATH,ADMIN_USER,"passwd.php"))) {
-	$page->redirect("newlogin.php");
+if (! $SYSTEM->hasAdministrator()) {
+	$PAGE->redirect("newlogin.php");
 	exit;
-} elseif (! $usr->checkLogin() || $usr->username() != ADMIN_USER) {
-	$page->redirect("bloglogin.php");
+} elseif (! $usr->checkLogin() || ! $usr->isAdministrator()) {
+	$PAGE->redirect("bloglogin.php");
 	exit;
 }
 
-if (POST($upgrade)) {
-	if (is_absolute(POST($upgrade))) $upgrade_path = trim(POST($upgrade));
-	else $upgrade_path = calculate_document_root().PATH_DELIM.trim(POST($upgrade));
+if ( POST('upgrade') && POST('upgrade_btn') ) {
+	if (is_absolute(POST('upgrade'))) $upgrade_path = trim(POST('upgrade'));
+	else $upgrade_path = calculate_document_root().PATH_DELIM.trim(POST('upgrade'));
 	$b = NewBlog($upgrade_path);
 	$upgrade_status = $b->upgradeWrappers();
-	$page->redirect(current_file(true));
-} elseif (POST($update)) {
-	if (is_absolute(POST($update))) $update_path = trim(POST($update));
-	else $update_path = calculate_document_root().PATH_DELIM.trim(POST($update));
-	$page->redirect(htmlentities("updateblog.php?blogpath=".$update_path));
-} elseif (POST($fixperm)) {
-	if (is_absolute(POST($fixperm))) $fixperm_path = trim(POST($fixperm));
-	else $fixperm_path = calculate_document_root().PATH_DELIM.trim(POST($fixperm));
+	if ($upgrade_status) $status = spf_("Upgrade of %s completed successfully.",
+	                                    $b->blogid);
+	else $status = spf_("Error: Upgrade exited with status %s.", $upgrade_status);
+	$tpl->set("UPGRADE_STATUS", $status);
+
+} elseif ( POST('register') && POST('register_btn') ) {
+	$blog = NewBlog(POST('register'));
+	if (! $blog->isBlog()) {
+		$status = spf_("The path '%s' is not an LnBlog weblog.", POST('register'));
+	} else {
+		$ret = $SYSTEM->registerBlog($blog->blogid);
+		if ($ret) $status = spf_("Blog %s successfully registered.", $blog->blogid);
+		else $status = spf_("Registration error: exited with code %s", $ret);
+	}
+	$tpl->set("REGISTER_STATUS", $status);
+	
+} elseif ( POST('fixperm') && POST('fixperm_btn') ) {
+	if (is_absolute(POST('fixperm'))) $fixperm_path = trim(POST('fixperm'));
+	else $fixperm_path = calculate_document_root().PATH_DELIM.trim(POST('fixperm'));
 	$b = NewBlog(POST($fixperm_path));
 	$upgrade_status = $b->fixDirectoryPermissions();
+	if ($upgrade_status) $status = _("Permission update completed successfully.");
+	else $status = spf_("Error: Update exited with status %s.", $upgrade_status);
+	$tpl->set("FIXPERM_STATUS", $status);
 }
 
+$blogs = $SYSTEM->getBlogList();
+$blog_names = array();
+foreach ($blogs as $blg) {
+	$blog_names[] = $blg->blogid;
+}
+$tpl->set("BLOG_ID_LIST", $blog_names);
+
 $body = $tpl->process();
-$page->display($body);
+$PAGE->display($body);
 ?>

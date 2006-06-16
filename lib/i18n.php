@@ -62,6 +62,10 @@ function fmtdate($fmt, $ts=false) {
 		}
 		return $ret;
 	} else {
+		#$strftime_codes = array('%a','%A','%b','%B','%c','%C','%d','%D','%e','%g',
+		#                        );
+		#$date_codes = array('l', 'l', 'M', 'F', 'c', 'Y', 'd', 'm/d/y', 'j', 'Y',
+		#                    );
 		return date($fmt, $ts);
 	}
 }

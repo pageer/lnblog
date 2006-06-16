@@ -20,7 +20,7 @@ class PageHeader extends Plugin {
 		$blg = NewBlog();
 		if ($blg->isBlog()) { 
 			?>
-<h1><a href="<?php echo $blg->getURL(); ?>" title="<?php echo $blg->description; ?>"><?php echo $blg->name; ?></a></h1>
+<h1><a href="<?php echo $blg->uri('blog'); ?>" title="<?php echo $blg->description; ?>"><?php echo $blg->name; ?></a></h1>
 <?php 
 			if ($this->show_desc) { ?>
 <h3><?php echo $blg->description;?></h3>

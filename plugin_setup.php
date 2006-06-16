@@ -31,23 +31,25 @@ require_once("blogconfig.php");
 require_once("lib/creators.php");
 require_once("lib/plugin.php");
 
-$page = NewPage();
+global $PAGE;
 $usr = NewUser();
 
 if (defined("BLOG_ROOT")) {
 	$blg = NewBlog();
-	if (! $blg->canModifyBlog()) {
-		$page->redirect("login.php");
+	if (! $SYSTEM->canModify($blg, $usr) || !$usr->checkLogin()) {
+		$PAGE->redirect($blg->uri('login'));
+		exit;
 	}
-} elseif (! $usr->checkLogin(ADMIN_USER)) {
-	$page->redirect("bloglogin.php");
+} elseif (! $usr->isAdministrator() || !$usr->checkLogin()) {
+	$PAGE->redirect("bloglogin.php");
+	exit;
 }
 
 if (has_post()) {
 	$plug_name = sanitize(POST("plugin"));
 	$plug = new $plug_name;
 	$ret = $plug->updateConfig();
-	$page->redirect(current_file(true));
+	$PAGE->redirect(current_file(true));
 	exit;
 } elseif ( sanitize(GET("plugin")) && 
            class_exists(sanitize(GET("plugin"))) ) {
@@ -58,11 +60,14 @@ if (has_post()) {
 	$body .= '<li>'._('Version').': '.$plug->plugin_version.'</li>';
 	$body .= '<li>'._('Description').': '.$plug->plugin_desc.'</li></ul>';
 	ob_start();
-	$ret = $plug->showConfig($page);
+	$ret = $plug->showConfig($PAGE);
 	$buff = ob_get_contents();
 	ob_end_clean();
 	$body .= is_string($ret) ? $ret : $buff;
-	$body .= '<p><a href="'.current_uri(true,'').'">'._("Back to plugin list").'</a></p>';
+	if ( isset($blg) ) $url = $blg->uri('pluginconfig');
+	else $url = current_uri(true,'');
+	
+	$body .= '<p><a href="'.$url.'">'._("Back to plugin list").'</a></p>';
 } else {
 	global $PLUGIN_MANAGER;
 	$plug_list = $PLUGIN_MANAGER->getPluginList();
@@ -71,11 +76,12 @@ if (has_post()) {
 	$body .= '<table><tr><th>Plugin</th><th>Version</th><th>Description</th></tr>';
 	foreach ($plug_list as $plug) {
 		$p = new $plug;
-		$body .= '<tr><td><a href="?plugin='.$plug.'">'.$plug.'</a></td>';
+		$url = make_uri(false,array("plugin"=>$plug),false);
+		$body .= '<tr><td><a href="'.$url.'">'.$plug.'</a></td>';
 		$body .= '<td style="text-align: center">'.$p->plugin_version.'</td><td>'.$p->plugin_desc.'</td></tr>';
 	}
 	$body .= '</table>';
 }
-$page->title = spf_("%s Plugin Configuration", PACKAGE_NAME);
-$page->display($body);
+$PAGE->title = spf_("%s Plugin Configuration", PACKAGE_NAME);
+$PAGE->display($body);
 ?>

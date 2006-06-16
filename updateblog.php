@@ -28,6 +28,8 @@ require_once("blogconfig.php");
 require_once("lib/creators.php");
 require_once("lib/utils.php");
 
+global $PAGE;
+
 if (POST("blogpath")) $blog_path = POST("blogpath");
 elseif (GET("blogpath")) $blog_path = GET("blogpath");
 else $blog_path = false;
@@ -35,33 +37,34 @@ else $blog_path = false;
 $blog = NewBlog($blog_path);
 $usr = NewUser();
 $tpl = NewTemplate("blog_modify_tpl.php");
-$page = NewPage(&$blog);
-
-if (! $blog->canModifyBlog() ) {
-	$page->redirect("login.php");
-	exit;
-}
+$PAGE->setDisplayObject($blog);
 
 # NOTE - we should sanitize this input to avoid XSS attacks.  Then again, 
 # since this page is not publicly accessible, is that needed?
 
 if (has_post()) {
-	# Only the site administrator can change a blog owner.
-	if ($usr->username() == ADMIN_USER && POST("blogowner") ) {
-		$blog->owner = POST("blogowner");
+	
+	if ($SYSTEM->canModify($blog, $usr) && $usr->checkLogin()) {
+		# Only the site administrator can change a blog owner.
+		if ($usr->username() == ADMIN_USER && POST("blogowner") ) {
+			$blog->owner = POST("blogowner");
+		}
+		$blog->name = POST("blogname");
+		$blog->writers(POST("writelist") );
+		$blog->description = POST("desc");
+		$blog->image = POST("image");
+		$blog->theme = POST("theme");
+		$blog->max_entries = POST("maxent");
+		$blog->max_rss = POST("maxrss");
+		$blog->default_markup = POST("blogmarkup");
+	
+		$ret = $blog->update();
+		$SYSTEM->registerBlog($blog->blogid);
+		if (!$ret) $tpl->set("UPDATE_MESSAGE", _("Error: unable to update blog."));
+		else $PAGE->redirect($blog->getURL());
+	} else {
+		$tpl->set("UPDATE_MESSAGE", _("Error: user %s"));
 	}
-	$blog->name = POST("blogname");
-	$blog->writers(POST("writelist") );
-	$blog->description = POST("desc");
-	$blog->image = POST("image");
-	$blog->theme = POST("theme");
-	$blog->max_entries = POST("maxent");
-	$blog->max_rss = POST("maxrss");
-	$blog->default_markup = POST("blogmarkup");
-
-	$ret = $blog->update();
-	if (!$ret) $tpl->set("UPDATE_MESSAGE", _("Error updating blog."));
-	else $page->redirect($blog->getURL());
 }
 
 if ($usr->username() == ADMIN_USER) {
@@ -79,7 +82,7 @@ $tpl->set("POST_PAGE", current_file());
 $tpl->set("UPDATE_TITLE", sprintf(_("Update %s"), $blog->name));
 
 $body = $tpl->process();
-$page->title = sprintf(_("Update blog - %s"), $blog->name);
-$page->addStylesheet("form.css");
-$page->display($body, &$blog);
+$PAGE->title = spf_("Update blog - %s", $blog->name);
+$PAGE->addStylesheet("form.css");
+$PAGE->display($body, &$blog);
 ?>

@@ -33,6 +33,8 @@ OnOutput       - Fired when processing for HTML output starts.
 OutputComplete - Fired after the HTML output has been performed.
 */
 
+require_once("lib/lnblogobject.php");
+
 class Page extends LnBlogObject {
 
 	/*
@@ -61,7 +63,9 @@ class Page extends LnBlogObject {
 	var $charset;
 	var $rssfeeds;
 	var $stylesheets;
+	var $inline_stylesheets;
 	var $scripts;
+	var $inline_scripts;
 	var $metatags;
 	var $headers;
 	
@@ -74,8 +78,10 @@ class Page extends LnBlogObject {
 		# Set the default style sheets.
 		$this->stylesheets = array("main.css", "banner.css", "menubar.css", 
 		                           "sidebar.css");
+		$this->inline_stylesheets = array();
 		$this->rssfeeds = array();
 		$this->scripts = array();
+		$this->inline_scripts = array();
 		$this->metatags = array();
 		$this->headers = array();
 		
@@ -85,6 +91,16 @@ class Page extends LnBlogObject {
 		$this->charset = DEFAULT_CHARSET;
 
 		$this->raiseEvent("InitComplete");		
+	}
+	
+	# Method: setDisplayObject
+	# Sets the object which the page is currently displaying.
+	#
+	# Parameters:
+	# ref - A reference to the object to set.
+	
+	function setDisplayObject(&$ref) {
+		$this->display_object = $ref;
 	}
 
 	/*
@@ -101,6 +117,23 @@ class Page extends LnBlogObject {
 		$arg_list = func_get_args();
 		for ($i = 0; $i < $num_args; $i++) {
 			$this->stylesheets[] = $arg_list[$i];
+		}
+	}
+	
+		/*
+	Method: addInlineStylesheet
+	Adds style sheets to be added inline into the page.
+
+	Parameters:
+	Takes a variable number of string parameters, each containing the CSS code
+	to use for the inline styles.
+	*/
+
+	function addInlineStylesheet() {
+		$num_args = func_num_args();
+		$arg_list = func_get_args();
+		for ($i = 0; $i < $num_args; $i++) {
+			$this->inline_stylesheets[] = $arg_list[$i];
 		}
 	}
 
@@ -134,6 +167,19 @@ class Page extends LnBlogObject {
 		$this->scripts[] = array("href"=>$href, "type"=>$type);
 	}
 
+	/*
+	Method: addInlineScript
+	Adds an inline script to the header of the page.
+
+	Parameters:
+	text - The text of the script to add inline.
+	type - *Optional* MIME type of the script.  
+	       The default is text/javascript.
+	*/
+	function addInlineScript($text, $type="text/javascript") {
+		$this->inline_scripts[] = array("text"=>$text, "type"=>$type);
+	}
+	
 	/*
 	Method: addMeta
 	Adds a META item to the page.
@@ -207,7 +253,9 @@ class Page extends LnBlogObject {
 		$head->set("METADATA", $this->metatags);
 		$head->set("RSSFEEDS", $this->rssfeeds);
 		$head->set("STYLESHEETS",$this->stylesheets);
+		$head->set("INLINE_STYLESHEETS",$this->inline_stylesheets);
 		$head->set("SCRIPTS",$this->scripts);
+		$head->set("INLINE_SCRIPTS",$this->inline_scripts);
 		
 		if (get_class($blog)) $blog->exportVars(&$head);
 		$head->set("PAGE_CONTENT", $page_body);
@@ -219,5 +267,7 @@ class Page extends LnBlogObject {
 	}
 	
 }
+
+$PAGE = new Page();
 
 ?>

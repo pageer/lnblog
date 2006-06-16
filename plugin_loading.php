@@ -25,6 +25,8 @@ session_start();
 require_once("blogconfig.php");
 require_once("lib/creators.php");
 
+global $PAGE;
+
 function plug_sort($a, $b) {
 	if (is_numeric($a["order"]) && ! is_numeric($b["order"])) {
 		return -1;
@@ -48,18 +50,19 @@ function namefix($pg) {
 	return preg_replace("/\W/", "_", $pg);
 }
 
-$page = NewPage();
 $user = NewUser();
 
 global $PLUGIN_MANAGER;
 
 if (defined("BLOG_ROOT")) {
 	$blg = NewBlog();
-	if (! $blg->canModifyBlog()) {
-		$page->redirect("login.php");
+	if (! $SYSTEM->canModify($blg, $user) || ! $user->checkLogin()) {
+		$PAGE->redirect("login.php");
+		exit;
 	}
-} elseif (! $user->checkLogin(ADMIN_USER)) {
-	$page->redirect("bloglogin.php");
+} elseif (! $user->isAdministrator() || ! $user->checkLogin()) {
+	$PAGE->redirect("bloglogin.php");
+	exit;
 }
 
 $tpl = NewTemplate(PLUGIN_LOAD_TEMPLATE);
@@ -70,7 +73,6 @@ if (has_post()) {
 	$first = array();
 	
 	foreach ($PLUGIN_MANAGER->plugin_list as $plug) {
-		#echo "<p>En: $plug, ".POST(namefix($plug)."_en").", ".POST(namefix($plug)."_ord")."</p>";
 		if (! POST(namefix($plug)."_en")) $disabled[] = $plug;
 		if (is_numeric(POST(namefix($plug)."_ord"))) 
 			$first[$plug] = POST(namefix($plug)."_ord");
@@ -115,6 +117,6 @@ uasort($disp_list, "plug_sort");
 
 $tpl->set("PLUGIN_LIST", $disp_list);
 
-$page->title = spf_("%s Plugin Loading Configuration", PACKAGE_NAME);
-$page->display($tpl->process());
+$PAGE->title = spf_("%s Plugin Loading Configuration", PACKAGE_NAME);
+$PAGE->display($tpl->process());
 ?>
