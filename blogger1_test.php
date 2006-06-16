@@ -1,5 +1,8 @@
 <?php
 
+# This file is (loosely) based on the client.php test script that ships with 
+# XML-RPC for PHP 1.2.1.
+
 # File: blogger1_test.php
 # This is a simple test harness for the Blogger 1.0 API implementation.
 # You can use this to try out the blogger API.  Note that this file will just
@@ -14,7 +17,7 @@
 $LNBLOG_PATH = '/LnBlog';
 ?>
 <html>
-<head><title>xmlrpc</title></head>
+<head><title>Blogger API Test</title></head>
 <body>
 <form method="post">
 <div>Username:<input type="text" name="username" value="<?php
@@ -34,10 +37,7 @@ echo isset($_POST['entid'])?$_POST['entid']:'';?>" /></div>
 <?php
 
 if (! empty($_POST)) {
-	include("LnBlog/xmlrpc/xmlrpc.inc");
-	#ini_set("include_path", ini_get('include_path').";D:\Inetpub\wwwroot\LnBlog");
-	#include_once("LnBlog/blogconfig.php");
-	#include_once("LnBlog/lib/creators.php");
+	include("xmlrpc/xmlrpc.inc");
 
 		if (isset($_POST['new'])) {
 			$arr = array(new xmlrpcval("1234567", "string"), 
@@ -79,10 +79,6 @@ if (! empty($_POST)) {
 		$v = $r->value();
 		if (!$r->faultCode())
 		{
-#			echo "State number ". htmlentities($stateno) . " is "
-#				. htmlentities($v->scalarval()) . "<BR>";
-#			echo "<HR>I got this value back<BR><PRE>"
-#				. htmlentities($r->serialize()). "</PRE><HR>\n";
 			echo "It worked?";
 		}
 		else

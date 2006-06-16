@@ -57,6 +57,7 @@ class BlogEntry extends Entry {
 		
 		$this->raiseEvent("OnInit");
 	
+		$this->id = '';
 		$this->uid = '';
 		$this->ip = get_ip();
 		$this->date = "";
@@ -68,7 +69,7 @@ class BlogEntry extends Entry {
 		$this->subject = "";
 		$this->tags = "";
 		$this->data = "";
-		$this->abstract = "";
+		#$this->abstract = "";
 		$this->has_html = MARKUP_BBCODE;
 		$this->allow_comment = true;
 		$this->allow_tb = true;
@@ -122,7 +123,9 @@ class BlogEntry extends Entry {
 			
 		}
 		
-		if ( file_exists($this->file) ) $this->readFileData();
+		if ( file_exists($this->file) ) {
+			$this->readFileData();
+		}
 		
 		$this->raiseEvent("InitComplete");
 	}
@@ -143,7 +146,8 @@ class BlogEntry extends Entry {
 			for ($i=0; $i<3; $i++) $dir = dirname($dir);
 			$ret = NewBlog($dir);
 			if (!$ret->isBlog()) {
-				# If the entry is a BlogEntry, then the parent will be 2 more levels up
+				# If the entry is a BlogEntry, then the parent will be 2 more 
+				# (i.e. 5) levels up
 				for ($i=0; $i<2; $i++) $dir = dirname($dir);
 				$ret = NewBlog($dir);
 			}
@@ -168,6 +172,21 @@ class BlogEntry extends Entry {
 		return $ret;
 	}
 
+	# Method: globalID
+	# A unique ID for use with blogging APIs.  Note that this ID embedds the 
+	# parent blog's ID, whereas the <entryID> method provides an ID *within*
+	# the current blog.
+	# 
+	# Returns:
+	# A string with the unique ID.
+
+	function globalID() {
+		$ret = str_replace(PATH_DELIM, '/', 
+		                   substr(dirname($this->file), 
+		                          strlen(DOCUMENT_ROOT)));
+		return trim($ret, '/');
+	}
+
 	# Method: parentID
 	# Gets an identifier for the entry's parent blog.
 	#
@@ -178,6 +197,29 @@ class BlogEntry extends Entry {
 		$path = dirname($this->file);
 		for ($i = 0; $i < 4; $i++) $path = dirname($path);
 		return substr($path, strlen(DOCUMENT_ROOT));
+	}
+	
+	# Method: getUploadedFiles
+	# Gets an array of the names of all files uploaded to this entry.  
+	# Currently, this just means all files in the entry directory that were not
+	# created by LnBlog.
+	#
+	# Returns:
+	# An array containing the file names without path.
+	
+	function getUploadedFiles() {
+		$base_path = $this->localpath();
+		$std_files = array('index.php','config.php','edit.php','delete.php',
+		                   'trackback.php','uploadfile.php',ENTRY_DEFAULT_FILE);
+		$files = scan_directory($base_path);
+		
+		$ret = array();
+		
+		foreach ($files as $f) {
+			if (!in_array($f, $std_files) && !is_dir(mkpath($base_path, $f))) {
+				$ret[] = $f;
+			}
+		}
 	}
 
 	/*
@@ -219,7 +261,7 @@ class BlogEntry extends Entry {
 		if (! $path) $path = dirname($this->file);
 		return file_exists($path.PATH_DELIM.ENTRY_DEFAULT_FILE);
 	}
-
+	
 	/*
 	Method: localpath
 	Get the path to this entry's directory on the local filesystem.  Note 
@@ -473,6 +515,9 @@ class BlogEntry extends Entry {
 		$ret = $this->writeFileData();
 		# Add a wrapper file to make the link prettier.
 		if ($ret) {
+			$this->id = str_replace(PATH_DELIM, '/', 
+			                        substr(dirname($this->file), 
+									        strlen(DOCUMENT_ROOT)));
 			$this->makePrettyPermalink();
 		}
 		$this->raiseEvent("InsertComplete");

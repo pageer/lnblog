@@ -19,8 +19,14 @@
 */
 
 # File: editentry.php
-# Used to edit existing blog entries.
+# Used to edit existing blog entries and articles.
 # To create a new blog entry, refer to the <newentry.php> file.
+#
+# When editing entries, it is possible to include a file upload in the POST.
+# The number of uploads is determined by the AllowInitUpload variable 
+# in the entryconfig section of your LnBlog/userdata/system.ini.  The default
+# setting is 1.  To disable file uploads when creating or editing posts, set 
+# this variable to 0.
 #
 # This is included by the new.php wrapper script for blogs.
 
@@ -65,7 +71,24 @@ if (POST('submit')) {
 		if ($ent->data) {
 			$ret = $ent->update();
 			$blg->updateTagList($ent->tags());
-			if (!$ret) $err = _("Error: unable to update entry.");
+			
+			if ($ret) {
+				$num_uploads = $SYSTEM->sys_ini->value("entryconfig",	"AllowInitUpload",1);
+				for ($i=1; $i<=$num_uploads; $i++) {
+					$upld = NewFileUpload('upload'.$i, $ent->localpath());
+					if ( $upld->completed() ) {
+						$upld->moveFile();
+					} elseif ($upld->status() != FILEUPLOAD_NO_FILE) {
+						echo $upld->status();
+						$ret = false;
+						$err = $upld->errorMessage();
+					}
+				}
+			
+			} else { 
+				$err = _("Error: unable to update entry.");
+			}
+				
 		} else {
 			$err = _("Error: entry contains no data.");
 		}

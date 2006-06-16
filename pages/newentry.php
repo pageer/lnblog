@@ -23,6 +23,12 @@
 # To edit or delete an entry, refer to the <editentry.php> and <delentry.php>
 # files respectively.
 #
+# When creating entries, it is possible to include a file upload in the POST.
+# The number of uploads is determined by the AllowInitUpload variable 
+# in the entryconfig section of your LnBlog/userdata/system.ini.  The default
+# setting is 1.  To disable file uploads when creating or editing posts, set 
+# this variable to 0.
+#
 # This is included by the new.php wrapper script for blogs.
 
 session_start();
@@ -73,7 +79,23 @@ if (POST('submit')) {
 			else $ret = $ent->insert($blg);
 			$blg->updateTagList($ent->tags());
 			if ($is_art) $ent->setSticky(true);
-			if (!$ret) $err = _("Error: unable to add entry.");
+			
+			if ($ret) {
+				$num_uploads = $SYSTEM->sys_ini->value("entryconfig",	"AllowInitUpload",1);
+				for ($i=1; $i<=$num_uploads; $i++) {
+					$upld = NewFileUpload('upload'.$i, $ent->localpath());
+					if ( $upld->completed() ) {
+						$upld->moveFile();
+					} elseif ($upld->status() != FILEUPLOAD_NO_FILE) {
+						$ret = false;
+						$err = $upld->errorMessage();
+					}
+				}
+			
+			} else { 
+				$err = _("Error: unable to add entry.");
+			}
+
 		} else {
 			$err = _("Error: entry contains no data.");
 		}

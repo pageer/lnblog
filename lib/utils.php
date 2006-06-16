@@ -429,6 +429,41 @@ function localpath_to_uri($path, $full_uri=true) {
 	return $url_path;
 }
 
+# Function: uri_to_localpath
+# The reverse of <localpath_to_uri>, this function takes a URI handled by LnBlog
+# and converts it into a local path to the file or directory in question.  This
+# function assumes that the URI is fully qualified, e.g. 
+# |http://somehost.com/somepath/somefile.ext
+# Note that this may or may not play well with Apache .htaccess files.
+#
+# Parameters:
+# uri - The URI to convert.
+#
+# Returns:
+# A string containing the local path referenced by the URI.  Not that this path
+# may or may not exist.
+
+function uri_to_localpath($uri) {
+	# Extract the protocol.
+	$pos = strpos($uri, '://');
+	$protocol = substr($uri, 0, $pos);
+	$temp_uri = substr($uri, $pos+3);
+	
+	# Now separate the domain and path.
+	$pos = strpos($uri, '/');
+	$domain = substr($temp_uri, 0, $pos);
+	$path = substr($temp_uri, $pos);
+	
+	# Check if there is a port number with the domain.
+	$pos = strpos($domain, ':');
+	if ($pos) {
+		$domain = substr($domain, 0, $pos);
+		$port = substr($domain, $pos+1);
+	} else $port = '';
+	
+	
+}
+
 # Function: get_ip
 # Quick function to get the user's IP address.  This should probably be
 # extended to account for proxies and such.

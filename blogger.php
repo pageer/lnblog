@@ -92,6 +92,21 @@ $function_map = array(
 	"blogger.setTemplate"   => array("function"=>"set_template")
 );
 
+# Method: blogger.newPost
+# Adds a new post to the blog.
+#
+# Parameters:
+# appkey(string)   - No longer used.  Pass a dumby value.
+# blogid(string)   - Identifier for the blog.
+# username(string) - Username to log in as.
+# password(string) - The password to log in with.
+# content(string)  - The body text of the post.
+# publish(boolean) - Whether or not to immediately publish the entry.
+#                    The parameter is not currently used by LnBlog.
+#
+# Returns:
+# A string representation of the unique ID of this post.
+
 function new_post($params) {
 
 	global $xmlrpcerruser;
@@ -133,13 +148,28 @@ function new_post($params) {
 		$ent->data = $data;
 		$ret = $ent->insert($blog);
 		$blog->updateTagList($ent->tags());
-		if ($ret) $ret = new xmlrpcresp( new xmlrpcval($ent->uri("base")) );
+		if ($ret) $ret = new xmlrpcresp( new xmlrpcval($ent->globalID()) );
 		else $ret = new xmlrpcresp(0, $xmlrpcerruser+2, "Entry add failed");
 	} else {
 		$ret = new xmlrpcresp(0, $xmlrpcerruser+3, "Invalid password - cannot create new post");
 	 }
 	return $ret;
 }
+
+# Method: blogger.editPost
+# Edit an existing post.
+#
+# Parameters:
+# appkey(string)   - No longer used.  Pass a dumby value.
+# postid(string)   - Identifier for the post.
+# username(string) - Username to log in as.
+# password(string) - The password to log in with.
+# content(string)  - The new body text of the post.
+# publish(boolean) - Whether or not to immediately publish the entry.
+#                    The parameter is not currently used by LnBlog.
+#
+# Returns:
+# True on success.  On failure, a fault is raised.
 
 function edit_post($params) {
 	global $xmlrpcerruser;
@@ -186,7 +216,7 @@ function edit_post($params) {
 			$ent->data = $data;
 			$ret = $ent->update();
 			$blog->updateTagList($ent->tags());
-			if ($ret) $ret = new xmlrpcresp( new xmlrpcval($ent->uri("base"), 'string') );
+			if ($ret) $ret = new xmlrpcresp( new xmlrpcval(true, 'boolean') );
 			else $ret = new xmlrpcresp(0, $xmlrpcerruser+2, "Entry update failed");
 			
 		} else {
@@ -198,6 +228,17 @@ function edit_post($params) {
 	 }
 	return $ret;
 }
+
+# Method: blogger.getUsersBlogs
+# Gets a list of all blogs that a given user can add posts to.
+#
+# Parameters:
+# appkey(string)   - No longer used.  Pass a dumby value.
+# username(string) - Username to log in as.
+# password(string) - The password to log in with.
+#
+# Returns:
+# An array of structs containing the blog name, id, and URL.
 
 function get_user_blogs($params) {
 	global $xmlrpcerruser;
@@ -232,6 +273,19 @@ function get_user_blogs($params) {
 	}
 	return $ret;
 }
+
+# Method: blogger.getUserInfo
+# Gets the information for the given user.
+#
+# Parameters:
+# appkey(string)   - No longer used.  Pass a dumby value.
+# username(string) - Username to log in as.
+# password(string) - The password to log in with.
+#
+# Returns:
+# A struct containing user's userid, firstname, lastname, nickname, email, and 
+# url.  Note that not all of these necessarily apply to LnBlog, and so any field
+# that is not found will be "faked" with a reasonable value or empty.
 
 function get_user_info($params) {
 	global $xmlrpcerruser;
@@ -303,11 +357,34 @@ function get_user_info($params) {
 	return $ret;
 }
 
+# Method: blogger.getTemplate
+# Gets the template used for the main or entry page.
+# This doesn't apply to LnBlog and so always returns a "not implemented" message.
+#
+# Parameters:
+# appkey(string)        - No longer used.  Pass a dumby value.
+# blogid(string)        - Identifier for the blog.
+# username(string)      - Username to log in as.
+# password(string)      - The password to log in with.
+# templateType(string)  - The type of template to get.
+
 function get_template($params) {
 	global $xmlrpcerruser;
 	return new xmlrpcresp(0, $xmlrpcerruser+1, 
 	                      "Method blogger.getTemplate not implemented.");
 }
+
+# Method: blogger.setTemplate
+# Sets the template used for the main or entry page.
+# This doesn't apply to LnBlog and so always returns a "not implemented" message.
+#
+# Parameters:
+# appkey(string)        - No longer used.  Pass a dumby value.
+# blogid(string)        - Identifier for the blog.
+# username(string)      - Username to log in as.
+# password(string)      - The password to log in with.
+# templateType(string)  - The type of template to get.
+
 function set_template($params) {
 	global $xmlrpcerruser;
 	return new xmlrpcresp(0, $xmlrpcerruser+1, 

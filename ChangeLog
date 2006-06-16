@@ -1,3 +1,21 @@
+06-Jun-2006: verison 0.7.1
+- Added a command-line Python utility to make MetaWeblog API calls.  This is a
+simple client program for testing and automation.
+- Added links to admin page for editing system.ini and groups.ini.
+- Fixed incorrect return values in the Blogger and MetaWeblog API 
+implementations.  In particular, the newPost methods were returning a URI, not
+the unique ID that needed to be passed in the API calls.
+
+31-May-2006:
+- Extended MetaWeblog API to allow uploading to a particular entry with the
+newMediaObject method.
+
+29-May-2006:
+- Implemented MetaWeblog API.
+- Started on support for Pingbacks.
+- Changed entry input mode selection to select box.
+- Added file upload boxes to the entry/article add/edit pages.
+
 20-May-2006: version 0.7.0
 - More authentication fixes.
 - Fixed receiving trackback excerpts.

@@ -261,6 +261,11 @@ class Article extends BlogEntry {
 		$this->ip = get_ip();
 
 		$ret = $this->writeFileData();
+		if ($ret) {
+			$this->id = str_replace(PATH_DELIM, '/', 
+			                        substr(dirname($this->file), 
+									        strlen(DOCUMENT_ROOT)));
+		}
 		$this->raiseEvent("InsertComplete");
 		return $ret;
 		

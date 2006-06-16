@@ -40,41 +40,23 @@ class FileUpload extends LnBlogObject {
 		$this->size = 0;
 		$this->mimetype = '';
 		$this->error = FILEUPLOAD_NOT_INITIALIZED;
-		if (php_version_at_least("4.1.0")) {
-			if (isset($_FILES[$field])) {
-				if ($index === false) {
-					$this->destname = $_FILES[$field]['name'];
-					$this->tempname = $_FILES[$field]['tmp_name'];
-					$this->size = $_FILES[$field]['size'];
-					$this->mimetype = $_FILES[$field]['type'];
-					if (php_version_at_least("4.2.0")) 
-						$this->error = $_FILES[$field]['error'];
-				} else {
-					$this->destname = $_FILES[$field]['name'][$index];
-					$this->tempname = $_FILES[$field]['tmp_name'][$index];
-					$this->size = $_FILES[$field]['size'][$index];
-					$this->mimetype = $_FILES[$field]['type'][$index];
-					if (php_version_at_least("4.2.0")) 
-						$this->error = $_FILES[$field]['error'][$index];
-				}
-				$this->error = FILEUPLOAD_NO_ERROR;
+		if (isset($_FILES[$field])) {
+			if ($index === false) {
+				$this->destname = $_FILES[$field]['name'];
+				$this->tempname = $_FILES[$field]['tmp_name'];
+				$this->size = $_FILES[$field]['size'];
+				$this->mimetype = $_FILES[$field]['type'];
+				if (php_version_at_least("4.2.0")) 
+					$this->error = $_FILES[$field]['error'];
+			} else {
+				$this->destname = $_FILES[$field]['name'][$index];
+				$this->tempname = $_FILES[$field]['tmp_name'][$index];
+				$this->size = $_FILES[$field]['size'][$index];
+				$this->mimetype = $_FILES[$field]['type'][$index];
+				if (php_version_at_least("4.2.0")) 
+					$this->error = $_FILES[$field]['error'][$index];
 			}
-		} else {
-			global $HTTP_POST_FILES;
-			if (isset($HTTP_POST_FILES)) {
-				if ($index === false) {
-					$this->destname = $HTTP_POST_FILES[$field]['name'];
-					$this->tempname = $HTTP_POST_FILES[$field]['tmp_name'];
-					$this->size = $HTTP_POST_FILES[$field]['size'];
-					$this->mimetype = $HTTP_POST_FILES[$field]['type'];
-				} else {
-					$this->destname = $HTTP_POST_FILES[$field]['name'][$index];
-					$this->tempname = $HTTP_POST_FILES[$field]['tmp_name'][$index];
-					$this->size = $HTTP_POST_FILES[$field]['size'][$index];
-					$this->mimetype = $HTTP_POST_FILES[$field]['type'][$index];
-				}
-				$this->error = FILEUPLOAD_NO_ERROR;
-			}
+			$this->error = FILEUPLOAD_NO_ERROR;
 		}
 	}
 
@@ -105,22 +87,10 @@ class FileUpload extends LnBlogObject {
 		if ($ret == FILEUPLOAD_NO_ERROR && $this->size <= 0) 
 			$ret = FILEUPLOAD_FILE_EMPTY;
 		
-		# Simple filename truncation test.  Returns an error if there is 
-		# no dot in the filename.
-		#if ( $ret == FILEUPLOAD_NO_ERROR && ! strstr($this->destname, ".") )
-		#	$ret = FILEUPLOAD_NAME_TRUNCATED;
-			
-		if (php_version_at_least("4.0.3")) {
-			$is_up = is_uploaded_file($this->tempname);
-			if (! $is_up) $ret = FILEUPLOAD_NOT_UPLOADED;
-		} else {
-			if (!$tmp_file = get_cfg_var('upload_tmp_dir')) {
-				$tmp_file = dirname(tempnam('', ''));
-			}
-			$tmp_file .= '/' . basename($filename);
-			/* User might have trailing slash in php.ini... */
-			$is_up = (ereg_replace('/+', '/', $tmp_file) == $filename);
-			if (! $is_up) $ret = FILEUPLOAD_BAD_NAME;
+		if (is_file($this->tempname)) $tmp_path = $this->tempname;
+		else $tmp_path = mkpath(ini_get("upload_tmp_dir"), $this->tempname);
+		if (! is_uploaded_file($tmp_path) || ! $this->tempname) {
+			$ret = FILEUPLOAD_NO_FILE;
 		}
 		
 		return $ret;
@@ -145,7 +115,6 @@ class FileUpload extends LnBlogObject {
 		if (!$err) $err = $this->error;
 		switch ($err) {
 			case FILEUPLOAD_NO_ERROR:
-			#echo "'".mkpath($this->destdir, $this->destname)."'";
 				$ret = spf_("File '<a href=\"%s\">%s</a>' successfully uploaded.", 
 				            localpath_to_uri(mkpath($this->destdir, $this->destname)),
 				            $this->destname);

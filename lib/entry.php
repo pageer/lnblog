@@ -502,6 +502,14 @@ class Entry extends LnBlogObject{
 			}
 		if (! $this->abstract) $this->abstract = $this->getAbstract();
 		$this->data = $file_data;
+		if (is_subclass_of($this, 'BlogEntry')) {
+			$this->id = str_replace(PATH_DELIM, '/', 
+			                        substr(dirname($this->file), 
+									        strlen(DOCUMENT_ROOT)));
+		} else {
+			$this->id = str_replace(PATH_DELIM, '/', 
+			                        substr($this->file, strlen(DOCUMENT_ROOT)));
+		}
 		return $file_data;
 	}
 

@@ -4,6 +4,8 @@
 <ul>
 <li><a href="plugin_setup.php"><?php p_("Configure site-wide plugins"); ?></a></li>
 <li><a href="plugin_loading.php"><?php p_("Configure enabled plugins and load order"); ?></a></li>
+<li><a href="editfile.php?file=userdata/system.ini"><?php p_("Edit system.ini file"); ?></a></li>
+<li><a href="editfile.php?file=userdata/groups.ini"><?php p_("Edit groups.ini file"); ?></a></li>
 <li><a href="sitemap.php"><?php p_("Modify site-wide menubar"); ?></a></li>
 <li><a href="newlogin.php"><?php p_("Add new user"); ?></a></li>
 <?php if (isset($SHOW_NEW)) { ?>

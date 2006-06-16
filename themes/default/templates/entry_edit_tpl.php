@@ -12,8 +12,15 @@ if ($EVENT_REGISTER->hasHandlers("posteditor", "ShowControls")) {
 } else {
 	include("js_editor.php");
 }
+global $SYSTEM;
+if ($SYSTEM->sys_ini->value("entryconfig", "AllowInitUpload", 1)) {
+	$enctype = 'multipart/form-data';
+} else {
+	$enctype = 'application/x-www-form-urlencoded';
+}
+
 ?>
-<form id="postform" method="post" action="<?php echo $FORM_ACTION; ?>">
+<form id="postform" method="post" action="<?php echo $FORM_ACTION; ?>" enctype="<?php echo $enctype;?>">
 <div>
 <label class="basic_form_label" for="subject"><?php p_("Subject"); ?></label>
 <input id="subject" name="subject" accesskey="s" type="text" size="40" <?php 
@@ -42,20 +49,25 @@ if (isset($URL)) { ?>value="<?php echo $URL; ?>" <?php } ?>/>
 <div>
 <textarea id="body" name="body" accesskey="d" rows="18" cols="40"><?php if (isset($DATA)) echo $DATA; ?></textarea>
 </div>
+<?php 
+global $SYSTEM;
+$num_uploads = $SYSTEM->sys_ini->value("entryconfig", "AllowInitUpload", 1);
+for ($i=1; $i<=$num_uploads; $i++) { ?>
 <div>
-<label for="mode_none"><?php p_("Auto-markup only"); ?></label>
-<input id="mode_none" name="input_mode" type="radio" <?php if ($HAS_HTML == MARKUP_NONE) { 
-?>checked="checked"<?php } ?> value="<?php echo MARKUP_NONE; ?>" />
+<label for="upload<?php echo $i;?>"><?php p_("Upload file");?></label>
+<input type="file" name="upload<?php echo $i;?>" id="upload<?php echo $i;?>" />
 </div>
+<?php } ?>
 <div>
-<label for="mode_bbcode"><a onclick="javascript:window.open('<?php echo INSTALL_ROOT_URL; ?>/Readme.html#lbcode'); return false;" href="<?php echo INSTALL_ROOT_URL; ?>/Readme.html#lbcode"><?php p_("Use LBcode markup"); ?></a></label>
-<input id="mode_bbcode" name="input_mode" type="radio" <?php if ($HAS_HTML == MARKUP_BBCODE) { 
-?>checked="checked"<?php } ?> value="<?php echo MARKUP_BBCODE; ?>" />
-</div>
-<div>
-<label for="mode_html"><?php p_("Allow HTML markup"); ?></label>
-<input id="mode_html" name="input_mode" type="radio" <?php if ($HAS_HTML == MARKUP_HTML) { 
-?>checked="checked"<?php } ?> value="<?php echo MARKUP_HTML; ?>" />
+<label for="input_mode"><?php p_("Markup type");?></label>
+<select id="input_mode" name="input_mode">
+<option value="<?php echo MARKUP_NONE;?>"<?php if ($HAS_HTML == MARKUP_NONE){
+echo ' selected="selected"';}?>><?php p_("Auto-markup");?></option>
+<option value="<? echo MARKUP_BBCODE;?>"<?php if ($HAS_HTML == MARKUP_BBCODE){
+echo ' selected="selected"';}?>><?php p_("LBcode");?></option>
+<option value="<? echo MARKUP_HTML;?>"<?php if ($HAS_HTML == MARKUP_HTML){
+echo ' selected="selected"';}?>><?php p_("HTML");?></option>
+</select>
 </div>
 <div>
 <label for="comments">Allow comments</label>
