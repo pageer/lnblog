@@ -29,21 +29,25 @@ session_start();
 require_once("config.php");
 require_once("lib/creators.php");
 
+global $PAGE;
+
 $blog = NewBlog();
 $ent = NewBlogEntry();
 $usr = NewUser();
 $tpl = NewTemplate(UPLOAD_TEMPLATE);
-$page = NewPage();
 
 $target = false;
-if ( isset($_GET["profile"]) && $usr->checkLogin() && 
+if ( isset($_GET["profile"]) &&  
      ($_GET["profile"] == $usr->username() || $usr->isAdministrator()) ) {
 	$target = USER_DATA_PATH.PATH_DELIM.$usr->username();
-} elseif ($ent->isEntry() && $blog->canModifyEntry()) {
+} elseif ($ent->isEntry() && $SYSTEM->canModify($ent, $usr)) {
 	$target = $ent->localpath();
-} elseif ($blog->canModifyBlog()) {
+} elseif ($SYSTEM->canModify($blog, $usr)) {
 	$target = $blog->home_path;
 }
+
+# Check that the user is logged in.
+if (! $usr->checkLogin()) $target = false;
 
 if ($target) {
 
@@ -80,8 +84,8 @@ if ($target) {
 	$body .= "</h3>";
 }
 
-$page->addStylesheet("form.css");
-$page->title = _("Upload file");
-$page->display($body, &$blog);
+$PAGE->addStylesheet("form.css");
+$PAGE->title = _("Upload file");
+$PAGE->display($body, &$blog);
 
 ?>

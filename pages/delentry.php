@@ -29,24 +29,34 @@ session_start();
 require_once("config.php");
 require_once("lib/creators.php");
 
+global $PAGE;
+
 $blog = NewBlog();
-$ent = NewBlogEntry();
-$page = NewPage(&$ent);
+$usr = NewUser();
+$ent = NewEntry();
+$PAGE->setDisplayObject($ent);
+
+$is_art = is_a($ent, 'Article') ? true : false;
 
 $conf_id = _("OK");
 $cancel_id = _("Cancel");
 $message = spf_("Do you really want to delete '%s'?", $ent->subject);
 
 if (POST($conf_id)) {
-	$ret = $blog->deleteEntry();
-	if ($ret == UPDATE_SUCCESS) $page->redirect(BLOG_ROOT_URL);
-	else $message = spf_("Unable to delete '%s'.  Try again?", $ent->subject);
+	$err = false;
+	if ($SYSTEM->canDelete($ent, $usr) && $usr->checkLogin()) {
+		$ret = $ent->delete();
+		if (!$ret) $message = spf_("Error: Unable to delete '%s'.  Try again?", $ent->subject);
+		else $PAGE->redirect($blog->getURL());
+	} else {
+		$message = _("Error: user ".$usr->username()." does not have permission to delete this entry.");
+	}
 } elseif (POST($cancel_id)) {
-	$page->redirect("index.php");
+	$PAGE->redirect($ent->permalink());
 }
 
 $tpl = NewTemplate(CONFIRM_TEMPLATE);
-$tpl->set("CONFIRM_TITLE", _("Remove entry?"));
+$tpl->set("CONFIRM_TITLE", $is_art ? _("Remove article?") : _("Remove entry?"));
 $tpl->set("CONFIRM_MESSAGE",$message);
 $tpl->set("CONFIRM_PAGE", current_file() );
 $tpl->set("OK_ID", $conf_id);
@@ -56,7 +66,8 @@ $tpl->set("CANCEL_LABEL", _("No"));
 
 $body = $tpl->process();
 
-$page->title = spf_("%s - Delete entry", $blog->name);
-$page->display($body, &$blog);
+$PAGE->title = $is_art ? spf_("%s - Delete entry", $blog->name) : 
+                         spf_("%s - Delete article", $blog->name);;
+$PAGE->display($body, &$blog);
 
 ?>

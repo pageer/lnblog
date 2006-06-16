@@ -21,8 +21,10 @@ session_start();
 require_once("config.php");
 require_once("lib/creators.php");
 
+global $PAGE;
+
 $blog = NewBlog();
-$page = NewPage(&$blog);
+$PAGE->setDisplayObject($blog);
 
 $tags = GET("tag");
 $show_posts = GET("show") ? true : false;
@@ -37,7 +39,7 @@ foreach ($tag_list as $key=>$val) {
 $ret = $blog->getEntriesByTag($tag_list, $limit, true);
 if ($show_posts) {
 	$body = $blog->getWeblog();
-	$page->addStylesheet("blogentry.css");
+	$PAGE->addStylesheet("blogentry.css");
 } else {
 	$links = array();
 	foreach ($ret as $ent) {
@@ -51,6 +53,6 @@ if ($show_posts) {
 	$body = $tpl->process();
 }
 
-$page->title = $blog->name.' - '._("Topic Search");
-$page->display($body);
+$PAGE->title = $blog->name.' - '._("Topic Search");
+$PAGE->display($body);
 ?>

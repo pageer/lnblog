@@ -27,10 +27,12 @@ session_start();
 require_once("config.php");
 require_once("lib/creators.php");
 
+global $PAGE;
+
 $blog = NewBlog();
-$page = NewPage($blog);
+$PAGE->setDisplayObject($blog);
 $ret = $blog->getWeblog(); 
-$page->title = $blog->name;
-$page->addStylesheet("blogentry.css");
-$page->display($ret, &$blog);
+$PAGE->title = $blog->name;
+$PAGE->addStylesheet("blogentry.css");
+$PAGE->display($ret, &$blog);
 ?>

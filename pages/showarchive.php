@@ -28,8 +28,11 @@ session_start();
 
 require_once("config.php");
 require_once("lib/creators.php");
+
+global $PAGE;
+
 $blog = NewBlog();
-$page = NewPage(&$blog);
+$PAGE->setDisplayObject($blog);
 
 $year_dir = basename(getcwd());
 $title = $blog->name." - ".$year_dir;
@@ -45,9 +48,9 @@ foreach ($LINK_LIST as $key=>$item) $LINK_LIST[$key]["title"] = $item["year"];
 $tpl->set("LINK_LIST", $LINK_LIST);
 $tpl->set("LIST_FOOTER", 
           '<a href="'.$blog->getURL().BLOG_ENTRY_PATH.'/all.php">'.
-          _("List all entries")."</a>");
+          _("List all entries").'</a>');
 $body = $tpl->process();
 
-$page->title = $title;
-$page->display($body, &$blog);
+$PAGE->title = $title;
+$PAGE->display($body, &$blog);
 ?>

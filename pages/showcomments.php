@@ -29,38 +29,32 @@ session_start();
 require_once("config.php");
 require_once("lib/creators.php");
 
-$ent = NewBlogEntry();
+global $PAGE;
+
+$ent = NewEntry();
 $blg = NewBlog();
-$page = NewPage(&$ent);
+$PAGE->setDisplayObject($ent);
 			
-$page->title = $ent->subject . " - " . $blg->name;
+$PAGE->title = $ent->subject . " - " . $blg->name;
 
 # This code will detect if a comment has been submitted and, if so,
 # will add it.  We do this before printing the comments so that a 
 # new comment will be displayed on the page.
-if (has_post()) {
-	$ret = $ent->addComment();
-	if ($ret) {
-		$page->redirect($ent->commentlink());
-	}
+# Here we include and call handle_comment() to output a comment form, add a 
+# comment if one has been posted, and set "remember me" cookies.
+$comm_output = '';
+if ($ent->allow_comment) {
+	require_once('pagelib.php');
+	$comm_output = handle_comment($ent);
 }
 
 $content = $ent->getComments();
 
 # Extra styles to add.  Build the list as we go to keep from including more
 # style sheets than we need to.
-$page->addStylesheet("comment.css");
+$PAGE->addStylesheet("comment.css");
+$content .= $comm_output;
 
-if ($ent->allow_comment) { 
-	$page->addStylesheet("form.css");
-	$comm_tpl = NewTemplate(COMMENT_FORM_TEMPLATE);
-	$comm_tpl->set("FORM_TARGET", $ent->uri("commentpage"));
-	if (! $content) 
-		$comm_tpl->set("PARENT_TITLE", 
-		              '<a href="'.$ent->permalink().'">'.$ent->subject.'</a>');
-	$content .= $comm_tpl->process();
-}
-
-$page->addScript("entry.js");
-$page->display($content, &$blg);
+$PAGE->addScript("entry.js");
+$PAGE->display($content, &$blg);
 ?>

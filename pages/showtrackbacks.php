@@ -22,25 +22,28 @@ session_start();
 require_once("config.php");
 require_once("lib/creators.php");
 
+global $PAGE;
+
+$u = NewUser();
 $ent = NewBlogEntry();
 $blg = NewBlog();
-$page = NewPage(&$ent);
+$PAGE->setDisplayObject($ent);
 
 # If there is a POST url, then this is a trackback ping.  Receive it and 
 # exit.  Otherwise, display the page.
 if (POST("url")) {
 	$ret = $ent->getPing();
 } else {			
-	if (GET("delete") && $blg->canModifyEntry()) {
+	if (GET("delete") && $SYSTEM->canDelete($tb, $u) && $u->checkLogin() ) {
 		$tb = NewTrackback(sanitize(GET("delete")));
 		$tb->delete();
 	}
-	$page->title = $ent->subject . " - " . $blg->name;
-	$page->addStylesheet("trackback.css");
+	$PAGE->title = $ent->subject . " - " . $blg->name;
+	$PAGE->addStylesheet("trackback.css");
 	$body = $ent->getTrackbacks();
 	if (! $body) $body = '<p>'.
 		spf_('There are no trackbacks for <a href="%s">\'%s\'</a>',
 		     $ent->permalink(), $ent->subject).'</p>';
-	$page->display($body, &$blog);
+	$PAGE->display($body, &$blog);
 }
 ?>

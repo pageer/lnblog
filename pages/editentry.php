@@ -22,41 +22,83 @@
 # Used to edit existing blog entries.
 # To create a new blog entry, refer to the <newentry.php> file.
 #
-# This is included by the edit.php wrapper script for blog entries.
+# This is included by the new.php wrapper script for blogs.
 
 session_start();
+require_once("config.php");
 require_once("lib/creators.php");
 
-$ent = NewBlogEntry();
-$blg = NewBlog();
-$page = NewPage(&$ent);
+function set_template(&$tpl, &$ent) {
+	$tpl->set("SUBJECT", htmlentities($ent->subject));
+	$tpl->set("TAGS", htmlentities($ent->tags));
+	$tpl->set("DATA", htmlentities($ent->data));
+	$tpl->set("HAS_HTML", $ent->has_html);
+	$tpl->set("COMMENTS", $ent->allow_comment);
+	$tpl->set("TRACKBACKS", $ent->allow_tb);
+}
 
-$submit_id = _("Submit");
-$preview_id = _("Preview");
+global $PAGE;
+
+$blg = NewBlog();
+$u = NewUser();
+$ent = NewEntry();
+$PAGE->setDisplayObject($ent);
+
+$is_art = is_a($ent, 'Article');
+
 $tpl = NewTemplate(ENTRY_EDIT_TEMPLATE);
-$tpl->set("PREV_ID", $preview_id);
-$tpl->set("SUBMIT_ID", $submit_id);
+set_template($tpl, $ent);
+$tpl->set("FORM_ACTION", make_uri(false,false,false) );
 $blg->exportVars($tpl);
 
-$tpl->set("FORM_ACTION", current_file() );
-$tpl->set("SUBJECT", htmlentities($ent->subject));
-$tpl->set("TAGS", htmlentities($ent->tags));
-$tpl->set("DATA", htmlentities($ent->data));
-$tpl->set("HAS_HTML", $ent->has_html);
-$tpl->set("COMMENTS", $ent->allow_comment);
-$tpl->set("TRACKBACKS", $ent->allow_tb);
-
-if (POST($submit_id)) {
-	$ret = $blg->updateEntry();
-	if ($ret == UPDATE_SUCCESS) $page->redirect($blg->getURL());
-	else $blg->errorEntry($ret, $tpl);
-} elseif (POST($preview_id)) {
-	$blg->previewEntry($tpl);
+if (POST('submit')) {
+	
+	$err = false;
+	
+	if ($u->checkLogin() && $SYSTEM->canModify($ent, $u)) {
+	
+		if ($is_art) $ent = NewArticle();
+		else $ent = NewBlogEntry();
+		
+		$ent->getPostData();
+		
+		if ($ent->data) {
+			$ret = $ent->update();
+			$blg->updateTagList($ent->tags());
+			if (!$ret) $err = _("Error: unable to update entry.");
+		} else {
+			$err = _("Error: entry contains no data.");
+		}
+		
+	} else {
+		$err = spf_("Permission denied: user %s cannot update this entry.", $u->username());
+	}
+	
+	if ($err) {
+		$tpl->set("HAS_UPDATE_ERROR");
+		$tpl->set("UPDATE_ERROR_MESSAGE", $err);
+		set_template($tpl, $ent);
+	} else $PAGE->redirect($blg->getURL());
+	
+} elseif (POST('preview')) {
+	
+	$last_var = $is_art ? 'last_article' : 'last_blogentry';
+	
+	$blg->$last_var = $ent;
+	
+	$blg->$last_var->getPostData();
+	$u->exportVars($tpl);
+	$blg->raiseEvent($is_art?"OnArticlePreview":"OnEntryPreview");
+	set_template($tpl, $blg->$last_var);
+	$tpl->set("PREVIEW_DATA", $blg->$last_var->get() );
 }
 
 $body = $tpl->process();
-$page->title = spf_("%s - Edit entry", $blg->name);
-$page->addStylesheet("form.css", "blogentry.css");
-$page->addScript("editor.js");
-$page->display($body, &$blg);
+$title = $is_art ? 
+         spf_("%s - Edit Entry", $blg->name) :
+         spf_("%s - Edit Article", $blg->name);
+$PAGE->title = 
+$PAGE->addStylesheet("form.css", $is_art?"blogentry.css":"article.css");
+$PAGE->addScript("editor.js");
+$PAGE->display($body, &$blg);
 ?>

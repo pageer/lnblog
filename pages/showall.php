@@ -27,8 +27,10 @@
 session_start();
 require_once("lib/creators.php");
 
+global $PAGe;
+
 $blog = NewBlog();
-$page = NewPage(&$blog);
+$PAGE->setDisplayObject($blog);
 
 $title = spf_("All entries for %s.", $blog->name);
 $blog->getRecent(-1);
@@ -45,7 +47,7 @@ foreach ($blog->entrylist as $ent) {
 $tpl->set("LINK_LIST", $LINK_LIST);
 $body = $tpl->process();
 
-$page->title = $blog->name." - ".$title;
-$page->display($body, &$blog);
+$PAGE->title = $blog->name." - ".$title;
+$PAGE->display($body, &$blog);
 
 ?>

@@ -22,46 +22,42 @@ session_start();
 require_once("config.php");
 require_once("lib/creators.php");
 
-$ent = NewBlogEntry();
-$blg = NewBlog();
-$page = NewPage(&$ent);
-			
-# This code will detect if a comment has been submitted and, if so,
-# will add it.  We do this before printing the comments so that a 
-# new comment will be displayed on the page.
+global $PAGE;
 
-if (has_post()) {
-	$ret = $ent->addComment();
-	if ($ret) {
-		$page->redirect($ent->permalink());
-	}
+$ent = NewEntry();
+$blg = NewBlog();
+$usr = NewUser();
+$PAGE->setDisplayObject($ent);
+
+# Here we include and call handle_comment() to output a comment form, add a 
+# comment if one has been posted, and set "remember me" cookies.
+$comm_output = '';
+if ($ent->allow_comment) {
+	require_once('pagelib.php');
+	$comm_output = handle_comment($ent);
 }
 
 # Get the entry AFTER posting the comment so that the comment count is right.
-$page->title = $ent->subject . " - " . $blg->name;
-$content =  $ent->get( $blg->canModifyEntry() );
+$PAGE->title = $ent->subject . " - " . $blg->name;
+$show_ctl = $SYSTEM->canModify($ent, $usr) && $usr->checkLogin();
+$content =  $ent->get($show_ctl);
 
 # Array for adding style sheets.  We build this as we go so that we don't 
 # end up sending more stylesheets than we need to.
-$page->addStylesheet("blogentry.css");
+$PAGE->addStylesheet(is_a($ent, "Article")?"article.css":"blogentry.css");
 
 # Add TrackBacks for current entry.
 $tmp_content = $ent->getTrackbacks();
 $content .= $tmp_content;
-if ($tmp_content) $page->addStylesheet("trackback.css");
+if ($tmp_content) $PAGE->addStylesheet("trackback.css");
 # Now add the comments.
 $tmp_content = $ent->getComments();
 $content .= $tmp_content;
-if ($tmp_content) $page->addStylesheet("comment.css");
+if ($tmp_content) $PAGE->addStylesheet("comment.css");
 
 # Add comment form if applicable.
-if ($ent->allow_comment) { 
-	$page->addStylesheet("form.css");
-	$comm_tpl = NewTemplate(COMMENT_FORM_TEMPLATE);
-	$comm_tpl->set("FORM_TARGET", $ent->uri("basepage"));
-	$content .= $comm_tpl->process();
-}
+$content .= $comm_output;
 
-$page->addScript("entry.js");
-$page->display($content, &$blog);
+$PAGE->addScript("entry.js");
+$PAGE->display($content, &$blog);
 ?>

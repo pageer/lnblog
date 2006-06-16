@@ -27,33 +27,75 @@ session_start();
 
 require_once("lib/creators.php");
 
+global $PAGE;
+global $SYSTEM;
+
 $blog = NewBlog();
 $ent = NewBlogEntry();
-$page = NewPage(&$ent);
-$tburl = "trackback_url";
+$usr = NewUser();
+$tb = NewTrackback();
+$PAGE->setDisplayObject($ent);
 
-if (GET("send_ping") == "yes" || POST("send_ping") == "yes" ) {
+if ( GET("send_ping") == "yes" ) {
+
+	$tpl = NewTemplate("send_trackback_tpl.php");
 	
-	if (! $blog->canModifyEntry() ) $page->redirect("index.php");
-
-	$tpl = NewTemplate("send_trackback_tpl_new.php");
-
-	$tpl->set("TB_URL_ID", $tburl );
-	$tpl->set("TB_URL", POST($tburl) );
-	$tpl->set("TB_EXCERPT_ID", "excerpt");
-	$tpl->set("TB_EXCERPT", $ent->markup() );
-	
-	# If the form has been posted, send the trackback.
-	if (POST($tburl)) {
-		$ret = $ent->sendPing( POST($tburl), POST("excerpt") );
-		$tpl->set("ERROR_MESSAGE", $ret);
-	} #else echo "<p>"._("Not posted")."</p>";
+	if ($SYSTEM->canModify($ent, $usr) && $usr->checkLogin()) {
+		
+		# Set default values for the trackback properties.
+		$tb->title = $ent->subject;
+		$tb->blog = $blog->name;
+		$tb->data = $ent->getAbstract();
+		$tb->url = $ent->permalink();
+		
+		# If the form has been posted, send the trackback.
+		if (has_post()) {
+			
+			$tb->url = trim(POST('url'));
+			$tb->blog = POST('blog_name');
+			$tb->data = POST('excerpt');
+			$tb->title = POST('title');
+			
+			if ( ! trim(POST('target_url')) || ! POST('url') ) {
+				$tpl->set("ERROR_MESSAGE", _("You must supply an entry URL and a target URL."));
+			} else {
+				$ret = $tb->send( trim(POST('target_url')) );
+				if ($ret['error'] == '0') {
+					$tpl->set("ERROR_MESSAGE", _("Trackback ping succeded."));
+				} else {
+					$tpl->set("ERROR_MESSAGE", 
+					          spf_('Error %s: %s', $ret['error'], $ret['message']));
+				}
+			}
+		}
+		
+		$tpl->set("TB_URL", $tb->url );
+		$tpl->set("TB_TITLE", $tb->title);
+		$tpl->set("TB_EXCERPT", $tb->data );
+		$tpl->set("TB_BLOG", $tb->blog);
+		$tpl->set("TARGET_URL", trim(POST('target_url')));
+		
+	} else {
+		$tpl->set("ERROR_MESSAGE", 
+		          spf_("User %s cannot send trackback pings from this entry.",
+		               $usr->username()));
+	}
 
 	$body = $tpl->process();
-	$page->title = _("Send Trackback Ping");
-	$page->display($body, &$body);
+	$PAGE->title = _("Send Trackback Ping");
+	$PAGE->addStyleSheet("form.css");
+	$PAGE->display($body, &$body);
 	
 } else {
-	$ret = $ent->getPing();
+	if ($ent->allow_tb) {
+		$ret = $tb->receive();
+	} else {
+		$output = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n".
+		          "<response>\n".
+		          "<error>1</error>\n";
+		          "<message>"._("This entry does not accept trackbacks.")."</message>\n";
+		          "</response>\n";
+		echo $output;
+	}
 }
 ?>

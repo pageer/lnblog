@@ -26,33 +26,88 @@
 # This is included by the new.php wrapper script for blogs.
 
 session_start();
+require_once("config.php");
 require_once("lib/creators.php");
 
-$blg = NewBlog();
-$page = NewPage(&$blg);
+function set_template(&$tpl, &$ent) {
+	$tpl->set("URL", POST("short_path"));
+	$tpl->set("SUBJECT", htmlentities($ent->subject));
+	$tpl->set("TAGS", htmlentities($ent->tags));
+	$tpl->set("DATA", htmlentities($ent->data));
+	$tpl->set("HAS_HTML", $ent->has_html);
+	$tpl->set("COMMENTS", $ent->allow_comment);
+	$tpl->set("TRACKBACKS", $ent->allow_tb);
+}
 
-$submit_id = "submit";
-$preview_id = "preview";
+global $PAGE;
+
+$is_art = GET('type')=='article';
+
+$blg = NewBlog();
+$u = NewUser();
+$PAGE->setDisplayObject($blg);
+
 $tpl = NewTemplate(ENTRY_EDIT_TEMPLATE);
+if ($is_art) {
+	$tpl->set("GET_SHORT_PATH");
+	$tpl->set("COMMENTS", false);
+	$tpl->set("TRACKBACKS", false);
+}
 $tpl->set("FORM_ACTION", current_file() );
-$tpl->set("SUBMIT_ID", $submit_id);
-$tpl->set("PREV_ID", $preview_id);
 $tpl->set("HAS_HTML", $blg->default_markup);
 $blg->exportVars($tpl);
 
-if (POST($submit_id)) {
-	$ret = $blg->newEntry();
-	if ($ret == UPDATE_SUCCESS) $page->redirect($blg->getURL());
-	else $blg->errorEntry($ret, $tpl);
-} elseif (POST($preview_id)) {
-	$u = NewUser();
+if (POST('submit')) {
+	
+	$err = false;
+	
+	if ($u->checkLogin() && $SYSTEM->canAddTo($blg, $u)) {
+	
+		if ($is_art) $ent = NewArticle();
+		else $ent = NewBlogEntry();
+		
+		$ent->getPostData();
+		
+		if ($ent->data) {
+			if ($is_art) $ret = $ent->insert($blg, POST('short_path'));
+			else $ret = $ent->insert($blg);
+			$blg->updateTagList($ent->tags());
+			if ($is_art) $ent->setSticky(true);
+			if (!$ret) $err = _("Error: unable to add entry.");
+		} else {
+			$err = _("Error: entry contains no data.");
+		}
+		
+	} else {
+		$err = spf_("Permission denied: user %s cannot add entries to this blog.", $u->username());
+	}
+	
+	if ($err) {
+		$tpl->set("HAS_UPDATE_ERROR");
+		$tpl->set("UPDATE_ERROR_MESSAGE", $err);
+		set_template($tpl, $ent);
+	} else $PAGE->redirect($blg->getURL());
+	
+} elseif (POST('preview')) {
+	
+	$last_var = $is_art ? 'last_article' : 'last_blogentry';
+	
+	if ($is_art) $blg->$last_var = NewBlogEntry();
+	else $blg->$last_var = NewArticle();
+	
+	$blg->$last_var->getPostData();
 	$u->exportVars($tpl);
-	$blg->previewEntry($tpl);
+	$blg->raiseEvent($is_art?"OnArticlePreview":"OnEntryPreview");
+	set_template($tpl, $blg->$last_var);
+	$tpl->set("PREVIEW_DATA", $blg->$last_var->get() );
 }
 
 $body = $tpl->process();
-$page->title = spf_("%s - New Entry", $blg->name);
-$page->addStylesheet("form.css", "blogentry.css");
-$page->addScript("editor.js");
-$page->display($body, &$blg);
+$title = $is_art ? 
+         spf_("%s - New Entry", $blg->name) :
+         spf_("%s - New Article", $blg->name);
+$PAGE->title = 
+$PAGE->addStylesheet("form.css", $is_art?"blogentry.css":"article.css");
+$PAGE->addScript("editor.js");
+$PAGE->display($body, &$blg);
 ?>

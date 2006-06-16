@@ -28,17 +28,19 @@
 #
 # This is included by the useredit.php wrapper script for blogs.
 
-require_once("blogconfig.php");
+require_once("config.php");
 require_once("lib/creators.php");
 
 session_start();
 
+global $PAGE;
+
 $usr = NewUser();
-$page = NewPage(&$usr);
+$PAGE->setDisplayObject($usr);
 $blog = NewBlog();
 
 if (! $usr->checkLogin() ) {
-	$page->redirect("index.php");
+	$PAGE->redirect("index.php");
 	exit;
 }
 
@@ -117,13 +119,13 @@ if (has_post()) {
 	
 	$usr->save();
 	if ($pwd_change) $usr->login(POST($password));
-	$page->redirect("index.php");
+	$PAGE->redirect("index.php");
 	
 }
 
 $body = $tpl->process();
 if (! defined("BLOG_ROOT")) $blog = false;;
-$page->addStylesheet("form.css");
-$page->title = $page_name;
-$page->display($body, &$blog);
+$PAGE->addStylesheet("form.css");
+$PAGE->title = $page_name;
+$PAGE->display($body, &$blog);
 ?>

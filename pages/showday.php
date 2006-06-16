@@ -29,19 +29,25 @@ session_start();
 require_once("config.php");
 require_once("lib/creators.php");
 
+global $PAGE;
+
 $blog = NewBlog();
-$page = NewPage(&$blog);
+$PAGE->setDisplayObject($blog);
 
 $curr_dir = getcwd();
 
-$month = basename($curr_dir);
-$year = basename(dirname($curr_dir));
+if (GET('month')) $month = GET('month');
+else              $month = basename($curr_dir);
+
+if (GET('year')) $year = GET('year');
+else             $year = basename(dirname($curr_dir));
+
 $day = sprintf("%02d", GET("day") );
 
 $ret = $blog->getDay($year, $month, $day);
 
 if (count($ret) == 1) {
-	$page->redirect( $ret[0]->permalink() );
+	$PAGE->redirect( $ret[0]->permalink() );
 	exit;
 } elseif (count($ret) == 0) {
 	$body = spf_("No entry found for %d-%d-%d", $year, $month, $day);
@@ -49,8 +55,8 @@ if (count($ret) == 1) {
 	$body = $blog->getWeblog();
 }
 
-$page->title = $blog->name." - ".spf_("Entries for %s", $day);
-$page->addStylesheet("blogentry.css");
-$page->display($body, &$blog);
+$PAGE->title = $blog->name." - ".spf_("Entries for %s", $day);
+$PAGE->addStylesheet("blogentry.css");
+$PAGE->display($body, &$blog);
 
 ?>

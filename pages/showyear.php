@@ -21,8 +21,11 @@ session_start();
 
 require_once("config.php");
 require_once("lib/creators.php");
+
+global $PAGE;
+
 $blog = NewBlog();
-$page = NewPage(&$blog);
+$PAGE->setDisplayObject($blog);
 $month_list = $blog->getMonthList();
 
 foreach ($month_list as $key=>$val) { 
@@ -44,6 +47,6 @@ $tpl->set("LIST_FOOTER",
 
 $tpl->set("LINK_LIST", $month_list);
 $body = $tpl->process();
-$page->display($body, &$blog);
+$PAGE->display($body, &$blog);
 
 ?>

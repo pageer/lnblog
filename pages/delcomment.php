@@ -21,7 +21,7 @@
 # File: delcomment.php
 # Used to delete a reader comment.
 # Comments are added to entries and articles in the <showentry.php> and
-# <showarticle.php> files respectively.
+# <showcomments.php> files respectively.
 #
 # This is included by the delete.php wrapper script in the comments 
 # subdirectory of entries and articles.
@@ -30,23 +30,28 @@ session_start();
 require_once("config.php");
 require_once("lib/creators.php");
 
-$blog = NewBlog();
-$page = NewPage();
+global $PAGE;
 
-if (! $blog->canModifyEntry() ) $page->redirect("index.php");
+$blog = NewBlog();
+$u = NewUser();
 
 $anchor = POST("comment");
 if (!$anchor) $anchor = GET("comment");
-if (!$anchor) $page->redirect("index.php");
+if (!$anchor) $PAGE->redirect("index.php");
 $comm = NewBlogComment($anchor);
-$page->display_object = &$comm;
+$PAGE->setDisplayObject($comm);
+
+if (! $SYSTEM->canDelete($comm, $u) || ! $u->checkLogin() ) {
+	$PAGE->redirect("index.php");
+	exit;
+}
 
 $conf_id = _("OK");
 $message = spf_("Do you really want to delete %s?", $anchor);
 
 if (POST($conf_id) || GET("conf") == "yes") {
 	$ret = $comm->delete();
-	if ($ret) $page->redirect("index.php");
+	if ($ret) $PAGE->redirect("index.php");
 	else $message = spf_("Unable to delete %s.  Try again?", $anchor);
 }
 
@@ -62,7 +67,7 @@ $tpl->set("PASS_DATA_ID", "comment");
 $tpl->set("PASS_DATA", $anchor);
 $body = $tpl->process();
 
-$page->title = spf_("%s - Delete comment", $blog->name);
-$page->display($body, $blog);
+$PAGE->title = spf_("%s - Delete comment", $blog->name);
+$PAGE->display($body, $blog);
 
 ?>

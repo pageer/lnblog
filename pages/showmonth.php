@@ -24,8 +24,10 @@ session_start();
 require_once("config.php");
 require_once("lib/creators.php");
 
+global $PAGE;
+
 $blog = NewBlog();
-$page = NewPage(&$blog);
+$PAGE->setDisplayObject($blog);
 
 $list = $blog->getMonth(); 
 
@@ -48,7 +50,7 @@ if (USE_STRFTIME) {
 # Optionally show all the entries as a weblog.
 if (strtolower(GET("show")) == "all") {
 	$body = $blog->getWeblog();
-	$page->addStylesheet("blogentry.css");
+	$PAGE->addStylesheet("blogentry.css");
 } else {
 
 	$tpl = NewTemplate(LIST_TEMPLATE);
@@ -70,7 +72,7 @@ if (strtolower(GET("show")) == "all") {
 	$body = $tpl->process();
 }
 
-$page->title = $blog->name." - ".$title;
-$page->display($body, &$blog);
+$PAGE->title = $blog->name." - ".$title;
+$PAGE->display($body, &$blog);
 
 ?>
