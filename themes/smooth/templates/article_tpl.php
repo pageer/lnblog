@@ -23,13 +23,10 @@
 <?php } ?>
 <?php	if ($SHOW_CONTROLS) { ?>
 		<li class="blogadmin">
-			<a href="<?php echo $UPLOAD_LINK; ?>">Upload File</a>
+			<a href="<?php echo $PERMALINK; ?>uploadfile.php">Upload File</a>
 		</li>
 		<li class="blogadmin">
-			<a href="<?php echo $EDIT_LINK; ?>e">Edit</a>
-		</li>
-		<li class="blogadmin">
-			<a href="<?php echo $DELETE_LINK; ?>"><?php p_("Delete");?></a>
+			<a href="<?php echo $PERMALINK; ?>edit.php">Edit</a>
 		</li>
 <?php } 
 if (! empty($ALLOW_TRACKBACKS)) { ?>

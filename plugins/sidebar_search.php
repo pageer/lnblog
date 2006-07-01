@@ -45,7 +45,7 @@ class SidebarSearch extends Plugin {
 		$blg = NewBlog();
 		if (! $blg->isBlog()) return true;
 		$tooltip = _("Search for posts containing a space-separated list of words. If the search sting is enclosed in forward slashes, it will be treated as a regular expression.");
-		if ($this->caption) { # Suppress empty header ?>
+		if ($this->caption) { /* Suppress empty header */ ?>
 <h3><?php echo $this->caption; ?></h3><?php
 		} ?>
 <div class="panel">

@@ -51,6 +51,8 @@
 	width: 100%;
 	margin: 0px;
 	padding: 0px;
+	padding-left: 8%;
+	width: 92%;
 } 
 
 #sidebar ul li a:hover {
@@ -60,13 +62,13 @@
 #sidebar ul.imglist li a:hover {
 	background-color: #f4f4f4;  /* Match the normal background. */
 }
-
+/*
 #sidebar ul li a {
 	display: block;
 	padding-left: 8%;
 	width: 92%;
 }
-
+*/
 #sidebar img {
 	text-align: center;
 	vertical-align: middle;

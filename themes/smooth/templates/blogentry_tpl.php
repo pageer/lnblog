@@ -6,7 +6,8 @@
 <div class="blogentryfooter">
 <p><?php p_("Posted by");?> 
 <?php if (! isset($NO_USER_PROFILE)) { # Display profile link or not ?>
-<li class="bloguser"><?php pf_("By %s", '<a href="'.$PROFILE_LINK.'">'.$USER_DISPLAY_NAME.'</a>');?></li><?php 
+<?php pf_("By %s", '<a
+href="'.$PROFILE_LINK.'">'.$USER_DISPLAY_NAME.'</a>');?><?php 
 } elseif ( isset($USER_EMAIL) ) { ?>
 <a href="mailto:<?php echo $USER_EMAIL; ?>"><?php echo $USER_DISPLAY_NAME; ?></a><?php 
 } else { 

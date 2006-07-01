@@ -53,14 +53,24 @@ $tpl->set("FORM_TITLE", $form_name);
 $tpl->set("FORM_ACTION", current_file());
 $tpl->set("UNAME", $user_name);
 $tpl->set("PWD", $password);
-$tpl->set("REF", SERVER("HTTP_REFERER") );
+if ( strstr(POST('referer'), 'login.php') !== false ||
+     strstr(POST('referer'), 'logout.php') !== false ) {
+	$tpl->set("REF", 'index.php' );
+} else {
+	$tpl->set("REF", SERVER("HTTP_REFERER") );
+}
 
 if ( POST($user_name) && POST($password) ) {
 	$usr = NewUser(trim(POST($user_name)));
 	$ret = $usr->login(POST($password));
 	if (POST("referer")) {
-		if ( basename(POST("referer")) != current_file() && 
-		     basename(POST("referer")) != "newlogin.php") {
+		#if ( basename(POST("referer")) != current_file() && 
+		#     basename(POST("referer")) != "newlogin.php") {
+		if ( strstr(POST('referer'), 'login.php') !== false ||
+		     strstr(POST('referer'), 'logout.php') !== false ) {
+			$tpl->set("REF", 'index.php' );
+			$redir_url = 'index.php';
+		} else {
 		     #strpos(POST("referer"), localpath_to_uri(INSTALL_ROOT)) !== false 
 			$tpl->set("REF", POST("referer") );
 			$redir_url = POST("referer");

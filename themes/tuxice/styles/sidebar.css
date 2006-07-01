@@ -60,16 +60,21 @@
 	background-color: #f4f4f4;  /* Same as regular background. */
 }
 
-#sidebar ul li a:hover {
+#sidebar ul li a:hover, #sidebar ul li:hover {
 	background-color: white;
 }
 
+#sidebar ul li {
+	padding-left: 8%;
+	width: 92%;
+}
+/*
 #sidebar ul li a {
 	display: block;
 	padding-left: 8%;
 	width: 92%;
 }
-
+*/
 #sidebar img {
 	text-align: center;
 	margin: 1% 0 1% 5%;

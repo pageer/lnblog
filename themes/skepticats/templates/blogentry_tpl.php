@@ -28,7 +28,7 @@
 <li><a href="<?php echo $SHOW_TRACKBACK_LINK; ?>/"><?php p_('View TrackBacks');?> (<?php echo $TRACKBACKCOUNT; ?>)</a></li>
 <?php } 
 if (! empty($ALLOW_TRACKBACKS)) {?>
-<li><?php p_('TrackBack <abbr title="Uniform Resource Locator">URL</abbr>');?>: <a href="<?php echo $PERMALINK; ?>trackback.php"><?php echo $PING_LINK; ?></a></li>
+<li><?php p_('TrackBack <abbr title="Uniform Resource Locator">URL</abbr>');?>: <a href="<?php echo $TRACKBACK_LINK; ?>"><?php echo $$TRACKBACK_LINK; ?></a></li>
 <?php } ?>
 </ul>
 <?php if ($SHOW_CONTROLS) { ?>

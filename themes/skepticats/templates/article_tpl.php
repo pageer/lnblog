@@ -23,9 +23,6 @@
 		<li class="blogadmin">
 			<a href="<?php echo $PERMALINK; ?>edit.php"><?php p_('Edit');?></a>
 		</li>
-		<li class="blogadmin">
-			<a href="<?php echo $DELETE_LINK; ?>"><?php p_("Delete");?></a>
-		</li>
 <?php } ?>
 	</ul>
 </div>

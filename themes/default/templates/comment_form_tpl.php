@@ -48,7 +48,7 @@ if (isset($COMMENT_EMAIL)) echo "value=\"$COMMENT_EMAIL\""; ?> />
 <label for="showemail"><?php p_("Display my e-mail address"); ?></label>
 <input id="showemail" name="showemail" type="checkbox" <?php 
 if (isset($COMMENT_SHOWEMAIL)) echo "checked=\"checked\""; ?> />
-</div
+</div>
 <div>
 <label for="remember"><?php p_("Remember me"); ?></label>
 <input id="remember" name="remember" type="checkbox" checked="checked" />

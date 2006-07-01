@@ -12,7 +12,7 @@ independent weblogs with multiple user accounts.  This feature is ideal for mana
 sub-sites on the same web site.
 
 One of LnBlog's main design goals in flexibility.  To this end, it includes a theme system and
-a plugin system to allow user extensions.  The theme system is both powerful, allowing you to
+a plugin system to allow user extensions.  The theme system is powerful, allowing you to
 change virtually every element on a page, yet flexible enough that you can simply override one
 file for one blog without having to change or copy anything else.  Various page elements, such 
 as the sidebar, are provided by plugins and can be removed or rearranged simply by moving or 
@@ -20,14 +20,15 @@ renaming plugin files.
 
 Section: Requirements
 
-The only hard and fast requirements for LnBlog are PHP 4.1 the ability to write files to the web
+The only hard and fast requirements for LnBlog are PHP 4.1 and he ability to write files to the web
 server.  LnBlog *does* support running with *safe_mode* enabled by using FTP for file writing.
 You can also choose to use the standard file writing functions.  If you want to use LnBlog in a
 language other than English, then the PHP gettext and iconv extensions are highly recommended, but 
-not strictly required.
+not strictly required.  The CURL extension is recommended if you plan to use trackbacks, but is
+not required.
 
 You can use any web server or operating system.  LnBlog is tested on Windows XP with IIS and 
-Linux with Apache.  No database is required.
+Linux with Apache.  It currently works with both PHP4 and PHP5.  No database is required.
 
 Section: Installation
 
@@ -39,11 +40,12 @@ The setup process for LnBlog is entirely web-based and mostly painless.
      process.
 4) - Pick the type of file writing you want.  If you have PHP *safe_mode* enabled on your web server, 
      then you *must* use FTP.  If you use "native" file writing, make sure that the LnBlog "userdata" 
-     folder and the folder where you will be creating blogs are writable.  See the <fsconfig.php>
+     folder and all the files in it are writable for all users.  You will also have to  make the folder 
+	 where you will be creating blogs is writable.  See the <fsconfig.php>
      documentation for details.  If you are using a shared hosting account or if you don't have 
      root/administrator access to the server, FTP is recommended.
-5) - Set the administrator password and account information.
-6) - Log in as the administrator.
+5) - Create an user account.  This initial user will be a system administrator.
+6) - Log in with the account you just created.
 7) - Start creating new users and weblogs.
 
 Section: Upgrading
@@ -54,16 +56,22 @@ Upgrading LnBlog is normally pretty simple.  Assuming your LnBlog installation i
 1) - Rename your old LnBlog directory on the server to LnBlog-old.
 2) - Upload the new version into a folder named LnBlog.
 3) - Copy the contents of your LnBlog-old/userdata folder into LnBlog/userdata.
-4) - Copy any customized or non-standard plugins or themes from LnBlog-old to the corresponding
-     location in the new LnBlog folder.
+4) - If you have any customized or non-standard plugins or themes in your LnBlog-old/plugins or
+     LnBlog-old/themes directories, copy them to the corresponding location in the new LnBlog folder.
 5) - Try out the new version.  If everything works, then you can delete LnBlog-old.  If not, then
      you can revert to the old version by removing the newer one and renameing LnBlog-old to LnBlog.
 
-In some cases, there may be additional steps, but this is not the norm.  For instance, some upgrades
-will require updating wrapper scripts.  This is done by going to the system administratino page (the
-same one from step 3 of the <Installation> section) and running an "upgrade to current version" 
-on your blog directory.
+In some cases, there may be additional steps, but this is not the norm.  The most common additional
+step is updating the wrapper scripts for each blog.  To do that, you would do the following:
 
+1) - Go to the LnBlog administration page and log in as the administrator.
+2) - In the "Upgrade Functions" section of the page, select your blog's path in the 
+     "upgrade to current version" drop-down box.  
+3) - Click the "Upgrade" button and wait until the page has finished loading.
+     When it completes, you should see a status message.
+
+Note that upgrading your blog wrappers is not required for every version upgrade of LnBlog, although 
+it normally won't hurt anything.  
 
 Section: License
 

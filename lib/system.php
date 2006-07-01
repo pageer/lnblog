@@ -257,7 +257,8 @@ class System {
 		
 		if ( $this->inGroup($usr->username(), 'administrators') ||
 		     $this->isOwner($usr->username(), $parm) ||
-			 $this->isOwner($usr->username(), $parm->getParent() ) ) {
+			 ( method_exists($parm, 'getParent') && 
+			   $this->isOwner($usr->username(), $parm->getParent()) ) ) {
 			$ret = true;
 		}
 		

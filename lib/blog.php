@@ -130,6 +130,8 @@ class Blog extends LnBlogObject {
 		       file_exists($this->home_path.PATH_DELIM.'blogdata.txt');
 	}
 
+	function getParent() { return false; }
+
 	/*
 	Method: writers
 	Set and return the list of users who can add posts to the blog.  

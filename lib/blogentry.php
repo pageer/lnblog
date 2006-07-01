@@ -517,9 +517,7 @@ class BlogEntry extends Entry {
 		$ret = $this->writeFileData();
 		# Add a wrapper file to make the link prettier.
 		if ($ret) {
-			$this->id = str_replace(PATH_DELIM, '/', 
-			                        substr(dirname($this->file), 
-									        strlen(DOCUMENT_ROOT)));
+			$this->id = $this->globalID();
 			$this->makePrettyPermalink();
 		}
 		$this->raiseEvent("InsertComplete");

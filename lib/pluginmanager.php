@@ -41,8 +41,7 @@ class PluginManager {
 		$this->plugin_list = $this->getFileList();
 		# Get various settings to determine which plugins should be loaded and 
 		# in what order.
-		$defexcl = "sidebar_archives.php,htaccess_generator.php,".
-			"sidebar_googlesearch.php,private_blog.php";
+		$defexcl = "sidebar_archives.php,htaccess_generator.php";
 		$excl = $this->plugin_config->value("Plugin_Manager", "exclude_list", $defexcl);
 		$this->exclude_list = explode(",", $excl);
 		if (! is_array($this->exclude_list)) $this->exclude_list = array();
@@ -58,7 +57,9 @@ class PluginManager {
 		$this->load_list = array();
 		if (is_array($this->load_first)) {
 			foreach ($this->load_first as $val) {
-				$this->load_list[$val] = $val;
+				if ($this->testFile($val)) {
+					$this->load_list[$val] = $val;
+				}
 			}
 		}
 
@@ -174,6 +175,29 @@ class PluginManager {
 			}
 		}
 		ini_set('include_path', $old_path);
+	}
+	
+	/* Method: testFile
+	 * Test if a particular plugin file exists.
+	 *
+	 * Parameters:
+	 * plug - The name of the plugin file.
+	 *
+	 * Returns:
+	 * True if the file exists in the userdata, LnBlog, or blog plugins 
+	 * directory, false otherwise.
+	 */
+	function testFile($plug) {
+		$lnblog_path = mkpath(INSTALL_ROOT,'plugins',$plug);
+		if (file_exists($lnblog_path)) return true;
+		$userdata_path = mkpath(USER_DATA_PATH,'plugins',$plug);
+		if (file_exists($userdata_path)) return true;
+		$blog = NewBlog();
+		if ($blog->isBlog()) {
+			$blog_path = mkpath($blog->home_path,'plugins',$plug);
+			if (file_exists($blog_path)) return true;
+		}
+		return false;
 	}
 	
 }

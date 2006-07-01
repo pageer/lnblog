@@ -363,6 +363,7 @@ function new_media($params) {
 # does not have RSS URLs for categories.
 
 function get_categories($params) {
+	global $PLUGIN_MANAGER;
 	global $xmlrpcerruser;
 	global $SYSTEM;
 	
@@ -382,11 +383,25 @@ function get_categories($params) {
 		
 		if ($blog->isBlog()) {
 			$arr = array();
+			$base_feed_path = $blog->home_path.PATH_DELIM.BLOG_FEED_PATH;
+			$base_feed_uri = $blog->uri('base').BLOG_FEED_PATH.'/';
 			foreach ($blog->tag_list as $tag) {
 				$cat = array();
 				$cat['description'] = new xmlrpcval($tag, 'string');
 				$cat['htmlURL'] = new xmlrpcval($blog->uri('tags').'?tag='.urlencode($tag), 'string');
-				$cat['rssURL'] = new xmlrpcval('', 'string');
+				
+				$topic = preg_replace('/\W/', '', $tag);
+				$rdf_file = $topic.'_'.$PLUGIN_MANAGER->plugin_config->value("RSS1FeedGenerator", "feed_file", "news.rdf");
+				$xml_file = $topic.'_'.$PLUGIN_MANAGER->plugin_config->value("RSS2FeedGenerator", "feed_file", "news.xml");
+				if (file_exists($base_feed_path.PATH_DELIM.$xml_file)) {
+					$rss_url = $base_feed_uri.$xml_file;
+				} elseif (file_exists($base_feed_path.PATH_DELIM.$rdf_file)) {
+					$rss_url = $base_feed_uri.$rdf_file;
+				} else {
+					$rss_url = '';
+				}
+				
+				$cat['rssURL'] = new xmlrpcval($rss_url, 'string');
 				$arr[$tag] = new xmlrpcval($cat, 'struct');
 			}
 			$ret = new xmlrpcresp(new xmlrpcval($arr, 'struct'));

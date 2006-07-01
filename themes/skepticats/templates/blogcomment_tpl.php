@@ -17,7 +17,7 @@
 		if ($SHOW_CONTROLS) { 
 			foreach ($CONTROL_BAR as $item) {
 		?>
-		<li class="admin"><?php echo $item; ?></a></li>
+		<li class="admin"><?php echo $item; ?></li>
 		<?php 
 			} 
 		}

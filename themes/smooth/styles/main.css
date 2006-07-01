@@ -20,6 +20,7 @@ div#container {
 	padding: 0;
 	margin-bottom: 0;
 	background-image: url(/LnBlog/themes/smooth/images/bg.png);
+	background-color: white;
 	background-repeat: repeat-y;
 }
 

@@ -99,11 +99,14 @@ class RSS1FeedGenerator extends Plugin {
 
 	function RSS1FeedGenerator() {
 		$this->plugin_desc = _("Create RSS 1.0 feeds for comments and blog entries.");
-		$this->plugin_version = "0.1.0";
+		$this->plugin_version = "0.2.0";
 		$this->addOption("feed_file", _("The file name for the blog RSS feed"),
 		                 "news.rdf", "text");
 		$this->addOption("comment_file", _("The file name for comment RSS feeds"),
 		                 "comments.rdf", "text");
+		$this->addOption("topic_feeds", _("Generate feeds for each topic"),
+		                 true, 'checkbox');
+		$this->getConfig();
 	}
 
 	function updateCommentRSS1(&$cmt) {
@@ -150,7 +153,39 @@ class RSS1FeedGenerator extends Plugin {
 		if (! $ret) return UPDATE_RSS1_ERROR;
 		else return UPDATE_SUCCESS;
 	}
+
+	function updateBlogRSS1ByEntryTopic ($entry) {
+
+		$blog = $entry->getParent();
+		$ret = true;
+
+		if (! $entry->tags()) return false;
+
+		foreach ($entry->tags() as $tag) {
+
+			$feed = new RSS1();
+			$topic = preg_replace('/\W/','',$tag);
+			$file = $topic.'_'.$this->feed_file;
+			$path = mkpath($blog->home_path,BLOG_FEED_PATH,$file);
+			$feed_url = localpath_to_uri($path);
+
+			$feed->url = $feed_url;
+			$feed->image = $blog->image;
+			$feed->title = spf_('%s - %s', $blog->name, $topic);
+			$feed->description = $blog->description;
+			$feed->site = $blog->getURL();
 	
+			if (! $blog->entrylist) $blog->getEntriesByTag(array($tag), $blog->max_rss);
+			foreach ($blog->entrylist as $ent) 
+				$feed->entrylist[] = new RSS1Entry($ent->permalink(), $ent->subject, $ent->subject);
+		
+			$ret = $feed->writeFile($path);
+			if (! $ret) $ret &= UPDATE_RSS1_ERROR;
+			else $ret &= UPDATE_SUCCESS;
+		}
+		return $ret;	
+	}
+
 }
 
 $gen = new RSS1FeedGenerator();
@@ -160,5 +195,10 @@ $gen->registerEventHandler("blogcomment", "DeleteComplete", "updateCommentRSS1")
 $gen->registerEventHandler("blogentry", "InsertComplete", "updateBlogRSS1");
 $gen->registerEventHandler("blogentry", "UpdateComplete", "updateBlogRSS1");
 $gen->registerEventHandler("blogentry", "DeleteComplete", "updateBlogRSS1");
+if ($gen->topic_feeds) {
+	$gen->registerEventHandler("blogentry", "InsertComplete", "updateBlogRSS1ByEntryTopic");
+	$gen->registerEventHandler("blogentry", "UpdateComplete", "updateBlogRSS1ByEntryTopic");
+	$gen->registerEventHandler("blogentry", "DeleteComplete", "updateBlogRSS1ByEntryTopic");
+}
 
 ?>

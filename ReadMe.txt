@@ -1,0 +1,54 @@
+LnBlog: A flexible file-base weblog
+Copyright (C) 2005 Peter A. Geer <pageer@skepticats.com>
+
+About LnBlog
+------------
+LnBlog is a weblog system that is written in PHP and stores data in text files.
+It aims to provide a rich feature set with maximum flexibility while remaining
+low on requirements.
+
+Documentation
+-------------
+Full documentation is available at the LnBlog website.  It can be viewed online 
+at the following URL:
+http://www.skepticats.com/lnblog/documentation/
+You may also download a copy of the documentation for local viewing at the 
+following location:
+http://www.skepticats.com/lnblog/content/download/lnblog_docs.zip
+
+Requirements
+------------
+LnBlog needs a web server with PHP 4.1 or greater installed and the ability to
+write to the file system.  Both Apache and IIS are supported and no database
+is required.  File writing through FTP is supported for hosts with safe mode
+enabled. PCRE (Perl-Compatible Regular Expression) support, which is standard
+with most PHP installations, must be enabled. Support for the CURL and gettext
+extensions is helpful, but not required.  
+
+Instalation
+-----------
+To install LnBlog on your web server, simply extract the ZIP archive and upload 
+the resulting folder to the publicly accessible portion of your web server.
+After that, open a web browser go to the URL corresponding to that location.
+This will start the graphical configuration process.  You will be prompted to 
+configure file writing and create an initial user account, after which you will 
+be taken to the administration page where you can create more users, create blog,
+and set other options.
+
+License
+-------
+LnBlog: A flexible file-base weblog
+Copyright (C) 2005 Peter A. Geer <pageer@skepticats.com>
+
+This program is free software; you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software 
+Foundation; either version 2 of the License, or (at your option) any later 
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY 
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A 
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this
+program; if not, write to the Free Software Foundation, Inc., 675 Mass Ave, 
+Cambridge, MA 02139, USA.

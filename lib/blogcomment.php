@@ -103,7 +103,11 @@ class BlogComment extends Entry {
 				       "delete.php?comment=".$this->getAnchor();
 		}
 	}
-		
+	
+	function queryStringToID() {
+		return false;
+	}
+	
 	/*
 	Method: getPath
 	Get the path to use for to store the comment.  This is specific to 

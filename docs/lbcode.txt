@@ -71,13 +71,13 @@ RSS feeds, and because you will not know the final URL until _after_ you post th
 The rules are as follows.
 - URLs that do not contain any slashes (/), colons (:), or at signs (@), such as "myimage.jpg", will be treated as relative 
   to the current blog entry.  So the URL "myimage.jpg" will be converted to something like
-  "http://www.myhost.com/myblog/entries/2006/03/02/1234_56/myimage.jpg".
+  http://www.myhost.com/myblog/entries/2006/03/02/1234_56/myimage.jpg.
 - URLs that contain slashes but no at signs or colons, *and* do not start with a slash, will be treated as relative to the 
   current blog root.  So, for example, "content/article/myfile.zip" will be converted to something like 
-  "http://www.myhost.com/myblog/content/article/myfile.zip".
+  http://www.myhost.com/myblog/content/article/myfile.zip.
 - Lastly, URLs that start with a slash, but do not contain colons or at signs, will be interpreted as relative to the 
   root of the web site.  So "/otherblog/somefile.txt" will be converted to something like 
-  "http://www.myhost.com/otherblog/somefile.txt".
+  http://www.myhost.com/otherblog/somefile.txt.
 
 Section: Other Notes
 
@@ -92,8 +92,9 @@ There are several other things to note with regard to the various LBCode stateme
   both the ALT attribute, which is required in XHTML, and the TITLE attribute, which gives you the tooltips in Mozilla-based 
   browsers. Since Internet Explorer incorrectly uses the ALT text for tooltips, you'll actually get the same tooltip in all 
   browsers. 
-- In Mozilla-based browsers, the <q> tag renders quotation marks automatically. However, this depends on the CSS2 :before and 
-  :after pseudo-elements, which are not supported by Internet Explorer, so use this with care. Note that in the default 
+- In Mozilla-based browsers, the <q> tag renders quotation marks automatically. 
+  However, this depends on the CSS2 :before and :after pseudo-elements, which are not supported by Internet Explorer, 
+  so use this with care. Note that in the default 
   LnBlog stylsheets, the <q> tag is rendered with italic text, so that even in Internet Explorer, it can be distinguished 
   from normal text.
 - The current LBCode handler does not deal gracefully with multiline tags.  So if, e.g., you have a multiline block quotation 

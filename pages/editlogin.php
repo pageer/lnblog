@@ -47,7 +47,7 @@ if (! $usr->checkLogin() ) {
 # Allow us to use this to create the admin login.
 if ($blog->isBlog()) {
 	$page_name = _("Change User Information");
-	$form_title = sprintf(_("New Login for %s"), $blog->name);
+	$form_title = spf_("New Login for %s", $blog->name);
 	$redir_page = $blog->getURL();
 } else {
 	# Add the template directory to the include_path.
@@ -56,7 +56,7 @@ if ($blog->isBlog()) {
 	$redir_page = "index.php";
 }
 
-$form_title = sprintf(_("Modify User - %s"), $usr->username());
+$form_title = spf_("Modify User - %s", $usr->username());
 $user_name = "user";
 $password = "passwd";
 $confirm = "confirm";
@@ -119,7 +119,7 @@ if (has_post()) {
 	
 	$usr->save();
 	if ($pwd_change) $usr->login(POST($password));
-	$PAGE->redirect("index.php");
+	$PAGE->redirect($redir_page);
 	
 }
 

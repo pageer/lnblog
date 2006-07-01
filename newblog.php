@@ -97,7 +97,7 @@ if ( has_post() ) {
 				$tpl->set("UPDATE_MESSAGE", _("Blog create but not registered.  This means the system will not list it on the admin pages.  Please try registering this blog by hand from the administration page."));
 			}
 		} else {
-			$tpl->set("UPDATE_MESSAGE", _("Error creating blog.  This could be a problem with the file permissions on your server.  Please refer to the <a href=\"http://www.skepticats.com/LnBlog/Readme.html\">documentation</a> for more information."));
+			$tpl->set("UPDATE_MESSAGE", _("Error creating blog.  This could be a problem with the file permissions on your server.  Please refer to the <a href=\"http://www.skepticats.com/LnBlog/documentation/\">documentation</a> for more information."));
 		}
 	}
 }

@@ -88,7 +88,7 @@ $pass = trim(POST("pwd"));
 $tpl->set("PASS", $pass);
 $hostname = trim(POST("host"));
 $tpl->set("HOSTNAME", $hostname);
-$test_file = getcwd().PATH_DELIM."Readme.html";
+$test_file = getcwd().PATH_DELIM."ReadMe.txt";
 $tpl->set("TEST_FILE", $test_file);
 $tpl->set("TARGETPAGE", current_file());
 $ftp_root = "";

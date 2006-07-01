@@ -27,9 +27,9 @@ if (POST("docroot")) {
 	define("DOCUMENT_ROOT", $doc_root);
 }
 $tpl->set("DOC_ROOT", $doc_root);
-$target_url = localpath_to_uri($curr_dir.PATH_DELIM."Readme.html");
+$target_url = localpath_to_uri($curr_dir.PATH_DELIM."ReadMe.txt");
 $tpl->set("TARGET_URL", $target_url);
-$documentation_path = $doc_root.PATH_DELIM.basename($curr_dir).PATH_DELIM."Readme.html";
+$documentation_path = $doc_root.PATH_DELIM.basename($curr_dir).PATH_DELIM."ReadMe.txt";
 $tpl->set("DOCUMENTATION_PATH", $documentation_path);
 $documentation_exists = file_exists($documentation_path);
 $tpl->set("DOCUMENTATION_EXISTS", $documentation_exists);

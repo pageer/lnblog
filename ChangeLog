@@ -1,3 +1,15 @@
+24-Jun-2006: version 0.7.3
+- Fixed errors when deleted templates are still in load-first list.
+- Fixed HTML validation errors in some templates.
+- Fixed sidebar list styles for recentcomments plugin.
+
+22-Jun-2006:
+- Fixed error with System->canAddTo() checking non-existing blog parent.
+- Fixed wrong redirect in edituser.php.
+- Made redirects from the login page smarter.
+- Added per-category RSS feeds to RSS generator plugins, topic list plugin, and
+the MetaWeblog API.
+
 12-Jun-2006: version 0.7.2
 - Added checkbox to set sticky state when editing articles.
 - Fixed redirects on changing the installation path in blogpaths.php.

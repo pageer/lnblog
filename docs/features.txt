@@ -1,6 +1,11 @@
 Document: Feature List
 
-Here is a list of the features currently supported by LnBlog.  These features are spread out between the core of LnBlog and the standard plugins.  Plugins can be disabled, so if you don't want a feature that is implemented in a plugin, you can just turn it off.  Also, all elements of the sidebar (as well as the menubar/sitemap and page banner) are implemented as plugins, and so can be configured and turned off just like other plugins.
+Here is a list of the features currently supported by LnBlog.  These features 
+are spread out between the core of LnBlog and the standard plugins.  Plugins can
+be disabled, so if you don't want a feature that is implemented in a plugin, you
+can just turn it off.  Also, all elements of the sidebar (as well as the 
+menubar/sitemap and page banner) are implemented as plugins, and so can be 
+configured and turned off just like other plugins.
 
 Section: Features
 
@@ -11,10 +16,11 @@ Section: Features
 - Static articles.
 - Send and receive trackbacks.
 - Multiple user accounts.
-- Multiple weblogs with simple user permissions.
+- Multiple weblogs.
 - Upload files to blogs, entries, and articles.
-- Can work in PHP *safe_mode*.
+- Can work with PHP's *safe_mode* turned on.
 - Use a dialect of BBCode to post entries.
+- Support for Blogger 1.0 and MetaWeblog APIs.
 - Support for internationalization.
 - Support for themes.
 - Support for plugins.
@@ -40,3 +46,11 @@ The following are a list of the standard plugins that come with LnBlog.
 - Sidebar form to search your blog with Google (assuming Google has spidered it, disabled by default).
 - Sidebar form to search your blog for a set of words or a regular expression.  Unlike the Google search plugins, this one runs entirely on your server.
 - Sidebar list of tags used in the blog and links to show entries by tag.
+
+Section: Other Plugins
+
+The following features are available via officially supported plugins which are
+not shipped in the default installation.
+
+- Post editing with a JavaScript rich text editor (currently both TinyMCE and
+FCKEditor plugins are available).

@@ -142,15 +142,17 @@ class RSS2FeedGenerator extends Plugin {
 
 	function RSS2FeedGenerator() {
 		$this->plugin_desc = _("Create RSS 2.0 feeds for comments and blog entries.");
-		$this->plugin_version = "0.2.0";
+		$this->plugin_version = "0.3.0";
 		$this->guid_is_permalink = true;
 		$this->addOption("guid_is_permalink", 
-			_("Use entry permalink as globally unique identifier"),
-			true, "checkbox");
+		                 _("Use entry permalink as globally unique identifier"),
+		                 true, "checkbox");
 		$this->addOption("feed_file", _("File name for blog RSS 2 feed"),
-			"news.xml", "text");
+		                 "news.xml", "text");
 		$this->addOption("comment_file", _("File name for comment RSS 2 feeds"),
-			"comments.xml", "text");
+		                 "comments.xml", "text");
+		$this->addOption("topic_feeds", _("Generate feeds for each topic"),
+		                 true, 'checkbox');
 		$this->getConfig();
 		if (! defined("RSS2GENERATOR_GUID_IS_PERMALINK"))
 			define("RSS2GENERATOR_GUID_IS_PERMALINK", $this->guid_is_permalink);
@@ -211,7 +213,50 @@ class RSS2FeedGenerator extends Plugin {
 		if (! $ret) return  UPDATE_RSS1_ERROR;
 		else return UPDATE_SUCCESS;
 	}
+
+	function updateBlogRSS2ByEntryTopic ($entry) {
+
+		$blog = $entry->getParent();
+		$ret = true;
+
+		if (! $entry->tags()) return false;
+
+		foreach ($entry->tags() as $tag) {
+
+			$usr = NewUser();
+			$feed = new RSS2();
+			$topic = preg_replace('/\W/', '', $tag);
+			$path = mkpath($blog->home_path,BLOG_FEED_PATH,$topic.'_'.$this->feed_file);
+			$feed_url = localpath_to_uri($path);
+
+			$feed->url = $feed_url;
+			$feed->image = $blog->image;
+			$feed->description = $blog->description;
+			$feed->title = $blog->name;
 	
+			if (! $blog->entrylist) $blog->getEntriesByTag(array($tag), $blog->max_rss);
+			foreach ($blog->entrylist as $ent) {
+				$usr = NewUser($ent->uid);
+				$author_data = $usr->email();
+				if ( $author_data ) $author_data .= " (".$usr->displayName().")";
+				$cmt_count = $ent->getCommentCount();
+				$feed->entrylist[] = new RSS2Entry($ent->permalink(), 
+						$ent->subject, 
+						"<![CDATA[".$ent->markup($ent->data)."]]>", 
+						$ent->commentlink(),
+						$ent->permalink(), 
+						$author_data, "", "", 
+						$cmt_count ? $ent->commentlink().$this->comment_file : "", 
+						$cmt_count );
+			}
+		
+			$ret = $feed->writeFile($path);	
+			if (! $ret) $ret &=  UPDATE_RSS1_ERROR;
+			else $ret &= UPDATE_SUCCESS;
+		}
+		return $ret;
+	}
+
 }
 
 $gen = new RSS2FeedGenerator();
@@ -221,5 +266,9 @@ $gen->registerEventHandler("blogcomment", "DeleteComplete", "updateCommentRSS2")
 $gen->registerEventHandler("blogentry", "InsertComplete", "updateBlogRSS2");
 $gen->registerEventHandler("blogentry", "UpdateComplete", "updateBlogRSS2");
 $gen->registerEventHandler("blogentry", "DeleteComplete", "updateBlogRSS2");
-
+if ($gen->topic_feeds) {
+	$gen->registerEventHandler("blogentry", "InsertComplete", "updateBlogRSS2ByEntryTopic");
+	$gen->registerEventHandler("blogentry", "UpdateComplete", "updateBlogRSS2ByEntryTopic");
+	$gen->registerEventHandler("blogentry", "DeleteComplete", "updateBlogRSS2ByEntryTopic");
+}
 ?>
