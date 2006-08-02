@@ -1,0 +1,6 @@
+File: system.ini
+
+The system.ini file is used to store selected default global settings.
+Currently, new settings are being added this file rather than the
+<blogconfig.php> file, which was previous used for all settings.  
+
