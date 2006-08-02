@@ -51,15 +51,19 @@ class Blog extends LnBlogObject {
 
 	var $name;
 	var $home_path;
-	var $description;
 	var $image;
 	var $theme;
 	var $max_entries = BLOG_MAX_ENTRIES;
 	var $max_rss = BLOG_MAX_ENTRIES;
+	var $allow_enclosure = 1;
 	var $default_markup = MARKUP_BBCODE;
 	var $owner = ADMIN_USER;
 	var $write_list;
 	var $tag_list;
+	
+	var $auto_pingback;
+	var $gather_replies;
+	
 	var $entrylist;
 	var $last_blogentry;
 	var $last_article;
@@ -97,11 +101,16 @@ class Blog extends LnBlogObject {
 		$this->image = '';
 		$this->max_entries = BLOG_MAX_ENTRIES;
 		$this->max_rss = BLOG_MAX_ENTRIES;
+		$this->allow_enclosure = 1;
 		$this->default_markup = MARKUP_BBCODE;
 		$this->theme = "default";
 		$this->owner = ADMIN_USER;
 		$this->write_list = array();
 		$this->tag_list = array();
+		
+		$this->auto_pingback = true;
+		$this->gather_replies = true;
+		
 		$this->entrylist = array();
 		$this->last_blogentry = false;
 		$this->last_article = false;
@@ -222,8 +231,9 @@ class Blog extends LnBlogObject {
 		$path = $this->home_path.PATH_DELIM.BLOG_CONFIG_PATH;
 		$ini = NewINIParser($path);
 		$props = array("name", "description", "image", "max_entries", 
-		               "max_rss", "theme", "owner", "default_markup",
-		               "write_list", "tag_list");
+		               "max_rss", "allow_enclosure", "theme", "owner", 
+		               "default_markup", "write_list", "tag_list",
+		               "gather_replies", "auto_pingback");
 		foreach ($props as $key) {
 			if (is_array($this->$key)) {
 				$ini->setValue("blog", $key, implode(",", $this->$key));
@@ -466,26 +476,17 @@ class Blog extends LnBlogObject {
 	*/
 	function getURL($full_uri=true) {
 		return $this->uri('blog');
-		#if (URI_TYPE == "querystring") {
-		#	return INSTALL_ROOT_URL."pages/showblog.php?blog=".$this->blogid;
-		#} elseif (URI_TYPE == "htaccess") {
-		#	
-		#} else {
-		#	if (defined("BLOG_ROOT_URL")) {
-		#		return BLOG_ROOT_URL;
-		#	} else {
-		#		return localpath_to_uri($this->home_path, $full_uri);
-		#	}
-		#}
 	}
 
 	/* Method: uri
 	   Get the URI of the designated resource.
 		
 		Parameters:
-		type  - The type of URI to get, e.g. permalink, edit link, etc.
+		type            - The type of URI to get, e.g. permalink, edit link, etc.
 		data parameters - All other parameters after the first are interpreted 
-		                  as additional data for the URL.
+		                  as additional data for the URL.  The parameters are 
+		                  expected to be strings of the form "key=val".  Note that
+		                  not all types of URI accept parameters.
 
 		Returns:
 		A string with the permalink. 
@@ -494,6 +495,17 @@ class Blog extends LnBlogObject {
 		$dir_uri = localpath_to_uri($this->home_path);
 		$qs_arr = array('blog'=>$this->blogid);
 		$qs_uri = make_uri(INSTALL_ROOT_URL."pages/showblog.php", $qs_arr);
+
+		if (func_num_args() > 1) {
+			$num_args = func_num_args();
+			for ($i = 2; $i < $num_args; $i++) {
+				$var = func_get_arg($i);
+				$arr = explode("=", $var, 2);
+				if (count($arr) == 2) {
+					$qs_arr[$arr[0]] = $arr[1];
+				}
+			}
+		}
 	
 		switch ($type) {
 			case "base":
@@ -541,10 +553,10 @@ class Blog extends LnBlogObject {
 				elseif (URI_TYPE == 'htaccess') return '';
 				else return $dir_uri."uploadfile.php";
 			case "edit":
-				if (URI_TYPE == 'querystring')
-					return make_uri(INSTALL_ROOT_URL.'updateblog.php', $qs_arr);
-				elseif (URI_TYPE == 'htaccess') return '';
-				return $dir_uri."edit.php";
+				#if (URI_TYPE == 'querystring')
+					return make_uri(INSTALL_ROOT_URL.'pages/updateblog.php', $qs_arr);
+				#elseif (URI_TYPE == 'htaccess') return '';
+				#return $dir_uri."edit.php";
 			case "login":
 				if (URI_TYPE == 'querystring')
 					return make_uri(INSTALL_ROOT_URL.'bloglogin.php', $qs_arr);
@@ -556,9 +568,7 @@ class Blog extends LnBlogObject {
 				elseif (URI_TYPE == 'htaccess') return '';
 				return $dir_uri."logout.php";
 			case "editfile":
-				$arr = array('blog'=>$this->blogid, 'file'=>func_get_arg(1));	
-				if (func_num_args() > 2) $arr['list'] = func_get_arg(2);
-				return make_uri(INSTALL_ROOT_URL.'editfile.php', $arr);
+				return make_uri(INSTALL_ROOT_URL.'pages/editfile.php', $qs_arr);
 			case "edituser":
 				return make_uri(INSTALL_ROOT_URL.'pages/editlogin.php', $qs_arr);
 			case "pluginconfig":
@@ -566,6 +576,8 @@ class Blog extends LnBlogObject {
 			case "pluginload":
 				return make_uri(INSTALL_ROOT_URL.'plugin_loading.php', $qs_arr);
 			case "tags":
+				if (URI_TYPE == 'querystring')
+					return make_uri(INSTALL_ROOT_URL.'pages/tagsearch.php', $qs_arr);
 				return make_uri($dir_uri.'tags.php');
 		}
 		return $dir_uri;
@@ -807,6 +819,9 @@ class Blog extends LnBlogObject {
 		$tpl->set("BLOG_BASE_DIR", $this->home_path);
 		$tpl->set("BLOG_URL", $this->getURL() );
 		$tpl->set("BLOG_URL_ROOTREL", $this->getURL(false));
+		$tpl->set("BLOG_ALLOW_ENC", $this->allow_enclosure);
+		$tpl->set("BLOG_GATHER_REPLIES", $this->gather_replies);
+		$tpl->set("BLOG_AUTO_PINGBACK", $this->auto_pingback);
 	}
 
 	/*
@@ -846,49 +861,63 @@ class Blog extends LnBlogObject {
 	function upgradeWrappers () {
 		$this->raiseEvent("OnUpgrade");
 		$inst_path = getcwd();
+		$files = array();
 		# Upgrade the base blog directory first.  All other directories will
 		# get a copy of the config.php created here.
 		$ret = create_directory_wrappers($this->home_path, BLOG_BASE, $inst_path);
+		if (! is_array($ret)) return false;
+		else $fiels = $ret;
 		
 		# Upgrade the articles.
 		$path = $this->home_path.PATH_DELIM.BLOG_ARTICLE_PATH;
-		$ret &= create_directory_wrappers($path, BLOG_ARTICLES);
+		$ret = create_directory_wrappers($path, BLOG_ARTICLES);
+		$files = array_merge($files, $ret);
 		
 		$path = $this->home_path.PATH_DELIM.BLOG_ENTRY_PATH;
-		$ret &= create_directory_wrappers($path, BLOG_ENTRIES);
+		$ret = create_directory_wrappers($path, BLOG_ENTRIES);
+		$files = array_merge($files, $ret);
 		$dir_list = scan_directory($path, true);
 		foreach ($dir_list as $yr) {
 			$year_path = $path.PATH_DELIM.$yr;
-			$ret &= create_directory_wrappers($year_path, YEAR_ENTRIES);
+			$ret = create_directory_wrappers($year_path, YEAR_ENTRIES);
+			$files = array_merge($files, $ret);
 			$year_list = scan_directory($year_path, true);
 			foreach ($year_list as $mn) {
 				$month_path = $year_path.PATH_DELIM.$mn;
-				$ret &= create_directory_wrappers($month_path, MONTH_ENTRIES);
+				$ret = create_directory_wrappers($month_path, MONTH_ENTRIES);
+				$files = array_merge($files, $ret);
 				$month_list = scan_directory($month_path, true);
 				foreach ($month_list as $ent) {
 					$ent_path = $month_path.PATH_DELIM.$ent;
 					$cmt_path = $ent_path.PATH_DELIM.ENTRY_COMMENT_DIR;
 					$tb_path = $ent_path.PATH_DELIM.ENTRY_TRACKBACK_DIR;
-					$ret &= create_directory_wrappers($ent_path, ENTRY_BASE);
-					$ret &= create_directory_wrappers($cmt_path, ENTRY_COMMENTS);
-					$ret &= create_directory_wrappers($tb_path, ENTRY_TRACKBACKS);
+					$ret = create_directory_wrappers($ent_path, ENTRY_BASE);
+					$files = array_merge($files, $ret);
+					$ret = create_directory_wrappers($cmt_path, ENTRY_COMMENTS);
+					$files = array_merge($files, $ret);
+					$ret = create_directory_wrappers($tb_path, ENTRY_TRACKBACKS);
+					$files = array_merge($files, $ret);
 				}
 			}
 		}
 		$path = $this->home_path.PATH_DELIM.BLOG_ARTICLE_PATH;
-		$ret &= create_directory_wrappers($path, BLOG_ARTICLES);
+		$ret = create_directory_wrappers($path, BLOG_ARTICLES);
+		$files = array_merge($files, $ret);
 		$dir_list = scan_directory($path, true);
 		foreach ($dir_list as $ar) {
 			$ar_path = $path.PATH_DELIM.$ar;
 			$cmt_path = $ar_path.PATH_DELIM.ENTRY_COMMENT_DIR;
-			$ret &= create_directory_wrappers($ar_path, ARTICLE_BASE);
-			$ret &= create_directory_wrappers($cmt_path, ENTRY_COMMENTS);
+			$ret = create_directory_wrappers($ar_path, ARTICLE_BASE);
+			$files = array_merge($files, $ret);
+			$ret = create_directory_wrappers($cmt_path, ENTRY_COMMENTS);
+			$files = array_merge($files, $ret);
 		}
 		$this->sw_version = PACKAGE_VERSION;
 		$this->last_upgrade = date('r');
-		$ret &= $this->writeBlogData();
+		$ret = $this->writeBlogData();
+		if (! $ret) $files[] = $this->home_path.PATH_DELIM.BLOG_CONFIG_PATH;
 		$this->raiseEvent("UpgradeComplete");
-		return $ret;
+		return $files;
 	}
 
 	# Method: fixDirectoryPermissions
@@ -933,12 +962,6 @@ class Blog extends LnBlogObject {
 		# directory.  These directories are added to the include_path using
 		# a config file that is copied to all entry directories.
 		# It is assumed that this will only be run from the install directory.
-		if (get_magic_quotes_gpc()) {
-			$this->name = stripslashes($this->name);
-			$this->description = stripslashes($this->description);
-			$this->image = stripslashes($this->image);
-			$this->theme = stripslashes($this->theme);
-		}
 		$this->name = htmlentities($this->name);
 		$this->description = htmlentities($this->description);
 		
@@ -993,12 +1016,6 @@ class Blog extends LnBlogObject {
 	
 	function update () {
 		$this->raiseEvent("OnUpdate");
-		if (get_magic_quotes_gpc()) {
-			$this->name = stripslashes($this->name);
-			$this->description = stripslashes($this->description);
-			$this->image = stripslashes($this->image);
-			$this->theme = stripslashes($this->theme);
-		}
 		$this->name = htmlentities($this->name);
 		$this->description = htmlentities($this->description);
 		if (KEEP_EDIT_HISTORY) {

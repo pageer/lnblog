@@ -65,6 +65,7 @@ if ( GET("send_ping") == "yes" ) {
 				} else {
 					$tpl->set("ERROR_MESSAGE", 
 					          spf_('Error %s: %s', $ret['error'], $ret['message']));
+					print_r($ret);
 				}
 			}
 		}
@@ -88,14 +89,14 @@ if ( GET("send_ping") == "yes" ) {
 	
 } else {
 	if ($ent->allow_tb) {
-		$ret = $tb->receive();
+		$output = $tb->receive();
 	} else {
 		$output = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n".
 		          "<response>\n".
 		          "<error>1</error>\n";
 		          "<message>"._("This entry does not accept trackbacks.")."</message>\n";
 		          "</response>\n";
-		echo $output;
 	}
+	echo $output;
 }
 ?>

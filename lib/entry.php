@@ -20,7 +20,7 @@
 
 require_once("lib/utils.php");
 require_once("lib/lnblogobject.php");
-
+require_once("lib/lbparse.php");
 /*
 Class: Entry
 An abstract class representing entries of all types in the blog database.
@@ -260,7 +260,7 @@ class Entry extends LnBlogObject{
 		} elseif ($this->has_html == MARKUP_BBCODE) {
 			$patterns = array('/\[.+\]/Usi', '/\[\/.+\]/Usi');
 			$replacements = array('', '', '', '');
-			$ret = preg_replace($patters, $replacements, $this->data);
+			$ret = preg_replace($patterns, $replacements, $this->data);
 		} else $ret = $this->data;
 		return $ret;
 	}
@@ -297,6 +297,11 @@ class Entry extends LnBlogObject{
 	# Returns:
 	# A string with the converted text.
 	
+	function bbcodeToHTML2($data, $strip=false) {
+		$p = new LBParser($data);
+		return '<p>'.$p->parse().'</p>';
+	}
+	
 	function bbcodeToHTML($data, $strip=false) {
 		$ret = $data;
 		
@@ -319,10 +324,18 @@ class Entry extends LnBlogObject{
 		$patterns[16] = "/\[img-left=(.+)\](.+)\[\/img-left\]/Usi";
 		$patterns[17] = "/\[img-right=(.+)\](.+)\[\/img-right\]/Usi";
 		$patterns[18] = "/\[h\](.*)\[\/h\]/Usi";
-
+		
 		$whitespace_patterns[0] = '/\r\n\r\n/';
 		$whitespace_patterns[1] = '/\n\n/';
 		$whitespace_patterns[2] = '/\n/';
+		$whitespace_patterns[2] = '/\t/';
+		
+		/*
+		$code_patterns[0] = '/(<code.*)<\/p><p>(.*<\/code>)/U';
+		$code_patterns[1] = '/(<code.*)<br \/>(.*<\/code>)/U';
+		$code_replacements[0] = '$1'."\n\n".'$2';
+		$code_replacements[1] = '$1'."\n".'$2';
+		*/
 		
 		if ($strip) {
 			$replacements[0] = '$2';
@@ -348,6 +361,8 @@ class Entry extends LnBlogObject{
 			$whitespace_replacements[0] = "\r\n\r\n";
 			$whitespace_replacements[1] = "\n\n";
 			$whitespace_replacements[2] = "\n";
+			$whitespace_replacements[3] = "\t";
+			
 		} else {
 			$replacements[0] = '<a href="$1">$2</a>';
 			$replacements[1] = '<img alt="$2" title="$2" src="$1" />';
@@ -372,6 +387,7 @@ class Entry extends LnBlogObject{
 			$whitespace_replacements[0] = '</p><p>';
 			$whitespace_replacements[1] = '</p><p>';
 			$whitespace_replacements[2] = '<br />';
+			$whitespace_replacements[3] = '&nbsp;&nbsp;&nbsp;';
 		}
 		
 		ksort($patterns);

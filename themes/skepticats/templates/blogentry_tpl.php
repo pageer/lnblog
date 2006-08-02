@@ -29,6 +29,9 @@
 <?php } 
 if (! empty($ALLOW_TRACKBACKS)) {?>
 <li><?php p_('TrackBack <abbr title="Uniform Resource Locator">URL</abbr>');?>: <a href="<?php echo $TRACKBACK_LINK; ?>"><?php echo $$TRACKBACK_LINK; ?></a></li>
+<?php } 
+if ( ! empty($PINGBACKCOUNT) ) { ?>
+<li><a href="<?php echo $PINGBACK_LINK; ?>/"><?php p_('View Pingbacks');?> (<?php echo $PINGBACKCOUNT; ?>)</a></li>
 <?php } ?>
 </ul>
 <?php if ($SHOW_CONTROLS) { ?>

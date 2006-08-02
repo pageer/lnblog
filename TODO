@@ -1,13 +1,14 @@
 Features to be added:
 
-* Allow use of query strings and .htaccess rules in place of wrapper scripts.
-* Ability to create draft posts and articles.
-* Ability to create entry from uploaded HTML document.
-* Ability to display an HTML document in the standard page layout.
-* Documentation on how templates get strung together to make a page.
+* Support for PingBacks.
+* AJAX interface for deleting/banning comments and trackbacks?
+* Option to display trackbacks in same list as comments?
 * Improved user interface for blog settings and administration.
 * Support for polls?
 * Multi-page articles?
 * Option to publish entries as articles?
-* Option to use *just* sessions (no cookies) for login?
+* Ability to create entry from uploaded HTML document.
+* Ability to display an HTML document in the standard page layout.
+* Ability to create drafts for posts and articles.
+* Allow use of query strings and .htaccess rules in place of wrapper scripts.
 

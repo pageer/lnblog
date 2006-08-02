@@ -56,7 +56,21 @@ class BlogEntry extends Entry {
 	function BlogEntry ($path="", $revision=ENTRY_DEFAULT_FILE) {
 		
 		$this->raiseEvent("OnInit");
+		
+		$this->initVars();
+		$this->getFile($path, $revision);
+		
+		if ( file_exists($this->file) ) {
+			$this->readFileData();
+		}
+		
+		$this->raiseEvent("InitComplete");
+	}
 	
+	# Initializes the member variables.
+	# This is for INTERNAL USE ONLY and exists mainly to pass on the 
+	# variables to subclasses without having to call the entire constructor.
+	function initVars() {
 		$this->id = '';
 		$this->uid = '';
 		$this->ip = get_ip();
@@ -69,10 +83,12 @@ class BlogEntry extends Entry {
 		$this->subject = "";
 		$this->tags = "";
 		$this->data = "";
-		#$this->abstract = "";
+		$this->abstract = "";
+		$this->enclosure = '';
 		$this->has_html = MARKUP_BBCODE;
 		$this->allow_comment = true;
 		$this->allow_tb = true;
+		$this->allow_pingback = true;
 		$this->template_file = ENTRY_TEMPLATE;
 		$this->metadata_fields = array("id"=>"postid", "uid"=>"userid", 
 			"date"=>"date", "post_date"=>"postdate",
@@ -81,17 +97,25 @@ class BlogEntry extends Entry {
 			"sent_ping"=>"trackback ping", "subject"=>"subject",
 			"abstract"=>"abstract", "allow_comment"=>"allowcomment",
 			"has_html"=>"hashtml", "tags"=>"tags", 
-			"allow_tb"=>"allowtrackback");
-		
+			"allow_tb"=>"allowtrackback", 
+			"allow_pingback"=>"allowpingback", "enclosure"=>"enclosure");
+	}
+	
+	# Gets the directory and data file for this entry.
+	# Again, this is for INTERNAL USE ONLY and is inherited, with parameters,
+	# by the Article class.
+	function getFile($path, $revision, $getvar='entry', 
+	                 $subdir=BLOG_ENTRY_PATH,
+		             $id_re='/^\d{4}\/\d{2}\/\d{2}_\d{4}\d?\d?$/') {
 		# Auto-detect the current entry.  If no path is given, 
 		# then assume the current directory.
-		if ($path && file_exists($path)) {
+		if ($path && is_dir($path)) {
 		
 			$this->file = $path.PATH_DELIM.$revision;
 			
-		} elseif (GET("entry") || $path) {
+		} elseif (GET($getvar) || $path) {
 
-			$entrypath = trim($path ? $path : GET("entry"));
+			$entrypath = trim($path ? $path : sanitize(GET($getvar)));
 			
 			# Get the blog path from the query string.
 			if (defined("BLOG_ROOT")) {
@@ -102,13 +126,15 @@ class BlogEntry extends Entry {
 				$blogpath = "";
 			}
 
-			# Get the path from the entry field.  If the entry string is 
-			# malformed, then just empty it.
-			if ( preg_match('/^\d{4}\/\d{2}\/\d{2}_\d{4}\d?\d?$/', $entrypath) )
-				$entrypath = str_replace("/", PATH_DELIM, $entrypath );
-			else $entrypath = "";
+			if ($id_re) {
+				# Get the path from the entry field.  If the entry string is 
+				# malformed, then just empty it.
+				if ( preg_match($id_re, $entrypath) )
+					$entrypath = str_replace("/", PATH_DELIM, $entrypath );
+				else $entrypath = "";
+			}
 
-			$this->file = mkpath($blogpath,BLOG_ENTRY_PATH,$entrypath,$revision);
+			$this->file = mkpath($blogpath,$subdir,$entrypath,$revision);
 			
 		} else {
 		
@@ -120,14 +146,8 @@ class BlogEntry extends Entry {
 					$this->file = getcwd().PATH_DELIM.$revision;
 				}
 			}
-			
 		}
-		
-		if ( file_exists($this->file) ) {
-			$this->readFileData();
-		}
-		
-		$this->raiseEvent("InitComplete");
+		return $this->file;
 	}
 	
 	/*
@@ -221,6 +241,105 @@ class BlogEntry extends Entry {
 				$ret[] = $f;
 			}
 		}
+	}
+
+	# Method: getEnclosure
+	# Gets the URL, file size, and media type of the file set as the enclosure
+	# for this entry, it if exists.  The file is checkedy by converting the 
+	# URL into a local path using the same rules as entry URL absolutizaiton,
+	# or simply doing a URL to localpath conversion.
+	#
+	# Returns:
+	# If the enclosure property is set and the file is found, returns an array 
+	# with elements "url", "length", and "type".  If the file is not found, then 
+	# checks if the enclosure matches the expected content or an enclosure tag in
+	# an RSS feed.  If so, extracts the data into an array.  
+	# Otherwise Otherwise, returns false.
+
+	function getEnclosure() {
+		# Remove stray whitespace.
+		$enc = trim($this->enclosure);
+
+		# Strip any query string.
+		if (strpos($enc, '?') !== false) {
+			$idx = strpos($enc, '?');
+			$enc = substr($enc, 0, $idx);
+		}
+
+		if (! $enc) return false;
+
+		# Calculate the enclosure path, using the same rules as LBCode URI 
+		# absolutizing.  
+		# No slash = relative to entry directory.
+		if (strpos($enc, '/') === false) {
+			$path = mkpath($this->localpath(), $enc);
+
+		# Slash but not at start = relative to blog directory
+		} elseif (! strpos($enc, ':') && substr($enc, 1, 1) != '/') {
+			$blog = $this->getParent();
+			$path = mkpath($blog->home_path, $enc);
+		
+		# Slash at start, no colon = root-relatice path
+		} elseif (! strpos($enc, ':') && substr($enc, 1, 1) == '/') {
+			$path = mkpath(DOCUMENT_ROOT, $enc);
+		} else {
+			$path = uri_to_localpath($enc);
+		}
+
+		if (file_exists($path)) {
+			$ret = array();
+			$ret['url'] = localpath_to_uri($path);
+			$ret['length'] = filesize($path);
+			if (extension_loaded("fileinfo")) {
+				$mh = finfo_open(FILEINFO_MIME|FILEINFO_PRESERVE_ATIME);
+				$ret['type'] = finfo_file($mh, $path);
+			} elseif (function_exists('mime_content_type')) {
+				$ret['type'] = mime_content_type($path);
+			} else {
+				# No fileinfo, no mime_magic, so revert to file extension matching.
+				$dotpos = strrpos($path, '.');
+				$ext = strtolower(substr($path, $dotpos));
+				$type = 'application/octet-stream';
+				
+				switch ($ext) {
+					case 'mp3': $type = 'audio/mpeg'; break;
+					case 'aif':
+					case 'aifc':
+					case 'aiff': $type = 'audio/x-aiff'; break;
+					case 'm3u': $type = 'audio/x-mpegurl'; break;
+					case 'ra': 
+					case 'ram': $type = 'audio/x-pn-realaudio'; break;
+					case 'wav': $type = 'audio/x-wav'; break;
+					case 'mp2':
+					case 'mpa':
+					case 'mpeg':
+					case 'mpe':
+					case 'mpg':
+					case 'mpv2': $type = 'video/mpeg'; break;
+					case 'mov':
+					case 'qt': $type = 'video/quicktime'; break;
+					case 'asf':
+					case 'asr':
+					case 'asx': $type = 'video/x-ms-asf'; break;
+					case 'avi': $type = 'video/x-msvideo'; break;
+					case 'wmv': $type = 'video/x-ms-wmv'; break;
+					case 'wma': $type = 'audio/x-ms-wma'; break;
+				}
+
+				$ret['type'] = $type;
+			}
+
+		} elseif (strpos($this->enclosure, 'url')    !== false && 
+		          strpos($this->enclosure, 'length') !== false &&
+		          strpos($this->enclosure, 'type')   !== false) {
+			$enc = $this->enclosure;
+			$ret = array();
+			$ret['url'] = preg_replace('/url\s*=\s*"(.+)"/Ui', '$1', $enc);
+			$ret['length'] = preg_replace('/length\s*=\s*"(.+)"/Ui', '$1', $enc);
+			$ret['type'] = preg_replace('/type\s*=\s*"(.+)"/Ui', '$1', $enc);
+		} else $ret = false;
+
+		return $ret;
 	}
 
 	/*
@@ -341,8 +460,13 @@ class BlogEntry extends Entry {
 			case "send_tb":     return $dir_uri."trackback.php?send_ping=yes";
 			case "get_tb":      return $dir_uri."trackback.php";
 			case "trackback":   return $dir_uri.ENTRY_TRACKBACK_DIR."/";
+			case "pingback":   return $dir_uri.ENTRY_PINGBACK_DIR."/";
 			case "upload":      return $dir_uri."uploadfile.php";
-			case "edit":        return $dir_uri."edit.php";
+			case "edit":
+				$entry_type = is_a($this, 'Article') ? 'article' : 'entry';
+				return make_uri(INSTALL_ROOT_URL."pages/editentry.php", 
+				                array("blog"     =>$this->parentID(), 
+				                      $entry_type=>$this->entryID()));
 			case "delete":     
 				if (KEEP_EDIT_HISTORY) {
 					return $dir_uri."delete.php";
@@ -485,7 +609,7 @@ class BlogEntry extends Entry {
 		$basepath = $blog->home_path.PATH_DELIM.BLOG_ENTRY_PATH;
 		$dir_path = $basepath.PATH_DELIM.$this->getPath($curr_ts);
 		
-		# If the entry driectory already exists, something is wrong. 
+		# If the entry directory already exists, something is wrong. 
 		if ( is_dir($dir_path) ) 
 			$dir_path = $basepath.PATH_DELIM.$this->getPath($curr_ts, false, true);
 		if ( is_dir($dir_path) ) return false;
@@ -503,6 +627,7 @@ class BlogEntry extends Entry {
 		# Create the comments directory.
 		create_directory_wrappers($dir_path.PATH_DELIM.ENTRY_COMMENT_DIR, ENTRY_COMMENTS);
 		create_directory_wrappers($dir_path.PATH_DELIM.ENTRY_TRACKBACK_DIR, ENTRY_TRACKBACKS);
+		create_directory_wrappers($dir_path.PATH_DELIM.ENTRY_PINGBACK_DIR, ENTRY_PINGBACKS);
 				
 		$this->file = $dir_path.PATH_DELIM.ENTRY_DEFAULT_FILE;
 		# Set the timestamp and date, plus the ones for the original post, if
@@ -593,17 +718,11 @@ class BlogEntry extends Entry {
 		$this->data = POST("body");
 		$this->allow_comment = POST("comments") ? 1 : 0;
 		$this->allow_tb = POST("trackbacks") ? 1 : 0;
+		$this->allow_pingback = POST("pingbacks") ? 1 : 0;
 		$this->has_html = POST("input_mode");
+		$this->enclosure = POST("enclosure");
 		foreach ($this->custom_fields as $fld=>$desc) {
 			$this->$fld = POST($fld);
-		}
-		if (get_magic_quotes_gpc()) {
-			$this->subject = stripslashes($this->subject);
-			$this->tags = stripslashes($this->tags);
-			$this->data = stripslashes($this->data);
-			foreach ($this->custom_fields as $fld=>$desc) {
-				$this->$fld = stripslashes($this->$fld);
-			}
 		}
 		if (! $this->uid) {
 			$u = NewUser();
@@ -643,8 +762,11 @@ class BlogEntry extends Entry {
 		$tmp->set("ABSTRACT", $this->abstract);
 		$tmp->set("TAGS", $this->tags());
 		$tmp->set("BODY", $this->markup() );
+		$tmp->set("ENCLOSURE", $this->enclosure);
+		$tmp->set("ENCLOSURE_DATA", $this->getEnclosure());
 		$tmp->set("ALLOW_COMMENTS", $this->allow_comment);
 		$tmp->set("ALLOW_TRACKBACKS", $this->allow_tb);
+		$tmp->set("ALLOW_PINGBACKS", $this->allow_pingback);
 		$tmp->set("PERMALINK", $this->permalink() );
 		$tmp->set("PING_LINK", $this->uri("send_tb"));
 		$tmp->set("TRACKBACK_LINK", $this->uri("get_tb"));
@@ -656,6 +778,8 @@ class BlogEntry extends Entry {
 		$tmp->set("COMMENT_LINK", $this->uri("comment"));
 		$tmp->set("TRACKBACKCOUNT", $this->getTrackbackCount() );
 		$tmp->set("SHOW_TRACKBACK_LINK", $this->uri("trackback"));
+		$tmp->set("PINGBACKCOUNT", $this->getPingbackCount() );
+		$tmp->set("PINGBACK_LINK", $this->uri('pingback'));
 		$tmp->set("SHOW_CONTROLS", $show_edit_controls);
 
 		foreach ($this->custom_fields as $fld=>$desc) {
@@ -671,6 +795,124 @@ class BlogEntry extends Entry {
 		return $ret;
 	}
 
+	# Generic reply-handling functions. 
+	# These functions are generic and can get lists of comments, trackbacks, or 
+	# pingbacks based on given parameters.  The public methods for getting the
+	# different kinds of replies are wrappers around these.
+	
+	# Method: getReplyCount
+	# Get the number of replies of a particular type.
+	#
+	# Parameters:
+	# parms - An associative array of various parameters.  The valid array
+	#         keys are "path", which is the directory to scan, "ext", which is
+	#         the file extension of the data files, and "match_re", which is a 
+	#         regular expression matching the names of the data files minus
+	#         the extension (default is /[\w\d]+/)).
+	#         Note that "path" and "ext" keys are required.
+	#
+	# Returns:
+	# An integer representing the number of replies of the given type.
+	# If the call fails for some reason, then false is returned.
+	
+	function getReplyCount($params) {
+		$dir_path = dirname($this->file);
+		$dir_path = $dir_path.PATH_DELIM.$params['path'];
+		$dir_array = scan_directory($dir_path);
+		if ($dir_array === false) return false;
+		
+		$count = 0;
+		foreach ($dir_array as $file) {
+			$cond = is_file($dir_path.PATH_DELIM.$file) && 
+			        preg_match("/[\w\d]+".$params['ext']."/", $file);
+			if ($cond) $count++;
+		}
+		return $count;
+	}
+	
+	# Method: getReplyArray
+	# Get an array of replies of a particular type.
+	#
+	# Parameters:
+	# params - An associative array of settings, as in <getReplyCount>.  In 
+	#          *addition* to the keys allowed by that function, this one also 
+	#          requires a "creator" key, which is the name of a function that
+	#          will return the correct type of object given the data path to 
+	#          its storage file as a parameter.  It also accepts an optional
+	#          "sort_asc" key, which will sort the files in order by filename,
+	#          (which equates to date order) rather than in reverse order when 
+	#          set to true.
+	#
+	# Returns:
+	# An array of BlogComment, Trackback, or Pingback objects, depending on 
+	# the parameters.  Returns false on failure.
+	
+	function getReplyArray($params) {
+		$dir_path = dirname($this->file);
+		$dir_path = $dir_path.PATH_DELIM.$params['path'];
+		if (! is_dir($dir_path)) return false;
+		else $reply_dir = scan_directory($dir_path);
+		
+		$reply_files = array();
+		foreach ($reply_dir as $file) {
+			$cond = is_file($dir_path.PATH_DELIM.$file) && 
+			        preg_match("/[\w\d]+".$params['ext']."/", $file);
+			if ($cond) $reply_files[] = $file; 
+		}
+		if (isset($params['sort_asc']) && $params['sort_asc']) {
+			sort($reply_files);
+		} else {
+			rsort($reply_files);
+		}
+
+		$reply_array = array();
+		$creator = $params['creator'];
+		foreach ($reply_files as $file)
+			$reply_array[] = $creator($dir_path.PATH_DELIM.$file);
+		
+		return $reply_array;
+	}
+	
+	# Method: getReplies
+	# Gets the HTML markup to display to list a given type of reply.
+	#
+	# Parameters:
+	# params - An associative array of parameters, as in <getReplyArray>.  In 
+	#          addition, it requires the 'itemclass' and 'listtitle' keys to be
+	#          set.  These are the CSS class applied to each reply and the title
+	#          given to the whole reply list, respectively.  There is also an 
+	#          optional "listclass" key that gives the CSS class to apply to 
+	#          the list.
+	#
+	# Returns:
+	# A string of HTML markup to send to the client.
+	
+	function getReplies($params) {
+		$replies = $this->getReplyArray($params);
+		$ret = "";
+		if ($replies) {
+			$reply_text = array();
+			foreach ($replies as $reply) {
+				$reply_text[] = $reply->get();
+			}
+		}
+
+		# Suppress markup entirely if there are no replies of the given type.
+		if (isset($reply_text)) {
+			$tpl = NewTemplate(LIST_TEMPLATE);
+			$tpl->set("ITEM_CLASS", $params['itemclass']);
+			if (isset($params['listclass'])) {
+				$tpl->set("LIST_CLASS", $params['listclass']);
+			}
+			$tpl->set("ORDERED");
+			$tpl->set("LIST_TITLE", $params['listtitle']);
+			$tpl->set("ITEM_LIST", $reply_text);
+			$ret = $tpl->process();
+		}
+
+		return $ret;
+	}
+	
 	# Comment handling functions.
 
 	/*
@@ -678,22 +920,12 @@ class BlogEntry extends Entry {
 	Determine the number of comments that belong to this object.
 
 	Returns:
-	A non-negative integer representing the number of comments.
+	A non-negative integer representing the number of comments or false on 
+	failure.
 	*/
 	function getCommentCount() {
-		$dir_path = dirname($this->file);
-		$comment_dir_path = $dir_path.PATH_DELIM.ENTRY_COMMENT_DIR;
-		$comment_dir = scan_directory($comment_dir_path);
-		if ($comment_dir === false) return false;
-		
-		$count = 0;
-		foreach ($comment_dir as $file) {
-			$cond = is_file($comment_dir_path.PATH_DELIM.$file) && 
-			        preg_match("/[\w\d]+".COMMENT_PATH_SUFFIX."/", $file);
-			if ($cond) $count++;
-		}
-		return $count;
-
+		$params = array('path'=>ENTRY_COMMENT_DIR, 'ext'=>COMMENT_PATH_SUFFIX);
+		return $this->getReplyCount($params);
 	}
 
 	/*
@@ -708,25 +940,9 @@ class BlogEntry extends Entry {
 	An array of BlogComment object.
 	*/
 	function getCommentArray($sort_asc=true) {
-		$dir_path = dirname($this->file);
-		$comment_dir_path = $dir_path.PATH_DELIM.ENTRY_COMMENT_DIR;
-		if (! is_dir($comment_dir_path)) return false;
-		else $comment_dir = scan_directory($comment_dir_path);
-		
-		$comment_files = array();
-		foreach ($comment_dir as $file) {
-			$cond = is_file($comment_dir_path.PATH_DELIM.$file) && 
-			        preg_match("/[\w\d]+".COMMENT_PATH_SUFFIX."/", $file);
-			if ($cond) $comment_files[] = $file; 
-		}
-		if ($sort_asc) sort($comment_files);
-		else rsort($comment_files);
-
-		$comment_array = array();
-		foreach ($comment_files as $file)
-			$comment_array[] = NewBlogComment($comment_dir_path.PATH_DELIM.$file);
-		
-		return $comment_array;
+		$params = array('path'=>ENTRY_COMMENT_DIR, 'ext'=>COMMENT_PATH_SUFFIX,
+		                'creator'=>'NewBlogComment', 'sort_asc'=>$sort_asc);
+		return $this->getReplyArray($params);
 	}
 
 	/*
@@ -741,29 +957,12 @@ class BlogEntry extends Entry {
 	A string of HTML markup.
 	*/
 	function getComments($sort_asc=true) {
-		$comment_files = $this->getCommentArray($sort_asc);
-		$ret = "";
-		if ($comment_files) {
-			$comments = array();
-			foreach ($comment_files as $file) {
-				$comments[] = $file->get();
-			}
-		}
-
-		# Suppress the comment stuff entirely for posts that don't have 
-		# any comments.
-		if (isset($comments)) {
-			$tpl = NewTemplate(LIST_TEMPLATE);
-			$tpl->set("ITEM_CLASS", "fullcomment");
-			$tpl->set("ORDERED");
-			$tpl->set("LIST_TITLE", 
-			          spf_('Comments on <a href="%s">%s</a>', 
-				            $this->permalink(), $this->subject));
-			$tpl->set("ITEM_LIST", $comments);
-			$ret = $tpl->process();
-		}
-
-		return $ret;
+		$title = spf_('Comments on <a href="%s">%s</a>', 
+		              $this->permalink(), $this->subject);
+		$params = array('path'=>ENTRY_COMMENT_DIR, 'ext'=>COMMENT_PATH_SUFFIX,
+		                'creator'=>'NewBlogComment', 'sort_asc'=>$sort_asc,
+		                'itemclass'=>'fullcomment', 'listtitle'=>$title);
+		return $this->getReplies($params);
 	}
 
 	# TrackBack handling functions.
@@ -773,21 +972,12 @@ class BlogEntry extends Entry {
 	Get the number of TrackBacks for this object.
 
 	Returns:
-	A non-negative integer representing the number of TrackBacks.
+	A non-negative integer representing the number of TrackBacks or false on 
+	failure.
 	*/
 	function getTrackbackCount() {
-		$dir_path = dirname($this->file);
-		$tb_path = $dir_path.PATH_DELIM.ENTRY_TRACKBACK_DIR;
-		$tb_dir_content = scan_directory($tb_path);
-		if ($tb_dir_content === false) return false;
-		
-		$count = 0;
-		foreach ($tb_dir_content as $file) {
-			$cond = is_file($tb_path.PATH_DELIM.$file) && 
-			        preg_match("/[\w\d]+".TRACKBACK_PATH_SUFFIX."/", $file);
-			if ($cond) $count++;
-		}
-		return $count;
+		$params = array('path'=>ENTRY_TRACKBACK_DIR, 'ext'=>TRACKBACK_PATH_SUFFIX);
+		return $this->getReplyCount($params);
 	}
 
 	/*
@@ -803,25 +993,10 @@ class BlogEntry extends Entry {
 	An array of Trackback objects.
 	*/
 	function getTrackbackArray($sort_asc=true) {
-		$dir_path = dirname($this->file);
-		$tb_path = $dir_path.PATH_DELIM.ENTRY_TRACKBACK_DIR;
-		if (! is_dir($tb_path)) return false;
-		else $tb_dir_content = scan_directory($tb_path);
-		
-		$tb_files = array();
-		foreach ($tb_dir_content as $file) {
-			$cond = is_file($tb_path.PATH_DELIM.$file) && 
-			        preg_match("/[\w\d]+".TRACKBACK_PATH_SUFFIX."/", $file);
-			if ($cond) $tb_files[] = $file; 
-		}
-		if ($sort_asc) sort($tb_files);
-		else rsort($tb_files);
-
-		$tb_array = array();
-		foreach ($tb_files as $file) 
-			$tb_array[] = NewTrackback($tb_path.PATH_DELIM.$file);
-		
-		return $tb_array;
+		$params = array('path'=>ENTRY_TRACKBACK_DIR, 
+		                'ext'=>TRACKBACK_PATH_SUFFIX,
+		                'creator'=>'NewTrackback', 'sort_asc'=>$sort_asc);
+		return $this->getReplyArray($params);
 	}
 
 	/*
@@ -836,28 +1011,166 @@ class BlogEntry extends Entry {
 	A string of markup.
 	*/				  
 	function getTrackbacks($sort_asc=true) {
-		$trackbacks = $this->getTrackbackArray($sort_asc);	
-		if (!$trackbacks) return "";
-		$ret = "";
-		if ($trackbacks) {
-			$tbtext = array();
-			foreach ($trackbacks as $tb) {
-				$tbtext[] = $tb->get();
+		$title = spf_('Trackbacks on <a href="%s">%s</a>', 
+		              $this->permalink(), $this->subject);
+		$params = array('path'=>ENTRY_TRACKBACK_DIR, 'ext'=>TRACKBACK_PATH_SUFFIX,
+		                'creator'=>'NewTrackback', 'sort_asc'=>$sort_asc,
+		                'itemclass'=>'trackback', 'listclass'=>'tblist',
+		                'listtitle'=>$title);
+		return $this->getReplies($params);
+	}
+	
+	# Pingback handling functions
+	
+	/*
+	Method: getPingbackCount
+	Get the number of Pingbacks for this object.
+
+	Returns:
+	A non-negative integer representing the number of Pingbacks or false on 
+	failure.
+	*/
+	function getPingbackCount() {
+		$params = array('path'=>ENTRY_PINGBACK_DIR, 'ext'=>PINGBACK_PATH_SUFFIX);
+		return $this->getReplyCount($params);
+	}
+
+	/*
+	Method: getPingbackArray
+	Get an array of Pingback objects that contains all Pingbacks for 
+	this entry.
+
+	Parameters:
+	sort_asc - *Optional* boolean (true by default) determining whether the
+	           pingbacks should be sorted in ascending order by date.
+	
+	Returns:
+	An array of Pingback objects.
+	*/
+	function getPingbackArray($sort_asc=true) {
+		$params = array('path'=>ENTRY_PINGBACK_DIR, 
+		                'ext'=>PINGBACK_PATH_SUFFIX,
+		                'creator'=>'NewPingback', 'sort_asc'=>$sort_asc);
+		return $this->getReplyArray($params);
+	}
+
+	/*
+	Method: getPingbacks
+	Get some HTML that displays the Pingbacks for this entry.
+
+	Parameters:
+	sort_asc - *Optional* boolean (true by default) determining whether the
+	           pingbacks should be sorted in ascending order by date.
+	
+	Returns:
+	A string of markup.
+	*/				  
+	function getPingbacks($sort_asc=true) {
+		$title = spf_('Pingbacks on <a href="%s">%s</a>', 
+		              $this->permalink(), $this->subject);
+		$params = array('path'=>ENTRY_PINGBACK_DIR, 'ext'=>PINGBACK_PATH_SUFFIX,
+		                'creator'=>'NewPingback', 'sort_asc'=>$sort_asc,
+		                'itemclass'=>'pingback', 'listclass'=>'pblist',
+		                'listtitle'=>$title);
+		return $this->getReplies($params);
+	}
+	
+	# Method: sendPings
+	# Scans the links in the current entry, determines which are 
+	# pingback-enabled, and sends a pingback ping to those links.
+	#
+	# Parameters:
+	# local - *Optional* boolean that determines whether or not to send pings
+	#         to posts on the same webserver.  *Defaults* to false.
+	# Returns:
+	# An array of associative arrays.  Each array has 'uri' and a 'response' 
+	# key, which contain the target URI and the XML-RPC response object.
+	
+	function sendPings($local=false) {
+		
+		$urls = $this->extractLinks($local);
+		$ping = NewPingback();
+		$ret = array();
+		
+		foreach ($urls as $uri) {
+			
+			$pb_server = $ping->checkPingbackEnabled($uri);
+
+			if ($pb_server) {
+			
+				$linkdata = parse_url($pb_server);
+
+				$host = isset($linkdata['host']) ? $linkdata['host'] : SERVER("SERVER_NAME");
+				$path = isset($linkdata['path']) ? $linkdata['path'] : '';
+				$port = isset($linkdata['port']) ? $linkdata['port'] : 80;
+				
+				$parms = array(new xmlrpcval($this->permalink(), 'string'), 
+				               new xmlrpcval($uri, 'string'));
+				$msg = new xmlrpcmsg('pingback.ping', $parms);
+				
+				$client = new xmlrpc_client($path, $host, $port);
+				#$client->setDebug(1);
+				$result = $client->send($msg);
+				$ret[] = array('uri'=>$uri, 'response'=>$result);
+			}
+			
+		}
+		return $ret;
+	}
+	
+	# Method: pingExists
+	# Checks if a Pingback ping has already been recorded for the source URL.
+	#
+	# Parameters:
+	# uri - The source URI to check.
+	#
+	# Returns:
+	# True if there is already a recorded ping with the source URI, false 
+	# otherwise.
+	
+	function pingExists ($uri) {
+		$pings = $this->getPingbackArray();
+		foreach ($pings as $p) {
+			if ($p->source == $uri) return true;
+		}
+		return false;
+	}
+	
+	# Method: extractLinks
+	# Extracts all the hyperlinks from the entry text.
+	#
+	# Parameters:
+	# allow_local - *Optional* boolean parameter that determines if local links,
+	#               should be included.  *Defaults* to false.
+	#
+	# Returns:
+	# An array of URLs containing each hyperlink in the entry.  If allow_local 
+	# is false, then links without a protocol and host name are excluded.
+	
+	function extractLinks($allow_local=false) {
+		$matches = array();
+		if ($this->has_html == MARKUP_BBCODE) {
+			$ret = preg_match_all('/\[url=([^\]]+)\]/i', $this->data, $matches);
+		} elseif ($this->has_html == MARKUP_HTML) {
+			$ret = preg_match_all('/href="([^"])+"/i', $this->data, $matches);
+		} else {
+			$ret = preg_match_all('/((http|https|ftp):\/\/\S*)/i', $this->data, $matches);
+		}
+		
+		$url_matches = $matches[1];
+		$ret = array();
+		
+		foreach ($url_matches as $m) {
+			if ($allow_local) {
+				$ret[] = $m;
+			} else {
+				$url = parse_url($m);
+				if (isset($url['host']) && $url['host'] != SERVER("SERVER_NAME")) {
+					$ret[] = $m;
+				}
 			}
 		}
-		
-		if (isset($tbtext)) {
-			$tpl = NewTemplate(LIST_TEMPLATE);
-			$tpl->set("LIST_CLASS", "tblist");
-			$tpl->set("ITEM_CLASS", "trackback");
-			$tpl->set("ORDERED");
-			$tpl->set("LIST_TITLE", 
-			          spf_('TrackBacks for <a href="%s">%s</a>',
-			               $this->permalink(), $this->subject));
-			$tpl->set("ITEM_LIST", $tbtext);
-			$ret = $tpl->process();
-		}
-		
+
 		return $ret;
 	}
 

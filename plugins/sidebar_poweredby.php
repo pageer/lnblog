@@ -35,7 +35,7 @@ class LnBlogAd extends Plugin {
 	}
 }
 
-$login = new LnBlogAd();
+$login =& new LnBlogAd();
 if ($login->use_footer) {
 	$login->registerEventHandler("footer", "OnOutput", "footer_output");
 } else {

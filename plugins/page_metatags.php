@@ -1,13 +1,16 @@
 <?php
+# Plugin: MetaData
+# Adds HTML META tags to the page heading.  This includes description, author,
+# and generator values.  There is also an option to include a list of keywords
+# for use by search engines.
+
 class MetaData extends Plugin {
 
 	function MetaData() {
 		$this->plugin_desc = _("Add some META tags to the page.");
 		$this->plugin_version = "0.2.0";
-		$this->meta_keywords = "";
-		$this->member_list = array();
-		$this->member_list["meta_keywords"] = 
-			array("description"=>_("Keywords for search engines"));
+		$this->addOption('meta_keywords', _("Keywords for search engines"),
+		                 "", "text");
 		$this->getConfig();
 	}
 
@@ -23,7 +26,7 @@ class MetaData extends Plugin {
 	}
 }
 
-$meta = new MetaData();
+$meta =& new MetaData();
 $meta->registerEventHandler("page", "OnOutput", "addMetaTags");
 
 ?>

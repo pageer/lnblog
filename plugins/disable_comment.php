@@ -21,7 +21,7 @@
 class DisableComments extends Plugin {
 
 	function DisableComments() {
-		$this->plugin_desc = _("Allows you to globally disable comments or trackbacks for an entire blog.");
+		$this->plugin_desc = _("Allows you to globally disable comments, trackbacks, or pingbacks for an entire blog.");
 		$this->plugin_version = "0.2.0";
 		$this->no_comment = "default";
 		$this->no_trackback = false;
@@ -33,8 +33,10 @@ class DisableComments extends Plugin {
 		                       "disable" =>_("Disable all comments")));
 		$this->addOption("no_trackback", _("Disable trackbacks for all entries"),
 		                 false, "checkbox");
+		$this->addOption("no_pingback", _("Disable pingbacks for all entries"),
+		                 false, "checkbox");
 		$this->addOption("close_old", 
-				_("Close comments and trackbacks older than this many days"),
+				_("Close all replies on entries older than this many days"),
 				"", "text");
 		$this->getConfig();
 	}
@@ -48,6 +50,7 @@ class DisableComments extends Plugin {
 			if (! $usr->checkLogin()) $param->allow_comment = false;
 		}
 		if ($this->no_trackback) $param->allow_tb = false;
+		if ($this->no_pingback) $param->allow_pingback = false;
 
 		if (is_numeric($this->close_old) && $this->close_old > 0) {
 			# Subtract the number of days * 86400 seconds/day from the 
@@ -56,12 +59,13 @@ class DisableComments extends Plugin {
 			if ($param->post_ts < $close_time) {
 				$param->allow_comment = false;
 				$param->allow_tb = false;
+				$param->allow_pingback = false;
 			}
 		}
 	}
 
 }
-$obj = new DisableComments();
+$obj =& new DisableComments();
 $obj->registerEventHandler("blogentry", "InitComplete", "disable");
 $obj->registerEventHandler("article", "InitComplete", "disable");
 

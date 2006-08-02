@@ -48,11 +48,15 @@ if ($ent->allow_comment) {
 	$comm_output = handle_comment($ent);
 }
 
-$content = $ent->getComments();
-
-# Extra styles to add.  Build the list as we go to keep from including more
-# style sheets than we need to.
-$PAGE->addStylesheet("comment.css");
+$content = '';
+if (! GET('post')) {
+	$content = $ent->getComments();
+	# Extra styles to add.  Build the list as we go to keep from including more
+	# style sheets than we need to.
+	$PAGE->addStylesheet("comment.css");
+} elseif (! $ent->allow_comment) {
+	$content = '<p>'._('Comments are closed on this entry.').'</p>';
+}
 $content .= $comm_output;
 
 $PAGE->addScript("entry.js");

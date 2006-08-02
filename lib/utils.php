@@ -36,6 +36,7 @@ define("ARTICLE_BASE", 6);
 define("BLOG_ARTICLES", 7);
 define("ENTRY_TRACKBACKS", 8);
 define("ENTRY_DRAFTS", 9);
+define("ENTRY_PINGBACKS", 10);
 
 # Types of files for use with the getlink() function.
 # For convenience, these are defined as the directories under a theme.
@@ -246,8 +247,10 @@ function SERVER($key, $val="") {
 
 function COOKIE($key, $val="") {
 	if ($val) return $_COOKIE[$key] = $val;
-	elseif (isset($_COOKIE[$key])) return $_COOKIE[$key];
-	else return false;
+	elseif (isset($_COOKIE[$key])) {
+		if (get_magic_quotes_gpc()) return stripslashes($_COOKIE[$key]);
+		else return $_COOKIE[$key];
+	} else return false;
 }
 	
 # Function: POST
@@ -261,8 +264,10 @@ function COOKIE($key, $val="") {
 
 function POST($key, $val="") {
 	if ($val) return $_POST[$key] = $val;
-	elseif (isset($_POST[$key])) return $_POST[$key];
-	else return false;
+	elseif (isset($_POST[$key])) {
+		if (get_magic_quotes_gpc()) return stripslashes($_POST[$key]); 
+		else return $_POST[$key];
+	} else return false;
 }
 
 # Function: GET
@@ -276,8 +281,10 @@ function POST($key, $val="") {
 
 function GET($key, $val="") {
 	if ($val) return $_GET[$key] = $val;
-	elseif (isset($_GET[$key])) return $_GET[$key];
-	else return false;
+	elseif (isset($_GET[$key])) {
+		if (get_magic_quotes_gpc()) return stripslashes($_GET[$key]); 
+		else return $_GET[$key];
+	} else return false;
 }
 
 # Function: GETPOST
@@ -292,9 +299,13 @@ function GET($key, $val="") {
 # if neither one is set.
 
 function GETPOST($key) {
-	if (isset($_POST[$key])) return $_POST[$key];
-	elseif (isset($_GET[$key])) return $_GET[$key];
-	else return false;
+	if (isset($_POST[$key])) {
+		if (get_magic_quotes_gpc()) return stripslashes($_POST[$key]);
+		else return $_POST[$key];
+	} elseif (isset($_GET[$key])) { 
+		if (get_magic_quotes_gpc()) return stripslashes($_GET[$key]);
+		else return $_GET[$key];
+	} else return false;
 }
 
 # Function: has_post
@@ -444,23 +455,24 @@ function localpath_to_uri($path, $full_uri=true) {
 # may or may not exist.
 
 function uri_to_localpath($uri) {
-	# Extract the protocol.
-	$pos = strpos($uri, '://');
-	$protocol = substr($uri, 0, $pos);
-	$temp_uri = substr($uri, $pos+3);
+
+	$url_bits = parse_url($uri);
+	if (! $url_bits) return '';
 	
-	# Now separate the domain and path.
-	$pos = strpos($uri, '/');
-	$domain = substr($temp_uri, 0, $pos);
-	$path = substr($temp_uri, $pos);
+	#$protocol = isset($url_bits['scheme']) ? $url_bits['scheme'] : '';
+	#$domain = isset($url_bits['host']) ? $url_bits['host'] : '';
+	$path = isset($url_bits['path']) ? $url_bits['path'] : '';
+		
+	# Account for user home directories in path.  Please note that this is 
+	# an ugly, ugly hack to make this function work when I'm testing on my
+	# local workstation, where I use ~/www for by web root.
+	if ( preg_match(URI_TO_LOCALPATH_MATCH_RE, $path) ) {
+		$path = preg_replace(URI_TO_LOCALPATH_MATCH_RE, URI_TO_LOCALPATH_REPLACE_RE, $path);
+	}
 	
-	# Check if there is a port number with the domain.
-	$pos = strpos($domain, ':');
-	if ($pos) {
-		$domain = substr($domain, 0, $pos);
-		$port = substr($domain, $pos+1);
-	} else $port = '';
-	
+	$path = mkpath(DOCUMENT_ROOT, $path);
+	$path = canonicalize($path);
+	return $path;
 	
 }
 
@@ -512,6 +524,8 @@ function pathconfig_php_string($inst_root, $inst_url, $blog_url) {
 # the instpath parameter is for the software installation path 
 # and is only required for the BLOG_BASE type, as it is used 
 # to create the config.php file.
+# As of version 0.7.4, this function returns an array of paths for
+# which the file operation returned an error code.
 
 function create_directory_wrappers($path, $type, $instpath="") {
 
@@ -527,7 +541,9 @@ function create_directory_wrappers($path, $type, $instpath="") {
 
 	$current = $path.PATH_DELIM;
 	$parent = dirname($path).PATH_DELIM;
-	$ret = 1;
+	$config_level = 0;
+	$ret = 0;
+	$ret_list = array();
 	
 	switch ($type) {
 		case BLOG_BASE:
@@ -541,63 +557,77 @@ function create_directory_wrappers($path, $type, $instpath="") {
 			                  "tags"=>"pages/tagsearch",
 			                  "pluginload"=>"plugin_loading",
 			                  "profile"=>"userinfo");
-			$ret &= $fs->write_file($current."config.php", config_php_string(0));
+			$config_level = 0;
 			if (! file_exists($current."pathconfig.php")) {
 				$inst_root = realpath($instpath);
 				$blog_root = realpath($path);
 				$inst_url = localpath_to_uri($inst_root);
 				$blog_url = localpath_to_uri($blog_root);
 				$config_data = pathconfig_php_string($inst_root, $inst_url, $blog_url);
-				$ret &= $fs->write_file($current."pathconfig.php", $config_data);
+				$ret = $fs->write_file($current."pathconfig.php", $config_data);
+				if (! $ret) $ret_list[] = $current."pathconfig.php";
 			}
 			break;
 		case BLOG_ENTRIES:
 			$filelist = array("index"=>"pages/showarchive", "all"=>"pages/showall");
-			$ret &= $fs->write_file($current."config.php", config_php_string(1));
+			$config_level = 1;
 			break;
 		case YEAR_ENTRIES:
 			$filelist = array("index"=>"pages/showyear");
-			$ret &= $fs->write_file($current."config.php", config_php_string(2));
+			$config_level = 2;
 			break;
 		case MONTH_ENTRIES:
 			$filelist = array("index"=>"pages/showmonth", "day"=>"pages/showday");
-			$ret &= $fs->write_file($current."config.php", config_php_string(3));
+			$config_level = 3;
 			break;
 		case ENTRY_BASE:
 			$filelist = array("index"=>"pages/showentry", "edit"=>"pages/editentry",
-			                  "delete"=>"pages/delentry", "uploadfile"=>"pages/fileupload",
+			                  "delete"=>"pages/delentry", 
+			                  "uploadfile"=>"pages/fileupload",
 			                  "trackback"=>"pages/tb_ping");
-			$ret &= $fs->write_file($current."config.php", config_php_string(4));
+			$config_level = 4;
 			break;
 		case ENTRY_COMMENTS:
 			$filelist = array("index"=>"pages/showcomments", "delete"=>"pages/delcomment");
-			$ret &= $fs->write_file($current."config.php", config_php_string(5));
+			$config_level = 5;
 			break;
 		case ENTRY_TRACKBACKS:
 			$filelist = array("index"=>"pages/showtrackbacks");
-			$ret &= $fs->write_file($current."config.php", config_php_string(5));
+			$config_level = 5;
+			break;
+		case ENTRY_PINGBACKS:
+			$filelist = array("index"=>"pages/showpingbacks");
+			$config_level = 5;
 			break;
 		case ARTICLE_BASE:
 			# The same as for entries, but for some reason, I never added a delete.
 			$filelist = array("index"=>"pages/showentry", "edit"=>"pages/editentry",
 			                  "uploadfile"=>"pages/fileupload",
 			                  "trackback"=>"pages/tb_ping");
-			$ret &= $fs->write_file($current."config.php", config_php_string(2));
+			$config_level = 2;
 			break;
 		case BLOG_ARTICLES:
 			$filelist = array("index"=>"pages/showarticles");
-			$ret &= $fs->write_file($current."config.php", config_php_string(1));
+			$config_level = 1;
 			break;
 		case ENTRY_DRAFTS:
 			$filelist = array("index"=>"pages/showdraft");
-			$ret &= $fs->write_file($current."config.php", config_php_string(1));
+			$config_level = 1;
 			break;
 	}
+	# Write the config.php file, with the appropriate level of distance
+	# from the blog root.
+	$ret = $fs->write_file($current."config.php", 
+	                       config_php_string($config_level));
+	if (! $ret) $ret_list[] = $current."config.php";
+
 	foreach ($filelist as $file=>$content) {
-		$ret &= $fs->write_file($current.$file.".php", $head.$content.$tail);
+		$curr_file = $current.$file.".php";
+		$ret = $fs->write_file($curr_file, $head.$content.$tail);
+		if (! $ret) $ret_list[] = $curr_file;
 	}
 	$fs->destruct();
-	return $ret;
+	return $ret_list;
 }
 
 # Function: getlink
@@ -703,22 +733,6 @@ function sanitize($str, $pattern="/\W/", $sub="") {
 	}
 }
 
-# Function: stripslashes_smart
-# A smarter version of stripslashes(), based on a regular expression.
-#
-# Parameters:
-# str - The string to strip.
-#
-# Retruns:
-# The string with multiple backslashes converted to a single one and 
-# backslashes before quotes removed.
-
-function stripslashes_smart($str) {
-	$matches = array("/\\'/", '/\\"/', '/\\\+/');
-	$replacements = array("'", '"', "\\");
-	return preg_replace($matches, $replacements, $str);
-}
-
 # Function: in_arrayi
 # Like in_array() standard function, except case-insensitive
 # for strings.
@@ -756,9 +770,12 @@ function make_uri($base=false, $query_string=false, $no_get=true,
 	if ($query_string) $qs = array_merge($qs, $query_string); 
 	
 	if ( ! $base ) $base = $_SERVER['SCRIPT_NAME'];
-	elseif (strpos($base, '?') !== false) {
-		$url_parms = substr($base, strpos($base, '?')+1);
-		$url_parms = str_replace('&amp;', '&', $base);
+	
+	$qs_start_pos = strpos($base, '?');
+	if ($qs_start_pos !== false) {
+		$url_parms = substr($base, $qs_start_pos+1);
+		$base = substr($base, 0, $qs_start_pos);
+		$url_parms = str_replace('&amp;', '&', $url_parms);
 		$parms = explode('&', $url_parms);
 		foreach ($parms as $p) {
 			$tmp = explode('=', $p);

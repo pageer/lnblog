@@ -1,27 +1,29 @@
-<h4 onclick="toggle_show('editorbox', this);"><?php p_("LBCode Markup");?><a href="#" >(-)</a></h4>
-<div id="editorbox">
-<button id="bold" accesskey="b" title="<?php p_('Bold');?>" onclick="one_parm('b', '<?php p_('Enter text to bold.');?>');"><strong><?php p_("B");?></strong></button>
-<button id="italic" accesskey="i" title="<?php p_('Italic');?>" onclick="one_parm('i', '<?php p_('Enter text to italicize.');?>');"><em><?php p_("I");?></em></button>
-<button id="underline" accesskey="u" title="<?php p_('Underline');?>" onclick="one_parm('u', '<?php p_('Enter text to underline.');?>');"><span style="text-decoration: underline"><?php p_("U");?></span></button>
-<button id="qt" accesskey="q" title="<?php p_('Short Quote');?>" onclick="opt_parm('q', '<?php p_('Enter quotation text.');?>', '<?php p_("Enter optional citation");?>');">"<?php p_("quote");?>"</button>
-<button id="bq" accesskey="k" title="<?php p_('Blockquote'); ?>" onclick="opt_parm('quote', '<?php p_('Enter block quotation text.');?>', '<?php p_("Enter optional citation");?>');">"<?php p_("bq");?>"</button>
-<button id="abr" accesskey="a" title="<?php p_('Abbreviation');?>" onclick="two_parm('ab', '<?php p_("Enter the abbreviation");?>', '<?php p_("Enter the full phrase it stands for");?>');"><?php p_('abbr');?></button>
-<button id="acr" accesskey="c" title="<?php p_('Acronym'); ?>" onclick="two_parm('ac', '<?php p_("Enter the acronym");?>', '<?php p_("Enter the full phrase it stands for");?>');"><?php p_('ac'); ?></button>
-<button id="url" accesskey="l" title="<?php p_('Hyperlink'); ?>" onclick="two_parm('url', '<?php p_("Enter the link text");?>', '<?php p_("Enter the link URL");?>');"><span style="color: blue; text-decoration: underline"><?php p_('link');?></span></button>
-<button id="img" accesskey="m" title="<?php p_('Image'); ?>" onclick="two_parm('img', '<?php p_("Enter the image title");?>', '<?php p_("Enter the image URL");?>);"><?php p_('img');?></button>
-<button id="code" accesskey="o" title="<?php p_('Code');?>" onclick="one_parm('code', '<?php p_("Enter text to mark as code");?>');"><code><?php p_('code');?></code></button>
+<div id="lbcode_editor">
+<strong><a href="http://www.skepticats.com/lnblog/documentation/files/docs/lbcode-txt.html">
+<?php p_("LBCode");?></a></strong><a onclick="toggle_show('editorbox', this);" href="#dummy" >(-)</a>
+<div id="editorbox" style="display:inline">
+<button type="button" id="bold" accesskey="b" title="<?php p_('Bold');?>" onclick="one_parm('b', '<?php p_('Enter text to bold.');?>');"><strong><?php p_("B");?></strong></button>
+<button type="button" id="italic" accesskey="i" title="<?php p_('Italic');?>" onclick="one_parm('i', '<?php p_('Enter text to italicize.');?>');"><em><?php p_("I");?></em></button>
+<button type="button" id="underline" accesskey="u" title="<?php p_('Underline');?>" onclick="one_parm('u', '<?php p_('Enter text to underline.');?>');"><span style="text-decoration: underline"><?php p_("U");?></span></button>
+<button type="button" id="qt" accesskey="q" title="<?php p_('Short Quote');?>" onclick="opt_parm('q', '<?php p_('Enter quotation text.');?>', '<?php p_("Enter optional citation");?>');">"<?php p_("quote");?>"</button>
+<button type="button" id="bq" accesskey="k" title="<?php p_('Blockquote'); ?>" onclick="opt_parm('quote', '<?php p_('Enter block quotation text.');?>', '<?php p_("Enter optional citation");?>');">"<?php p_("bq");?>"</button>
+<button type="button" id="abr" accesskey="a" title="<?php p_('Abbreviation');?>" onclick="two_parm('ab', '<?php p_("Enter the abbreviation");?>', '<?php p_("Enter the full phrase it stands for");?>');"><?php p_('abbr');?></button>
+<button type="button" id="acr" accesskey="c" title="<?php p_('Acronym'); ?>" onclick="two_parm('ac', '<?php p_("Enter the acronym");?>', '<?php p_("Enter the full phrase it stands for");?>');"><?php p_('ac'); ?></button>
+<button type="button" id="url" accesskey="l" title="<?php p_('Hyperlink'); ?>" onclick="two_parm('url', '<?php p_("Enter the link text");?>', '<?php p_("Enter the link URL");?>');"><span style="color: blue; text-decoration: underline"><?php p_('link');?></span></button>
+<button type="button" id="img" accesskey="m" title="<?php p_('Image'); ?>" onclick="two_parm('img', '<?php p_("Enter the image title");?>', '<?php p_("Enter the image URL");?>);"><?php p_('img');?></button>
+<button type="button" id="code" accesskey="o" title="<?php p_('Code');?>" onclick="one_parm('code', '<?php p_("Enter text to mark as code");?>');"><code><?php p_('code');?></code></button>
 </div>
-<?php if (EDITOR_SHOW_INLINE_BOXES) { # Hide the edit boxes. ?>
-<h4 onclick="toggle_show('editboxes', this);"><?php p_("Inline editor boxes");?><a href="#" >(+)</a></h4>
+<?php if (EDITOR_SHOW_INLINE_BOXES) { /* Hide the edit boxes. */ ?>
+<p onclick="toggle_show('editboxes', this);"><strong><?php p_("Inline editor boxes");?></strong><a href="#dummy" >(+)</a></p>
 <div id="editboxes">
 <label for="desc_txt" title="<?php p_('Text to be displayed on page'); ?>"><?php p_('Text'); ?></label>
 <input type="text" id="desc_txt" accesskey="t" title="<?php p_('Text to be displayed on page'); ?>" />
 <label for="meta_txt" title="<?php p_('Link/image URL or abbreviation title'); ?>"><?php p_('Attribute'); ?></label>
 <input type="text" id="meta_txt" accesskey="r" title="<?php p_('Link/image URL or abbreviation title'); ?>" />
 </div>
-<?php } # End edit box hiding ?>
-<?php if (EDITOR_SHOW_SYMBOLS) { # Hide the math entity buttons. ?>
-<h4 onclick="toggle_show('mathent', this);"><?php p_("Special symbols");?><a href="#" >(+)</a></h4>
+<?php } /* End edit box hiding */ ?>
+<?php if (EDITOR_SHOW_SYMBOLS) { /* Hide the math entity buttons. */ ?>
+<h4 onclick="toggle_show('mathent', this);"><?php p_("Special symbols");?><a href="#dummy" >(+)</a></h4>
 <div id="mathent">
 <?php
 $math_entities = array();
@@ -46,6 +48,5 @@ foreach ($math_entities as $type=>$vals) { ?>
 </p>
 <?php } ?>
 </div>
-<?php } # End math entity hiding ?>
-<hr />
-
+<?php } /* End math entity hiding */ ?>
+</div>

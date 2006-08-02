@@ -6,6 +6,7 @@ so you should use this only for changes that are particular to the calendar.
 
 table.calendar {
 	margin: 1% auto;
+	font-size: 80%;
 	width: 94%;
 	text-align: center;
 }
@@ -26,12 +27,12 @@ p.calendar {
 	text-align: center;
 }
 
-a.llink {
+.llink {
 	font-size: 80%;
 	margin-right: 3%;
 }
 
-a.rlink {
+.rlink {
 	font-size: 80%;
 	margin-left: 3%;
 }

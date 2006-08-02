@@ -10,29 +10,29 @@
 </div>
 <?php } ?>
 <div>
-<label for="<?php echo $PWD; ?>"><?php p_('Password'); ?></label>
-<input type="password" id="<?php echo $PWD; ?>" name="<?php echo $PWD; ?>" <?php if (isset($PWD_VALUE)) echo 'value="'.$PWD_VALUE.'" '; ?>/>
+<label for="passwd"><?php p_('Password'); ?></label>
+<input type="password" id="passwd" name="passwd" <?php if (isset($PWD_VALUE)) echo 'value="'.$PWD_VALUE.'" '; ?>/>
 </div>
 <div>
-<label for="<?php echo $CONFIRM; ?>"><?php p_('Confirm'); ?></label>
-<input type="password" id="<?php echo $CONFIRM; ?>" name="<?php echo $CONFIRM; ?>" <?php if (isset($CONFIRM_VALUE)) echo 'value="'.$CONFIRM_VALUE.'" '; ?>/>
+<label for="confirm"><?php p_('Confirm'); ?></label>
+<input type="password" id="confirm" name="confirm" <?php if (isset($CONFIRM_VALUE)) echo 'value="'.$CONFIRM_VALUE.'" '; ?>/>
 </div>
 <div>
-<label for="<?php echo $FULLNAME; ?>"><?php p_('Real name');?></label>
-<input type="text" id="<?php echo $FULLNAME; ?>" name="<?php echo $FULLNAME; ?>" <?php if (isset($FULLNAME_VALUE)) echo 'value="'.$FULLNAME_VALUE.'" '; ?>/>
+<label for="fullname"><?php p_('Real name');?></label>
+<input type="text" id="fullname" name="fullname" <?php if (isset($FULLNAME_VALUE)) echo 'value="'.$FULLNAME_VALUE.'" '; ?>/>
 </div>
 <div>
-<label for="<?php echo $EMAIL; ?>"><?php p_('E-Mail');?></label>
-<input type="text" id="<?php echo $EMAIL; ?>" name="<?php echo $EMAIL; ?>" <?php if (isset($EMAIL_VALUE)) echo 'value="'.$EMAIL_VALUE.'" '; ?>/>
+<label for="email"><?php p_('E-Mail');?></label>
+<input type="text" id="email" name="email" <?php if (isset($EMAIL_VALUE)) echo 'value="'.$EMAIL_VALUE.'" '; ?>/>
 </div>
 <div>
-<label for="<?php echo $HOMEPAGE; ?>"><?php p_('Homepage');?></label>
-<input type="text" id="<?php echo $HOMEPAGE; ?>" name="<?php echo $HOMEPAGE; ?>" <?php if (isset($HOMEPAGE_VALUE)) echo 'value="'.$HOMEPAGE_VALUE.'" '; ?>/>
+<label for="homepage"><?php p_('Homepage');?></label>
+<input type="text" id="homepage" name="homepage" <?php if (isset($HOMEPAGE_VALUE)) echo 'value="'.$HOMEPAGE_VALUE.'" '; ?>/>
 </div>
 <?php foreach ($CUSTOM_FIELDS as $key=>$val) { ?>
 <div>
-<label for="<?php echo $key;?>"><?php echo $val;?></label>
-<input type="text" id="<?php echo $key;?>" name="<?php echo $key;?>" <?php if (isset($CUSTOM_VALUES[$key])) echo 'value="'.$CUSTOM_VALUES[$key].'" '; ?>/>
+<label for="<?php echo $key;?>"><?php echo htmlspecialchars($val);?></label>
+<input type="text" id="<?php echo $key;?>" name="<?php echo $key;?>" <?php if (isset($CUSTOM_VALUES[$key])) echo 'value="'.htmlspecialchars($CUSTOM_VALUES[$key]).'" '; ?>/>
 </div>
 <?php } ?>
 <?php if ( isset($UPLOAD_LINK) && isset($PROFILE_EDIT_LINK) ) { ?>

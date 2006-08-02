@@ -7,6 +7,15 @@ fieldset {
 	padding: 0;
 }
 
+fieldset#entry_settings {
+	 border: 1px solid black;
+}
+
+fieldset#entry_settings legend {
+	margin-left: 3em; 
+	font-weight: bold;
+}
+
 form {
 	width: 98%;
 	margin: 0;

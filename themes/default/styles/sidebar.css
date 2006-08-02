@@ -35,8 +35,8 @@
 }
 
 #sidebar ul, #sidebar .panel {
-	margin: 0px;
-	padding-left: 0px;
+	margin: 0;
+	padding-left: 0;
 	margin-top: 1em;
 	margin-bottom: 1em;
 }
@@ -49,17 +49,17 @@
 #sidebar ul li {
 	list-style-type: none;
 	width: 100%;
-	margin: 0px;
-	padding: 0px;
+	margin: 0;
+	padding: 0;
 	padding-left: 8%;
 	width: 92%;
 } 
 
-#sidebar ul li a:hover {
+#sidebar ul li a:hover, #sidebar ul li:hover {
 	background-color: white;
 }
 
-#sidebar ul.imglist li a:hover {
+#sidebar .imglist a:hover {
 	background-color: #f4f4f4;  /* Match the normal background. */
 }
 /*
@@ -72,8 +72,9 @@
 #sidebar img {
 	text-align: center;
 	vertical-align: middle;
-	margin: 1% 0 1% 5%;
-	border: 0px;
+	margin: 0;
+	padding: 0;
+	border: 0;
 }
 
 @media print {

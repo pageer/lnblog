@@ -92,11 +92,11 @@ class ContentBan extends Plugin {
 		$blg = NewBlog();
 		$usr = NewUser();
 		$banfile = $this->ban_list;
-		echo '<li><a href="'.$blg->uri('editfile', $banfile).'">'.
+		echo '<li><a href="'.$blg->uri('editfile', "file=$banfile").'">'.
 			_("Blog RegEx blacklist").'</a></li>';
 		if ($usr->isAdministrator()) {
 			echo '<li><a href="'.
-				make_uri(INSTALL_ROOT_URL.'editfile.php',
+				make_uri(INSTALL_ROOT_URL.'pages/editfile.php',
 				         array('file'=>'userdata/'.$banfile)).'">'.
 				_("Global RegEx blacklist").'</a></li>';
 		}
@@ -104,7 +104,7 @@ class ContentBan extends Plugin {
 
 }
 
-$ban = new ContentBan();
+$ban =& new ContentBan();
 $ban->registerEventHandler("blogcomment", "OnInsert", "clearData");
 $ban->registerEventHandler("trackback", "POSTRetreived", "clearTBData");
 $ban->registerEventHandler("loginops", "PluginOutput", "sidebarLink");

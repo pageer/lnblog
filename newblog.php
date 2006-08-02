@@ -51,27 +51,13 @@ else $blog->home_path = "myblog";
 if (has_post()) {
 
 	$blog->owner = POST("owner");
-	$blog->name = POST("blogname");
-	$blog->writers(POST("writelist") );
-	$blog->description = POST("desc");
-	$blog->image = POST("image");
-	$blog->theme = POST("theme");
-	$blog->max_entries = POST("maxent");
-	$blog->max_rss = POST("maxrss");
-	$blog->default_markup = POST("blogmarkup");
+	blog_get_post_data($blog);
 }
 
 $tpl->set("SHOW_BLOG_PATH");
 $tpl->set("BLOG_PATH_REL", $blog->home_path);
 $tpl->set("BLOG_OWNER", $blog->owner);
-$tpl->set("BLOG_WRITERS", implode(",", $blog->writers()) );
-$tpl->set("BLOG_NAME", $blog->name);
-$tpl->set("BLOG_DESC", $blog->description);
-$tpl->set("BLOG_IMAGE", $blog->image);
-$tpl->set("BLOG_THEME", $blog->theme);
-$tpl->set("BLOG_MAX", $blog->max_entries);
-$tpl->set("BLOG_RSS_MAX", $blog->max_rss);
-$tpl->set("BLOG_DEFAULT_MARKUP", $blog->default_markup);
+blog_set_template($tpl, $blog);
 $tpl->set("BLOG_PATH", $blog->home_path);
 $tpl->set("POST_PAGE", current_file());
 $tpl->set("UPDATE_TITLE", _("Create new weblog"));

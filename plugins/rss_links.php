@@ -8,6 +8,8 @@ class RSSLinks extends Plugin {
 	
 	function linkFeeds(&$param) {
 		global $PLUGIN_MANAGER;
+		global $PAGE;
+		$param = $PAGE;
 		$rss1_file = $PLUGIN_MANAGER->plugin_config->value(
 			"rss1feedgenerator", "feed_file", "news.rdf");
 		$rss1_comments = $PLUGIN_MANAGER->plugin_config->value(
@@ -22,34 +24,42 @@ class RSSLinks extends Plugin {
 			# RSS 2 comments
 			if (file_exists($param->display_object->localpath().PATH_DELIM.
 			                ENTRY_COMMENT_DIR.PATH_DELIM.$rss2_comments) ) {
-				$param->addRSSFeed($param->display_object->permalink().
+				$param->addRSSFeed($param->display_object->uri('base').
 				                   ENTRY_COMMENT_DIR."/".$rss2_comments, 
-				                   "application/xml+rss", _("Comments - RSS 2.0"));
+				                   "application/rss+xml", _("Comments - RSS 2.0"));
 			}
 
 			# RSS 1 comments
 			if (file_exists($param->display_object->localpath().PATH_DELIM.
 			                ENTRY_COMMENT_DIR.PATH_DELIM.$rss1_comments) ) {
-				$param->addRSSFeed($param->display_object->permalink().
+				$param->addRSSFeed($param->display_object->uri('base').
 				                   ENTRY_COMMENT_DIR."/".$rss1_comments, 
 				                   "application/xml", _("Comments - RSS 1.0"));
 			}
-		} elseif ($obj_type == 'blog' || 
+		} 
+		
+		if ($obj_type == 'blog' || 
 		          $obj_type == 'blogentry' || 
 		          $obj_type == 'article') {
-
+			
+			if (is_a($param->display_object, 'Blog')) {
+				$obj = $param->display_object;
+			} else {
+				$obj = $param->display_object->getParent();
+			}
+					  
 			# RSS2 entries
-			if (file_exists($param->display_object->home_path.PATH_DELIM.
+			if (file_exists($obj->home_path.PATH_DELIM.
 			                BLOG_FEED_PATH.PATH_DELIM.$rss2_file) ) {
-				$param->addRSSFeed($param->display_object->getURL().
+				$param->addRSSFeed($obj->getURL().
 				                   BLOG_FEED_PATH."/".$rss2_file, 
-				                   "application/xml+rss", _("Entries - RSS 2.0"));
+				                   "application/rss+xml", _("Entries - RSS 2.0"));
 			}
 
 			# RSS1 entries
-			if (file_exists($param->display_object->home_path.PATH_DELIM.
+			if (file_exists($obj->home_path.PATH_DELIM.
 			                BLOG_FEED_PATH.PATH_DELIM.$rss1_file) ) {
-				$param->addRSSFeed($param->display_object->getURL().
+				$param->addRSSFeed($obj->getURL().
 				                   BLOG_FEED_PATH."/".$rss1_file, 
 				                   "application/xml", _("Entries - RSS 1.0"));
 			}
@@ -58,6 +68,6 @@ class RSSLinks extends Plugin {
 
 }
 
-$lnk = new RSSLinks();
+$lnk =& new RSSLinks();
 $lnk->registerEventHandler("page", "OnOutput", "linkFeeds");
 ?>

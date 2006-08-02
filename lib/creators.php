@@ -166,6 +166,13 @@ function NewTrackback($param=false) {
 	return new Trackback($param);
 }
 
+# Function: NewPingback
+# Creates a new pingback object.
+function NewPingback($param=false) {
+	require_once("pb.php");
+	return new Pingback($param);
+}
+
 # Function: NewIniParser
 # Creates a new INI file parser object.
 function NewIniParser($file=false) {

@@ -58,31 +58,21 @@ if ($blog->isBlog()) {
 
 $form_title = spf_("Modify User - %s", $usr->username());
 $user_name = "user";
-$password = "passwd";
-$confirm = "confirm";
-$full_name = "fullname";
-$email = "email";
-$homepage = "homepage";
 $reset="reset";  # Set to 1 to reset the password.
 
 $tpl = NewTemplate("login_create_tpl.php");
 $tpl->set("FORM_TITLE", $form_title);
 $tpl->set("FORM_ACTION", current_file());
-$tpl->set("PWD", $password);
-$tpl->set("CONFIRM", $confirm);
-$tpl->set("FULLNAME", $full_name);
-$tpl->set("FULLNAME_VALUE", $usr->name() );
-$tpl->set("EMAIL", $email);
-$tpl->set("EMAIL_VALUE", $usr->email() );
-$tpl->set("HOMEPAGE", $homepage);
-$tpl->set("HOMEPAGE_VALUE", $usr->homepage() );
+$tpl->set("FULLNAME_VALUE", htmlentities($usr->name()) );
+$tpl->set("EMAIL_VALUE", htmlentities($usr->email()) );
+$tpl->set("HOMEPAGE_VALUE", htmlentities($usr->homepage()) );
 
 $blog_qs = ($blog->isBlog() ? "blog=".$blog->blogid."&amp;" : "");
 $tpl->set("UPLOAD_LINK", 
           INSTALL_ROOT_URL."pages/fileupload.php?".
           $blog_qs."profile=".$usr->username() );
-$tpl->set("PROFILE_EDIT_LINK", INSTALL_ROOT_URL."editfile.php?".
-          $blog_qs."profile=".$usr->username()."&amp;file=profile.htm" );
+$tpl->set("PROFILE_EDIT_LINK", $blog->uri("editfile", "file=profile.htm", 
+                                          'profile='.$usr->username() ) );
 $tpl->set("PROFILE_EDIT_DESC", _("Edit extra profile data") );
 $tpl->set("UPLOAD_DESC", _("Upload file to profile") );
 
@@ -98,27 +88,27 @@ $tpl->set("CUSTOM_VALUES", $usr->custom);
 
 if (has_post()) {
 	
-	if ( trim(POST($password)) && 
-	     trim(POST($password)) == trim(POST($confirm))) {
+	if ( trim(POST('passwd')) && 
+	     trim(POST('passwd')) == trim(POST('confirm'))) {
 		$pwd_change = true;
-		$usr->password(trim(POST($password)));
-	} elseif ( trim(POST($password)) && 
-	           trim(POST($password)) == trim(POST($confirm))) {
+		$usr->password(trim(POST('passwd')));
+	} elseif ( trim(POST('passwd')) && 
+	           trim(POST('passwd')) == trim(POST('confirm'))) {
 		$tpl->set("FORM_MESSAGE", _("The passwords you entered do not match."));
 	} else {
 		$pwd_change = false;
 	}
 	
-	$usr->name(trim(POST($full_name)));
-	$usr->email(trim(POST($email)));
-	$usr->homepage(trim(POST($homepage)));
+	$usr->name(trim(POST('fullname')));
+	$usr->email(trim(POST('email')));
+	$usr->homepage(trim(POST('homepage')));
 	
 	foreach ($section as $key=>$val) {
 		$usr->custom[$key] = trim(POST($key));
 	}
 	
 	$usr->save();
-	if ($pwd_change) $usr->login(POST($password));
+	if ($pwd_change) $usr->login(POST('passwd'));
 	$PAGE->redirect($redir_page);
 	
 }

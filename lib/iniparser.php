@@ -43,6 +43,9 @@ class INIParser {
 	# This method preserves comments in the file.
 
 	function readFile() {
+		# Check whether or not magic quotes will mess up our data.
+		#$black_magic = ini_get('magic_quotes_runtime');
+
 		# Allow an option to use the built-in PHP INI file parser.
 		# Note that this DOES NOT PRESERVE COMMENTS in the INI file.
 		# Whether or not that's a problem depends on your point of view.
@@ -50,18 +53,24 @@ class INIParser {
 			$this->data = parse_ini_file($this->filename, true);
 			return;
 		}
+
 		$file_content = file($this->filename);
 		$this->data = array();
 		$cur_sec = false;
 		foreach ($file_content as $line) {
 			$line = trim($line);
+			#if ($black_magic) $line = stripslashes($line);
+
 			if ( preg_match("/^\[.+\]$/",$line) ) {
+				
 				$sec_name = str_replace(array("[", "]"), "", $line);
+				
 				# If this section already exists, ignore the line.
 				if (! isset($this->data[$sec_name]) ) {
 					$this->data[$sec_name] = array();
 					$cur_sec = $sec_name;
 				}
+
 			} else {
 				$line_arr = explode('=', $line, 2);
 				# If the line doesn't match the var=value pattern, or if it's a

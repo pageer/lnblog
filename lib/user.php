@@ -124,7 +124,7 @@ class User extends LnBlogObject {
 		if ($this->email) $tpl->set("USER_EMAIL", $this->email);
 		if ($this->default_group) $tpl->set("DEFAULT_GROUP",$this->defaultGroup());
 		$tpl->set("GROUPS", $this->groups());
-		if (strtolower(substr(trim($this->homepage), 0, 7)) != "http://" &&
+		if (strpos($this->homepage, "http://") === false && 
 		    trim($this->homepage) != "") {
 			$this->homepage = "http://".$this->homepage;
 		}
@@ -364,7 +364,7 @@ class User extends LnBlogObject {
 			} else {
 				setcookie(CURRENT_USER, $this->username, 
 					(LOGIN_EXPIRE_TIME ? time() + LOGIN_EXPIRE_TIME:false), "/");
-				setcookie(PW_HASH, $this->passwd, 
+				setcookie(PW_HASH, md5($this->passwd.get_ip()), 
 					(LOGIN_EXPIRE_TIME ? time() + LOGIN_EXPIRE_TIME:false), "/");
 				$ret = true;
 			}
@@ -416,7 +416,8 @@ class User extends LnBlogObject {
 			# This is NOT secure, but it is convenient.
 			$usr = COOKIE(CURRENT_USER);
 			$pwhash = COOKIE(PW_HASH);
-			$auth_ok = ($this->username == $usr && $this->passwd = $pwhash);
+			$auth_ok = ($this->username == $usr && 
+			            md5($this->passwd.get_ip()) == $pwhash);
 		}
 		if ($auth_ok) return true;
 		else return false;

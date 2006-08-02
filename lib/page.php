@@ -68,6 +68,7 @@ class Page extends LnBlogObject {
 	var $inline_scripts;
 	var $metatags;
 	var $headers;
+	var $links;
 	
 	function Page($ref=false) {
 	
@@ -84,6 +85,7 @@ class Page extends LnBlogObject {
 		$this->inline_scripts = array();
 		$this->metatags = array();
 		$this->headers = array();
+		$this->links = array();
 		
 		$this->title = '';
 
@@ -120,7 +122,7 @@ class Page extends LnBlogObject {
 		}
 	}
 	
-		/*
+	/*
 	Method: addInlineStylesheet
 	Adds style sheets to be added inline into the page.
 
@@ -135,6 +137,19 @@ class Page extends LnBlogObject {
 		for ($i = 0; $i < $num_args; $i++) {
 			$this->inline_stylesheets[] = $arg_list[$i];
 		}
+	}
+
+	/*
+	Method: addLink
+	Adds a generic link element to the page header.
+	
+	Parameters:
+	attribs - An associative array, with each key corresponding to an attribute
+	          of the link with the corresponding value as the value.
+	*/
+	function addLink($attribs) {
+		if (count($attribs) == 0) return false;
+		$this->links[] = $attribs;
 	}
 
 	/*
@@ -215,6 +230,7 @@ class Page extends LnBlogObject {
 	*/
 	
 	function redirect($url) {
+		$url = str_replace(array("\r","\n",'%0d','%0D','%0a','%0A'), '', $url);
 		header("Location: ".$url);
 		exit;
 	}
@@ -229,6 +245,8 @@ class Page extends LnBlogObject {
 	*/
 	
 	function refresh($url, $delay=0) {
+		$url = str_replace(array("\r","\n",'%0d','%0D','%0a','%0A'), '', $url);
+		if (! is_int($delay)) $delay = 0;
 		header("Refresh: ".$delay."; ".$url);
 	}
 
@@ -256,6 +274,7 @@ class Page extends LnBlogObject {
 		$head->set("INLINE_STYLESHEETS",$this->inline_stylesheets);
 		$head->set("SCRIPTS",$this->scripts);
 		$head->set("INLINE_SCRIPTS",$this->inline_scripts);
+		$head->set("LINKS", $this->links);
 		
 		if (get_class($blog)) $blog->exportVars(&$head);
 		$head->set("PAGE_CONTENT", $page_body);

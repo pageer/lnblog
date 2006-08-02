@@ -27,7 +27,7 @@ class TrackbackNotifier extends Plugin {
 
 }
 
-$notifier = new TrackbackNotifier();
+$notifier =& new TrackbackNotifier();
 $notifier->registerEventHandler("trackback", "ReceiveComplete", "send_notificaiton");
 
 ?>

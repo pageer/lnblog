@@ -80,13 +80,13 @@ $tpl->set("PREF_ID", $pref);
 
 if ( has_post() ) {
 
-	$tpl->set("DOC_ROOT", stripslashes_smart(POST($docroot)) );
+	$tpl->set("DOC_ROOT", POST($docroot) );
 	if (POST($ftp) == "ftpfs") $tpl->set("USE_FTP", POST($ftp) );
 	$tpl->set("USER", POST($uid) );
 	$tpl->set("PASS", POST($pwd) );
 	$tpl->set("CONF", POST($conf) );
 	$tpl->set("HOST", POST($host) );
-	$tpl->set("ROOT", stripslashes_smart(POST($root)) );
+	$tpl->set("ROOT", POST($root) );
 	$tpl->set("PREF", POST($pref) );
 
 	$content = '';
@@ -101,8 +101,6 @@ if ( has_post() ) {
 		$content = "<?php\n";
 		if ( POST($docroot) ) {
 			$webroot = trim(POST($docroot));
-			$webroot = get_magic_quotes_gpc() ? 
-			           stripslashes($webroot) : $webroot;
 			define("DOCUMENT_ROOT", $webroot);
 			$content .= 'define("DOCUMENT_ROOT", "'.DOCUMENT_ROOT."\");\n";
 		}
@@ -190,8 +188,6 @@ if ( has_post() ) {
 					$ftproot = $ftp_root_test_result;
 				} else {
 					$ftproot = trim(POST($root));
-					$ftproot = get_magic_quotes_gpc() ? 
-					           stripslashes($ftproot) : $ftproot;
 				}
 				define("FTP_ROOT", $ftproot);
 				if (trim(POST($pref)) != '') {
@@ -201,8 +197,6 @@ if ( has_post() ) {
 				$content = "<?php\n";
 				if (POST($docroot)) {
 					$webroot = trim(POST($docroot));
-					$webroot = get_magic_quotes_gpc() ? 
-					           stripslashes($webroot) : $webroot;
 					
 					define("DOCUMENT_ROOT", $webroot );
 					$content .= 'define("DOCUMENT_ROOT", "'.DOCUMENT_ROOT."\");\n";

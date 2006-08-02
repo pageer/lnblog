@@ -31,9 +31,9 @@ require_once("lib/creators.php");
 session_start();
 
 function populate_fields(&$tpl) {
-	global $user_name, $password, $confirm, $full_name, $email, $homepage;
-	$tpl->set("UNAME_VALUE", trim(POST($user_name)));
-	$tpl->set("PWD_VALUE", trim(POST($password)));
+	global $confirm, $full_name, $email, $homepage;
+	$tpl->set("UNAME_VALUE", trim(POST('user')));
+	$tpl->set("PWD_VALUE", trim(POST('passwd')));
 	$tpl->set("CONFIRM_VALUE", trim(POST($confirm)));
 	$tpl->set("FULLNAME_VALUE", trim(POST($full_name)));
 	$tpl->set("EMAIL_VALUE", trim(POST($email)));
@@ -88,11 +88,11 @@ $cust_ini = NewINIParser($cust_path);
 $section = $cust_ini->getSection(CUSTOM_PROFILE_SECTION);
 $tpl->set("CUSTOM_FIELDS", $section);
 
-$post_complete = POST($user_name) && POST($password) && POST($confirm);
-$partial_post = POST($user_name) || POST($password) || POST($confirm);
+$post_complete = POST('user') && POST('passwd') && POST($confirm);
+$partial_post = POST('user') || POST('passwd') || POST($confirm);
 
 if ($post_complete) {
-	if ( POST($confirm) != POST($password) ) {
+	if ( POST($confirm) != POST('passwd') ) {
 		$tpl->set("FORM_MESSAGE", 
 			"<span style=\"color: red\">".
 			_("The passwords you entered do not match.").
@@ -100,8 +100,8 @@ if ($post_complete) {
 		populate_fields($tpl);
 	} else {
 		$usr = NewUser();
-		$usr->username(trim(POST($user_name)));
-		$usr->password(trim(POST($password)));
+		$usr->username(trim(POST('user')));
+		$usr->password(trim(POST('passwd')));
 		$usr->name(trim(POST($full_name)));
 		$usr->email(trim(POST($email)));
 		$usr->homepage(trim(POST($homepage)));
@@ -135,11 +135,11 @@ if ($post_complete) {
 			'<span style="color: red">'.
 			_("You must confirm your password.").
 			'</span>');
-	if (! POST($password)) $tpl->set("FORM_MESSAGE", 
+	if (! POST('passwd')) $tpl->set("FORM_MESSAGE", 
 			'<span style="color: red">'.
 			_("You must enter a password.").
 			'</span>');
-	if (! POST($user_name)) $tpl->set("FORM_MESSAGE", 
+	if (! POST('user')) $tpl->set("FORM_MESSAGE", 
 			'<span style="color: red">'.
 			_("You must enter a username.").
 			'</span>');

@@ -26,6 +26,8 @@ if ($files !== true) {
 		$do_output = true;
 	}
 }
+	
+require_once("lib/utils.php");
 
 # Add this really massive if statements to that we don't end up declaring the 
 # same class twice, i.e. if the page is called directly, this class will be defined 
@@ -67,8 +69,7 @@ class SidebarSearch extends Plugin {
 		# search term is treated as a raw regular expression.
 		$blg = NewBlog();
 		if (! isset($_POST["sb_search_terms"])) return false;
-		$search_data = trim($_POST["sb_search_terms"]);
-		if (get_magic_quotes_gpc()) $search_data = stripslashes($search_data);
+		$search_data = trim(POST("sb_search_terms"));
 		if (preg_match("/\/.+\//", $search_data)) {
 			$terms = array(trim($_POST["sb_search_terms"])."i");
 		} else {
@@ -111,9 +112,9 @@ class SidebarSearch extends Plugin {
 		if (! $LINK_LIST) {
 			$tpl->set("LIST_TITLE", _("No search results found."));
 			$tpl->set("ITEM_LIST", array(_("No posts matched")));
-		} elseif (isset($_POST["sb_search_terms"]) && trim($_POST["sb_search_terms"])) {
+		} elseif (trim(POST("sb_search_terms"))) {
 			$tpl->set("LIST_TITLE", 
-			          spf_('Search results for "%s"', $_POST["sb_search_terms"]));
+			          spf_('Search results for "%s"', POST("sb_search_terms")));
 			$tpl->set("LINK_LIST", $LINK_LIST);
 		} else {
 			$tpl->set("LIST_TITLE", 
@@ -131,7 +132,7 @@ class SidebarSearch extends Plugin {
 
 } # End massive if statement
 
-$sbsearch = new SidebarSearch();
+$sbsearch =& new SidebarSearch();
 if ($do_output) {
 	$sbsearch->show_page();
 } else {

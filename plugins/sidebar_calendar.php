@@ -1,11 +1,31 @@
 <?php
 class SidebarCalendar extends Plugin {
 	
-	function SidebarCalendar() {
+	function SidebarCalendar($do_output=0) {
+		global $SYSTEM;
 		$this->plugin_desc = _("Provides a link calendar for the sidebar.");
 		$this->plugin_version = "0.1.1";
 		$this->addOption("caption", _("Title for calendar"), _("Calendar"));
+		$this->addOption("show_all", _("Include link to show all entries"),
+		                 false, "checkbox");
+		
+		$this->addOption('no_event',
+			_('No event handlers - do output when plugin is created'),
+			$SYSTEM->sys_ini->value("plugins","EventDefaultOff", 0), 
+			'checkbox');
+			
 		$this->getConfig();
+		
+		if ( $this->no_event || 
+		     $SYSTEM->sys_ini->value("plugins","EventForceOff", 0) ) {
+			# If either of these is true, then don't set the event handler
+			# and rely on explicit invocation for output.
+		} else {
+			$this->registerEventHandler("sidebar", "OnOutput", "put_calendar");
+			$this->registerEventHandler("page", "OnOutput", "add_style");
+		}
+		
+		if ($do_output) $this->output();
 	}
 
 	function add_style(&$param) {
@@ -97,10 +117,20 @@ class SidebarCalendar extends Plugin {
 			$labelnext = fmtdate( (USE_STRFTIME?"%b":"M"), strtotime($year."-".($month + 1)."-01") );
 			$labelprev = fmtdate( (USE_STRFTIME?"%b":"M"), strtotime($year."-".($month - 1)."-01") );
 		}
-		$next_link = '<a class="rlink" href="'.make_uri(false,$qsnext,false).
-		             '">'.$labelnext.'&nbsp;&gt;&gt;</a>';
-		$prev_link = '<a class="llink" href="'.make_uri(false,$qsprev,false).
-		             '">&lt;&lt;&nbsp;'.$labelprev.'</a>';
+		
+		if (is_dir(mkpath(BLOG_ROOT,BLOG_ENTRY_PATH, $qsnext['year'], $qsnext['month']))) {
+			$next_link = ' <a class="rlink" href="'.make_uri(false,$qsnext,false).
+			             '">'.$labelnext.'&nbsp;&gt;&gt;</a>';
+		} else {
+			$next_link = "<span class=\"rlink\">$labelnext&nbsp;&gt;&gt;</span>";
+		}
+		
+		#if (is_dir(mkpath(BLOG_ROOT,BLOG_ENTRY_PATH, $qsprev['year'], $qsprev['month']))) {
+			$prev_link = '<a class="llink" href="'.make_uri(false,$qsprev,false).
+			             '">&lt;&lt;&nbsp;'.$labelprev.'</a> ';
+		#} else {
+		#	$prev_link = "<spanvclass=\"llink\">&lt;&lt;&nbsp;$labelprev</span>";
+		#}
 		
 		#echo '<div class="panel">';
 		echo '<p class="calendar">';
@@ -142,16 +172,20 @@ class SidebarCalendar extends Plugin {
 		echo "</table>";
 		echo '<p class="calendar">'.
 		     '<a style="margin-right: 5%" '.
-		     'href="'.$blog->getURL().BLOG_ENTRY_PATH.'/">'._('Archives').'</a>'.
-		     '<a style="margin-left: 5%" '.
-		     'href="'.$blog->getURL().BLOG_ENTRY_PATH.'/all.php">'._('Show all').'</a>'.
-		     '</p>';
-		#echo "</div>";
+		     'href="'.$blog->getURL().BLOG_ENTRY_PATH.'/">'._('Archives').'</a> ';
+		if ($this->show_all) {
+			echo '<a style="margin-left: 5%" '.
+			     'href="'.$blog->getURL().BLOG_ENTRY_PATH.'/all.php">'.
+			     _('Show all').'</a>';
+		}
+		echo '</p>';;
 	}
 	
 }
 
-$sb = new SidebarCalendar();
-$sb->registerEventHandler("sidebar", "OnOutput", "put_calendar");
-$sb->registerEventHandler("page", "OnOutput", "add_style");
+global $PLUGIN_MANAGER;
+if (! $PLUGIN_MANAGER->plugin_config->value('recent', 'creator_output', 0)) {
+	$sb =& new SidebarCalendar();
+}
+
 ?>

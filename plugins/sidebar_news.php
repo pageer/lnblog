@@ -7,6 +7,8 @@ class News extends Plugin {
 		$this->addOption("header", 
 			_("Sidebar section heading"), 
 			_("News Feeds"));
+		$this->addOption("std_icons", _("Use standard RSS icons for feeds"),
+			true, "checkbox");
 		$this->getConfig();
 	}
 
@@ -27,42 +29,120 @@ class News extends Plugin {
 		$blog_feeds = BLOG_ROOT.PATH_DELIM.BLOG_FEED_PATH.PATH_DELIM;
 		$blog_feeds_url = $blg->uri('base').BLOG_FEED_PATH."/";
 		
-		if (file_exists($blog_feeds.$rss1_file) ||
-		    file_exists($blog_feeds.$rss2_file)) {
-			 	if ($this->header) { # Suppress empty header ?>
+		if ( file_exists($blog_feeds.$rss1_file) ||
+		     file_exists($blog_feeds.$rss2_file)) {
+			if ($this->header) { /* Suppress empty header. */ ?>
 <h3><?php echo $this->header; ?></h3><?php 
-				} ?>
+			} 
+			if ($this->std_icons) { ?>
+<ul>
+<?php
+			} else { ?>
 <ul class="imglist">
 <?php
+			}
+			
 			$ent = NewBlogEntry();
+			$std_rss_icon = getlink("xml_feed.png", LINK_IMAGE);
+			$std_rdf_icon = getlink("rdf_feed.png", LINK_IMAGE);
+			$old_rss_icon = getlink("rss2_button.png", LINK_IMAGE);
+			$old_rdf_icon = getlink("rss1_button.png", LINK_IMAGE);
+			
 			if ($ent->isEntry()) {
 				$comm_feeds_url = $ent->commentlink();
 				$ent_path = $ent->localpath().PATH_DELIM.
 				            ENTRY_COMMENT_DIR.PATH_DELIM;
+				
+				$old_rss_comments_icon = getlink("rss2_comments_button.png", LINK_IMAGE);
+				$old_rdf_comments_icon = getlink("rss1_comments_button.png", LINK_IMAGE);
+				
 				if (file_exists($ent_path.$rss1_comments) ) { 
-?>
-<li><a href="<?php echo $comm_feeds_url.$rss1_comments; ?>"><img src="<?php echo getlink("rss1_comments_button.png", LINK_IMAGE); ?>" alt="<?php p_("Comment links - RSS 1.0"); ?>" title="<?php p_("RSS 1.0 comment feed - links only"); ?>" /></a></li><?php
+					$title = _("RSS 1.0 comment feed - links only");
+					if ($this->std_icons) {
+						$text = _("Comment headlines");
+						$icon = $std_rdf_icon;
+					} else {
+						$text = '';
+						$icon = $old_rdf_comments_icon;
+					}
+					echo '<li>'.
+					     $this->link_markup($comm_feeds_url.$rss1_comments,
+					                        'rdf', $icon, $title,
+					                        $text).
+					     '</li>';
 				}
 				if (file_exists($ent_path.$rss2_comments) ) {
-?>
-<li><a href="<?php echo $comm_feeds_url.$rss2_comments; ?>"><img src="<?php echo getlink("rss2_comments_button.png", LINK_IMAGE); ?>" alt="<?php p_("Full comments - RSS 2.0"); ?>" title="<?php p_("RSS 2.0 comment feed - full comments"); ?>" /></a></li>
-<?php
+					
+					$title = _("RSS 2.0 comment feed - full comments");
+					if ($this->std_icons) {
+						$text = _("Comment text");
+						$icon = $std_rss_icon;
+					} else {
+						$text = '';
+						$icon = $old_rss_comments_icon;
+					}
+					echo '<li>'.
+					     $this->link_markup($comm_feeds_url.$rss2_comments,
+					                        'rss', $icon, $title,
+					                        $text).
+					     '</li>';
 				}
 			}  # End inner if
-			if (file_exists($blog_feeds.$rss1_file)) {
-?>
-<li><a href="<?php echo $blog_feeds_url.$rss1_file; ?>"><img src="<?php echo getlink("rss1_button.png", LINK_IMAGE); ?>" alt="<?php p_("Entry links - RSS 1.0"); ?>" title="<?php p_("RSS 1.0 blog entry feed - links only"); ?>" /></a></li> <?php
+			if (file_exists($blog_feeds.$rss1_file)) { 
+				$title = _("RSS 1.0 blog entry feed - links only");
+				if ($this->std_icons) {
+					$text = _("Entry headlines");
+					$icon = $std_rdf_icon;
+				} else {
+					$text = '';
+					$icon = $old_rdf_icon;
+				}
+				echo '<li>'.
+				     $this->link_markup($blog_feeds_url.$rss1_file,
+				                        'rdf', $icon, $title,
+				                        $text).
+				     '</li>';
 			}
-			if (file_exists($blog_feeds.$rss2_file)) { ?>
-<li><a href="<?php echo $blog_feeds_url.$rss2_file; ?>"><img src="<?php echo getlink("rss2_button.png", LINK_IMAGE); ?>" alt="<?php p_("Full entires - RSS 2.0"); ?>" title="<?php p_("RSS 2.0 blog entry feed - full entries"); ?>" /></a></li><?php
-			} ?>
+
+			if (file_exists($blog_feeds.$rss2_file)) { 
+				$title = _("RSS 2.0 blog entry feed - full text");
+				if ($this->std_icons) {
+					$text = _("Entry text");
+					$icon = $std_rss_icon;
+				} else {
+					$text = '';
+					$icon = $old_rss_icon;
+				}
+				echo '<li>'.
+				     $this->link_markup($blog_feeds_url.$rss2_file,
+				                        'rss', $icon, $title,
+				                        $text).
+				     '</li>';
+			}
+?>
 </ul>
 <?php 
 		}  # End outer if
 	}  # End function
+	
+	function link_markup($href, $feed_type, $img, $title, $text=false) {
+		switch($feed_type) {
+			case 'xml':
+			case 'rss':
+				$type = 'applicaiton/rss+xml'; break;
+			case 'rdf':
+				$type = 'applicaiton/xml'; break;
+			case 'atom':
+				$type = 'applicaiton/atom+xml'; break;
+		}
+		$link = '<a href="'.$href.'" type="'.$type.'">'.
+		        ($text ? $text." " : '').
+		        '<img src="'.$img.'" alt="'.$title.'" title="'.$title.'" /></a>';
+		return $link;
+	}
 
 } 
 
-$newsfeeds = new News();
+$newsfeeds =& new News();
 $newsfeeds->registerEventHandler("sidebar", "OnOutput", "output");
 ?>

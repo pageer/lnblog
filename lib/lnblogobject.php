@@ -102,7 +102,7 @@ class LnBlogObject {
 	function registerEventHandler($type, $name, $func) {
 		global $EVENT_REGISTER;
 		return $EVENT_REGISTER->addHandler($type, $name, 
-		                                   get_class($this), $func);
+		                                   $this, $func);
 	}
 	
 	/* Method: registerStaticEventHandler

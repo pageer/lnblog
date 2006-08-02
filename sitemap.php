@@ -70,8 +70,7 @@ if (has_post()) {
 		$target_file = USER_DATA_PATH.PATH_DELIM.$target_file;
 	}
 
-	if (get_magic_quotes_gpc()) $data = stripslashes(POST("output"));
-	else $data = POST("output");
+	$data = POST("output");
 	$ret = write_file($target_file, $data);
 
 	if (! $ret) {

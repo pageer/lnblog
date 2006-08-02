@@ -1,6 +1,6 @@
 <!DOCTYPE webproject>
 <webproject>
-  <project usePreviewPrefix="0" type="Local" previewPrefix="" usePersistentBookmarks="0" name="LnBlog" encoding="iso 8859-1" enableEvents="true" >
+  <project usePreviewPrefix="0" previewPrefix="" type="Local" usePersistentBookmarks="0" name="LnBlog" encoding="iso 8859-1" enableEvents="true" >
     <upload/>
     <defaultDTD>-//w3c//dtd xhtml 1.0 strict//en</defaultDTD>
     <item url="lib/" uploadstatus="1" />
@@ -142,8 +142,6 @@
     <item url="themes/tuxice/templates/blogcomment_tpl.php" uploadstatus="1" />
     <item url="themes/tuxice/templates/blogentry_tpl.php" uploadstatus="1" />
     <item url="themes/tuxice/templates/include_menubar.php" uploadstatus="1" />
-    <item url="userdata/" uploadstatus="1" />
-    <item url="userdata/fsconfig.php" uploadstatus="1" />
     <item url="blogconfig.php" uploadstatus="1" />
     <item url="bloglogin.php" uploadstatus="1" />
     <item url="bloglogout.php" uploadstatus="1" />
@@ -272,7 +270,6 @@
     <item url="plugins/content_ban.php" uploadstatus="1" />
     <item url="plugins/disable_comment.php" uploadstatus="1" />
     <item url="plugins/ipban.php" uploadstatus="1" />
-    <item url="plugins/private_blog.php" uploadstatus="1" />
     <item url="plugins/sidebar_archives.php" uploadstatus="1" />
     <item url="plugins/sidebar_search.php" uploadstatus="1" />
     <item url="plugins/trackback_notify.php" uploadstatus="1" />
@@ -292,46 +289,33 @@
     <item url="lnblog.session" uploadstatus="1" />
     <item url="Specification.tex" uploadstatus="1" />
     <item url="mkdist.sh" uploadstatus="1" />
-    <item url="lib/blog-mysql.php" />
-    <item url="lib/system.php" />
-    <item url="pages/pagelib.php" />
-    <item url="sajax/" />
-    <item url="sajax/Changes.txt" />
-    <item url="sajax/Readme-LnBlog.txt" />
-    <item url="sajax/Readme.txt" />
-    <item url="sajax/Sajax.php" />
-    <item url="themes/clean/" />
-    <item url="themes/clean/images/" />
-    <item url="themes/clean/scripts/" />
-    <item url="themes/clean/styles/" />
-    <item url="themes/clean/styles/blogentry.css" />
-    <item url="themes/clean/styles/comment.css" />
-    <item url="themes/clean/styles/main.css" />
-    <item url="themes/clean/templates/" />
-    <item url="themes/clean/templates/blogcomment_tpl.php" />
-    <item url="themes/clean/templates/blogentry_tpl.php" />
-    <item url="themes/default/templates/blog_path_tpl.php~" />
-    <item url="themes/default/templates/plugin_layout_tpl.php" />
-    <item url="userdata/pageer/" />
-    <item url="userdata/pageer/passwd.php" />
-    <item url="userdata/pageer/user.ini" />
-    <item url="userdata/groups.ini" />
-    <item url="userdata/ip_ban.txt" />
-    <item url="userdata/re_ban.txt" />
-    <item url="userdata/system.ini" />
-    <item url="xmlrpc/" />
-    <item url="xmlrpc/ChangeLog" />
-    <item url="xmlrpc/NEWS" />
-    <item url="xmlrpc/README" />
-    <item url="xmlrpc/Readme-LnBlog.txt" />
-    <item url="xmlrpc/xmlrpc.inc" />
-    <item url="xmlrpc/xmlrpcs.inc" />
-    <item url="blogger1_test.php" />
-    <item url="blogger.php" />
-    <item url="Specification.aux" />
-    <item url="Specification.dvi" />
-    <item url="Specification.log" />
-    <item url="Specification.tex.backup" />
-    <item url="Specification.toc" />
+    <item url="lib/blog-mysql.php" uploadstatus="1" />
+    <item url="lib/system.php" uploadstatus="1" />
+    <item url="pages/pagelib.php" uploadstatus="1" />
+    <item url="sajax/" uploadstatus="1" />
+    <item url="sajax/Changes.txt" uploadstatus="1" />
+    <item url="sajax/Readme-LnBlog.txt" uploadstatus="1" />
+    <item url="sajax/Readme.txt" uploadstatus="1" />
+    <item url="sajax/Sajax.php" uploadstatus="1" />
+    <item url="themes/clean/" uploadstatus="1" />
+    <item url="themes/clean/images/" uploadstatus="1" />
+    <item url="themes/clean/scripts/" uploadstatus="1" />
+    <item url="themes/clean/styles/" uploadstatus="1" />
+    <item url="themes/clean/styles/blogentry.css" uploadstatus="1" />
+    <item url="themes/clean/styles/comment.css" uploadstatus="1" />
+    <item url="themes/clean/styles/main.css" uploadstatus="1" />
+    <item url="themes/clean/templates/" uploadstatus="1" />
+    <item url="themes/clean/templates/blogcomment_tpl.php" uploadstatus="1" />
+    <item url="themes/clean/templates/blogentry_tpl.php" uploadstatus="1" />
+    <item url="themes/default/templates/plugin_layout_tpl.php" uploadstatus="1" />
+    <item url="xmlrpc/" uploadstatus="1" />
+    <item url="xmlrpc/ChangeLog" uploadstatus="1" />
+    <item url="xmlrpc/NEWS" uploadstatus="1" />
+    <item url="xmlrpc/README" uploadstatus="1" />
+    <item url="xmlrpc/Readme-LnBlog.txt" uploadstatus="1" />
+    <item url="xmlrpc/xmlrpc.inc" uploadstatus="1" />
+    <item url="xmlrpc/xmlrpcs.inc" uploadstatus="1" />
+    <item url="blogger1_test.php" uploadstatus="1" />
+    <item url="blogger.php" uploadstatus="1" />
   </project>
 </webproject>

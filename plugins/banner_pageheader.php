@@ -8,12 +8,30 @@
 
 class PageHeader extends Plugin {
 
-	function PageHeader() {
+	function PageHeader($do_output=0) {
+		global $SYSTEM;
+
 		$this->plugin_desc = _("Output a banner for the page.");
-		$this->plugin_version = "0.2.1";
+		$this->plugin_version = "0.2.2";
 		$this->show_desc = false;
 		$this->addOption("show_desc", _("Show description"), false,"checkbox");
+
+		$this->addOption('no_event',
+			_('No event handlers - do output when plugin is created'),
+			$SYSTEM->sys_ini->value("plugins","EventDefaultOff", 0), 
+			'checkbox');
+
 		$this->getConfig();
+
+		if ( $this->no_event || 
+		     $SYSTEM->sys_ini->value("plugins","EventForceOff", 0) ) {
+			# If either of these is true, then don't set the event handler
+			# and rely on explicit invocation for output.
+		} else {
+			$this->registerEventHandler("banner", "OnOutput", "output");
+		}
+		
+		if ($do_output) $this->output();
 	}
 
 	function output($parm=false) {
@@ -38,6 +56,8 @@ class PageHeader extends Plugin {
 	}
 }
 
-$bann = new PageHeader();
-$bann->registerEventHandler("banner", "OnOutput", "output");
+global $PLUGIN_MANAGER;
+if (! $PLUGIN_MANAGER->plugin_config->value('pageheader', 'creator_output', 0)) {
+	$plug =& new PageHeader();
+}
 ?>

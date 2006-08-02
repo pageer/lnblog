@@ -1,3 +1,38 @@
+22-Jul-2006
+- Major cleanup of the entry edit template and editor, including lots of new 
+unobtrusive JavaScript code.
+- Added a plugin to validat TrackBack pings.  Works like Pingback, checking that
+the pinging page actually links to the pinged page.  Note that this is not 
+mentioned in the TrackBack specification, but is not incompatible with it.
+
+14-Jul-2006:
+- Finally made sending trackbacks without CURL work.  That only took way, way,
+WAY too long.
+- Finally added Pingback support.
+- Consolidated e-mail notification into a single ReplyNotifier plugin.
+- Made RSS plugins create comment feed when entry is first created.
+- Changed default sidebar to display variations on the new "standard" RSS icon.
+- Various code cleanup.
+
+09-Jul-2006:
+- Moved all those stripslashes calls out of the code and encapsulated them in 
+the POST(), GET(), GETPOST(), and COOKIE() functions in utils.php.
+- Fixed homepage not showing in profiles.
+- Added default profile.ini with a contacturl property.
+- Don't show e-mail address is profile if there is a contacturl specified.
+- Changed new/edit redirects to point to the entry/article, not the blog.
+- Added option to use stylesheet in RSS2 feeds.
+
+05-Jul-2006:
+- Added support for setting enclosure in entries.
+- Added option to IPBan plugin to ban and delete at same time.
+- Made IP ban not display link if IP is already banned.
+- Made blog upgrade return a list of failed files, rather than a meaningless 
+error code.
+
+30-Jun-2006:
+- Added URL sanitizing to redirect and refresh methods of Page class.
+
 24-Jun-2006: version 0.7.3
 - Fixed errors when deleted templates are still in load-first list.
 - Fixed HTML validation errors in some templates.

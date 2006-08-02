@@ -54,6 +54,21 @@ function get_blog_path() {
 	}
 }
 
+# Function: load_plugin
+# Loads a plugin.  This is used for plugins that do page output and will result 
+# in the plugin outputing its markup.  Note that not all plugins support this 
+# and for those that do, it is configurable as an option, with the alternative 
+# being using the event system.
+#
+# Parameters:
+# plugin_name - The name of the class for this plugin.
+#
+# Returns:
+# An instance of the plugin.  The return value may safely be disregarded.
+function load_plugin($plugin_name) {
+	return new $plugin_name(true);
+}
+
 # Define config files for various parts of the plugin framework.
 define("FS_PLUGIN_CONFIG", "fsconfig.php");
 
@@ -109,6 +124,26 @@ if (file_exists(mkpath(INSTALL_ROOT,USER_DATA,"userconfig.cfg"))) {
 			define(strtoupper(trim($pieces[0])), $pieces[1]);
 		}
 	}
+}
+
+# Function: read_file
+# Reads file contents, respecting the values of the LNBLOG_OPEN_BASEDIR and 
+# LNBLOG_PARANOIA configuration constants.
+#
+# If LNBLOG_OPEN_BASEDIR and LNBLOG_PARANOIA are not defined or set to false, 
+# then this function behaves exactly like the standard file() function.
+#
+# If LNBLOG_OPEN_BASEDIR is set, it will return false for any attempt to read a 
+# file that is above that directory in the filesystem.  So for example, if 
+# LNBLOG_OPEN_BASEDIR = /var/www/demo, then this will return the
+# contents of /var/www/demo/file.txt or /var/www/demo/foo/bar.txt, but it will
+# return false for /var/www/myfile.txt
+#
+# If LNBLOG_PARANOIA is set, this will return false when attempting to open any
+# file with a .php extension.  So, for example, it would open 
+# /var/www/demo/foo.txt, but would return false for /var/www/demo/foo.php.
+function read_file($filename) {
+	
 }
 
 # Put this definition after we initialize userconfig.cfg, so that it can be
@@ -377,8 +412,8 @@ The corresponding replacement expression to <URI_TO_LOCALPATH_MATCH_RE>.
 # Constant: EDITOR_HIDE_SYMBOLS
 # Shows the the buttons to add entities for mathamatical symbols.
 #
-# *Default* is true.
-@define("EDITOR_SHOW_SYMBOLS", true);
+# *Default* is false.
+@define("EDITOR_SHOW_SYMBOLS", false);
 
 ########################################
 # Section: User Authentication
@@ -532,6 +567,12 @@ The corresponding replacement expression to <URI_TO_LOCALPATH_MATCH_RE>.
 # *Default* is "trackback".
 @define("ENTRY_TRACKBACK_DIR", "trackback");
 
+# Constant: ENTRY_PINGBACK_DIR
+# Directory name to access pingbacks on entries and articles.
+#
+# *Default* is "pingback".
+@define("ENTRY_PINGBACK_DIR", "pingback");
+
 # Constant: ENTRY_PATH_SUFFIX
 # The file suffix for old versions of entries and articles.
 # Note that this only applies to file-based storage when using history 
@@ -561,6 +602,16 @@ The corresponding replacement expression to <URI_TO_LOCALPATH_MATCH_RE>.
 #
 # The *default* is ".txt".
 @define("TRACKBACK_PATH_SUFFIX", ".txt");     # File suffix for saved pings.
+
+########################################
+# Section: Pingback configuration
+
+# Constant: PINGBACK_PATH_SUFFIX
+# File suffix used for storing Pingbacks.
+# Note that this is specific to file-based storage.
+#
+# The *default* is ".txt".
+@define("PINGBACK_PATH_SUFFIX", ".txt");     # File suffix for saved pings.
 
 #############################################
 # Section: Comment configuration

@@ -31,6 +31,6 @@ class GoogleSearch extends Plugin {
 
 }
 
-$searchbar = new GoogleSearch();
+$searchbar =& new GoogleSearch();
 $searchbar->registerEventHandler("sidebar", "OnOutput", "output");
 ?>

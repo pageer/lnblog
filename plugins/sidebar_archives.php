@@ -9,13 +9,29 @@
 
 class Archives extends Plugin {
 
-	function Archives() {
+	function Archives($do_output=0) {
+		global $SYSTEM;
 		$this->plugin_name = _("List the months of archives for a blog.");
-		$this->plugin_version = "0.2.0";
+		$this->plugin_version = "0.2.1";
 		$this->addOption("max_months", _("Number of months to show"), 6, "text");
 		$this->addOption("title", _("Sidebar section title"), 
 		                 _("Archives"), "text");
+		$this->addOption('no_event',
+			_('No event handlers - do output when plugin is created'),
+			$SYSTEM->sys_ini->value("plugins","EventDefaultOff", 0), 
+			'checkbox');
+						 
 		$this->getConfig();
+		
+		if ( $this->no_event || 
+		     $SYSTEM->sys_ini->value("plugins","EventForceOff", 0) ) {
+			# If either of these is true, then don't set the event handler
+			# and rely on explicit invocation for output.
+		} else {
+			$this->registerEventHandler("sidebar", "OnOutput", "output");
+		}
+		
+		if ($do_output) $this->output();
 	}
 
 	function output($parm=false) {
@@ -44,6 +60,9 @@ class Archives extends Plugin {
 	}  # End of function
 }
 
-$arch = new Archives();
-$arch->registerEventHandler("sidebar", "OnOutput", "output");
+global $PLUGIN_MANAGER;
+if (! $PLUGIN_MANAGER->plugin_config->value('recent', 'creator_output', 0)) {
+	$rec =& new Archives();
+}
+
 ?>

@@ -55,7 +55,7 @@ class LoginOps extends Plugin {
 	
 }
 
-$login = new LoginOps();
+$login =& new LoginOps();
 #$login->addEvent
 $login->registerEventHandler("sidebar", "OnOutput", "output");
 ?>

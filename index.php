@@ -93,10 +93,16 @@ if ( POST('upgrade') && POST('upgrade_btn') ) {
 	if (is_absolute(POST('upgrade'))) $upgrade_path = trim(POST('upgrade'));
 	else $upgrade_path = calculate_document_root().PATH_DELIM.trim(POST('upgrade'));
 	$b = NewBlog($upgrade_path);
-	$upgrade_status = $b->upgradeWrappers();
-	if ($upgrade_status) $status = spf_("Upgrade of %s completed successfully.",
-	                                    $b->blogid);
-	else $status = spf_("Error: Upgrade exited with status %s.", $upgrade_status);
+	$file_list = $b->upgradeWrappers();
+	if (empty($file_list)) {
+		$status = spf_("Upgrade of %s completed successfully.",
+		               $b->blogid);
+	} elseif ($file_list === false) {
+		$status = spf_("Error: %s does not seem to exist.", $b->blogid);
+	} else {
+		$status = spf_("Error: The following file could not be written - %s.", 
+		               implode("<br />", $file_list));
+	}
 	$tpl->set("UPGRADE_STATUS", $status);
 
 } elseif ( POST('register') && POST('register_btn') ) {

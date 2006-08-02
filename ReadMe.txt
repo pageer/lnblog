@@ -25,8 +25,8 @@ enabled. PCRE (Perl-Compatible Regular Expression) support, which is standard
 with most PHP installations, must be enabled. Support for the CURL and gettext
 extensions is helpful, but not required.  
 
-Instalation
------------
+Installation
+------------
 To install LnBlog on your web server, simply extract the ZIP archive and upload 
 the resulting folder to the publicly accessible portion of your web server.
 After that, open a web browser go to the URL corresponding to that location.
@@ -34,6 +34,15 @@ This will start the graphical configuration process.  You will be prompted to
 configure file writing and create an initial user account, after which you will 
 be taken to the administration page where you can create more users, create blog,
 and set other options.
+
+Upgrade
+-------
+To upgrade an existing LnBlog installation, extract the new ZIP archive and 
+upload the folder to your server.  You should then rename your old LnBLog 
+directory to, e.g., LnBlog-old, and rename the new one in its place (i.e., give
+it the same name the old version had).  Lastly, copy or move the userdata 
+subdirectory from your old  LnBlog directory to the new one, overwriting existing
+files.
 
 License
 -------

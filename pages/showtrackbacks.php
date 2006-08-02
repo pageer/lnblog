@@ -28,22 +28,37 @@ $u = NewUser();
 $ent = NewBlogEntry();
 $blg = NewBlog();
 $PAGE->setDisplayObject($ent);
+$tb = NewTrackback();
 
 # If there is a POST url, then this is a trackback ping.  Receive it and 
 # exit.  Otherwise, display the page.
-if (POST("url")) {
-	$ret = $ent->getPing();
-} else {			
-	if (GET("delete") && $SYSTEM->canDelete($tb, $u) && $u->checkLogin() ) {
+if (! $tb->incomingPing()) {
+
+	if ( GET("delete") ) {
 		$tb = NewTrackback(sanitize(GET("delete")));
-		$tb->delete();
+		if ($SYSTEM->canDelete($tb, $u) && $u->checkLogin() ) {
+			$tb->delete();
+		}
 	}
 	$PAGE->title = $ent->subject . " - " . $blg->name;
 	$PAGE->addStylesheet("trackback.css");
 	$body = $ent->getTrackbacks();
-	if (! $body) $body = '<p>'.
-		spf_('There are no trackbacks for <a href="%s">\'%s\'</a>',
-		     $ent->permalink(), $ent->subject).'</p>';
+	if (! $body) {
+		$body = '<p>'.
+		        spf_('There are no trackbacks for <a href="%s">\'%s\'</a>',
+		        $ent->permalink(), $ent->subject).'</p>';
+	}
 	$PAGE->display($body, &$blog);
+} else {
+	if ($ent->allow_tb) {
+		$output = $tb->receive();
+	} else {
+		$output = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n".
+		          "<response>\n".
+		          "<error>1</error>\n";
+		          "<message>"._("This entry does not accept trackbacks.")."</message>\n";
+		          "</response>\n";
+	}
+	echo $output;
 }
 ?>

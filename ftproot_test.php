@@ -107,7 +107,6 @@ if ($user && $pass && $hostname) {
 			$ftp_root = find_dir($test_file, $ftp->connection);
 		} else {
 			$ftp_root = POST("ftproot");
-			if (get_magic_quotes_gpc()) $ftp_root = stripslashes($ftp_root);
 		}
 		$ftp->ftp_root = $ftp_root;
 		

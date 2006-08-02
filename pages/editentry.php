@@ -33,18 +33,8 @@
 session_start();
 require_once("config.php");
 require_once("lib/creators.php");
-
-function set_template(&$tpl, &$ent) {
-	$tpl->set("SUBJECT", htmlentities($ent->subject));
-	$tpl->set("TAGS", htmlentities($ent->tags));
-	$tpl->set("DATA", htmlentities($ent->data));
-	$tpl->set("HAS_HTML", $ent->has_html);
-	$tpl->set("COMMENTS", $ent->allow_comment);
-	$tpl->set("TRACKBACKS", $ent->allow_tb);
-	if (is_a($ent, 'Article')) {
-		$tpl->set("STICKY", $ent->isSticky());
-	}
-}
+require_once("xmlrpc/xmlrpc.inc");
+require_once("pages/pagelib.php");
 
 global $PAGE;
 
@@ -56,7 +46,9 @@ $PAGE->setDisplayObject($ent);
 $is_art = is_a($ent, 'Article');
 
 $tpl = NewTemplate(ENTRY_EDIT_TEMPLATE);
-set_template($tpl, $ent);
+entry_set_template($tpl, $ent);
+$tpl->set("ALLOW_ENCLOSURE", $blg->allow_enclosure);
+$tpl->set("BLOG_TAGS", $blg->tag_list);
 $tpl->set("FORM_ACTION", make_uri(false,false,false) );
 $blg->exportVars($tpl);
 
@@ -65,9 +57,6 @@ if (POST('submit')) {
 	$err = false;
 	
 	if ($u->checkLogin() && $SYSTEM->canModify($ent, $u)) {
-	
-		if ($is_art) $ent = NewArticle();
-		else $ent = NewBlogEntry();
 		
 		$ent->getPostData();
 		
@@ -77,18 +66,20 @@ if (POST('submit')) {
 			$blg->updateTagList($ent->tags());
 			
 			if ($ret) {
-				$num_uploads = $SYSTEM->sys_ini->value("entryconfig",	"AllowInitUpload",1);
-				for ($i=1; $i<=$num_uploads; $i++) {
-					$upld = NewFileUpload('upload'.$i, $ent->localpath());
-					if ( $upld->completed() ) {
-						$upld->moveFile();
-					} elseif ($upld->status() != FILEUPLOAD_NO_FILE) {
-						echo $upld->status();
-						$ret = false;
-						$err = $upld->errorMessage();
-					}
+				
+				$messages = handle_uploads($ent);
+				if (is_array($messages)) {
+					$ret = false;
+					$err = _("Upload errors:")."<br />".
+					       implode("\n<br />", $messages);
 				}
 			
+				# Check for pingback-enabled links and send them pings.
+				if ($ret && $blg->auto_pingback) {
+					$err = handle_pingback_pings($ent);
+					if ($err) $ret = false;
+				}
+				                                  
 			} else { 
 				$err = _("Error: unable to update entry.");
 			}
@@ -104,8 +95,8 @@ if (POST('submit')) {
 	if ($err) {
 		$tpl->set("HAS_UPDATE_ERROR");
 		$tpl->set("UPDATE_ERROR_MESSAGE", $err);
-		set_template($tpl, $ent);
-	} else $PAGE->redirect($blg->getURL());
+		entry_set_template($tpl, $ent);
+	} else $PAGE->redirect($ent->permalink());
 	
 } elseif (POST('preview')) {
 	
@@ -116,7 +107,7 @@ if (POST('submit')) {
 	$blg->$last_var->getPostData();
 	$u->exportVars($tpl);
 	$blg->raiseEvent($is_art?"OnArticlePreview":"OnEntryPreview");
-	set_template($tpl, $blg->$last_var);
+	entry_set_template($tpl, $blg->$last_var);
 	$tpl->set("PREVIEW_DATA", $blg->$last_var->get() );
 }
 

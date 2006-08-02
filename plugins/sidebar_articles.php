@@ -4,9 +4,10 @@
 
 class Articles extends Plugin {
 
-	function Articles() {
+	function Articles($do_output=0) {
+		global $SYSTEM;
 		$this->plugin_desc = _("List the articles for a blog.");
-		$this->plugin_version = "0.2.3";
+		$this->plugin_version = "0.2.4";
 		$this->header = _("Articles");
 		$this->static_link = true;
 		$this->custom_links = "links.htm";
@@ -21,7 +22,23 @@ class Articles extends Plugin {
 		$this->addOption("custom_links", 
 			_("File where additional links to display are stored"),
 			"links.htm", "true");
+			
+		$this->addOption('no_event',
+			_('No event handlers - do output when plugin is created'),
+			$SYSTEM->sys_ini->value("plugins","EventDefaultOff", 0), 
+			'checkbox');
+			
 		$this->getConfig();
+		
+		if ( $this->no_event || 
+		     $SYSTEM->sys_ini->value("plugins","EventForceOff", 0) ) {
+			# If either of these is true, then don't set the event handler
+			# and rely on explicit invocation for output.
+		} else {
+			$this->registerEventHandler("sidebar", "OnOutput", "output");
+		}
+		
+		if ($do_output) $this->output();
 	}
 	
 	function output($parm=false) {
@@ -53,19 +70,21 @@ class Articles extends Plugin {
 <li style="margin-top: 0.5em"><a href="<?php echo $blg->uri('articles'); ?>"><?php echo $this->showall_text;?></a></li><?php
 			} 
 			if ($SYSTEM->canModify($blg, $u)) {
-?><li style="margin-top: 0.5em"><a href="<?php echo $blg->uri('editfile', $this->custom_links, 'yes');?>"><?php p_("Add custom links");?></a></li>
+?><li style="margin-top: 0.5em"><a href="<?php echo $blg->uri('editfile', 'file='.$this->custom_links, 'list=yes');?>"><?php p_("Add custom links");?></a></li>
 <?php
 			}?>
 </ul>
 <?php 	
 		} elseif ($SYSTEM->canModify($blg, $u)) { ?>
 <ul><li style="margin-top: 0.5em"><a href="<?php 
-	echo $blg->uri('editfile', $this->custom_links, 'yes');?>"><?php p_("Add custom links");?></a></li></ul><?php
+	echo $blg->uri('editfile', 'file='.$this->custom_links, 'list=yes');?>"><?php p_("Add custom links");?></a></li></ul><?php
 		} # End if block 
 	}  # End function
 	
 }
 
-$art = new Articles();
-$art->registerEventHandler("sidebar", "OnOutput", "output");
+global $PLUGIN_MANAGER;
+if (! $PLUGIN_MANAGER->plugin_config->value('recent', 'creator_output', 0)) {
+	$art =& new Articles();
+}
 ?>

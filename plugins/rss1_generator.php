@@ -1,7 +1,11 @@
 <?php
 require_once("lib/utils.php");
-
-# Entries for RDF Site Summary documents.
+# Plugin: RSS1FeedGenerator
+# Generates RSS 1.0 (RDF Site Summary) feeds for a blog.  This generates both 
+# feeds for new entries and comment feeds for each individual entry.  There is 
+# also an option (enabled by default) to generate a feed for each topic contained
+# in the blog.  There are also options to set the names of the feed files, if 
+# you so desire.
 
 class RSS1Entry {
 	
@@ -110,7 +114,14 @@ class RSS1FeedGenerator extends Plugin {
 	}
 
 	function updateCommentRSS1(&$cmt) {
-		$parent = $cmt->getParent();
+		
+		#if (method_exists($cmt, 'isComment') && $cmt->isComment()) {
+		if (is_a($cmt, "BlogComment")) {
+			$parent = $cmt->getParent();
+		} else {
+			$parent = $cmt;
+		}
+#echo get_class($cmt).", ".get_class($parent).", ".($cmt->isComment()?"yes":"no");
 		$blog = $parent->getParent();
 		$feed = new RSS1();
 		$comment_path = $parent->localpath().PATH_DELIM.ENTRY_COMMENT_DIR;
@@ -188,11 +199,12 @@ class RSS1FeedGenerator extends Plugin {
 
 }
 
-$gen = new RSS1FeedGenerator();
+$gen =& new RSS1FeedGenerator();
 $gen->registerEventHandler("blogcomment", "InsertComplete", "updateCommentRSS1");
 $gen->registerEventHandler("blogcomment", "UpdateComplete", "updateCommentRSS1");
 $gen->registerEventHandler("blogcomment", "DeleteComplete", "updateCommentRSS1");
 $gen->registerEventHandler("blogentry", "InsertComplete", "updateBlogRSS1");
+$gen->registerEventHandler("blogentry", "InsertComplete", "updateCommentRSS1");
 $gen->registerEventHandler("blogentry", "UpdateComplete", "updateBlogRSS1");
 $gen->registerEventHandler("blogentry", "DeleteComplete", "updateBlogRSS1");
 if ($gen->topic_feeds) {

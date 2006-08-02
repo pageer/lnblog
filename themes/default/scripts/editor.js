@@ -2,6 +2,16 @@ var short_forms = Array();
 var abbrev_phrases = Array();
 var acronym_phrases = Array();
 
+function addEvent(obj, sType, fn){
+    if (obj.addEventListener){
+        obj.addEventListener(sType, fn, false);
+    } else if (obj.attachEvent) {
+        var r = obj.attachEvent("on"+sType, fn);
+    } else {
+        alert("Handler could not be attached");
+    }
+}
+
 function insertAtCursor(myField, myValue) {
 	//IE support
 	if (document.selection) {
@@ -86,7 +96,7 @@ function one_parm(type, prompt_text) {
 	insertAtCursor(
 		document.getElementById("body"), 
 		'[' + type + ']' + text_str + '[/' + type + ']');
-	return true;
+	return false;
 }
 
 function two_parm(type, prompt_text, meta_text) {
@@ -137,7 +147,7 @@ function two_parm(type, prompt_text, meta_text) {
 		document.getElementById("body"),
 		'[' + type + '=' + meta_str + ']' +	desc_str + '[/' + type + ']');
 
-	return true;
+	return false;
 
 }
 
@@ -176,7 +186,7 @@ function opt_parm(type, prompt_text, meta_text) {
 	
 	insertAtCursor(
 		document.getElementById("body"), data_str);
-	return true;
+	return false;
 
 }
 
@@ -192,21 +202,18 @@ function insertEntity(type) {
 
 function toggle_show(ctrl, caller) {
 	var cnt = document.getElementById(ctrl);
-	var links = caller.getElementsByTagName("a");
 	var block_hidden = false;
-	//window.alert(cnt.style.display);
-	for (var i=0; i < links.length; i++) {
-		// Account for undefined display style
-		if (! cnt.style.display && links[i].innerHTML == "(+)") {
-			block_hidden = true;
-		}
+
+	if (! cnt.style.display && caller.innerHTML == "(+)") {
+		block_hidden = true;
 	}
+	
 	if (cnt.style.display == "none" ||  block_hidden) {
-		cnt.style.display = "block";
-		for (var i=0; i < links.length; i++) links[i].innerHTML = "(-)";
+		cnt.style.display = "inline";
+		caller.innerHTML = "(-)";
 	} else {
 		cnt.style.display = "none";
-		for (var i=0; i < links.length; i++) links[i].innerHTML = "(+)";
+		caller.innerHTML = "(+)";
 	}
 }
 
@@ -221,3 +228,64 @@ function set_article_path() {
 	document.getElementById("short_path").value = path;
 	return true;
 }
+
+function toggle_lbcode_editor(ev) {
+	var lbcode = document.getElementById('lbcode_editor');
+	var dropdown = document.getElementById('input_mode');
+	if (lbcode) {
+		if (dropdown.value == 1) lbcode.style.display = 'inline';
+		else lbcode.style.display = 'none';
+	}
+	return true;
+}
+
+function toggle_post_settings(ev) {
+	var settings = document.getElementById('entry_settings');
+	var divs = settings.getElementsByTagName('div');
+	var leg = settings.getElementsByTagName('legend');
+	var leglink = leg[0].getElementsByTagName('a');
+	
+	if (leglink[0].innerHTML == '(+)') { 
+		leglink[0].innerHTML = '(-)';
+	} else { 
+		leglink[0].innerHTML = '(+)';
+	}
+	
+	for (i = 0; i < divs.length; i++) {
+		if (divs[i].style.display == 'none') divs[i].style.display = 'block';
+		else divs[i].style.display = 'none';
+	}	
+	return false;
+}
+
+function topic_add_tag(e) {
+	var tags = document.getElementById('tags');
+	var tagsel = document.getElementById('tag_list');
+	if (tags.value == '') {
+		tags.value = tagsel.value;
+	} else if (tagsel.value != '') {
+		tags.value = tags.value+','+tagsel.value;
+	}
+}
+
+function document_add_all_events(e) {
+
+	// Toggle the LBCode editor on or off depending on the markup setting.
+	var inputmode = document.getElementById('input_mode');
+	addEvent(inputmode, 'change', toggle_lbcode_editor);
+	toggle_lbcode_editor();
+	
+	// Toggle the extended settings fields on or off.
+	var setfld = document.getElementById('entry_settings');
+	var setleg = setfld.getElementsByTagName('legend');
+	addEvent(setleg[0], 'click', toggle_post_settings);
+	toggle_post_settings();
+	
+	var tagsel = document.getElementById('tag_list');
+	addEvent(tagsel, 'change', topic_add_tag);
+	
+	document.getElementById('subject').focus();
+	return true;
+}
+//document.onload = function (e) { window.alert("FOO"); }
+addEvent(window, 'load', document_add_all_events);

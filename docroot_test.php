@@ -21,7 +21,6 @@ $tpl->set("CURR_DIR", $curr_dir);
 $tpl->set("TARGETFILE", current_file());
 if (POST("docroot")) {
 	$doc_root = POST("docroot");
-	if (get_magic_quotes_gpc()) $doc_root = stripslashes($doc_root);
 } else {
 	$doc_root = calculate_document_root();
 	define("DOCUMENT_ROOT", $doc_root);

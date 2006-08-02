@@ -27,10 +27,11 @@ class IPBan extends Plugin {
 	
 	function IPBan() {
 		$this->plugin_desc = _("Allows you to ban IP addresses from adding comments or trackbacks.");
-		$this->plugin_version = "0.2.2";
+		$this->plugin_version = "0.2.3";
 		$this->addOption("ban_list", _("File to store list of banned IPs."),
 			"ip_ban.txt", "text");
 		$this->addOption("admin_local", _("Show per-blog ban link when administrator"), false, "checkbox");
+		$this->addOption("ban_del", _("Ban link both bans IP and deletes"), true, "checkbox");
 		$this->getConfig();
 	}
 
@@ -67,19 +68,33 @@ class IPBan extends Plugin {
 		if ($SYSTEM->canModify($blog, $usr) && $usr->checkLogin()) {
 			$cb_link = 
 				spf_("IP: %s", $cmt->ip);
-			$cb_link_loc =
-				' (<a href="'.make_uri(false, array('banip'=>$cmt->ip)).'" '.
-				'onclick="return window.confirm(\''.
-				spf_("Ban IP address %s will from submitting comments or trackbacks to this blog?", $cmt->ip).
-				'\');">'._("Ban IP").'</a>) ';
-			$cb_link_glob = ' (<a href="'.
-				make_uri(false,array('banip'=>$cmt->ip, 'global'=>'yes')).
-				'&amp;global=yes" '.
-				'onclick="return window.confirm(\''.
-				spf_("Ban IP address %s will from submitting comments or trackbacks to this entire site?", $cmt->ip).
-				'\');">'._("Global Ban").'</a>)';
+			if ($this->ban_del) {
+				$cb_link_loc =
+					' (<a href="'.make_uri($cmt->uri("delete"), array('banip'=>$cmt->ip)).'" '.
+					'onclick="return window.confirm(\''.
+					spf_("Delete %s and ban IP address %s from submitting comments or trackbacks to this blog?", $cmt->getAnchor(), $cmt->ip).
+					'\');">'._("Delete &amp; Ban IP").'</a>) ';
+				$cb_link_glob = ' (<a href="'.
+					make_uri($cmt->uri("delete"),array('banip'=>$cmt->ip, 'global'=>'yes')).'" '.
+					'onclick="return window.confirm(\''.
+					spf_("Delete %s and ban IP address %s from submitting comments or trackbacks to this entire site?", $cmt->getAnchor(), $cmt->ip).
+					'\');">'._("Delete &amp; Ban Globally").'</a>)';
+			} else {
+				$cb_link_loc =
+					' (<a href="'.make_uri(false, array('banip'=>$cmt->ip)).'" '.
+					'onclick="return window.confirm(\''.
+					spf_("Ban IP address %s from submitting comments or trackbacks to this blog?", $cmt->ip).
+					'\');">'._("Ban IP").'</a>) ';
+				$cb_link_glob = ' (<a href="'.
+					make_uri(false,array('banip'=>$cmt->ip, 'global'=>'yes')).
+					'onclick="return window.confirm(\''.
+					spf_("Ban IP address %s from submitting comments or trackbacks to this entire site?", 	$cmt->ip).
+					'\');">'._("Global Ban").'</a>)';
+			}
 
-			if ($usr->checkLogin() && $usr->isAdministrator()) {
+			if ($this->checkBan($cmt->ip) || $cmt->ip == GET('banip')) {
+				$cb_link .= _(" (Banned)");
+			} elseif ($usr->checkLogin() && $usr->isAdministrator()) {
 				if ($this->admin_local) {
 					$cb_link .= $cb_link_loc.$cb_link_glob;
 				} else {
@@ -104,6 +119,7 @@ class IPBan extends Plugin {
 				$ip = trim($_GET["banip"]);
 				$global = isset($_GET["global"]);
 				$this->updateList(array($ip), $global);
+				#$param->redirect(make_uri());
 			}
 		}
 	}
@@ -157,11 +173,11 @@ class IPBan extends Plugin {
 		$usr = NewUser();
 		$banfile = $PLUGIN_MANAGER->plugin_config->value("ipban", 
 		                                 "ban_list", "ip_ban.txt");
-		echo '<li><a href="'.$blg->uri('editfile', $banfile).'">'.
+		echo '<li><a href="'.$blg->uri('editfile', "file=$banfile").'">'.
 			_("Blog IP blacklist").'</a></li>';
 		if ($usr->isAdministrator()) {
 			echo '<li><a href="'.
-				make_uri(INSTALL_ROOT_URL.'editfile.php',
+				make_uri(INSTALL_ROOT_URL.'pages/editfile.php',
 				         array('file'=>'userdata/'.$banfile)).
 				'">'._("Global IP blacklist").'</a></li>';
 		}
@@ -169,7 +185,7 @@ class IPBan extends Plugin {
 
 }
 
-$ban = new IPBan();
+$ban =& new IPBan();
 $ban->registerEventHandler("blogcomment", "OnOutput", "addBanLink");
 $ban->registerEventHandler("blogcomment", "OnInsert", "clearData");
 $ban->registerEventHandler("trackback", "OnOutput", "addBanLink");

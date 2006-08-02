@@ -59,6 +59,6 @@ class LoginLink extends Plugin {
 	
 }
 
-$login = new LoginLink();
+$login =& new LoginLink();
 $login->registerEventHandler("sidebar", "OnOutput", "output");
 ?>

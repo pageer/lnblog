@@ -46,7 +46,7 @@ class CommentNotifier extends Plugin {
 
 }
 
-$notifier = new CommentNotifier();
+$notifier =& new CommentNotifier();
 $notifier->registerEventHandler("blogcomment", "InsertComplete", "send_notificaiton");
 
 ?>

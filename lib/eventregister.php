@@ -127,15 +127,23 @@ class EventRegister {
 	 */
 
 	function addHandler($raising_class, $name, 
-	                    $catching_class, $handler, $static=false) {
+	                    &$catching_class, $handler, $static=false) {
 		$rclass = strtolower($raising_class);
 		$ename = strtolower($name);
-		$cclass = strtolower($catching_class);
+		if (is_object($catching_class)) {
+			$cclass = strtolower(get_class($catching_class));
+		} else {
+			$cclass = strtolower($catching_class);
+		}
 		if (! $this->isEvent($rclass,$ename)) $this->addEvent($rclass, $ename);
 		if (! isset($this->event_list[$rclass][$ename][$cclass])) {
 			$this->event_list[$rclass][$ename][$cclass] = array();
 			$this->event_list[$rclass][$ename][$cclass]['static'] = array();
 			$this->event_list[$rclass][$ename][$cclass]['instance'] = array();
+			if (is_object($catching_class)) {
+				$this->event_list[$rclass][$ename][$cclass]['object'] =&
+					$catching_class;
+			}
 		}							
 		$mtype = $static ? 'static' : 'instance';
 		$this->event_list[$rclass][$ename][$cclass][$mtype][] = $handler;
@@ -163,20 +171,45 @@ class EventRegister {
 		$rcls = strtolower($raisecls);
 		$ename = strtolower($event);
 		if (! $this->isEvent($rcls,$ename)) return false;
-		foreach ($this->event_list[$rcls][$ename] as $classname=>$handlers) {
-			if (class_exists($classname) && $handlers['instance']) {
-				$tmp_class = new $classname;
+#echo '<pre>';
+#print_r($this->event_list);
+#echo '</pre>';
+		$keys = array_keys($this->event_list[$rcls][$ename]);
+		#foreach ($this->event_list[$rcls][$ename] as $classname=>$handlers) {
+		foreach ($keys as $classname) {
+
+			if ( class_exists($classname) && 
+			     $this->event_list[$rcls][$ename][$classname]['instance'] ) {
+				if (isset($this->event_list[$rcls][$ename][$classname]['object'])) {
+					$tmp_class =& $this->event_list[$rcls][$ename][$classname]['object'];
+					if ( strtolower(get_class($tmp_class)) != $classname) {
+						$tmp_class = new $classname;
+						#echo "Didn't work: $classname<br />\n";
+					}
+				} else {
+					$tmp_class = new $classname;
+				}
+			} else {
+				$tmp_class = false;
 			}
+
+			#if (get_class($tmp_class) != strtolower($classname)) 
+			#	echo "<p>Class: $classname != ".get_class($tmp_class)."</p>";
+
+			foreach ($this->event_list[$rcls][$ename][$classname]['instance'] as $hnd) {
+			#echo '<p>'."$rcls -> $ename -> $classname<br />".
+			#		get_class($tmp_class).': '.
+			#     (is_object($tmp_class)?"yes":"no").'<br />'.
+			#	  (method_exists($tmp_class, $hnd)?"yes":"no").': '.
+			#	  $hnd.'</p>';
 			
-			foreach ($handlers['instance'] as $hnd) {
-				if (class_exists($classname) && 
-				    method_exists($tmp_class, $hnd)) {
+				if ( method_exists($tmp_class, $hnd) ) {
 					$tmp_class->$hnd($param);
 				} else {
 					call_user_func($hnd, $param);
 				}
 			}
-			foreach ($handlers['static'] as $hnd) {
+			foreach ($this->event_list[$rcls][$ename][$classname]['static'] as $hnd) {
 				$methods = get_class_methods($classname);
 				$ret = array_search(strtolower($hnd),$methods);
 				if ($ret !== false && $ret !== null) {

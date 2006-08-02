@@ -269,16 +269,6 @@ class BlogComment extends Entry {
 			$this->$fld = POST($fld);
 			$this->$fld = $this->stripHTML($this->$fld);
 		}
-		if (get_magic_quotes_gpc()) {
-			$this->name = stripslashes($this->name);
-			$this->email = stripslashes($this->email);
-			$this->url = stripslashes($this->url);
-			$this->subject = stripslashes($this->subject);
-			$this->data = stripslashes($this->data);
-			foreach ($this->custom_fields as $fld=>$desc) {
-				$this->$fld = stripslashes($this->$fld);
-			}
-		}
 		# Note: Don't strip HTML from the comment data, because we do that 
 		# when we add in the links and other markup.
 		$this->name = $this->stripHTML($this->name);
@@ -336,6 +326,18 @@ class BlogComment extends Entry {
 	function permalink() {
 		return $this->uri("permalink");
 	}
+
+	/*
+	Method: isComment
+	Determines whether or not the object is an existing, saved comment.
+
+	Parameters:
+	path - The *optional* path to the comment data file.  If not specified, 
+	       then the file property is used.
+	
+	Returns:
+	True if the comment data file exists, false otherwise.
+	*/
 
 	function isComment($path=false) {
 		if (!$path) $path = $this->file;

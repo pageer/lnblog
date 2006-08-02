@@ -1,7 +1,9 @@
 <?php  
 class Recent extends Plugin {
 
-	function Recent() {
+	function Recent($do_output=0) {
+		global $SYSTEM;
+		
 		$this->plugin_desc = _("Show some of the more recent posts in the sidebar.");
 		$this->plugin_version = "0.2.0";
 		$this->addOption("old_header", 
@@ -14,7 +16,23 @@ class Recent extends Plugin {
 			_("Number of entries to show"), "Blog default", "text");
 		$this->addOption("show_main",
 			_("Show link to main blog page"), true, "checkbox");
+		
+		$this->addOption('no_event',
+			_('No event handlers - do output when plugin is created'),
+			$SYSTEM->sys_ini->value("plugins","EventDefaultOff", 0), 
+			'checkbox');
+			
 		$this->getConfig();
+		
+		if ( $this->no_event || 
+		     $SYSTEM->sys_ini->value("plugins","EventForceOff", 0) ) {
+			# If either of these is true, then don't set the event handler
+			# and rely on explicit invocation for output.
+		} else {
+			$this->registerEventHandler("sidebar", "OnOutput", "output");
+		}
+		
+		if ($do_output) $this->output();
 	}
 
 	function output($parm=false) {
@@ -53,7 +71,7 @@ class Recent extends Plugin {
 <li><a href="<?php echo $ent->permalink(); ?>"><?php echo $ent->subject; ?></a></li>
 <?php 
 			}	 # End foreach
-			if ($this->show_main) { # Link to main page ?>
+			if ($this->show_main) { /* Link to main page */ ?>
 <li style="margin-top: 0.5em"><a href="<?php echo $blg->getURL();?>"><?php p_("Show home page");?></a></li><?php 
 			} ?>
 </ul>
@@ -63,6 +81,9 @@ class Recent extends Plugin {
 
 }
 
-$rec = new Recent();
-$rec->registerEventHandler("sidebar", "OnOutput", "output");
+global $PLUGIN_MANAGER;
+if (! $PLUGIN_MANAGER->plugin_config->value('recent', 'creator_output', 0)) {
+	$rec =& new Recent();
+}
+
 ?>

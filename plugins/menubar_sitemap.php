@@ -28,9 +28,11 @@ class SiteMap extends Plugin {
 
 	var $link_file;
 
-	function SiteMap() {
+	function SiteMap($do_output=0) {
+		global $SYSTEM;
+
 		$this->plugin_desc = _("Show a sitemap in the menubar");
-		$this->plugin_version = "0.3.0";
+		$this->plugin_version = "0.3.1";
 		$this->list_header = _("Site Map");
 		$this->no_markup = false;
 		$this->addOption("auto_map", _("Automatically list all blogs in sitemap"),
@@ -39,9 +41,26 @@ class SiteMap extends Plugin {
 		                 "sitemap.htm", "text");
 		$this->addOption("list_header", _("Heading at start of menubar"),
 		                 _("Site Map"), "text");
-		$this->addOption("no_markup", _("Use unmodified file contents as menubar (no auto-generated HTML)"),
-		                 false, "checkbox");
+		$this->addOption("no_markup", 
+			_("Use unmodified file contents as menubar (no auto-generated HTML)"),
+			false, "checkbox");
+
+		$this->addOption('no_event',
+			_('No event handlers - do output when plugin is created'),
+			$SYSTEM->sys_ini->value("plugins","EventDefaultOff", 0), 
+			'checkbox');
+
 		$this->getConfig();
+
+		if ( $this->no_event || 
+		     $SYSTEM->sys_ini->value("plugins","EventForceOff", 0) ) {
+			# If either of these is true, then don't set the event handler
+			# and rely on explicit invocation for output.
+		} else {
+			$this->registerEventHandler("menubar", "OnOutput", "output");
+		}
+		
+		if ($do_output) $this->output();
 	}
 
 	function output($parm=false) {
@@ -101,7 +120,6 @@ class SiteMap extends Plugin {
 	}
 
 }
-$map = new SiteMap();
-$map->registerEventHandler("menubar", "OnOutput", "output");
+$map =& new SiteMap(0);
 $map->registerEventHandler("loginops", "PluginOutput", "showLink");
 ?>

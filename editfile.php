@@ -30,15 +30,15 @@
 
 session_start();
 
-require_once("blogconfig.php");
+require_once("config.php");
 require_once("lib/creators.php");
 require_once("lib/utils.php");
 
 global $PAGE;
 
-$file = GETPOST("file");
-if (get_magic_quotes_gpc()) $file = stripslashes($file);
+$file = GET("file");
 if (PATH_DELIM  != '/') $file = str_replace('/', PATH_DELIM, $file);
+$file = str_replace("..".PATH_DELIM, '', $file);
 
 $u = NewUser();
 $blog = NewBlog();
@@ -71,27 +71,23 @@ if (! $edit_ok) {
 }
 
 $tpl = NewTemplate("file_edit_tpl.php");
-$query_string = (isset($_GET["blog"]) ? "?blog=".$_GET["blog"] : "");
-if (isset($_GET["profile"])) {
-	$query_string .= ($query_string?"&amp;":"?")."profile=".$_GET["profile"];
-}
 
 # Prepare template for link list display.
-if (isset($_GET["list"])) {
+if (GET("list")) {
 	$tpl->set("SHOW_LINK_EDITOR");
 	$PAGE->addScript("sitemap.js");
-	$query_string .= ($query_string ? "&amp;" : "?")."list=yes";
 }
-$tpl->set("FORM_ACTION", current_file(true).$query_string);
+
+$tpl->set("FORM_ACTION", make_uri(false,false,false));
 if (isset($_GET["list"])) $tpl->set("PAGE_TITLE", "Edit Link List");
 else $tpl->set("PAGE_TITLE", "Edit Text File");
 
-if (! isset($_POST["file"])) $file = $relpath.PATH_DELIM.$file;
+#if (! isset($_POST["file"])) $file = $relpath.PATH_DELIM.$file;
+$file = $relpath.PATH_DELIM.$file;
 
 if (has_post()) {
 
-	if (get_magic_quotes_gpc()) $data = stripslashes(POST("output"));
-	else $data = POST("output");
+	$data = POST("output");
 	$ret = write_file($file, $data);
 
 	if (! $ret) {

@@ -35,6 +35,9 @@ if ( ! empty($TRACKBACKCOUNT) ) { ?>
 <?php } 
 if (! empty($ALLOW_TRACKBACKS)) { ?>
 <span><a href="<?php echo $TRACKBACK_LINK; ?>"><?php p_("TrackBack <abbr title=\"Uniform Resource Locator\">URL</abbr>");?></a></span>
+<?php } 
+if (! empty($PINGBACKCOUNT)) { ?>
+<span><a href="<?php echo $PINGBACK_LINK; ?>"><?php p_("View Pingbacks");?> (<?php echo $PINGBACKCOUNT; ?>)</a></span>
 <?php } ?>
 </div>
 </div>

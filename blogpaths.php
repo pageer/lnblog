@@ -23,7 +23,7 @@
 # particular blog.  This is basically an editor for the pathconfig.php file.
 
 session_start();
-require_once("blogconfig.php");
+require_once("config.php");
 require_once("lib/creators.php");
 require_once("lib/utils.php");
 
@@ -42,8 +42,8 @@ $inst_root = INSTALL_ROOT;
 $inst_url = INSTALL_ROOT_URL;
 $blog_url = $blog->getURL(); #BLOG_ROOT_URL;
 
-if (! $SYSTEM->canModify($blog, $usr) && ! $usr->checkLogin() ) {
-	$PAGE->redirect("login.php");
+if (! ($SYSTEM->canModify($blog, $usr) && $usr->checkLogin())  ) {
+	$PAGE->redirect($blog->uri('login'));
 	exit;
 }
 

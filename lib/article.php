@@ -40,55 +40,13 @@ class Article extends BlogEntry {
 
 	function Article($path="", $revision=ENTRY_DEFAULT_FILE) {
 		$this->raiseEvent("OnInit");
-		$this->uid = ADMIN_USER;
-		$this->ip = get_ip();
-		$this->date = "";
-		$this->timestamp = "";
-		$this->subject = "";
-		$this->tags = "";
-		$this->data = "";
-		$this->has_html = MARKUP_BBCODE;
+		
+		$this->initVars();
 		$this->allow_comment = false;
 		$this->allow_tb = false;
+		$this->allow_pingback = false;
 		$this->template_file = ARTICLE_TEMPLATE;
-		$this->metadata_fields = array("id"=>"postid", "uid"=>"userid", 
-			"date"=>"date", "post_date"=>"postdate",
-			"timestamp"=>"timestamp", "post_ts"=>"posttimestamp",
-			"ip"=>"ip", "mail_notify"=>"mail notification",
-			"sent_ping"=>"trackback ping", "subject"=>"subject",
-			"abstract"=>"abstract", "allow_comment"=>"allowcomment",
-			"has_html"=>"hashtml", "tags"=>"tags", 
-			"allow_tb"=>"allowtrackback");
-
-		if ($path && file_exists($path)) {
-			$this->file = $path.PATH_DELIM.$revision;
-		} elseif (GET("article") || $path) {
-		
-			$entrypath = trim($path ? $path : sanitize(GET("entry")));
-
-			# Get the blog path from the query string.
-			if (defined("BLOG_ROOT")) {
-				$blogpath = BLOG_ROOT;
-			} elseif ( defined("INSTALL_ROOT") && sanitize(GET("blog")) ) {
-				$blogpath = calculate_document_root().PATH_DELIM.sanitize(GET("blog"));
-			} else {
-				$blogpath = "";
-			}
-
-			$this->file = mkpath($blogpath,BLOG_ARTICLE_PATH,$entrypath,$revision);
-
-		} else {
-
-			$this->file = getcwd().PATH_DELIM.$revision;
-			# We might be in a comment or trackback directory, 
-			if (! $this->isEntry() ) {
-				$this->file = dirname(getcwd()).PATH_DELIM.$revision;
-				if (! $this->isEntry() ) {
-					$this->file = getcwd().PATH_DELIM.$revision;
-				}
-			}
-
-		}
+		$this->getFile($path, $revision, 'article', BLOG_ARTICLE_PATH, '');
 
 		if ( file_exists($this->file) ) {
 			$this->readFileData();
@@ -122,7 +80,7 @@ class Article extends BlogEntry {
 	shown on things like front-page article lists.
 
 	Parameters:
-	show - *Optional* boolean parameter to turn stickiness on or off.  
+	show - *Optional* boolean parameter to turn stickiness on or off.
 	       Default is true (stickiness on).
 
 	Returns:
@@ -154,7 +112,7 @@ class Article extends BlogEntry {
 	function isSticky($path=false) {
 		return ($this->isArticle($path) && 
 		        file_exists($path ? $path : 
-				              (dirname($this->file).PATH_DELIM.STICKY_PATH) ) );
+		                    (dirname($this->file).PATH_DELIM.STICKY_PATH) ) );
 	}
 
 	/*

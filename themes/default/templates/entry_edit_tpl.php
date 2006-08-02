@@ -6,19 +6,12 @@
 } ?>
 <fieldset>
 <?php
-global $EVENT_REGISTER;
-if ($EVENT_REGISTER->hasHandlers("posteditor", "ShowControls")) {
-	$EVENT_REGISTER->activateEventFull($tmp=false, "posteditor", "ShowControls");
-} else {
-	include("js_editor.php");
-}
 global $SYSTEM;
 if ($SYSTEM->sys_ini->value("entryconfig", "AllowInitUpload", 1) > 0) {
 	$enctype = 'multipart/form-data';
 } else {
 	$enctype = 'application/x-www-form-urlencoded';
 }
-
 ?>
 <form id="postform" method="post" action="<?php echo $FORM_ACTION; ?>" enctype="<?php echo $enctype;?>">
 <div>
@@ -28,9 +21,15 @@ if (isset($SUBJECT)) { ?>value="<?php echo $SUBJECT; ?> " <?php } ?><?php
 if (isset($GET_SHORT_PATH)) { ?>onblur="set_article_path();"<?php } ?>/>
 </div>
 <div>
-<label class="basic_form_label" for="tags"><?php p_("Tags"); ?></label>
+<label class="basic_form_label" for="tags"><?php p_("Topics"); ?></label>
 <input id="tags" name="tags" accesskey="t" type="text" size="40" <?php 
 if (isset($TAGS)) { ?>value="<?php echo $TAGS; ?>" <?php } ?>/>
+<select id="tag_list">
+<option value="" selected="selected"><?php p_("Add topic:");?></option>
+<?php foreach ($BLOG_TAGS as $tag) { ?>
+	<option value="<?php echo $tag;?>"><?php echo $tag;?></option>
+<?php } ?>
+</select>
 </div>
 <?php if (isset($GET_SHORT_PATH)) { ?>
 <div>
@@ -50,20 +49,41 @@ if (isset($URL)) { ?>value="<?php echo $URL; ?>" <?php } ?>/>
 <textarea id="body" name="body" accesskey="d" rows="18" cols="40"><?php if (isset($DATA)) echo $DATA; ?></textarea>
 </div>
 <?php 
+global $EVENT_REGISTER;
 global $SYSTEM;
+
+if ($EVENT_REGISTER->hasHandlers("posteditor", "ShowControls")) {
+	$EVENT_REGISTER->activateEventFull($tmp=false, "posteditor", "ShowControls");
+} else {
+	include("js_editor.php");
+}
+?>
+<fieldset id="entry_settings">
+<legend>Entry settings<a href="#dummy">(-)</a></legend>
+<?php
 $num_uploads = $SYSTEM->sys_ini->value("entryconfig", "AllowInitUpload", 1);
 for ($i=1; $i<=$num_uploads; $i++) { ?>
 <div>
 <label for="upload<?php echo $i;?>"><?php p_("Upload file");?></label>
 <input type="file" name="upload<?php echo $i;?>" id="upload<?php echo $i;?>" />
 </div>
-<?php } ?>
-<?php if (isset($STICKY)) { ?>
+<?php } # End upload for
+if ($ALLOW_ENCLOSURE || ! empty($ENCLOSURE)) { ?>
+<div>
+<label for="enclosure" title="<?php 
+p_('Enter the URL of the MP3 or other media file for this post.  If you are uploading the file to this post, you can enter just the filename.');
+?>"><?php p_("Enclosure/Podcast URL");?></label>
+<input type="text" name="enclosure" id="enclosure" title="<?php 
+p_('Enter the URL of the MP3 or other media file for this post.  If you are uploading the file to this post, you can enter just the filename.');
+?>" value="<?php if (isset($ENCLOSURE)) echo $ENCLOSURE;?>" />
+</div>
+<?php } # End enclosure
+if (isset($STICKY)) { ?>
 <div>
 <label for="sticky"><?php p_("Make sticky (show in sidebar)"); ?></label>
 <input id="sticky" name="sticky" type="checkbox" <?php if ($STICKY) { ?> checked="checked" <?php } ?> />
 </div>
-<?php } ?>
+<?php } /* End sticky */ ?>
 <div>
 <label for="input_mode"><?php p_("Markup type");?></label>
 <select id="input_mode" name="input_mode">
@@ -85,6 +105,12 @@ echo ' selected="selected"';}?>><?php p_("HTML");?></option>
 <input id="trackbacks" name="trackbacks" type="checkbox" <?php if (! (isset($TRACKBACKS) && !$TRACKBACKS) ) { 
 ?>checked="checked"<?php } ?> />
 </div>
+<div>
+<label for="pingbacks">Allow pingbacks</label>
+<input id="pingbacks" name="pingbacks" type="checkbox" <?php if (! (isset($PINGBACKS) && !$PINGBACKS) ) { 
+?>checked="checked"<?php } ?> />
+</div>
+</fieldset>
 <div class="threebutton">
 <input name="submit" id="submit" type="submit" value="<?php p_("Submit");?>" />
 <input name="preview" id="preview" type="submit" value="<?php p_("Preview");?>" />
@@ -92,6 +118,3 @@ echo ' selected="selected"';}?>><?php p_("HTML");?></option>
 </div>
 </form>
 </fieldset>
-<script type="text/javascript">
-document.getElementById('subject').focus();
-</script>

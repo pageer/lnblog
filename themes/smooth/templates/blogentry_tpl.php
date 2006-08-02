@@ -42,7 +42,10 @@ echo $list;
 <?php } ?>
 <?php if ( ! empty($TRACKBACKCOUNT) ) { ?>
 <li><a href="<?php echo $SHOW_TRACKBACK_LINK; ?>"><?php p_("TrackBacks");?> (<?php echo $TRACKBACKCOUNT; ?>)</a></li>
-<?php } 
+<?php }
+if ( ! empty($PINGBACKCOUNT) ) { ?>
+<li><a href="<?php echo $PINGBACK_LINK; ?>"><?php p_("Pingbacks");?> (<?php echo $PINGBACKCOUNT; ?>)</a></li>
+<?php }
 if (! empty($ALLOW_TRACKBACKS)) {?>
 <li><a href="<?php echo $TRACKBACK_LINK; ?>"><?php p_('TrackBack <abbr title="Uniform Resource Locator">URL</abbr>');?></a></li>
 <?php } ?>

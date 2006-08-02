@@ -2,7 +2,7 @@
 <?php if (isset($UPDATE_MESSAGE)) { ?>
 <p style="color: red"><?php echo $UPDATE_MESSAGE; ?></p>
 <?php } ?>
-<fieldset>
+
 <form id="addblog" method="post" action="<?php echo $POST_PAGE; ?>">
 <?php if (isset($SHOW_BLOG_PATH)) { /* for new blogs */ ?>
 <div>
@@ -56,26 +56,44 @@ foreach ($dir as $theme) { ?>
 </select>
 </div>
 <div>
-<label for="maxent"><?php p_("Maximum number of entries"); ?></label>
-<input id="maxent" name="maxent" value="<?php echo $BLOG_MAX; ?>" />
+<label for="maxent"><?php p_("Maximum number of entries on front page"); ?></label>
+<input id="maxent" name="maxent" size="3" value="<?php echo $BLOG_MAX; ?>" />
 </div>
 <div>
 <label for="maxrss"><?php p_("Maximum number of entries in RSS feeds"); ?></label>
-<input id="maxrss" name="maxrss" value="<?php echo $BLOG_RSS_MAX; ?>" />
+<input id="maxrss" name="maxrss" size="3" value="<?php echo $BLOG_RSS_MAX; ?>" />
+</div>
+<fieldset>
+<div>
+<label for="pingback"><?php p_("Send Pingbacks when posting entries"); ?></label>
+<input id="pingback" name="pingback"  type="checkbox" <?php 
+if ($BLOG_AUTO_PINGBACK) { ?>checked="checked"<?php } ?> />
+</div>
+<?php if (0) { /* Not yet implemented.*/ ?>
+<div>
+<label for="replies"><?php p_("Display comments, TrackBacks, and Pingbacks in a single list"); ?></label>
+<input id="replies" name="replies"  type="checkbox" <?php 
+if ($BLOG_GATHER_REPLIES) { ?>checked="checked"<?php } ?> />
+</div>
+<?php } ?>
+<div>
+<label for="allow_enc"><?php p_("Allow enclosures in entries (for Podcasting)"); ?></label>
+<input id="allow_enc" name="allow_enc" type="checkbox" <?php 
+if ($BLOG_ALLOW_ENC) { ?>checked="checked"<?php } ?> />
 </div>
 <div>
 <label for="blogmarkup"><?php p_("Default markup mode for entries and articles"); ?></label>
-<select id="blogmarkup" name="blogmarkup" value="<?php echo $BLOG_DEFAULT_MARKUP; ?>">
+<select id="blogmarkup" name="blogmarkup">
 <option value="<?php echo MARKUP_NONE;?>"<?php if ($BLOG_DEFAULT_MARKUP == MARKUP_NONE) { echo ' selected="selected"'; } ?>><?php p_("Auto-markup");?></option>
 <option value="<?php echo MARKUP_BBCODE;?>"<?php if ($BLOG_DEFAULT_MARKUP == MARKUP_BBCODE) { echo ' selected="selected"'; } ?>><?php p_("LBCode");?></option>
-<option value="<?php echo MARKUP_HTML?>"<?php if ($BLOG_DEFAULT_MARKUP == MARKUP_HTML) { echo ' selected="selected"'; } ?>><?php p_("HTML");?></option>
+<option value="<?php echo MARKUP_HTML;?>"<?php if ($BLOG_DEFAULT_MARKUP == MARKUP_HTML) { echo ' selected="selected"'; } ?>><?php p_("HTML");?></option>
 </select>
 </div>
 <div style="text-align: center">
 <?php if ( defined("INSTALL_ROOT_URL") && defined("BLOG_ROOT") && 
            is_dir(BLOG_ROOT) && BLOG_ROOT != INSTALL_ROOT) { 
 	$blog = NewBlog(); ?>
-<a href="<?php echo INSTALL_ROOT_URL;?>blogpaths.php?blog=<?php echo $blog->blogid;?>">Edit paths for blog</a>
+<a href="<?php echo INSTALL_ROOT_URL;?>pages/blogpaths.php?blog=<?php echo $blog->blogid;?>">Edit paths for blog</a>
 <?php } ?>
 </div>
 <div>
@@ -83,4 +101,4 @@ foreach ($dir as $theme) { ?>
 <span class="basic_form_clear"><input name="clear" id="clear" type="reset" value="<?php p_("Clear"); ?>" /></span>
 </div>
 </form>
-</fieldset>
+

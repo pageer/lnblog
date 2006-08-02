@@ -27,9 +27,13 @@
 # Inherits: LnBlogObject
 #
 # Events:
+# OnInit          - Fired when the object is about to initialize.
+# InitComplete    - Fired after the object has been initialized.
 # POSTRetreived   - Fired when POST data for a trackback is retreived.
 # OnInsert        - Fired before a trackback is stored.
 # InsertComplete  - Fired after a trackback is saved.
+# OnDelete        - Fired when a trackback is about to be deleted.
+# DeleteComplete  - Fired right after a trackback has been deleted.
 # OnReceive       - Fired when starting to receive a ping.
 # ReceiveComplete - Fired after receiving a ping.
 # OnSend          - Fired before sending a ping.
@@ -54,6 +58,8 @@ class Trackback extends LnBlogObject {
 	var $file;
 
 	function Trackback($path=false) {
+		$this->raiseEvent("OnInit");
+		
 		$this->title = '';
 		$this->blog = '';
 		$this->data = '';
@@ -65,6 +71,8 @@ class Trackback extends LnBlogObject {
 			if (! is_file($this->file)) $this->file = $this->getFilename($this->file);
 			if (is_file($this->file)) $this->readFileData($this->file);
 		}
+		
+		$this->raiseEvent("InitComplete");
 	}
 
 	# Method: getParent
@@ -75,6 +83,27 @@ class Trackback extends LnBlogObject {
 	
 	function getParent() {
 		return NewEntry();
+	}
+
+	# Method: isTrackback
+	# Determines if an object or file is a saved trackback.
+	#
+	# Parameters:
+	# path - The *optional* path to the trackback data file.  If not given, 
+	#        then the object's file property is used.
+	#
+	# Returns:
+	# True if the data file exists and is under an entry trackback directory, 
+	# false otherwise
+
+	function isTrackback($path=false) {
+		if (!$path) $path = $this->file;
+		if ( file_exists($path) && 
+		     basename(dirname($path)) == ENTRY_TRACKBACK_DIR ) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	# Method: uri
@@ -108,12 +137,6 @@ class Trackback extends LnBlogObject {
 		$this->data = htmlspecialchars(POST("excerpt"));
 		$this->blog = htmlspecialchars(POST("blog_name"));
 		$this->url = POST("url");
-		if (get_magic_quotes_gpc()) {
-			$this->title = stripslashes($this->title);
-			$this->data = stripslashes(strip_tags($this->data));
-			$this->blog = stripslashes($this->blog);
-			$this->url = stripslashes($this->url);
-		}
 		$this->ip = get_ip();
 		$this->ping_date = date('r');
 		$this->raiseEvent("POSTRetreived");
@@ -126,11 +149,12 @@ class Trackback extends LnBlogObject {
 	# url - The URL to which the trackback ping will be sent.
 	#
 	# Returns: 
-	# An associative array with 'error' and 'message' elements.  The error
-	# element contains the trackback return code from the remote server.
-	# The message element contains the error message if there was one.
-	# Note that a return code of 0 indicates success, while other values
-	# indicate an error.
+	# An associative array with 'error', 'message', and 'response' elements.
+	# The error element contains the trackback return code from the remote
+	# server.  The message element contains the error message if there was
+	# one.  Note that a return code of 0 indicates success, while other values
+	# indicate an error.  The response element contains the full XML response,
+	# for debugging purposes.
 	
 	function send($url) {
 		$this->raiseEvent("OnSend");
@@ -140,7 +164,7 @@ class Trackback extends LnBlogObject {
 		if ($this->title) $query_string .= "&title=".urlencode($this->title);
 		if ($this->blog) $query_string .= "&blog_name=".urlencode($this->blog);
 		if ($this->data) $query_string .= "&excerpt=".urlencode($this->data);
-		
+
 		if (extension_loaded("curl")) {
 
 			# Initialize CURL and POST to the target URL.
@@ -152,27 +176,30 @@ class Trackback extends LnBlogObject {
 			curl_setopt($hnd, CURLOPT_POSTFIELDS, $query_string);
 			$response = curl_exec($hnd);
 
-		} else {	
-
-			# Extract the host name and path from the URL.
-			$proto_pos = strpos($url, "://");
-			$slash_pos = strpos($url, "/", $proto_pos + 3);
-			if ($proto_pos == false || $slash_pos == false) return false;
-			$host = substr($url, $proto_pos + 3, $slash_pos - ($proto_pos + 3));
-			$path = substr($url, $slash_pos);
+		} else {
+			
+			$url_bits = parse_url($url);
+			$host = $url_bits['host'];
+			$path = $url_bits['path'];
+			$port = isset($url_bits['port']) ? $url_bits['port'] : 80;
 
 			# Open a socket.
-			$fp = fsockopen($host, 80);
-			if (!$fp) return false;
+			$fp = pfsockopen($host, $port);
+			if (!$fp) {
+				return false;
+			}
 			
 			# Create the HTTP request to be sent to the remote host.
 			$data = "POST ".$path."\r\n".
+			        "Host: ".$host."\r\n".
 			        "Content-Type: application/x-www-form-urlencoded; ".
-		   	        "charset=utf-8\r\n\r\n".
+		   	        "charset=utf-8\r\n".
+					"Content-Length: ".strlen($query_string)."\r\n".
+					"Connection: close\r\n\r\n".
 		      	  $query_string;
 
 			# Send the data and then get back any response.
-			fwrite($fp, $query_string);
+			fwrite($fp, $data);
 			$response = '';
 	
 			while (! feof($fp)) {
@@ -181,7 +208,7 @@ class Trackback extends LnBlogObject {
 			fclose($fp);
 
 		}
-		
+
 		# Get the error code
 		$start_tag_pos = strpos($response, "<error>");
 		$end_tag_pos = strpos($response, "</error>");
@@ -206,7 +233,8 @@ class Trackback extends LnBlogObject {
 		}
 		
 		$this->raiseEvent("SendComplete");
-		return array('error'=>$ret_code, 'message'=>$ret_msg);
+		return array('error'=>$ret_code, 'message'=>$ret_msg,
+		             'response'=>htmlentities($response));
 	}
 
 	# Method: receive
@@ -229,7 +257,8 @@ class Trackback extends LnBlogObject {
 		} else {
 			$ts = time();
 			$this->ping_date = date("Y-m-d H:i:s T", $ts);
-			$path = mkpath($parent->localpath(), ENTRY_TRACKBACK_DIR, $ts.".txt");
+			$path = mkpath($parent->localpath(), ENTRY_TRACKBACK_DIR, 
+			               $ts.TRACKBACK_PATH_SUFFIX);
 			$ret = $this->writeFileData($path);
 			if (! $ret) $error = _("Unable to save ping data.");
 		}
@@ -240,9 +269,8 @@ class Trackback extends LnBlogObject {
 		if ($error != '') $output .= "<message>$error</message>\n";
 		$output .= "</response>\n";
 
-		echo $output;
 		$this->raiseEvent("ReceiveComplete");
-		return $error;
+		return $output;
 	}
 
 	# Method: incomingPing
@@ -370,11 +398,13 @@ class Trackback extends LnBlogObject {
 	# True on success, false on failure.
 	
 	function delete() {
+		$this->raiseEvent("OnDelete");
 		if (file_exists($this->file)) {
 			$fs = NewFS();
 			$ret = $fs->delete($this->file);
 			$fs->destruct();
 		} else $ret = false;
+		$this->raiseEvent("DeleteComplete");
 		return $ret;
 	}
 

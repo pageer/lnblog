@@ -41,6 +41,9 @@ if ( ! empty($COMMENTCOUNT) ) { ?>
 <?php }
 if ( ! empty($TRACKBACKCOUNT) ) { ?>
 <li><a href="<?php echo $SHOW_TRACKBACK_LINK;?>"><?php p_("View TrackBacks");?> (<?php echo $TRACKBACKCOUNT;?>)</a></li>
+<?php } 
+if ( ! empty($PINGBACKCOUNT) ) { ?>
+<li><a href="<?php echo $PINGBACK_LINK;?>"><?php p_("View Pingbacks");?> (<?php echo $PINGBACKCOUNT;?>)</a></li>
 <?php } ?>
 	</ul>
 </div>
