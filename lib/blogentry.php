@@ -461,12 +461,14 @@ class BlogEntry extends Entry {
 			case "entry":
 			case "page": 
 				$pretty_file = $this->calcPrettyPermalink();
-				$pretty_file = dirname($this->localpath()).PATH_DELIM.$pretty_file;
+				if ($pretty_file)
+					$pretty_file = dirname($this->localpath()).PATH_DELIM.$pretty_file;
 				if ( file_exists($pretty_file) ) {
 					return localpath_to_uri($pretty_file);
 				} else {
 					$pretty_file = $this->calcPrettyPermalink(true);
-					$pretty_file = dirname($this->localpath()).PATH_DELIM.$pretty_file;
+					if ($pretty_file)
+						$pretty_file = dirname($this->localpath()).PATH_DELIM.$pretty_file;
 					if ( file_exists($pretty_file) ) {
 						return localpath_to_uri($pretty_file);
 					} else {
@@ -684,7 +686,7 @@ class BlogEntry extends Entry {
 		$ret = trim($this->subject);
 		if (!$use_broken_regex) {
 			$ret = str_replace(array("'", '"'), "_", $ret);
-			$ret = preg_replace("/[\W_]+/", "_", $ret);
+			$ret = preg_replace("/[^A-Za-z_]+/", "_", $ret);
 		} else {
 			$ret = preg_replace("/\W/", "_", $ret);
 		}

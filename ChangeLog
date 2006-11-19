@@ -1,3 +1,23 @@
+03-Sep-2006: version 0.8.1
+- Added BotBlock plugin for comment spam.
+
+31-Aug-2006:
+- Added accept-charset attribute to entry and comment forms.
+- Changed htmlentities() to htmlspecialchars() when populating entry edit form.
+This keeps unicode characters from getting garbled in the edit area.
+- Changed pretty-permalink calculation to strip unicode characters as well.  
+Apparently they don't work in URLs.
+- Fixed image button for LBCode editor.
+- Added color button and image align combo to LBCode editor.  Also removed the 
+seldom-used quote and blockquote buttons to make room.
+- For entries with an enclosure, add a link element for it in the page head.
+
+27-Aug-2006:
+- Fixed newline not translating in LBCode.
+- Fixed invalid HTML in comment form template.
+- Added an LBCode color tag.
+- Fixed bad permalink on entries with no subject.
+
 23-Aug-2006: version 0.8.0 "No Need for TrackBack"
 - Added some events and documentation to FileUpload class.
 - Hacked file editing to make podcasts work when uploading file with post.

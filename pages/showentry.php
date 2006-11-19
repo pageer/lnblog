@@ -62,6 +62,16 @@ $content .= $tmp_content;
 # Add comment form if applicable.
 $content .= $comm_output;
 
+if ($ent->enclosure) {
+	$enc = $ent->getEnclosure();
+	if ($enc) {
+		$enc_arr = array("rel"=>_('enclosure'), 
+		                 "href"=>$enc['url'], 
+		                 "type"=>$enc['type']);
+		$PAGE->addLink($enc_arr);
+	}
+}
+
 if ($ent->allow_pingback) {
 	$PAGE->addHeader("X-Pingback", INSTALL_ROOT_URL."pingback.php");
 	$PAGE->addLink(array('rel'=>'pingback',

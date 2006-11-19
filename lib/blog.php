@@ -251,6 +251,26 @@ class Blog extends LnBlogObject {
 	}
 
 	/*
+	Method: getDateRange
+	Get all blog entries posted between a given range of dates.
+	Note that the range is inclusive.
+
+	Parameters:
+	end_date   - A string containing end date of the range in "yyyy-mm-dd" 
+	             format.  This can also use "yyyy-mm" or "yyyy" format.
+	start_date - The *optional* start date of the range.  If this is omitted, 
+	             the the end date will be taken as the entirity of the range,
+	             whether it is a day, month, or year.
+
+	Returns:
+	An array of BlogEntry objects.
+	*/
+	function getDateRange($end_date, $start_date = '') {
+		$end = split('-', $end_date);
+		
+	}
+
+	/*
 	Method: getDay
 	Get all the blog entries for a particular day.
 

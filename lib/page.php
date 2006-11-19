@@ -257,12 +257,17 @@ class Page extends LnBlogObject {
 
 	function display($page_body, $blog=false) {
 		$this->raiseEvent("OnOutput");
+
+		$content_type = $this->mime_type."; charset=".$this->charset;
+
+		if (! isset($this->headers["Content-Type"]))
+			$this->headers["Content-Type"] = $content_type;
 	
 		foreach ($this->headers as $name=>$value) {
 			header($name.": ".$value);
 		}
 	
-		$this->addMeta($this->mime_type."; charset=".$this->charset, false, "Content-type");
+		$this->addMeta($content_type, false, "Content-type");
 		$this->addMeta(PACKAGE_NAME." ".PACKAGE_VERSION, "generator");
 		
 		$head = NewTemplate(PAGE_HEAD_TEMPLATE);

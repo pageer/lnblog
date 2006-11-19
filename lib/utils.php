@@ -21,11 +21,6 @@
 # File: Utilities
 # Utility library.  Implements some general purpose functions plus some
 # wrappers that implement functionality available in PHP 5.
-#echo "Including utils.php...\n";
-#echo "Included Files:\n";
-#$x=get_included_files();
-#print_r($x);
-#echo "Include path: ".get_include_path()."\n";
 
 # Types of directories to create.
 define("BLOG_BASE", 0);
@@ -396,7 +391,7 @@ function localpath_to_uri($path, $full_uri=true) {
 
 	if (file_exists($path))	$full_path = realpath($path);
 	else $full_path = $path;
-
+	
 	# Add a trailing slash if the path is a directory.
 	if (is_dir($full_path)) $full_path .= PATH_DELIM;
 	$root = calculate_document_root();

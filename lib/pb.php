@@ -273,7 +273,7 @@ class Pingback extends Trackback {
 			
 			$url_bits = parse_url($url);
 			$host = $url_bits['host'];
-			$path = $url_bits['path'];
+			$path = isset($url_bits['path']) ? $url_bits['path'] : "/";
 			$port = isset($url_bits['port']) ? $url_bits['port'] : 80;
 			$query = isset($url_bits['query']) ? $url_bits['query'] : '';
 			

@@ -190,6 +190,67 @@ function opt_parm(type, prompt_text, meta_text) {
 
 }
 
+function set_color(text_prompt, attr_prompt) {
+
+	var text_str;
+	var color_str;
+	var data_str;
+	
+	if (hasSelection(document.getElementById("body"))) {
+		text_str = hasSelection(document.getElementById("body"));
+	} else {
+		text_str = window.prompt(text_prompt);
+	}
+	
+	if (! text_str) return false;
+	
+	var color = document.getElementById('colorselect');
+	if (color.value == 'custom') {
+		color_str = window.prompt(attr_prompt);
+	} else {
+		color_str = color.value;
+	}
+	
+	data_str = '[color='+color_str+']'+text_str+'[/color]';
+	
+	insertAtCursor(document.getElementById("body"), data_str);
+	return false;
+
+}
+
+function set_img(text_prompt, attr_prompt) {
+
+	var text_str;
+	var url_str;
+	var tag_str;
+	var data_str;
+	
+	if (hasSelection(document.getElementById("body"))) {
+		text_str = hasSelection(document.getElementById("body"));
+	} else {
+		text_str = window.prompt(text_prompt);
+	}
+	
+	if (! text_str) return false;
+	
+	url_str = window.prompt(attr_prompt);
+	if (! url_str) return false;
+	
+	var alignbox = document.getElementById('imgalign');
+	if (alignbox.value == 'center') {
+		tag_str = 'img';
+	} else {
+		tag_str = 'img-'+alignbox.value;
+	}
+	
+	data_str = '['+tag_str+'='+url_str+']'+text_str+'[/'+tag_str+']';
+	
+	insertAtCursor(document.getElementById("body"), data_str);
+	return false;
+
+}
+
+
 function insertChar(type) {
 	insertAtCursor(document.getElementById("body"), type);
 	return true;

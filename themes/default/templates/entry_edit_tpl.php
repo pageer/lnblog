@@ -13,7 +13,7 @@ if ($SYSTEM->sys_ini->value("entryconfig", "AllowInitUpload", 1) > 0) {
 	$enctype = 'application/x-www-form-urlencoded';
 }
 ?>
-<form id="postform" method="post" action="<?php echo $FORM_ACTION; ?>" enctype="<?php echo $enctype;?>">
+<form id="postform" method="post" action="<?php echo $FORM_ACTION; ?>" enctype="<?php echo $enctype;?>" accept-charset="<?php echo DEFAULT_CHARSET;?>">
 <div>
 <label class="basic_form_label" for="subject"><?php p_("Subject"); ?></label>
 <input id="subject" name="subject" accesskey="s" type="text" size="40" <?php 

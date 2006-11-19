@@ -45,7 +45,7 @@ $PAGE->title = $ent->subject . " - " . $blg->name;
 $comm_output = '';
 if ($ent->allow_comment) {
 	require_once('pagelib.php');
-	$comm_output = handle_comment($ent);
+	$comm_output = handle_comment($ent, true);
 }
 
 $content = '';

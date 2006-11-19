@@ -324,11 +324,14 @@ class Entry extends LnBlogObject{
 		$patterns[16] = "/\[img-left=(.+)\](.+)\[\/img-left\]/Usi";
 		$patterns[17] = "/\[img-right=(.+)\](.+)\[\/img-right\]/Usi";
 		$patterns[18] = "/\[h\](.*)\[\/h\]/Usi";
+		$patterns[19] = "/\[color=(.+)\](.+)\[\/color\]/Usi";
+
 		
 		$whitespace_patterns[0] = '/\r\n\r\n/';
 		$whitespace_patterns[1] = '/\n\n/';
-		$whitespace_patterns[2] = '/\n/';
-		$whitespace_patterns[2] = '/\t/';
+		$whitespace_patterns[2] = '/\r\n/';
+		$whitespace_patterns[3] = '/\n/';
+		$whitespace_patterns[4] = '/\t/';
 		
 		/*
 		$code_patterns[0] = '/(<code.*)<\/p><p>(.*<\/code>)/U';
@@ -357,11 +360,14 @@ class Entry extends LnBlogObject{
 			$replacements[16] = '';
 			$replacements[17] = '';
 			$replacements[18] = '$1';
+			$replacements[19] = '$2';
 			
 			$whitespace_replacements[0] = "\r\n\r\n";
 			$whitespace_replacements[1] = "\n\n";
-			$whitespace_replacements[2] = "\n";
-			$whitespace_replacements[3] = "\t";
+			$whitespace_replacements[2] = "\r\n";
+			$whitespace_replacements[3] = "\n";
+			$whitespace_replacements[4] = "\t";
+			
 			
 		} else {
 			$replacements[0] = '<a href="$1">$2</a>';
@@ -383,11 +389,14 @@ class Entry extends LnBlogObject{
 			$replacements[16] = '<img alt="$2" title="$2" style="float: left; clear: none;" src="$1" />';
 			$replacements[17] = '<img alt="$2" title="$2" style="float: right; clear: none;" src="$1" />';
 			$replacements[18] = '</p><h'.LBCODE_HEADER_WEIGHT.'>$1</h'.LBCODE_HEADER_WEIGHT.'><p>';
+			$replacements[19] = '<span style="color: $1">$2</span>';
 			
 			$whitespace_replacements[0] = '</p><p>';
 			$whitespace_replacements[1] = '</p><p>';
 			$whitespace_replacements[2] = '<br />';
-			$whitespace_replacements[3] = '&nbsp;&nbsp;&nbsp;';
+			$whitespace_replacements[3] = '<br />';
+			$whitespace_replacements[4] = '&nbsp;&nbsp;&nbsp;';
+			
 		}
 		
 		ksort($patterns);

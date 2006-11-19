@@ -39,7 +39,7 @@ function handle_comment(&$ent, $use_comm_link=false) {
 	$comm_tpl->set("FORM_TARGET", $ent->uri("basepage"));
 	
 	if ($ent->getCommentCount() == 0) {
-		$comm_tpl->set("PARENT_TITLE", $ent->subject);
+		if ($use_comm_link) $comm_tpl->set("PARENT_TITLE", trim($ent->subject));
 		$comm_tpl->set("PARENT_URL", $ent->permalink());
 	}
 	
@@ -183,9 +183,9 @@ function handle_pingback_pings(&$ent) {
 
 function entry_set_template(&$tpl, &$ent) {
 	$tpl->set("URL", POST("short_path"));
-	$tpl->set("SUBJECT", htmlentities($ent->subject));
-	$tpl->set("TAGS", htmlentities($ent->tags));
-	$tpl->set("DATA", htmlentities($ent->data));
+	$tpl->set("SUBJECT", htmlspecialchars($ent->subject));
+	$tpl->set("TAGS", htmlspecialchars($ent->tags));
+	$tpl->set("DATA", htmlspecialchars($ent->data));
 	$tpl->set("ENCLOSURE", $ent->enclosure);
 	$tpl->set("HAS_HTML", $ent->has_html);
 	$tpl->set("COMMENTS", $ent->allow_comment);

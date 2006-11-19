@@ -1,13 +1,14 @@
 <div id="commentsubmit">
-<h3><a name="postcommentform">
+<h3>
 <?php 
 # Include a link to the parent entry if there are no comments on it.
-if (isset($PARENT_TITLE)) {
+if (! empty($PARENT_TITLE)) {
 	pf_('Add your comments on <a href="%s">%s</a>', $PARENT_URL, $PARENT_TITLE);
 } else { 
 	p_("Add your comments");
 } ?>
-</a></h3>
+&nbsp;<a name="postcommentform" class="anchor">#</a>
+</h3>
 <p>
 <?php
 # Set the message to display on the form.  If not given, use the default.
@@ -22,7 +23,7 @@ http:// or ftp:// will be automatically converted to hyperlinks.");
 global $EVENT_REGISTER;
 $EVENT_REGISTER->activateEventFull($tmp=false, "commentform", "BeforeForm");?>
 <fieldset>
-<form id="commentform" method="post" action="<?php echo $FORM_TARGET;?>">
+<form id="commentform" method="post" action="<?php echo $FORM_TARGET;?>" accept-charset="<?php echo DEFAULT_CHARSET;?>">
 <?php $EVENT_REGISTER->activateEventFull($tmp=false, "commentform", "FormBegin");?>
 <div>
 <label class="basic_form_label" for="subject"><?php p_("Subject"); ?></label>
