@@ -22,8 +22,8 @@ LnBlog needs a web server with PHP 4.1 or greater installed and the ability to
 write to the file system.  Both Apache and IIS are supported and no database
 is required.  File writing through FTP is supported for hosts with safe mode
 enabled. PCRE (Perl-Compatible Regular Expression) support, which is standard
-with most PHP installations, must be enabled. Support for the CURL and gettext
-extensions is helpful, but not required.  
+with most PHP installations, must be enabled. Support for the CURL, gettext, 
+and either mime-magic or fileinfo extensions is helpful, but not required.  
 
 Installation
 ------------
@@ -43,6 +43,14 @@ directory to, e.g., LnBlog-old, and rename the new one in its place (i.e., give
 it the same name the old version had).  Lastly, copy or move the userdata 
 subdirectory from your old  LnBlog directory to the new one, overwriting existing
 files.
+
+Plugins
+-------
+LnBlog supports an event-driven plugin system and ships with a large number of 
+standard plugins.  There are also a number of non-standard plugins available 
+from the official web site.  These include extra sidebar panels, JavaScript 
+rich-text editors, and others.  These can be downloaded from:
+http://www.skepticats.com/lnblog/content/plugins/
 
 License
 -------

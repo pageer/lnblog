@@ -49,8 +49,15 @@ if (has_post()) {
 	$plug_name = sanitize(POST("plugin"));
 	$plug = new $plug_name;
 	$ret = $plug->updateConfig();
-	$PAGE->redirect(current_file(true));
+
+	if ($blg->isBlog()) {
+		$PAGE->redirect($blg->uri('pluginconfig'));
+	} else {
+		$PAGE->redirect(INSTALL_ROOT_URL."plugin_setup.php");
+	}
+
 	exit;
+
 } elseif ( sanitize(GET("plugin")) && 
            class_exists(sanitize(GET("plugin"))) ) {
 	$plug_name = sanitize(GET("plugin"));
@@ -64,7 +71,7 @@ if (has_post()) {
 	$buff = ob_get_contents();
 	ob_end_clean();
 	$body .= is_string($ret) ? $ret : $buff;
-	if ( isset($blg) ) $url = $blg->uri('pluginconfig');
+	if ($blg->isBlog() ) $url = $blg->uri('pluginconfig');
 	else $url = current_uri(true,'');
 	
 	$body .= '<p><a href="'.$url.'">'._("Back to plugin list").'</a></p>';

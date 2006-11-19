@@ -40,7 +40,8 @@ $PAGE->setDisplayObject($usr);
 $blog = NewBlog();
 
 if (! $usr->checkLogin() ) {
-	$PAGE->redirect("index.php");
+	if ($blog->isBlog()) $PAGE->redirect($blog->uri('blog'));
+	else $PAGE->redirect(INSTALL_ROOT_URL);
 	exit;
 }
 
@@ -48,12 +49,12 @@ if (! $usr->checkLogin() ) {
 if ($blog->isBlog()) {
 	$page_name = _("Change User Information");
 	$form_title = spf_("New Login for %s", $blog->name);
-	$redir_page = $blog->getURL();
+	$redir_page = $blog->uri('blog');
 } else {
 	# Add the template directory to the include_path.
 	$page_name = _("Change Administrator Login");
 	$form_title = _("System Aministration Login");
-	$redir_page = "index.php";
+	$redir_page = INSTALL_ROOT_URL;
 }
 
 $form_title = spf_("Modify User - %s", $usr->username());

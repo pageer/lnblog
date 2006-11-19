@@ -62,19 +62,25 @@ class SiteMap extends Plugin {
 		
 		if ($do_output) $this->output();
 	}
-
-	function output($parm=false) {
-		global $SYSTEM;
-		
-		$map_file = '';
+	
+	function get_map_file() {
 		$blog = NewBlog();
-		
 		if ( $blog->isBlog() && 
 		     file_exists(BLOG_ROOT.PATH_DELIM.$this->link_file) ) {
 			$map_file = BLOG_ROOT.PATH_DELIM.$this->link_file;
 		} elseif (is_file(mkpath(USER_DATA_PATH,$this->link_file))) {
 			$map_file = mkpath(USER_DATA_PATH,$this->link_file);
+		} else {
+			$map_file = '';
 		}
+		return $map_file;
+	}
+
+	function output($parm=false) {
+		global $SYSTEM;
+		
+		$blog = NewBlog();
+		$map_file = $this->get_map_file();
 		
 		$markup = '';
 		if ($this->auto_map) {
@@ -115,7 +121,8 @@ class SiteMap extends Plugin {
 	
 	function showLink($param) {
 		$blog = NewBlog();
-		echo '<li><a href="'.$blog->uri('blog').'map.php">'.
+		$url = $blog->uri('editfile', 'map=yes', 'file='.$this->link_file, 'list=yes');
+		echo '<li><a href="'.$url.'">'.
 			_("Edit custom sitemap").'</a></li>';
 	}
 

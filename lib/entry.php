@@ -20,7 +20,7 @@
 
 require_once("lib/utils.php");
 require_once("lib/lnblogobject.php");
-require_once("lib/lbparse.php");
+#require_once("lib/lbparse.php");
 /*
 Class: Entry
 An abstract class representing entries of all types in the blog database.
@@ -297,10 +297,10 @@ class Entry extends LnBlogObject{
 	# Returns:
 	# A string with the converted text.
 	
-	function bbcodeToHTML2($data, $strip=false) {
-		$p = new LBParser($data);
-		return '<p>'.$p->parse().'</p>';
-	}
+	#function bbcodeToHTML2($data, $strip=false) {
+	#	$p = new LBParser($data);
+	#	return '<p>'.$p->parse().'</p>';
+	#}
 	
 	function bbcodeToHTML($data, $strip=false) {
 		$ret = $data;

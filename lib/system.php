@@ -10,8 +10,6 @@
 # it is very convenient and doesn't cause any design problems for the time
 # being.
 
-require_once("lib/creators.php");
-
 class System {
 	
 	function System() {

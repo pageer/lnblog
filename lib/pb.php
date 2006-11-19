@@ -84,12 +84,13 @@ class Pingback extends Trackback {
 		$this->raiseEvent("OnInsert");
 		$ts = time();
 		$this->ping_date = date("Y-m-d H:i:s T", $ts);
+		$this->timestamp = time();
 		$this->ip = get_ip();
 		$this->file = mkpath($ent->localpath(), ENTRY_PINGBACK_DIR, 
 		                     $ts.PINGBACK_PATH_SUFFIX);
 		$dir = mkpath($ent->localpath(), ENTRY_PINGBACK_DIR);
 		if (! is_dir($dir)) {
-			$ret = create_directory_wrappers($dir, ENTRY_PINGBACKS);
+			$ret = create_directory_wrappers($dir, ENTRY_PINGBACKS, get_class($ent));
 		}
 		$ret = $this->writeFileData($this->file);
 		$this->raiseEvent("InsertComplete");
@@ -158,6 +159,9 @@ class Pingback extends Trackback {
 				case 'Title':
 					$this->title = $dat;
 					break;
+				case 'Timestamp':
+					$this->timestamp = $dat;
+					break;
 				case 'IP':
 					$this->ip = $dat;
 					break;
@@ -186,8 +190,9 @@ class Pingback extends Trackback {
 			$fs->mkdir_rec(dirname($path));
 		}
 		$data = "Target: ".$this->target."\n".
-		        "Source: ".$this->target."\n".
+		        "Source: ".$this->source."\n".
 		        "Date: ".$this->ping_date."\n".
+		        "Timestamp: ".$this->timestamp."\n".
 		        "IP: ".$this->ip."\n".
 		        "Title: ".$this->title."\n".
 		        $this->excerpt;
@@ -225,6 +230,7 @@ class Pingback extends Trackback {
 		$tpl->set("PB_PERMALINK", $this->permalink());
 		$tpl->set("PB_ANCHOR", $this->getAnchor());
 		$tpl->set("PB_DATE", $this->ping_date);
+		$tpl->set("PB_TIMESTAMP", $this->timestamp);
 		$tpl->set("PB_IP", $this->ip);
 		$tpl->set("PB_TITLE", $this->title);
 		$tpl->set("PB_EXCERPT", $this->excerpt);

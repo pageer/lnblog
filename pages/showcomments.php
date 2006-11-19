@@ -53,7 +53,7 @@ if (! GET('post')) {
 	$content = $ent->getComments();
 	# Extra styles to add.  Build the list as we go to keep from including more
 	# style sheets than we need to.
-	$PAGE->addStylesheet("comment.css");
+	$PAGE->addStylesheet("reply.css");
 } elseif (! $ent->allow_comment) {
 	$content = '<p>'._('Comments are closed on this entry.').'</p>';
 }

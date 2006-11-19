@@ -268,6 +268,10 @@ class Trackback extends LnBlogObject {
 		          "<error>".$err_code."</error>\n";
 		if ($error != '') $output .= "<message>$error</message>\n";
 		$output .= "</response>\n";
+		ob_start();
+		print_r($this);
+		$output .= ob_get_contents();
+		ob_end_clean();
 
 		$this->raiseEvent("ReceiveComplete");
 		return $output;

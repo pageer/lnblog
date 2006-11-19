@@ -9,6 +9,11 @@ Format: 1.35
 # Footer: [text]
 # If you want to add a copyright notice, this would be the place to do it.
 
+# These are indexes you deleted, so Natural Docs will not add them again
+# unless you remove them from this line.
+
+Don't Index: Variables
+
 
 # --------------------------------------------------------------------------
 # 
@@ -32,93 +37,110 @@ Format: 1.35
 
 Group: User Documentation  {
 
-   File: Overview and Setup  (docs\overview.txt)
-   File: Feature List  (docs\features.txt)
-   File: To do list  (docs\todo.txt)
-   File: Translations  (docs\translations.txt)
-   File: Using Plugins  (docs\plugins.txt)
-   File: User Profiles  (docs\userprofiles.txt)
-   File: LBCode Markup  (docs\lbcode.txt)
+   File: Overview and Setup  (docs/overview.txt)
+   File: Feature List  (docs/features.txt)
+   File: To do list  (docs/todo.txt)
+   File: Translations  (docs/translations.txt)
+   File: Using Plugins  (docs/plugins.txt)
+   File: User Profiles  (docs/userprofiles.txt)
+   File: LBCode Markup  (docs/lbcode.txt)
+   File: system.ini  (docs/systemini.txt)
    }  # Group: User Documentation
 
 Group: Configuration  {
 
-   File: blogconfig.php  (blogconfig.php)
-   File: constants.php  (lib\constants.php)
-   File: fsconfig.php  (docs\fsconfig.txt)
-   File: pathconfig.php  (docs\pathconfig.txt)
-   File: userconfig.cfg  (docs\userconfig.txt)
-   File: userconfig.php  (docs\userconfigphp.txt)
+   File: blogconfig.php  (no auto-title, blogconfig.php)
+   File: constants.php  (lib/constants.php)
+   File: fsconfig.php  (docs/fsconfig.txt)
+   File: pathconfig.php  (docs/pathconfig.txt)
+   File: userconfig.cfg  (docs/userconfig.txt)
+   File: userconfig.php  (docs/userconfigphp.txt)
    }  # Group: Configuration
 
 Group: Libraries  {
 
-   File: Article  (lib\article.php)
-   File: Blog  (lib\blog.php)
-   File: BlogComment  (lib\blogcomment.php)
-   File: BlogEntry  (lib\blogentry.php)
-   File: Creator Functions  (no auto-title, lib\creators.php)
-   File: disabled\lbcode.php  (lib\disabled\lbcode.php)
-   File: Draft  (lib\draft.php)
-   File: Entry  (lib\entry.php)
-   File: EventRegister  (lib\eventregister.php)
-   File: FS  (lib\fs.php)
-   File: IniParser  (lib\iniparser.php)
-   File: Internationalization  (no auto-title, lib\i18n.php)
-   File: LnBlogObject  (lib\lnblogobject.php)
-   File: Page  (lib\page.php)
-   File: PHPTemplate  (lib\template.php)
-   File: Plugin  (lib\plugin.php)
-   File: PluginManager  (lib\pluginmanager.php)
-   File: Trackback  (lib\tb.php)
-   File: User  (lib\user.php)
-   File: Utilities  (lib\utils.php)
+   File: Article  (lib/article.php)
+   File: Blog  (lib/blog.php)
+   File: BlogComment  (lib/blogcomment.php)
+   File: BlogEntry  (lib/blogentry.php)
+   File: Creator Functions  (no auto-title, lib/creators.php)
+   File: Entry  (lib/entry.php)
+   File: EventRegister  (lib/eventregister.php)
+   File: FileUpload  (lib/upload.php)
+   File: FS  (lib/fs.php)
+   File: IniParser  (lib/iniparser.php)
+   File: Internationalization  (no auto-title, lib/i18n.php)
+   File: LnBlogObject  (lib/lnblogobject.php)
+   File: Page  (lib/page.php)
+   File: PHPTemplate  (lib/template.php)
+   File: Pingback  (lib/pb.php)
+   File: Plugin  (lib/plugin.php)
+   File: PluginManager  (lib/pluginmanager.php)
+   File: System  (lib/system.php)
+   File: Trackback  (lib/tb.php)
+   File: User  (lib/user.php)
+   File: Utilities  (lib/utils.php)
    }  # Group: Libraries
 
 Group: Pages  {
 
-   File: delcomment.php  (pages\delcomment.php)
-   File: delentry.php  (pages\delentry.php)
-   File: editarticle.php  (pages\editarticle.php)
-   File: editentry.php  (pages\editentry.php)
-   File: editlogin.php  (pages\editlogin.php)
-   File: fileupload.php  (pages\fileupload.php)
-   File: newarticle.php  (pages\newarticle.php)
-   File: newentry.php  (pages\newentry.php)
-   File: showall.php  (pages\showall.php)
-   File: showarchive.php  (pages\showarchive.php)
-   File: showarticle.php  (pages\showarticle.php)
-   File: showarticles.php  (pages\showarticles.php)
-   File: showblog.php  (pages\showblog.php)
-   File: showcomments.php  (pages\showcomments.php)
-   File: showday.php  (pages\showday.php)
+   File: blogpaths.php  (pages/blogpaths.php)
+   File: delcomment.php  (pages/delcomment.php)
+   File: delentry.php  (pages/delentry.php)
+   File: editentry.php  (pages/editentry.php)
+   File: editlogin.php  (pages/editlogin.php)
+   File: fileupload.php  (pages/fileupload.php)
+   File: newentry.php  (pages/newentry.php)
+   File: pagelib.php  (pages/pagelib.php)
+   File: showall.php  (pages/showall.php)
+   File: showarchive.php  (pages/showarchive.php)
+   File: showarticles.php  (pages/showarticles.php)
+   File: showblog.php  (pages/showblog.php)
+   File: showcomments.php  (pages/showcomments.php)
+   File: showday.php  (pages/showday.php)
+   File: sitemap.php  (pages/editfile.php)
+   File: updateblog.php  (pages/updateblog.php)
    }  # Group: Pages
 
 Group: Administration Pages  {
 
+   File: basic_layout_tpl.php  (themes/default/templates/basic_layout_tpl.php)
+   File: blogger.php  (blogger.php)
+   File: blogger1_test.php  (blogger1_test.php)
    File: bloglogin.php  (bloglogin.php)
    File: bloglogout.php  (bloglogout.php)
-   File: blogpaths.php  (blogpaths.php)
    File: docroot_test.php  (docroot_test.php)
    File: fs_setup.php  (fs_setup.php)
    File: ftproot_test.php  (ftproot_test.php)
    File: index.php  (index.php)
+   File: metaweblog.php  (metaweblog.php)
+   File: metaweblog_test.php  (metaweblog_test.php)
    File: newblog.php  (newblog.php)
    File: newlogin.php  (newlogin.php)
+   File: page_head_tpl.php  (themes/default/templates/page_head_tpl.php)
+   File: pingback.php  (pingback.php)
+   File: pingback_test.php  (pingback_test.php)
    File: plugin_loading.php  (plugin_loading.php)
    File: plugin_setup.php  (plugin_setup.php)
-   File: sitemap.php  (sitemap.php)
-   File: sitemap.php  (editfile.php)
-   File: updateblog.php  (updateblog.php)
    File: userinfo.php  (userinfo.php)
    }  # Group: Administration Pages
 
 Group: Plugins  {
 
-      File: ContentBan  (plugins\content_ban.php)
-      File: IPBan  (plugins\ipban.php)
-      }  # Group: Plugins
-		
+   File: Archives  (plugins/sidebar_archives.php)
+   File: ContentBan  (plugins/content_ban.php)
+   File: DisableComments  (plugins/disable_comment.php)
+   File: HTAccessGenerator  (plugins/htaccess_generator.php)
+   File: IPBan  (plugins/ipban.php)
+   File: MetaData  (plugins/page_metatags.php)
+   File: PageHeader  (plugins/banner_pageheader.php)
+   File: ReplyNotifier  (plugins/reply_notifier.php)
+   File: RSS1FeedGenerator  (plugins/rss1_generator.php)
+   File: RSS2FeedGenerator  (plugins/rss2_generator.php)
+   File: SiteMap  (plugins/menubar_sitemap.php)
+   File: TrackbackValidator  (plugins/trackback_validator.php)
+   }  # Group: Plugins
+
 Group: Index  {
 
    Index: Everything

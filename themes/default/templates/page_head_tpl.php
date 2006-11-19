@@ -7,7 +7,10 @@
 #
 # The file also has code to reference stylesheets and scripts, both as linked
 # files and as inline text.  There is also code to add links for RSS feeds (as
-# opposed to general link elements).
+# opposed to general link elements).  Note that all this data is passed to the
+# template through the global <Page> object, which in turn gets if from 
+# individual page scripts and plugins.  Nothing but the structural HTML is 
+# hard-coded in this file.
 #
 # Unless, for some reason, you need to make changes to the basic structure of 
 # the page head, you should not need to modify this file.  The structure of the 

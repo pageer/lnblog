@@ -49,15 +49,15 @@ $PAGE->addStylesheet(is_a($ent, "Article")?"article.css":"blogentry.css");
 # Add TrackBacks for current entry.
 $tmp_content = $ent->getTrackbacks();
 $content .= $tmp_content;
-if ($tmp_content) $PAGE->addStylesheet("trackback.css");
+#if ($tmp_content) $PAGE->addStylesheet("trackback.css");
 # Now add the Pingbacks.
 $tmp_content = $ent->getPingbacks();
 $content .= $tmp_content;
-if ($tmp_content) $PAGE->addStylesheet("pingback.css");
+#if ($tmp_content) $PAGE->addStylesheet("pingback.css");
 # Now add the comments.
 $tmp_content = $ent->getComments();
 $content .= $tmp_content;
-if ($tmp_content) $PAGE->addStylesheet("comment.css");
+#if ($tmp_content) $PAGE->addStylesheet("comment.css");
 
 # Add comment form if applicable.
 $content .= $comm_output;
@@ -68,5 +68,6 @@ if ($ent->allow_pingback) {
 	                     'href'=>INSTALL_ROOT_URL."pingback.php"));
 }
 $PAGE->addScript("entry.js");
+$PAGE->addStylesheet("reply.css");
 $PAGE->display($content, &$blog);
 ?>

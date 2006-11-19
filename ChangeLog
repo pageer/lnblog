@@ -1,7 +1,36 @@
-22-Jul-2006
+23-Aug-2006: version 0.8.0 "No Need for TrackBack"
+- Added some events and documentation to FileUpload class.
+- Hacked file editing to make podcasts work when uploading file with post.
+- Added a BUGS file listing known problems.
+
+22-Aug-2006:
+- Fixed *more* Pingback and TrackBack bugs.  Everything finally seems to be 
+working now.
+- Fixed error on updating un-sticky articles.
+- Fixed up some broken templates.
+- Fixed displaying empty subjects in recentcomments plugin.
+
+20-Aug-2006:
+- Alphabetize topics in entry editor.
+- Added system.ini option to put the entry editor below the textarea.  Default 
+is now to put it on top.
+- Fixed problems sending pingback to non-absolute local URLs in LBCode.
+- Consolidated sitemap.php into editfile.php.
+- Fixed bad topic links.
+
+17-Aug-2006:
+- Fixed incorrect Pingback URI recording.
+- Fixed bad redirects after moving file edit page.
+- Added option to send pingbacks when posting entry.
+
+03-Aug02006:
+- More code cleanup, including fixing up the URL generation code in many places.
+- Added option to show months and years in the archive page.
+
+22-Jul-2006:
 - Major cleanup of the entry edit template and editor, including lots of new 
 unobtrusive JavaScript code.
-- Added a plugin to validat TrackBack pings.  Works like Pingback, checking that
+- Added a plugin to validate TrackBack pings.  Works like Pingback, checking that
 the pinging page actually links to the pinged page.  Note that this is not 
 mentioned in the TrackBack specification, but is not incompatible with it.
 

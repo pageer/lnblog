@@ -36,7 +36,7 @@ if ( GET("delete") ) {
 	}
 }
 $PAGE->title = $ent->subject . " - " . $blg->name;
-#$PAGE->addStylesheet("pingback.css");
+$PAGE->addStylesheet("reply.css");
 $body = $ent->getPingbacks();
 if (! $body) $body = '<p>'.
 	spf_('There are no pingbacks for <a href="%s">\'%s\'</a>',

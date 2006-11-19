@@ -1,0 +1,36 @@
+/* This file defines the various global styles of all pages, including things
+   like the link styles, the style of the page banner and sidebar, 
+*/
+
+a {
+	text-decoration: none;
+}
+
+a:link {	
+	color: blue;
+}
+
+a:visited {
+	color: #8B008B;
+}
+
+a:hover {
+	text-decoration: underline;
+	color: red;
+}
+
+q { 
+	font-style: italic; 
+}
+
+
+
+@media print {
+
+	a:link,
+	a:visited {
+		color: black;
+		text-decoration: underline;
+	}
+
+}

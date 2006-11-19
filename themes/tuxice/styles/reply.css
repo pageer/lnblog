@@ -1,0 +1,44 @@
+/* Styles for comments. */
+
+#entrycomments {
+	margin-top: 1%;
+}
+
+
+.fullcomment {
+	border-bottom: thin dotted black;
+}
+
+.commentheader h3, .commentfooter ul {
+	padding: 0px;
+	margin: 0px;
+}
+
+.commentfooter {
+	font-size: 80%;
+}
+
+.commentfooter li {
+	list-style-type: none;
+}
+
+.commentdata {
+	padding: 1%;
+}
+
+.commentfooter li.commenturl, .commentfooter li.commentname {
+	display: inline;
+	margin-right: 1%;
+}
+
+/* TrackBack styles */
+.tblist {
+	background: white;
+	border: 1px solid black;
+}
+
+@media print {
+	.fullcomment {
+		page-break-inside: avoid;
+	}
+}

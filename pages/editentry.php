@@ -22,13 +22,7 @@
 # Used to edit existing blog entries and articles.
 # To create a new blog entry, refer to the <newentry.php> file.
 #
-# When editing entries, it is possible to include a file upload in the POST.
-# The number of uploads is determined by the AllowInitUpload variable 
-# in the entryconfig section of your LnBlog/userdata/system.ini.  The default
-# setting is 1.  To disable file uploads when creating or editing posts, set 
-# this variable to 0.
-#
-# This is included by the new.php wrapper script for blogs.
+# This page functions in largely the same way as the 
 
 session_start();
 require_once("config.php");
@@ -48,7 +42,9 @@ $is_art = is_a($ent, 'Article');
 $tpl = NewTemplate(ENTRY_EDIT_TEMPLATE);
 entry_set_template($tpl, $ent);
 $tpl->set("ALLOW_ENCLOSURE", $blg->allow_enclosure);
+sort($blg->tag_list);
 $tpl->set("BLOG_TAGS", $blg->tag_list);
+$tpl->set("SEND_PINGBACKS", $blg->auto_pingback);
 $tpl->set("FORM_ACTION", make_uri(false,false,false) );
 $blg->exportVars($tpl);
 
@@ -73,9 +69,9 @@ if (POST('submit')) {
 					$err = _("Upload errors:")."<br />".
 					       implode("\n<br />", $messages);
 				}
-			
+
 				# Check for pingback-enabled links and send them pings.
-				if ($ret && $blg->auto_pingback) {
+				if ($ret && POST("send_pingbacks")) {
 					$err = handle_pingback_pings($ent);
 					if ($err) $ret = false;
 				}

@@ -32,8 +32,10 @@
 # Note that this should really be a factory class, but PHP 4 doesn't allow 
 # static methods, so it's more convenient just to make them functions.
 
-require_once("blogconfig.php");
-
+#echo "Including creators.php...\n";
+#echo "Included Files:\n";
+#$x=get_included_files();
+#var_dump($x);
 # Function: NewFS
 # Creates a new filesystem access object.
 function NewFS() {

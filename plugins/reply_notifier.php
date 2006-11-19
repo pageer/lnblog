@@ -58,6 +58,7 @@ class ReplyNotifier extends Plugin {
 		        spf_("Name: %s\n", $param->name).
 		        spf_("E-mail: %s\n", $param->email).
 		        spf_("URL: %s\n", $param->url).
+		        spf_("IP address: %s\n", $param->ip).
 		        spf_("Subject: %s\n\n", $param->subject).
 		        $param->data;
 
@@ -71,7 +72,7 @@ class ReplyNotifier extends Plugin {
 		$parent = $param->getParent();
 
 		$subject = spf_("Trackback on %s", $parent->subject);
-		$data = _("A new trackback ping has been received.\n").
+		$data = _("A new TrackBack ping has been received.\n").
 		        spf_("The URL for this ping is: %s\n\n", $param->uri("trackback")).
 		        spf_("Date received: %s\n", $param->ping_date).
 		        spf_("IP address: %s\n", $param->ip).

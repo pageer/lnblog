@@ -297,6 +297,8 @@ class BlogEntry extends Entry {
 				$ret['type'] = mime_content_type($path);
 			} else {
 				# No fileinfo, no mime_magic, so revert to file extension matching.
+				# This is a dirty and incomplete method, but I suppose it's better
+				# than nothing.  But only marginally.
 				$dotpos = strrpos($path, '.');
 				$ext = strtolower(substr($path, $dotpos));
 				$type = 'application/octet-stream';
@@ -440,6 +442,20 @@ class BlogEntry extends Entry {
 	*/
 	function uri($type) {
 		$dir_uri = localpath_to_uri($this->localpath());
+		
+		$qs_arr = array();
+		
+		if (func_num_args() > 1) {
+			$num_args = func_num_args();
+			for ($i = 2; $i < $num_args; $i++) {
+				$var = func_get_arg($i);
+				$arr = explode("=", $var, 2);
+				if (count($arr) == 2) {
+					$qs_arr[$arr[0]] = $arr[1];
+				}
+			}
+		}
+		
 		switch ($type) {
 			case "permalink":
 			case "entry":
@@ -464,6 +480,8 @@ class BlogEntry extends Entry {
 			case "upload":      return $dir_uri."uploadfile.php";
 			case "edit":
 				$entry_type = is_a($this, 'Article') ? 'article' : 'entry';
+				$qs_arr['blog'] = $this->parentID();
+				$qs_arr[$entry_type] = $this->entryID();
 				return make_uri(INSTALL_ROOT_URL."pages/editentry.php", 
 				                array("blog"     =>$this->parentID(), 
 				                      $entry_type=>$this->entryID()));
@@ -472,9 +490,9 @@ class BlogEntry extends Entry {
 					return $dir_uri."delete.php";
 				} else {
 					$entry_type = is_a($this, 'Article') ? 'article' : 'entry';
-					return make_uri(INSTALL_ROOT_URL."pages/delentry.php", 
-					                array("blog"     =>$this->parentID(), 
-					                      $entry_type=>$this->entryID()));
+					$qs_arr['blog'] = $this->parentID();
+					$qs_arr[$entry_type] = $this->entryID();
+					return make_uri(INSTALL_ROOT_URL."pages/delentry.php", $qs_arr);
 				}
 			case "comment":     return $dir_uri.ENTRY_COMMENT_DIR."/";
 			case "commentpage": return $dir_uri.ENTRY_COMMENT_DIR."/index.php";
@@ -520,11 +538,11 @@ class BlogEntry extends Entry {
 		# create these wrappers.
 		if ($this->allow_comment && 
 		    ! is_dir($dir_path.PATH_DELIM.ENTRY_COMMENT_DIR) ) {
-			create_directory_wrappers($dir_path.PATH_DELIM.ENTRY_COMMENT_DIR, ENTRY_COMMENTS);
+			create_directory_wrappers($dir_path.PATH_DELIM.ENTRY_COMMENT_DIR, ENTRY_COMMENTS, get_class($this));
 		}
 		if ($this->allow_tb &&
 		    ! is_dir($dir_path.PATH_DELIM.ENTRY_TRACKBACK_DIR) ) {
-			create_directory_wrappers($dir_path.PATH_DELIM.ENTRY_TRACKBACK_DIR, ENTRY_TRACKBACKS);
+			create_directory_wrappers($dir_path.PATH_DELIM.ENTRY_TRACKBACK_DIR, ENTRY_TRACKBACKS, get_class($this));
 		}
 
 		if (! $ret) {
@@ -1089,9 +1107,10 @@ class BlogEntry extends Entry {
 	function sendPings($local=false) {
 		
 		$urls = $this->extractLinks($local);
+
 		$ping = NewPingback();
 		$ret = array();
-		
+
 		foreach ($urls as $uri) {
 			
 			$pb_server = $ping->checkPingbackEnabled($uri);
@@ -1130,6 +1149,7 @@ class BlogEntry extends Entry {
 	
 	function pingExists ($uri) {
 		$pings = $this->getPingbackArray();
+		if (! $pings) return false;
 		foreach ($pings as $p) {
 			if ($p->source == $uri) return true;
 		}
@@ -1149,21 +1169,18 @@ class BlogEntry extends Entry {
 	
 	function extractLinks($allow_local=false) {
 		$matches = array();
-		if ($this->has_html == MARKUP_BBCODE) {
-			$ret = preg_match_all('/\[url=([^\]]+)\]/i', $this->data, $matches);
-		} elseif ($this->has_html == MARKUP_HTML) {
-			$ret = preg_match_all('/href="([^"])+"/i', $this->data, $matches);
-		} else {
-			$ret = preg_match_all('/((http|https|ftp):\/\/\S*)/i', $this->data, $matches);
-		}
-		
-		$url_matches = $matches[1];
+		$data = $this->markup();
+
+		$ret = preg_match_all('/href="([^"]+)"/i', $data, $matches);
+
+		$url_matches = $matches[1];  # Grab only the saved subexpression.
 		$ret = array();
-		
+
 		foreach ($url_matches as $m) {
 			if ($allow_local) {
 				$ret[] = $m;
 			} else {
+				# If we're NOT allowing local pings, filter them out.
 				$url = parse_url($m);
 				if (isset($url['host']) && $url['host'] != SERVER("SERVER_NAME")) {
 					$ret[] = $m;

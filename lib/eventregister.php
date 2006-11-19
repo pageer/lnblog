@@ -146,7 +146,10 @@ class EventRegister {
 			}
 		}							
 		$mtype = $static ? 'static' : 'instance';
-		$this->event_list[$rclass][$ename][$cclass][$mtype][] = $handler;
+		# Don't register the same event handler more than once.
+		if (! in_array($handler, $this->event_list[$rclass][$ename][$cclass][$mtype]) ) {
+			$this->event_list[$rclass][$ename][$cclass][$mtype][] = $handler;
+		}
 		return true;
 	}
 

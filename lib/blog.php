@@ -439,10 +439,11 @@ class Blog extends LnBlogObject {
 	/*
 	Method: getRecentMonthList
 	Get a list of recent months, starting from the current month and going
-	backward.  This is essentially a wrapper around	<getMonthList>.
+	backward.  This is essentially a wrapper around <getMonthList>.
 
 	Parameters:
 	nummonths - *Optional* number of months to return.  The default is 12.
+	            If set to zero or less, then all months will be retreived.
 	
 	Returns:
 	An array of the most recent months in the same format used by 
@@ -457,7 +458,7 @@ class Blog extends LnBlogObject {
 			$month_list = $this->getMonthList($year["year"]);
 			foreach ($month_list as $month) {
 				$ret[] = $month;
-				if (++$count >= $nummonths) break 2;
+				if ($nummonths > 0 && ++$count >= $nummonths) break 2;
 			}
 		}
 		return $ret;
@@ -496,9 +497,9 @@ class Blog extends LnBlogObject {
 		$qs_arr = array('blog'=>$this->blogid);
 		$qs_uri = make_uri(INSTALL_ROOT_URL."pages/showblog.php", $qs_arr);
 
-		if (func_num_args() > 1) {
-			$num_args = func_num_args();
-			for ($i = 2; $i < $num_args; $i++) {
+		$num_args = func_num_args();
+		if ($num_args > 1) {
+			for ($i = 1; $i < $num_args; $i++) {
 				$var = func_get_arg($i);
 				$arr = explode("=", $var, 2);
 				if (count($arr) == 2) {
@@ -524,11 +525,17 @@ class Blog extends LnBlogObject {
 					return '';
 				elseif (URI_TYPE == 'htaccess') return '';
 				else return $dir_uri.BLOG_ENTRY_PATH."/all.php";
+				#else return $dir_uri.BLOG_ENTRY_PATH."/".func_get_arg(2)."/";
 			case 'listall':
 				if (URI_TYPE == 'querystring')
 					return make_uri(INSTALL_ROOT_URL."pages/showall.php",$qs_arr);
 				elseif (URI_TYPE == 'htaccess') return '';
 				else return $dir_uri.BLOG_ENTRY_PATH."/all.php";
+			case 'archives':
+				if (URI_TYPE == 'querystring')
+					return make_uri(INSTALL_ROOT_URL."pages/showarchive.php", $qs_arr);
+				else 
+					return $dir_uri.BLOG_ENTRY_PATH."/";
 			case 'showday':
 				if (URI_TYPE == 'querystring')
 					return make_uri(INSTALL_ROOT_URL."pages/showday.php",
@@ -540,10 +547,7 @@ class Blog extends LnBlogObject {
 				else return make_uri($dir_uri.BLOG_ENTRY_PATH."/day.php",
 				                     array('day'=>func_get_arg(2)));
 			case "addentry":
-				if (URI_TYPE == "querystring") 	
-					return make_uri(INSTALL_ROOT_URL."pages/newentry.php", $qs_arr);
-				elseif (URI_TYPE == "htaccess") return '';
-				else return $dir_uri."new.php";
+				return make_uri(INSTALL_ROOT_URL."pages/newentry.php", $qs_arr);
 			case "addarticle":
 				$qs_arr['type'] = 'article';
 				return make_uri(INSTALL_ROOT_URL.'pages/newentry.php',$qs_arr);
@@ -578,7 +582,7 @@ class Blog extends LnBlogObject {
 			case "tags":
 				if (URI_TYPE == 'querystring')
 					return make_uri(INSTALL_ROOT_URL.'pages/tagsearch.php', $qs_arr);
-				return make_uri($dir_uri.'tags.php');
+				return make_uri($dir_uri.'tags.php', $qs_arr);
 		}
 		return $dir_uri;
 	}

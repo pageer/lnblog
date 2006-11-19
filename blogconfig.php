@@ -30,7 +30,9 @@ define("PATH_DELIM", strtoupper(substr(PHP_OS,0,3)=='WIN')?'\\':'/');
 # A string with each of the arguments separated by PATH_DELIM.
 function mkpath() {
 	$args = func_get_args();
-	return implode(PATH_DELIM, $args);
+	$ret = implode(PATH_DELIM, $args);
+	$ret = str_replace(PATH_DELIM.PATH_DELIM, PATH_DELIM, $ret);
+	return $ret;
 }
 
 # Function: get_blog_path
@@ -48,7 +50,7 @@ function get_blog_path() {
 			$path = str_replace("/", PATH_DELIM, $path);
 		}
 		$path = preg_replace("/[^\w|"."\\".PATH_DELIM."]/", "", $path);
-		return DOCUMENT_ROOT.PATH_DELIM.$path;
+		return mkpath(DOCUMENT_ROOT, $path);
 	} else {
 		return false;
 	}
@@ -208,7 +210,7 @@ define("PACKAGE_NAME", "LnBlog");
 # Constant: PACKAGE_VERSION
 # The version number of the software.  This is a string in the format 
 # "1.2.3".  Note that each number may be more than one digit.
-define("PACKAGE_VERSION", "0.7.3");
+define("PACKAGE_VERSION", "0.8.0");
 
 # Constant: PACKAGE_URL
 # The full URL of the LnBlog project home page.
@@ -217,7 +219,6 @@ define("PACKAGE_URL", "http://www.skepticats.com/lnblog/");
 # Add I18N support here, as this is currently the earliest we can do it.
 # Refer to the lib/i18n.php file for details.
 require_once("lib/i18n.php");
-
 # Constant: PACKAGE_DESCRIPTION
 # The offical text-blurb description of the software.
 define("PACKAGE_DESCRIPTION", spf_("%s: a simple and (hopefully) elegant weblog", PACKAGE_NAME));
@@ -744,8 +745,13 @@ if (is_dir(USER_DATA_PATH.PATH_DELIM.$theme_templates)) {
 # when a template doesn't exist in a theme.
 $inc_path .= PATH_SEPARATOR.mkpath(INSTALL_ROOT,"themes","default","templates");
 
-# Finally, we actuall set the include_path.
+# Finally, we actually set the include_path.
 ini_set('include_path', $inc_path);
+
+# Include the library of wrapper functions, which will be used to actually 
+# create objects by including the right file at the right time.
+# This is for parsimony of includes.
+require_once("lib/creators.php");
 
 # Now that everything is initialized, we can create the global event register
 # and plugin manager and create a top-level page for handling output..

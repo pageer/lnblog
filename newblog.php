@@ -30,6 +30,7 @@
 session_start();
 require_once("blogconfig.php");
 require_once("lib/creators.php");
+require_once("pages/pagelib.php");
 
 global $PAGE;
 

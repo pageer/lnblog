@@ -21,9 +21,11 @@
 # File: Utilities
 # Utility library.  Implements some general purpose functions plus some
 # wrappers that implement functionality available in PHP 5.
-
-require_once("lib/creators.php");
-
+#echo "Including utils.php...\n";
+#echo "Included Files:\n";
+#$x=get_included_files();
+#print_r($x);
+#echo "Include path: ".get_include_path()."\n";
 
 # Types of directories to create.
 define("BLOG_BASE", 0);
@@ -589,15 +591,15 @@ function create_directory_wrappers($path, $type, $instpath="") {
 			break;
 		case ENTRY_COMMENTS:
 			$filelist = array("index"=>"pages/showcomments", "delete"=>"pages/delcomment");
-			$config_level = 5;
+			$config_level = strtolower($instpath) == 'article' ? 3 : 5;
 			break;
 		case ENTRY_TRACKBACKS:
 			$filelist = array("index"=>"pages/showtrackbacks");
-			$config_level = 5;
+			$config_level = strtolower($instpath) == 'article' ? 3 : 5;
 			break;
 		case ENTRY_PINGBACKS:
 			$filelist = array("index"=>"pages/showpingbacks");
-			$config_level = 5;
+			$config_level = strtolower($instpath) == 'article' ? 3 : 5;
 			break;
 		case ARTICLE_BASE:
 			# The same as for entries, but for some reason, I never added a delete.

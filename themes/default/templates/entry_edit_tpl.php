@@ -45,9 +45,6 @@ if (isset($URL)) { ?>value="<?php echo $URL; ?>" <?php } ?>/>
 if (isset($URL)) { ?>value="<?php echo $URL; ?>" <?php } ?>/>
 </div>
 <?php } ?>
-<div>
-<textarea id="body" name="body" accesskey="d" rows="18" cols="40"><?php if (isset($DATA)) echo $DATA; ?></textarea>
-</div>
 <?php 
 global $EVENT_REGISTER;
 global $SYSTEM;
@@ -55,11 +52,22 @@ global $SYSTEM;
 if ($EVENT_REGISTER->hasHandlers("posteditor", "ShowControls")) {
 	$EVENT_REGISTER->activateEventFull($tmp=false, "posteditor", "ShowControls");
 } else {
+	$use_js_editor = true;
+}
+if (isset($use_js_editor) && ! $SYSTEM->sys_ini->value('entryconfig', 'EditorOnBottom', 0)) {
+	include("js_editor.php");
+}
+?>
+<div>
+<textarea id="body" name="body" accesskey="d" rows="18" cols="40"><?php if (isset($DATA)) echo $DATA; ?></textarea>
+</div>
+<?php
+if (isset($use_js_editor) && $SYSTEM->sys_ini->value('entryconfig', 'EditorOnBottom', 0)) {
 	include("js_editor.php");
 }
 ?>
 <fieldset id="entry_settings">
-<legend>Entry settings<a href="#dummy">(-)</a></legend>
+<legend><?php p_("Entry settings");?><a href="#dummy">(-)</a></legend>
 <?php
 $num_uploads = $SYSTEM->sys_ini->value("entryconfig", "AllowInitUpload", 1);
 for ($i=1; $i<=$num_uploads; $i++) { ?>
@@ -68,7 +76,7 @@ for ($i=1; $i<=$num_uploads; $i++) { ?>
 <input type="file" name="upload<?php echo $i;?>" id="upload<?php echo $i;?>" />
 </div>
 <?php } # End upload for
-if ($ALLOW_ENCLOSURE || ! empty($ENCLOSURE)) { ?>
+if ($ALLOW_ENCLOSURE || ! empty($ENCLOSURE)) { /* Add optional enclosure box.*/?>
 <div>
 <label for="enclosure" title="<?php 
 p_('Enter the URL of the MP3 or other media file for this post.  If you are uploading the file to this post, you can enter just the filename.');
@@ -78,7 +86,7 @@ p_('Enter the URL of the MP3 or other media file for this post.  If you are uplo
 ?>" value="<?php if (isset($ENCLOSURE)) echo $ENCLOSURE;?>" />
 </div>
 <?php } # End enclosure
-if (isset($STICKY)) { ?>
+if (isset($STICKY)) { /* Checkbox to make articles "sticky". */ ?>
 <div>
 <label for="sticky"><?php p_("Make sticky (show in sidebar)"); ?></label>
 <input id="sticky" name="sticky" type="checkbox" <?php if ($STICKY) { ?> checked="checked" <?php } ?> />
@@ -96,18 +104,23 @@ echo ' selected="selected"';}?>><?php p_("HTML");?></option>
 </select>
 </div>
 <div>
-<label for="comments">Allow comments</label>
+<label for="comments"><?php p_("Allow comments");?></label>
 <input id="comments" name="comments" type="checkbox" <?php if (! (isset($COMMENTS) && !$COMMENTS) ) { 
 ?>checked="checked"<?php } ?> />
 </div>
 <div>
-<label for="trackbacks">Allow trackbacks</label>
+<label for="trackbacks"><?php p_("Allow TrackBacks");?></label>
 <input id="trackbacks" name="trackbacks" type="checkbox" <?php if (! (isset($TRACKBACKS) && !$TRACKBACKS) ) { 
 ?>checked="checked"<?php } ?> />
 </div>
 <div>
-<label for="pingbacks">Allow pingbacks</label>
+<label for="pingbacks"><?php p_("Allow Pingbacks");?></label>
 <input id="pingbacks" name="pingbacks" type="checkbox" <?php if (! (isset($PINGBACKS) && !$PINGBACKS) ) { 
+?>checked="checked"<?php } ?> />
+</div>
+<div>
+<label for="send_pingbacks"><?php p_("Send Pingbacks after posting");?></label>
+<input id="send_pingbacks" name="send_pingbacks" type="checkbox" <?php if (! (isset($SEND_PINGBACKS) && !$SEND_PINGBACKS) ) { 
 ?>checked="checked"<?php } ?> />
 </div>
 </fieldset>

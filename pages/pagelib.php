@@ -38,6 +38,11 @@ function handle_comment(&$ent, $use_comm_link=false) {
 		$comm_tpl->set("COMMENT_SHOWEMAIL", COOKIE('comment_showemail'));
 	$comm_tpl->set("FORM_TARGET", $ent->uri("basepage"));
 	
+	if ($ent->getCommentCount() == 0) {
+		$comm_tpl->set("PARENT_TITLE", $ent->subject);
+		$comm_tpl->set("PARENT_URL", $ent->permalink());
+	}
+	
 	if (has_post()) {
 		
 		$cmt = NewBlogComment();
@@ -121,6 +126,13 @@ function handle_uploads(&$ent) {
 	if ($err) {
 		return $err;
 	} else {
+		# This event is raised here as sort of a hack.  The idea is that some
+		# plugins will need information on uploaded files, but can only get that 
+		# when an event is raised by the entry.
+		# In particular, this intended to regenerate the RSS2 feed after uploading
+		# a file from the edit form, so that the enclosure information will be 
+		# set correctly.
+		$ent->raiseEvent("UpdateComplete");
 		return true;
 	}
 }

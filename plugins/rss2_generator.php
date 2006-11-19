@@ -213,13 +213,17 @@ class RSS2FeedGenerator extends Plugin {
 			$feed->entrylist[] = new RSS2Entry($ent->permalink(), 
 				$ent->subject, 
 				"<![CDATA[".$ent->markup($ent->data)."]]>",
-				"", $ent->peramalink());
+				"", $ent->permalink());
 		
 		$ret = $feed->writeFile($path);	
 		return $ret;
 	}
 
-	function updateBlogRSS2 ($entry) {
+	function checkEnclosure(&$entry) {
+
+	}
+
+	function updateBlogRSS2 (&$entry) {
 
 		$usr = NewUser();
 		$feed = new RSS2();
@@ -232,6 +236,13 @@ class RSS2FeedGenerator extends Plugin {
 		$feed->image = $blog->image;
 		$feed->description = $blog->description;
 		$feed->title = $blog->name;
+
+		#$enclosure_data = $entry->getEnclosure();
+		#echo $entry->enclosure;
+		#print_r($enclosure_data);
+		#if ($entry->enclosure && ! $enclosure_data) {
+		#	$this->registerEventHandler("fileupload", "MoveComplete", "UpdateBlogRSS2");
+		#}
 	
 		if (! $blog->entrylist) $blog->getRecent($blog->max_rss);
 		foreach ($blog->entrylist as $ent) {
@@ -239,6 +250,10 @@ class RSS2FeedGenerator extends Plugin {
 			$author_data = $usr->email();
 			if ( $author_data ) $author_data .= " (".$usr->displayName().")";
 			$cmt_count = $ent->getCommentCount();
+
+			# If there's an enclosure, but we can't get it's data, then it might
+			# be a file uploaded with the entry, so set an upload event listener.
+
 			$feed->entrylist[] = new RSS2Entry($ent->permalink(), 
 				$ent->subject, 
 				"<![CDATA[".$ent->markup($ent->data)."]]>", 
@@ -246,7 +261,7 @@ class RSS2FeedGenerator extends Plugin {
 				$ent->uri('base'), 
 				$author_data, $ent->tags(), "", 
 				$cmt_count ? $ent->commentlink().$this->comment_file : "", 
-				$cmt_count, $ent->getEnclosure() );
+				$cmt_count, $ent->getEnclosure());
 		}
 		
 		$ret = $feed->writeFile($path);	
@@ -254,7 +269,7 @@ class RSS2FeedGenerator extends Plugin {
 		else return UPDATE_SUCCESS;
 	}
 
-	function updateBlogRSS2ByEntryTopic ($entry) {
+	function updateBlogRSS2ByEntryTopic (&$entry) {
 
 		$blog = $entry->getParent();
 		$ret = true;
@@ -275,13 +290,20 @@ class RSS2FeedGenerator extends Plugin {
 			$feed->description = $blog->description;
 			$feed->title = $blog->name;
 	
+			# If there's an enclosure, but we can't get it's data, then it might
+			# be a file uploaded with the entry, so set an upload event listener.
+			#$enclosure_data = $entry->getEnclosure();
+			#if ($entry->enclosure && ! $enclosure_data) {
+			#	$this->registerEventHandler("fileupload", "MoveComplete", "UpdateBlogRSS2ByEntryTopic");
+			#}
+
 			if (! $blog->entrylist) $blog->getEntriesByTag(array($tag), $blog->max_rss);
 			foreach ($blog->entrylist as $ent) {
 				$usr = NewUser($ent->uid);
 				$author_data = $usr->email();
 				if ( $author_data ) $author_data .= " (".$usr->displayName().")";
 				$cmt_count = $ent->getCommentCount();
-				$feed->entrylist[] = new RSS2Entry($ent->permalink(), 
+								$feed->entrylist[] = new RSS2Entry($ent->permalink(), 
 						$ent->subject, 
 						"<![CDATA[".$ent->markup($ent->data)."]]>", 
 						$ent->commentlink(),

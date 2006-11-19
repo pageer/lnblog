@@ -19,17 +19,44 @@
 */
 
 # File: newentry.php
-# Used to create a new blog entry.  
+# Used to create a new blog entry or article.  
 # To edit or delete an entry, refer to the <editentry.php> and <delentry.php>
 # files respectively.
 #
-# When creating entries, it is possible to include a file upload in the POST.
-# The number of uploads is determined by the AllowInitUpload variable 
-# in the entryconfig section of your LnBlog/userdata/system.ini.  The default
-# setting is 1.  To disable file uploads when creating or editing posts, set 
-# this variable to 0.
+# The three main input fields on this page are the entry subject, topics, and 
+# the post itself.  When creating new articles, there is also a box for the 
+# article path, which is the directory name in which th article will be stored.
 #
-# This is included by the new.php wrapper script for blogs.
+# The topic box has a drop-down list of topics next to it.  This control uses 
+# JavaScript such that selecting an item from the drop-down will add it to the
+# comma-separated list of entry topics, provided it is not already in the list.
+#
+# The main post body is entered in the textarea.  Input is expected to be in the
+# format given in the entry options below the textarea.  If the input mode is
+# set to LBCode, then some simple editor buttons will be displayed just above 
+# the textarea.  These use JavaScript to insert prompt for text and insert the 
+# appropriate LBCode markup.  There is currently no included HTML post editor,
+# but plugins for both the FCKeditor and TinyMCE JavaScript rich-text HTML 
+# editors are available for download.
+#
+# There are a number of entry options which are initially hidden on the page.
+# These include a file upload box, a podcast/enclosure URL box, a "sticky" 
+# checkbox for articles, the markup mode box, checkboxes to allow posting of
+# comments, TrackBacks, and Pingbacks to the entry, and finally a checkbox 
+# determining whether to send Pingback pings after the entry is posted.  Default
+# settings for most of these options are configured on the <updateblog.php> page.
+#
+# There are a few couple of settings in the <system.ini> file that are relevant 
+# here.  The first is the AllowInitUpload setting, which determines the number 
+# of file upload boxes that appear on the page.  The default setting is 1, but 
+# it can be increased to allow multiple files to be uploaded.  To disable 
+# uploading files from the new entry page, set this to 0.
+#
+# The second setting is AllowLocalPingbacks.  This setting determines whether or
+# not Pingback pings should be sent to URLs on the same server.  This might be
+# desirable as an easy way to back-link references to other entries on your 
+# blog or other blogs on your server.  To disable this and only send pings to 
+# remote servers, set this value to 0.
 
 session_start();
 require_once("config.php");
@@ -51,10 +78,13 @@ if ($is_art) {
 	$tpl->set("STICKY", true);
 	$tpl->set("COMMENTS", false);
 	$tpl->set("TRACKBACKS", false);
+	$tpl->set("PINGBACKS", false);
 }
 $tpl->set("ALLOW_ENCLOSURE", $blg->allow_enclosure);
 $tpl->set("FORM_ACTION", current_file() );
 $tpl->set("HAS_HTML", $blg->default_markup);
+$tpl->set("SEND_PINGBACKS", $blg->auto_pingback);
+sort($blg->tag_list);
 $tpl->set("BLOG_TAGS", $blg->tag_list);
 $blg->exportVars($tpl);
 
@@ -87,7 +117,7 @@ if (POST('submit')) {
 				# Send pingbacks to any relevant links.
 				# Should this go before the uploads or after?
 				# And for that matter, does it even make a difference?
-				if ($ret && $blg->auto_pingback) {
+				if ($ret && POST('send_pingbacks')) {
 					$err = handle_pingback_pings($ent);
 					if ($err) $ret = false;
 				}

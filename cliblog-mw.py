@@ -23,12 +23,199 @@ import xmlrpclib
 import mimetypes
 import base64
 
-version = ('0', '1', '0')
+import xml.dom.minidom
+
+version = ('0', '2', '0')
+package_name = 'cliblog'
+
+class Connection:
+	def __init__(self):
+		self.username = ''
+		self.password = ''
+		self.blog = ''
+		self.uri = ''
+		
+	def __init__(self, profile):
+		self.username = ''
+		self.password = ''
+		self.blog = ''
+		self.uri = ''
+		self.readProfile(profile)
+	
+	def createServer(self, uri = ''):
+		if uri != '':
+			self.uri = uri
+		self.server = xmlrpclib.ServerProxy(self.uri)
+		
+	def readProfile(self, filename):
+		if os.access(filename, os.R_OK):
+			path = filename
+		else:
+			path = os.path.join([os.environ('HOME'), '.' + package_name, filename + '.xml'])
+		domtree = xml.dom.minidom.parse(path)
+		self.uri = document.getElementsByTagName('uri')[0].childNodes[0].data
+		self.username = document.getElementsByTagName('username')[0].childNodes[0].data
+		self.password = document.getElementsByTagName('password')[0].childNodes[0].data
+		blog = document.getElementsByTagName('blog')
+		if blog != []:
+			self.blog = blog
+			
+	def writeProfile(self, name):
+		path = os.path.join([os.environ('HOME'), '.' + package_name)
+		if os.access(path, os.W_OK):
+			
+		else:
+			path = os.environ('HOME')
+		
+		
+
+class BlogEntry:
+	def __init__(self):
+		self.id = ''
+		self.description = ''
+		self.title = ''
+		self.categories = []
+		
+	def __init__(self, struct):
+		self.id = ''
+		self.description = ''
+		self.title = ''
+		self.categories = []
+		self.unserialize(struct)
+
+	def __init__(self, data, title, categories):
+		self.id = ''
+		self.description = data
+		self.title = title
+		self.categories = categories
+
+	def serialize(self):
+		return self.__dict__
+	
+	def unserialize(self, struct):
+		for key, val in struct.items():
+			self.__dict__[key] = val
+		
+	def get(self, conn, id = ''):
+		"""Retrieves the entry data via a metaWeblog.getPost method call."""
+		if id != '':
+			self.id = id
+		ret = conn.server.metaWeblog.getPost(self.id, conn.username, conn.password)
+		self.unserialize(ret)
+
+	def new(self, conn, blog='', publish = True):
+		"""Calls metaWeblog.newPost to create a new blog entry based on the 
+		current object."""
+		if blog != '':
+			conn.blog = blog
+		ret = conn.server.metaWeblog.newPost(conn.blog, conn.username, conn.password, self.serialize(), publish)
+		self.id = ret
+		return ret
+		 
+	def edit(self, conn, publish = True):
+		"""Calls metaWeblog.editPost to change the contents of the current 
+		object on the server.  The content of this object should reflect the 
+		desired new content of the post."""
+		ret = conn.server.metaWeblog.editPost(self.id, conn.username, conn.password, self.serialize(), publish)
+		return ret
+
+	def printPost(self):
+		data = ''
+		for key,val in post.items():
+			if key == 'description':
+				data = val
+			elif type(val) == types.ListType:
+				print key+': '+string.join(val, ',')
+			else:
+				print key+': '+str(val)
+		print data
+
+		
+class Blog:
+	def __init__(self):
+		self.id = ''
+		self.categories = {}
+		self.posts = []
+		
+	def newMediaObject(self, conn, path, name = '', mimetype = ''):
+		hnd = file(infile)
+		data = hnd.read()
+		data = string.strip(base64.encodestring(data))
+		
+		if name == '':
+			name = os.path.basename(hnd.name)
+		
+		hnd.close()
+		
+		if mimetype == '':
+			mimetype,enc = mimetypes.guess_type(infile)
+		
+		request = {'name':name, 'type':mimetype, 'bits':data}
+		ret = conn.server.metaWeblog.newMediaObject(self.id, conn.username, conn.password, request)
+		return ret
+		
+	def newPost(self, conn, post, publish = True):
+		return post.new(conn, self.id, publish)
+
+	def getCategories(self, conn):
+		ret = conn.server.metaWeblog.getVategories(self.id, conn.username, conn.password)
+		self.categories = ret
+		return ret
+		
+	def getRecentPosts(self, conn, numposts):
+		posts = conn.server.metaWeblog.getRecentPosts(self.id, conn.username, conn.password, numposts)
+		ret = []
+		for p in posts:
+			ret.append(BlogEntry(p))
+		return ret
+		
+	def printCategories(self):
+		for key, val in self.categories.items():
+			print 'Category: ' + key
+			for k, v in val.items():
+				print k + ": " + v
+			print ''
+
+			
+def proc_command_line(opts, args):
+	"""Converts the command-line arguments into a dictionary for easy lookup."""
+	ret = {'action':'', 'title':'', 'categories':'', 'description':'', 
+	       'file':'', 'numposts':'', 'id':'', 'profile':'', 
+	       'user':'', 'passwd': '', 'help': False, 'version': False}
+	for o, a in opts:
+		if o in ('-a', '--action'):
+			ret['action'] = a.lower()
+		elif o in ('-t', '--title'):
+			ret['title'] = a
+		elif o in ('-c', '--catgeories'):
+			ret['categories'] = a.split(',')
+		elif o in ('-d', '--description'):
+			ret['description'] = a
+		elif o in ('-f', '--file'):
+			ret['file'] = a
+		elif o in ('-n', '--numposts'):
+			ret['numposts'] = a
+		elif o in ('-i', '--id'):
+			ret['id'] = a
+		elif o in ('-p', '--profile'):
+			ret['profile'] = a
+		elif o in ('-h', '--help'):
+			ret['help'] = True
+		elif o in ('-l', '--login'):
+			ret['user'] = 
+			ret['passwd'] = 
+		elif o in ('-v', '--version'):
+			ret['version'] = True
+	
+	
+#def create_connection(opts, args):
+	
 
 def main():
 	
-	short_args = 'a:t:c:d:f:hn:e:p:v'
-	long_args = ['action=','title=','categories=','description=','file=','help','numposts=','entryid=','profile=','version']
+	short_args = 'a:t:c:d:f:hn:i:p:vl:'
+	long_args = ['action=','title=','categories=','description=','file=','help',
+	             'numposts=','id=','profile=','version','login=']
 	
 	try:
 		opts,args = getopt.getopt(sys.argv[1:], short_args, long_args)
@@ -49,43 +236,9 @@ def main():
 	entid = ''
 	profile = ''
 	
-	for o, a in opts:
-		if o in ('-a', '--action'):
-			if a.lower() in ('newpost','editpost','getpost','getrecentposts','getcategories','newmediaobject'):
-				method = a
-			else:
-				print 'Action '+a+' not recognized.'
-				usage()
-				sys.exit(2)
-
-		elif o in ('-t', '--title'):
-			title = a
-
-		elif o in ('-c', '--catgeories'):
-			cats = a.split(',')
-
-		elif o in ('-d', '--description'):
-			text = a
-
-		elif o in ('-f', '--file'):
-			infile = a
-
-		elif o in ('-n', '--numposts'):
-			numposts = a
-
-		elif o in ('-e', '--entryid'):
-			entid = a
-			
-		elif o in ('-p', '--profile'):
-			profile = a
-
-		elif o in ('-h', '--help'):
-			usage()
-			sys.exit(0)
-
-		elif o in ('-v', '--version'):
-			print string.join(version, '.')
-			sys.exit(0)
+	commands = proc_command_line(opts, args)
+	
+	if 
 			
 	try:
 		if len(args) == 4:
@@ -267,12 +420,6 @@ Options:\n\n\
 -n  --numposts     The number of posts to get when calling the getRecentPosts\n\
                    method.  The default is 5.\n\
 \n\
--e  --entryid      For newMediaObject calls, an optional entry ID to which the \n\
-                   file should be added.  Note that this is not a standard part\n\
-                   of the MetaWeblog API and WILL NOT be implemented by all \n\
-                   blogs.  This is currently supported by LnBlog version 0.7.1\n\
-                   and greater.\n\
-\n\
 -f  --file         The file name used for this request.  If the request uses\n\
                    the newMediaObject method, then this is the file that will\n\
                    be sent to the blog.\n\
@@ -289,8 +436,10 @@ Options:\n\n\
                         Tags: Test,Example\n\
                         Here is the actual content of the post body.\n\
 \n\
--p  --profile      Use given profile file for the connection information.  If\n\
-                   the four\n"
+-l  --login        Set the username and password to log in.  The single \n\
+                   argument is of the form username:password.\n\
+\n\
+-p  --profile      Use given profile file for the connection information.\n"
 
 
 if __name__ == "__main__":

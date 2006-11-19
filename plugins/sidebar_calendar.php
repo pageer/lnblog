@@ -172,10 +172,10 @@ class SidebarCalendar extends Plugin {
 		echo "</table>";
 		echo '<p class="calendar">'.
 		     '<a style="margin-right: 5%" '.
-		     'href="'.$blog->getURL().BLOG_ENTRY_PATH.'/">'._('Archives').'</a> ';
+		     'href="'.$blog->uri('archives').'">'._('Archives').'</a> ';
 		if ($this->show_all) {
 			echo '<a style="margin-left: 5%" '.
-			     'href="'.$blog->getURL().BLOG_ENTRY_PATH.'/all.php">'.
+			     'href="'.$blog->uri('listall').'">'.
 			     _('Show all').'</a>';
 		}
 		echo '</p>';;

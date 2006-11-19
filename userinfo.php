@@ -25,9 +25,8 @@
 # Currently, this is not included in the default interface.
 
 session_start();
-
 require_once("blogconfig.php");
-require_once("lib/creators.php");
+#require_once("lib/creators.php");
 require_once("lib/utils.php");
 
 global $PAGE;

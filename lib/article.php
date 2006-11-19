@@ -89,10 +89,12 @@ class Article extends BlogEntry {
 
 	function setSticky($show=true) {
 		$f = NewFS();
+		
 		if ($show) 
 			$ret = $f->write_file(dirname($this->file).PATH_DELIM.STICKY_PATH, $this->subject);
-		else 
+		elseif (file_exists(dirname($this->file).PATH_DELIM.STICKY_PATH))
 			$ret = $f->delete(dirname($this->file).PATH_DELIM.STICKY_PATH);
+		else $ret = true;
 		$f->destruct();
 		return $ret;
 	}

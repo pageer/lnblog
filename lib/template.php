@@ -57,6 +57,15 @@ class PHPTemplate extends LnBlogObject {
 	function set($var, $val=true) {
 		return $this->vars[$var] = $val;
 	}
+	
+	# Method: unsetVar
+	# Unsets a previously set template variable.
+	#
+	# Parameters:
+	# var - The name of the variable to unset.
+	function unsetVar($var) {
+		unset($this->vars[$var]);
+	}
 
 	# Method: varSet
 	# Determine if a template variable has been set.

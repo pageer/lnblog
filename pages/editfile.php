@@ -79,10 +79,9 @@ if (GET("list")) {
 }
 
 $tpl->set("FORM_ACTION", make_uri(false,false,false));
-if (isset($_GET["list"])) $tpl->set("PAGE_TITLE", "Edit Link List");
-else $tpl->set("PAGE_TITLE", "Edit Text File");
+if (isset($_GET["list"])) $tpl->set("PAGE_TITLE", _("Edit Link List"));
+else $tpl->set("PAGE_TITLE", _("Edit Text File"));
 
-#if (! isset($_POST["file"])) $file = $relpath.PATH_DELIM.$file;
 $file = $relpath.PATH_DELIM.$file;
 
 if (has_post()) {
@@ -95,7 +94,7 @@ if (has_post()) {
 		$tpl->set("ERROR_MESSAGE", 
 		          spf_("Unable to create file %s.", $file));
 		$tpl->set("FILE_TEXT", htmlentities($data));
-	} #else $PAGE->redirect("index.php");
+	}
 	
 } else {
 
@@ -103,8 +102,10 @@ if (has_post()) {
 		$data = implode("", file($file));	
 	} else {
 		$data = "";
-		$tpl->set("EDIT_ERROR", _("Create new file"));
-		$tpl->set("ERROR_MESSAGE", _("The selected file does not exist.  It will be created."));
+		if (! GET('map')) {
+			$tpl->set("EDIT_ERROR", _("Create new file"));
+			$tpl->set("ERROR_MESSAGE", _("The selected file does not exist.  It will be created."));
+		}
 	}
 }
 
@@ -113,6 +114,24 @@ $tpl->set("FILE_PATH", $file);
 $tpl->set("FILE_SIZE", file_exists($file)?filesize($file):0);
 $tpl->set("FILE_URL", localpath_to_uri($file));	
 $tpl->set("FILE", $file);
+
+if (GET('map')) {
+	$tpl->set("SITEMAP_MODE");
+	$tpl->set("FORM_MESSAGE", spf_('This page will help you create a site map 
+to display in the navigation bar at the top of your blog.  This file is stored 
+under the name %s in the root directory of your weblog for a personal sitemap or
+in the %s installation directory for the system default.  This file in simply a 
+series of <abbr title="Hypertext Markup Language">HTML</abbr> links, each on 
+it\'s own line, which the template will process into a list.  If you require a 
+more complicated menu bar, you will have to create a custom template.',
+basename(SITEMAP_FILE), PACKAGE_NAME));
+	$tpl->set("PAGE_TITLE", _("Create site map"));
+	$tpl->unsetVar("FILE_SIZE");
+	$tpl->unsetVar("FILE_URL");
+	$tpl->unsetVar("FILE_PATH");
+	$tpl->unsetVar("FILE");
+	$tpl->unsetVar("FILE_URL");
+}
 
 if (! defined("BLOG_ROOT")) $blog = false;
 

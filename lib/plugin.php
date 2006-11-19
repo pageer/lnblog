@@ -27,7 +27,7 @@
  */
 
 require_once("lib/lnblogobject.php");
-require_once("lib/creators.php");
+#require_once("lib/creators.php");
 
 class Plugin extends LnBlogObject{
 

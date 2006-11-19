@@ -21,6 +21,20 @@
 require_once("lib/utils.php");
 require_once("lib/lnblogobject.php");
 
+# Class: FileUpload
+# Handles file uploads via HTTP POSTs.
+# Handling the upload is a three-step process.  First, you need to create an 
+# instance of the class, passing it the form field name and optional 
+# destination directory and upload array index.  After that, you check if the
+# upload completed successfully, and based on that check, either move the file
+# to the permanent location or emit an error message.
+#
+# Events:
+# OnInit       - Fired when the object is created.
+# InitComplete - Fired after object is initialized.
+# OnMove       - Fired before moving the uploaded file to its destination.
+# MoveComplete - Fired after the file is successfully moved.
+
 class FileUpload extends LnBlogObject {
 	
 	var $field;
@@ -32,6 +46,7 @@ class FileUpload extends LnBlogObject {
 	var $error;
 
 	function FileUpload($field, $dir=false, $index=false) {
+		$this->raiseEvent("OnInit");
 		if (!$dir) $this->destdir = getcwd();
 		else $this->destdir = $dir;
 		$this->field = $field;
@@ -58,7 +73,14 @@ class FileUpload extends LnBlogObject {
 			}
 			$this->error = FILEUPLOAD_NO_ERROR;
 		}
+		$this->raiseEvent("InitComplete");
 	}
+
+	# Method: status
+	# Get a status code for the file upload.
+	#
+	# Returns:
+	# An integer representing the upload status.
 
 	function status() {
 
@@ -96,20 +118,43 @@ class FileUpload extends LnBlogObject {
 		return $ret;
 	}
 
+	# Method: completed
+	# Determines the status of the upload.
+	#
+	# Returns:
+	# True if the file uploaded without error, false otherwise.
+
 	function completed() { 
 		return ($this->status() == FILEUPLOAD_NO_ERROR); 
 	}
 
-	function moveFile() {
+	# Method: moveFile
+	# Moves the file from the upload directory to the permanent location.
+	#
+	# Retruns:
+	# True on success, false otherwise.
 
+	function moveFile() {
+		$this->raiseEvent("OnMove");
 		$tmp_dir = ini_get("upload_tmp_dir");
 		$fs = NewFS();
 		if (is_file($this->tempname)) $tmp_path = $this->tempname;
 		else $tmp_path = $tmp_dir.PATH_DELIM.$this->tempname;
 		$ret = $fs->copy($tmp_path, $this->destdir.PATH_DELIM.$this->destname);
 		$fs->destruct();
+		if ($ret) $this->raiseEvent("MoveComplete");
 		return $ret;
 	}
+
+	# Method: errorMessage
+	# Gets a message associated with the <status> of the upload.
+	#
+	# Parameters:
+	# err - *Optional* status code for which to get the message.  The default is
+	#       to use the error property of the object.
+	#
+	# Returns:
+	# A string containing the appropriate message.
 
 	function errorMessage($err=false) {
 		if (!$err) $err = $this->error;

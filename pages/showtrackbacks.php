@@ -41,7 +41,7 @@ if (! $tb->incomingPing()) {
 		}
 	}
 	$PAGE->title = $ent->subject . " - " . $blg->name;
-	$PAGE->addStylesheet("trackback.css");
+	$PAGE->addStylesheet("reply.css");
 	$body = $ent->getTrackbacks();
 	if (! $body) {
 		$body = '<p>'.

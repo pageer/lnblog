@@ -57,10 +57,10 @@ class TrackbackValidator extends Plugin {
 		# option.
 		if ($this->base_uri && strpos($data, $ent->uri('base')) > 0) {
 			return true;
+		} else {
+			$param->url = '';
+			return false;
 		}
-		
-		$param->url = '';
-		return false;
 	}
 	
 	function fetch_page($url) {

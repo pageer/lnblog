@@ -31,6 +31,8 @@ require_once("lib/creators.php");
 
 global $PAGE;
 
+$list_months = false;
+
 $blog = NewBlog();
 $PAGE->setDisplayObject($blog);
 
@@ -42,13 +44,22 @@ sort($year_list);
 $tpl = NewTemplate(LIST_TEMPLATE);
 $tpl->set("LIST_TITLE", spf_("Archive of %s", $blog->name));
 
-$LINK_LIST = $blog->getyearList();
-foreach ($LINK_LIST as $key=>$item) $LINK_LIST[$key]["title"] = $item["year"];
+$list_months = $list_months || GET('list') == 'yes';
+
+if ($list_months) {
+	$LINK_LIST = $blog->getRecentMonthList(0);
+	foreach ($LINK_LIST as $key=>$item) {
+		$ts = strtotime($item['year'].'-'.$item['month'].'-01');
+		$LINK_LIST[$key]["title"] = strftime("%B %Y", $ts);
+	}
+} else {
+	$LINK_LIST = $blog->getYearList();
+	foreach ($LINK_LIST as $key=>$item) $LINK_LIST[$key]["title"] = $item["year"];
+}
 
 $tpl->set("LINK_LIST", $LINK_LIST);
 $tpl->set("LIST_FOOTER", 
-          '<a href="'.$blog->getURL().BLOG_ENTRY_PATH.'/all.php">'.
-          _("List all entries").'</a>');
+          '<a href="'.$blog->uri('listall').'">'._("List all entries").'</a>');
 $body = $tpl->process();
 
 $PAGE->title = $title;
