@@ -11,7 +11,6 @@ resources than I can currently muster in order to fix.
 * The use of defined constants for configuration is questionable.
 * A unit testing suite would make testing much less painful.
 * User permissions should be more granular.
-* Have not tested effect of making the document root a blog folder.
 
 Section: Possible Features
 
@@ -19,7 +18,7 @@ This is a list of features to be added to later verions.
 Note that not all of these *will* be added - this is just a list of ideas.  The 
 features are presented in no particular order.
 
-* Support for PingBacks.
+* Support for a static blog home page.
 * AJAX interface for deleting/banning comments and trackbacks?
 * Option to display trackbacks in same list as comments?
 * Improved user interface for blog settings and administration.
@@ -28,5 +27,4 @@ features are presented in no particular order.
 * Option to publish entries as articles?
 * Ability to create entry from uploaded HTML document.
 * Ability to display an HTML document in the standard page layout.
-* Ability to create drafts for posts and articles.
 * Allow use of query strings and .htaccess rules in place of wrapper scripts.

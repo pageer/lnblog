@@ -24,6 +24,8 @@ class ReplyNotifier extends Plugin {
 
 	function send_message(&$ent, $subject, $data) {
 		$u = NewUser($ent->uid);
+		$curr_user = NewUser();
+		$owner_reply = ($u->username() == $curr_user->username());
 		
 		if ($u->email() && !$owner_reply) {
 			@mail($u->email(), $subject, $data, 

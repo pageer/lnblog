@@ -1,5 +1,6 @@
 Features to be added:
 
+* Support for a static blog home page.
 * AJAX interface for deleting/banning comments and trackbacks?
 * Improved user interface for blog settings and administration.
 * Support for polls?
@@ -7,5 +8,4 @@ Features to be added:
 * Option to cross-publish entries as articles.
 * Ability to create entry from uploaded HTML document.
 * Ability to display an HTML document in the standard page layout.
-* Ability to create drafts for posts and articles.
 * Allow use of query strings and .htaccess rules in place of wrapper scripts.

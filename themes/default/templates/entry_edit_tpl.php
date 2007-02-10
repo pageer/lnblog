@@ -70,6 +70,16 @@ if (isset($use_js_editor) && $SYSTEM->sys_ini->value('entryconfig', 'EditorOnBot
 <legend><?php p_("Entry settings");?><a href="#dummy">(-)</a></legend>
 <?php
 $num_uploads = $SYSTEM->sys_ini->value("entryconfig", "AllowInitUpload", 1);
+
+if ($num_uploads > 0) {
+?>
+<div>
+<label for="adduploadlink">Insert link when adding uploads</label>
+<input type="checkbox" id="adduploadlink" checked="checked" />
+</div>
+<?php
+}
+
 for ($i=1; $i<=$num_uploads; $i++) { ?>
 <div>
 <label for="upload<?php echo $i;?>"><?php p_("Upload file");?></label>
@@ -126,8 +136,9 @@ echo ' selected="selected"';}?>><?php p_("HTML");?></option>
 </fieldset>
 <div class="threebutton">
 <input name="submit" id="submit" type="submit" value="<?php p_("Submit");?>" />
+<input name="draft" id="draft" type="submit" value="<?php p_("Save Draft");?>" />
 <input name="preview" id="preview" type="submit" value="<?php p_("Preview");?>" />
-<input name="clear" id="clear" type="reset" value="<?php p_("Clear");?>" />
+<!--<input name="clear" id="clear" type="reset" value="<?php p_("Clear");?>" />-->
 </div>
 </form>
 </fieldset>

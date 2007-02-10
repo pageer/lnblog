@@ -310,14 +310,33 @@ class BlogComment extends Entry {
 	A string with the name of the associated file.
 	*/
 	function getFilename($anchor) {
-		$ent = NewEntry();
-		$ret = substr($anchor, 7);
+		if (strpos($anchor, "#") !== false) {
+			$pieces = split('#', $anchor);
+			$entid = dirname($pieces[0]);
+			$cmtid = $pieces[1];
+		} else {
+			$entid = false;
+			$cmtid = $anchor;
+		}
+		$ent = NewEntry($entid);
+		$ret = substr($cmtid, 7);
 		$ret .= COMMENT_PATH_SUFFIX;
 		$ret = mkpath($ent->localpath(),ENTRY_COMMENT_DIR,$ret);
 		$ret = realpath($ret);
 		return $ret;
 	}
 
+	# Method: globalID
+	# Get the global identifier for this trackback.
+	function globalID() {
+		$parent = $this->getParent();
+		$id = $parent->globalID();
+		if (defined('ENTRY_COMMENT_DIR') && ENTRY_COMMENT_DIR) {
+			$id .= '/'.ENTRY_COMMENT_DIR;
+		}
+		$id .= '/#'.$this->getAnchor();
+	}
+	
 	/*
 	Method: permalink
 	Get the permalink to the object.  This is essentially the URI of the 

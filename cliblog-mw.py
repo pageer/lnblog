@@ -25,117 +25,89 @@ import base64
 
 import xml.dom.minidom
 
-version = ('0', '2', '0')
-package_name = 'cliblog'
+VERSION = ('0', '3', '0')
+PACKAGE_NAME = 'naturalblog'
 
-class Connection:
-	def __init__(self):
-		self.username = ''
-		self.password = ''
-		self.blog = ''
-		self.uri = ''
+class NaturalBlogObject:
+	def serializeXML(self):
+		i = xml.dom.minidom.getDOMImplementation()
+		doc = i.createDocument(None, self.__class__.__name__, None)
+		top = doc.documentElement
+		for k,v in self.__dict__.items():
+			e = doc.createElement(k)
+			val = doc.createTextNode(v)
+			e.appendChild(val)
+			top.appendChild(e)
+		return doc.toxml()
 		
-	def __init__(self, profile):
-		self.username = ''
-		self.password = ''
-		self.blog = ''
-		self.uri = ''
-		self.readProfile(profile)
-	
-	def createServer(self, uri = ''):
-		if uri != '':
-			self.uri = uri
-		self.server = xmlrpclib.ServerProxy(self.uri)
-		
-	def readProfile(self, filename):
-		if os.access(filename, os.R_OK):
-			path = filename
-		else:
-			path = os.path.join([os.environ('HOME'), '.' + package_name, filename + '.xml'])
-		domtree = xml.dom.minidom.parse(path)
-		self.uri = document.getElementsByTagName('uri')[0].childNodes[0].data
-		self.username = document.getElementsByTagName('username')[0].childNodes[0].data
-		self.password = document.getElementsByTagName('password')[0].childNodes[0].data
-		blog = document.getElementsByTagName('blog')
-		if blog != []:
-			self.blog = blog
-			
-	def writeProfile(self, name):
-		path = os.path.join([os.environ('HOME'), '.' + package_name)
+	def readXML(self, path):
+		doc = xml.dom.minidom.parse(path) 
+		for node in doc.documentElement.childNodes:
+			if node.nodeType == xml.dom.Node.ELEMENT_NODE:
+				self.__dict__[node.tagName] = node.firstChild.nodeValue.strip()
+				
+	def configPath(self):
+		path = os.path.join(os.environ('HOME'), '.'+PACKAGE_NAME)
 		if os.access(path, os.W_OK):
-			
+			return path
 		else:
-			path = os.environ('HOME')
+			return os.environ('HOME')
+			
+	def saveXML(self, filename):
+		path = os.path.join(os.environ('HOME'), '.'+PACKAGE_NAME)
+		if not os.path.isdir(path):
+			os.mkdir(path)
+		f = file(path)
+		f.write(self.serializeXML())
+		f.close()
 		
-		
-
-class BlogEntry:
-	def __init__(self):
-		self.id = ''
-		self.description = ''
-		self.title = ''
-		self.categories = []
-		
-	def __init__(self, struct):
-		self.id = ''
-		self.description = ''
-		self.title = ''
-		self.categories = []
-		self.unserialize(struct)
-
-	def __init__(self, data, title, categories):
-		self.id = ''
-		self.description = data
-		self.title = title
-		self.categories = categories
-
 	def serialize(self):
 		return self.__dict__
 	
 	def unserialize(self, struct):
 		for key, val in struct.items():
 			self.__dict__[key] = val
-		
-	def get(self, conn, id = ''):
-		"""Retrieves the entry data via a metaWeblog.getPost method call."""
-		if id != '':
-			self.id = id
-		ret = conn.server.metaWeblog.getPost(self.id, conn.username, conn.password)
-		self.unserialize(ret)
 
-	def new(self, conn, blog='', publish = True):
-		"""Calls metaWeblog.newPost to create a new blog entry based on the 
-		current object."""
-		if blog != '':
-			conn.blog = blog
-		ret = conn.server.metaWeblog.newPost(conn.blog, conn.username, conn.password, self.serialize(), publish)
-		self.id = ret
-		return ret
-		 
-	def edit(self, conn, publish = True):
-		"""Calls metaWeblog.editPost to change the contents of the current 
-		object on the server.  The content of this object should reflect the 
-		desired new content of the post."""
-		ret = conn.server.metaWeblog.editPost(self.id, conn.username, conn.password, self.serialize(), publish)
-		return ret
 
-	def printPost(self):
-		data = ''
-		for key,val in post.items():
-			if key == 'description':
-				data = val
-			elif type(val) == types.ListType:
-				print key+': '+string.join(val, ',')
-			else:
-				print key+': '+str(val)
-		print data
-
-		
-class Blog:
+class BlogUser(NaturalBlogObject):
 	def __init__(self):
-		self.id = ''
+		self.nickname = ''
+		self.userid = ''
+		self.url = ''
+		self.email = ''
+		self.lastname = ''
+		self.firstname = ''
+		
+		
+class BlogEntry(NaturalBlogObject):
+	def __init__(self, data='', title='', categories=[]):
+		self.postid = ''
+		self.guid = ''
+		self.title = title
+		self.categories = categories
+		self.excerpt = ''
+		self.description = ''
+		self.allow_comment = True
+		self.allow_trackback = True
+		self.allow_pingback = True
+		
+		if type(data) == dict:
+			self.unserialize(data)
+		else:
+			self.description - data
+
+
+class Blog(NaturalBlogObject):
+	def __init__(self, struct=None):
+		self.blogid = ''
+		self.blogName = ''
+		self.url = ''
 		self.categories = {}
 		self.posts = []
+		
+		if struct != None:
+			self.unserialize(struct)
+		
 		
 	def newMediaObject(self, conn, path, name = '', mimetype = ''):
 		hnd = file(infile)
@@ -176,6 +148,43 @@ class Blog:
 				print k + ": " + v
 			print ''
 
+
+class ServerAccount(NaturalBlogObject):
+	def __init__(self, uri=None):
+		self.name = ''
+		self.uri = uri
+		self.username = ''
+		self.password = ''
+		self.server = None
+		self.createServer(self.uri)
+		
+	def createServer(self):
+		if self.uri != None:
+			self.server =  xmlrpclib.ServerProxy(self.uri)
+
+			
+class CompositeAccount(ServerAccount):
+	def getBlogs(self):
+		ret = self.server.blogger.getUsersBlogs("ABCD1234", self.username, self.password)
+		bloglist = []
+
+		for blog in ret:
+			bloglist.append(Blog(blog))
+
+		return bloglist
+		
+	def getBlogCategories(self, blogid):
+		if type(blogid) == Blog
+		ret = self.server.metaWeblog.getCategories(blogid, self.username, self.password)
+		catlist = []
+		
+		for cat in ret:
+			catlist.append(cat['description'])
+		return catlist
+		
+	def newPost(self, blogid, entry, publish):
+		ret = self.server.metaWeblog.newPost(blog.blogid, self.username, self.password, entry.serialize(), publish)
+		return ret
 			
 def proc_command_line(opts, args):
 	"""Converts the command-line arguments into a dictionary for easy lookup."""
@@ -202,8 +211,8 @@ def proc_command_line(opts, args):
 		elif o in ('-h', '--help'):
 			ret['help'] = True
 		elif o in ('-l', '--login'):
-			ret['user'] = 
-			ret['passwd'] = 
+			ret['user'] = ''
+			ret['passwd'] = ''
 		elif o in ('-v', '--version'):
 			ret['version'] = True
 	
@@ -238,8 +247,6 @@ def main():
 	
 	commands = proc_command_line(opts, args)
 	
-	if 
-			
 	try:
 		if len(args) == 4:
 			server_uri = args[0]

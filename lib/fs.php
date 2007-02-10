@@ -29,6 +29,8 @@ require_once("blogconfig.php");
 class FS {
 
 	var $default_mode;
+	var $directory_mode;
+	var $script_mode;
 
 	function FS() {}
 	
@@ -110,8 +112,68 @@ class FS {
 	# False on failure, an unspecified non-false value on success.
 	function chmod($path, $mode) {}
 	
-	function defaultMode() {}
-	
+	# Method: directoryMode
+	# Gets and sets the permissions to use when creating directories.
+	#
+	# Parameters:
+	# mode - The *optional* octal permissions to use.
+	#
+	# Returns:
+	# The octal UNIX permissions used when creating directories.
+	function directoryMode($mode=false) {
+		if ($mode) $this->directory_mode = $mode;
+		return $this->directory_mode;
+	}
+
+	# Method: scriptMode
+	# Gets and sets the 
+	#
+	# Parameters:
+	# mode - The *optional* octal permissions to use.
+	#
+	# Returns:
+	# The octal UNIX permissions used when creating PHP scripts.
+	function scriptMode($mdoe=false) {
+		if ($mode) $this->script_mode = $mode;
+		return $this->script_mode;
+	}
+
+	# Method: defaultMode
+	# Gets and sets the permissions to use for other files, i.e. not
+	# directories or PHP scripts
+	#
+	# Parameters:
+	# mode - The *optional* octal permissions to use.
+	#
+	# Returns:
+	# The octal UNIX permissions used when creating other files.
+	function defaultMode($mode=false) {
+		if ($mode) $this->default_mode = $mode;
+		return $this->default_mode;
+	}
+
+	# Method: isScript
+	# Determines if a given path represents a PHP script or not.
+	#
+	# Parameters:
+	# path - the path of the file in question.
+	#
+	# Returns:
+	# True if the file uses a known extension for PHP scripts, false otherwise.
+	# Currently, known extensions are of the form .phpX where X is empty or a 
+	# number.
+	function isScript($path) {
+		$filedata = pathinfo($path);
+		if ( isset($filedata['extension']) ) {
+			$ext = strtolower($filedata['extension']);
+			if ( substr($ext, 0, 3) == "php" &&
+			    ( strlen($ext) == 3 || is_numeric(substr($ext, 3, 1)) ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	# Method: copy
 	# Copy a single file.
 	#

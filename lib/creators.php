@@ -32,10 +32,6 @@
 # Note that this should really be a factory class, but PHP 4 doesn't allow 
 # static methods, so it's more convenient just to make them functions.
 
-#echo "Including creators.php...\n";
-#echo "Included Files:\n";
-#$x=get_included_files();
-#var_dump($x);
 # Function: NewFS
 # Creates a new filesystem access object.
 function NewFS() {
@@ -72,9 +68,12 @@ function NewEntry($param=false) {
 	$artid = false;
 	$entid = false;
 	
-	if ( isset($_GET['article']) || isset($_GET['entry']) ) {
-		if (isset($_GET['article'])) $artid = $_GET['article'];
-		elseif (isset($_GET['entry'])) $entid = $_GET['entry'];
+	if (isset($_GET['article'])) {
+		$artid = $_GET['article'];
+	} elseif (isset($_GET['entry'])) {
+		$entid = $_GET['entry'];
+	} elseif (isset($_GET['draft'])) {
+		$entid = $_GET['draft'];
 	} else {
 		if (! $param) $param = getcwd();
 		if (strpos($param, BLOG_ARTICLE_PATH) !== false) {
@@ -82,10 +81,16 @@ function NewEntry($param=false) {
 			if (basename($artid) == ENTRY_COMMENT_DIR) 
 				$artid = dirname($artid);
 		}
-		elseif (strpos($param, BLOG_ENTRY_PATH) !== false) {
+		elseif (strpos($param, BLOG_ENTRY_PATH) !== false ||
+		        strpos($param, BLOG_DRAFT_PATH) !== false) {
 			$entid = $param;
-			if (basename($entid) == ENTRY_COMMENT_DIR) 
+			$dir_base = basename($entid);
+			$child_paths = array(ENTRY_COMMENT_DIR, 
+			                     ENTRY_TRACKBACK_DIR, 
+			                     ENTRY_PINGBACK_DIR);
+			if ( in_array($dir_base, $child_paths) ) {
 				$entid = dirname($entid);
+			}
 		}
 	}
 	
@@ -188,16 +193,12 @@ function NewIniParser($file=false) {
 # parameter passed, which can be either an anchor name as displayed on the page 
 # or a local file path.
 function NewReply($id) {
-	if (file_exists($id)) {
-
-	} else {
-		if (substr($id, 0, 7) == "comment") {
-
-		} elseif (substr($id, 0, 9) == "trackback") {
-		
-		} elseif (substr($is, 0, 8) == "pingback") {
-
-		}
+	if (strpos($id, '#comment') !== false) {
+		return NewBlogComment($id);
+	} elseif (strpos($id, '#trackback') !== false) {
+		return NewTrackback($id);
+	} elseif (strpos($id, '#pingback') !== false) {
+		return NewPingback($id);
 	}
 }
 

@@ -63,7 +63,7 @@ class Articles extends Plugin {
 			if (is_file($blg->home_path.PATH_DELIM.$this->custom_links)) {
 				$data = file($blg->home_path.PATH_DELIM.$this->custom_links);
 				foreach ($data as $line) {
-?><li><?php echo htmlspecialchars($line);?></li><?php
+?><li><?php echo $line;?></li><?php
 				}
 			}
 			if ($this->static_link) { /*Optionally show link to article index*/?>

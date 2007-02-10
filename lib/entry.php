@@ -516,30 +516,9 @@ class Entry extends LnBlogObject{
 	function readFileData() {
 
 		if (substr($this->file, strlen($this->file)-4) != ".xml") {
-	
-			$data = file($this->file);
-			$file_data = "";
-			if (! $data) $file_data = false;
-			else 
-				foreach ($this->custom_fields as $fld=>$desc) {
-					$this->metadata_fields[$fld] = $fld;
-				}
-				$lookup = array_flip($this->metadata_fields);
-				foreach ($data as $line) {
-					preg_match('/<!--META ([\w|\s|-]*): (.*) META-->/', $line, $matches);
-					if ($matches && isset($lookup[strtolower($matches[1])])) {
-						$this->$lookup[strtolower($matches[1])] = $matches[2];
-					}
-					$cleanline = preg_replace("/<!--META.*META-->\s\r?\n?\r?/", "", $line);
-				
-					$file_data .= $cleanline;
-				}
-			$this->data = $file_data;
-
+			$this->readOldFile();
 		} else {
-			$xml = new SimpleXMLReader($this->file);
-			$xml->parse();
-			$xml->populateObject($this);
+			$this->deserializeXML($this->file);
 		}
 
 		if (! $this->abstract) $this->abstract = $this->getAbstract();
@@ -552,6 +531,27 @@ class Entry extends LnBlogObject{
 			                        substr($this->file, strlen(DOCUMENT_ROOT)));
 		}
 		return $this->data;
+	}
+
+	function readOldFile() {
+		$data = file($this->file);
+		$file_data = "";
+		if (! $data) $file_data = false;
+		else 
+			foreach ($this->custom_fields as $fld=>$desc) {
+				$this->metadata_fields[$fld] = $fld;
+			}
+			$lookup = array_flip($this->metadata_fields);
+			foreach ($data as $line) {
+				preg_match('/<!--META ([\w|\s|-]*): (.*) META-->/', $line, $matches);
+				if ($matches && isset($lookup[strtolower($matches[1])])) {
+					$this->$lookup[strtolower($matches[1])] = $matches[2];
+				}
+				$cleanline = preg_replace("/<!--META.*META-->\s\r?\n?\r?/", "", $line);
+			
+				$file_data .= $cleanline;
+			}
+		$this->data = $file_data;
 	}
 
 	# Method: writeFileData
@@ -569,23 +569,9 @@ class Entry extends LnBlogObject{
 		$fs = NewFS();
 
 		if (defined("USE_OLD_ENTRY_FORMAT")) {
-			
-			$header = '';
-			foreach ($this->custom_fields as $fld=>$desc) {
-				$this->metadata_fields[$fld] = $fld;
-			}
-			foreach ($this->metadata_fields as $mem=>$fvar) {
-				$header .= "<!--META ".$fvar.": ".
-					(isset($this->$mem) ? $this->$mem : "")." META-->\n";
-			}
-			$file_data = $header.$this->data;
-
+			$file_data = $this->writeOldFile();
 		} else {
-
-			$xml = new SimpleXMLWriter($this);
-			foreach ($this->exclude_fields as $fld) $xml->exclude($fld);
-			#$xml->cdata("data");
-			$file_data = $xml->serialize();
+			$file_data = $this->serializeXML();
 		}
 
 		if (! is_dir(dirname($this->file)) ) 
@@ -593,6 +579,19 @@ class Entry extends LnBlogObject{
 		$ret = $fs->write_file($this->file, $file_data);
 		$fs->destruct();
 		return $ret;
+	}
+	
+	function writeOldFile() {
+		$header = '';
+		foreach ($this->custom_fields as $fld=>$desc) {
+			$this->metadata_fields[$fld] = $fld;
+		}
+		foreach ($this->metadata_fields as $mem=>$fvar) {
+			$header .= "<!--META ".$fvar.": ".
+				(isset($this->$mem) ? $this->$mem : "")." META-->\n";
+		}
+		$file_data = $header.$this->data;
+		return $file_data;
 	}
 
 }

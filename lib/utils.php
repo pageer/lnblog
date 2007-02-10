@@ -34,6 +34,7 @@ define("BLOG_ARTICLES", 7);
 define("ENTRY_TRACKBACKS", 8);
 define("ENTRY_DRAFTS", 9);
 define("ENTRY_PINGBACKS", 10);
+define("BLOG_DRAFTS", 11);
 
 # Types of files for use with the getlink() function.
 # For convenience, these are defined as the directories under a theme.
@@ -162,6 +163,7 @@ function scan_directory($path, $dirs_only=false) {
 # The calculated document root path.
 
 function calculate_document_root() {
+
 	# Bail out if DOCUMENT_ROOT is already defined.
 	if ( defined("DOCUMENT_ROOT") ) return DOCUMENT_ROOT;
 
@@ -183,6 +185,99 @@ function calculate_document_root() {
 	}
 	return substr($curr_file, 0, $pos + 1);
 	
+}
+
+function calculate_server_root($path, $assume_subdomain=false) {
+
+	$ret = '';
+
+	if (defined("SUBDOMAIN_ROOT") && defined("DOCUMENT_ROOT")) {
+
+		# If the path doesn't start with either the subdomain or document
+		# root, then something is very, very wrong, so we need to bail 
+		# the hell out and do it loud!
+		if ( ! (strpos($path, DOCUMENT_ROOT)  === 0 ||
+		        strpos($path, SUBDOMAIN_ROOT) === 0) ) {
+			echo "Bad file passed to calculate_server_root() in ".__FILE__.
+			     ".� The path '".$path."' is not under the document root (".
+				  DOCUMENT_ROOT.") or the subdomain root (".SUBDOMAIN_ROOT.
+				  ").  Cannot get server root.";
+			return false;
+		}
+
+		# Case 1 - The document root and subdomain root are the same.
+		if (SUBDOMAIN_ROOT == DOCUMENT_ROOT) {
+
+			$ret = DOCUMENT_ROOT;
+
+		# Case 2 - The document root is inside subdomain root.
+		} elseif (strpos(DOCUMENT_ROOT, SUBDOMAIN_ROOT) === 0) {
+			
+			# If the path contains the document root, assume that we're NOT 
+			# in a subdomain.
+			$ret = ( strpos($path, DOCUMENT_ROOT) === 0) ? 
+			       DOCUMENT_ROOT: SUBDOMAIN_ROOT;
+
+		# Case 3 - The subdomain root is inside the document root.
+		} elseif (strpos(SUBDOMAIN_ROOT, DOCUMENT_ROOT) === 0) {
+
+			# If the path is in the document root, but not the subdomain
+			# root, then we're definitely not in a subdomain.
+			if (strpos($path, DOCUMENT_ROOT) === 0 &&
+			    strpos($path, SUBDOMAIN_ROOT) === false) {
+				$ret = DOCUMENT_ROOT;
+			} else {
+				# Otherwise, there's no way to tell if the directory is a subdomain
+				# without hitting the network, so just pass the decision to the caller.
+				$ret = $assume_subdomain ? SUBDOMAIN_ROOT : DOCUMENT_ROOT;
+			}
+
+		# Case 4 - The two directories are independent.
+		} else {
+			# If path is under the document, return that.  Otherwise, return the 
+			# subdomain root.  This ends up the same as case 2.
+			$ret = ( strpos($path, DOCUMENT_ROOT) === 0) ? 
+			       DOCUMENT_ROOT: SUBDOMAIN_ROOT;
+		}
+
+	} else {
+		$ret = calculate_document_root();
+	}
+
+	return $ret;
+
+}
+
+# Function: test_server_root
+# Tests a root-relative path against the document root and subdomain root 
+# directory and determines which one "works."  
+#
+# Parameters:
+# path - The root-relative path to test.
+# assume_subdomain - Optional boolean which, when set to true, tells the routine
+#                    to assume a subdomain path when the test results are 
+#                    ambiguous.  Defaults to *false*.
+
+function test_server_root($path, $assume_subdomain=false) {
+	$ret = false;
+	$doc_path = mkpath(calculate_document_root(), $path);
+	if (defined("SUBDOMAIN_ROOT")) {
+		$sub_path = mkpath(SUBDOMAIN_ROOT, $path);
+		if ($doc_path == $sub_path) {
+			$ret = $doc_path;
+		} elseif ( file_exists($doc_path) && file_exists($sub_path) ) {
+			$ret = $assume_subdomain ? $sub_path : $doc_path;
+		} elseif ( file_exists($doc_path) && ! file_exists($sub_path) ) {
+			$ret = $doc_path;
+		} elseif ( ! file_exists($doc_path) && file_exists($sub_path) ) {
+			$ret = $sub_path;
+		} else {
+			$ret = false;
+		}
+	} else {
+		if (file_exists($doc_path)) $ret = $doc_path;
+	}
+	return $ret;
 }
 
 # Function: php_version_at_least
@@ -376,6 +471,8 @@ function current_url() {
 	return $protocol."://".$host.$port.$path;
 }
 
+
+
 # Function: localpath_to_uri
 # Convert a local path to a URI.
 #
@@ -387,20 +484,29 @@ function current_url() {
 # Returns:
 # A string with the URL oc the given path.
 
-function localpath_to_uri($path, $full_uri=true) {
+function localpath_to_uri($path, $full_uri=true, $https=false) {
 
 	if (file_exists($path))	$full_path = realpath($path);
 	else $full_path = $path;
 	
 	# Add a trailing slash if the path is a directory.
 	if (is_dir($full_path)) $full_path .= PATH_DELIM;
+	
 	$root = calculate_document_root();
+	$subdom_root = '';
+	if (defined("SUBDOMAIN_ROOT")) {
+		$subdom_root = SUBDOMAIN_ROOT;
+	}
+
 	# Normalize to lower case on Windows in order to avoid problems
 	# with case-sensitive substring removal.
 	if ( strtoupper( substr(PHP_OS,0,3) ) == 'WIN' ) {
 		$root = strtolower($root);
+		$subdom_root= strtolower($subdom_root);
 		$full_path = strtolower($full_path);
 	}
+
+	$subdomain = '';
 
 	# Account for user home directories in path.  Please note that this is 
 	# an ugly, ugly hack to make this function work when I'm testing on my
@@ -408,6 +514,11 @@ function localpath_to_uri($path, $full_uri=true) {
 	if ( preg_match(LOCALPATH_TO_URI_MATCH_RE, $full_path) ) {
 		#$url_path = '/~'.basename(dirname($root)).$url_path;
 		$url_path = preg_replace(LOCALPATH_TO_URI_MATCH_RE, LOCALPATH_TO_URI_REPLACE_RE, $full_path);
+	} elseif ($subdom_root && strpos($full_path, $subdom_root) === 0) {
+		$url_path = str_replace($subdom_root, "", $full_path);
+		$slashpos = strpos($url_path, PATH_DELIM);
+		$subdomain = substr($url_path, 0, $slashpos);
+		$url_path = substr($url_path, $slashpos + 1);
 	} else {
 		$url_path = str_replace($root, "", $full_path);
 	}
@@ -426,12 +537,15 @@ function localpath_to_uri($path, $full_uri=true) {
 		
 	if ($full_uri) {
 		# Add the protocol and server.
-		$protocol = "http";
+		$protocol = ($https ? "https" : "http");
 		if (SERVER("HTTPS") == "on") $protocol = "https";
 		$host = SERVER("SERVER_NAME");
 		$port = SERVER("SERVER_PORT");
 		if ($port == 80 || $port == "") $port = "";
 		else $port = ":".$port;
+		if ($subdomain) {
+			$host = $subdomain.".".DOMAIN_NAME;
+		}
 		$url_path = $protocol."://".$host.$port.$url_path;
 	}
 	return $url_path;
@@ -467,7 +581,18 @@ function uri_to_localpath($uri) {
 		$path = preg_replace(URI_TO_LOCALPATH_MATCH_RE, URI_TO_LOCALPATH_REPLACE_RE, $path);
 	}
 	
-	$path = mkpath(DOCUMENT_ROOT, $path);
+	if (defined("DOMAIN_NAME") && defined("SUBDOMAIN_ROOT") &&
+		isset($url_bits['host']) && 
+		preg_match('/'.str_replace('.','\.',DOMAIN_NAME).'$/', DOMAIN_NAME) &&
+		strpos($url_bits['host'], DOMAIN_NAME) > 1) {
+			
+		$pos = strpos($url_bits['host'], DOMAIN_NAME);
+		$tmp_path = substr($url_bits['host'], 0, $pos - 1);
+		$path = mkpath(SUBDOMAIN_ROOT, $tmp_path, $path);
+	} else {
+		$path = mkpath(DOCUMENT_ROOT, $path);
+	}
+	
 	$path = canonicalize($path);
 	return $path;
 	
@@ -481,7 +606,8 @@ function uri_to_localpath($uri) {
 # The numeric IP address of the client.
 
 function get_ip() {
-	return $_SERVER["REMOTE_ADDR"];
+	if (isset($_SERVER['REMOTE_ADDR']))return $_SERVER["REMOTE_ADDR"];
+	else return '127.0.0.1';
 }
 
 # Returns the string to use for a config.php file.  The levels parameter
@@ -567,6 +693,10 @@ function create_directory_wrappers($path, $type, $instpath="") {
 			break;
 		case BLOG_ENTRIES:
 			$filelist = array("index"=>"pages/showarchive", "all"=>"pages/showall");
+			$config_level = 1;
+			break;
+		case BLOG_DRAFTS:
+			$filelist = array("index"=>"pages/showdrafts");
 			$config_level = 1;
 			break;
 		case YEAR_ENTRIES:
@@ -665,7 +795,7 @@ function getlink($name, $type=false) {
 				break;
 			case "js":
 			case "vbs":
-				$ltype = LINK_SCRIPT;
+				$l_type = LINK_SCRIPT;
 				break;
 			case "css":
 			case "xsl":
@@ -807,6 +937,51 @@ function make_uri($base=false, $query_string=false, $no_get=true,
 	
 	return $ret;
 }
+
+# Function: set_domain_cookie
+# A convenience wrapper for the setcookie() function.  If the DOMAIN_NAME
+# constant is set, then this will set the cookie for .domain.whatever, but will
+# simply skip the domain parameter otherwise.  This also sets the path to the
+# root directory.
+
+function set_domain_cookie($name, $value='', $expire=0) {
+	if (defined('DOMAIN_NAME')) {
+		setcookie($name, $value, $expire, '/', '.'.DOMAIN_NAME);
+	} else {
+		setcookie($name, $value, $expire, '/');
+	}
+}
+
+# Function: get_entry_from_uri
+# Takes a URI and converts it into an entry object.
+function get_entry_from_uri($uri) {
+	$local_path = uri_to_localpath($uri);
+
+	if (is_dir($local_path)) {
+		$ent = NewEntry($local_path);
+		
+	# If the resulting entry is a file, then see if it's a PHP wrapper script
+	# for entry pretty-permalinks.
+	} elseif (is_file($local_path)) {
+		$dir_path = dirname($local_path);
+		$content = file($local_path);
+	
+		if (preg_match("/chdir\('([^']+)'\)/", $content[0], $matches)) {
+			$dir = $matches[1];
+		} else $dir = '';
+		$dir = mkpath($dir_path, $dir);
+		$ent = NewEntry($dir);
+		
+	# In the future, we will want to add conditions for checking query strings
+	# and Apache rewrite rules.
+	
+	# If no condition is met, then bail out with an unrecognized URI fault.
+	} else {
+		$ent = false;
+	}
+	return $ent;
+}
+
 
 if (! function_exists('is_a')) {
 	function is_a($obj, $class) {

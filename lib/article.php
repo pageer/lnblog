@@ -46,7 +46,7 @@ class Article extends BlogEntry {
 		$this->allow_tb = false;
 		$this->allow_pingback = false;
 		$this->template_file = ARTICLE_TEMPLATE;
-		$this->getFile($path, $revision, 'article', BLOG_ARTICLE_PATH, '');
+		$this->getFile($path, $revision, 'article', BLOG_ARTICLE_PATH, '/.*/');
 
 		if ( file_exists($this->file) ) {
 			$this->readFileData();
@@ -196,14 +196,16 @@ class Article extends BlogEntry {
 	Save the object as a new article.
 
 	Parameters:
-	blog     - The blog object into which the article should be inserted.
-	dir_path - *Optional* directory name to use for the article.
+	blog       - The blog object into which the article should be inserted.
+	dir_path   - *Optional* directory name to use for the article.
+	from_draft - Indicates that the article is based on a draft entry, not
+	             taken directly from user input.
 	
 	Returns:
 	True on success, false on failure.
 	*/
 
-	function insert ($blog, $dir_path=false) {
+	function insert ($blog, $dir_path=false, $from_draft=false) {
 
 		$this->raiseEvent("OnInsert");
 		if (!$this->uid) {
@@ -217,6 +219,10 @@ class Article extends BlogEntry {
 		if (! is_dir($basepath)) create_directory_wrappers($basepath, BLOG_ARTICLES);
 		if (!$dir_path) $dir_path = $this->getPath();
 		$dir_path = $basepath.PATH_DELIM.$dir_path;
+		if ($from_draft) {
+			$fs = NewFS();
+			$fs->rename(dirname($this->file), $dir_path);
+		}
 		$ret = create_directory_wrappers($dir_path, ARTICLE_BASE);
 
 		# Create directories for comments and trackbacks.

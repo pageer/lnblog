@@ -109,6 +109,18 @@ class User extends LnBlogObject {
 		if ($pw) $this->login($pw);
 	
 	}
+	
+	# Method: exists
+	# Determines if the object represents an existing, registered user.
+	#
+	# Returns:
+	# True if the user exists, false otherwise.
+	function exists($uname=false) {
+		if (! $uname) $uname = $this->username;
+		return realpath(mkpath(USER_DATA_PATH,$uname,"passwd.php")) &&
+		       realpath(mkpath(USER_DATA_PATH,$uname,"user.ini"));
+	}
+	
 
 	# Method: exportVars
 	# Convenience function to export relevant user data to a template.
@@ -214,8 +226,8 @@ class User extends LnBlogObject {
 			
 			# Prevent password change from logging out on cookie-only config.
 			if ( $this->username == COOKIE(CURRENT_USER) )
-				setcookie(PW_HASH, $this->passwd, 
-					(LOGIN_EXPIRE_TIME ? time() + LOGIN_EXPIRE_TIME:false), "/");
+				set_domain_cookie(PW_HASH, $this->passwd, 
+					(LOGIN_EXPIRE_TIME ? time() + LOGIN_EXPIRE_TIME:false));
 		}
 	}
 
@@ -354,18 +366,18 @@ class User extends LnBlogObject {
 					$_SESSION[CURRENT_USER] = $this->username; 
 					$_SESSION[LOGIN_TOKEN] = $token;
 					$_SESSION[LAST_LOGIN_TIME] = $ts;
-					setcookie(LAST_LOGIN_TIME, "$ts", 
-						(LOGIN_EXPIRE_TIME ? time()+LOGIN_EXPIRE_TIME:false), "/");
-					setcookie(CURRENT_USER, $this->username, 
-						(LOGIN_EXPIRE_TIME ? time()+LOGIN_EXPIRE_TIME:false), "/");
-					setcookie(LOGIN_TOKEN, $token, 
-						(LOGIN_EXPIRE_TIME ? time()+LOGIN_EXPIRE_TIME:false), "/");
+					set_domain_cookie(LAST_LOGIN_TIME, "$ts", 
+						(LOGIN_EXPIRE_TIME ? time()+LOGIN_EXPIRE_TIME:false));
+					set_domain_cookie(CURRENT_USER, $this->username, 
+						(LOGIN_EXPIRE_TIME ? time()+LOGIN_EXPIRE_TIME:false));
+					set_domain_cookie(LOGIN_TOKEN, $token, 
+						(LOGIN_EXPIRE_TIME ? time()+LOGIN_EXPIRE_TIME:false));
 					$ret = true;
 			} else {
-				setcookie(CURRENT_USER, $this->username, 
-					(LOGIN_EXPIRE_TIME ? time() + LOGIN_EXPIRE_TIME:false), "/");
-				setcookie(PW_HASH, md5($this->passwd.get_ip()), 
-					(LOGIN_EXPIRE_TIME ? time() + LOGIN_EXPIRE_TIME:false), "/");
+				set_domain_cookie(CURRENT_USER, $this->username, 
+					(LOGIN_EXPIRE_TIME ? time() + LOGIN_EXPIRE_TIME:false));
+				set_domain_cookie(PW_HASH, md5($this->passwd.get_ip()), 
+					(LOGIN_EXPIRE_TIME ? time() + LOGIN_EXPIRE_TIME:false));
 				$ret = true;
 			}
 		} else $ret = false;
@@ -380,12 +392,12 @@ class User extends LnBlogObject {
 			unset($_SESSION[CURRENT_USER]);
 			unset($_SESSION[LOGIN_TOKEN]);
 			unset($_SESSION[LAST_LOGIN_TIME]);
-			setcookie(CURRENT_USER, "", time() - 3600, "/");
-			setcookie(LOGIN_TOKEN, "", time() - 3600, "/");
-			setcookie(LAST_LOGIN_TIME, "", time() - 3600, "/");
+			set_domain_cookie(CURRENT_USER, "", time() - 3600);
+			set_domain_cookie(LOGIN_TOKEN, "", time() - 3600);
+			set_domain_cookie(LAST_LOGIN_TIME, "", time() - 3600);
 		} else {
-			setcookie(CURRENT_USER, "", time() - 3600, "/");
-			setcookie(PW_HASH, "", time() - 3600, "/");
+			set_domain_cookie(CURRENT_USER, "", time() - 3600);
+			set_domain_cookie(PW_HASH, "", time() - 3600);
 		}
 	}
 

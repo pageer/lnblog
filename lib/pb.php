@@ -59,6 +59,17 @@ class Pingback extends Trackback {
 		$this->raiseEvent("InitComplete");
 	}
 	
+	# Method: globalID
+	# Get the global identifier for this trackback.
+	function globalID() {
+		$parent = $this->getParent();
+		$id = $parent->globalID();
+		if (defined('ENTRY_PINGBACK_DIR') && ENTRY_PINGBACK_DIR) {
+			$id .= '/'.ENTRY_PINGBACK_DIR;
+		}
+		$id .= '/#'.$this->getAnchor();
+	}
+	
 	# Method: uri
 	# Get the URI for various functions
 
@@ -158,15 +169,8 @@ class Pingback extends Trackback {
 		$ret = realpath($ret);
 		return $ret;
 	}
-
-	# Method: readFileData
-	# Reads pingback data from a file.
-	#
-	# Parameters:
-	# path - Optional path for the data file.  *Default* is the current file.
-
-	function readFileData($path=false) {
-		if (! $path) $path = $this->file;
+	
+	function readOldFile($path) {
 		$file_data = file($path);
 		foreach ($file_data as $line) {
 			$line = trim($line);
@@ -205,35 +209,7 @@ class Pingback extends Trackback {
 		}
 	}
 	
-	# Method: writeFileData
-	# Write pingback data to a file.
-	#
-	# Parameters:
-	# path - The path to which to write the data
-	#
-	# Returns:
-	# True on success, false on failure.
-
-	function writeFileData($path) {
-		
-		$fs = NewFS();
-		if (! is_dir( dirname($path) ) ) {
-			$fs->mkdir_rec(dirname($path));
-		}
-		$data = "Target: ".$this->target."\n".
-		        "Source: ".$this->source."\n".
-		        "Date: ".$this->ping_date."\n".
-		        "Timestamp: ".$this->timestamp."\n".
-		        "IP: ".$this->ip."\n".
-		        "Title: ".$this->title."\n".
-		        $this->excerpt;
-		$ret = $fs->write_file($path, $data);
-		$this->file = $path;
-		$fs->destruct();
-		return $ret;
-	}
-	
-		# Method: get
+	# Method: get
 	# Put the saved data into a template for display.
 	#
 	# Returns:

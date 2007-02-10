@@ -89,7 +89,7 @@ sort($blg->tag_list);
 $tpl->set("BLOG_TAGS", $blg->tag_list);
 $blg->exportVars($tpl);
 
-if (POST('submit')) {
+if ( POST('submit') || POST('draft') ) {
 	
 	$err = false;
 	
@@ -101,9 +101,14 @@ if (POST('submit')) {
 		$ent->getPostData();
 		
 		if ($ent->data) {
-			if ($is_art) $ret = $ent->insert($blg, POST('short_path'));
-			else $ret = $ent->insert($blg);
-			$blg->updateTagList($ent->tags());
+			if (POST('draft')) {
+				$ret = $ent->saveDraft($blg);
+			} else {
+				if ($is_art) $ret = $ent->insert($blg, POST('short_path'));
+				else $ret = $ent->insert($blg);
+				$blg->updateTagList($ent->tags());
+			}
+			
 			if ($is_art && POST('sticky')) $ent->setSticky(true);
 			
 			if ($ret) {
@@ -152,7 +157,11 @@ if (POST('submit')) {
 		$tpl->set("HAS_UPDATE_ERROR");
 		$tpl->set("UPDATE_ERROR_MESSAGE", $err);
 		entry_set_template($tpl, $ent);
-	} else $PAGE->redirect($ent->permalink());
+	} elseif ( POST('draft') ) {
+		$PAGE->redirect($blg->uri('listdrafts'));
+	} else {
+		$PAGE->redirect($ent->permalink());
+	}
 	
 } elseif (POST('preview')) {
 	
@@ -174,8 +183,8 @@ if (POST('submit')) {
 if (! isset($page_body)) $page_body = $tpl->process();
 
 $title = $is_art ? 
-         spf_("%s - New Entry", $blg->name) :
-         spf_("%s - New Article", $blg->name);
+         spf_("%s - New Article", $blg->name) :
+         spf_("%s - New Entry", $blg->name);
 $PAGE->title = $title;
 $PAGE->addStylesheet("form.css","entry.css");
 $PAGE->addScript("editor.js");

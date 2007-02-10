@@ -50,7 +50,7 @@ $tpl->set("SEND_PINGBACKS", $blg->auto_pingback == 'all');
 $tpl->set("FORM_ACTION", make_uri(false,false,false) );
 $blg->exportVars($tpl);
 
-if (POST('submit')) {
+if ( POST('submit') || POST('draft') ) {
 	
 	$err = false;
 	
@@ -59,9 +59,13 @@ if (POST('submit')) {
 		$ent->getPostData();
 		
 		if ($ent->data) {
-			$ret = $ent->update();
-			if ($is_art) $ent->setSticky(POST('sticky'));
-			$blg->updateTagList($ent->tags());
+			if (POST('draft')) {
+				$ret = $ent->saveDraft($blg);
+			} else {
+				$ret = $ent->update();
+				if ($is_art) $ent->setSticky(POST('sticky'));
+				$blg->updateTagList($ent->tags());
+			}
 			
 			if ($ret) {
 				
@@ -74,12 +78,12 @@ if (POST('submit')) {
 				}
 
 				# Check for pingback-enabled links and send them pings.
-				if ($ret && POST("send_pingbacks")) {
+				if ( $ret && POST("send_pingbacks") && ! POST('draft') ) {
 					$err = handle_pingback_pings($ent);
 					if (! isset($page_body)) $page_body = '';
 					$page_body .= "<p>".$err."</p>";
 				}
-				            
+				
 				if (isset($page_body)) {
 					$refresh_delay = 10;
 					$page_body = "<h4>"._("Entry created, but with errors")."</h4>".
@@ -105,7 +109,11 @@ if (POST('submit')) {
 		$tpl->set("HAS_UPDATE_ERROR");
 		$tpl->set("UPDATE_ERROR_MESSAGE", $err);
 		entry_set_template($tpl, $ent);
-	} else $PAGE->redirect($ent->permalink());
+	} elseif ( POST('draft') ) {
+		$PAGE->redirect($blg->uri('listdrafts'));
+	} else {
+		$PAGE->redirect($ent->permalink());
+	}
 	
 } elseif (POST('preview')) {
 	
@@ -130,10 +138,9 @@ if (POST('submit')) {
 # fatal error, such as a failed pingback.
 if (! isset($page_body)) $page_body = $tpl->process();
 
-$title = $is_art ? 
-         spf_("%s - Edit Entry", $blg->name) :
-         spf_("%s - Edit Article", $blg->name);
-$PAGE->title = 
+$PAGE->title = $is_art ? 
+         spf_("%s - Edit Article", $blg->name) :
+         spf_("%s - Edit Entry", $blg->name);
 $PAGE->addStylesheet("form.css", "entry.css");
 $PAGE->addScript("editor.js");
 $PAGE->display($page_body, &$blg);

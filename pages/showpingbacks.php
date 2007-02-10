@@ -26,7 +26,7 @@ require_once("pages/pagelib.php");
 global $PAGE;
 
 $u = NewUser();
-$ent = NewBlogEntry();
+$ent = NewEntry();
 $blg = NewBlog();
 $PAGE->setDisplayObject($ent);
 

@@ -1,4 +1,35 @@
-10-Nov-2006: version 0.8.2
+09-Feb-2007:
+- Added support for draft entries.
+- Added some i18n documentation.
+- Changes to file writing setup page.
+
+29-Jan-2007:
+- Many, many changes since last time.  
+- Added file permissions settings for file writing classes.
+- Added support for subdomains.
+- Fixed Blogger and MetaWeblog API implementations.
+- Added pingback.extensions.getPingbacks method for pingback syndication.
+- Consolidated all the XML-RPC stuff in a single xmlrpc.php file.
+- Added CHECK_DOCUMENT_ROOT option to be set in userconfig.cfg.  Setting this
+to false will bypass the document root check in blogconfig.php.  Note that this 
+check can sometimes fail due to permissions on the doucment root or it's 
+parent directory, and so it might be useful to turn it off.
+
+21-Dec-2006: version 0.8.2
+- Fixed Javascript confirmation with ipban plugin.
+- Added entry editor option to turn off inserting links on upload box change.
+- Added ability for administrators to edit user accounts.
+
+14-Dec-2006:  
+- Fixed unconverted theme style sheets.
+- Made bad DOCUMENT_ROOT error not kill the script and added output line
+noting the path to the blogconfig.php file.
+
+28-Nov-2006:
+- Fixed bug in detecting entry path for Pingback and TrackBack
+viewing pages.
+
+10-Nov-2006: 
 - Fixed bug in sending pingbacks.
 - Fixed URLs and JavaScript for deleting single TrackBack or Pingback.
 - Changed default format for blog entry files to XML.  To revert to old format,

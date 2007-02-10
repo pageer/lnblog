@@ -12,6 +12,14 @@
 <li><a href="pages/editfile.php?file=userdata/groups.ini"><?php p_("Edit groups.ini file"); ?></a></li>
 <li><a href="pages/editfile.php?map=yes&amp;file=userdata/sitemap.htm&amp;list=yes"><?php p_("Modify site-wide menubar"); ?></a></li>
 <li><a href="newlogin.php"><?php p_("Add new user"); ?></a></li>
+<li>Edit existing user
+<select id="username" name="username">
+<?php foreach ($USER_ID_LIST as $uid) { ?>
+<option><?php echo $uid;?></option>
+<?php } ?>
+</select>
+<input type="submit" name="edituser" id="edituser" value="<?php p_("Edit");?>" />
+</li>
 <?php if (isset($SHOW_NEW)) { ?>
 <li><a href="newblog.php"><?php p_("Add new blog"); ?></a></li>
 <?php } ?>

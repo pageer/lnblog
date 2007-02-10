@@ -2,55 +2,6 @@ var short_forms = Array();
 var abbrev_phrases = Array();
 var acronym_phrases = Array();
 
-function addEvent(obj, sType, fn){
-    if (obj.addEventListener){
-        obj.addEventListener(sType, fn, false);
-    } else if (obj.attachEvent) {
-        var r = obj.attachEvent("on"+sType, fn);
-    } else {
-        alert("Handler could not be attached");
-    }
-}
-
-function insertAtCursor(myField, myValue) {
-	//IE support
-	if (document.selection) {
-		myField.focus();
-		sel = document.selection.createRange();
-		sel.text = myValue;
-	}
-	//MOZILLA/NETSCAPE support
-	else if (myField.selectionStart || myField.selectionStart == '0') {
-		var startPos = myField.selectionStart;
-		var endPos = myField.selectionEnd;
-		myField.value = myField.value.substring(0, startPos)
-			+ myValue
-			+ myField.value.substring(endPos, myField.value.length);
-	} else {
-		myField.value += myValue;
-	}
-	myField.focus();
-}
-
-function hasSelection(myField) {
-	var ret = false;
-	//IE support
-	if (document.selection) {
-		myField.focus();
-		sel = document.selection.createRange();
-		ret = sel.text;
-	}
-	//MOZILLA/NETSCAPE support
-	else if (myField.selectionStart || myField.selectionStart == '0') {
-		var startPos = myField.selectionStart;
-		var endPos = myField.selectionEnd;
-		ret = myField.value.substring(startPos, endPos);
-	} else {
-		ret = false;
-	}
-	return ret;
-}
-
 function add_acr(shrt, lng) {
 	var len = short_forms.push(shrt);
 	acronym_phrases[len-1] = lng;
@@ -87,13 +38,13 @@ function one_parm(type, prompt_text) {
 	    document.getElementById("editboxes").style.display == "block") {
 		text_str = document.getElementById("desc_txt").value;
 		document.getElementById("desc_txt").value = '';
-	} else if (hasSelection(document.getElementById("body"))) {
-		text_str = hasSelection(document.getElementById("body"));
+	} else if (lnblog.getSelection(document.getElementById("body"))) {
+		text_str = lnblog.getSelection(document.getElementById("body"));
 	} else {
 		text_str = window.prompt(prompt_text);
 	}
 	if (! text_str) return false;
-	insertAtCursor(
+	lnblog.insertAtCursor(
 		document.getElementById("body"), 
 		'[' + type + ']' + text_str + '[/' + type + ']');
 	return false;
@@ -107,8 +58,8 @@ function two_parm(type, prompt_text, meta_text) {
 	if (document.getElementById("editboxes") &&
 	    document.getElementById("editboxes").style.display == "block") {
 		desc_str = document.getElementById("desc_txt").value;
-	} else if (hasSelection(document.getElementById("body"))) {
-		desc_str = hasSelection(document.getElementById("body"));
+	} else if (lnblog.getSelection(document.getElementById("body"))) {
+		desc_str = lnblog.getSelection(document.getElementById("body"));
 	} else {
 		desc_str = window.prompt(prompt_text);
 	}
@@ -143,7 +94,7 @@ function two_parm(type, prompt_text, meta_text) {
 	
 	if (! meta_str) return false;
 	
-	insertAtCursor(
+	lnblog.insertAtCursor(
 		document.getElementById("body"),
 		'[' + type + '=' + meta_str + ']' +	desc_str + '[/' + type + ']');
 
@@ -160,8 +111,8 @@ function opt_parm(type, prompt_text, meta_text) {
 	if (document.getElementById("editboxes") &&
 	    document.getElementById("editboxes").style.display == "block") {
 		desc_str = document.getElementById("desc_txt").value;
-	} else if (hasSelection(document.getElementById("body"))) {
-		desc_str = hasSelection(document.getElementById("body"));
+	} else if (lnblog.getSelection(document.getElementById("body"))) {
+		desc_str = lnblog.getSelection(document.getElementById("body"));
 	} else {
 		desc_str = window.prompt(prompt_text);
 	}
@@ -184,7 +135,7 @@ function opt_parm(type, prompt_text, meta_text) {
 		data_str = '[' + type + '=' + meta_str + ']' + desc_str + '[/' + type + ']'
 	}
 	
-	insertAtCursor(
+	lnblog.insertAtCursor(
 		document.getElementById("body"), data_str);
 	return false;
 
@@ -196,8 +147,8 @@ function set_color(text_prompt, attr_prompt) {
 	var color_str;
 	var data_str;
 	
-	if (hasSelection(document.getElementById("body"))) {
-		text_str = hasSelection(document.getElementById("body"));
+	if (lnblog.getSelection(document.getElementById("body"))) {
+		text_str = lnblog.getSelection(document.getElementById("body"));
 	} else {
 		text_str = window.prompt(text_prompt);
 	}
@@ -211,9 +162,11 @@ function set_color(text_prompt, attr_prompt) {
 		color_str = color.value;
 	}
 	
+	if (color_str == undefined) return false;
+
 	data_str = '[color='+color_str+']'+text_str+'[/color]';
 	
-	insertAtCursor(document.getElementById("body"), data_str);
+	lnblog.insertAtCursor(document.getElementById("body"), data_str);
 	return false;
 
 }
@@ -225,8 +178,8 @@ function set_img(text_prompt, attr_prompt) {
 	var tag_str;
 	var data_str;
 	
-	if (hasSelection(document.getElementById("body"))) {
-		text_str = hasSelection(document.getElementById("body"));
+	if (lnblog.getSelection(document.getElementById("body"))) {
+		text_str = lnblog.getSelection(document.getElementById("body"));
 	} else {
 		text_str = window.prompt(text_prompt);
 	}
@@ -245,14 +198,14 @@ function set_img(text_prompt, attr_prompt) {
 	
 	data_str = '['+tag_str+'='+url_str+']'+text_str+'[/'+tag_str+']';
 	
-	insertAtCursor(document.getElementById("body"), data_str);
+	lnblog.insertAtCursor(document.getElementById("body"), data_str);
 	return false;
 
 }
 
 
 function insertChar(type) {
-	insertAtCursor(document.getElementById("body"), type);
+	lnblog.insertAtCursor(document.getElementById("body"), type);
 	return true;
 }
 
@@ -333,6 +286,10 @@ function upload_add_link(e) {
 	var ext = this.value.replace(/^(.*)(\..+)$/, "$2");
 	var img_exts = new Array('.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff', '.tif');
 	var is_img = false;
+
+	var check_add = document.getElementById("adduploadlink");
+	if (check_add && ! check_add.checked) return false;
+
 	for (i=0; i< img_exts.length; i++) {
 		if (img_exts[i] == ext) {
 			is_img = true;
@@ -359,15 +316,15 @@ function upload_add_link(e) {
 		var body = document.getElementById('body');
 		if (is_img) {
 			if (document.getElementById('input_mode').value == 1) {
-				insertAtCursor(body, '[img='+this.value+']'+res+'[/img]');
+				lnblog.insertAtCursor(body, '[img='+this.value+']'+res+'[/img]');
 			} else {
-				insertAtCursor(body, '<img src="'+this.value+'" alt="'+res+'" title="'+res+'" />');
+				lnblog.insertAtCursor(body, '<img src="'+this.value+'" alt="'+res+'" title="'+res+'" />');
 			}
 		} else {
 			if (document.getElementById('input_mode').value == 1) {
-				insertAtCursor(body, '[url='+this.value+']'+res+'[/url]');
+				lnblog.insertAtCursor(body, '[url='+this.value+']'+res+'[/url]');
 			} else {
-				insertAtCursor(body, '<a href="'+this.value+'">'+res+'</a>');
+				lnblog.insertAtCursor(body, '<a href="'+this.value+'">'+res+'</a>');
 			}
 		}
 	}
@@ -377,28 +334,28 @@ function document_add_all_events(e) {
 
 	// Toggle the LBCode editor on or off depending on the markup setting.
 	var inputmode = document.getElementById('input_mode');
-	addEvent(inputmode, 'change', toggle_lbcode_editor);
+	lnblog.addEvent(inputmode, 'change', toggle_lbcode_editor);
 	toggle_lbcode_editor();
 	
 	// Toggle the extended settings fields on or off.
 	var setfld = document.getElementById('entry_settings');
 	var setleg = setfld.getElementsByTagName('legend');
-	addEvent(setleg[0], 'click', toggle_post_settings);
+	lnblog.addEvent(setleg[0], 'click', toggle_post_settings);
 	toggle_post_settings();
 
 	// Add event handlers to file upload boxes.
 	var uploads = document.getElementsByTagName('input');
 	for (i=0; i< uploads.length; i++) {
 		if (uploads[i].type == 'file') {
-			addEvent(uploads[i], 'change', upload_add_link);
+			lnblog.addEvent(uploads[i], 'change', upload_add_link);
 		}
 	}
 	
 	var tagsel = document.getElementById('tag_list');
-	addEvent(tagsel, 'change', topic_add_tag);
+	lnblog.addEvent(tagsel, 'change', topic_add_tag);
 	
 	document.getElementById('subject').focus();
 	return true;
 }
 //document.onload = function (e) { window.alert("FOO"); }
-addEvent(window, 'load', document_add_all_events);
+lnblog.addEvent(window, 'load', document_add_all_events);

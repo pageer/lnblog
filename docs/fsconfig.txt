@@ -3,10 +3,10 @@ Stores data storage configuration.
 
 Section: File Writing Overview
 
-Currently, LnBlog only stores data by writing it to text file on the webg
+Currently, LnBlog only stores data by writing it to text file on the web
 server.  However, it supports two methods for doing this.  One is to use 
 standard file-writing functions and the other is to use FTP.  These are 
-refferred to, respectively, as NteiveFS and FTPFS.  Deciding 
+refferred to, respectively, as NativeFS and FTPFS.  Deciding 
 between these is the first configuration step for LnBlog and is done by
 the <fs_setup.php> script.  This script creates the fsconfig.php file, 
 which should not be present in an initial installation.

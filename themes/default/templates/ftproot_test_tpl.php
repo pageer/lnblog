@@ -6,19 +6,8 @@
 </head>
 <body>
 <h3><?php p_('FTP Root Test'); ?></h3>
-<p><?php p_('This page will attempt to detect your 
-<abbr title="File Transfer Protocol">FTP</abbr> root.  This is the root 
-directory for <abbr title="File Transfer Protocol">FTP</abbr> use and is not 
-necessarily the same as the real system root.  To run the test, enter your 
-FTP username, password, and host name and click the "Test" button to detect 
-the <abbr title="File Transfer Protocol">FTP</abbr> root.  You can also test
-other <abbr title="File Transfer Protocol">FTP</abbr> root values by filling 
-in the "FTP Root" box.'); ?></p>
-<p><?php p_('To determine success, check the results section below.  If the 
-last line indicates that the test file was found, then you can copy the 
-"FTP root" value into the appropriate configuration page.  If it indicates 
-that the file was <em>not</em> found, then you will have to try another 
-value.'); ?></p>
+<p><?php p_('This page will attempt to detect your <abbr title="File Transfer Protocol">FTP</abbr> root.  This is the root directory for <abbr title="File Transfer Protocol">FTP</abbr> use and is not necessarily the same as the real system root.  To run the test, enter your FTP username, password, and host name and click the "Test" button to detect the <abbr title="File Transfer Protocol">FTP</abbr> root.  You can also test other <abbr title="File Transfer Protocol">FTP</abbr> root values by filling in the "FTP Root" box.'); ?></p>
+<p><?php p_('To determine success, check the results section below.  If the last line indicates that the test file was found, then you can copy the "FTP root" value into the appropriate configuration page.  If it indicates that the file was <em>not</em> found, then you will have to try another value.'); ?></p>
 <p><?php p_('Current Directory'); ?>: <?php echo $CURR_DIR; ?></p>
 <?php if ($ERROR_MESSAGE) { ?>
 <h4><?php echo $ERROR_MESSAGE; ?></h4>

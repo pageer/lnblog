@@ -37,7 +37,9 @@ require_once("lib/fs.php");
 class NativeFS extends FS {
 
 	function NativeFS() {
-		$this->default_mode = 0777;
+		$this->default_mode = FS_DEFAULT_MODE;
+		$this->script_mode = FS_SCRIPT_MODE;
+		$this->directory_mode = FS_DIRECTORY_MODE;
 	}
 	
 	function destruct() {}
@@ -47,21 +49,29 @@ class NativeFS extends FS {
 
 	function chdir($dir) { return chdir($dir); }
 	
-	function mkdir($dir, $mode=0777) { 
-		$old_mask = umask(0000);
-		$ret = mkdir($dir, $mode); 
-		umask($old_mask);
+	function mkdir($dir, $mode=false) { 
+		if (! $mode) $mode = $this->directory_mode;
+		if ($mode) {
+			$old_mask = umask(0000);
+			$ret = mkdir($dir, $mode); 
+			umask($old_mask);
+		} else {
+			# The optional mode assumes PHP 4.2.0 or greater.
+			# Is that a problem?
+			$ret = mkdir($dir);
+		}
 		return $ret;
 	}
 
-	function mkdir_rec($dir, $mode=0777) {
+	function mkdir_rec($dir, $mode=false) {
 		$parent = dirname($dir);
 		if ( $parent == $dir ) return false;
-		$old_mask = umask(0000);
-		if (! is_dir($parent) )	$ret = mkdir_rec($parent, $mode);
+		#if (! $mode) $mode = $this->directory_mode;
+		#$old_mask = umask(0000);
+		if (! is_dir($parent) )	$ret = $this->mkdir_rec($parent, $mode);
 		else $ret = true;
-		if ($ret) $ret = mkdir($dir, $mode);
-		umask($old_mask);
+		if ($ret) $ret = $this->mkdir($dir, $mode);
+		#umask($old_mask);
 		return $ret;
 	}
 
@@ -93,20 +103,26 @@ class NativeFS extends FS {
 		return chmod($path, $mode);
 	}
 
-	function defaultMode() {
-		return $this->default_mode;
-	}
-
 	function copy($src, $dest)   { return copy($src, $dest); }
 	function rename($src, $dest) { return rename($src, $dest); }
 	function delete($src)        { return unlink($src); }
 
 	function write_file($path, $contents) {
+		$mask = $this->isScript($path) ? $this->script_mode : $this->default_mode;
+		
+		if ($mask) {
+			$old_umask = umask(0000);
+			umask($mask xor 0777);
+		}
+		
 		$fh = fopen($path, "w");
 		if ($fh) {
 			$ret = fwrite($fh, $contents);
 			fclose($fh);
 		} else $ret = false;
+
+		if ($mask) umask($old_umask);
+		
 		return $ret;
 	}
 

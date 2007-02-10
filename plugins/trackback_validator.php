@@ -38,6 +38,9 @@ class TrackbackValidator extends Plugin {
 	
 	function check_for_link(&$param) {
 		$url = parse_url($param->url);
+		
+		if (!$url || ! isset($url['host'])) return false;
+		
 		if ( $this->allow_self && $url['host'] == SERVER("SERVER_NAME") ) {
 			return true;
 		}

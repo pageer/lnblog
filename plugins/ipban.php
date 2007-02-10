@@ -33,6 +33,11 @@ class IPBan extends Plugin {
 		$this->addOption("admin_local", _("Show per-blog ban link when administrator"), false, "checkbox");
 		$this->addOption("ban_del", _("Ban link both bans IP and deletes"), true, "checkbox");
 		$this->getConfig();
+		
+		# Call banIP() here so that it will get called on pages that never output, 
+		# e.g. when you do a JavaScript confirmation on a "delete and ban", which 
+		# redirects instead of outputing the page.	
+		$this->banIP($this);
 	}
 
 	# Write the ban list to disk.
@@ -71,12 +76,12 @@ class IPBan extends Plugin {
 			if ($this->ban_del) {
 				$cb_link_loc =
 					' (<a href="'.make_uri($cmt->uri("delete"), array('banip'=>$cmt->ip)).'" '.
-					'onclick="return window.confirm(\''.
+					'onclick="this.href = this.href + \'&conf=yes\'; return window.confirm(\''.
 					spf_("Delete %s and ban IP address %s from submitting comments or trackbacks to this blog?", $cmt->getAnchor(), $cmt->ip).
 					'\');">'._("Delete &amp; Ban IP").'</a>) ';
 				$cb_link_glob = ' (<a href="'.
 					make_uri($cmt->uri("delete"),array('banip'=>$cmt->ip, 'global'=>'yes')).'" '.
-					'onclick="return window.confirm(\''.
+					'onclick="this.href = this.href + \'&conf=yes\'; return window.confirm(\''.
 					spf_("Delete %s and ban IP address %s from submitting comments or trackbacks to this entire site?", $cmt->getAnchor(), $cmt->ip).
 					'\');">'._("Delete &amp; Ban Globally").'</a>)';
 			} else {

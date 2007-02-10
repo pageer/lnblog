@@ -46,16 +46,167 @@ require_once("lib/utils.php");
 
 session_start();
 
-global $PAGE;
+# Test how and if native file writing works.
+function nativefs_test() {
+	
+	$ret = array('write'=>false, 'delete'=>false, 
+	             'user'=>'', 'group'=>'', 
+	             'summary'=>'');
+	
+	$stat_data = false;
+	
+	$f = @fopen("tempfile.tmp", "w");
+	if ($f !== false) {
 
-$docroot = "documentroot";
-$ftp = "use_ftp";
-$uid = "ftp_user";
-$pwd = "ftp_pwd";
-$conf = "ftp_conf";
-$host = "ftp_host";
-$root = "ftp_root";
-$pref = "ftp_prefix";
+		$old = umask(0777);
+		$can_write = fwrite($f, "Test");
+		fclose($f);
+		umask($old);
+		
+		$stat_data = stat("tempfile.tmp");
+		if ($stat_data) {
+			$ret['user'] = $stat_data['uid'];
+			$ret['group'] = $stat_data['gid'];
+		}
+		
+		$ret['delete'] = @unlink("tempfile.tmp");
+	}
+	
+	$ret['summary'] = _("NativeFS test results:")."<br />".
+		spf_("Create new files: %s", $ret['write'] ? "yes" : "no")."<br />".
+		spf_("Delete files: %s", $ret['delete'] ? "yes" : "no")."<br />".
+		spf_("File owner: %s", $ret['user'])."<br />".
+		spf_("File owner: %s", $ret['group']);
+
+	return $ret;
+}
+
+# Test to autodetect the FTP root directory for the given account.
+function ftproot_test() {
+	require("lib/ftpfs.php");
+	@$ftp = new FTPFS(trim(POST("ftp_host")), 
+	                  trim(POST("ftp_user")), trim(POST("ftp_pwd")) );
+	if ($ftp->status !== false) {
+		
+		# Try to calculate the FTP root.
+		ftp_chdir($ftp->connection, "/");
+		$ftp_list = ftp_nlist($ftp->connection, ".");
+		
+		$file = getcwd().PATH_DELIM."fs_setup.php";
+		$drive = substr($file, 0, 2);
+
+		# Get the current path into an array.
+		if (PATH_DELIM != "/") {
+			if (substr($file, 1, 1) == ":") $file = substr($file, 3);
+			$file = str_replace(PATH_DELIM, "/", $file);
+		}
+
+		if (substr($file, 0, 1) == "/") $file = substr($file, 1);
+		$dir_list = explode("/", $file);
+
+		# For each local directory element, loop through contents of 
+		# the FTP root directory.  If the current element is in FTP root,
+		# then the parent of the current element is the root.
+		# $ftp_root starts at root and has the current directory appended
+		# at the end of each outer loop iteration.  Thus, $ftp_root 
+		# always holds the parent of the currently processing directory.
+		# Note that we must account for Windows drive letters.
+		if (PATH_DELIM == "/") {
+			$ftp_root = "/";
+		} else {
+			$ftp_root = $drive.PATH_DELIM;
+		}
+		foreach ($dir_list as $dir) {
+			foreach ($ftp_list as $ftpdir) {
+				if ($dir == $ftpdir && $ftpdir != ".." && $ftpdir != ".") {
+					break 2;
+				}
+			}
+			$ftp_root .= $dir.PATH_DELIM;
+		}
+		
+		# Now check that the result we got is OK.
+		$ftp->ftp_root = $ftp_root;
+		$dir_list = ftp_nlist($ftp->connection, 
+								$ftp->localpathToFSPath(getcwd()));
+		if (! is_array($dir_list)) $dir_list = array();
+
+		foreach ($dir_list as $ent) {
+			if ("fs_setup.php" == basename($ent)) {
+				return $ftp_root;
+			} 
+		}
+	}
+	return false;
+}
+
+# Check that all required fields have been populated by the user.
+function check_fields() {
+	$errs = array();	
+	$plugin = trim(POST('use_ftp'));
+	
+	if (trim(POST("docroot")) != '') $errs[] = _("No document root set.");
+	
+	$ret = (POST('use_ftp') == 'ftpfs' || POST('use_ftp') == 'nativefs');
+	if (! $ret) $errs[] = _("Invalid file writing mode.");
+	
+	$ret = is_numeric(POST('permdir')) && strlen(POST('permdir')) == 4;
+	$ret = $ret && is_numeric(POST('permscript')) && strlen(POST('permscript')) == 4;
+	$ret = $ret && is_numeric(POST('permfile')) && strlen(POST('permfile')) == 4;
+	if (! $ret) $errs[] = _("Invalid permissions specified.");
+	
+	
+	if ($plugin == 'nativefs') {
+		# Nothing to do?
+	} elseif ($plugin == 'ftpfs') {
+		if (trim(POST('ftp_user')) == '') $errs[] = _("Missing FTP username.");
+		if (trim(POST('ftp_pwd')) == '') $errs[] = _("Missing FTP password.");
+		if (trim(POST('ftp_conf')) == '') $errs[] = _("Missing FTP password confirmation.");
+		if (trim(POST('ftp_host')) == '') $errs[] = _("Missing FTP hostname.");
+		
+		if (POST('ftp_pwd') != POST('ftp_conf')) $errs[] = _("FTP passwords do not match.");
+	}
+	
+	if (count($errs) > 0) return $errs;
+	else return true;
+}
+
+function template_set_post_data(&$tpl) {
+	$tpl->set("DOC_ROOT", POST("docroot") );
+	if (POST("use_ftp") == "ftpfs") $tpl->set("USE_FTP", POST("use_ftp") );
+	$tpl->set("USER", POST("ftp_user") );
+	$tpl->set("PASS", POST("ftp_pwd") );
+	$tpl->set("CONF", POST("ftp_conf") );
+	$tpl->set("HOST", POST("ftp_host") );
+	$tpl->set("ROOT", POST("ftp_root") );
+	$tpl->set("PREF", POST("ftp_prefix") );
+	$tpl->set("HOSTTYPE", POST("hosttype"));
+	$tpl->set("PERMDIR", POST('permdir'));
+	$tpl->set("PERMSCRIPT", POST('permscript'));
+	$tpl->set("PERMFILE", POST('permfile'));
+}
+
+function serialize_constants() {
+	$ret = '';
+	$consts = array("DOCUMENT_ROOT", "SUBDOMAIN_ROOT", "DOMAIN_NAME",
+	                "FS_PLUGIN", "FTPFS_USER", 
+	                "FTPFS_PASSWORD", "FTPFS_HOST",
+	                "FTP_ROOT", "FTPFS_PATH_PREFIX",
+	                "FS_DEFAULT_MODE", "FS_SCRIPT_MODE", "FS_DIRECTORY_MODE");
+	foreach ($consts as $c) {
+		if (defined($c)) {
+			if (is_numeric(constant($c))) {
+				$ret .= 'define("'.$c.'", '.constant($c).');'."\n";
+			} else {
+				$ret .= 'define("'.$c.'", "'.constant($c).'");'."\n";
+			}
+		}
+	}
+	if ($ret) $ret = "<?php\n$ret?>";
+	return $ret;
+}
+
+global $PAGE;
 
 if ( file_exists(INSTALL_ROOT.PATH_DELIM.USER_DATA.PATH_DELIM.FS_PLUGIN_CONFIG) ) {
 	header("Location: index.php");
@@ -69,163 +220,81 @@ $redir_page = "index.php";
 $tpl = NewTemplate(FS_CONFIG_TEMPLATE);
 
 $tpl->set("FORM_ACTION", basename(SERVER("PHP_SELF")) );
-$tpl->set("DOC_ROOT_ID", $docroot);
-$tpl->set("USE_FTP_ID", $ftp);
-$tpl->set("USER_ID", $uid);
-$tpl->set("PASS_ID", $pwd);
-$tpl->set("CONF_ID", $conf);
-$tpl->set("HOST_ID", $host);
-$tpl->set("ROOT_ID", $root);
-$tpl->set("PREF_ID", $pref);
 
 if ( has_post() ) {
 
-	$tpl->set("DOC_ROOT", POST($docroot) );
-	if (POST($ftp) == "ftpfs") $tpl->set("USE_FTP", POST($ftp) );
-	$tpl->set("USER", POST($uid) );
-	$tpl->set("PASS", POST($pwd) );
-	$tpl->set("CONF", POST($conf) );
-	$tpl->set("HOST", POST($host) );
-	$tpl->set("ROOT", POST($root) );
-	$tpl->set("PREF", POST($pref) );
-
-	$content = '';
+	template_set_post_data($tpl);
+	$field_test = check_fields();
 
 	# Note that DOCUMENT_ROOT is not strictly required, as all uses 
 	# of it should be wrapped in a document root calculation function
-	# for legacy versions.
+	# for legacy versions.  However....
 
-	if ( POST($ftp) == "nativefs" ) {
+	$fields = array("docroot"=>"DOCUMENT_ROOT", "subdomroot"=>"SUBDOMAIN_ROOT",
+	                "domain"=>"DOMAIN_NAME", "permfile"=>"FS_DEFAULT_MODE",
+	                "permdir"=>"FS_DIRECTORY_MODE", 
+	                "permscript"=>"FS_SCRIPT_MODE");
+	foreach ($fields as $key=>$val) {
+		if (POST($key)) {
+			define($val, trim(POST($key)));
+		}
+	}
+	
+	if ( POST("use_ftp") == "nativefs" ) {
 
 		define("FS_PLUGIN", "nativefs");
-		$content = "<?php\n";
-		if ( POST($docroot) ) {
-			$webroot = trim(POST($docroot));
-			define("DOCUMENT_ROOT", $webroot);
-			$content .= 'define("DOCUMENT_ROOT", "'.DOCUMENT_ROOT."\");\n";
-		}
-		$content .= 'define("FS_PLUGIN", "'.FS_PLUGIN."\");\n?>";
 
-	} elseif ( POST($ftp) == "ftpfs" ) {
+	} elseif ( POST("use_ftp") == "ftpfs" ) {
 
 		# Check that all required fields have been specified.
-		$vars = array($uid, $pwd, $conf, $host, $root);
+		$vars = array("ftp_user", "ftp_pwd", "ftp_conf", "ftp_host", "ftp_root");
 		$has_all_data = true;
 		foreach ($vars as $val) {
 			$has_all_data = $has_all_data && ( trim(POST($val)) != "" );
 		}
 
 		# Make a vain attempt to guess the FTP root.
-		if ( trim(POST($uid)) && trim(POST($pwd)) && trim(POST($conf)) 
-		     && trim(POST($host)) && trim(POST($pwd)) == trim(POST($conf))
-			  && ! trim(POST($root)) ) {
-			require("lib/ftpfs.php");
-			@$ftp = new FTPFS(trim(POST($host)), 
-			                 trim(POST($uid)), trim(POST($pwd)) );
-			if ($ftp->status !== false) {
-				
-				# Try to calculate the FTP root.
-				ftp_chdir($ftp->connection, "/");
-				$ftp_list = ftp_nlist($ftp->connection, ".");
-				
-				$file = getcwd().PATH_DELIM."fs_setup.php";
-				$drive = substr($file, 0, 2);
-
-				# Get the current path into an array.
-				if (PATH_DELIM != "/") {
-					if (substr($file, 1, 1) == ":") $file = substr($file, 3);
-					$file = str_replace(PATH_DELIM, "/", $file);
-				}
-
-				if (substr($file, 0, 1) == "/") $file = substr($file, 1);
-				$dir_list = explode("/", $file);
-
-				# For each local directory element, loop through contents of 
-				# the FTP root directory.  If the current element is in FTP root,
-				# then the parent of the current element is the root.
-				# $ftp_root starts at root and has the current directory appended
-				# at the end of each outer loop iteration.  Thus, $ftp_root 
-				# always holds the parent of the currently processing directory.
-				# Note that we must account for Windows drive letters.
-				if (PATH_DELIM == "/") {
-					$ftp_root = "/";
-				} else {
-					$ftp_root = $drive.PATH_DELIM;
-				}
-				foreach ($dir_list as $dir) {
-					foreach ($ftp_list as $ftpdir) {
-						if ($dir == $ftpdir && $ftpdir != ".." && $ftpdir != ".") {
-							break 2;
-						}
-					}
-					$ftp_root .= $dir.PATH_DELIM;
-				}
-				
-				# Now check that the result we got is OK.
-				$ftp->ftp_root = $ftp_root;
-				$dir_list = ftp_nlist($ftp->connection, 
-				                      $ftp->localpathToFSPath(getcwd()));
-				if (! is_array($dir_list)) $dir_list = array();
-
-				foreach ($dir_list as $ent) {
-					if ("fs_setup.php" == basename($ent)) {
-						$ftp_root_test_result = $ftp_root;
-						$has_all_data = true;
-					} 
-				}
-			}
+		if ( trim(POST("ftp_user")) && trim(POST("ftp_pwd")) && trim(POST("ftp_conf")) 
+		     && trim(POST("ftp_host")) && trim(POST("ftp_pwd")) == trim(POST("ftp_conf"))
+			  && ! trim(POST("ftp_root")) ) {
+			$ftp_root_test_result = ftproot_test();
 		}
 
 		if ($has_all_data) {
 
-			if ( trim(POST($pwd)) == trim(POST($conf)) ) {
+			if ( trim(POST("ftp_pwd")) == trim(POST("ftp_conf")) ) {
 				
 				define("FS_PLUGIN", "ftpfs");
-				define("FTPFS_USER", trim(POST($uid)) );
-				define("FTPFS_PASSWORD",trim( POST($pwd)) );
-				define("FTPFS_HOST", trim(POST($host)) );
+				define("FTPFS_USER", trim(POST("ftp_user")) );
+				define("FTPFS_PASSWORD",trim( POST("ftp_pwd")) );
+				define("FTPFS_HOST", trim(POST("ftp_host")) );
 				if (isset($ftp_root_test_result)) {
 					$ftproot = $ftp_root_test_result;
 				} else {
-					$ftproot = trim(POST($root));
+					$ftproot = trim(POST("ftp_root"));
 				}
 				define("FTP_ROOT", $ftproot);
-				if (trim(POST($pref)) != '') {
-					define("FTPFS_PATH_PREFIX", trim(POST($pref)) );
+				if (trim(POST("ftp_prefix")) != '') {
+					define("FTPFS_PATH_PREFIX", trim(POST("ftp_prefix")) );
 				} 
-				
-				$content = "<?php\n";
-				if (POST($docroot)) {
-					$webroot = trim(POST($docroot));
-					
-					define("DOCUMENT_ROOT", $webroot );
-					$content .= 'define("DOCUMENT_ROOT", "'.DOCUMENT_ROOT."\");\n";
-				}
-				$content .= 'define("FS_PLUGIN", "'.FS_PLUGIN."\");\n".
-					'define("FTPFS_USER", "'.FTPFS_USER."\");\n".
-					'define("FTPFS_PASSWORD", "'.FTPFS_PASSWORD."\");\n".
-					'define("FTPFS_HOST", "'.FTPFS_HOST."\");\n".
-					'define("FTP_ROOT", "'.FTP_ROOT."\");\n";
-				if ( trim(POST($pref)) != '' ) {
-					$content .= 'define("FTPFS_PATH_PREFIX", "'.FTPFS_PATH_PREFIX."\");\n";
-				}
-				$content .= '?>';
 
 			} else {
 				$tpl->set("FORM_MESSAGE", _("Error: Passwords do not match."));
 			}
-		} elseif (trim(POST($pwd)) != trim(POST($conf))) {
+		} elseif (trim(POST("ftp_pwd")) != trim(POST("ftp_conf"))) {
 			$tpl->set("FORM_MESSAGE", _("Error: Passwords do not match."));
 		} elseif (isset($ftp_root)) {
 			$tpl->set("FORM_MESSAGE", spf_("Error: The auto-detected FTP root directory %s was not acceptable.  You will have to set this manually.", $ftp_root));
 		} else {
 			$tpl->set("FORM_MESSAGE", _("Error: For FTP file writing, you must fill in the FTP login information."));
 		}
-	
+		
 	} else {
 		$tpl->set("FORM_MESSAGE", _("Error: No file writing method selected."));
 	}
 
+	$content = serialize_constants();
+	
 	if ($content) {
 	
 		@$fs = NewFS();
@@ -244,14 +313,11 @@ if ( has_post() ) {
 		if (! $ret) {
 			if (FS_PLUGIN == "ftpfs") {
 				$tpl->set("FORM_MESSAGE", sprintf(
-					_("Error: Could not create fsconfig.php file.  Make sure that 
-					the directory %s exists on the server and is writable to %s."),
+					_("Error: Could not create fsconfig.php file.  Make sure that the directory %s exists on the server and is writable to %s."),
 					INSTALL_ROOT.PATH_DELIM.USER_DATA, FTPFS_USER));
 			} else {
 				$tpl->set("FORM_MESSAGE", sprintf(
-					_("Error: Could not create fsconfig.php file.  Make sure that 
-					the directory %s exists on the server and is writable to 
-					the web server user."), INSTALL_ROOT.PATH_DELIM.USER_DATA));
+					_("Error: Could not create fsconfig.php file.  Make sure that the directory %s exists on the server and is writable to the web server user."), INSTALL_ROOT.PATH_DELIM.USER_DATA));
 			}
 		} else {
 			header("Location: index.php");
@@ -265,12 +331,18 @@ if ( has_post() ) {
 	}
 	
 } else {
+	$tpl->set("HOSTTYPE", "suexec");
 	$tpl->set("HOST", "localhost");  
 	$tpl->set("DOC_ROOT", calculate_document_root() );
+	$tpl->set("PERMDIR", '0000');
+	$tpl->set("PERMSCRIPT", '0000');
+	$tpl->set("PERMFILE", '0000');
+
 }
 
 $body = $tpl->process();
 $PAGE->addStylesheet("form.css");
-$PAGE->addScript("fssetup.js");
+#$PAGE->addScript("lnblog_lib.js");
+$PAGE->addScript("fs_setup.js");
 $PAGE->display($body, &$blog);
 ?>

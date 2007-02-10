@@ -14,21 +14,21 @@
 	margin-top: 2%;
 }
 
-.commentheader h3 {
+.comment .header h3 {
 	padding: 0px;
 	margin: 0px;
 }
 
-.commentfooter {
+.comment .footer {
 	font-size: 80%;
 }
 
-.commentfooter ul {
+.comment .footer ul {
 	padding: 0px;
 	margin: 0px;
 }
 
-.commentfooter li {
+.comment .footer li {
 	list-style-type: none;
 }
 
@@ -36,7 +36,8 @@
 	padding: 1%;
 }
 
-.commentfooter li.commenturl, div.commentfooter li.commentname {
+.comment .footer li.commenturl, 
+div.comment .footer li.commentname {
 	display: inline;
 	margin-right: 1%;
 }

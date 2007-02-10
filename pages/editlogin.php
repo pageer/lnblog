@@ -35,15 +35,24 @@ session_start();
 
 global $PAGE;
 
-$usr = NewUser();
-$PAGE->setDisplayObject($usr);
+$edit_user = NewUser();
 $blog = NewBlog();
 
-if (! $usr->checkLogin() ) {
+if (! $edit_user->checkLogin() ) {
 	if ($blog->isBlog()) $PAGE->redirect($blog->uri('blog'));
 	else $PAGE->redirect(INSTALL_ROOT_URL);
 	exit;
 }
+
+if ($edit_user->isAdministrator() && isset($_GET['user'])) {
+	$usr = NewUser($_GET['user']);
+	if (! $usr->exists()) {
+		$usr = NewUser();
+	}
+} else {
+	$usr = NewUser();
+}
+$PAGE->setDisplayObject($usr);
 
 # Allow us to use this to create the admin login.
 if ($blog->isBlog()) {

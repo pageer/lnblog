@@ -1,0 +1,113 @@
+/* Styles for blog entries. */
+
+.blogentry,
+.article {
+	/*border: thin solid black;*/
+	border-bottom: 1px dotted black;
+	margin-bottom: 0;
+	width: 98%;
+	padding: 1%;
+}
+
+.blogentryheader h2,
+.articleheader h2 {
+	margin: 0px;
+	padding: 0px;
+}
+
+.blogentryfooter,
+.articlefooter {
+	font-size: 80%;
+	margin-bottom: 3%;
+	/*clear: both;*/
+}
+
+.blogentryfooter ul,
+.articlefooter ul, 
+.articleheader ul {
+	margin: 0px;
+	padding: 0px;
+}
+
+.blogentryfooter li,
+.articlefooter li, 
+.articleheader li  {
+	list-style-type: none;
+}
+
+ul.postadmin li {
+	display: inline;
+	margin-right: 1%;
+}
+
+ul.comments {
+	border: 1px solid black;
+	background-color: #6b85b0;
+	padding: 4px 3px 4px 3px;
+	font-size: 80%;
+	font-family: courier, monospace;
+	width: 98%;
+}
+
+ul.comments li {
+	display: inline;
+	background-color: #f4f4f4;
+	border: 1px solid black;
+	margin: 2px;
+	padding: 1px;
+}
+
+ul.comments li hover {
+	background-color: black;
+}
+
+li.bloguser, li.bloguserurl {
+	display: inline;
+	margin-right: 1%;
+}
+
+.blogentry  div.blogentrybody,
+.article  div.articlebody {
+	padding: 1%;
+	/*white-space: pre;*/
+}
+
+.blogentrybody p,
+.articlebody p {
+	text-indent: 1em;
+	margin-bottom: 0.7em;
+	margin-top: 0.3em;
+	/*clear: both;*/
+}
+
+.blogentrybody img {
+	display: block;
+	margin: 1em auto;
+}
+
+.blogentryfooter h3 {
+	margin-bottom: 0px;
+	margin-top: 0px
+}
+
+.blogadmin {
+	display: inline;
+	margin-right: 1%;
+}
+
+@media print {
+
+	#commentsubmit {
+		display: none;
+	}
+	
+	.postadmin {
+		display: none;
+	}
+	
+	.blogentry,
+	.article {
+		page-break-inside: avoid;
+	}
+	
+}

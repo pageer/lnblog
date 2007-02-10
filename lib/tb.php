@@ -306,6 +306,14 @@ class Trackback extends LnBlogObject {
 
 	function readFileData($path=false) {
 		if (! $path) $path = $this->file;
+		if (substr($this->file, strlen($this->file)-4) != ".xml") {
+			$this->readOldFile($path);
+		} else {
+			$this->deserializeXML($path);
+		}
+	}
+
+	function readOldFile($path) {
 		$file_data = file($path);
 		foreach ($file_data as $line) {
 			$line = trim($line);
@@ -355,13 +363,8 @@ class Trackback extends LnBlogObject {
 		$fs = NewFS();
 		if (! is_dir( dirname($path) ) ) {
 			$fs->mkdir_rec(dirname($path));
-		}
-		$data = "URL: ".$this->url."\n".
-		        "Date: ".$this->ping_date."\n".
-		        "IP: ".$this->ip."\n".
-		        "Title: ".$this->title."\n".
-		        "Blog: ".$this->blog."\n".
-		        $this->data;
+		};
+		$data = $this->serializeXML();
 		$ret = $fs->write_file($path, $data);
 		$this->file = $path;
 		$fs->destruct();
@@ -446,22 +449,40 @@ class Trackback extends LnBlogObject {
 	}
 
 	# Method: getFilename
-	# Converts an anchor from <getAnchor> into a filename.
+	# Converts an anchor from <getAnchor> or an ID from globalID into a filename.
 	#
 	# Parameters:
-	# anchor - The anchor to turn into a filename.
+	# anchor - The anchor or ID to turn into a filename.
 	#
 	# Returns:
-	# The name of the trackback file.
+	# The path to the trackback file.
 	
 	function getFilename($anchor) {
-		$ent = NewEntry();
-		$ret = substr($anchor, 9);
+		if (strpos($anchor, "#") !== false) {
+			$pieces = split('#', $anchor);
+			$entid = dirname($pieces[0]);
+			$tbid = $pieces[1];
+		} else {
+			$entid = false;
+			$tbid = $anchor;
+		}
+		$ent = NewEntry($entid);
+		$ret = substr($tbid, 9);
 		$ret .= TRACKBACK_PATH_SUFFIX;
 		$ret = mkpath($ent->localpath(),ENTRY_TRACKBACK_DIR,$ret);
 		$ret = realpath($ret);
 		return $ret;
 	}
 
+	# Method: globalID
+	# Get the global identifier for this trackback.
+	function globalID() {
+		$parent = $this->getParent();
+		$id = $parent->globalID();
+		if (defined('ENTRY_TRACKBACK_DIR') && ENTRY_TRACKBACK_DIR) {
+			$id .= '/'.ENTRY_TRACKBACK_DIR;
+		}
+		$id .= '/#'.$this->getAnchor();
+	}
 }
 ?>

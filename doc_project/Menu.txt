@@ -130,8 +130,15 @@ Group: Administration Pages  {
    File: newlogin.php  (newlogin.php)
    File: plugin_loading.php  (plugin_loading.php)
    File: plugin_setup.php  (plugin_setup.php)
-   File: RecentComments  (userdata/plugins/sidebar_recentcomments.php)
-   File: SiteMap  (userdata/plugins/menubar_breadcrumbs.php)
+
+   Group: Userdata  {
+
+      File: RecentComments  (userdata/plugins/sidebar_recentcomments.php)
+      File: RSS2FeedGenerator  (userdata/feed_generator.php)
+      File: SiteMap  (userdata/plugins/menubar_breadcrumbs.php)
+      File: SiteMap  (userdata/menubar_breadcrumbs.php)
+      }  # Group: Userdata
+
    File: userinfo.php  (userinfo.php)
    }  # Group: Administration Pages
 
@@ -149,6 +156,7 @@ Group: Plugins  {
    File: DisableComments  (plugins/disable_comment.php)
    File: HTAccessGenerator  (plugins/htaccess_generator.php)
    File: IPBan  (plugins/ipban.php)
+   File: Linksleeve  (plugins/linksleeve.php)
    File: MetaData  (plugins/page_metatags.php)
    File: PageHeader  (plugins/banner_pageheader.php)
    File: ReplyNotifier  (plugins/reply_notifier.php)

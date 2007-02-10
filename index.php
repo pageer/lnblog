@@ -124,6 +124,16 @@ if ( POST('upgrade') && POST('upgrade_btn') ) {
 	if ($upgrade_status) $status = _("Permission update completed successfully.");
 	else $status = spf_("Error: Update exited with status %s.", $upgrade_status);
 	$tpl->set("FIXPERM_STATUS", $status);
+
+} elseif (POST("username") && POST("edituser")) {
+
+	$usr = NewUser();
+	if ($usr->exists(POST("username"))) {
+		$PAGE->redirect("pages/editlogin.php?user=".POST('username'));
+	} else {
+		$status = spf_("User %s does not exist.", POST('username'));
+	}
+
 }
 
 $blogs = $SYSTEM->getBlogList();
@@ -132,6 +142,13 @@ foreach ($blogs as $blg) {
 	$blog_names[] = $blg->blogid;
 }
 $tpl->set("BLOG_ID_LIST", $blog_names);
+
+$users = $SYSTEM->getUserList();
+$user_ids = array();
+foreach ($users as $u) {
+	$user_ids[] = $u->username();
+}
+$tpl->set("USER_ID_LIST", $user_ids);
 
 $body = $tpl->process();
 $PAGE->display($body);

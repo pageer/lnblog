@@ -50,6 +50,12 @@ function get_blog_path() {
 			$path = str_replace("/", PATH_DELIM, $path);
 		}
 		$path = preg_replace("/[^\w|"."\\".PATH_DELIM."]/", "", $path);
+		
+		if ( defined("SUBDOMAIN_ROOT") && 
+		     is_dir(mkpath(SUBDOMAIN_ROOT, $path)) ) {
+			return mkpath(SUBDOMAIN_ROOT, $path);
+		}
+		
 		return mkpath(DOCUMENT_ROOT, $path);
 	} else {
 		return false;
@@ -71,19 +77,46 @@ function load_plugin($plugin_name) {
 	return new $plugin_name(true);
 }
 
+$curr_dir = dirname(__FILE__);
+$cfg_file = '';
+if (file_exists(mkpath($curr_dir,"userdata", "userconfig.cfg"))) {
+	$cfg_file = mkpath($curr_dir,"userdata", "userconfig.cfg");
+} elseif (file_exists(mkpath($curr_dir, "userconfig.cfg"))) {
+	$cfg_file = mkpath($curr_dir, "userconfig.cfg");
+}
+
+# Look for the userconfig.cfg and define any variables in it.
+# This is a more "user friendly" alternative to userconfig.php.
+if (file_exists($cfg_file)) {
+	$data = file($cfg_file);
+	foreach ($data as $line) {
+		# Skip comments lines starting with a hash.
+		if (preg_match("/^\s*#/", $line)) continue;
+		$pieces = explode("=", $line, 2);
+		if (count($pieces) == 2) {
+			$pieces[1] = trim($pieces[1]);
+			$curr_piece = strtolower($pieces[1]);
+			
+			if ($curr_piece == "true") $pieces[1] = true;
+			elseif ($curr_piece == "false") $pieces[1] = false;
+			
+			define(strtoupper(trim($pieces[0])), $pieces[1]);
+		}
+	}
+}
+
+if (defined("DOCUMENT_ROOT") && ! is_dir(DOCUMENT_ROOT) &&  
+    (! defined("CHECK_DOCUMENT_ROOT") || CHECK_DOCUMENT_ROOT == true) ) {
+	echo "The document root is defined as ".DOCUMENT_ROOT.", but the is_dir(DOCUMENT_ROOT) check failed.  Your installation is broken.  Edit your ".FS_PLUGIN_CONFIG." file to reflect the correct document root directory or ensure that PHP can read that directory and its parent.<br />This message was generated from the file ".__FILE__;
+}
+
 # Define config files for various parts of the plugin framework.
-define("FS_PLUGIN_CONFIG", "fsconfig.php");
+@define("FS_PLUGIN_CONFIG", "fsconfig.php");
 
 # Since we were able to include this file, we must already have the installation
 # directory in the path.  So we can just include userdata/fsconfig.php and not
 # have to worry about the exact path.
 @include_once(USER_DATA."/".FS_PLUGIN_CONFIG);
-
-if (defined("DOCUMENT_ROOT") && ! is_dir(DOCUMENT_ROOT) ) {
-	die("The document root is defined as ".DOCUMENT_ROOT.", but this directory
-does not exist.  Your installation is broken.  Edit your ".FS_PLUGIN_CONFIG."
-file to reflect the correct document root directory.");
-}
 
 # If we do not have the INSTALL_ROOT defined from a previously included
 # pathconfig.php, then we need to take care of that.  We'll try to get the
@@ -112,46 +145,6 @@ define("USER_DATA_PATH", INSTALL_ROOT.PATH_DELIM.USER_DATA);
 # actually faster when the file doesn't exist.
 if (file_exists(mkpath(INSTALL_ROOT,USER_DATA,"userconfig.php")) ) {
 	include(USER_DATA."/userconfig.php");
-}
-
-# Look for the userconfig.cfg and define any variables in it.
-# This is a more "user friendly" alternative to userconfig.php.
-if (file_exists(mkpath(INSTALL_ROOT,USER_DATA,"userconfig.cfg"))) {
-	$data = file(mkpath(INSTALL_ROOT,USER_DATA,"userconfig.cfg"));
-	foreach ($data as $line) {
-		# Skip comments lines starting with a hash.
-		if (preg_match("/^\s*#/", $line)) continue;
-		$pieces = explode("=", $line, 2);
-		if (count($pieces) == 2) {
-			$pieces[1] = trim($pieces[1]);
-			$curr_piece = strtolower($pieces[1]);
-			
-			if ($curr_piece == "true") $pieces[1] = true;
-			elseif ($curr_piece == "false") $pieces[1] = false;
-			
-			define(strtoupper(trim($pieces[0])), $pieces[1]);
-		}
-	}
-}
-
-# Function: read_file
-# Reads file contents, respecting the values of the LNBLOG_OPEN_BASEDIR and 
-# LNBLOG_PARANOIA configuration constants.
-#
-# If LNBLOG_OPEN_BASEDIR and LNBLOG_PARANOIA are not defined or set to false, 
-# then this function behaves exactly like the standard file() function.
-#
-# If LNBLOG_OPEN_BASEDIR is set, it will return false for any attempt to read a 
-# file that is above that directory in the filesystem.  So for example, if 
-# LNBLOG_OPEN_BASEDIR = /var/www/demo, then this will return the
-# contents of /var/www/demo/file.txt or /var/www/demo/foo/bar.txt, but it will
-# return false for /var/www/myfile.txt
-#
-# If LNBLOG_PARANOIA is set, this will return false when attempting to open any
-# file with a .php extension.  So, for example, it would open 
-# /var/www/demo/foo.txt, but would return false for /var/www/demo/foo.php.
-function read_file($filename) {
-	
 }
 
 # Put this definition after we initialize userconfig.cfg, so that it can be
@@ -349,14 +342,14 @@ Depending on your setup, you may need to add components before the username
 or change the document root from www to something else.  Of course, if you
 don't use ~user directories, you can probably ignore this. 
 
-*Default* is "/^\/home\/([^\/]+)\/www(.*)/i".
+*Default* is "/^\/home\/([^\/]+)\/(www|public_html)\/(.*)/i".
 */
 @define("LOCALPATH_TO_URI_MATCH_RE", "/^\/home\/([^\/]+)\/(www|public_html)\/(.*)/i");
 
 /* Constant: LOCALPATH_TO_URI_REPLACE_RE
 The corresponding replacement pattern to <LOCALPATH_TO_URI_MATCH_RE>. 
 
-*Default* is "/~$1$2".
+*Default* is "/~$1/$3".
 */
 @define("LOCALPATH_TO_URI_REPLACE_RE", "/~$1/$3");
 
@@ -480,7 +473,7 @@ The corresponding replacement expression to <URI_TO_LOCALPATH_MATCH_RE>.
 # Directory where draft entries are stored.
 #
 # Default is "drafts".
-@define("ENTRY_DRAFT_PATH", "drafts");
+@define("BLOG_DRAFT_PATH", "drafts");
 
 # Constant: BLOG_ARTICLE_PATH
 # Like <BLOG_ENTRY_PATH>, except for static articles.
@@ -608,7 +601,7 @@ The corresponding replacement expression to <URI_TO_LOCALPATH_MATCH_RE>.
 # Note that this is specific to file-based storage.
 #
 # The *default* is ".txt".
-@define("TRACKBACK_PATH_SUFFIX", ".txt");     # File suffix for saved pings.
+@define("TRACKBACK_PATH_SUFFIX", ".xml");     # File suffix for saved pings.
 
 ########################################
 # Section: Pingback configuration
@@ -618,7 +611,7 @@ The corresponding replacement expression to <URI_TO_LOCALPATH_MATCH_RE>.
 # Note that this is specific to file-based storage.
 #
 # The *default* is ".txt".
-@define("PINGBACK_PATH_SUFFIX", ".txt");     # File suffix for saved pings.
+@define("PINGBACK_PATH_SUFFIX", ".xml");     # File suffix for saved pings.
 
 #############################################
 # Section: Comment configuration

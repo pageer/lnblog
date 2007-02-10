@@ -58,7 +58,11 @@ class BlogEntry extends Entry {
 		$this->raiseEvent("OnInit");
 		
 		$this->initVars();
-		$this->getFile($path, $revision);
+		$this->getFile($path, $revision, 
+		               array('entry', 'draft'), 
+		               array(BLOG_ENTRY_PATH, BLOG_DRAFT_PATH),
+		               array('/^\d{4}\/\d{2}\/\d{2}_\d{4}\d?\d?$/',
+		                     '/^\d{2}_\d{4}\d?\d?$/'));
 		
 		
 		if ( file_exists($this->file) ) {
@@ -109,64 +113,98 @@ class BlogEntry extends Entry {
 	# by the Article class.
 	function getFile($path, $revision, $getvar='entry', 
 	                 $subdir=BLOG_ENTRY_PATH,
-		             $id_re='/^\d{4}\/\d{2}\/\d{2}_\d{4}\d?\d?$/') {
+	                 $id_re='/^\d{4}\/\d{2}\/\d{2}_\d{4}\d?\d?$/') {
+		$path = trim($path);
+
+		# Account for $getvar being an array.  If it is, just get the first
+		# element that's actually set.
+		$first_get = '';
+		if (is_array($getvar)) {
+			foreach ($getvar as $g) {
+				if (isset($_GET[$g])) {
+					$first_get = $_GET[$g];
+				}
+			}
+		} else {
+			$first_get = GET($getvar);
+		}
+
 		# Auto-detect the current entry.  If no path is given, 
 		# then assume the current directory.
-		if ($path && is_dir($path)) {
+		if (is_dir($path)) {
 		
 			$this->file = $path.PATH_DELIM.$revision;
-			if (! file_exists($this->file) && 
-			      file_exists($path.PATH_DELIM."current.htm")) {
-				$this->file = $path.PATH_DELIM."current.htm";
-			}
-			
-		} elseif (GET($getvar) || $path) {
+			# Support old blog entry format.
+			if (! file_exists($this->file) ) $this->tryOldFileName();
 
-			$entrypath = trim($path ? $path : sanitize(GET($getvar)));
+		} elseif ($first_get || $path) {
+			# If $path is an identifier, then convert it to a real path.
+
+			$entrypath = trim($path ? $path : sanitize($first_get));
+		
+			# If the path is a short entry ID, then try to detect the blog and
+			# reconstruct the full path.
+			if (is_array($id_re)) {
+				$has_match = 0;
+				foreach($id_re as $re) {
+					$has_match = preg_match($re, $entrypath);
+					if ($has_match) break;
+				}
+			} else $has_match = preg_match($id_re, $entrypath);
 			
-			# Get the blog path from the query string.
-			if (defined("BLOG_ROOT")) {
-				$blogpath = BLOG_ROOT;
-			} elseif ( defined("INSTALL_ROOT") && sanitize(GET("blog")) ) {
-				$blogpath = calculate_document_root().PATH_DELIM.sanitize(GET("blog"));
+			if ( $has_match ) {
+				
+				# If we can pass a short ID, it's assumed that we can find the
+				# current blog from the environment (query string, config.php, etc.)
+				$blog = NewBlog();
+				$entrypath = str_replace("/", PATH_DELIM, $entrypath );
+				
+				if (is_array($subdir)) {
+					foreach ($subdir as $s) {
+						$f = mkpath($blog->home_path,$s,$entrypath,$revision);
+						if (file_exists($f)) $this->file =$f;
+					}
+					if (! $this->file) {
+						$this->file = mkpath($blog->home_path,$subdir[0],$entrypath,$revision);
+					}
+				} else $this->file = mkpath($blog->home_path,$subdir,$entrypath,$revision);
+				
+				#$this->file = mkpath($blog->home_path,$subdir,$entrypath,$revision);
+
 			} else {
-				$blogpath = "";
+				# If we don't have a short entry ID, assume it's a global ID.
+				$entrypath = test_server_root($entrypath);
+				$this->file = mkpath($entrypath,$revision);
 			}
 
-			if ($id_re) {
-				# Get the path from the entry field.  If the entry string is 
-				# malformed, then just empty it.
-				if ( preg_match($id_re, $entrypath) )
-					$entrypath = str_replace("/", PATH_DELIM, $entrypath );
-				else $entrypath = "";
-			}
+			if (! file_exists($this->file)) $this->tryOldFileName();			
 
-			$this->file = mkpath($blogpath,$subdir,$entrypath,$revision);
-			if (! file_exists($this->file)) {
-				$tmpfile = mkpath($blogpath,$subdir,$entrypath,"current.htm");
-				if (file_exists($tmpfile)) $this->file = $tmpfile;
-			}
-			
 		} else {
 		
 			$this->file = getcwd().PATH_DELIM.$revision;
-			if (! file_exists($this->file) && 
-			      file_exists(getcwd().PATH_DELIM."current.htm")) {
-				$this->file = getcwd().PATH_DELIM."current.htm";
-			}
+			if (! file_exists($this->file) ) $this->tryOldFileName();
+			
 			# We might be in a comment or trackback directory, 
 			if (! $this->isEntry() ) {
 				$tmpfile = dirname(getcwd()).PATH_DELIM.$revision;
-				if (! file_exists($tmpfile) && 
-				      file_exists(dirname(getcwd()).PATH_DELIM."current.htm")) {
-					$this->file = dirname(getcwd()).PATH_DELIM."current.htm";
-				}
+				if (! file_exists($tmpfile) ) $this->tryOldFileName();
 			}
 		}
 	
 		return $this->file;
 	}
 	
+	# For INTERNAL USE ONLY.  If the calculated entry file does
+	# not exist, try the old filename and change the file 
+	# property if that does exist.
+	function tryOldFileName() {
+		$tmpfile = dirname($this->file);
+		$tmpfile = mkpath($tmpfile,"current.htm");
+		if (file_exists($tmpfile)) {
+			$this->file = $tmpfile;
+		}
+	}
+
 	/*
 	Method: getParent
 	Get a copy of the parent of this objcet, i.e. the blog to which it
@@ -197,15 +235,17 @@ class BlogEntry extends Entry {
 	#
 	# Returns:
 	# For file-based storage, string containing the last part of the path.
-	# Normally, this is in the form ##/##/##_####
+	# Normally, this is in the form ##/##/##_#### or ##_#### for drafts
 
 	function entryID() {
 		$temp = dirname($this->file);
 		$ret = basename($temp);  # Add day component.
-		$temp = dirname($temp);
-		$ret = basename($temp)."/".$ret;  # Add month component.
-		$temp = dirname($temp);
-		$ret = basename($temp)."/".$ret;  # Add year component.
+		if (! $this->isDraft()) {
+			$temp = dirname($temp);
+			$ret = basename($temp)."/".$ret;  # Add month component.
+			$temp = dirname($temp);
+			$ret = basename($temp)."/".$ret;  # Add year component.
+		}
 		return $ret;
 	}
 
@@ -218,9 +258,16 @@ class BlogEntry extends Entry {
 	# A string with the unique ID.
 
 	function globalID() {
-		$ret = str_replace(PATH_DELIM, '/', 
-		                   substr(dirname($this->file), 
-		                          strlen(DOCUMENT_ROOT)));
+		$root = calculate_server_root($this->file);
+		$ret = dirname($this->file);
+		$ret = substr($ret, strlen($root));
+		$ret = str_replace(PATH_DELIM, '/', $ret);
+		#$parent = $this->getParent();
+		#$ret = $parent->blogid;
+		#$ret = dirname($this->file);
+		#$ret = str_replace(PATH_DELIM, '/', 
+		#                   substr(dirname($this->file), 
+		#                          strlen(DOCUMENT_ROOT)));
 		return trim($ret, '/');
 	}
 
@@ -231,10 +278,12 @@ class BlogEntry extends Entry {
 	# For file-based storage, returns the webroot-relative path to the blog.
 
 	function parentID() {
-		$path = dirname($this->file);
-		$num_levels = is_a($this, 'Article') ? 2 : 4;
-		for ($i = 0; $i < $num_levels; $i++) $path = dirname($path);
-		return substr($path, strlen(DOCUMENT_ROOT));
+		$parent = $this->getParent();
+		return $parent->blogid;
+		#$path = dirname($this->file);
+		#$num_levels = is_a($this, 'Article') ? 2 : 4;
+		#for ($i = 0; $i < $num_levels; $i++) $path = dirname($path);
+		#return substr($path, strlen(DOCUMENT_ROOT));
 	}
 	
 	# Method: getUploadedFiles
@@ -375,6 +424,20 @@ class BlogEntry extends Entry {
 	}
 	
 	/*
+	Method: isDraft
+	Checks if the given entry is saved as a draft, as opposed to a published 
+	blog entry.
+	
+	Returns:
+	True if the entry is a draft, false otherwise.
+	*/
+	function isDraft($path=false) {
+		if (! $path) $path = dirname($this->file);
+		return ( $this->isEntry($path) &&
+		         basename(dirname($path)) == BLOG_DRAFT_PATH );
+	}
+	
+	/*
 	Method: localpath
 	Get the path to this entry's directory on the local filesystem.  Note 
 	that this is specific to file-based storage and so should only be c
@@ -485,17 +548,25 @@ class BlogEntry extends Entry {
 			case "pingback":   return $dir_uri.ENTRY_PINGBACK_DIR."/";
 			case "upload":      return $dir_uri."uploadfile.php";
 			case "edit":
-				$entry_type = is_a($this, 'Article') ? 'article' : 'entry';
+				if ($this->isDraft()) {
+					$entry_type = 'draft';
+				} else {
+					$entry_type = is_a($this, 'Article') ? 'article' : 'entry';
+				}
 				$qs_arr['blog'] = $this->parentID();
 				$qs_arr[$entry_type] = $this->entryID();
-				return make_uri(INSTALL_ROOT_URL."pages/editentry.php", 
+				return make_uri(INSTALL_ROOT_URL."pages/entryedit.php", 
 				                array("blog"     =>$this->parentID(), 
 				                      $entry_type=>$this->entryID()));
 			case "delete":     
 				if (KEEP_EDIT_HISTORY) {
 					return $dir_uri."delete.php";
 				} else {
-					$entry_type = is_a($this, 'Article') ? 'article' : 'entry';
+					if ($this->isDraft()) {
+						$entry_type = 'draft';
+					} else {
+						$entry_type = is_a($this, 'Article') ? 'article' : 'entry';
+					}
 					$qs_arr['blog'] = $this->parentID();
 					$qs_arr[$entry_type] = $this->entryID();
 					return make_uri(INSTALL_ROOT_URL."pages/delentry.php", $qs_arr);
@@ -620,12 +691,13 @@ class BlogEntry extends Entry {
 	Save the object to persistent storage.
 	
 	Parameters:
-	blog - The blog into which the entry will be inserted.
-
+	blog       - The blog into which the entry will be inserted.
+	from_draft - Indicates that the entry will be inserted from a 
+	             draft entry, not created directly from user input.
 	Returns:
 	True on success, false on failure.
 	*/
-	function insert (&$blog) {
+	function insert (&$blog, $from_draft=false) {
 	
 		if (! $this->uid) {
 			$usr = NewUser();
@@ -650,6 +722,10 @@ class BlogEntry extends Entry {
 		$year_path = dirname($month_path);
 		if (! is_dir($year_path)) $ret = create_directory_wrappers($year_path, YEAR_ENTRIES);
 		if (! is_dir($month_path)) $ret = create_directory_wrappers($month_path, MONTH_ENTRIES);
+		if ($from_draft) {
+			$fs = NewFS();
+			$fs->rename(dirname($this->file), $dir_path);	
+		}
 		$ret = create_directory_wrappers($dir_path, ENTRY_BASE);
 
 		# Create the comments directory.
@@ -677,6 +753,56 @@ class BlogEntry extends Entry {
 
 		return $ret;
 		
+	}
+	
+	/* 
+	Method: publishDraft
+	Publishes a draft entry as an actual blog entry.
+	This is an alias for BlogEntry::insert($blog, true).
+	*/
+	function publishDraft(&$blog) {
+		return $this->insert($blog, true);
+	}
+	
+	function publishDraftAsArticle(&$blog, $path=false) {
+		$art = NewArticle();
+		foreach ($this as $key=>$val) {
+			$art->$key = $val;
+		}
+		return $art->insert($blog, $path, true);
+	}
+	
+	/*
+	Method: saveDraft
+	Saves the object as a draft, which can be recalled, edited, 
+	and published latter.
+	*/
+	function saveDraft(&$blog) {
+		$ret = true;
+		
+		$ts = time();
+		$draft_path = mkpath($blog->home_path, BLOG_DRAFT_PATH);
+		if (! is_dir($draft_path)) {
+			$r = create_directory_wrappers($draft_path, BLOG_DRAFTS);
+			if (! empty($r)) $ret = false;
+		}
+		
+		if (! file_exists($this->file)) {
+			$dirname = $this->getPath($ts, true);
+			$path = mkpath($draft_path, $dirname);
+			$fs = NewFS();
+			$ret &= $fs->mkdir_rec($path);
+			$this->file = mkpath($path, ENTRY_DEFAULT_FILE);
+		}
+	
+		if (! $this->uid) {
+			$usr = NewUser();
+			$this->uid = $usr->username();
+		}
+		
+		$ret = $this->writeFileData();
+		
+		return $ret;
 	}
 	
 	/*

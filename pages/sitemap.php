@@ -53,13 +53,7 @@ if ($blog->isBlog()) {
 
 $tpl = NewTemplate("file_edit_tpl.php");
 $tpl->set("PAGE_TITLE", _("Create site map"));
-$tpl->set("FORM_MESSAGE", spf_('This page will help you create a site map to 
-display in the navigation bar at the top of your blog.  This file is stored 
-under the name %s in the root directory of your weblog for a personal sitemap or
-in the %s installation directory for the system default.  This file in simply a 
-series of <abbr title="Hypertext Markup Language">HTML</abbr> links, each on 
-it\'s own line, which the template will process into a list.  If you require a 
-more complicated menu bar, you will have to create a custom template.',
+$tpl->set("FORM_MESSAGE", spf_('This page will help you create a site map to display in the navigation bar at the top of your blog.  This file is stored under the name %s in the root directory of your weblog for a personal sitemap or in the %s installation directory for the system default.  This file in simply a series of <abbr title="Hypertext Markup Language">HTML</abbr> links, each on it\'s own line, which the template will process into a list.  If you require a more complicated menu bar, you will have to create a custom template.',
 SITEMAP_FILE, PACKAGE_NAME));
 $tpl->set("FORM_ACTION", current_file() );
 $tpl->set("SHOW_LINK_EDITOR");

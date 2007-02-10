@@ -43,7 +43,10 @@ class FTPFS extends FS {
 	var $ftp_root;
 	
 	function FTPFS($host=false, $user=false, $pass=false) {
-		$this->default_mode = 0755;
+		$this->default_mode = FS_DEFAULT_MODE;
+		$this->script_mode = FS_SCRIPT_MODE;
+		$this->directory_mode = FS_DIRECTORYY_MODE;
+
 		if ($host) $this->host = $host;
 		elseif (defined("FTPFS_HOST")) $this->host = FTPFS_HOST;
 		if ($user) $this->username = $user;
@@ -70,7 +73,7 @@ class FTPFS extends FS {
 	# A non-tranparent destructor.  Needed to cleanly disconnect from the 
 	# FTP server.
 
-	function desctuct() {
+	function destruct() {
 		$this->disconnect();
 	}
 
@@ -145,15 +148,21 @@ class FTPFS extends FS {
 		return $ret;
 	}
 	
-	function mkdir($dir, $mode=0755) {
+	function mkdir($dir, $mode=false) {
+		if (! $mode) $mode = $this->directory_mode;
 		$dir = $this->localpathToFSPath($dir);
-		if ($this->connected() ) $ret = ftp_mkdir($this->connection, $dir);
-		else $ret = false;
+		if ($this->connected() ) {
+			$ret = ftp_mkdir($this->connection, $dir);
+			if ($mode) {
+				$ret = $this->chmod($dir, $mode);
+			}
+		} else $ret = false;
 		return $ret;
 	}
 
-	function mkdir_rec($dir, $mode=0755) {
+	function mkdir_rec($dir, $mode=false) {
 		if (! $this->connected() ) return false;
+		if (! $mode) $mode = $this->directory_mode;
 		$parent = dirname($dir);
 		if ($parent == $dir) return false;
 		if (! is_dir($parent) ) $ret = $this->mkdir_rec($dir);
@@ -195,12 +204,8 @@ class FTPFS extends FS {
 	function chmod($path, $mode) {
 		if (! $this->connected() ) return false;
 		$path = $this->localpathToFSPath($path);
-		$ret = ftp_chmod($path);
+		$ret = ftp_chmod($this->connection, $mode, $path);
 		return $ret;
-	}
-
-	function defaultMode() {
-		return $this->default_mode;
 	}
 
 	function copy($src, $dest) {
@@ -243,6 +248,15 @@ class FTPFS extends FS {
 				$ret = ftp_fput($this->connection, $ftp_path, $temp, FTP_BINARY);
 			}
 		}
+
+		if ($ret) {
+			$mode = $this->isScript($ftp_path) ? $this->script_mode :
+			                                     $this->default_mode;
+			if ($mode) {
+				$this->chmod($ftp_path, $mode);
+			}
+		}
+
 		return $ret;
 	}
 

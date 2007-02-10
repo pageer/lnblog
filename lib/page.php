@@ -91,6 +91,8 @@ class Page extends LnBlogObject {
 		$this->mime_type = DEFAULT_MIME_TYPE;
 		$this->charset = DEFAULT_CHARSET;
 
+		$this->addScript("lnblog_lib.js");
+		
 		$this->raiseEvent("InitComplete");		
 	}
 	

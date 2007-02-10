@@ -65,9 +65,9 @@ if ($ent->enclosure) {
 }
 
 if ($ent->allow_pingback) {
-	$PAGE->addHeader("X-Pingback", INSTALL_ROOT_URL."pingback.php");
+	$PAGE->addHeader("X-Pingback", INSTALL_ROOT_URL."xmlrpc.php");
 	$PAGE->addLink(array('rel'=>'pingback',
-	                     'href'=>INSTALL_ROOT_URL."pingback.php"));
+	                     'href'=>INSTALL_ROOT_URL."xmlrpc.php"));
 }
 $PAGE->addScript("entry.js");
 $PAGE->addStylesheet("reply.css");

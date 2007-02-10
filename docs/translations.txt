@@ -26,8 +26,50 @@ spf_()   - Like pf_(), but returns the translation instead of printing it.  This
            sprintf in the same way that pf_() is analogous to printf().
 
 To extract the strings translated by these functions, you can use the --keyword argument to 
-xgettext, which comes with GNU gettext.  The command would look something like this.
-| xgettext -LPHP --keyword=_:1 --keyword=p_:1 --keyword=pf_:1 --keyword=spf_:1 *.php
+xgettext, which comes with GNU gettext.  The exact command for this is given in the next section.
+
+Section: Basic gettext Translation Steps
+
+Translating LnBlog with GNU gettext is a little esoteric, but not really all that difficult.
+In this section, we will walk through the steps of creating and installing a translation.  For a more
+detailed tutorial, I recommend Gora Mohanty's "A tutorial on Native Language Support using GNU gettext"
+available at <http://oriya.sarovar.org/docs/gettext/>.
+
+To do the translation, you will need a copy of the GNU gettext utilities.  On all modern Linux 
+distributions, these are either installed by default or available from standard package repositories.
+On Windows, you will need to download them separately.  The GNUWin32 project has a handy installer available at <http://gnuwin32.sourceforge.net/packages/gettext.htm>.  You will simply need to run the 
+installer and add the "C:\Program Files\GnuWin32\bin" directory to your path.
+
+The first step is extracting the translation strings.  (If a messages.pot file was already included in your copy of LnBlog, you may skip this step.)  If you are using a UNIX or Linux system, then you can 
+do this by opening a command prompt, changing to the LnBlog directory, and running the following
+command.
+| xgettext -LPHP --keyword=_:1 --keyword=p_:1 --keyword=pf_:1 --keyword=spf_:1 -o messages.pot `find -name "*.php"`
+This will create a template PO file that will be the basis for your translation.
+
+The next step is to your initial translation file.  To do this, run the command below.
+| msginit -l en_US -o LnBlog.po -i messages.pot
+This example uses en_US as the locale for the translation.  You should, naturally, substitute the 
+actual language and/or country code for which you are translating in the -l option.  
+
+Now you are ready to start translating.  The actual translation consists of simply editing the 
+LnBlog.po file.  You may do this with a standard text editor, with GNU Emacs PO mode, or with a special 
+PO editor such as KBabel.
+
+Editing the PO file in a text editor is pretty straight-forward.  When you open the file, you will see
+a number of line pairs, labeled msgid and msgstr respectively.  The msgid is the untranslated English
+text that appears in the source code.  The msgstr is the translated value that gettext will display.
+You simply need to go through the file and translate the msgstr lines into your language.  You should
+note that some lines include scancodes such as %s and %d.  These indicate that a word or number will
+be substituted into the line in that position.  
+
+Once you have finished translating your LnBlog.po file, it is time to build the binary translation file
+that will be used by gettext at runtime.  To do that, use the following command.
+| msgfmt -c -v -o LnBlog.mo LnBlog.po
+Installing this file is as simple as copying it into the appropriate directory.  The exact directory 
+depends on the locale, but the basic pattern is 
+| LnBlog/locale/en_US/LC_MESSAGES/
+Once this directory is created and your LnBlog.mo file copied into it, you should be able to see your
+translation working.
 
 Section: Ad Hoc Translation Format
 
@@ -47,9 +89,13 @@ tags are required, as is the array creation on the second line.  Also note that 
 
 Section: Charset issues
 
-All LnBlog templates are encoded as ISO-8859-1 characters in the 7-bit character code range, which 
-(if my understanding is correct) is compatible with UTF-8.  Therefore, if you are working in a 
-language that requires characters outside the 7-bit ASCII range (codes 0-127), then you should use a 
-character set compatible with 7-bit ASCII.  In the Unicode world, this generally means UTF-8.
-If you use a different character encoding, it might be necessary to re-encode all the templates using
-that encoding.
+All LnBlog templates are encoded with the UTF-8 character set and are restricted to only characters in
+the 7-bit ASCII range.  Any translations should use a character set that is compatible with this, as
+the internationalization system does not do any character set conversion on the HTML code in the 
+various theme templates.  In other words, if you do a translation, it is best if your text is encoded
+in UTF-8.
+
+Section: Contributing Translations
+
+Anyone is welcome to translate LnBlog into any language whatsoever.  If you would like to have your 
+translation added to the official distribution, then please contact me at pageer@skepticats.com.

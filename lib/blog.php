@@ -73,17 +73,27 @@ class Blog extends LnBlogObject {
 		
 		$this->raiseEvent("OnInit");
 	
-		$this->name = '';
+		if ( !$path && isset($_GET['blog']) ) $path = sanitize(GET("blog"));
+		$path = trim($path);
+
 		if ($path) {
-			if (is_dir($path)) $this->home_path = realpath($path);
-			else $this->home_path = calculate_document_root().PATH_DELIM.$path;
+			if (is_dir($path)) {
+				$this->home_path = realpath($path);
+				$root = calculate_server_root($this->home_path);
+				$this->blogid = substr($this->home_path, strlen($root));
+			} else {
+				$this->home_path = $this->get_blog_path($path);
+				$this->blogid = $path;
+			}
 
 		} elseif (defined("BLOG_ROOT")) { 
 			$this->home_path = BLOG_ROOT;
-		} elseif (isset($_GET["blog"]) && defined("INSTALL_ROOT")) {
-			$this->home_path = calculate_document_root().PATH_DELIM.sanitize(GET("blog"));
+			$root = calculate_server_root($this->home_path);
+			$this->blogid = substr($this->home_path, strlen($root));
 		} else {
 			$this->home_path = getcwd();
+			$root = calculate_server_root($this->home_path);
+			$this->blogid = substr($this->home_path, strlen($root));
 		}
 		
 		# Canonicalize the home path.
@@ -97,6 +107,7 @@ class Blog extends LnBlogObject {
 		$this->url_method = '';
 		
 		# Various default blog properties go here.
+		$this->name = '';
 		$this->description = '';
 		$this->image = '';
 		$this->max_entries = BLOG_MAX_ENTRIES;
@@ -115,16 +126,24 @@ class Blog extends LnBlogObject {
 		$this->last_blogentry = false;
 		$this->last_article = false;
 		
-		if (defined("DOCUMENT_ROOT")) {
-			$this->blogid = substr($this->home_path, strlen(DOCUMENT_ROOT));
-		} else {
-			$this->blogid = '';
-		}
 		$this->custom_fields = array();
 		$this->readBlogData();
 		
 		$this->raiseEvent("InitComplete");
 
+	}
+	
+	function get_blog_path($id) {
+		global $SYSTEM;
+		$path = test_server_root($id);
+		if ( ! is_dir($path) ) {
+			$path = $SYSTEM->sys_ini->value("bloglist", $id);
+			if (! is_dir($path)) {
+				echo spf_("Unable to locate blogID %s.  Make sure the ID is correct or add an entry to the [bloglist] section of system.ini.", $id);
+				return false;
+			}
+		}
+		return $path;
 	}
 	
 	/*
@@ -542,6 +561,11 @@ class Blog extends LnBlogObject {
 					return make_uri(INSTALL_ROOT_URL."pages/showarticles.php",$qs_arr);
 				elseif (URI_TYPE == 'htaccess') return '';
 				else return $dir_uri.BLOG_ARTICLE_PATH."/";
+			case 'listdrafts':
+				if (URI_TYPE == 'querystring') 
+					return '';
+				elseif (URI_TYPE == 'htaccess') return '';
+				else return $dir_uri.BLOG_DRAFT_PATH."/";
 			case 'listyear':
 				if (URI_TYPE == 'querystring') 
 					return '';
@@ -581,10 +605,10 @@ class Blog extends LnBlogObject {
 					return $ret;
 				}
 			case "addentry":
-				return make_uri(INSTALL_ROOT_URL."pages/newentry.php", $qs_arr);
+				return make_uri(INSTALL_ROOT_URL."pages/entryedit.php", $qs_arr);
 			case "addarticle":
 				$qs_arr['type'] = 'article';
-				return make_uri(INSTALL_ROOT_URL.'pages/newentry.php',$qs_arr);
+				return make_uri(INSTALL_ROOT_URL.'pages/entryedit.php',$qs_arr);
 			case "upload":
 				if (URI_TYPE == 'querystring')
 					return make_uri(INSTALL_ROOT_URL.'pages/fileupload.php',$qs_arr);
@@ -673,15 +697,16 @@ class Blog extends LnBlogObject {
 	and get a given number of them.
 
 	Parameters:
-	number - The number of entries to return.  If set to -1, then returns all 
-	         entries.
+	number - *Optional* number of entries to return.  If set to a negative 
+	         number, then returns all entries will be returned.  The default 
+				value is -1.
 	offset - *Optional* number of entries from the beginning of the list to 
 	         skip.  The default is 0, i.e. start at the beginning.
 
 	Returns:
 	An array of BlogEntry objects.
 	*/
-	function getEntries($number,$offset=0) {
+	function getEntries($number=-1,$offset=0) {
 	
 		$entry = NewBlogEntry();
 		$this->entrylist = array();
@@ -708,7 +733,7 @@ class Blog extends LnBlogObject {
 							$this->entrylist[] = NewBlogEntry($ent_path);
 							$num_found++;
 							# If we've hit the max, then break out of all 3 loops.
-							if ($num_found >= $number && $number != -1) break 3;
+							if ($num_found >= $number && $number >= 0) break 3;
 						}
 						$num_scanned++;
 					}
@@ -724,7 +749,7 @@ class Blog extends LnBlogObject {
 	# Parameter: 
 	# taglist   - An array of tags to search for.
 	# limit     - Maximum number of entries to return.  The *default* is 
-	#             zero, which me !;!/an return *all* matching entries.
+	#             zero, which means return *all* matching entries.
 	# match_all - Optional boolean that determines whether the entry must 
 	#             have every tag in taglist to match.  The *default* is false.
 	#
@@ -779,6 +804,27 @@ class Blog extends LnBlogObject {
 		return $this->entrylist;
 	}
 
+	/* 
+	Method: getDrafts
+	Gets all the current drafts for this blog.
+	
+	Returns:
+	An array of BlogEntry objects.
+	*/
+	function getDrafts() {
+		$art = NewBlogEntry();
+		$art_path = mkpath($this->home_path, BLOG_DRAFT_PATH);
+		
+		$art_list = scan_directory($art_path);
+		$ret = array();
+		foreach ($art_list as $dir) {
+			if ($art->isEntry(mkpath($art_path,$dir)) ) {
+				$ret[] = NewEntry(mkpath($art_path,$dir));
+			}
+		}
+		return $ret;
+	}
+
 	/*
 	Method: getArticles
 	Returns a list of all articles, in no particular order.
@@ -788,7 +834,7 @@ class Blog extends LnBlogObject {
 	*/
 	function getArticles() {
 		$art = NewArticle();
-		$art_path = $this->home_path.PATH_DELIM.BLOG_ARTICLE_PATH.PATH_DELIM;
+		$art_path = mkpath($this->home_path, BLOG_ARTICLE_PATH);
 		$art_list = scan_directory($art_path);
 		$ret = array();
 		foreach ($art_list as $dir) {
@@ -840,6 +886,114 @@ class Blog extends LnBlogObject {
 		}
 		return $ret;
 
+	}
+
+	# This method is for internal use only.
+	function getItemReplies($array_creator, $reply_array_creator) {
+		$ent_array = $this->$array_creator();
+		$ret = array();
+		foreach ($ent_array as $ent) {
+			$ret = array_merge($ret, $ent->$reply_array_creator());
+		}
+		return $ret;
+	}
+
+	# This method is also for internal use only.  It and getItemReplies are
+	# generic helper functions for the publicly visible functions 
+	# that follow.
+	function getItemRepliesAll($array_creator) {
+		$ret = $this->getItemReplies($array_creator, "getCommentArray");
+		$ret = array_merge($ret, $this->getItemReplies($array_creator, "getTrackbackArray"));
+		$ret = array_merge($ret, $this->getItemReplies($array_creator, "getPingbackArray"));
+		return $ret;
+	}
+
+	# Method: getEntryReplies
+	# Gets all the replies for all entries belonging to this blog, including
+	# all comments, trackbacks, and pingbacks.
+	#
+	# Returns:
+	# An array of objects, including BlogComment, Trackback, and Pingback
+	# objects.  The sorting of this list is dependent on the data storage
+	# implementation for the blog.
+	function getEntryReplies() {
+		return $this->getItemRepliesAll("getEntries");
+	}
+
+	# Method: getEntryComments
+	# Like <getEntryReplies>, but only returns BlogComments.
+	function getEntryComments() {
+		return $this->getItemReplies("getEntries", "getCommentArray");
+	}
+
+	# Method: getEntryTrackbacks
+	# Like <getEntryReplies>, but only returns Trackbacks.
+	function getEntryTrackbacks() {
+		return $this->getItemReplies("getEntries", "getTrackbackArray");
+	}
+
+	# Method: getEntryPingbacks
+	# Like <getEntryReplies>, but only returns Pingbacks.
+	function getEntryPingbacks() {
+		return $this->getItemReplies("getEntries", "getPingbackArray");
+	}
+
+	# Method: getArticleReplies
+	# Like <getEntryReplies>, but returns the replies for all Articles, instead
+	# of for all BlogEntries.
+	function getArticleReplies() {
+		return $this->getItemRepliesAll("getArticles");
+	}
+
+	# Method: getArticleComments
+	# Like <getArticleReplies>, but only returns BlogComments.
+	function getArticleComments() {
+		return $this->getItemReplies("getArticles", "getCommentArray");
+	}
+
+	# Method: getArticleTrackbacks
+	# Like <getArticleReplies>, but only returns Trackbacks.
+	function getArticleTrackbacks() {
+		return $this->getItemReplies("getArticles", "getTrackbackArray");
+	}
+
+	# Method: getArticleArticlePingbacks
+	# Like <getArticleReplies>, but only returns Pingbacks.
+	function getArticlePingbacks() {
+		return $this->getItemReplies("getArticles", "getPingbackArray");
+	}
+
+	# Method: getReplies
+	# Like <getEntryReplies> and <getArticleReplies>, but combines both, 
+	# returning an array of *all* replies for this blog.
+	function getReplies() {
+		$ret = $this->getEntryReplies();
+		$ret = array_merge($ret, $this->getArticleReplies());
+		return $ret;
+	}
+
+	# Method: getComments
+	# Like <getReplies>, but only for comments.
+	function getComments() {
+		$ret = $this->getEntryComments();
+		$ret = array_merge($ret, $this->getArticleComments());
+		return $ret;
+	}
+	
+	# Method: getTrackbacks
+	# Like <getReplies>, but only for comments.
+	function getTrackbacks() {
+		$ret = $this->getEntryTrackbacks();
+		$ret = array_merge($ret, $this->getArticleTrackbacks());
+		return $ret;
+	}
+	
+	# Method: getPingbacks
+	# Like <getReplies>, but only for comments.
+	function getPingbacks() {
+		$ret = $this->getEntryPingbacks();
+		$ret = array_merge($ret, $this->getArticlePingbacks());
+		return $ret;
 	}
 	
 	/*

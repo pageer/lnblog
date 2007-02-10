@@ -1,0 +1,92 @@
+/* Styles for blog entries. */
+
+.blogentry {
+	margin-bottom: 2%;
+}
+
+.article {
+	margin-bottom: 1%;
+}
+
+.blogentryheader h2 {
+	margin: 0px;
+	padding: 0px;
+	background-color: white;
+	color: black;
+}
+
+.articleheader h2 {
+	margin: 0px;
+	padding: 0px;
+}
+
+.blogentryfooter {
+	font-size: 80%;
+	margin-bottom: 3%;
+	clear: both;
+}
+
+.articlefooter {
+	font-size: 80%;
+}
+
+.blogentryfooter ul,
+.articlefooter ul,
+.articleheader ul {
+	margin: 0px;
+	padding: 0px;
+}
+
+.blogentryfooter li,
+.articlefooter li, 
+.articleheader li {
+	list-style-type: none;
+}
+
+ul.postadmin li,
+.blogadmin {
+	display: inline;
+	margin-right: 1%;
+}
+
+li.bloguser, li.bloguserurl {
+	display: inline;
+	margin-right: 1%;
+}
+
+
+
+.blogentry  div.blogentrybody,
+.article  div.articlebody {
+	padding: 1%;
+	/*white-space: pre;*/
+}
+
+.blogentrybody p {
+	text-indent: 1em;
+	clear: both;
+}
+
+.blogentrybody img {
+	display: block;
+	margin: 1em auto;
+}
+
+.blogentryfooter h3 {
+	margin-bottom: 0px;
+	margin-top: 0px
+}
+
+@media print {
+	
+	#commentsubmit {
+		display: none;
+	}
+	
+	.blogentry, 
+	.article {
+		page-break-inside: avoid;
+	}
+	
+}
+
