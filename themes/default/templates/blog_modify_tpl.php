@@ -1,3 +1,12 @@
+<?php
+# Template: blog_modify_tpl.php
+# This template is included by the <newblog.php> and <updateblog.php> pages.
+# It contains the markup for setting the properties of a blog.
+#
+# Note that this also includes a small amount of code to scan the available 
+# themes directories to get a list of themes.  This really should be moved 
+# outside the template, but for the time being, just don't modify it.
+?>
 <h2><?php echo $UPDATE_TITLE; ?></h2>
 <?php if (isset($UPDATE_MESSAGE)) { ?>
 <p style="color: red"><?php echo $UPDATE_MESSAGE; ?></p>
@@ -66,8 +75,17 @@ foreach ($dir as $theme) { ?>
 <fieldset>
 <div>
 <label for="pingback"><?php p_("Send Pingbacks when posting entries"); ?></label>
-<input id="pingback" name="pingback"  type="checkbox" <?php 
-if ($BLOG_AUTO_PINGBACK) { ?>checked="checked"<?php } ?> />
+<select id="pingback" name="pingback">
+<option value="all"<?php 
+if ($BLOG_AUTO_PINGBACK == 'all') { echo ' selected="selected"'; } 
+?>>Always</option>
+<option value="new"<?php 
+if ($BLOG_AUTO_PINGBACK == 'new') { echo ' selected="selected"'; } 
+?>>New entries only</option>
+<option value="none"<?php
+if ($BLOG_AUTO_PINGBACK == 'none') { echo ' selected="selected"'; } 
+?>>Never</option>
+</select>
 </div>
 <?php if (0) { /* Not yet implemented.*/ ?>
 <div>

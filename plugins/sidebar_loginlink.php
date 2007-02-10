@@ -2,21 +2,34 @@
 
 class LoginLink extends Plugin {
 
-	function LoginLink() {
+	function LoginLink($do_output=0) {
+		global $SYSTEM;
 		$this->plugin_desc = _("Adds login panel to the sidebar.");
 		$this->plugin_version = "0.3.0";
 		$this->use_form = false;
 		$this->admin_link = false;
-		$this->member_list = array();
-		$this->member_list["use_form"] =
-			array("description"=>_("Use a login form, instead of a link to the login page"),
-			      "default"=>false,
-			      "control"=>"checkbox");
-		$this->member_list["admin_link"] =
-			array("description"=>_("Show link to administration pages"),
-			      "default"=>false,
-			      "control"=>"checkbox");
+		$this->addOption("use_form",
+			_("Use a login form, instead of a link to the login page"),
+			false, "checkbox");
+		$this->addOption("admin_link",
+			_("Show link to administration pages"),
+			false, "checkbox");
+		$this->addOption('no_event',
+			_('No event handlers - do output when plugin is created'),
+			$SYSTEM->sys_ini->value("plugins","EventDefaultOff", 0), 
+			'checkbox');
+
 		$this->getConfig();
+
+		if ( $this->no_event || 
+		     $SYSTEM->sys_ini->value("plugins","EventForceOff", 0) ) {
+			# If either of these is true, then don't set the event handler
+			# and rely on explicit invocation for output.
+		} else {
+			$this->registerEventHandler("sidebar", "OnOutput", "output");
+		}
+		
+		if ($do_output) $this->output();
 	}
 
 	function output($parm=false) {
@@ -59,6 +72,8 @@ class LoginLink extends Plugin {
 	
 }
 
-$login =& new LoginLink();
-$login->registerEventHandler("sidebar", "OnOutput", "output");
+global $PLUGIN_MANAGER;
+if (! $PLUGIN_MANAGER->plugin_config->value('loginlink', 'creator_output', 0)) {
+	$plug =& new LoginLink();
+}
 ?>

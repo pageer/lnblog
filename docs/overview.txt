@@ -2,48 +2,53 @@ Document: Overview and Setup
 
 Section: Overview
 
-LnBlog is a web-based weblog program that is written in PHP 4 and stores data in text files.  It 
-aims to be full-featured, flexible, and configurabe, but still remain easy to use and keep 
-software requirements low.  It is designed to work well on inexpensive shared web hosts.
+LnBlog is a web-based weblog program that is written in PHP 4 and stores data in text
+files.  It aims to be full-featured, flexible, and configurabe, but still remain easy to
+use and keep software requirements low.  It is designed to work well on inexpensive shared
+web hosts.
 
-In terms of functionality, LnBlog includes support for all the basic blogging features, such as user 
-comments, TrackBacks, RSS feeds, and file uploads.  LnBlog also allows you to create multiple 
-independent weblogs with multiple user accounts.  This feature is ideal for managing multiple 
-sub-sites on the same web site.
+In terms of functionality, LnBlog includes support for all the basic blogging features,
+such as user comments, TrackBacks, RSS feeds, and file uploads.  LnBlog also allows you to
+create multiple independent weblogs with multiple user accounts.  This feature is ideal
+for managing multiple sub-sites on the same web site.
 
-One of LnBlog's main design goals in flexibility.  To this end, it includes a theme system and
-a plugin system to allow user extensions.  The theme system is powerful, allowing you to
-change virtually every element on a page, yet flexible enough that you can simply override one
-file for one blog without having to change or copy anything else.  Various page elements, such 
-as the sidebar, are provided by plugins and can be removed or rearranged simply by moving or 
-renaming plugin files.
+One of LnBlog's main design goals in flexibility.  To this end, it includes a theme system
+and a plugin system to allow user extensions.  The theme system is powerful, allowing you
+to change virtually every element on a page, yet flexible enough that you can simply
+override one file for one blog without having to change or copy anything else.  Various
+page elements, such as the sidebar, are provided by plugins and can be removed or
+rearranged simply by moving or renaming plugin files.
 
 Section: Requirements
 
-The only hard and fast requirements for LnBlog are PHP 4.1 and he ability to write files to the web
-server.  LnBlog *does* support running with *safe_mode* enabled by using FTP for file writing.
-You can also choose to use the standard file writing functions.  If you want to use LnBlog in a
-language other than English, then the PHP gettext and iconv extensions are highly recommended, but 
-not strictly required.  The CURL extension is recommended if you plan to use trackbacks, but is
-not required.
+The only hard and fast requirements for LnBlog are PHP 4.1 and he ability to write files
+to the web server.  LnBlog *does* support running with *safe_mode* enabled by using FTP
+for file writing.  You can also choose to use the standard file writing functions.  
 
-You can use any web server or operating system.  LnBlog is tested on Windows XP with IIS and 
-Linux with Apache.  It currently works with both PHP4 and PHP5.  No database is required.
+You can use any web server or operating system.  LnBlog is tested on Windows XP with IIS
+and Linux with Apache.  No database is required.  It currently works with both PHP4 and PHP5 
+and should be able to run under pretty much any PHP configuration.  The only required PHP
+extensions are PCRE and XML_Parser, both of which are enabled by default in PHP 4.2 and greater.
+If you want to use LnBlog in a language other than English, then the PHP gettext and iconv 
+extensions are highly recommended, but not strictly required.  The CURL extension is also 
+recommended for Pingback and TrackBacks, but this is not required either.
+
 
 Section: Installation
 
 The setup process for LnBlog is entirely web-based and mostly painless.
 
-1) - Unzip the LnBlog archive into a directory on your hard drive.
+1) - Unzip the LnBlog archive into a directory on your hard drive.  You should remove the version
+     number from the directory name to make upgrades easier in the future.
 2) - Upload the LnBlog directory to your web server.
 3) - Point your web browser to the LnBlog directory on your web server.  This will start the setup 
      process.
-4) - Pick the type of file writing you want.  If you have PHP *safe_mode* enabled on your web server, 
-     then you *must* use FTP.  If you use "native" file writing, make sure that the LnBlog "userdata" 
-     folder and all the files in it are writable for all users.  You will also have to  make the folder 
-	 where you will be creating blogs is writable.  See the <fsconfig.php>
-     documentation for details.  If you are using a shared hosting account or if you don't have 
-     root/administrator access to the server, FTP is recommended.
+4) - Pick the type of file writing you want.  If you have PHP *safe_mode* enabled on your
+     web server, then you *must* use FTP.  If you use "native" file writing, make sure
+     that the LnBlog "userdata" folder and all the files in it are writable for all users.
+     You will also have to  make the folder where you will be creating blogs writable. 
+     See the <fsconfig.php> documentation for details.  If you are using a shared hosting
+     account or if you don't have root/administrator access to the server, FTP is recommended.
 5) - Create a user account.  This initial user will be a system administrator.
 6) - Log in with the account you just created.
 7) - Start creating new users and weblogs.
@@ -55,7 +60,8 @@ Upgrading LnBlog is normally pretty simple.  Assuming your LnBlog installation i
 
 1) - Rename your old LnBlog directory on the server to LnBlog-old.
 2) - Upload the new version into a folder named LnBlog.
-3) - Copy the contents of your LnBlog-old/userdata folder into LnBlog/userdata.
+3) - Copy the contents of your LnBlog-old/userdata folder into LnBlog/userdata, overwriting 
+     any existing files.
 
 If you keep all your non-standard plugins and themes in your userdata folder (which is recommended),
 then this will result in a clean installation of the new version with all your settings carried over.
@@ -80,7 +86,7 @@ notice specifically directs you to do so.  The upgrade steps are as follows.
 4) - Repeat for each blog you created using LnBlog.
 
 Note that upgrading your blog is not required for every version upgrade of LnBlog, although 
-doing it normally won't hurt anything.  
+doing it anyway won't hurt anything.  
 
 Section: License
 

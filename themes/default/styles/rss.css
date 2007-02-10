@@ -11,7 +11,8 @@ look moderately crappy in IE6.
 @namespace slash url(http://purl.org/rss/1.0/modules/slash/);
 @namespace wfw   url(http://wellformedweb.org/CommentAPI/);
 
-rss {
+rss,
+body {
 	display: block;
 	background-color: #6b85b0;
 	margin: 5px;

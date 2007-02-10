@@ -94,6 +94,9 @@ if (has_post()) {
 	
 	if (! $ret) {
 		$tpl->set("UPDATE_MESSAGE", spf_("Error updating file %s", $file));
+	} else {
+		# We redirect so that the user sees the changes right away.
+		$PAGE->redirect(current_uri());
 	}
 }
 

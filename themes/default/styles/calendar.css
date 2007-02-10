@@ -4,7 +4,12 @@ It will only be linked into the page if the calendar plugin is loaded,
 so you should use this only for changes that are particular to the calendar.
 */
 
-table.calendar {
+#calendar.panel {
+	padding: 0;
+	width: 100%;
+}
+
+#calendar table {
 	margin: 1% auto;
 	font-size: 80%;
 	width: 94%;
@@ -39,5 +44,5 @@ p.calendar {
 
 /* Set the color in which the current date should be highlighted. */
 .today {
-background-color: #cdcdcd;
+background-color: white; /*#cdcdcd;*/
 }

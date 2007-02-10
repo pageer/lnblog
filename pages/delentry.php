@@ -53,7 +53,16 @@ $ent->subject);
 		$message = _("Error: user ".$usr->username()." does not have permission to delete this entry.");
 	}
 } elseif (POST($cancel_id)) {
+
 	$PAGE->redirect($ent->permalink());
+	
+} elseif ( empty($_POST) && ! $usr->checkLogin() ) {
+	# Prevent user agents from just navigating to this page.
+	# Note that users whose cookies expire while on the page will
+	# still see error messages.
+	header("HTTP/1.0 403 Forbidden");
+	p_("Access to this page is restricted to logged-in users.");
+	exit;
 }
 
 $tpl = NewTemplate(CONFIRM_TEMPLATE);

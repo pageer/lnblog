@@ -36,11 +36,29 @@ if (! class_exists("SidebarSearch")) {  # Start massive if statement
 
 class SidebarSearch extends Plugin {
 
-	function SidebarSearch() {
+	function SidebarSearch($do_output=0) {
+		global $SYSTEM;
 		$this->plugin_desc = _("Search for terms in blog entries.");
-		$this->plugin_version = "0.1.0";
+		$this->plugin_version = "0.1.1";
 		$this->addOption("caption", _("Caption for search panel"), _("Search"));
+
+		$this->addOption('no_event',
+			_('No event handlers - do output when plugin is created'),
+			$SYSTEM->sys_ini->value("plugins","EventDefaultOff", 0), 
+			'checkbox');
+
 		$this->getConfig();
+
+		if ( $this->no_event || 
+		     $SYSTEM->sys_ini->value("plugins","EventForceOff", 0) ) {
+			# If either of these is true, then don't set the event handler
+			# and rely on explicit invocation for output.
+		} else {
+			$this->registerEventHandler("sidebar", "OnOutput", "sidebar_panel");
+		}
+		
+		if ($do_output) $this->sidebar_panel();
+
 	}
 
 	function sidebar_panel($param=false) {
@@ -136,7 +154,10 @@ $sbsearch =& new SidebarSearch();
 if ($do_output) {
 	$sbsearch->show_page();
 } else {
-	$sbsearch->registerEventHandler("sidebar", "OnOutput", "sidebar_panel");
+global $PLUGIN_MANAGER;
+	if (! $PLUGIN_MANAGER->plugin_config->value('sidebarsearch', 'creator_output', 0)) {
+		$sb =& new SidebarSearch();
+	}
 }
 
 ?>

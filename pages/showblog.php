@@ -33,6 +33,6 @@ $blog = NewBlog();
 $PAGE->setDisplayObject($blog);
 $ret = $blog->getWeblog(); 
 $PAGE->title = $blog->name;
-$PAGE->addStylesheet("blogentry.css");
+$PAGE->addStylesheet("entry.css");
 $PAGE->display($ret, &$blog);
 ?>

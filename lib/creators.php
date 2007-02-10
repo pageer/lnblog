@@ -182,4 +182,23 @@ function NewIniParser($file=false) {
 	return new INIParser($file);
 }
 
+# Function: NewReply
+# Creates a new object based on a reply identifier.  The object is a 
+# BlogComment, Trackback, or Pinback.  The type of object is based on the 
+# parameter passed, which can be either an anchor name as displayed on the page 
+# or a local file path.
+function NewReply($id) {
+	if (file_exists($id)) {
+
+	} else {
+		if (substr($id, 0, 7) == "comment") {
+
+		} elseif (substr($id, 0, 9) == "trackback") {
+		
+		} elseif (substr($is, 0, 8) == "pingback") {
+
+		}
+	}
+}
+
 ?>

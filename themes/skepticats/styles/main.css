@@ -1,26 +1,168 @@
 /* 
 Main style sheet.  This controls the basic page look, including the page header, 
-menu bar, and sidebar.  It does not include the blog entries, comments, forums, etc.
+menu bar, and sidebar.  It does not include the blog entries, comments, forms, etc.
 */
 
-html, body { height: 100%; }
+html, body { height: 100%; }  /* Use the whole page. */
 
-/* Styles for the page content area. */
+/***** Positioning *****/
 
+/* Banner placement - top of the page, all the way across. */
+#banner {
+	width: 100%;
+	border: 1px solid black;
+	background-color: #6b85b0;  /* A grayish-blue. */
+	background-repeat: no-repeat;
+}
+
+/* Menubar - right underneath the banner, same width. */
+#menubar {
+	width: 100%;
+	border: 1px solid black;
+	background: #cdcdcd; /* A darker gray. */
+	border-top: none;
+}
+
+/* Page content area - left side of page, with margins. */
 #pagecontent {
 	margin: 1% 1% 1% 1%;
-	width: 60%;
+	width: 65%;
 	float: left;
 }
 
+/* Sidebar - Right side, with space between it and content area. */
+#sidebar {
+	float: right;
+	width: 30%;
+	margin-top: 2%;
+	border: 1px solid black;
+	background-color: #f4f4f4; /* A light-gray. */
+}
+
+
+/***** Menubar styles *****/
+
+/* Headings in the menubar.  Normally, this is just the "site map" label 
+   at the beginning. */
+#menubar h1, #menubar h2 {
+	font-size: 100%;
+	display: inline;
+}
+
+#menubar ul {
+	display: inline;
+	padding-left: 2em;
+}
+
+#menubar ul li {
+	list-style-type: none;
+	display: inline;
+	margin-left: 1em;
+	margin-right: 1em;
+}
+
+
+/***** Sidebar styles *****/
+
+#sidebar h1, 
+#sidebar h2, 
+#sidebar h4 {
+	font-size: 100%;
+	margin-right: 1em;
+	margin-left: 1em;
+}
+
+#sidebar h3, 
+#sidebar .panelheader {
+	margin-top: 0;
+	margin-bottom: 0;
+	width: 95%;
+	padding-left: 5%;
+	color: white;
+	background-color: #6b85b0;
+}
+
+#sidebar h3 a, 
+#sidebar .panelheader a {
+	color: white;
+	display: block;
+	width: 100%;
+}
+
+#sidebar h3 a:visited, 
+#sidebar .panelheader a:visited {
+	color: white;
+}
+
+#sidebar ul, 
+#sidebar .panel {
+	margin: 0;
+	padding-left: 0;
+	margin-top: 1em;
+	margin-bottom: 1em;
+}
+
+#sidebar .panel {
+	padding-left: 8%;
+	width: 92%;
+}
+
+#sidebar ul li {
+	list-style-type: none;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	padding-left: 8%;
+	width: 92%;
+} 
+
+#sidebar ul li a:hover, 
+#sidebar ul li:hover {
+	background-color: white;
+}
+
+#sidebar .imglist a:hover {
+	background-color: #f4f4f4;  /* Match the normal background. */
+}
+
+#sidebar img {
+	text-align: center;
+	vertical-align: middle;
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+
+/***** Banner styles *****/
+
+#banner h1,
+#banner h2,
+#banner h3 {
+	text-align: center;
+	vertical-align: middle;
+	color: white;
+}
+
+#banner a:link,
+#banner a:visited {
+	color: white;
+}
+
+/***** Link styles *****/
+
+/* Base link style: blue text, no underline.
+   Visited links: red text, no underline.
+	Hovering on links: add underline. 
+*/
 a:link {
-	text-decoration: none;
 	color: blue;
+	text-decoration: none;
 }
 
 a:visited {
-	text-decoration: none;
 	color: #8B008B;
+	text-decoration: none;
 }
 
 a:hover {
@@ -28,9 +170,47 @@ a:hover {
 	color: red;
 }
 
-input:focus, textarea:focus {
+/* In links in article and entry bodies, add a dotted underline with a 
+   background image.  Let this be replaced with the underline on hover. */ 
+
+.blogentrybody a:link,
+.blogentrybody a:visited,
+.articlebody a:link,
+.articlebody a:visited {
+	background-image: url(../images/underline.png);
+	background-position: bottom left;
+	background-repeat: repeat-x;
+}
+
+#pagecontent a:hover {
+	background-image: none;
+}
+
+
+a.anchor:link {
+	color: white;
+}
+
+a.anchor:hover {
+	color: gray;
+}
+
+
+
+/* Basic form styles for sidebar and comment form. */
+input[type='checkbox']:focus,
+input[type='text']:focus,
+input[type='radio']:focus,
+textarea:focus {
 	background-color: #ffffe1;
 }
+
+/***** Font styles *****/
+
+/* Put quotes in italics, as IE does not support :before and :after. */
+q { font-style: italic; }
+
+/***** Print media styles *****/
 
 @media print {
 
@@ -38,12 +218,21 @@ input:focus, textarea:focus {
 
 	#pagecontent {
 		margin: 1% 1% 1% 1%;
-		width: 95%;
+		width: 100%;
 	}
 
 	a:link, a:visited {
-		color: black;
-		text-decoration: none;
+		text-decoration: underline;
+		background-image: none;
+	}
+
+	/* Don't show the banner, sidebar, menubar, or commit submit form
+	   when printing the page. */
+	#banner, 
+	#menubar, 
+	#sidebar, 
+	#commentsubmit {
+		display: none;
 	}
 
 }

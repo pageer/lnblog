@@ -1,3 +1,7 @@
+<?php
+# Template: blog_admin_tpl.php
+# This page contains the markup for the main administration page.
+?>
 <h1><?php pf_("%s System Administration", PACKAGE_NAME); ?></h1>
 <form method="post" action="<?php echo $FORM_ACTION; ?>">
 <h3><?php p_('Add Features'); ?></h3>

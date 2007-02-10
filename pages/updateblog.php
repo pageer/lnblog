@@ -20,6 +20,11 @@
 
 # File: updateblog.php
 # Used to update the settings on an existing blog.
+# Note that some of the settings on this page, such as the settings to turn on
+# and off comments, TrackBacks, etc., are default settings, not global settings.
+# They are not applied retroactively to old entries and can be changed when
+# adding a new entry.  To globally disable comments, TrackBacks, and Pignbacks
+# for a blog, use the <disable_comments.php> plugin.
 #
 # In the standard setup, this file is included by the per-blog edit.php file.
 

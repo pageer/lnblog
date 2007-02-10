@@ -2,7 +2,7 @@ File: pathconfig.php
 
 There is a pathconfig.php file in the root directory of each weblog.  The purpose of this 
 file is simply to the path and URL to the LnBlog installation and to define the URL to 
-the blog root directory.  You can edit these values with the <blogpath.php> page. 
+the blog root directory.  You can edit these values with the <blogpaths.php> page. 
 
 Note that the only time you would really want to change this is when you move
 your LnBlog installation folder, either as part of site cleanup or because you

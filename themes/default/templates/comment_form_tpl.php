@@ -7,7 +7,7 @@ if (! empty($PARENT_TITLE)) {
 } else { 
 	p_("Add your comments");
 } ?>
-&nbsp;<a name="postcommentform" class="anchor">#</a>
+&nbsp;<a href="#postcommentform" name="postcommentform" class="anchor">#</a>
 </h3>
 <p>
 <?php
@@ -59,9 +59,9 @@ if (isset($COMMENT_SHOWEMAIL)) echo "checked=\"checked\""; ?> />
 <label for="remember"><?php p_("Remember me"); ?></label>
 <input id="remember" name="remember" type="checkbox" checked="checked" />
 </div>
-<div>
-<span class="basic_form_submit"><input name="submit" id="submit" type="submit" value="<?php p_("Submit"); ?>" /></span>
-<span class="basic_form_clear"><input name="clear" id="clear" type="reset" value="<?php p_("Clear"); ?>" /></span>
+<div class="form_buttons">
+<input name="submit" id="submit" type="submit" value="<?php p_("Submit"); ?>" />
+<input name="clear" id="clear" type="reset" value="<?php p_("Clear"); ?>" />
 </div>
 <?php $EVENT_REGISTER->activateEventFull($tmp=false, "commentform", "FormEnd");?>
 </form>

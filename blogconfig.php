@@ -79,6 +79,12 @@ define("FS_PLUGIN_CONFIG", "fsconfig.php");
 # have to worry about the exact path.
 @include_once(USER_DATA."/".FS_PLUGIN_CONFIG);
 
+if (defined("DOCUMENT_ROOT") && ! is_dir(DOCUMENT_ROOT) ) {
+	die("The document root is defined as ".DOCUMENT_ROOT.", but this directory
+does not exist.  Your installation is broken.  Edit your ".FS_PLUGIN_CONFIG."
+file to reflect the correct document root directory.");
+}
+
 # If we do not have the INSTALL_ROOT defined from a previously included
 # pathconfig.php, then we need to take care of that.  We'll try to get the
 # blog's pathconfig.php file, and failing that, we'll just use the cwd.
@@ -210,7 +216,7 @@ define("PACKAGE_NAME", "LnBlog");
 # Constant: PACKAGE_VERSION
 # The version number of the software.  This is a string in the format 
 # "1.2.3".  Note that each number may be more than one digit.
-define("PACKAGE_VERSION", "0.8.0");
+define("PACKAGE_VERSION", "0.8.2");
 
 # Constant: PACKAGE_URL
 # The full URL of the LnBlog project home page.
@@ -538,8 +544,8 @@ The corresponding replacement expression to <URI_TO_LOCALPATH_MATCH_RE>.
 # The file name used to store the data for a blog enrty or article.
 # Note that this is specific to file-based storage.
 #
-# The *default* is "current.htm".
-@define("ENTRY_DEFAULT_FILE", "current.htm");
+# The *default* is "entry.xml".
+@define("ENTRY_DEFAULT_FILE", "entry.xml");  # Formerly current.htm
 
 # Constant: TAG_SEPARATOR
 # The character used to separate individual tags entered for entries.
@@ -580,7 +586,7 @@ The corresponding replacement expression to <URI_TO_LOCALPATH_MATCH_RE>.
 # tracking.
 #
 # The *default* is ".htm".
-@define("ENTRY_PATH_SUFFIX", ".htm");
+@define("ENTRY_PATH_SUFFIX", ".xml");
 
 # Constant: STICKY_PATH
 # The name of the "sticky" file for articles.
@@ -655,7 +661,7 @@ The corresponding replacement expression to <URI_TO_LOCALPATH_MATCH_RE>.
 # File suffix to use for comment files.  
 #
 #*Default* is ".txt". 
-@define("COMMENT_PATH_SUFFIX", ".txt");
+@define("COMMENT_PATH_SUFFIX", ".xml");
 
 # Constant: COMMENT_DELETED_PATH
 # Leaf directory name where deleted comments are stored. 

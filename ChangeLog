@@ -1,3 +1,55 @@
+10-Nov-2006: version 0.8.2
+- Fixed bug in sending pingbacks.
+- Fixed URLs and JavaScript for deleting single TrackBack or Pingback.
+- Changed default format for blog entry files to XML.  To revert to old format,
+set USE_OLD_ENTRY_FORMAT = true in userconfig.cfg.
+- Fixed links, validation errors, and miscellaneous XMl breakage when putting
+ampersands in tags.
+
+02-Nov-2006:
+- Fixed entry preview bug when register_globals is enabled.
+
+29-Oct-2006:
+- Fixed blog getDay() and getDayCount() methods.
+- Made sidebar calendar not suck so much.
+- Changed calendar prev/next month navigation to use AJAX instead of query
+strings with page reloads.
+
+12-Oct-2006:
+- Added JavaScript to add link/image code to text area when changing/adding a
+file upload.
+- Added excerpt extraction to Pingback server.
+- Made entries with identical titles in same month not overwrite eachother's 
+pretty permalinks.
+
+06-Oct-2006:
+- Make BlogEntry::calcPrettyPermalink() actually conform to the character 
+limitations in the URI specification (RFC3986).
+- Changed BlogEntry::getReplyArray() to retrun an empty array on failure 
+rather than false.
+- Added link to enclosure file when displaying blog entries.
+
+05-Oct-2006:
+- Fixed wrong version number AGAIN.  Why do I always forget that?
+- Fixed Page::refresh() method.
+- Made entry add/edit pages display error and refresh to entry page when the
+entry update succeeds, but an upload or pingback fails.
+- Added system.ini option to display all replies in a single list for the entry,
+page rather than a separate section for each.
+
+01-Oct-2006:
+- Added mass-deletion of replies for entires.  You can now delete all or many of
+the comments/TrackBacks/Pingbacks for an entry with a single page request.
+- Added check on DOCUMENT_ROOT in blogconfig.php.  If the DOCUMENT_ROOT is 
+defined, but does not exist, print an error and die.
+
+14-Sep-2006:
+- Changed blog pingback setting so to allow sending pings for all entries, only 
+new entries, or never.
+
+12-Sep-2006:
+- Cleaned up and consolidated stylesheets, changing references in page files.
+
 03-Sep-2006: version 0.8.1
 - Added BotBlock plugin for comment spam.
 

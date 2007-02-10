@@ -49,8 +49,8 @@ class BlogEntry extends Entry {
 	var $allow_comment = true;
 	var $allow_tb = true;
 	var $has_html;
-	var $mail_notify = true;
-	var $sent_ping = true;
+	#var $mail_notify = true;
+	#var $sent_ping = true;
 	var $abstract;
 
 	function BlogEntry ($path="", $revision=ENTRY_DEFAULT_FILE) {
@@ -59,6 +59,7 @@ class BlogEntry extends Entry {
 		
 		$this->initVars();
 		$this->getFile($path, $revision);
+		
 		
 		if ( file_exists($this->file) ) {
 			$this->readFileData();
@@ -78,8 +79,8 @@ class BlogEntry extends Entry {
 		$this->post_date = false;
 		$this->timestamp = "";
 		$this->post_ts = false;
-		$this->mail_notify = true;
-		$this->sent_ping = true;
+		#$this->mail_notify = true;
+		#$this->sent_ping = true;
 		$this->subject = "";
 		$this->tags = "";
 		$this->data = "";
@@ -90,11 +91,13 @@ class BlogEntry extends Entry {
 		$this->allow_tb = true;
 		$this->allow_pingback = true;
 		$this->template_file = ENTRY_TEMPLATE;
+		$this->custom_fields = array();
+		$this->exclude_fields = array("exclude_fields", "metadata_fields",
+		                              "template_file", "file");
 		$this->metadata_fields = array("id"=>"postid", "uid"=>"userid", 
 			"date"=>"date", "post_date"=>"postdate",
 			"timestamp"=>"timestamp", "post_ts"=>"posttimestamp",
-			"ip"=>"ip", "mail_notify"=>"mail notification",
-			"sent_ping"=>"trackback ping", "subject"=>"subject",
+			"ip"=>"ip", "subject"=>"subject",
 			"abstract"=>"abstract", "allow_comment"=>"allowcomment",
 			"has_html"=>"hashtml", "tags"=>"tags", 
 			"allow_tb"=>"allowtrackback", 
@@ -112,6 +115,10 @@ class BlogEntry extends Entry {
 		if ($path && is_dir($path)) {
 		
 			$this->file = $path.PATH_DELIM.$revision;
+			if (! file_exists($this->file) && 
+			      file_exists($path.PATH_DELIM."current.htm")) {
+				$this->file = $path.PATH_DELIM."current.htm";
+			}
 			
 		} elseif (GET($getvar) || $path) {
 
@@ -135,18 +142,28 @@ class BlogEntry extends Entry {
 			}
 
 			$this->file = mkpath($blogpath,$subdir,$entrypath,$revision);
+			if (! file_exists($this->file)) {
+				$tmpfile = mkpath($blogpath,$subdir,$entrypath,"current.htm");
+				if (file_exists($tmpfile)) $this->file = $tmpfile;
+			}
 			
 		} else {
 		
 			$this->file = getcwd().PATH_DELIM.$revision;
+			if (! file_exists($this->file) && 
+			      file_exists(getcwd().PATH_DELIM."current.htm")) {
+				$this->file = getcwd().PATH_DELIM."current.htm";
+			}
 			# We might be in a comment or trackback directory, 
 			if (! $this->isEntry() ) {
-				$this->file = dirname(getcwd()).PATH_DELIM.$revision;
-				if (! $this->isEntry() ) {
-					$this->file = getcwd().PATH_DELIM.$revision;
+				$tmpfile = dirname(getcwd()).PATH_DELIM.$revision;
+				if (! file_exists($tmpfile) && 
+				      file_exists(dirname(getcwd()).PATH_DELIM."current.htm")) {
+					$this->file = dirname(getcwd()).PATH_DELIM."current.htm";
 				}
 			}
 		}
+	
 		return $this->file;
 	}
 	
@@ -298,37 +315,9 @@ class BlogEntry extends Entry {
 			} else {
 				# No fileinfo, no mime_magic, so revert to file extension matching.
 				# This is a dirty and incomplete method, but I suppose it's better
-				# than nothing.  But only marginally.
-				$dotpos = strrpos($path, '.');
-				$ext = strtolower(substr($path, $dotpos));
-				$type = 'application/octet-stream';
-				
-				switch ($ext) {
-					case 'mp3': $type = 'audio/mpeg'; break;
-					case 'aif':
-					case 'aifc':
-					case 'aiff': $type = 'audio/x-aiff'; break;
-					case 'm3u': $type = 'audio/x-mpegurl'; break;
-					case 'ra': 
-					case 'ram': $type = 'audio/x-pn-realaudio'; break;
-					case 'wav': $type = 'audio/x-wav'; break;
-					case 'mp2':
-					case 'mpa':
-					case 'mpeg':
-					case 'mpe':
-					case 'mpg':
-					case 'mpv2': $type = 'video/mpeg'; break;
-					case 'mov':
-					case 'qt': $type = 'video/quicktime'; break;
-					case 'asf':
-					case 'asr':
-					case 'asx': $type = 'video/x-ms-asf'; break;
-					case 'avi': $type = 'video/x-msvideo'; break;
-					case 'wmv': $type = 'video/x-ms-wmv'; break;
-					case 'wma': $type = 'audio/x-ms-wma'; break;
-				}
-
-				$ret['type'] = $type;
+				# than nothing.  Though only marginally.
+				require_once('lib/stupid_mime.php');	
+				$ret['type'] = stupid_mime_get_type($path);
 			}
 
 		} elseif (strpos($this->enclosure, 'url')    !== false && 
@@ -381,7 +370,8 @@ class BlogEntry extends Entry {
 	*/
 	function isEntry ($path=false) {
 		if (! $path) $path = dirname($this->file);
-		return file_exists($path.PATH_DELIM.ENTRY_DEFAULT_FILE);
+		return file_exists($path.PATH_DELIM.ENTRY_DEFAULT_FILE) || 
+		       file_exists($path.PATH_DELIM."current.htm");
 	}
 	
 	/*
@@ -464,7 +454,21 @@ class BlogEntry extends Entry {
 				if ($pretty_file)
 					$pretty_file = dirname($this->localpath()).PATH_DELIM.$pretty_file;
 				if ( file_exists($pretty_file) ) {
-					return localpath_to_uri($pretty_file);
+					# Check for duplicated entry subjects.
+					$base_path = substr($pretty_file, 0, strlen($pretty_file)-5);
+					$i = 2;
+					if ( file_exists( $base_path.$i.".php") ) {
+						while ( file_exists( $base_path.$i.".php" ) ) {
+							$contents = file_get_contents($base_path.$i.".php");
+							if (strpos($contents, basename(dirname($this->file)))) {
+								return localpath_to_uri($base_path.$i.".php");
+							}
+							$i++;
+						}
+						return $dir_uri;
+					} else {
+						return localpath_to_uri($pretty_file);
+					}
 				} else {
 					$pretty_file = $this->calcPrettyPermalink(true);
 					if ($pretty_file)
@@ -506,6 +510,7 @@ class BlogEntry extends Entry {
 	
 	function getByPath ($path, $revision=ENTRY_DEFAULT_FILE) {
 		$file_path = $path.PATH_DELIM.$revision;
+		if (! file_exists($file_path)) $file_path = $path.PATH_DELIM."current.htm";
 		return $this->readFileData($file_path); 
 	}
 	
@@ -529,10 +534,13 @@ class BlogEntry extends Entry {
 		$target = $dir_path.PATH_DELIM.
 			$this->getPath($curr_ts, true, true).ENTRY_PATH_SUFFIX;
 		$source = $dir_path.PATH_DELIM.ENTRY_DEFAULT_FILE;
+		if (! file_exists($source)) $source = $dir_path.PATH_DELIM."current.htm";
 
 		$fs = NewFS();
 		$ret = $fs->rename($source, $target);
-			
+		
+		if (basename($this->file) == "current.htm")
+			$this->file = $dir_path.PATH_DELIM.ENTRY_DEFAULT_FILE;
 		if ($ret) $ret = $this->writeFileData();
 
 		# Create wrappers for comments and trackbacks if they do not exist.
@@ -583,7 +591,7 @@ class BlogEntry extends Entry {
 		if (! $this->isEntry($dir_path) ) return false;
 		
 		$this->raiseEvent("OnDelete");
-		
+
 		$subfile = $this->calcPrettyPermalink();
 		if (file_exists($subfile)) {
 			$fs->delete($subfile);
@@ -686,7 +694,7 @@ class BlogEntry extends Entry {
 		$ret = trim($this->subject);
 		if (!$use_broken_regex) {
 			$ret = str_replace(array("'", '"'), "_", $ret);
-			$ret = preg_replace("/[^A-Za-z_]+/", "_", $ret);
+			$ret = preg_replace("/[^A-Za-z0-9_\-\.\~]+/", "_", $ret);
 		} else {
 			$ret = preg_replace("/\W/", "_", $ret);
 		}
@@ -709,6 +717,16 @@ class BlogEntry extends Entry {
 			$path = dirname(dirname($this->file));
 			$dir_path = basename(dirname($this->file));
 			$path .= PATH_DELIM.$subfile;
+			# Check that there isn't already a file by this name.
+			if (file_exists($path)) {
+				$i = 2;
+				# Get rid of the .php extension
+				$base = substr($path, 0, strlen($path) - 5);
+				while (file_exists($path)) {
+					$path = $base.$i.".php";
+					$i++;
+				}
+			}
 			$ret = write_file($path, "<?php chdir('".$dir_path."'); include('config.php'); include('index.php'); ?>");
 		} else $ret = false;
 		return $ret;
@@ -843,8 +861,13 @@ class BlogEntry extends Entry {
 		
 		$count = 0;
 		foreach ($dir_array as $file) {
-			$cond = is_file($dir_path.PATH_DELIM.$file) && 
-			        preg_match("/[\w\d]+".$params['ext']."/", $file);
+			$cond = is_file($dir_path.PATH_DELIM.$file);
+			if ($cond) {
+				$cond = preg_match("/[\-_\d]+".$params['ext']."/", $file);
+				if (! $cond && isset($params['altext'])) {
+					$cond = preg_match("/[\w\d]+".$params['altext']."/", $file);
+				}
+			}
 			if ($cond) $count++;
 		}
 		return $count;
@@ -870,14 +893,19 @@ class BlogEntry extends Entry {
 	function getReplyArray($params) {
 		$dir_path = dirname($this->file);
 		$dir_path = $dir_path.PATH_DELIM.$params['path'];
-		if (! is_dir($dir_path)) return false;
+		if (! is_dir($dir_path)) return array();
 		else $reply_dir = scan_directory($dir_path);
 		
 		$reply_files = array();
 		foreach ($reply_dir as $file) {
-			$cond = is_file($dir_path.PATH_DELIM.$file) && 
-			        preg_match("/[\w\d]+".$params['ext']."/", $file);
+			$cond = is_file($dir_path.PATH_DELIM.$file);
+			if ($cond) {
+				$cond = preg_match("/[\-_\d]+".$params['ext']."/", $file);
+				if (! $cond && isset($params['altext'])) {
+					$cond = preg_match("/[\w\d]+".$params['altext']."/", $file);
+				}
 			if ($cond) $reply_files[] = $file; 
+			}
 		}
 		if (isset($params['sort_asc']) && $params['sort_asc']) {
 			sort($reply_files);
@@ -944,7 +972,7 @@ class BlogEntry extends Entry {
 	failure.
 	*/
 	function getCommentCount() {
-		$params = array('path'=>ENTRY_COMMENT_DIR, 'ext'=>COMMENT_PATH_SUFFIX);
+		$params = array('path'=>ENTRY_COMMENT_DIR, 'ext'=>COMMENT_PATH_SUFFIX, 'altext'=>'.txt');
 		return $this->getReplyCount($params);
 	}
 
@@ -960,7 +988,7 @@ class BlogEntry extends Entry {
 	An array of BlogComment object.
 	*/
 	function getCommentArray($sort_asc=true) {
-		$params = array('path'=>ENTRY_COMMENT_DIR, 'ext'=>COMMENT_PATH_SUFFIX,
+		$params = array('path'=>ENTRY_COMMENT_DIR, 'ext'=>COMMENT_PATH_SUFFIX, 'altext'=>'.txt',
 		                'creator'=>'NewBlogComment', 'sort_asc'=>$sort_asc);
 		return $this->getReplyArray($params);
 	}
@@ -979,7 +1007,7 @@ class BlogEntry extends Entry {
 	function getComments($sort_asc=true) {
 		$title = spf_('Comments on <a href="%s">%s</a>', 
 		              $this->permalink(), $this->subject);
-		$params = array('path'=>ENTRY_COMMENT_DIR, 'ext'=>COMMENT_PATH_SUFFIX,
+		$params = array('path'=>ENTRY_COMMENT_DIR, 'ext'=>COMMENT_PATH_SUFFIX, 'altext'=>'.txt',
 		                'creator'=>'NewBlogComment', 'sort_asc'=>$sort_asc,
 		                'itemclass'=>'fullcomment', 'listtitle'=>$title);
 		return $this->getReplies($params);

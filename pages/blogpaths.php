@@ -70,7 +70,7 @@ $tpl->set("POST_PAGE", current_file());
 $tpl->set("UPDATE_TITLE", sprintf(_("Update paths for %s"), $blog->name));
 
 $body = $tpl->process();
-$PAGE->title = sprintf(_("Update blog paths - %s"), $blog->name);
+$PAGE->title = sprintf(_("Update blog paths - %s"), htmlspecialchars($blog->name));
 $PAGE->addStylesheet("form.css");
 $PAGE->display($body, &$blog);
 ?>

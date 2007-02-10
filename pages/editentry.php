@@ -44,7 +44,9 @@ entry_set_template($tpl, $ent);
 $tpl->set("ALLOW_ENCLOSURE", $blg->allow_enclosure);
 sort($blg->tag_list);
 $tpl->set("BLOG_TAGS", $blg->tag_list);
-$tpl->set("SEND_PINGBACKS", $blg->auto_pingback);
+# Send pingbacks only if set to send for all posts.  Otherwise it's off or
+# only for new posts.
+$tpl->set("SEND_PINGBACKS", $blg->auto_pingback == 'all');
 $tpl->set("FORM_ACTION", make_uri(false,false,false) );
 $blg->exportVars($tpl);
 
@@ -68,14 +70,25 @@ if (POST('submit')) {
 					$ret = false;
 					$err = _("Upload errors:")."<br />".
 					       implode("\n<br />", $messages);
+					$page_body = "<p>".$err."</p>";
 				}
 
 				# Check for pingback-enabled links and send them pings.
 				if ($ret && POST("send_pingbacks")) {
 					$err = handle_pingback_pings($ent);
-					if ($err) $ret = false;
+					if (! isset($page_body)) $page_body = '';
+					$page_body .= "<p>".$err."</p>";
 				}
-				                                  
+				            
+				if (isset($page_body)) {
+					$refresh_delay = 10;
+					$page_body = "<h4>"._("Entry created, but with errors")."</h4>".
+					        $page_body."\n<p>".
+							spf_('You will be redirected to <a href="%s">the new entry</a> in %d seconds.',
+							     $ent->permalink(), $refresh_delay)."</p>";
+					$PAGE->refresh($ent->permalink(), $refresh_delay);
+				}
+				
 			} else { 
 				$err = _("Error: unable to update entry.");
 			}
@@ -105,14 +118,23 @@ if (POST('submit')) {
 	$blg->raiseEvent($is_art?"OnArticlePreview":"OnEntryPreview");
 	entry_set_template($tpl, $blg->$last_var);
 	$tpl->set("PREVIEW_DATA", $blg->$last_var->get() );
+
+} elseif ( empty($_POST) && ! $u->checkLogin() ) {
+	header("HTTP/1.0 403 Forbidden");
+	p_("Access to this page is restricted to logged-in users.");
+	exit;
 }
 
-$body = $tpl->process();
+# Process the template into the page body, but only if we have not already set
+# it.  We may set it above to display a message that does not constitute a 
+# fatal error, such as a failed pingback.
+if (! isset($page_body)) $page_body = $tpl->process();
+
 $title = $is_art ? 
          spf_("%s - Edit Entry", $blg->name) :
          spf_("%s - Edit Article", $blg->name);
 $PAGE->title = 
-$PAGE->addStylesheet("form.css", $is_art?"blogentry.css":"article.css");
+$PAGE->addStylesheet("form.css", "entry.css");
 $PAGE->addScript("editor.js");
-$PAGE->display($body, &$blg);
+$PAGE->display($page_body, &$blg);
 ?>

@@ -205,7 +205,7 @@ class EventRegister {
 			#     (is_object($tmp_class)?"yes":"no").'<br />'.
 			#	  (method_exists($tmp_class, $hnd)?"yes":"no").': '.
 			#	  $hnd.'</p>';
-			
+	
 				if ( method_exists($tmp_class, $hnd) ) {
 					$tmp_class->$hnd($param);
 				} else {

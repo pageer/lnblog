@@ -27,7 +27,7 @@ class IPBan extends Plugin {
 	
 	function IPBan() {
 		$this->plugin_desc = _("Allows you to ban IP addresses from adding comments or trackbacks.");
-		$this->plugin_version = "0.2.3";
+		$this->plugin_version = "0.2.4";
 		$this->addOption("ban_list", _("File to store list of banned IPs."),
 			"ip_ban.txt", "text");
 		$this->addOption("admin_local", _("Show per-blog ban link when administrator"), false, "checkbox");
@@ -138,7 +138,7 @@ class IPBan extends Plugin {
 		$banned_ips = array_merge($global_list, $local_list);
 		$ban_post = false;
 		foreach ($banned_ips as $item) {
-			if (preg_match("/".trim($item)."/", trim($check_ip))) {
+			if (preg_match("/^".trim($item)."$/", trim($check_ip))) {
 				$ban_post = true;
 				break;
 			}

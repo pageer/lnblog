@@ -5,7 +5,7 @@ class TagList extends Plugin {
 		global $SYSTEM;
 
 		$this->plugin_desc = _("Provides a list of links to view post for each tag used in the blog.");
-		$this->plugin_version = "0.2.1";
+		$this->plugin_version = "0.2.2";
 		$this->addOption("header", _("Sidebar section heading"), _("Topics"));
 		$this->addOption("show_feeds", _("Show RSS feeds"), true, 'checkbox');
 
@@ -40,11 +40,14 @@ class TagList extends Plugin {
 		$base_feed_uri = $blg->uri('base').BLOG_FEED_PATH.'/';
 
 		if ($this->header) {
-?><h3><?php echo $this->header;?></h3><?php } ?>
-<ul><?php
+?>
+<h3><?php echo $this->header;?></h3>
+<?php } ?>
+<ul>
+<?php
 		foreach ($blg->tag_list as $tag) { 
-			?><li><a href="<?php echo $blg->uri('tags', 'tag='.$tag);?>"><?php echo $tag;?></a><?php
-		
+?><li><a href="<?php echo $blg->uri('tags', 'tag='.urlencode($tag));?>">
+<?php echo htmlspecialchars($tag);?></a><?php
 			if ($this->show_feeds) {
 				$topic = preg_replace('/\W/','',$tag);
 

@@ -28,14 +28,17 @@
 session_start();
 require_once("config.php");
 require_once("lib/creators.php");
+require_once("pages/pagelib.php");
 
 global $PAGE;
 
 $ent = NewEntry();
 $blg = NewBlog();
+$usr = NewUser();
 $PAGE->setDisplayObject($ent);
 			
-$PAGE->title = $ent->subject . " - " . $blg->name;
+#$PAGE->title = htmlspecialchars($ent->subject . " - " . $blg->name);
+$PAGE->title = htmlspecialchars($ent->subject) . " - " . $blg->name;
 
 # This code will detect if a comment has been submitted and, if so,
 # will add it.  We do this before printing the comments so that a 
@@ -49,8 +52,10 @@ if ($ent->allow_comment) {
 }
 
 $content = '';
+
+# Allow a query string to get just the comment form, not the actual comments.
 if (! GET('post')) {
-	$content = $ent->getComments();
+	$content = show_comments($ent, $usr);
 	# Extra styles to add.  Build the list as we go to keep from including more
 	# style sheets than we need to.
 	$PAGE->addStylesheet("reply.css");

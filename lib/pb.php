@@ -47,6 +47,7 @@ class Pingback extends Trackback {
 		$this->excerpt = '';
 		$this->ip = '';
 		$this->ping_date = '';
+		$this->timestamp = '';
 		$this->file = $path;
 		if ($this->file) {
 			if (! is_file($this->file)) 
@@ -68,8 +69,15 @@ class Pingback extends Trackback {
 				return localpath_to_uri(dirname($this->file)).
 				       "#".$this->getAnchor();
 			case "delete":
-				return localpath_to_uri(dirname($this->file)).
-				       "?delete=".$this->getAnchor();
+				$qs_arr = array();
+				$parent = $this->getParent();
+				$entry_type = is_a($this, 'Article') ? 'article' : 'entry';
+				$qs_arr['blog'] = $parent->parentID();
+				$qs_arr[$entry_type] = $parent->entryID();
+				$qs_arr['delete'] = $this->getAnchor();
+				return make_uri(INSTALL_ROOT_URL."pages/delcomment.php", $qs_arr);
+				#return localpath_to_uri(dirname($this->file)).
+				#       "?delete=".$this->getAnchor();
 		}
 	}
 	
@@ -89,12 +97,35 @@ class Pingback extends Trackback {
 		$this->file = mkpath($ent->localpath(), ENTRY_PINGBACK_DIR, 
 		                     $ts.PINGBACK_PATH_SUFFIX);
 		$dir = mkpath($ent->localpath(), ENTRY_PINGBACK_DIR);
+
+		if (! $this->source) return false;
+
 		if (! is_dir($dir)) {
 			$ret = create_directory_wrappers($dir, ENTRY_PINGBACKS, get_class($ent));
 		}
 		$ret = $this->writeFileData($this->file);
 		$this->raiseEvent("InsertComplete");
 		return $ret;
+	}
+	
+	# Method: isPingback
+	# Determines if an object or file is a saved pingback.
+	#
+	# Parameters:
+	# path - The *optional* path to the pingback data file.  If not given, 
+	#        then the object's file property is used.
+	#
+	# Returns:
+	# True if the data file exists and is under an entry pingback directory, 
+	# false otherwise
+	function isPingback($path=false) {
+		if (!$path) $path = $this->file;
+		if ( file_exists($path) && 
+		     basename(dirname($path)) == ENTRY_PINGBACK_DIR ) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	# Method: getAnchor
@@ -111,7 +142,7 @@ class Pingback extends Trackback {
 	}
 
 	# Method: getFilename
-	# Converts an anchor from getAnchor into a filename.
+	# Converts an anchor from <getAnchor> into a filename.
 	#
 	# Parameters:
 	# anchor - The anchor to turn into a filename.
@@ -120,7 +151,7 @@ class Pingback extends Trackback {
 	# The name of the pingback file.
 	
 	function getFilename($anchor) {
-		$ent = NewBlogEntry();
+		$ent = NewEntry();
 		$ret = substr($anchor, 8);
 		$ret .= PINGBACK_PATH_SUFFIX;
 		$ret = mkpath($ent->localpath(),ENTRY_PINGBACK_DIR,$ret);
@@ -219,7 +250,7 @@ class Pingback extends Trackback {
 		$this->control_bar = array();
 		$this->control_bar[] = 
 			'<a href="'.$del_link.'" '.
-			'onclick="return window.confirm(\'Delete '.$anchor.'?\');">'
+			'onclick="return comm_del(this, \''.spf_("Delete %s?", $anchor).'\');">'
 			._("Delete").'</a>';
 		
 		$this->raiseEvent("OnOutput");

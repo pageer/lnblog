@@ -66,7 +66,10 @@ if (! $u->checkLogin()) $edit_ok = false;
 
 if (! $edit_ok) {
 	if (SERVER("referer")) $PAGE->redirect(SERVER("referer"));
-	else $PAGE->redirect("index.php");
+	else {
+		header("HTTP/1.0 403 Forbidden");
+		p_("You do not have permission to edit this file.");
+	}
 	exit;
 }
 

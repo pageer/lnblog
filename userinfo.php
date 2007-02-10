@@ -21,8 +21,12 @@
 # File: userinfo.php
 # Displays the public information for a user.
 #
-# This will display the username, real name, e-mail, and URL for a user.
-# Currently, this is not included in the default interface.
+# This will display the username, real name, e-mail, URL, and other 
+# information for a user.  This page is linked to the user's name in the # by-line of posts and comments.
+#
+# This displays built-in profile information, extra fields 
+# added in a profile.ini file, and any narative set in the
+# user's profile.htm file.
 
 session_start();
 require_once("blogconfig.php");

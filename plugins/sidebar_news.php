@@ -1,15 +1,32 @@
 <?php
 class News extends Plugin {
 
-	function News() {
+	function News($do_output=0) {
+		global $SYSTEM;
 		$this->plugin_desc = _("List the RSS feeds for the current page.");
-		$this->plugin_version = "0.2.0";
+		$this->plugin_version = "0.2.1";
 		$this->addOption("header", 
 			_("Sidebar section heading"), 
 			_("News Feeds"));
 		$this->addOption("std_icons", _("Use standard RSS icons for feeds"),
 			true, "checkbox");
+
+		$this->addOption('no_event',
+			_('No event handlers - do output when plugin is created'),
+			$SYSTEM->sys_ini->value("plugins","EventDefaultOff", 0), 
+			'checkbox');
+
 		$this->getConfig();
+
+		if ( $this->no_event || 
+		     $SYSTEM->sys_ini->value("plugins","EventForceOff", 0) ) {
+			# If either of these is true, then don't set the event handler
+			# and rely on explicit invocation for output.
+		} else {
+			$this->registerEventHandler("sidebar", "OnOutput", "output");
+		}
+		
+		if ($do_output) $this->output();
 	}
 
 	function output() {
@@ -143,6 +160,8 @@ class News extends Plugin {
 
 } 
 
-$newsfeeds =& new News();
-$newsfeeds->registerEventHandler("sidebar", "OnOutput", "output");
+global $PLUGIN_MANAGER;
+if (! $PLUGIN_MANAGER->plugin_config->value('news', 'creator_output', 0)) {
+	$newsfeeds =& new News();
+}
 ?>

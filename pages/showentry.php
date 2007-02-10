@@ -21,6 +21,7 @@
 session_start();
 require_once("config.php");
 require_once("lib/creators.php");
+require_once("pages/pagelib.php");
 
 global $PAGE;
 
@@ -42,22 +43,13 @@ $PAGE->title = $ent->subject . " - " . $blg->name;
 $show_ctl = $SYSTEM->canModify($ent, $usr) && $usr->checkLogin();
 $content =  $ent->get($show_ctl);
 
-# Array for adding style sheets.  We build this as we go so that we don't 
-# end up sending more stylesheets than we need to.
-$PAGE->addStylesheet(is_a($ent, "Article")?"article.css":"blogentry.css");
-
-# Add TrackBacks for current entry.
-$tmp_content = $ent->getTrackbacks();
-$content .= $tmp_content;
-#if ($tmp_content) $PAGE->addStylesheet("trackback.css");
-# Now add the Pingbacks.
-$tmp_content = $ent->getPingbacks();
-$content .= $tmp_content;
-#if ($tmp_content) $PAGE->addStylesheet("pingback.css");
-# Now add the comments.
-$tmp_content = $ent->getComments();
-$content .= $tmp_content;
-#if ($tmp_content) $PAGE->addStylesheet("comment.css");
+if ($SYSTEM->sys_ini->value("entryconfig", "GroupReplies", 0)) {
+	$content .= show_all_replies($ent, $usr);
+} else {
+	$content .= show_trackbacks($ent, $usr);
+	$content .= show_pingbacks($ent, $usr);
+	$content .= show_comments($ent, $usr);
+}
 
 # Add comment form if applicable.
 $content .= $comm_output;
@@ -79,5 +71,6 @@ if ($ent->allow_pingback) {
 }
 $PAGE->addScript("entry.js");
 $PAGE->addStylesheet("reply.css");
+$PAGE->addStylesheet("entry.css");
 $PAGE->display($content, &$blog);
 ?>

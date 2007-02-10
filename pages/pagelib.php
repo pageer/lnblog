@@ -4,8 +4,9 @@
 # This file is a library of routines that are shared among several pages.  
 # It is in the pages directory rather than the lib directory because the
 # functions here are front-end code, not back-end stuff.  For example, this 
-# file contains the shared function for adding a (working) comment form to the 
-# page.
+# file contains the shared function for adding a comment form to the page, 
+# displaying lists of comments, and handling posted comments and files, 
+# and so forth.
 
 # Function: handle_comment
 # Handles comments posted to an entry.  This includes generating the form 
@@ -161,7 +162,7 @@ function handle_pingback_pings(&$ent) {
 	foreach ($results as $res) {
 		if ($res['response']->faultCode()) {
 			$errors[] = spf_('URI: %s', $res['uri']).'<br />'.
-			            spf_("Error %d: %s", 
+			            spf_("Error %d: %s<br />", 
 			                 $res['response']->faultCode(), 
 			                 $res['response']->faultString());
 		}
@@ -237,7 +238,199 @@ function blog_get_post_data(&$blog) {
 	$blog->max_rss = POST("maxrss");
 	$blog->allow_enclosure = POST("allow_enc")?1:0;
 	$blog->default_markup = POST("blogmarkup");
-	$blog->auto_pingback = POST('pingback')?1:0;
+	$blog->auto_pingback = POST('pingback');
 	$blog->gather_replies = POST('replies')?1:0;
+}
+
+function show_comments(&$ent, &$usr, $sort_asc=true) {
+
+	$title = spf_('Comments on <a href="%s">%s</a>', 
+	              $ent->permalink(), htmlspecialchars($ent->subject));
+	$params = array('path'=>ENTRY_COMMENT_DIR, 'ext'=>COMMENT_PATH_SUFFIX, 'altext'=>'.txt',
+	                'creator'=>'NewBlogComment', 'sort_asc'=>$sort_asc,
+	                'itemclass'=>'comment', 'listtitle'=>$title,
+	                'typename'=>_("comments"));
+	return show_replies($ent, $usr, $params);
+
+}
+
+function show_trackbacks(&$ent, &$usr, $sort_asc=true) {
+	$title = spf_('Trackbacks on <a href="%s">%s</a>', 
+	              $ent->permalink(), $ent->subject);
+	$params = array('path'=>ENTRY_TRACKBACK_DIR, 'ext'=>TRACKBACK_PATH_SUFFIX,
+	                'creator'=>'NewTrackback', 'sort_asc'=>$sort_asc,
+	                'itemclass'=>'trackback', 'listclass'=>'tblist',
+	                'listtitle'=>$title, 'typename'=>_("TrackBacks"));
+	return show_replies($ent, $usr, $params);
+}
+
+function show_pingbacks(&$ent, &$usr, $sort_asc=true) {
+	$title = spf_('Pingbacks on <a href="%s">%s</a>', 
+	              $ent->permalink(), $ent->subject);
+	$params = array('path'=>ENTRY_PINGBACK_DIR, 'ext'=>PINGBACK_PATH_SUFFIX,
+	                'creator'=>'NewPingback', 'sort_asc'=>$sort_asc,
+	                'itemclass'=>'pingback', 'listclass'=>'pblist',
+	                'listtitle'=>$title, 'typename'=>_("Pingbacks"));
+	return show_replies($ent, $usr, $params);
+}
+
+function reply_boxes($idx, &$obj) {
+	# Not sure if this should include a descriptive message or picture...
+	return '<span style="float: right">'.
+	       '<input type="hidden" '.
+	       'name="responseid'.$idx.'" id="'.get_class($obj).'id'.$idx.'" '.
+	       'value="'.$obj->getAnchor().'" />'.
+	       '<input type="checkbox" name="response'.$idx.'" '.
+	       'id="'.get_class($obj).$idx.'" class="markbox" /></span>';
+}
+
+# Function: show_replies
+# Gets the HTML for replies of the given type in a list.
+#
+# Parameters:
+# ent    - A reference to the entry for which to get replies.
+# usr    - A reference to the current user.
+# params - An array of configuration parameters.
+
+function show_replies(&$ent, &$usr, $params) {
+	global $SYSTEM;
+
+	$replies = $ent->getReplyArray($params);
+	$ret = "";
+	$count = 1;
+	if ($replies) {
+		$reply_text = array();
+		$count = 0;
+		foreach ($replies as $reply) {
+			if (! isset($reply_type)) $reply_type = get_class($reply);
+			$tmp = $reply->get();
+			if ($SYSTEM->canModify($reply, $usr)) {
+				$count += 1;
+				$tmp = reply_boxes($count, $reply).$tmp;
+			}
+			$reply_text[] = $tmp;
+		}
+	}
+
+	# Suppress markup entirely if there are no replies of the given type.
+	if (isset($reply_text)) {
+
+
+		$tpl = NewTemplate(LIST_TEMPLATE);
+		
+		if ($SYSTEM->canModify($reply, $usr)) {
+			$tpl->set("FORM_HEADER", "<p>".
+			          spf_("Delete marked %s", $params['typename']).' '.
+			          '<input type="submit" value="'._("Delete").'" />'.
+			          '<input type="button" value="'._("Select all").
+			          '" onclick="mark_type(\''.$reply_type.'\')" />'.
+			          '<input type="hidden" name="replycount" value="'.
+			          count($reply_text).'" />'."</p>\n");
+			
+			$blog = $ent->getParent();
+			$qs = array('blog'=>$blog->blogid);
+			if ($ent->isEntry()) $qs['entry'] = $ent->entryID();
+			else $qs['article'] = $ent->entryID();
+			$url = make_uri(INSTALL_ROOT_URL."pages/delcomment.php", $qs);
+			$tpl->set("FORM_ACTION", $url);
+		}
+		
+		$tpl->set("ITEM_CLASS", $params['itemclass']);
+		if (isset($params['listclass'])) {
+			$tpl->set("LIST_CLASS", $params['listclass']);
+		}
+		$tpl->set("ORDERED");
+		$tpl->set("LIST_TITLE", $params['listtitle']);
+		$tpl->set("ITEM_LIST", $reply_text);
+		$ret = $tpl->process();
+	}
+
+	return $ret;
+
+}
+
+function show_all_replies(&$ent, &$usr) {
+		global $SYSTEM;
+
+	# Get an array of each kind of reply.
+	$pingbacks = $ent->getReplyArray(
+		array('path'=>ENTRY_PINGBACK_DIR, 'ext'=>PINGBACK_PATH_SUFFIX,
+		      'creator'=>'NewPingback', 'sort_asc'=>true));
+	$trackbacks = $ent->getReplyArray(
+		array('path'=>ENTRY_TRACKBACK_DIR, 'ext'=>TRACKBACK_PATH_SUFFIX,
+		      'creator'=>'NewTrackback', 'sort_asc'=>true));
+	$comments = $ent->getReplyArray(
+		array('path'=>ENTRY_COMMENT_DIR, 'ext'=>COMMENT_PATH_SUFFIX,
+		      'creator'=>'NewBlogComment', 'sort_asc'=>true));
+			  
+	# Merge the arrays and sort entries based on the ping_date and/or timestamp.
+	$replies = array_merge($pingbacks, $trackbacks, $comments);
+	usort($replies, 'reply_compare');
+			  
+	$ret = "";
+	$count = 1;
+	if ($replies) {
+		$reply_text = array();
+		$count = 0;
+
+		foreach ($replies as $reply) {
+			$tmp = $reply->get();
+			if ($SYSTEM->canModify($reply, $usr)) {
+				$count += 1;
+				$tmp = reply_boxes($count, $reply).$tmp;
+			}
+			$reply_text[] = $tmp;
+		}
+	}
+
+	# Suppress markup entirely if there are no replies of the given type.
+	if (isset($reply_text)) {
+
+		$tpl = NewTemplate(LIST_TEMPLATE);
+		
+		if ($SYSTEM->canModify($reply, $usr)) {
+			$tpl->set("FORM_HEADER", 
+			          spf_("<p>Delete marked replies %s</p>", 
+			          '<input type="submit" value="'._("Delete").'" />'.
+					  '<input type="button" value="'._("Select all").'" onclick="mark_all();" />'.
+			          '<input type="hidden" name="replycount" value="'.
+			          count($reply_text).'" />'));
+			
+			$blog = $ent->getParent();
+			$qs = array('blog'=>$blog->blogid);
+			if ($ent->isEntry()) $qs['entry'] = $ent->entryID();
+			else $qs['article'] = $ent->entryID();
+			$url = make_uri(INSTALL_ROOT_URL."pages/delcomment.php", $qs);
+			$tpl->set("FORM_ACTION", $url);
+		}
+		
+		$tpl->set("ITEM_CLASS", 'reply');
+		$tpl->set("LIST_CLASS", 'replylist');
+		$tpl->set("ORDERED");
+		$tpl->set("LIST_TITLE", spf_('Replies on <a href="%s">%s</a>', 
+	              $ent->permalink(), $ent->subject));
+		$tpl->set("ITEM_LIST", $reply_text);
+		$ret = $tpl->process();
+	}
+
+	return $ret;
+}
+
+function reply_compare(&$a, &$b) {
+	if (isset($a->timestamp)) {
+		$a_ts = $a->timestamp;
+	} else {
+		$a_ts = strtotime($a->ping_date);
+	}
+	
+	if (isset($b->timestamp)) {
+		$b_ts = $b->timestamp;
+	} else {
+		$b_ts = strtotime($b->ping_date);
+	}
+	
+	if ($a_ts < $b_ts) return -1;
+	elseif ($a_ts == $b_ts) return 0;
+	else return 1;
 }
 ?>

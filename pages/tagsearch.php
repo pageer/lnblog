@@ -31,6 +31,7 @@ $show_posts = GET("show") ? true : false;
 $limit = GET("limit") ? GET("limit") : 0;
 
 $tag_list = explode(",", $tags);
+
 if (! is_array($tag_list)) $tag_list = array();
 foreach ($tag_list as $key=>$val) {
 	$tag_list[$key] = trim($val);
@@ -39,7 +40,7 @@ foreach ($tag_list as $key=>$val) {
 $ret = $blog->getEntriesByTag($tag_list, $limit, true);
 if ($show_posts) {
 	$body = $blog->getWeblog();
-	$PAGE->addStylesheet("blogentry.css");
+	$PAGE->addStylesheet("entry.css");
 } else {
 	$links = array();
 	foreach ($ret as $ent) {

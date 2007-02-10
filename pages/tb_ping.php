@@ -65,7 +65,7 @@ if ( GET("send_ping") == "yes" ) {
 				} else {
 					$tpl->set("ERROR_MESSAGE", 
 					          spf_('Error %s: %s', $ret['error'], $ret['message']));
-					print_r($ret);
+					#print_r($ret);
 				}
 			}
 		}

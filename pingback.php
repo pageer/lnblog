@@ -97,13 +97,16 @@ function get_ping($params) {
 			$ping->source = $sourceURI;
 			$ping->target = $targetURI;
 			$ping->title = $title;
-			
-			# Eventually, we should add some code to extract an excerpt.
-			# An HTML parser would be really handy right about now.
-			#$uri_start = strpos($content, $targetURI);
-			#$uri_length = strlen($targetURI);
-			#$content_length = strlen($content);
 			$ping->excerpt = '';
+			
+			$lines = preg_split("/<p>|\n|<br \>|<br>/i", $content);
+			foreach ($lines as $line) {
+				$url_pos = strpos($line, $targetURI);
+				if ($url_pos) {
+					$ping->excerpt = strip_tags($line);
+					break;
+				}
+			}
 			
 			$ret = $ping->insert($ent);
 			

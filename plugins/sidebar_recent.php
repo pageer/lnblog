@@ -56,11 +56,11 @@ class Recent extends Plugin {
 		if ( count($next_list) > 0 ) { 
 			if ($is_index) {
 ?>
-<h3><a href="<?echo $blg->getURL(); ?>"><?php echo $this->old_header ?></a></h3>
+<h3><a href="<?echo $blg->getURL(); ?>"><?php echo htmlspecialchars($this->old_header); ?></a></h3>
 <?php 
 			} else { # !$is_index 
 ?>
-<h3><a href="<?echo $blg->getURL(); ?>"><?php echo $this->recent_header; ?></a></h3>
+<h3><a href="<?echo $blg->getURL(); ?>"><?php echo htmlspecialchars($this->recent_header); ?></a></h3>
 <?php 
 			} # End inner if
 ?>
@@ -68,7 +68,7 @@ class Recent extends Plugin {
 <?php 
 			foreach ($next_list as $ent) { 
 ?>
-<li><a href="<?php echo $ent->permalink(); ?>"><?php echo $ent->subject; ?></a></li>
+<li><a href="<?php echo $ent->permalink(); ?>"><?php echo htmlspecialchars($ent->subject); ?></a></li>
 <?php 
 			}	 # End foreach
 			if ($this->show_main) { /* Link to main page */ ?>

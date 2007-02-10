@@ -2,9 +2,26 @@
 
 class LoginOps extends Plugin {
 
-	function LoginOps() {
+	function LoginOps($do_output=0) {
+		global $SYSTEM;
 		$this->plugin_desc = _("Adds a control panel to the sidebar.");
-		$this->plugin_version = "0.2.0";
+		$this->plugin_version = "0.2.1";
+		$this->addOption('no_event',
+			_('No event handlers - do output when plugin is created'),
+			$SYSTEM->sys_ini->value("plugins","EventDefaultOff", 0), 
+			'checkbox');
+
+		$this->getConfig();
+
+		if ( $this->no_event || 
+		     $SYSTEM->sys_ini->value("plugins","EventForceOff", 0) ) {
+			# If either of these is true, then don't set the event handler
+			# and rely on explicit invocation for output.
+		} else {
+			$this->registerEventHandler("sidebar", "OnOutput", "output");
+		}
+		
+		if ($do_output) $this->output();
 	}
 
 	function output($parm=false) {
@@ -55,7 +72,9 @@ class LoginOps extends Plugin {
 	
 }
 
-$login =& new LoginOps();
-#$login->addEvent
-$login->registerEventHandler("sidebar", "OnOutput", "output");
+global $PLUGIN_MANAGER;
+if (! $PLUGIN_MANAGER->plugin_config->value('loginops', 'creator_output', 0)) {
+	$plug =& new LoginOps();
+}
+
 ?>

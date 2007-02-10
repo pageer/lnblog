@@ -66,6 +66,8 @@ class BlogComment extends Entry {
 		$this->name = ANON_POST_NAME;
 		$this->has_html = MARKUP_NONE;
 		$this->show_email = COMMENT_EMAIL_VIEW_PUBLIC;
+		$this->exclude_fields = array('exclude_fields', 'metadata_fields',
+		                              'file');
 		$this->metadata_fields = array("id"=>"postid", "uid"=>"userid",
 			"name"=>"name", "email"=>"e-mail", "url"=>"url",
 			"show_email"=>"show_email", "date"=>"date", "post_date"=>"postdate",
@@ -215,8 +217,7 @@ class BlogComment extends Entry {
 	Returns:
 	True on success, false on failure.
 	*/
-	function insert($entry) {
-	
+	function insert($entry) {	
 	
 		$curr_ts = time();
 		$usr = NewUser();
@@ -309,8 +310,10 @@ class BlogComment extends Entry {
 	A string with the name of the associated file.
 	*/
 	function getFilename($anchor) {
+		$ent = NewEntry();
 		$ret = substr($anchor, 7);
 		$ret .= COMMENT_PATH_SUFFIX;
+		$ret = mkpath($ent->localpath(),ENTRY_COMMENT_DIR,$ret);
 		$ret = realpath($ret);
 		return $ret;
 	}
@@ -353,8 +356,12 @@ class BlogComment extends Entry {
 	A BlogEntry or Article object, depending on the context.
 	*/
 	function getParent() {
-		if (! file_exists($this->file)) return NewBlogEntry();
-		return NewEntry();
+		if (file_exists($this->file)) {
+			return NewEntry(dirname(dirname($this->file)));
+		} else {
+			return NewEntry();
+		}
+		#return NewEntry();
 		#$par_path = dirname(dirname($this->file));
 		#if (strpos($par_path, BLOG_ENTRY_PATH)) {
 		#	return NewBlogEntry($par_path);

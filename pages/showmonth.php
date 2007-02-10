@@ -50,7 +50,7 @@ if (USE_STRFTIME) {
 # Optionally show all the entries as a weblog.
 if (strtolower(GET("show")) == "all") {
 	$body = $blog->getWeblog();
-	$PAGE->addStylesheet("blogentry.css");
+	$PAGE->addStylesheet("entry.css");
 } else {
 
 	$tpl = NewTemplate(LIST_TEMPLATE);

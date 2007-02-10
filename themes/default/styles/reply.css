@@ -9,39 +9,39 @@
 	padding-left: 0;
 }
 
-.fullcomment {
+.comment {
 	border-bottom: thin dotted black;
 	margin-top: 2%;
 }
 
-.commentheader h3 {
+.comment .header h3 {
 	padding: 0px;
 	margin: 0px;
 }
 
-.commentfooter {
+.comment .footer {
 	font-size: 80%;
-}
-
-.commentfooter ul {
 	padding: 0px;
 	margin: 0px;
 }
 
-.commentfooter li {
+.comment .footer li {
 	list-style-type: none;
 }
 
-.commentdata {
+.comment .data {
 	padding: 1%;
 }
 
-.commentfooter li.commenturl, div.commentfooter li.commentname {
+.comment li.commenturl, 
+.reply li.commenturl, 
+.comment li.commentname,
+.reply li.commentname {
 	display: inline;
 	margin-right: 1%;
 }
 
-.commentname li[class~='user'] {
+li.user a {
 	font-weight: bold;
 }
 

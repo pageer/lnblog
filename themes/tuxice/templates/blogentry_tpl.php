@@ -1,5 +1,5 @@
 <div class="blogentry">
-<div class="blogentryheader">
+<div class="header">
 <h2><a href="<?php echo $PERMALINK; ?>"><?php echo $SUBJECT; ?></a></h2>
 <ul class="postdata">
 	<li class="blogdate"><?php pf_('Posted %s', $POSTDATE); ?></li>
@@ -25,10 +25,10 @@ if (! empty($TAGS)) { ?>
 <?php } ?>
 </ul>
 </div>
-<div class="blogentrybody">
+<div class="body">
 <?php echo $BODY; ?>
 </div>
-<div class="blogentryfooter">
+<div class="footer">
 <?php if ($SHOW_CONTROLS) { ?>
 <ul class="postadmin">
 	<li><a href="<?php echo $PING_LINK; ?>"><?php p_("Send TrackBack Ping");?></a></li>

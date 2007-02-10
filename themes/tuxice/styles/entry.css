@@ -1,0 +1,93 @@
+ /* Styles for blog entries. */
+
+.blogentry,
+.article {
+	border-bottom: thin dotted black;
+	padding-bottom: 2%;
+}
+
+.article {
+	margin-bottom: 1%;
+}
+
+.article .body {
+	padding: 1%;
+}
+
+.blogentry .header, 
+.blogentry .footer, 
+.blogentry .body {
+	clear: both;
+}
+
+.blogentry .header, 
+.blogentry .footer ul, 
+.postdata,
+.article .header h2, 
+.article .header ul, 
+.article .footer ul{
+	margin: 0px;
+	padding: 0px;
+}
+
+.blogentry .body {
+	border: 1px dotted black;
+	background-color: white;
+}
+
+/* Keeps large images withing the paragraph so they don't spill out 
+   of the box for this post. */
+.blogentry .body p {
+	clear: both;
+}
+
+.blogentry .body img {
+	display: block;
+	margin: 1em auto;
+}
+
+.article .body {
+	border: 1px dotted black;
+	background-color: white;
+}
+
+.blogentry .footer,
+.article   .footer,
+.postdata {
+	font-size: 80%;
+}
+
+.blogentry .footer li,
+.blogentry .header li,
+.article   .footer li,
+.article   .header li{
+	list-style-type: none;
+}
+
+.blogadmin, ul.postadmin li {
+	display: inline;
+	margin-right: 1%;
+}
+
+.blogentry  div.blogentrybody {
+	padding: 1%;
+}
+
+.blogentry div.blogentrybody p {
+	text-indent: 1em;
+}
+
+.blogadmin, .bloguserurl {
+	display: inline;
+}
+
+@media print {
+#commentsubmit {
+		display: none;
+}
+
+	.blogentry,
+	.article {
+		page-break-inside: avoid;
+}
+}

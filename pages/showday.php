@@ -56,7 +56,7 @@ if (count($ret) == 1) {
 }
 
 $PAGE->title = $blog->name." - ".spf_("Entries for %s", $day);
-$PAGE->addStylesheet("blogentry.css");
+$PAGE->addStylesheet("entry.css");
 $PAGE->display($body, &$blog);
 
 ?>

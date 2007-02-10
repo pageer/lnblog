@@ -287,14 +287,15 @@ class Blog extends LnBlogObject {
 		$fmtday = sprintf("%02d", $day);
 		$month_dir = mkpath(BLOG_ROOT,BLOG_ENTRY_PATH,
 		                    $year,sprintf("%02d", $month));
+		#$day_list = glob($month_dir.PATH_DELIM.$fmtday."*");
 		$day_list = scan_directory($month_dir, true);
 		rsort($day_list);
+
 		$match_list = array();
 		$ent = NewBlogEntry();
 		foreach ($day_list as $dy) {
-			if (substr($dy, 0, 2) == $fmtday && 
-			    $ent->isEntry($month_dir.PATH_DELIM.$dy) ) {
-				$match_list[] = NewBlogEntry($month_dir.PATH_DELIM.$dy);
+			if ( substr($dy, 0, 2) == $fmtday && $ent->isEntry($dy) ) {
+				$match_list[] = NewBlogEntry($dy);
 			}
 		}
 		foreach ($match_list as $ent) $this->entrylist[] = $ent;
@@ -316,13 +317,14 @@ class Blog extends LnBlogObject {
 	function getDayCount($year, $month, $day) {
 		$fmtday = sprintf("%02d", $day);
 		$month_dir = mkpath(BLOG_ROOT,BLOG_ENTRY_PATH,
-		                    $year,sprintf("%02d", $month),$fmtday);
+		                    $year,sprintf("%02d", $month));
+		#$day_list = glob($month_dir.PATH_DELIM.$fmtday."*");
 		$day_list = scan_directory($month_dir, true);
 		$ent = NewBlogEntry();
 		$ret = 0;
 		foreach ($day_list as $dy) {
-			if (substr($dy, 0, 2) == $fmtday && 
-			    $ent->isEntry($month_dir.PATH_DELIM.$dy) ) {
+			if ( substr($dy, 0, 2) == $fmtday && 
+			     $ent->isEntry(mkpath($month_dir,$dy)) ) {
 				$ret++;
 			}
 		}
@@ -544,8 +546,14 @@ class Blog extends LnBlogObject {
 				if (URI_TYPE == 'querystring') 
 					return '';
 				elseif (URI_TYPE == 'htaccess') return '';
-				else return $dir_uri.BLOG_ENTRY_PATH."/all.php";
-				#else return $dir_uri.BLOG_ENTRY_PATH."/".func_get_arg(2)."/";
+				#else return $dir_uri.BLOG_ENTRY_PATH."/all.php";
+				else return $dir_uri.BLOG_ENTRY_PATH."/".func_get_arg(1)."/";
+			case 'listmonth':
+				if (URI_TYPE == 'querystring') 
+					return '';
+				elseif (URI_TYPE == 'htaccess') return '';
+				else return $dir_uri.BLOG_ENTRY_PATH."/".func_get_arg(1)."/".func_get_arg(2)."/";
+
 			case 'listall':
 				if (URI_TYPE == 'querystring')
 					return make_uri(INSTALL_ROOT_URL."pages/showall.php",$qs_arr);
@@ -560,12 +568,18 @@ class Blog extends LnBlogObject {
 				if (URI_TYPE == 'querystring')
 					return make_uri(INSTALL_ROOT_URL."pages/showday.php",
 					                array('blog'=>$this->blogid,
-					                      'year'=>func_get_arg(2),
-					                      'month'=>func_get_arg(3),
-					                      'day'=>func_get_arg(4)));
+					                      'year'=>func_get_arg(1),
+					                      'month'=>func_get_arg(2),
+					                      'day'=>func_get_arg(3)));
 				elseif (URI_TYPE == 'htaccess') return '';
-				else return make_uri($dir_uri.BLOG_ENTRY_PATH."/day.php",
-				                     array('day'=>func_get_arg(2)));
+				else {
+					$year = func_get_arg(1);
+					$month = func_get_arg(2);
+					$day = func_get_arg(3);
+					$ret = make_uri($dir_uri.BLOG_ENTRY_PATH."/$year/$month/day.php",
+				                    array('day'=>$day));
+					return $ret;
+				}
 			case "addentry":
 				return make_uri(INSTALL_ROOT_URL."pages/newentry.php", $qs_arr);
 			case "addarticle":
@@ -602,6 +616,7 @@ class Blog extends LnBlogObject {
 			case "tags":
 				if (URI_TYPE == 'querystring')
 					return make_uri(INSTALL_ROOT_URL.'pages/tagsearch.php', $qs_arr);
+				unset($qs_arr['blog']);
 				return make_uri($dir_uri.'tags.php', $qs_arr);
 		}
 		return $dir_uri;
@@ -836,8 +851,8 @@ class Blog extends LnBlogObject {
 	tpl - The PHPTemplate to populate.
 	*/
 	function exportVars(&$tpl) {
-		$tpl->set("BLOG_NAME", $this->name);
-		$tpl->set("BLOG_DESCRIPTION", $this->description);
+		$tpl->set("BLOG_NAME", htmlspecialchars($this->name));
+		$tpl->set("BLOG_DESCRIPTION", htmlspecialchars($this->description));
 		$tpl->set("BLOG_IMAGE", $this->image);
 		$tpl->set("BLOG_MAX_ENTRIES", $this->max_entries);
 		$tpl->set("BLOG_BASE_DIR", $this->home_path);

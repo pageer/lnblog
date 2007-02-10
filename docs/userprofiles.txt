@@ -34,16 +34,17 @@ custom field.  Here is an example:
 |location=Location
 |bday=Birthday
 |lang=Favorite programming language
-|pubkey=Link to public GPG key
+|pubkey=<a href="whatever">GPG public key</a>
 
-In addition, you can create a profile.ini file inside the profile directory of a particular user.
-So, for example, if I want to have the above fields in my profile, but not foist them on other users,
-I could simply create the above file in the profile directory for my username, rather than the 
-LnBlog/userdata directory.
+In addition, you can create a profile.ini file inside the profile directory of a particular
+user.  So, for example, if I want to have the above fields in my profile, but not foist
+them on other users, I could simply create the above file in the profile directory for my
+username, rather than the LnBlog/userdata directory.
 
 Section: Adding Custom Markup
 
 If you want a substantial profile, then it's entirely likely that custom fields won't be enough for you.
-In that case, you can create a profile.htm file and put it in your user profile directory.  This file
-should contain HTML markup.  It will be appended to your profile after the custom fields, so be sure 
-that your markup is valid.  
+In that case, you can create a profile.htm file and put it in your user profile directory. 
+You can create this via the link on your profile edit page or upload it manually.  This file
+should contain HTML markup that will be appended to your profile after the custom fields, 
+so be sure that your markup is valid.  

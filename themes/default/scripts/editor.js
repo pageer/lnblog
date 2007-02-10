@@ -329,6 +329,50 @@ function topic_add_tag(e) {
 	}
 }
 
+function upload_add_link(e) {
+	var ext = this.value.replace(/^(.*)(\..+)$/, "$2");
+	var img_exts = new Array('.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff', '.tif');
+	var is_img = false;
+	for (i=0; i< img_exts.length; i++) {
+		if (img_exts[i] == ext) {
+			is_img = true;
+			break;
+		}
+	}
+
+	var prompt_text = false;  // Prompt user for descriptive text.
+	                          // The alternative is just using the filename.
+
+	if (prompt_text) {
+
+		if (is_img) {
+			var res = window.prompt("Add image "+this.value+".\nEnter image description:");
+		} else {
+			var res = window.prompt("Add link to "+this.value+".\nEnter link text:");
+		}
+
+	} else {
+		res = this.value;
+	}
+	
+	if (res) {
+		var body = document.getElementById('body');
+		if (is_img) {
+			if (document.getElementById('input_mode').value == 1) {
+				insertAtCursor(body, '[img='+this.value+']'+res+'[/img]');
+			} else {
+				insertAtCursor(body, '<img src="'+this.value+'" alt="'+res+'" title="'+res+'" />');
+			}
+		} else {
+			if (document.getElementById('input_mode').value == 1) {
+				insertAtCursor(body, '[url='+this.value+']'+res+'[/url]');
+			} else {
+				insertAtCursor(body, '<a href="'+this.value+'">'+res+'</a>');
+			}
+		}
+	}
+}
+
 function document_add_all_events(e) {
 
 	// Toggle the LBCode editor on or off depending on the markup setting.
@@ -341,6 +385,14 @@ function document_add_all_events(e) {
 	var setleg = setfld.getElementsByTagName('legend');
 	addEvent(setleg[0], 'click', toggle_post_settings);
 	toggle_post_settings();
+
+	// Add event handlers to file upload boxes.
+	var uploads = document.getElementsByTagName('input');
+	for (i=0; i< uploads.length; i++) {
+		if (uploads[i].type == 'file') {
+			addEvent(uploads[i], 'change', upload_add_link);
+		}
+	}
 	
 	var tagsel = document.getElementById('tag_list');
 	addEvent(tagsel, 'change', topic_add_tag);

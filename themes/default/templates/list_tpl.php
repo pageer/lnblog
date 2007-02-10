@@ -1,13 +1,17 @@
 <?php if (isset($LIST_TITLE)) { ?>
 <h2><?php echo $LIST_TITLE; ?></h2>
 <?php } 
-	if (isset($LIST_HEADER)) { 
-?>
+if (isset($LIST_HEADER)) { ?>
 <p><?php echo $LIST_HEADER; ?></p>
 <?php } 
-	if (! empty($LINK_LIST) || ! empty($ITEM_LIST)) { 
-?>
-<?php 
+if (! empty($LINK_LIST) || ! empty($ITEM_LIST)) { 
+	
+	if (isset($FORM_ACTION)) { ?>
+<form method="post" action="<?php echo $FORM_ACTION;?>">
+	<?php 
+		if (isset($FORM_HEADER)) echo $FORM_HEADER;
+	}
+
 	if (isset($ORDERED)) $tag = "ol";
 	else $tag = "ul";
 	echo "<$tag".(isset($LIST_CLASS)?" class=\"$LIST_CLASS\"":"").">\n";
@@ -16,7 +20,7 @@
 	# and ITEM_LIST, which is an array of strings.
 	if (isset($LINK_LIST)) {
 		foreach ($LINK_LIST as $LINK) { ?>
-<li><a href="<?php echo $LINK["link"]; ?>"><?php echo $LINK["title"]; ?></a></li>
+<li><a href="<?php echo $LINK["link"];?>"><?php echo $LINK["title"];?></a></li>
 <?php 
 		}
 	} elseif (isset($ITEM_LIST)) {
@@ -27,10 +31,16 @@
 <?php 
 		}
 	}
+
 	echo "</$tag>";
-?>
-<?php } 
-	if (isset($LIST_FOOTER)) { 
-?>
+
+	if (isset($FORM_ACTION)) { 
+		if (isset($FORM_FOOTER)) echo $FORM_FOOTER; ?>
+</form>
+	<?php }
+
+}
+
+if (isset($LIST_FOOTER)) { ?>
 <p><?php echo $LIST_FOOTER; ?></p>
 <?php } ?>

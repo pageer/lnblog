@@ -61,7 +61,7 @@ class Archives extends Plugin {
 }
 
 global $PLUGIN_MANAGER;
-if (! $PLUGIN_MANAGER->plugin_config->value('recent', 'creator_output', 0)) {
+if (! $PLUGIN_MANAGER->plugin_config->value('archives', 'creator_output', 0)) {
 	$rec =& new Archives();
 }
 

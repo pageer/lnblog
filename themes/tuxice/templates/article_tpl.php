@@ -1,15 +1,15 @@
 <div class="article">
-<div class="articleheader">
+<div class="header">
 <h2><a href="<?php echo $PERMALINK; ?>"><?php echo $TITLE; ?></a></h2>
 </div>
-<div class="articlebody">
+<div class="body">
 <?php echo $BODY; ?>
 </div>
-<div class="articlefooter">
+<div class="footer">
 	<ul>
-		<li class="articledate"><?php pf_('Published %s', $POSTDATE); ?></li>
+		<li><?php pf_('Published %s', $POSTDATE); ?></li>
 <?php if ($EDITDATE != $POSTDATE) { ?>
-		<li class="articledate"><?php pf_('Last updated %s', $EDITDATE);?></li>
+		<li><?php pf_('Last updated %s', $EDITDATE);?></li>
 <?php } ?>
 <?php if (! isset($NO_USER_PROFILE)) { # Display profile link or not ?>
 		<li class="bloguser"><?php pf_("By %s", '<a href="'.$PROFILE_LINK.'">'.$USER_DISPLAY_NAME.'</a>');?></li>

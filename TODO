@@ -1,14 +1,11 @@
 Features to be added:
 
-* Support for PingBacks.
 * AJAX interface for deleting/banning comments and trackbacks?
-* Option to display trackbacks in same list as comments?
 * Improved user interface for blog settings and administration.
 * Support for polls?
 * Multi-page articles?
-* Option to publish entries as articles?
+* Option to cross-publish entries as articles.
 * Ability to create entry from uploaded HTML document.
 * Ability to display an HTML document in the standard page layout.
 * Ability to create drafts for posts and articles.
 * Allow use of query strings and .htaccess rules in place of wrapper scripts.
-

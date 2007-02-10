@@ -1,7 +1,7 @@
 <?php
 /*
     LnBlog - A simple file-based weblog focused on design elegance.
-    Copyright (C) 2005 Peter A. Geer <pageer@skepticats.com>
+    Copyright (C) 2006 Peter A. Geer <pageer@skepticats.com>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,9 +19,8 @@
 */
 
 # File: delcomment.php
-# Used to delete a reader comment.
-# Comments are added to entries and articles in the <showentry.php> and
-# <showcomments.php> files respectively.
+# A unified page for deleting responses to an entry.  This handles both 
+# individual and bulk deletes for comments, TrackBacks, and Pingbacks.
 #
 # This is included by the delete.php wrapper script in the comments 
 # subdirectory of entries and articles.
@@ -30,44 +29,197 @@ session_start();
 require_once("config.php");
 require_once("lib/creators.php");
 
+# Convert anchor names to objects and check the delete permissions on them.
+# Returns false if the conversion or security check fails.
+function get_response_object($anchor, &$usr) {
+	global $SYSTEM;
+
+	if ( preg_match('/^comment/', $anchor) ) {
+		$ret = NewBlogComment($anchor);
+		if (! $ret->isComment()) $ret = false;
+	} elseif ( preg_match('/^trackback/', $anchor) ) {
+		$ret = NewTrackback($anchor);
+		if (! $ret->isTrackback()) $ret = false;
+	} elseif ( preg_match('/^pingback/', $anchor) ) {
+		$ret = NewPingback($anchor);
+		if (! $ret->isPingback()) $ret = false;
+	} else {
+		$ret = false;
+	}
+
+	# If ret is a valid object, but usr doesn't have delete permission, then
+	# return false.
+	if ( $ret && ! $SYSTEM->canDelete($ret, $usr) ) $ret = false;
+
+	return $ret;
+}
+
+# Perform deletion on an array of object.  Returns an array of objects for which
+# the deletion failed.
+function do_delete(&$obj_arr) {
+	$ret = array();
+	foreach ($obj_arr as $resp) {
+		$status = $resp->delete();
+		if (! $status) $ret[] = $resp;
+	}
+	return $ret;
+}
+
+# Convenience function to get markup for an HTML list.
+function get_list_text(&$obj) {
+	if (! is_object($obj)) {
+		return '<li>'.$obj."</li>\n";
+	} else {
+		return '<li>'.$obj->getAnchor().
+		       ' - <a href="'.$obj->permalink().'">'.
+		       ( isset($obj->title) ? $obj->title : $obj->subject).
+		       "</a></li>\n";
+	}
+}
+
 global $PAGE;
 
 $blog = NewBlog();
+$entry = NewEntry();
 $u = NewUser();
 
-$anchor = POST("comment");
-if (!$anchor) $anchor = GET("comment");
-if (!$anchor) $PAGE->redirect("index.php");
-$comm = NewBlogComment($anchor);
-$PAGE->setDisplayObject($comm);
-
-if (! $SYSTEM->canDelete($comm, $u) || ! $u->checkLogin() ) {
-	$PAGE->redirect("index.php");
+if (! $u->checkLogin()) {
+	$PAGE->redirect($entry->permalink());
 	exit;
 }
 
-$conf_id = _("OK");
-$message = spf_("Do you really want to delete %s?", $anchor);
+# which determines if the resposne is to be deleted.
 
-if (POST($conf_id) || GET("conf") == "yes") {
-	$ret = $comm->delete();
-	if ($ret) $PAGE->redirect("index.php");
-	else $message = spf_("Unable to delete %s.  Try again?", $anchor);
+$response_array = array();
+$denied_array = array();
+$index = 1;
+
+# Get the list of items to be deleted.
+# There are two possible cases.  First is the case where we've already confirmed
+# via this page.  The second is where we're either about to confirm or have
+# confirmed via a query string parameter.
+
+if (POST('responselist')) {
+
+	$anchors = explode(',', $_POST['responselist']);
+	foreach ($anchors as $a) {
+		$obj = get_response_object($a, $u);
+		if ($obj) $response_array[] = $obj;
+		else $denied_array[] = $a;
+	}
+
+} else {
+
+	# For multiple deletes, there are two lists of fields.  The responseid# is the
+	# anchor for that response, wile the response# is the corresponding checkbox 
+
+	while ( isset($_POST['responseid'.$index]) ) {
+		if ( POST('response'.$index) ) {
+			$obj = get_response_object($_POST['responseid'.$index], $u);
+			if ($obj) $response_array[] = $obj;
+			else $denied_array[] = $_POST['responseid'.$index];
+		}
+		$index++;
+	}
+
+	# Here we extract any response that may have been passed in the query string.
+	$getvars = array('comment', 'delete', 'response');
+	foreach ($getvars as $var) {
+		if (GET($var)) {
+			$obj = get_response_object(GET($var), $u);
+			if ($obj) $response_array[] = $obj;
+			else $denied_array[] = GET($var);
+		}
+	}
+
 }
 
-$tpl = NewTemplate(CONFIRM_TEMPLATE);
-$tpl->set("CONFIRM_TITLE", _("Delete comment?"));
-$tpl->set("CONFIRM_MESSAGE",$message);
+$tpl = NewTemplate('confirm_tpl.php');
 $tpl->set("CONFIRM_PAGE", current_file() );
-$tpl->set("OK_ID", $conf_id);
+$tpl->set("OK_ID", 'conf');
 $tpl->set("OK_LABEL", _("Yes"));
 $tpl->set("CANCEL_ID", _("Cancel"));
 $tpl->set("CANCEL_LABEL", _("Cancel"));
-$tpl->set("PASS_DATA_ID", "comment");
-$tpl->set("PASS_DATA", $anchor);
-$body = $tpl->process();
+$tpl->set("PASS_DATA_ID", "responselist");
 
-$PAGE->title = spf_("%s - Delete comment", $blog->name);
+$anchors = '';
+
+if ( count($response_array) <= 0 ) {
+	
+	# No permission to delete anything, so bail out.
+	
+	$title = _("Permission denied");
+	$message = _("You do not have permission to delete any of the selected responses.");
+	
+} elseif ( count($response_array) > 0 && count($denied_array) > 0 ) {
+
+	# We have some responses that can't be deleted, so confirm with the user.
+
+	$title = _("Delete responses");
+	$good_list = '';
+	$bad_list = '';
+	
+	foreach ($response_array as $resp) {
+		$anchors .= ($anchors == '' ? '' : ',').$resp->getAnchor();
+		$good_list .= get_list_text($resp);
+	}
+	
+	foreach ($denied_array as $obj) {
+		$bad_list .= get_list_text($obj);
+	}
+
+	$message = _("Delete the following responses?").
+	           '<ul>'.$good_list.'</ul>'.
+	           _('The following responses will <strong>not</strong> be deleted because you do not have sufficient permissions.').
+	           '<ul>'.$bad_list.'</ul>';
+
+} elseif (POST('conf') || GET("conf") == "yes") {
+	
+	# We already have confirmation, either from the form or the query string, 
+	# and a list of only valid responses, so now we can actually delete them.
+	
+	$ret = do_delete($response_array);
+	
+	if ( count($ret) > 0) {
+		
+		$list = '';
+		
+		foreach ($ret as $obj) {
+			$anchors .= ($anchors == '' ? '' : ',').$resp->getAnchor();
+			$list .= get_link_text($obj);
+		}
+		$title = _("Error deleting responses");
+		$message = _("Unable to delete the following responses.  Do you want to try again?");
+		$message .= $list;
+	} else {
+		$PAGE->redirect($entry->permalink());
+		exit;
+	}
+
+} else {
+
+	# Last is the case where we have all good responses, but no confirmation.
+	
+	$list = '';
+	
+	foreach ($response_array as $resp) {
+		$anchors .= ($anchors == '' ? '' : ',').$resp->getAnchor();
+		$list .= get_list_text($resp);
+	}
+	
+	$title = _("Delete responses");
+	$message = _("Do you want to delete the following responses?");
+	$message .= $list;
+	
+}
+
+$tpl->set("CONFIRM_TITLE", $title);
+$tpl->set("CONFIRM_MESSAGE",$message);
+$tpl->set("PASS_DATA", $anchors);
+
+$body = $tpl->process();
+$PAGE->title = spf_("%s - %s", $blog->name, $title);
+
 $PAGE->display($body, $blog);
 
 ?>

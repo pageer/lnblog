@@ -1,0 +1,74 @@
+/* Styles for blog entries and articles. */
+
+/* Set a bottom border. */
+.blogentry,
+.article {
+	border-bottom: thin dotted black;
+	margin-bottom: 2%;
+}
+
+/* Get rid of the margins and padding on various block-level elements. */
+.blogentry .header h2,
+.blogentry .footer h3,
+.blogentry .footer ul,
+.article   .header h2,
+.article   .header ul,
+.article   .footer ul {
+	margin: 0;
+	padding: 0;
+}
+
+
+/* Reduce the size of article footers. */
+.article .footer {
+	font-size: 80%;
+}
+
+/* Reduce footer size, add a bottom margin to separate posts on the main page,
+   and clear the footer so that floated images don't spill past the bottom
+	of the entry. */
+.blogentry .footer {
+	font-size: 80%;
+	margin-bottom: 3%;
+	clear: both;
+}
+
+/* Lists are semantic in the headers and footers, not visual.  Therefore, 
+   we turn off the bullets. */
+.blogentry .footer li,
+.article   .header li,
+.article   .footer li {
+	list-style-type: none;
+}
+
+/* Admin stuff is all inline - we don't need a new line for each action or for
+   each piece of user info.  However, we do need a little margin to separate 
+	them. */
+ul.inline li,
+.postadmin li,
+.bloguser, 
+.bloguserurl {
+	display: inline;
+	margin-right: 1%;
+}
+
+/* Add a little padding so that the entry text doesn't run into the edge of the
+   page or othe relements. */
+.blogentry .body,
+.article   .body {
+	padding: 1%;
+}
+
+/* This indents the first line of each paragraph. */
+.blogentry .body p {
+	text-indent: 1em;
+}
+
+/* Display images as block elements so that they are seperated from the text
+   by default.  Also, add a little margin around them.  This is especially 
+	helpful when the image is floated left or right, as it keeps the text from
+	running into the edge. */
+.blogentry .body img {
+	display: block;
+	margin: 1em auto;
+}

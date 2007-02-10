@@ -21,6 +21,7 @@
 session_start();
 require_once("config.php");
 require_once("lib/creators.php");
+require_once("pages/pagelib.php");
 
 global $PAGE;
 
@@ -42,7 +43,8 @@ if (! $tb->incomingPing()) {
 	}
 	$PAGE->title = $ent->subject . " - " . $blg->name;
 	$PAGE->addStylesheet("reply.css");
-	$body = $ent->getTrackbacks();
+	$PAGE->addScript("entry.js");
+	$body = show_trackbacks($ent, $u);
 	if (! $body) {
 		$body = '<p>'.
 		        spf_('There are no trackbacks for <a href="%s">\'%s\'</a>',

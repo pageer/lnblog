@@ -63,7 +63,7 @@ class Articles extends Plugin {
 			if (is_file($blg->home_path.PATH_DELIM.$this->custom_links)) {
 				$data = file($blg->home_path.PATH_DELIM.$this->custom_links);
 				foreach ($data as $line) {
-?><li><?php echo $line;?></li><?php
+?><li><?php echo htmlspecialchars($line);?></li><?php
 				}
 			}
 			if ($this->static_link) { /*Optionally show link to article index*/?>
@@ -84,7 +84,7 @@ class Articles extends Plugin {
 }
 
 global $PLUGIN_MANAGER;
-if (! $PLUGIN_MANAGER->plugin_config->value('recent', 'creator_output', 0)) {
+if (! $PLUGIN_MANAGER->plugin_config->value('articles', 'creator_output', 0)) {
 	$art =& new Articles();
 }
 ?>

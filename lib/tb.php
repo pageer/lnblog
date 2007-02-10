@@ -30,8 +30,6 @@
 # OnInit          - Fired when the object is about to initialize.
 # InitComplete    - Fired after the object has been initialized.
 # POSTRetreived   - Fired when POST data for a trackback is retreived.
-# OnInsert        - Fired before a trackback is stored.
-# InsertComplete  - Fired after a trackback is saved.
 # OnDelete        - Fired when a trackback is about to be deleted.
 # DeleteComplete  - Fired right after a trackback has been deleted.
 # OnReceive       - Fired when starting to receive a ping.
@@ -82,7 +80,12 @@ class Trackback extends LnBlogObject {
 	# A BlogEntry or Article object, depending on the context.
 	
 	function getParent() {
-		return NewEntry();
+		if (file_exists($this->file)) {
+			return NewEntry(dirname(dirname($this->file)));
+		} else {
+			return NewEntry();
+		}
+		#return NewEntry();
 	}
 
 	# Method: isTrackback
@@ -116,8 +119,15 @@ class Trackback extends LnBlogObject {
 				return localpath_to_uri(dirname($this->file)).
 				       "#".$this->getAnchor();
 			case "delete":
-				return localpath_to_uri(dirname($this->file)).
-				       "?delete=".$this->getAnchor();
+				$qs_arr = array();
+				$parent = $this->getParent();
+				$entry_type = is_a($this, 'Article') ? 'article' : 'entry';
+				$qs_arr['blog'] = $parent->parentID();
+				$qs_arr[$entry_type] = $parent->entryID();
+				$qs_arr['delete'] = $this->getAnchor();
+				return make_uri(INSTALL_ROOT_URL."pages/delcomment.php", $qs_arr);
+				#return localpath_to_uri(dirname($this->file)).
+				#       "?delete=".$this->getAnchor();
 		}
 	}
 
@@ -375,8 +385,8 @@ class Trackback extends LnBlogObject {
 		$this->control_bar = array();
 		$this->control_bar[] = 
 			'<a href="'.$del_link.'" '.
-			#'onclick="return (window.confirm(\'Delete '.$anchor.'?\')) && this.href = this.href + \'&amp;confirm=yes\');">'
-			'onclick="return window.confirm(\'Delete '.$anchor.'?\');">'
+			'onclick="return comm_del(this, \''.spf_("Delete %s?", $anchor).'\');">'
+			#'onclick="return window.confirm(\'Delete '.$anchor.'?\');">'
 			._("Delete").'</a>';
 		
 		$this->raiseEvent("OnOutput");
@@ -436,7 +446,7 @@ class Trackback extends LnBlogObject {
 	}
 
 	# Method: getFilename
-	# Converts an anchor from getAnchor into a filename.
+	# Converts an anchor from <getAnchor> into a filename.
 	#
 	# Parameters:
 	# anchor - The anchor to turn into a filename.
@@ -445,7 +455,7 @@ class Trackback extends LnBlogObject {
 	# The name of the trackback file.
 	
 	function getFilename($anchor) {
-		$ent = NewBlogEntry();
+		$ent = NewEntry();
 		$ret = substr($anchor, 9);
 		$ret .= TRACKBACK_PATH_SUFFIX;
 		$ret = mkpath($ent->localpath(),ENTRY_TRACKBACK_DIR,$ret);

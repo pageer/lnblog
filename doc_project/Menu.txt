@@ -44,7 +44,6 @@ Group: User Documentation  {
    File: Using Plugins  (docs/plugins.txt)
    File: User Profiles  (docs/userprofiles.txt)
    File: LBCode Markup  (docs/lbcode.txt)
-   File: system.ini  (docs/systemini.txt)
    }  # Group: User Documentation
 
 Group: Configuration  {
@@ -55,6 +54,7 @@ Group: Configuration  {
    File: pathconfig.php  (docs/pathconfig.txt)
    File: userconfig.cfg  (docs/userconfig.txt)
    File: userconfig.php  (docs/userconfigphp.txt)
+   File: system.ini  (docs/systemini.txt)
    }  # Group: Configuration
 
 Group: Libraries  {
@@ -64,13 +64,17 @@ Group: Libraries  {
    File: BlogComment  (lib/blogcomment.php)
    File: BlogEntry  (lib/blogentry.php)
    File: Creator Functions  (no auto-title, lib/creators.php)
+   File: disabled/lbcode.php  (lib/disabled/lbcode.php)
+   File: Draft  (lib/draft.php)
    File: Entry  (lib/entry.php)
    File: EventRegister  (lib/eventregister.php)
    File: FileUpload  (lib/upload.php)
    File: FS  (lib/fs.php)
    File: IniParser  (lib/iniparser.php)
    File: Internationalization  (no auto-title, lib/i18n.php)
+   File: lbcode.php  (lib/lbcode.php)
    File: LnBlogObject  (lib/lnblogobject.php)
+   File: MIME Types  (no auto-title, lib/stupid_mime.php)
    File: Page  (lib/page.php)
    File: PHPTemplate  (lib/template.php)
    File: Pingback  (lib/pb.php)
@@ -86,6 +90,7 @@ Group: Pages  {
 
    File: blogpaths.php  (pages/blogpaths.php)
    File: delcomment.php  (pages/delcomment.php)
+   File: delcomment.php  (pages/delcomment-old.php)
    File: delentry.php  (pages/delentry.php)
    File: editentry.php  (pages/editentry.php)
    File: editlogin.php  (pages/editlogin.php)
@@ -99,31 +104,43 @@ Group: Pages  {
    File: showcomments.php  (pages/showcomments.php)
    File: showday.php  (pages/showday.php)
    File: sitemap.php  (pages/editfile.php)
+   File: sitemap.php  (pages/sitemap.php)
    File: updateblog.php  (pages/updateblog.php)
    }  # Group: Pages
 
-Group: Administration Pages  {
+Group: Blogging Services  {
 
-   File: basic_layout_tpl.php  (themes/default/templates/basic_layout_tpl.php)
    File: blogger.php  (blogger.php)
    File: blogger1_test.php  (blogger1_test.php)
+   File: metaweblog.php  (metaweblog.php)
+   File: metaweblog_test.php  (metaweblog_test.php)
+   File: pingback.php  (pingback.php)
+   File: pingback_test.php  (pingback_test.php)
+   }  # Group: Blogging Services
+
+Group: Administration Pages  {
+
    File: bloglogin.php  (bloglogin.php)
    File: bloglogout.php  (bloglogout.php)
    File: docroot_test.php  (docroot_test.php)
    File: fs_setup.php  (fs_setup.php)
    File: ftproot_test.php  (ftproot_test.php)
    File: index.php  (index.php)
-   File: metaweblog.php  (metaweblog.php)
-   File: metaweblog_test.php  (metaweblog_test.php)
    File: newblog.php  (newblog.php)
    File: newlogin.php  (newlogin.php)
-   File: page_head_tpl.php  (themes/default/templates/page_head_tpl.php)
-   File: pingback.php  (pingback.php)
-   File: pingback_test.php  (pingback_test.php)
    File: plugin_loading.php  (plugin_loading.php)
    File: plugin_setup.php  (plugin_setup.php)
+   File: RecentComments  (userdata/plugins/sidebar_recentcomments.php)
+   File: SiteMap  (userdata/plugins/menubar_breadcrumbs.php)
    File: userinfo.php  (userinfo.php)
    }  # Group: Administration Pages
+
+Group: Themes  {
+
+   File: archive_layout_tpl.php  (themes/default/templates/archive_layout_tpl.php)
+   File: basic_layout_tpl.php  (themes/default/templates/basic_layout_tpl.php)
+   File: page_head_tpl.php  (themes/default/templates/page_head_tpl.php)
+   }  # Group: Themes
 
 Group: Plugins  {
 
@@ -138,7 +155,9 @@ Group: Plugins  {
    File: RSS1FeedGenerator  (plugins/rss1_generator.php)
    File: RSS2FeedGenerator  (plugins/rss2_generator.php)
    File: SiteMap  (plugins/menubar_sitemap.php)
+   File: The code to run this page directly was more or less completely copied  (plugins/disabled/sidebar_poll.php)
    File: TrackbackValidator  (plugins/trackback_validator.php)
+   File: unified_antispam.php  (plugins/disabled/unified_antispam.php)
    }  # Group: Plugins
 
 Group: Index  {

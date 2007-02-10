@@ -83,7 +83,8 @@ if ($is_art) {
 $tpl->set("ALLOW_ENCLOSURE", $blg->allow_enclosure);
 $tpl->set("FORM_ACTION", current_file() );
 $tpl->set("HAS_HTML", $blg->default_markup);
-$tpl->set("SEND_PINGBACKS", $blg->auto_pingback);
+# Send pingback unless they're turned off completely.
+$tpl->set("SEND_PINGBACKS", $blg->auto_pingback != 'none');
 sort($blg->tag_list);
 $tpl->set("BLOG_TAGS", $blg->tag_list);
 $blg->exportVars($tpl);
@@ -110,8 +111,9 @@ if (POST('submit')) {
 				$messages = handle_uploads($ent);
 				if (is_array($messages)) {
 					$ret = false;
-					$err = _("Upload errors:")."<br />".
+					$err = _("File upload errors:")."<br />".
 					       implode("\n<br />", $messages);
+					$page_body = "<p>".$err."</p>";
 				}
 				
 				# Send pingbacks to any relevant links.
@@ -119,7 +121,17 @@ if (POST('submit')) {
 				# And for that matter, does it even make a difference?
 				if ($ret && POST('send_pingbacks')) {
 					$err = handle_pingback_pings($ent);
-					if ($err) $ret = false;
+					if (! isset($page_body)) $page_body = '';
+					$page_body .= "<p>".$err."</p>";
+				}
+				
+				if (isset($page_body)) {
+					$refresh_delay = 10;
+					$page_body = "<h4>"._("Entry created, but with errors")."</h4>".
+					        $page_body."\n<p>".
+							spf_('You will be redirected to <a href="%s">the new entry</a> in %d seconds.',
+							     $ent->permalink(), $refresh_delay)."</p>";
+					$PAGE->refresh($ent->permalink(), $refresh_delay);
 				}
 			
 			} else { 
@@ -131,6 +143,8 @@ if (POST('submit')) {
 		}
 		
 	} else {
+		$ent = NewBlogEntry();
+		$ent->getPostData();
 		$err = spf_("Permission denied: user %s cannot add entries to this blog.", $u->username());
 	}
 	
@@ -144,8 +158,8 @@ if (POST('submit')) {
 	
 	$last_var = $is_art ? 'last_article' : 'last_blogentry';
 	
-	if ($is_art) $blg->$last_var = NewBlogEntry();
-	else $blg->$last_var = NewArticle();
+	if ($is_art) $blg->$last_var = NewArticle();
+	else $blg->$last_var = NewBlogEntry();
 	
 	$blg->$last_var->getPostData();
 	$u->exportVars($tpl);
@@ -154,12 +168,16 @@ if (POST('submit')) {
 	$tpl->set("PREVIEW_DATA", $blg->$last_var->get() );
 }
 
-$body = $tpl->process();
+# Process the template into the page body, but only if we have not already set
+# it.  We may set it above to display a message that does not constitute a 
+# fatal error, such as a failed pingback.
+if (! isset($page_body)) $page_body = $tpl->process();
+
 $title = $is_art ? 
          spf_("%s - New Entry", $blg->name) :
          spf_("%s - New Article", $blg->name);
 $PAGE->title = $title;
-$PAGE->addStylesheet("form.css", $is_art?"blogentry.css":"article.css");
+$PAGE->addStylesheet("form.css","entry.css");
 $PAGE->addScript("editor.js");
-$PAGE->display($body, &$blg);
+$PAGE->display($page_body, &$blg);
 ?>

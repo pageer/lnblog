@@ -26,9 +26,9 @@ class RSS1Entry {
 
 	function get() {
 		$ret = '<item rdf:about="'.$this->link."\">\n";
-		$ret .= "<title>".$this->title."</title>\n";
+		$ret .= "<title>".htmlspecialchars($this->title)."</title>\n";
 		$ret .= "<link>".$this->link."</link>\n";
-		$ret .= "<description>".$this->description."</description>\n";
+		$ret .= "<description>".htmlspecialchars($this->description)."</description>\n";
 		$ret .= "</item>\n";
 		return $ret;
 	}
@@ -72,16 +72,16 @@ class RSS1 {
 			'<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"'.
 			' xmlns="http://purl.org/rss/1.0/">'."\n";
 		$ret .= '<channel rdf:about="'.$this->url."\">\n";
-		$ret .= "<title>".$this->title."</title>\n";
+		$ret .= "<title>".htmlspecialchars($this->title)."</title>\n";
 		$ret .= "<link>".$this->site."</link>\n";
-		$ret .= "<description>".$this->description."</description>\n";
+		$ret .= "<description>".htmlspecialchars($this->description)."</description>\n";
 		if ($this->image) 
 			$ret .= '<image rdf:resource="'.$this->image."\" />\n";
 		$ret .= "<items>\n<rdf:Seq>\n".$list_text."</rdf:Seq>\n</items>";
 		$ret .= "\n</channel>\n";
 		if ($this->image) {
 			$ret .= '<image rdf:about="'.$this->url."\">\n";
-			$ret .= "<title>".$this->title."</title>\n";
+			$ret .= "<title>".htmlspecialchars($this->title)."</title>\n";
 			$ret .= "<link>".$this->site."</link>\n";
 			$ret .= "<url>".$this->image."</url>\n</image>\n";
 		}

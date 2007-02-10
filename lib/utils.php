@@ -668,6 +668,7 @@ function getlink($name, $type=false) {
 				$ltype = LINK_SCRIPT;
 				break;
 			case "css":
+			case "xsl":
 				$l_type = LINK_STYLESHEET;
 				break;
 		}
@@ -812,6 +813,14 @@ if (! function_exists('is_a')) {
 		$cls = strtolower(get_class($obj));
 		$class = strtolower(trim($class));
 		return ($cls == $class);
+	}
+}
+
+if (! function_exists('file_get_contents')) {
+	function file_get_contents($path) {
+		$ret = file($path);
+		if ($ret) $ret = implode('', $ret);
+		return $ret;
 	}
 }
 

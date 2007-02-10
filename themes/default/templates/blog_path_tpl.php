@@ -1,3 +1,8 @@
+<?php 
+# Template: blog_path_tpl.php
+# Contains the markup used to set the blog INSTALL_ROOT and INSTALL_ROOT_URL
+# configuration constants.  This is included by the <blogpaths.php> page.
+?>
 <h2><?php p_("Paths and URLs");?></h2>
 <p><?php p_("Use this page to adjust the path and URL for the LnBlog installation.  Use this is you want to make a blog use a different version of LnBlog, if you want to use a URL that does not map directly to the install path, or if you did the initial setup on a different server.");?></p>
 <?php if (isset($UPDATE_MESSAGE)) { ?>

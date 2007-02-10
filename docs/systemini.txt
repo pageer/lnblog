@@ -4,3 +4,20 @@ The system.ini file is used to store selected default global settings.
 Currently, new settings are being added this file rather than the
 <blogconfig.php> file, which was previous used for all settings.  
 
+Section: entryconfig
+This section holds defaults for new blog entries.
+
+Variable: AllowInitUpload
+This is the number of file upload fields that appear on the entry edit page.
+You can disable uploads from the edit page by setting this to 0.
+
+Variable: AllowLocalPingback
+This determines whether or not Pingback pings are sent to entries on the same 
+server.  If set to 1, LnBlog will send Pingback pings when you link to a blog
+entry on your own site.  If set to 0, it will only send ping to entries on other
+servers.
+
+Variable: GroupReplies
+When set to 1, this will put all replies (comments, TrackBacks, and Pingbacks) in
+a single list for display.  When set to 0, each type of reply will be displayed in a 
+different section.

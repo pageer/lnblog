@@ -1,19 +1,5 @@
 This file lists bugs known to exist at release time.  If you find a bug in this 
 release that is NOT mentioned in the list, then please report it.
 
-Version 0.8.1:
-- Calendar highlights current day even if it's showing a different month.
-- Calendar preserves parts of the query string that it shouldn't, e.g. when
-clicking on a particular day and then clicking the previous month, the day gets
-preserved, even though it shouldn't.
-- The Blog uri() method is incomplete/broken.  The "listyear" case doesn't work 
-and it's missing "listmonth" and "showmonth" cases.
-- Inclusion of auto-generated enclosure data is dependent on the RSS2 plugin 
-running AFTER the file is uploaded.  If the file has not yet been uploaded, the
-enclosure will be silently omitted, which should not happen.
-- When trying to use editfile.php to modify a file you don't have permission to
-modify (which you shouldn't be doing anyway), the redirect takes you to 
-LnBlog/pages/index.php, which doesn't exist.
-- When creating two entries with very similar title, i.e. differing only in 
-non-alphanumeric characters, the permalink of the second will overwrite the
-first.
+Version 0.8.2:
+- The Blog uri() method is incomplete.  It's missing a "showmonth" case. 

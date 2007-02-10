@@ -62,7 +62,7 @@ class RSS2Entry {
 	function get() {
 		$ret = "<item>\n";
 		if ($this->title) {
-			$ret .= "<title>".$this->title."</title>\n";
+			$ret .= "<title>".htmlspecialchars($this->title)."</title>\n";
 		}
 		if ($this->link) {
 			$ret .= "<link>".$this->link."</link>\n";
@@ -71,17 +71,17 @@ class RSS2Entry {
 			$ret .= "<pubDate>".$this->pub_date."</pubDate>";
 		}
 		if ($this->description) {
-			$ret .= "<description>\n".$this->description."\n</description>\n";
+			$ret .= "<description>\n".htmlspecialchars($this->description)."\n</description>\n";
 		}
 		if ($this->author) {
-			$ret .= "<author>".$this->author."</author>\n";
+			$ret .= "<author>".htmlspecialchars($this->author)."</author>\n";
 		}
 		if ($this->category) {
 			if (is_array($this->category)) {
 				foreach ($this->category as $cat) 
-					$ret .= '<category>'.$cat."</category>\n";
+					$ret .= '<category>'.htmlspecialchars($cat)."</category>\n";
 			} else {
-				$ret .= "<category>".$this->category."</category>\n";
+				$ret .= "<category>".htmlspecialchars($this->category)."</category>\n";
 			}
 		}
 		if($this->comment_count) {
@@ -124,6 +124,7 @@ class RSS2 {
 		$this->description = "";
 		$this->image = "";
 		$this->link_stylesheet = '';
+		$this->link_xslsheet = '';
 		$this->entrylist = array();
 	}
 
@@ -142,11 +143,15 @@ class RSS2 {
 			$sheet = getlink($this->link_stylesheet);
 			$ret .= '<?xml-stylesheet type="text/css" href="'.$sheet.'" ?>'."\n";
 		}
+		if ($this->link_xslsheet) {
+			$sheet = getlink($this->link_xslsheet);
+			$ret .= '<?xml-stylesheet type="text/xsl" href="'.$sheet.'" ?>'."\n";
+		}
 		$ret .= '<rss version="2.0" xmlns:slash="http://purl.org/rss/1.0/modules/slash/" xmlns:wfw="http://wellformedweb.org/CommentAPI/">'."\n";
 		$ret .= "<channel>\n";
 		$ret .= '<link>'.$this->url."</link>\n";
-		$ret .= "<title>".$this->title."</title>\n";
-		$ret .= "<description>".$this->description."</description>\n";
+		$ret .= "<title>".htmlspecialchars($this->title)."</title>\n";
+		$ret .= "<description>".htmlspecialchars($this->description)."</description>\n";
 		$ret .= "<generator>".PACKAGE_NAME." ".PACKAGE_VERSION."</generator>\n";
 		$ret .= $detail_text;
 		$ret .= "</channel>\n</rss>";
@@ -175,8 +180,10 @@ class RSS2FeedGenerator extends Plugin {
 		#$this->addOption("guid_is_permalink", 
 		#                 _("Use entry permalink as globally unique identifier"),
 		#                 true, "checkbox");
-		$this->addOption("feed_style", _("Style sheet for RSS feeds"),
+		$this->addOption("feed_style", _("CSS style sheet for RSS feeds"),
 		                 "rss.css", "text");
+		$this->addOption("feed_xsl", _("XSLT style sheet for RSS feeds"),
+		                 "rss.xsl", "text");
 		$this->addOption("feed_file", _("File name for blog RSS 2 feed"),
 		                 "news.xml", "text");
 		$this->addOption("comment_file", _("File name for comment RSS 2 feeds"),
@@ -199,6 +206,7 @@ class RSS2FeedGenerator extends Plugin {
 
 		$feed = new RSS2();
 		$feed->link_stylesheet = $this->feed_style;
+		$feed->link_xslsheet = $this->feed_xsl;
 		$comment_path = $parent->localpath().PATH_DELIM.ENTRY_COMMENT_DIR;
 		$path = $comment_path.PATH_DELIM.$this->comment_file;
 		$feed_url = localpath_to_uri($path);
@@ -212,7 +220,7 @@ class RSS2FeedGenerator extends Plugin {
 		foreach ($comm_list as $ent) 
 			$feed->entrylist[] = new RSS2Entry($ent->permalink(), 
 				$ent->subject, 
-				"<![CDATA[".$ent->markup($ent->data)."]]>",
+				$ent->markup($ent->data),
 				"", $ent->permalink());
 		
 		$ret = $feed->writeFile($path);	
@@ -228,6 +236,7 @@ class RSS2FeedGenerator extends Plugin {
 		$usr = NewUser();
 		$feed = new RSS2();
 		$feed->link_stylesheet = $this->feed_style;
+		$feed->link_xslsheet = $this->feed_xsl;
 		$blog = $entry->getParent();
 		$path = $blog->home_path.PATH_DELIM.BLOG_FEED_PATH.PATH_DELIM.$this->feed_file;
 		$feed_url = localpath_to_uri($path);
@@ -256,7 +265,7 @@ class RSS2FeedGenerator extends Plugin {
 
 			$feed->entrylist[] = new RSS2Entry($ent->permalink(), 
 				$ent->subject, 
-				"<![CDATA[".$ent->markup($ent->data)."]]>", 
+				$ent->markup($ent->data), 
 				$ent->commentlink(),
 				$ent->uri('base'), 
 				$author_data, $ent->tags(), "", 
@@ -281,6 +290,7 @@ class RSS2FeedGenerator extends Plugin {
 			$usr = NewUser();
 			$feed = new RSS2();
 			$feed->link_stylesheet = $this->feed_style;
+			$feed->link_xslsheet = $this->feed_xsl;
 			$topic = preg_replace('/\W/', '', $tag);
 			$path = mkpath($blog->home_path,BLOG_FEED_PATH,$topic.'_'.$this->feed_file);
 			$feed_url = localpath_to_uri($path);
@@ -305,7 +315,7 @@ class RSS2FeedGenerator extends Plugin {
 				$cmt_count = $ent->getCommentCount();
 								$feed->entrylist[] = new RSS2Entry($ent->permalink(), 
 						$ent->subject, 
-						"<![CDATA[".$ent->markup($ent->data)."]]>", 
+						$ent->markup($ent->data), 
 						$ent->commentlink(),
 						$ent->uri('base'), 
 						$author_data, "", "", 

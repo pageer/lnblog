@@ -19,18 +19,15 @@ class ReplyNotifier extends Plugin {
 		                 true, "checkbox");
 		$this->addOption("notify_pingback", _("Send notification for Pingbacks"),
 		                 true, "checkbox");
-		$this->plugin_version = "0.1.0";
+		$this->plugin_version = "0.1.1";
 	}
 
 	function send_message(&$ent, $subject, $data) {
-		if ($ent->mail_notify) {
-			$u = NewUser($ent->uid);
-			
-			if ($u->email() && !$owner_reply) {
-				@mail($u->email(), $subject, $data, 
-				      "From: LnBlog comment notifier <>");
-			}
-
+		$u = NewUser($ent->uid);
+		
+		if ($u->email() && !$owner_reply) {
+			@mail($u->email(), $subject, $data, 
+			      "From: LnBlog comment notifier <>");
 		}
 	}
 

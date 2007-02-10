@@ -1,18 +1,38 @@
 <?php
 class LnBlogAd extends Plugin {
 
-	function LnBlogAd() {
+	function LnBlogAd($do_output=0) {
+		global $SYSTEM;
 		$this->plugin_desc = _("Shameless link whoring.");
 		$this->plugin_version = "0.1.1";
 		$this->use_footer = false;
-		/*
-		$this->member_list = array();
-		$this->member_list["use_footer"] = 
-			array("description"=>_("Put the advertising in the footer, not the sidebar"),
-			      "control"=>"checkbox",
-			      "default"=>false);
+		$this->addOption("use_footer",
+			_("Put the advertising in the footer, not the sidebar"),
+			false, "checkbox");
+
+		$this->addOption('no_event',
+			_('No event handlers - do output when plugin is created'),
+			$SYSTEM->sys_ini->value("plugins","EventDefaultOff", 0), 
+			'checkbox');
+
 		$this->getConfig();
-		*/
+
+		if ( $this->no_event || 
+		     $SYSTEM->sys_ini->value("plugins","EventForceOff", 0) ) {
+			# If either of these is true, then don't set the event handler
+			# and rely on explicit invocation for output.
+		} else {
+			if ($this->use_footer) {
+				$this->registerEventHandler("footer", "OnOutput", "footer_output");
+			} else {
+				$this->registerEventHandler("sidebar", "OnOutput", "output");
+			}
+		}
+		
+		if ($do_output) {
+			if ($this->use_footer) $this->footer_output();
+			else $this->output();
+		}
 	}
 	
 	function output() { ?>
@@ -35,10 +55,8 @@ class LnBlogAd extends Plugin {
 	}
 }
 
-$login =& new LnBlogAd();
-if ($login->use_footer) {
-	$login->registerEventHandler("footer", "OnOutput", "footer_output");
-} else {
-	$login->registerEventHandler("sidebar", "OnOutput", "output");
+global $PLUGIN_MANAGER;
+if (! $PLUGIN_MANAGER->plugin_config->value('lnblogad', 'creator_output', 0)) {
+	$plug =& new LnBlogAd();
 }
 ?>

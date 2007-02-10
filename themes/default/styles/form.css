@@ -45,6 +45,16 @@ form div.threebutton input {
 	margin-left: 1%;
 }
 
+.form_buttons {
+	text-align: center;
+}
+
+.form_buttons input,
+.form_buttons button {
+	margin-left: 1%;
+	margin-right: 1%;
+}
+
 .basic_form_label {
 	float: left;
 	clear: left;

@@ -77,8 +77,7 @@ class Page extends LnBlogObject {
 		$this->display_object = &$ref;
 		$this->doctype = DEFAULT_DOCTYPE;
 		# Set the default style sheets.
-		$this->stylesheets = array("main.css", "banner.css", "menubar.css", 
-		                           "sidebar.css");
+		$this->stylesheets = array("main.css");
 		$this->inline_stylesheets = array();
 		$this->rssfeeds = array();
 		$this->scripts = array();
@@ -247,7 +246,7 @@ class Page extends LnBlogObject {
 	function refresh($url, $delay=0) {
 		$url = str_replace(array("\r","\n",'%0d','%0D','%0a','%0A'), '', $url);
 		if (! is_int($delay)) $delay = 0;
-		header("Refresh: ".$delay."; ".$url);
+		header("Refresh: ".$delay."; URL=".$url);
 	}
 
 	/*

@@ -20,6 +20,7 @@
 
 require_once("lib/utils.php");
 require_once("lib/lnblogobject.php");
+require_once("lib/xml.php");
 #require_once("lib/lbparse.php");
 /*
 Class: Entry
@@ -492,7 +493,10 @@ class Entry extends LnBlogObject{
 	}
 
 	# Method: readFileData
-	# Reads entry data from a file.  File metadata is enclosed in META tags
+	# Reads entry data from a file.  As of verions 0.8.2, data is stored in XML
+	# format, with the elements corresponding directly to class properties.
+	#
+	# In previous versions, file metadata is enclosed in META tags
 	# which are HTML comments, in one-per-line format.  Here is an example.
 	# |<!--META Subject: This is a subject META-->
 	# Variables are created for every such line which is referenced in the 
@@ -510,23 +514,35 @@ class Entry extends LnBlogObject{
 	# The body of the entry as a string.
 	
 	function readFileData() {
-		$data = file($this->file);
-		$file_data = "";
-		if (! $data) $file_data = false;
-		else 
-			foreach ($this->custom_fields as $fld=>$desc) {
-				$this->metadata_fields[$fld] = $fld;
-			}
-			$lookup = array_flip($this->metadata_fields);
-			foreach ($data as $line) {
-				preg_match('/<!--META ([\w|\s|-]*): (.*) META-->/', $line, $matches);
-				if ($matches) $this->$lookup[strtolower($matches[1])] = $matches[2];
-				$cleanline = preg_replace("/<!--META.*META-->\s\r?\n?\r?/", "", $line);
+
+		if (substr($this->file, strlen($this->file)-4) != ".xml") {
+	
+			$data = file($this->file);
+			$file_data = "";
+			if (! $data) $file_data = false;
+			else 
+				foreach ($this->custom_fields as $fld=>$desc) {
+					$this->metadata_fields[$fld] = $fld;
+				}
+				$lookup = array_flip($this->metadata_fields);
+				foreach ($data as $line) {
+					preg_match('/<!--META ([\w|\s|-]*): (.*) META-->/', $line, $matches);
+					if ($matches && isset($lookup[strtolower($matches[1])])) {
+						$this->$lookup[strtolower($matches[1])] = $matches[2];
+					}
+					$cleanline = preg_replace("/<!--META.*META-->\s\r?\n?\r?/", "", $line);
 				
-				$file_data .= $cleanline;
-			}
+					$file_data .= $cleanline;
+				}
+			$this->data = $file_data;
+
+		} else {
+			$xml = new SimpleXMLReader($this->file);
+			$xml->parse();
+			$xml->populateObject($this);
+		}
+
 		if (! $this->abstract) $this->abstract = $this->getAbstract();
-		$this->data = $file_data;
 		if (is_subclass_of($this, 'BlogEntry')) {
 			$this->id = str_replace(PATH_DELIM, '/', 
 			                        substr(dirname($this->file), 
@@ -535,7 +551,7 @@ class Entry extends LnBlogObject{
 			$this->id = str_replace(PATH_DELIM, '/', 
 			                        substr($this->file, strlen(DOCUMENT_ROOT)));
 		}
-		return $file_data;
+		return $this->data;
 	}
 
 	# Method: writeFileData
@@ -551,15 +567,27 @@ class Entry extends LnBlogObject{
 	
 	function writeFileData() {
 		$fs = NewFS();
-		$header = '';
-		foreach ($this->custom_fields as $fld=>$desc) {
-			$this->metadata_fields[$fld] = $fld;
+
+		if (defined("USE_OLD_ENTRY_FORMAT")) {
+			
+			$header = '';
+			foreach ($this->custom_fields as $fld=>$desc) {
+				$this->metadata_fields[$fld] = $fld;
+			}
+			foreach ($this->metadata_fields as $mem=>$fvar) {
+				$header .= "<!--META ".$fvar.": ".
+					(isset($this->$mem) ? $this->$mem : "")." META-->\n";
+			}
+			$file_data = $header.$this->data;
+
+		} else {
+
+			$xml = new SimpleXMLWriter($this);
+			foreach ($this->exclude_fields as $fld) $xml->exclude($fld);
+			#$xml->cdata("data");
+			$file_data = $xml->serialize();
 		}
-		foreach ($this->metadata_fields as $mem=>$fvar) {
-			$header .= "<!--META ".$fvar.": ".
-				(isset($this->$mem) ? $this->$mem : "")." META-->\n";
-		}
-		$file_data = $header.$this->data;
+
 		if (! is_dir(dirname($this->file)) ) 
 			$fs->mkdir_rec(dirname($this->file)); 
 		$ret = $fs->write_file($this->file, $file_data);

@@ -53,7 +53,7 @@ class Plugin extends LnBlogObject{
 	control     - The type of control used to display this variable on the 
 	              configuration screen.  For the most part, these map directly
 	              to HTML input element types.  The currently recognized 
-	              values are "text", "checkbox", "radio", and "select".  
+	              values are "text", "checkbox", "radio", "select", "file".  
 	              The *default* is "text".
 	default     - The default value for this variable.  This value will be 
 	              used if the user does not specify a setting.  Also, if the
@@ -137,7 +137,7 @@ class Plugin extends LnBlogObject{
 				echo '<legend>'.$config["description"].'</legend>';
 				foreach ($config["options"] as $val=>$desc) {
 					echo '<label for="'.$val.'">'.$desc.'</label>';
-					echo '<input name="'.$mem.'" id="'.$val.'" type="radio" value="'.$val.'"';
+					echo '<input name="'.$mem.'" id="'.$mem.'" type="radio" value="'.$val.'"';
 					if ($this->$mem == $val) echo 'checked="checked"';
 					echo ' /><br />';
 				}
@@ -152,6 +152,12 @@ class Plugin extends LnBlogObject{
 					echo '>'.$desc."</option>\n";
 				}
 				echo "</select>\n</div>\n";
+			} elseif ($config["control"] == "file") {
+				echo '<div>';
+				echo '<label for="'.$mem.'">'.$config['description']."</label>\n";
+				echo '<input name="'.$mem.'" id="'.$mem.'" type="text" value="'.$this->$mem.'" />';
+				echo '<input name="'.$mem.'_upload" id="'.$mem.'_upload" type="file" />';
+				echo "</div>\n";
 			} else { 
 				echo '<div>';
 				echo '<label for="'.$mem.'">'.$config["description"].'</label>';
@@ -174,6 +180,9 @@ class Plugin extends LnBlogObject{
 	# Retrieves configuration data for the plugin from an HTTP POST and
 	# stores the data in the relevant files.  
 	#
+	# Note that this also handles uploaded files.  If run from a blog, the file is
+	# uploaded to the blog root.  Otherwise, it goes to the userdata directory.
+	#
 	# Returns: 
 	# True on success, false on failure.
 	
@@ -181,12 +190,20 @@ class Plugin extends LnBlogObject{
 		if (! $this->member_list) return false;
 		if (defined("BLOG_ROOT")) {
 			$parser = NewINIParser(BLOG_ROOT.PATH_DELIM."plugins.ini");
+			$ul_path = BLOG_ROOT;
 		} else {
 			$parser = NewINIParser(USER_DATA_PATH.PATH_DELIM."plugins.ini");
+			$ul_path = USER_DATA_PATH;
 		}
 		foreach ($this->member_list as $mem=>$config) {
 			if (isset($config["control"]) && $config["control"] == "checkbox") {
 				$this->$mem = (POST($mem) ? "1":"0");
+			} elseif (isset($config["control"]) && $config["control"] == "file") {
+				$upld = NewFileUpload($mem."_upload", $ul_path);
+				if ( $upld->completed() ) {
+					$upld->moveFile();
+					$this->$mem = $upld->destname;
+				}
 			} else {
 				$this->$mem = POST($mem);
 			}

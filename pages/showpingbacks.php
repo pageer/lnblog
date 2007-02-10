@@ -21,6 +21,7 @@
 session_start();
 require_once("config.php");
 require_once("lib/creators.php");
+require_once("pages/pagelib.php");
 
 global $PAGE;
 
@@ -37,7 +38,8 @@ if ( GET("delete") ) {
 }
 $PAGE->title = $ent->subject . " - " . $blg->name;
 $PAGE->addStylesheet("reply.css");
-$body = $ent->getPingbacks();
+$PAGE->addScript("entry.js");
+$body = show_pingbacks($ent, $u);
 if (! $body) $body = '<p>'.
 	spf_('There are no pingbacks for <a href="%s">\'%s\'</a>',
 	     $ent->permalink(), $ent->subject).'</p>';

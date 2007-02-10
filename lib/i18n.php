@@ -45,6 +45,10 @@ if (extension_loaded("gettext")) {
 # strftime, which respects the locale and hence causes problems, or date, 
 # which is stupid and ignores the locale.
 #
+# Note that this function now attempts to auto-convert from strftime() format
+# codes to date() format codes.  Since all strftime() codes start with a %, 
+# old code that uses date() codes will be unaffacted.
+#
 # Parameters:
 # fmt - The format string for the date
 # ts  - The *optional* timestamp to use for the date.
@@ -62,10 +66,11 @@ function fmtdate($fmt, $ts=false) {
 		}
 		return $ret;
 	} else {
-		#$strftime_codes = array('%a','%A','%b','%B','%c','%C','%d','%D','%e','%g',
-		#                        );
-		#$date_codes = array('l', 'l', 'M', 'F', 'c', 'Y', 'd', 'm/d/y', 'j', 'Y',
-		#                    );
+		$strftime_codes = array('%a','%A','%b','%B','%c','%C','%d','%D','%e','%g',
+		                        '%Y');
+		$date_codes = array('D', 'l', 'M', 'F', 'c', 'Y', 'd', 'm/d/y', 'j', 'Y',
+		                    'Y');
+		$fmt = str_replace($strftime_codes, $date_codes, $fmt);
 		return date($fmt, $ts);
 	}
 }
