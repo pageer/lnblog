@@ -22,6 +22,7 @@ require_once("lib/utils.php");
 require_once("blogconfig.php");
 require_once("lib/creators.php");
 require_once("lib/lnblogobject.php");
+require_once("lib/urifactory.php");
 
 /* Class: Blog
  * The "master" class which represents a weblog.  Nearly all functions are 
@@ -131,6 +132,19 @@ class Blog extends LnBlogObject {
 		
 		$this->raiseEvent("InitComplete");
 
+	}
+	
+	#######################################################
+	# Section: RSS compatibility methods
+	#######################################################
+	
+	function title($no_escape=false) {
+		$ret = $this->name ? $this->name : '';
+		return ( $no_escape ? $ret : htmlspecialchars($ret) );
+	}
+	
+	function description() {
+		return htmlspecialchars($this->description);
 	}
 	
 	function get_blog_path($id) {
@@ -427,6 +441,41 @@ class Blog extends LnBlogObject {
 	}
 
 	/*
+	Method: getYear
+	Like <getMonth>, except gets entries for an entire year.
+	
+	Parameters:
+	year - *Optional* year to get.  If not given, the year will be auto-detected.
+	
+	Returns: 
+	An array of BlogEntry objects posted in the given year,
+	sorted in reverse chronological order by post date.
+	*/
+	function getYear($year=false) {
+		$ent = NewBlogEntry();
+		$curr_dir = getcwd();
+		if ($year) {
+			$curr_dir = mkpath($this->home_path,BLOG_ENTRY_PATH,$year);
+		} elseif (sanitize(GET("year"), "/\D/")) {
+			$curr_dir = mkpath($this->home_path,BLOG_ENTRY_PATH,
+			                   sanitize(GET("year"), "/\D/"));
+		}
+		$ent_list = array();
+		$dir_list = scan_directory($curr_dir, true);
+		
+		if (! $dir_list) return array();
+		
+		foreach ($dir_list as $dir) {
+			$path = mkpath($curr_dir, $dir);
+			if (is_dir($path)) {
+				$ent_list = array_merge($ent_list, $this->getMonth($year, $dir));
+			}
+		}
+		$this->entry_list = $ent_list;
+		return $this->entrylist;
+	}
+
+	/*
 	Method: getYearList
 	Get a list of all years in the archive, sorted in reverse chronological
 	order.  
@@ -526,124 +575,33 @@ class Blog extends LnBlogObject {
 		Parameters:
 		type            - The type of URI to get, e.g. permalink, edit link, etc.
 		data parameters - All other parameters after the first are interpreted 
-		                  as additional data for the URL.  The parameters are 
-		                  expected to be strings of the form "key=val".  Note that
-		                  not all types of URI accept parameters.
+		                  as additional data for the URL query string.  The 
+		                  exact meaning of each parameter depends on the URL type.
 
 		Returns:
 		A string with the permalink. 
 	*/
 	function uri($type) {
-		$dir_uri = localpath_to_uri($this->home_path);
-		$qs_arr = array('blog'=>$this->blogid);
-		$qs_uri = make_uri(INSTALL_ROOT_URL."pages/showblog.php", $qs_arr);
-
-		$num_args = func_num_args();
-		if ($num_args > 1) {
-			for ($i = 1; $i < $num_args; $i++) {
-				$var = func_get_arg($i);
-				$arr = explode("=", $var, 2);
-				if (count($arr) == 2) {
-					$qs_arr[$arr[0]] = $arr[1];
-				}
-			}
+		$uri = create_uri_object($this);
+		
+		$args = array();
+		for ($i=1; $i < func_num_args(); $i++) {
+			$args[$i] = func_get_arg($i);
 		}
-	
-		switch ($type) {
-			case "base":
-				return $dir_uri;
-			case "permalink":
-			case "blog":
-			case "page":
-				return (URI_TYPE == "querystring" ? $qs_uri : $dir_uri);
-			case 'articles':
-				if (URI_TYPE == 'querystring')
-					return make_uri(INSTALL_ROOT_URL."pages/showarticles.php",$qs_arr);
-				elseif (URI_TYPE == 'htaccess') return '';
-				else return $dir_uri.BLOG_ARTICLE_PATH."/";
-			case 'listdrafts':
-				if (URI_TYPE == 'querystring') 
-					return '';
-				elseif (URI_TYPE == 'htaccess') return '';
-				else return $dir_uri.BLOG_DRAFT_PATH."/";
-			case 'listyear':
-				if (URI_TYPE == 'querystring') 
-					return '';
-				elseif (URI_TYPE == 'htaccess') return '';
-				#else return $dir_uri.BLOG_ENTRY_PATH."/all.php";
-				else return $dir_uri.BLOG_ENTRY_PATH."/".func_get_arg(1)."/";
-			case 'listmonth':
-				if (URI_TYPE == 'querystring') 
-					return '';
-				elseif (URI_TYPE == 'htaccess') return '';
-				else return $dir_uri.BLOG_ENTRY_PATH."/".func_get_arg(1)."/".func_get_arg(2)."/";
-
-			case 'listall':
-				if (URI_TYPE == 'querystring')
-					return make_uri(INSTALL_ROOT_URL."pages/showall.php",$qs_arr);
-				elseif (URI_TYPE == 'htaccess') return '';
-				else return $dir_uri.BLOG_ENTRY_PATH."/all.php";
-			case 'archives':
-				if (URI_TYPE == 'querystring')
-					return make_uri(INSTALL_ROOT_URL."pages/showarchive.php", $qs_arr);
-				else 
-					return $dir_uri.BLOG_ENTRY_PATH."/";
-			case 'showday':
-				if (URI_TYPE == 'querystring')
-					return make_uri(INSTALL_ROOT_URL."pages/showday.php",
-					                array('blog'=>$this->blogid,
-					                      'year'=>func_get_arg(1),
-					                      'month'=>func_get_arg(2),
-					                      'day'=>func_get_arg(3)));
-				elseif (URI_TYPE == 'htaccess') return '';
-				else {
-					$year = func_get_arg(1);
-					$month = func_get_arg(2);
-					$day = func_get_arg(3);
-					$ret = make_uri($dir_uri.BLOG_ENTRY_PATH."/$year/$month/day.php",
-				                    array('day'=>$day));
-					return $ret;
-				}
-			case "addentry":
-				return make_uri(INSTALL_ROOT_URL."pages/entryedit.php", $qs_arr);
-			case "addarticle":
-				$qs_arr['type'] = 'article';
-				return make_uri(INSTALL_ROOT_URL.'pages/entryedit.php',$qs_arr);
-			case "upload":
-				if (URI_TYPE == 'querystring')
-					return make_uri(INSTALL_ROOT_URL.'pages/fileupload.php',$qs_arr);
-				elseif (URI_TYPE == 'htaccess') return '';
-				else return $dir_uri."uploadfile.php";
-			case "edit":
-				#if (URI_TYPE == 'querystring')
-					return make_uri(INSTALL_ROOT_URL.'pages/updateblog.php', $qs_arr);
-				#elseif (URI_TYPE == 'htaccess') return '';
-				#return $dir_uri."edit.php";
-			case "login":
-				if (URI_TYPE == 'querystring')
-					return make_uri(INSTALL_ROOT_URL.'bloglogin.php', $qs_arr);
-				elseif (URI_TYPE == 'htaccess') return '';
-				return $dir_uri."login.php";
-			case "logout":
-				if (URI_TYPE == 'querystring')
-					return make_uri(INSTALL_ROOT_URL.'bloglogout.php', $qs_arr);
-				elseif (URI_TYPE == 'htaccess') return '';
-				return $dir_uri."logout.php";
-			case "editfile":
-				return make_uri(INSTALL_ROOT_URL.'pages/editfile.php', $qs_arr);
-			case "edituser":
-				return make_uri(INSTALL_ROOT_URL.'pages/editlogin.php', $qs_arr);
-			case "pluginconfig":
-				return make_uri(INSTALL_ROOT_URL.'plugin_setup.php', $qs_arr);
-			case "pluginload":
-				return make_uri(INSTALL_ROOT_URL.'plugin_loading.php', $qs_arr);
-			case "tags":
-				if (URI_TYPE == 'querystring')
-					return make_uri(INSTALL_ROOT_URL.'pages/tagsearch.php', $qs_arr);
-				unset($qs_arr['blog']);
-				return make_uri($dir_uri.'tags.php', $qs_arr);
+		
+		# This is hideously ugly, but convenient based on the need for 
+		# backware compatibility.
+		if (func_num_args() == 1) {
+			return $uri->$type();
+		} elseif (func_num_args() == 2) {
+			return $uri->$type($args[1]);
+		} elseif (func_num_args() == 3) {
+			return $uri->$type($args[1], $args[2]);
+		} elseif (func_num_args() == 4) {
+			return $uri->$type($args[1], $args[2], $args[3]);
+		} else {
+			return false;
 		}
-		return $dir_uri;
 	}
 	
 	/*

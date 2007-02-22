@@ -17,51 +17,246 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
-# File: showarchive.php
-# Shows a list of the available years of archives for blog entries.
-#
-# This is included by the index.php wrapper script in the top-level entries
-# directory of blogs.
-
 session_start();
 
 require_once("config.php");
 require_once("lib/creators.php");
 
 global $PAGE;
+global $SYSTEM;
 
-$list_months = false;
+function show_base_archives(&$blog) {
+	global $SYSTEM;
+	
+	$tpl = NewTemplate(LIST_TEMPLATE);
+	
+	if ( strtolower(GET('list')) == 'yes') {
+		$list = $blog->getRecentMonthList(0);
+		foreach ($list as $key=>$item) {
+			$ts = strtotime($item['year'].'-'.$item['month'].'-01');
+			$list[$key]["title"] = strftime("%B %Y", $ts);
+		}
+		$footer_text = '<a href="'.
+		               make_uri(false, array("list"=>"no"), false).'">'.
+		               _("Show year list").'</a>';
+	} else {
+		$list = $blog->getYearList();
+		foreach ($list as $key=>$item) {
+			$list[$key]["title"] = $item["year"];
+		}
+		$footer_text = '<a href="'.
+		               make_uri(false, array("list"=>"yes"), false).'">'.
+		               _("Show month list").'</a>';
+	}
+	
+	if ($SYSTEM->canModify($blog))
+		$footer_text .= ' | <a href="'.
+		                $blog->uri('manage_reply').'">'.
+		                _("Manage replies").'</a>';
+	
+	$tpl->set('LIST_TITLE', get_list_title($blog));
+	if (empty($list)) {
+		$tpl->set("LIST_HEADER", _("There are no entries for this blog."));
+	} else {
+		$tpl->set("LIST_FOOTER", $footer_text);
+	}
+	
+	$tpl->set('LINK_LIST', $list);
+	
+	return $tpl->process();
+}
+
+function show_year_archives(&$blog, $year) {
+	global $SYSTEM;
+	$tpl = NewTemplate(LIST_TEMPLATE);
+	
+	if ( strtolower(GET('list')) == 'yes' ) {
+		$ents = $blog->getYear($year);
+		$links = array();
+		foreach ($ents as $ent) {
+			$lnk = array('link'=>$ent->permalink(), 'title'=>$ent->title());
+			$links[] = $lnk;
+		}
+		$footer_text = '<a id="list_toggle" href="'.
+					make_uri(false, array("list"=>"no"), false).'">'.
+					_("Show month list").'</a>';
+	} else {
+		$links = $blog->getMonthList($year);
+		foreach ($links as $key=>$val) { 
+			$ts = mktime(0, 0, 0, $val["month"], 1, $val["year"]);
+			$month_name = fmtdate("%B", $ts);
+			$links[$key]["title"] = $month_name;
+		}
+		
+		$footer_text = '<a href="'.make_uri(false, array("list"=>"yes"), false).'">'.
+						_("Show entry list").'</a>';
+	}
+	
+	if ($SYSTEM->canModify($blog))
+		$footer_text .= ' | <a href="'.$blog->uri('manage_reply', 'year='.$year).'">'.
+		                _("Manage replies").'</a>';
+	$footer_text .= " | ".
+	                '<a href="'.$blog->uri('archives').'/">'.
+	                _("Back to main archives").'</a>';
+	
+	$tpl->set('LIST_TITLE', get_list_title($blog, $year));
+	if (empty($links)) {
+		$tpl->set("LIST_HEADER", _("There are no entries for this year."));
+	} else {
+		$tpl->set("LIST_FOOTER", $footer_text);
+	}
+	$tpl->set('LINK_LIST', $links);
+	
+	return $tpl->process();
+}
+
+function show_month_archives(&$blog, $year, $month) {
+	global $SYSTEM;
+	$list = $blog->getMonth($year, $month);
+
+	if ( strtolower(GET('show')) == 'all' ) {
+		return $blog->getWeblog();
+	} else {
+		
+		$tpl = NewTemplate(LIST_TEMPLATE);
+		
+		$links = array();
+		foreach ($list as $ent) { 
+			$links[] = array("link"=>$ent->permalink(), "title"=>$ent->subject);
+		}
+
+		$footer_text = '<a href="?show=all">'.
+		               _("Show all entries at once").'</a>'.
+		               ($SYSTEM->canModify($blog) ?
+		                ' | <a href="'.$blog->uri('manage_reply', "year=$year", "month=$month").'">'.
+		                _("Manage replies").'</a>' : '').
+		               ' | <a href="'.$blog->getURL().BLOG_ENTRY_PATH."/$year/".
+		               '">'.spf_("Back to archive of %s", $year).'</a>';
+	
+		$tpl->set('LIST_TITLE', get_list_title($blog, $year, $month));
+		if (empty($links)) {
+			$tpl->set("LIST_HEADER", _("There are no entries for this month."));
+		} else {
+			$tpl->set('LIST_FOOTER', $footer_text);
+		}
+		
+		$tpl->set('LINK_LIST', $links);
+		
+		return $tpl->process();
+	}
+}
+
+function show_day_archives(&$blog, $year, $month, $day) {
+	global $SYSTEM;
+	global $PAGE;
+
+	$ret = $blog->getDay($year, $month, $day);
+
+	if (count($ret) == 1) {
+		$body = array(true, $ret[0]->permalink());
+	} elseif (count($ret) == 0) {
+		$body = spf_("No entry found for %d-%d-%d", $year, $month, $day);
+	} else {
+		$PAGE->addStyleSheet("entry.css");
+		$body = $blog->getWeblog();
+	}
+	return $body;
+}
+
+function get_list_title(&$blog, $year=false, $month=false) {
+	if ($month) {
+		$date = fmtdate("%B %Y", strtotime("$year-$month-01"));
+	} elseif ($year) {
+		$date = fmtdate("%Y", strtotime("$year-01-01"));
+	} else {
+		$date = "'".$blog->title()."'";
+	}
+	return spf_("Archives for %s", $date);
+}
 
 $blog = NewBlog();
 $PAGE->setDisplayObject($blog);
 
-$year_dir = basename(getcwd());
-$title = $blog->name." - ".$year_dir;
-$year_list = scan_directory(getcwd(), true);
-sort($year_list);
+$monthdir = basename(getcwd());
+$yeardir = basename(dirname(getcwd()));
+$month = false;
 
-$tpl = NewTemplate(LIST_TEMPLATE);
-$tpl->set("LIST_TITLE", spf_("Archive of %s", $blog->name));
+# First, check for the month and year in the query string.
+if (sanitize(GET('month'), '/\D/') && 
+    sanitize(GET('year'), '/\D/') ) {
+	$month = sanitize(GET('month'), '/\D/');
+	$year = sanitize(GET('year'), '/\D/');
+	
+# Failing that, try the directory names.
+} elseif ( preg_match('/^\d\d$/', $monthdir) &&
+           preg_match('/^\d\d\d\d$/',$yeardir) ) {
+	$month = $monthdir;
+	$year = $yeardir;
+	
+# If THAT fails, then there must not be a month, so try just the year.
+} elseif ( sanitize(GET('year'), '/\D/') ) {
+	$year = sanitize(GET('year'), '/\D/');
+} elseif ( preg_match('/^\d\d\d\d$/',$monthdir) ) {
+	$year = $monthdir;
 
-$list_months = $list_months || GET('list') == 'yes';
-
-if ($list_months) {
-	$LINK_LIST = $blog->getRecentMonthList(0);
-	foreach ($LINK_LIST as $key=>$item) {
-		$ts = strtotime($item['year'].'-'.$item['month'].'-01');
-		$LINK_LIST[$key]["title"] = strftime("%B %Y", $ts);
-	}
+# If we still don't have a year, show the base archives.
 } else {
-	$LINK_LIST = $blog->getYearList();
-	foreach ($LINK_LIST as $key=>$item) $LINK_LIST[$key]["title"] = $item["year"];
+	$year = false;
 }
 
-$tpl->set("LINK_LIST", $LINK_LIST);
-$tpl->set("LIST_FOOTER", 
-          '<a href="'.$blog->uri('listall').'">'._("List all entries").'</a>');
-$body = $tpl->process();
+$day = isset($_GET['day']) ? sprintf("%02d", GET("day") ) : false;
 
-$PAGE->title = $title;
-$PAGE->display($body, &$blog);
+if ($year && $month && $day) {
+	
+	$body = show_day_archives($blog, $year, $month, $day);
+	if (is_array($body)) {
+		$PAGE->redirect( $body[1] );
+		exit;
+	}
+
+} elseif ($year && $month) {
+	
+	$body = show_month_archives($blog, $year, $month);
+	
+} elseif ($year) {
+
+	$body = show_year_archives($blog, $year);
+
+} else {
+
+	$body = show_base_archives($blog);
+	
+}
+/*
+	if (strtolower(GET('list')) == 'yes') {
+		show_year_entries($blog, $tpl, $year);
+		$footer_text = '<a id="list_toggle" href="'.
+					make_uri(false, array("list"=>"no"), false).'">'.
+					_("Show month list").'</a>';
+	} else {
+		show_month_list($blog, $tpl, $year);
+		$footer_text = '<a href="'.make_uri(false, array("list"=>"yes"), false).'">'.
+						_("Show entry list").'</a>';
+	}
+	
+}
+*/
+
+#$footer_text .= " | ".
+#	'<a href="'.$blog->uri('archives').'/">'.
+#	_("Back to main archives").'</a>';
+	
+#$usr = NewUser();
+#if ($SYSTEM->canModify($blog, $usr))
+#	$footer_text .= ' | <a href="'.$blog->uri('manage_reply', 'year='.$year).'">'.
+#	                _("Manage replies").'</a><br />';
+
+#$tpl->set("LIST_FOOTER", $footer_text);
+
+#$body = $tpl->process();
+if (GET('ajax')) {
+	echo $body;
+} else {
+	$PAGE->display($body, &$blog);
+}
 ?>

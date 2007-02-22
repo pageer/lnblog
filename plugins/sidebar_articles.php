@@ -57,7 +57,7 @@ class Articles extends Plugin {
 <ul>
 <?php	
 			foreach($art_list as $dir) { ?>
-<li><a href="<?php echo $dir["link"]; ?>"><?php echo $dir["title"]; ?></a></li>
+<li><a href="<?php echo $dir["link"]; ?>"><?php echo htmlspecialchars($dir["title"]); ?></a></li>
 <?php 
 			} # End foreach loop 
 			if (is_file($blg->home_path.PATH_DELIM.$this->custom_links)) {

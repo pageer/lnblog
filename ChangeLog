@@ -1,3 +1,8 @@
+22-Feb-2007:
+- Lots of file consolidation.  Moved many of the small page files into just a
+few.
+- Added sane URL calculation for Blog and BlogEntry objects.
+
 09-Feb-2007:
 - Added support for draft entries.
 - Added some i18n documentation.

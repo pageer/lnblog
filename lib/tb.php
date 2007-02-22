@@ -65,6 +65,7 @@ class Trackback extends LnBlogObject {
 		$this->ip = '';
 		$this->ping_date = false;
 		$this->file = $path;
+		
 		if ($this->file) {
 			if (! is_file($this->file)) $this->file = $this->getFilename($this->file);
 			if (is_file($this->file)) $this->readFileData($this->file);
@@ -73,6 +74,20 @@ class Trackback extends LnBlogObject {
 		$this->raiseEvent("InitComplete");
 	}
 
+	# Method: title
+	# An RSS compatibility method for getting the title of an entry.
+	#
+	# Parameters:
+	# no_escape - *Optional* boolean that tells the function to not escape
+	#             ampersands and angle braces in the return value.
+	#
+	# Returns:
+	# A string containing the title of this object.
+	function title($no_escape=false) {
+		$ret = $this->title ? $this->title : NO_SUBJECT;
+		return $no_escape ? $ret : htmlspecialchars($ret);
+	}
+	
 	# Method: getParent
 	# Gets a copy of the parent object.
 	#
@@ -85,7 +100,6 @@ class Trackback extends LnBlogObject {
 		} else {
 			return NewEntry();
 		}
-		#return NewEntry();
 	}
 
 	# Method: isTrackback
@@ -278,10 +292,12 @@ class Trackback extends LnBlogObject {
 		          "<error>".$err_code."</error>\n";
 		if ($error != '') $output .= "<message>$error</message>\n";
 		$output .= "</response>\n";
+		/*
 		ob_start();
 		print_r($this);
 		$output .= ob_get_contents();
 		ob_end_clean();
+		*/
 
 		$this->raiseEvent("ReceiveComplete");
 		return $output;
@@ -364,9 +380,9 @@ class Trackback extends LnBlogObject {
 		if (! is_dir( dirname($path) ) ) {
 			$fs->mkdir_rec(dirname($path));
 		};
+		$this->file = $path;
 		$data = $this->serializeXML();
 		$ret = $fs->write_file($path, $data);
-		$this->file = $path;
 		$fs->destruct();
 		return $ret;
 	}
@@ -483,6 +499,7 @@ class Trackback extends LnBlogObject {
 			$id .= '/'.ENTRY_TRACKBACK_DIR;
 		}
 		$id .= '/#'.$this->getAnchor();
+		return $id;
 	}
 }
 ?>

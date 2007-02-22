@@ -26,7 +26,7 @@ require_once("pages/pagelib.php");
 global $PAGE;
 
 $u = NewUser();
-$ent = NewBlogEntry();
+$ent = NewEntry();
 $blg = NewBlog();
 $PAGE->setDisplayObject($ent);
 $tb = NewTrackback();
@@ -47,8 +47,11 @@ if (! $tb->incomingPing()) {
 	$body = show_trackbacks($ent, $u);
 	if (! $body) {
 		$body = '<p>'.
-		        spf_('There are no trackbacks for <a href="%s">\'%s\'</a>',
-		        $ent->permalink(), $ent->subject).'</p>';
+		        spf_('There are no trackbacks for %s',
+		             sprintf('<a href="%s">\'%s\'</a>', 
+				             $ent->permalink(), 
+				             $ent->subject)).
+		        '</p>';
 	}
 	$PAGE->display($body, &$blog);
 } else {

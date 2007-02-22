@@ -70,7 +70,6 @@
     <item desc="" modified_time="1164163180" url="pages/newentry.php" uploadstatus="1" />
     <item modified_time="1164770328" url="pages/pagelib.php" uploadstatus="1" />
     <item modified_time="1148797430" url="pages/showall.php" uploadstatus="1" />
-    <item modified_time="1154660590" url="pages/showarchive.php" uploadstatus="1" />
     <item modified_time="1148797430" url="pages/showarticles.php" uploadstatus="1" />
     <item modified_time="1157593836" url="pages/showblog.php" uploadstatus="1" />
     <item modified_time="1163221588" url="pages/showcomments.php" uploadstatus="1" />
@@ -79,7 +78,6 @@
     <item modified_time="1163210784" url="pages/showmonth.php" uploadstatus="1" />
     <item modified_time="1164770820" url="pages/showpingbacks.php" uploadstatus="1" />
     <item modified_time="1163035338" url="pages/showtrackbacks.php" uploadstatus="1" />
-    <item modified_time="1148797430" url="pages/showyear.php" uploadstatus="1" />
     <item modified_time="1156200050" url="pages/sitemap.php" uploadstatus="1" />
     <item modified_time="1163211322" url="pages/tagsearch.php" uploadstatus="1" />
     <item modified_time="1165441646" url="pages/tb_ping.php" uploadstatus="1" />
@@ -362,5 +360,7 @@
     <item url="xmlrpc/old/xmlrpcs.inc" uploadstatus="1" />
     <item url="xmlrpc/xmlrpc_wrappers.inc" uploadstatus="1" />
     <item url="ajax_server.php" uploadstatus="1" />
+    <item url="pages/showarchive-old.php" uploadstatus="1" />
+    <item url="pages/showarchive.php" uploadstatus="1" />
   </project>
 </webproject>

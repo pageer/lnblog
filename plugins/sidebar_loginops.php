@@ -53,6 +53,9 @@ class LoginOps extends Plugin {
 <li><a href="<?php echo $blg->uri('listdrafts');?>"><?php p_("Edit drafts");?></a></li>
 <?php }
       if ($SYSTEM->canModify($blg,$usr)) { ?>
+<li><a href="<?php echo $blg->uri('manage_reply');?>"><?php p_("Manage replies");?></a></li>
+<?php }
+      if ($SYSTEM->canModify($blg,$usr)) { ?>
 <li><a href="<?php echo $blg->uri('upload'); ?>"><?php p_("Upload file for blog"); ?></a></li>
 <li><a href="<?php echo $blg->uri('edit'); ?>"><?php p_("Edit weblog settings"); ?></a></li>
 <?php } ?>

@@ -667,19 +667,23 @@ function create_directory_wrappers($path, $type, $instpath="") {
 	$config_level = 0;
 	$ret = 0;
 	$ret_list = array();
-	
+
 	switch ($type) {
 		case BLOG_BASE:
 			if (!is_dir($instpath)) return false;
-			$filelist = array("index"=>"pages/showblog", "new"=>"pages/newentry",
-			                  "newart"=>"pages/newentry", "edit"=>"updateblog",
-			                  "login"=>"bloglogin", "logout"=>"bloglogout",
-			                  "uploadfile"=>"pages/fileupload", "map"=>"sitemap",
-			                  "useredit"=>"pages/editlogin", 
-			                  "plugins"=>"plugin_setup", 
-			                  "tags"=>"pages/tagsearch",
-			                  "pluginload"=>"plugin_loading",
-			                  "profile"=>"userinfo");
+			#$filelist = array("index"=>"pages/showblog", "new"=>"pages/newentry",
+			#                  "newart"=>"pages/newentry", "edit"=>"updateblog",
+			#                  "login"=>"bloglogin", "logout"=>"bloglogout",
+			#                  "uploadfile"=>"pages/fileupload", "map"=>"sitemap",
+			#                  "useredit"=>"pages/editlogin", 
+			#                  "plugins"=>"plugin_setup", 
+			#                  "tags"=>"pages/tagsearch",
+			#                  "pluginload"=>"plugin_loading",
+			#                  "profile"=>"userinfo");
+			$filelist = array("index"=>"pages/showblog");
+			$removelist = array("new", "newart", "edit", "login", "logout", 
+			                    "uploadfile", "map", "useredit", "plugins",
+			                    "tags", "pluginload", "profile");
 			$config_level = 0;
 			if (! file_exists($current."pathconfig.php")) {
 				$inst_root = realpath($instpath);
@@ -692,7 +696,9 @@ function create_directory_wrappers($path, $type, $instpath="") {
 			}
 			break;
 		case BLOG_ENTRIES:
-			$filelist = array("index"=>"pages/showarchive", "all"=>"pages/showall");
+			#$filelist = array("index"=>"pages/showarchive", "all"=>"pages/showall");
+			$filelist = array("index"=>"pages/showarchive");
+			$removelist = array("all");
 			$config_level = 1;
 			break;
 		case BLOG_DRAFTS:
@@ -700,37 +706,43 @@ function create_directory_wrappers($path, $type, $instpath="") {
 			$config_level = 1;
 			break;
 		case YEAR_ENTRIES:
-			$filelist = array("index"=>"pages/showyear");
+			#$filelist = array("index"=>"pages/showyear");
+			$filelist = array("index"=>"pages/showarchive");
 			$config_level = 2;
 			break;
 		case MONTH_ENTRIES:
-			$filelist = array("index"=>"pages/showmonth", "day"=>"pages/showday");
+			#$filelist = array("index"=>"pages/showmonth", "day"=>"pages/showday");
+			$filelist = array("index"=>"pages/showarchive");
+			$removelist = array("day");
 			$config_level = 3;
 			break;
 		case ENTRY_BASE:
-			$filelist = array("index"=>"pages/showentry", "edit"=>"pages/editentry",
-			                  "delete"=>"pages/delentry", 
-			                  "uploadfile"=>"pages/fileupload",
-			                  "trackback"=>"pages/tb_ping");
+			$filelist = array("index"=>"pages/showitem");
+			$removelist = array("edit", "delete", "trackback", "uploadfile");
+			                    #"uploadfile"=>"pages/fileupload",
+			                    #"trackback"=>"pages/tb_ping");
 			$config_level = 4;
 			break;
 		case ENTRY_COMMENTS:
-			$filelist = array("index"=>"pages/showcomments", "delete"=>"pages/delcomment");
+			$filelist = array("index"=>"pages/showitem");
+			$removelist = array("delete");
 			$config_level = strtolower($instpath) == 'article' ? 3 : 5;
 			break;
 		case ENTRY_TRACKBACKS:
-			$filelist = array("index"=>"pages/showtrackbacks");
+			$filelist = array("index"=>"pages/showitem");
 			$config_level = strtolower($instpath) == 'article' ? 3 : 5;
 			break;
 		case ENTRY_PINGBACKS:
-			$filelist = array("index"=>"pages/showpingbacks");
+			$filelist = array("index"=>"pages/showitem");
 			$config_level = strtolower($instpath) == 'article' ? 3 : 5;
 			break;
 		case ARTICLE_BASE:
 			# The same as for entries, but for some reason, I never added a delete.
-			$filelist = array("index"=>"pages/showentry", "edit"=>"pages/editentry",
-			                  "uploadfile"=>"pages/fileupload",
-			                  "trackback"=>"pages/tb_ping");
+			$filelist = array("index"=>"pages/showitem");
+			#$filelist = array("index"=>"pages/showentry", "edit"=>"pages/editentry",
+			#                  "uploadfile"=>"pages/fileupload",
+			#                  "trackback"=>"pages/tb_ping");
+			$removelist = array("edit", "trackback", "uploadfile", "trackback");
 			$config_level = 2;
 			break;
 		case BLOG_ARTICLES:
@@ -753,6 +765,16 @@ function create_directory_wrappers($path, $type, $instpath="") {
 		$ret = $fs->write_file($curr_file, $head.$content.$tail);
 		if (! $ret) $ret_list[] = $curr_file;
 	}
+
+	if (isset($removelist) && is_array($removelist)) {
+		foreach ($removelist as $file) {
+			$f = $current.$file.".php";
+			if (file_exists($f)) {
+				$fs->delete($f);
+			}
+		}
+	}
+
 	$fs->destruct();
 	return $ret_list;
 }

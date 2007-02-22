@@ -279,7 +279,8 @@ function reply_boxes($idx, &$obj) {
 	return '<span style="float: right">'.
 	       '<input type="hidden" '.
 	       'name="responseid'.$idx.'" id="'.get_class($obj).'id'.$idx.'" '.
-	       'value="'.$obj->getAnchor().'" />'.
+	       #'value="'.$obj->getAnchor().'" />'.
+		   'value="'.$obj->globalID().'" />'.
 	       '<input type="checkbox" name="response'.$idx.'" '.
 	       'id="'.get_class($obj).$idx.'" class="markbox" /></span>';
 }

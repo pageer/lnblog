@@ -101,8 +101,15 @@ class BlogComment extends Entry {
 			case "comment":
 				return localpath_to_uri(dirname($this->file))."#".$this->getAnchor();
 			case "delete":
-				return localpath_to_uri(dirname($this->file)).
-				       "delete.php?comment=".$this->getAnchor();
+				$qs_arr = array();
+				$parent = $this->getParent();
+				$entry_type = is_a($this, 'Article') ? 'article' : 'entry';
+				$qs_arr['blog'] = $parent->parentID();
+				$qs_arr[$entry_type] = $parent->entryID();
+				$qs_arr['delete'] = $this->getAnchor();
+				return make_uri(INSTALL_ROOT_URL."pages/delcomment.php", $qs_arr);
+				#return localpath_to_uri(dirname($this->file)).
+				#       "delete.php?comment=".$this->getAnchor();
 		}
 	}
 	
@@ -335,6 +342,7 @@ class BlogComment extends Entry {
 			$id .= '/'.ENTRY_COMMENT_DIR;
 		}
 		$id .= '/#'.$this->getAnchor();
+		return $id;
 	}
 	
 	/*

@@ -232,7 +232,7 @@ then your post ID will be exactly the same as above.
 # password(string) - The password to log in with.
 # content(string)  - The body text of the post.
 # publish(boolean) - Whether or not to immediately publish the entry.
-#                    The parameter is not currently used by LnBlog.
+#                    If set to false, the entry will be saved as a draft.
 #
 # Returns:
 # A string representation of the unique ID of this post.
@@ -247,7 +247,7 @@ function blogger_newPost($params) {
 	$username = $params->getParam(2);
 	$password = $params->getParam(3);
 	$content = $params->getParam(4);
-	$publish = $params->getParam(5);  # The publish flag is also ignored.
+	$publish = $params->getParam(5);
 	
 	$blog = NewBlog($blogid->scalarval());
 	
@@ -279,8 +279,14 @@ function blogger_newPost($params) {
 
 		$ent->uid = $usr->username();
 		$ent->data = $data;
-		$ret = $ent->insert($blog);
-		$blog->updateTagList($ent->tags());
+
+		if ($publish) {
+			$ret = $ent->insert($blog);
+			$blog->updateTagList($ent->tags());
+		} else {
+			$ret = $ent->saveDraft($blog);
+		}
+
 		if ($ret) $ret = new xmlrpcresp( new xmlrpcval($ent->globalID()) );
 		else $ret = new xmlrpcresp(0, $xmlrpcerruser+2, "Entry add failed");
 	} else {
@@ -313,7 +319,7 @@ function blogger_editPost($params) {
 	$username = $params->getParam(2);
 	$password = $params->getParam(3);
 	$content = $params->getParam(4);
-	$publish = $params->getParam(5);  # The publish flag is also ignored.
+	$publish = $params->getParam(5);
 	
 	#$postpath = $postid->scalarval();
 	#if (PATH_DELIM != '/') $postpath = str_replace("/", PATH_DELIM, $postpath);
@@ -347,8 +353,17 @@ function blogger_editPost($params) {
 		if ($data) {
 		
 			$ent->data = $data;
-			$ret = $ent->update();
-			$blog->updateTagList($ent->tags());
+			
+			if (! $ent->isDraft()) { 
+				$ret = $ent->update();
+				$blog->updateTagList($ent->tags());
+			} elseif ($ent->isDraft() && $publish) {
+				$ret = $ent->publishDraft($blog);
+				$blog->updateTagList($ent->tags());
+			} else {
+				$ret = $ent->saveDraft($blog);
+			}
+			
 			if ($ret) $ret = new xmlrpcresp( new xmlrpcval(true, 'boolean') );
 			else $ret = new xmlrpcresp(0, $xmlrpcerruser+2, "Entry update failed");
 			
@@ -644,8 +659,14 @@ function metaWeblog_newPost($params) {
 		}
 
 		$ent->uid = $usr->username();
-		$ret = $ent->insert($blog);
-		$blog->updateTagList($ent->tags());
+		
+		if ($publish) {
+			$ret = $ent->insert($blog);
+			$blog->updateTagList($ent->tags());
+		} else {
+			$ret = $ent->saveDraft($blog);
+		}
+		
 		if ($ret) $ret = new xmlrpcresp( new xmlrpcval($ent->globalID()) );
 		else $ret = new xmlrpcresp(0, $xmlrpcerruser+2, "Entry add failed");
 	} else {
@@ -720,8 +741,16 @@ function metaWeblog_editPost($params) {
 			
 		}
 
-		$ret = $ent->update();
-		$blog->updateTagList($ent->tags());
+		if (! $ent->isDraft()) { 
+			$ret = $ent->update();
+			$blog->updateTagList($ent->tags());
+		} elseif ($ent->isDraft() && $publish) {
+			$ret = $ent->publishDraft($blog);
+			$blog->updateTagList($ent->tags());
+		} else {
+			$ret = $ent->saveDraft($blog);
+		}
+
 		if ($ret) $ret = new xmlrpcresp( new xmlrpcval(true,'boolean') );
 		else $ret = new xmlrpcresp(0, $xmlrpcerruser+2, "Entry edit failed");
 	} else {

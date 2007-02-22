@@ -43,6 +43,7 @@ if ($SHOW_CONTROLS) { ?>
 <li><a href="<?php echo $UPLOAD_LINK; ?>"><?php p_("Upload File");?></a></li>
 <li><a href="<?php echo $EDIT_LINK; ?>"><?php p_("Edit");?></a></li>
 <li><a href="<?php echo $DELETE_LINK; ?>"><?php p_("Delete");?></a></li>
+<li><a href="<?php echo $MANAGE_REPLY_LINK; ?>"><?php p_("Manage replies"); ?></a></li>
 </ul>
 <?php } ?>
 <ul class="inline">

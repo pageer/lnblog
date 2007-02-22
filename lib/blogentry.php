@@ -493,6 +493,35 @@ class BlogEntry extends Entry {
 	Returns:
 	A string holding the relevant URI.
 	*/
+	
+	function uri($type) {
+		$uri = create_uri_object($this);
+		
+		return $uri->$type();
+		
+		/*
+		$args = array();
+		for ($i=1; $i < func_num_args(); $i++) {
+			$args[$i] = func_get_arg($i);
+		}
+		
+		# This is hideously ugly, but convenient based on the need for 
+		# backware compatibility.
+		if (func_num_args() == 1) {
+			return $uri->$type();
+		} elseif (func_num_args() == 2) {
+			return $uri->$type($args[1]);
+		} elseif (func_num_args() == 3) {
+			return $uri->$type($args[1], $args[2]);
+		} elseif (func_num_args() == 4) {
+			return $uri->$type($args[1], $args[2], $args[3]);
+		} else {
+			return false;
+		}
+		*/
+	}
+	
+	/*
 	function uri($type) {
 		$dir_uri = localpath_to_uri($this->localpath());
 		
@@ -542,11 +571,12 @@ class BlogEntry extends Entry {
 						return $dir_uri;
 					}
 				}
-			case "send_tb":     return $dir_uri."trackback.php?send_ping=yes";
-			case "get_tb":      return $dir_uri."trackback.php";
+			#case "send_tb":     return $dir_uri."trackback.php?send_ping=yes";
+			case "send_tb":     return $dir_uri.ENTRY_TRACKBACK_DIR."/?action=ping";
+			case "get_tb":      return $dir_uri.ENTRY_TRACKBACK_DIR."/index.php";
 			case "trackback":   return $dir_uri.ENTRY_TRACKBACK_DIR."/";
-			case "pingback":   return $dir_uri.ENTRY_PINGBACK_DIR."/";
-			case "upload":      return $dir_uri."uploadfile.php";
+			case "pingback":    return $dir_uri.ENTRY_PINGBACK_DIR."/";
+			case "upload":      return $dir_uri."/?action=upload";
 			case "edit":
 				if ($this->isDraft()) {
 					$entry_type = 'draft';
@@ -559,18 +589,18 @@ class BlogEntry extends Entry {
 				                array("blog"     =>$this->parentID(), 
 				                      $entry_type=>$this->entryID()));
 			case "delete":     
-				if (KEEP_EDIT_HISTORY) {
-					return $dir_uri."delete.php";
+				if ($this->isDraft()) {
+					$entry_type = 'draft';
 				} else {
-					if ($this->isDraft()) {
-						$entry_type = 'draft';
-					} else {
-						$entry_type = is_a($this, 'Article') ? 'article' : 'entry';
-					}
-					$qs_arr['blog'] = $this->parentID();
-					$qs_arr[$entry_type] = $this->entryID();
-					return make_uri(INSTALL_ROOT_URL."pages/delentry.php", $qs_arr);
+					$entry_type = is_a($this, 'Article') ? 'article' : 'entry';
 				}
+				$qs_arr['blog'] = $this->parentID();
+				$qs_arr[$entry_type] = $this->entryID();
+				return make_uri(INSTALL_ROOT_URL."pages/delentry.php", $qs_arr);
+			case "manage_reply": 
+				return make_uri(INSTALL_ROOT_URL."pages/manage_replies.php",
+				                array("blog"=>$this->parentID(), 
+				                      "entry"=>$this->entryID()));
 			case "comment":     return $dir_uri.ENTRY_COMMENT_DIR."/";
 			case "commentpage": return $dir_uri.ENTRY_COMMENT_DIR."/index.php";
 			case "base":        return $dir_uri;
@@ -578,6 +608,7 @@ class BlogEntry extends Entry {
 		}
 		return $dir_uri;
 	}
+	*/
 	
 	function getByPath ($path, $revision=ENTRY_DEFAULT_FILE) {
 		$file_path = $path.PATH_DELIM.$revision;
@@ -820,7 +851,7 @@ class BlogEntry extends Entry {
 		$ret = trim($this->subject);
 		if (!$use_broken_regex) {
 			$ret = str_replace(array("'", '"'), "_", $ret);
-			$ret = preg_replace("/[^A-Za-z0-9_\-\.\~]+/", "_", $ret);
+			$ret = preg_replace("/[^A-Za-z0-9_\-\~]+/", "_", $ret);
 		} else {
 			$ret = preg_replace("/\W/", "_", $ret);
 		}
@@ -937,6 +968,7 @@ class BlogEntry extends Entry {
 		$tmp->set("UPLOAD_LINK", $this->uri("upload"));
 		$tmp->set("EDIT_LINK", $this->uri("edit"));
 		$tmp->set("DELETE_LINK", $this->uri("delete"));
+		$tmp->set("MANAGE_REPLY_LINK", $this->uri("manage_reply"));
 		$tmp->set("TAG_LINK", $blog->uri('tags'));
 		$tmp->set("COMMENTCOUNT", $this->getCommentCount() );
 		$tmp->set("COMMENT_LINK", $this->uri("comment"));
@@ -1045,6 +1077,21 @@ class BlogEntry extends Entry {
 			$reply_array[] = $creator($dir_path.PATH_DELIM.$file);
 		
 		return $reply_array;
+	}
+	
+	/*
+	Method: getAllReplies
+	Gets an array of all replies to this entry.
+
+	Returns:
+	An array of BlogComment, Trackback, and Pingback objects.
+	*/
+	function getAllReplies() {
+		$repls = array();
+		$repls = array_merge($repls, $this->getCommentArray());
+		$repls = array_merge($repls, $this->getTrackbackArray());
+		$repls = array_merge($repls, $this->getPingbackArray());
+		return $repls;
 	}
 	
 	# Method: getReplies

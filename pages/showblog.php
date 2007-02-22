@@ -23,6 +23,56 @@
 #
 # This is included by the index.php wrapper script of blogs.
 
+# Function: show_blog_page
+# Shows the main blog page.  This is typically the front page of the blog.
+function show_blog_page(&$blog) {
+	global $PAGE;
+	$ret = $blog->getWeblog(); 
+	$PAGE->title = $blog->title();
+	$PAGE->addStylesheet("entry.css");
+	return $ret;
+}
+
+if ( isset($_GET['action']) ) {
+	if ( strtolower($_GET['action']) == 'newentry' ) {
+		include('newentry.php');
+		exit;
+	} elseif ( strtolower($_GET['action']) == 'edit' ) {
+		include('updateblog.php');
+		exit;
+	} elseif ( strtolower($_GET['action']) == 'login' ) {
+		include('bloglogin.php');
+		exit;
+	} elseif ( strtolower($_GET['action']) == 'logout' ) {
+		include('bloglogout.php');
+		exit;
+	} elseif ( strtolower($_GET['action']) == 'upload' ) {
+		include('fileupload.php');
+		exit;
+	} elseif ( strtolower($_GET['action']) == 'sitemap' ) {
+		include('sitemap.php');
+		exit;
+	} elseif ( strtolower($_GET['action']) == 'useredit' ) {
+		include('editlogin.php');
+		exit;
+	} elseif ( strtolower($_GET['action']) == 'plugins' ) {
+		include('plugin_setup.php');
+		exit;
+	} elseif ( strtolower($_GET['action']) == 'tags' ) {
+		include('tagsearch.php');
+		exit;
+	} elseif ( strtolower($_GET['action']) == 'pluginload' ) {
+		include('plugin_loading.php');
+		exit;
+	} elseif ( strtolower($_GET['action']) == 'profile' ) {
+		include('userinfo.php');
+		exit;
+	} elseif ( strtolower($_GET['action']) == 'managereply' ) {
+		include('manage_replies.php');
+		exit;
+	}
+}
+
 session_start();
 require_once("config.php");
 require_once("lib/creators.php");
@@ -31,8 +81,7 @@ global $PAGE;
 
 $blog = NewBlog();
 $PAGE->setDisplayObject($blog);
-$ret = $blog->getWeblog(); 
-$PAGE->title = $blog->name;
-$PAGE->addStylesheet("entry.css");
-$PAGE->display($ret, &$blog);
+
+$content = show_blog_page($blog);
+$PAGE->display($content, &$blog);
 ?>

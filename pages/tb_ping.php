@@ -31,7 +31,7 @@ global $PAGE;
 global $SYSTEM;
 
 $blog = NewBlog();
-$ent = NewBlogEntry();
+$ent = NewEntry();
 $usr = NewUser();
 $tb = NewTrackback();
 $PAGE->setDisplayObject($ent);
@@ -39,23 +39,23 @@ $PAGE->setDisplayObject($ent);
 if ( GET("send_ping") == "yes" ) {
 
 	$tpl = NewTemplate("send_trackback_tpl.php");
-	
+
 	if ($SYSTEM->canModify($ent, $usr) && $usr->checkLogin()) {
-		
+
 		# Set default values for the trackback properties.
 		$tb->title = $ent->subject;
 		$tb->blog = $blog->name;
 		$tb->data = $ent->getAbstract();
 		$tb->url = $ent->permalink();
-		
+
 		# If the form has been posted, send the trackback.
 		if (has_post()) {
-			
+
 			$tb->url = trim(POST('url'));
 			$tb->blog = POST('blog_name');
 			$tb->data = POST('excerpt');
 			$tb->title = POST('title');
-			
+
 			if ( ! trim(POST('target_url')) || ! POST('url') ) {
 				$tpl->set("ERROR_MESSAGE", _("You must supply an entry URL and a target URL."));
 			} else {
@@ -63,19 +63,24 @@ if ( GET("send_ping") == "yes" ) {
 				if ($ret['error'] == '0') {
 					$tpl->set("ERROR_MESSAGE", _("Trackback ping succeded."));
 				} else {
-					$tpl->set("ERROR_MESSAGE", 
-					          spf_('Error %s: %s', $ret['error'], $ret['message']));
+					ob_start();
 					print_r($ret);
+					$all_resp = ob_get_contents();
+					ob_end_clean();
+					$tpl->set("ERROR_MESSAGE", 
+					          spf_('Error %s: %s', $ret['error'], $ret['message']).
+							  '<br /><textarea rows="20" cols="20">'.
+							  $all_resp.'</textarea>');
 				}
 			}
 		}
-		
+
 		$tpl->set("TB_URL", $tb->url );
 		$tpl->set("TB_TITLE", $tb->title);
 		$tpl->set("TB_EXCERPT", $tb->data );
 		$tpl->set("TB_BLOG", $tb->blog);
 		$tpl->set("TARGET_URL", trim(POST('target_url')));
-		
+
 	} else {
 		$tpl->set("ERROR_MESSAGE", 
 		          spf_("User %s cannot send trackback pings from this entry.",
@@ -86,7 +91,7 @@ if ( GET("send_ping") == "yes" ) {
 	$PAGE->title = _("Send Trackback Ping");
 	$PAGE->addStyleSheet("form.css");
 	$PAGE->display($body, &$body);
-	
+
 } else {
 	if ($ent->allow_tb) {
 		$output = $tb->receive();

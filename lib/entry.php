@@ -91,6 +91,32 @@ class Entry extends LnBlogObject{
 		"tags"=>"Tags", "custom"=>"Custom");
 
 	/*
+	Method: title
+	An RSS compatibility method for getting the title of an entry.
+	
+	Parameters:
+	no_escape - *Optional* boolean that tells the function to not escape
+	            ampersands and angle braces in the return value.
+	
+	Returns:
+	A string containing the title of this object.
+	*/
+	function title($no_escape=false) {
+		$ret = $this->subject ? $this->subject : NO_SUBJECT;
+		return $no_escape ? $ret : htmlspecialchars($ret);
+	}
+	
+	/*
+	Method: description
+	An RSS compatibility method.  Like <title>, but for the main 
+	text of the item.
+	
+	Returns:
+	A string containing HTML code for the item's text.
+	*/
+	function description() { return $this->markup(); }
+		
+	/*
 	Method: data
 	Set or return the data property.  If the optional value parameter is set
 	to a true value (i.e. a non-empty string), then this value is set to the

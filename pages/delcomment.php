@@ -71,9 +71,8 @@ function get_list_text(&$obj) {
 		return '<li>'.$obj."</li>\n";
 	} else {
 		return '<li>'.$obj->getAnchor().
-		       ' - <a href="'.$obj->permalink().'">'.
-		       ( isset($obj->title) ? $obj->title : $obj->subject).
-		       "</a></li>\n";
+		       '<a href="'.$obj->permalink().'">'.
+		       $obj->title()."</a></li>\n";
 	}
 }
 
@@ -218,7 +217,7 @@ $tpl->set("CONFIRM_MESSAGE",$message);
 $tpl->set("PASS_DATA", $anchors);
 
 $body = $tpl->process();
-$PAGE->title = spf_("%s - %s", $blog->name, $title);
+$PAGE->title = sprintf("%s - %s", $blog->name, $title);
 
 $PAGE->display($body, $blog);
 

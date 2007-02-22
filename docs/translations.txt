@@ -68,8 +68,10 @@ that will be used by gettext at runtime.  To do that, use the following command.
 Installing this file is as simple as copying it into the appropriate directory.  The exact directory 
 depends on the locale, but the basic pattern is 
 | LnBlog/locale/en_US/LC_MESSAGES/
-Once this directory is created and your LnBlog.mo file copied into it, you should be able to see your
-translation working.
+Once this directory is created and your LnBlog.mo file copied into it, you are done.
+Just edit your LnBlog/userdata/userconfig.cfg or LnBlog/userdata/userconfig.php file 
+to set the LANGUAGE configuration constant to the correct value (or you can use the 
+$LANG environment variable) and should be able to see your translation working.
 
 Section: Ad Hoc Translation Format
 

@@ -26,6 +26,8 @@
 # Inherits:
 # <LnBlogObject>
 
+define("USER_PROFILE_FILE", "user.xml");
+
 require_once("lib/utils.php");
 require_once("lib/lnblogobject.php");
 
@@ -39,7 +41,7 @@ class User extends LnBlogObject {
 	var $homepage;
 	var $default_group;
 	var $custom;
-	var $user_list;
+	#var $user_list;
 
 	function User($uname=false, $pw=false) {
 		global $SYSTEM;
@@ -52,6 +54,8 @@ class User extends LnBlogObject {
 		$this->homepage = '';
 		$this->default_group = '';
 		$this->custom = array();
+		
+		$this->exclude_fields = array('salt', 'passwd', 'username');
 
 		if ($uname && realpath(mkpath(USER_DATA_PATH,$uname,"passwd.php"))) {
 		
@@ -61,9 +65,13 @@ class User extends LnBlogObject {
 			$this->username = $uname;
 			$this->passwd = $pwd;
 			$this->salt = $salt;
-				
+			
+			$xmlfile = realpath(mkpath(USER_DATA_PATH,$uname,USER_PROFILE_FILE));
 			$inifile = realpath(mkpath(USER_DATA_PATH,$uname,"user.ini"));
-			if ($inifile) {
+			
+			if ($xmlfile) {
+				$this->deserializeXML($xmlfile);
+			} elseif ($inifile) {
 				$ini = NewIniParser($inifile);
 				$this->fullname = $ini->value("userdata", "name", "");
 				$this->email    = $ini->value("userdata", "email", "");
@@ -118,7 +126,8 @@ class User extends LnBlogObject {
 	function exists($uname=false) {
 		if (! $uname) $uname = $this->username;
 		return realpath(mkpath(USER_DATA_PATH,$uname,"passwd.php")) &&
-		       realpath(mkpath(USER_DATA_PATH,$uname,"user.ini"));
+		       ( realpath(mkpath(USER_DATA_PATH,$uname,USER_PROFILE_FILE)) || 
+		         realpath(mkpath(USER_DATA_PATH,$uname,"user.ini")) );
 	}
 	
 
@@ -173,7 +182,7 @@ class User extends LnBlogObject {
 	}
 
 	# Method: save
-	# Save changes to user data.  
+	# Save changes to user data.
 	#
 	# Returns:
 	# True if the changes were successfully saved, false otherwise.
@@ -189,17 +198,19 @@ class User extends LnBlogObject {
 			if (! $ret) return $ret;
 		}
 		$ret = write_file(mkpath(USER_DATA_PATH,$this->username,"passwd.php"), $data);
+		
+		#$ini = NewINIParser(mkpath(USER_DATA_PATH,$this->username,USER_PROFILE_FILE));
+		#$ini->setValue("userdata", "name", $this->fullname);
+		#$ini->setValue("userdata", "email", $this->email);
+		#$ini->setValue("userdata", "homepage", $this->homepage);
+		#$ini->setValue("userdata", "default_group", $this->defaultGroup());
 
-		$ini = NewINIParser(mkpath(USER_DATA_PATH,$this->username,"user.ini"));
-		$ini->setValue("userdata", "name", $this->fullname);
-		$ini->setValue("userdata", "email", $this->email);
-		$ini->setValue("userdata", "homepage", $this->homepage);
-		$ini->setValue("userdata", "default_group", $this->defaultGroup());
-
-		foreach ($this->custom as $key=>$val) {
-			$ini->setValue("customdata", $key, $val);
-		}
-		$ret = $ini->writeFile();
+		#foreach ($this->custom as $key=>$val) {
+		#	$ini->setValue("customdata", $key, $val);
+		#}
+		#$ret = $ini->writeFile();
+		$data = $this->serializeXML();
+		$ret = write_file(mkpath(USER_DATA_PATH,$this->username,USER_PROFILE_FILE), $data);
 		if ($ret) $_SESSION["user-".$this->username] = serialize($this);
 		return $ret;
 	}

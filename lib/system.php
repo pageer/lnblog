@@ -270,7 +270,7 @@ class System {
 		return $ret;
 	}
 	
-	function canModify($parm, $usr=false) {
+	function canModify(&$parm, $usr=false) {
 		$ret = false;
 		if (!$usr) $usr = NewUser();
 		if ( $this->inGroup($usr->username(), 'administrators') ||
