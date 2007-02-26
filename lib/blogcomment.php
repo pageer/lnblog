@@ -96,25 +96,8 @@ class BlogComment extends Entry {
 	# Get the URI for various functions.
 
 	function uri($type) {
-		switch ($type) {
-			case "permalink":
-			case "comment":
-				return localpath_to_uri(dirname($this->file))."#".$this->getAnchor();
-			case "delete":
-				$qs_arr = array();
-				$parent = $this->getParent();
-				$entry_type = is_a($this, 'Article') ? 'article' : 'entry';
-				$qs_arr['blog'] = $parent->parentID();
-				$qs_arr[$entry_type] = $parent->entryID();
-				$qs_arr['delete'] = $this->getAnchor();
-				return make_uri(INSTALL_ROOT_URL."pages/delcomment.php", $qs_arr);
-				#return localpath_to_uri(dirname($this->file)).
-				#       "delete.php?comment=".$this->getAnchor();
-		}
-	}
-	
-	function queryStringToID() {
-		return false;
+		$uri = create_uri_object($this);
+		return $uri->$type();
 	}
 	
 	/*
@@ -131,40 +114,6 @@ class BlogComment extends Entry {
 	function getPath($ts) {
 		$base = date(COMMENT_PATH_FORMAT, $ts);
 		return $base;
-	}
-		
-	function metadataFields() {
-		$ret = array();
-		$ret["PostID"] =  $this->id;
-		$ret["UserID"] =  $this->uid;
-		$ret["Name"] =  $this->name;
-		$ret["E-Mail"] =  $this->email;
-		$ret["URL"] = $this->url;
-		$ret["Date"] =  $this->date;
-		$ret["PostDate"] = $this->post_date;
-		$ret["Timestamp"] =  $this->timestamp;
-		$ret["PostTimestamp"] = $this->post_ts;
-		$ret["Timestamp"] =  $this->timestamp;
-		$ret["IP"] =  $this->ip;
-		$ret["Subject"] =  $this->subject;
-		return $ret;
-	}
-		
-	function addMetadata($key, $val) {
-		switch ($key) {
-			case "PostID": $this->id = $val; break;
-			case "UserID": $this->uid = $val; break;
-			case "Name": $this->name = $val; break;
-			case "E-Mail": $this->email = $val; break;
-			case "URL": $this->url = $val; break;
-			case "Date": $this->date = $val; break;
-			case "PostDate": $this->post_date = $val; break;
-			case "Timestamp": $this->timestamp = $val; break;
-			case "PostTimestamp": $this->post_ts = $val; break;
-			case "Timestamp": $this->timestamp = $val; break;
-			case "IP": $this->ip = $val; break;
-			case "Subject": $this->subject = $val; break;
-		}
 	}
 		
 	/*
@@ -388,15 +337,6 @@ class BlogComment extends Entry {
 		} else {
 			return NewEntry();
 		}
-		#return NewEntry();
-		#$par_path = dirname(dirname($this->file));
-		#if (strpos($par_path, BLOG_ENTRY_PATH)) {
-		#	return NewBlogEntry($par_path);
-		#} elseif (strpos($par_path, BLOG_ARTICLE_PATH)) {
-		#	return NewArticle($par_path);
-		#} else {
-		#	return false;
-		#}
 	}
 
 	/*

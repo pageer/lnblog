@@ -114,11 +114,15 @@ function handle_uploads(&$ent) {
 	global $SYSTEM;
 	$err = array();
 	$num_uploads = $SYSTEM->sys_ini->value("entryconfig",	"AllowInitUpload", 1);
+	
 	for ($i=1; $i<=$num_uploads; $i++) {
 		$upld = NewFileUpload('upload'.$i, $ent->localpath());
 		if ( $upld->completed() ) {
 			$upld->moveFile();
-		} elseif ($upld->status() != FILEUPLOAD_NO_FILE) {
+		} elseif ( ( $upld->status() != FILEUPLOAD_NO_FILE && 
+		             $upld->status() != FILEUPLOAD_NOT_INITIALIZED ) ||
+		           ( $upld->status() == FILEUPLOAD_NOT_INITIALIZED &&
+		            ! defined("UPLOAD_IGNORE_UNINITIALIZED") ) ) {
 			$ret = false;
 			$err[] = $upld->errorMessage();
 		}

@@ -1,6 +1,15 @@
+26-Feb-2007:
+- Added wrapper upgrade check to loginops sidebar plugin.
+- Comments, trackbacks, pingbacks, and user files are now XML.
+- Added a "manage replies" feature to delete (and, in the future, do other 
+things to) comments and other replies.  This applies to blogs, 
+entries/articles, and all levels of archives.
+- Added sane URL support for comments, trackbacks, and pingbacks,
+as well as adding inheritance support to the BlogEntry URI class.
+
 22-Feb-2007:
 - Lots of file consolidation.  Moved many of the small page files into just a
-few.
+few "wrapper wrappers".
 - Added sane URL calculation for Blog and BlogEntry objects.
 
 09-Feb-2007:

@@ -51,7 +51,8 @@ function show_base_archives(&$blog) {
 	
 	if ($SYSTEM->canModify($blog))
 		$footer_text .= ' | <a href="'.
-		                $blog->uri('manage_reply').'">'.
+		                $blog->uri('manage_all').'">'.
+		                #make_uri(false, array('action'=>'manage_reply'), false).
 		                _("Manage replies").'</a>';
 	
 	$tpl->set('LIST_TITLE', get_list_title($blog));
@@ -93,7 +94,9 @@ function show_year_archives(&$blog, $year) {
 	}
 	
 	if ($SYSTEM->canModify($blog))
-		$footer_text .= ' | <a href="'.$blog->uri('manage_reply', 'year='.$year).'">'.
+		$footer_text .= ' | <a href="'.
+		                $blog->uri('manage_year', $year).'">'.
+		                #make_uri(false, array('action'=>'manage_reply'), false).
 		                _("Manage replies").'</a>';
 	$footer_text .= " | ".
 	                '<a href="'.$blog->uri('archives').'/">'.
@@ -112,9 +115,11 @@ function show_year_archives(&$blog, $year) {
 
 function show_month_archives(&$blog, $year, $month) {
 	global $SYSTEM;
+	global $PAGE;
 	$list = $blog->getMonth($year, $month);
 
 	if ( strtolower(GET('show')) == 'all' ) {
+		$PAGE->addStylesheet("entry.css");
 		return $blog->getWeblog();
 	} else {
 		
@@ -128,7 +133,7 @@ function show_month_archives(&$blog, $year, $month) {
 		$footer_text = '<a href="?show=all">'.
 		               _("Show all entries at once").'</a>'.
 		               ($SYSTEM->canModify($blog) ?
-		                ' | <a href="'.$blog->uri('manage_reply', "year=$year", "month=$month").'">'.
+		                ' | <a href="'.$blog->uri('manage_month', $year, $month).'">'.
 		                _("Manage replies").'</a>' : '').
 		               ' | <a href="'.$blog->getURL().BLOG_ENTRY_PATH."/$year/".
 		               '">'.spf_("Back to archive of %s", $year).'</a>';

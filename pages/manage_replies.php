@@ -159,7 +159,8 @@ function get_reply_list(&$blog, &$ent) {
 function get_archive_objects(&$blog, $type) {
 	$ret = array();
 	if (isset($_GET['year']) && isset($_GET['month'])) {
-		$ents = $blog->getMonth(GET('year'), GET('month'));
+		$ents = $blog->getMonth(sanitize(GET('year'), '/\D/'), 
+		                        sanitize(GET('month'), '/\D/'));
 	} elseif (isset($_GET['year'])) {
 		$ents = $blog->getYear(sanitize(GET('year'), '/\D/'));
 	} else {
@@ -216,12 +217,15 @@ function get_title($main_obj, $type) {
 		case 'comment':
 			$ret = $date ? spf_("Comments on entries for %s", $date):
 			               spf_("All comments on '%s'", $title);
+			break;
 		case 'trackback':
 			$ret = $date ? spf_("TrackBacks on entries for %s", $date):
 			               spf_("All TrackBacks for '%s'", $title);
+			break;
 		case 'pingback':
 			$ret = $date ? spf_("Pingbacks on entries for %s", $date):
 			               spf_("All Pingbacks for '%s'", $title);
+			break;
 		default:
 			$ret = $date ? spf_("Replies on entries for %s", $date):
 			               spf_("All replies for '%s'", $title);

@@ -64,6 +64,9 @@ class LoginOps extends Plugin {
 <li><a href="<?php echo INSTALL_ROOT_URL; ?>"><?php p_("Site administration"); ?></a></li>
 <?php } ?>
 <li><a href="<?php echo $blg->uri('logout'); ?>"><?php pf_("Logout %s", $usr->username());; ?></a></li>
+<?php if ($blg->sw_version < REQUIRED_VERSION) { ?>
+<li><?php pf_("Blog is at version %s.  Update required.", $blg->sw_version);?></li>
+<?php } ?>
 </ul>
 <?php if ($SYSTEM->canModify($blg,$usr)) { ?>
 <h3>Plugin Configuration</h3>

@@ -91,11 +91,12 @@ class System {
 	function getUserList() {
 		if (! is_dir(USER_DATA_PATH)) return false;
 		$dirhand = opendir(USER_DATA_PATH);
+		
 		$ret = array();
 		while ( false !== ($ent = readdir($dirhand)) ) {
 			# Should we check for user.ini, passwd.php, or both?
 			if ($ent != "." && $ent != ".." &&
-			    file_exists(mkpath(USER_DATA_PATH,$ent,"user.ini"))) {
+			    file_exists(mkpath(USER_DATA_PATH,$ent,"user.xml"))) {
 					$ret[] = NewUser($ent);
 			}
 		}

@@ -41,6 +41,7 @@ function populate_fields(&$tpl) {
 }
 
 global $PAGE;
+global $SYSTEM;
 $redir_page = "index.php";
 $tpl = NewTemplate(CREATE_LOGIN_TEMPLATE);
 

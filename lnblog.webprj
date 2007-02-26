@@ -60,27 +60,17 @@
     <item url="pages/" uploadstatus="1" />
     <item modified_time="1163221328" url="pages/blogpaths.php" uploadstatus="1" />
     <item modified_time="1155677258" url="pages/config.php" uploadstatus="1" />
-    <item modified_time="1148797430" url="pages/delcomment-old.php" uploadstatus="1" />
     <item modified_time="1159692952" url="pages/delcomment.php" uploadstatus="1" />
     <item modified_time="1161053198" url="pages/delentry.php" uploadstatus="1" />
-    <item modified_time="1164163331" url="pages/editentry.php" uploadstatus="1" />
     <item modified_time="1163437196" url="pages/editfile.php" uploadstatus="1" />
     <item modified_time="1155791430" url="pages/editlogin.php" uploadstatus="1" />
     <item modified_time="1148797430" url="pages/fileupload.php" uploadstatus="1" />
-    <item desc="" modified_time="1164163180" url="pages/newentry.php" uploadstatus="1" />
     <item modified_time="1164770328" url="pages/pagelib.php" uploadstatus="1" />
     <item modified_time="1148797430" url="pages/showall.php" uploadstatus="1" />
     <item modified_time="1148797430" url="pages/showarticles.php" uploadstatus="1" />
     <item modified_time="1157593836" url="pages/showblog.php" uploadstatus="1" />
-    <item modified_time="1163221588" url="pages/showcomments.php" uploadstatus="1" />
-    <item modified_time="1158197416" url="pages/showday.php" uploadstatus="1" />
-    <item modified_time="1160792832" url="pages/showentry.php" uploadstatus="1" />
-    <item modified_time="1163210784" url="pages/showmonth.php" uploadstatus="1" />
-    <item modified_time="1164770820" url="pages/showpingbacks.php" uploadstatus="1" />
-    <item modified_time="1163035338" url="pages/showtrackbacks.php" uploadstatus="1" />
     <item modified_time="1156200050" url="pages/sitemap.php" uploadstatus="1" />
     <item modified_time="1163211322" url="pages/tagsearch.php" uploadstatus="1" />
-    <item modified_time="1165441646" url="pages/tb_ping.php" uploadstatus="1" />
     <item modified_time="1162601346" url="pages/updateblog.php" uploadstatus="1" />
     <item url="plugins/" uploadstatus="1" />
     <item modified_time="1154477332" url="plugins/banner_pageheader.php" uploadstatus="1" />
@@ -109,11 +99,6 @@
     <item modified_time="1163204798" url="plugins/sidebar_tags.php" uploadstatus="1" />
     <item modified_time="1153862256" url="plugins/trackbackrdf.php" uploadstatus="1" />
     <item modified_time="1156283836" url="plugins/trackback_validator.php" uploadstatus="1" />
-    <item url="sajax/" uploadstatus="0" />
-    <item modified_time="1148797430" url="sajax/Changes.txt" uploadstatus="0" />
-    <item modified_time="1148797430" url="sajax/Readme-LnBlog.txt" uploadstatus="0" />
-    <item modified_time="1148797430" url="sajax/Readme.txt" uploadstatus="0" />
-    <item modified_time="1148797430" url="sajax/Sajax.php" uploadstatus="0" />
     <item url="themes/" uploadstatus="1" />
     <item url="themes/clean/" uploadstatus="1" />
     <item url="themes/clean/styles/" uploadstatus="1" />
@@ -260,7 +245,6 @@
     <item modified_time="1163303558" url="userdata/pageer/user.ini" uploadstatus="0" />
     <item url="userdata/plugins/" uploadstatus="0" />
     <item modified_time="1162861360" url="userdata/plugins/bot_block.php" uploadstatus="0" />
-    <item modified_time="1153513292" url="userdata/plugins/hide_sidebar.php" uploadstatus="0" />
     <item modified_time="1163282192" url="userdata/plugins/sidebar_contact.php" uploadstatus="0" />
     <item modified_time="1162861530" url="userdata/plugins/sidebar_recentcomments.php" uploadstatus="0" />
     <item modified_time="1161387162" url="userdata/groups.ini" uploadstatus="0" />
@@ -276,8 +260,6 @@
     <item modified_time="1148797428" url="xmlrpc/xmlrpc.inc" uploadstatus="1" />
     <item modified_time="1148797428" url="xmlrpc/xmlrpcs.inc" uploadstatus="1" />
     <item modified_time="1163220016" url="blogconfig.php" uploadstatus="1" />
-    <item modified_time="1149685916" url="blogger1_test.php" uploadstatus="1" />
-    <item modified_time="1150812956" url="blogger.php" uploadstatus="1" />
     <item modified_time="1150812956" url="bloglogin.php" uploadstatus="1" />
     <item modified_time="1148797432" url="bloglogout.php" uploadstatus="1" />
     <item modified_time="1163450456" url="BUGS" uploadstatus="1" />
@@ -295,7 +277,6 @@
     <item modified_time="1148797430" url="mkdist.sh" uploadstatus="0" />
     <item modified_time="1155676084" url="newblog.php" uploadstatus="1" />
     <item modified_time="1152399186" url="newlogin.php" uploadstatus="1" />
-    <item modified_time="1160687150" url="pingback.php" uploadstatus="1" />
     <item modified_time="1153119772" url="pingback_test.php" uploadstatus="1" />
     <item modified_time="1163201738" url="plugin_loading.php" uploadstatus="1" />
     <item modified_time="1155687278" url="plugin_setup.php" uploadstatus="1" />
@@ -310,19 +291,7 @@
     <templates>templates/</templates>
     <toolbars>toolbars/</toolbars>
     <annotations/>
-    <author>Peter A. Geer</author>
-    <email>pageer@skepticats.com</email>
-    <debuggerclient persistentWatches="0" persistentBreakpoints="0" >No Debugger</debuggerclient>
-    <exclude cvsignore="false" />
-    <teamdata>
-      <taskleaders/>
-      <subprojectleaders/>
-      <mailinglist address="" />
-    </teamdata>
-    <events/>
     <item modified_time="1163200716" url="lib/xml.php" uploadstatus="1" />
-    <item modified_time="1162594390" url="userdata/plugins/menubar_breadcrumbs.php" uploadstatus="1" />
-    <item modified_time="1163123738" url="userdata/plugins/sidebar_blogroll.php" uploadstatus="1" />
     <item modified_time="1162861718" url="userdata/plugins.ini" uploadstatus="1" />
     <item modified_time="1164770828" url="lnblog.webprj" uploadstatus="0" />
     <item modified_time="1163221296" url="themes/skepticats/styles/entry.css" uploadstatus="1" />
@@ -360,7 +329,22 @@
     <item url="xmlrpc/old/xmlrpcs.inc" uploadstatus="1" />
     <item url="xmlrpc/xmlrpc_wrappers.inc" uploadstatus="1" />
     <item url="ajax_server.php" uploadstatus="1" />
-    <item url="pages/showarchive-old.php" uploadstatus="1" />
     <item url="pages/showarchive.php" uploadstatus="1" />
+    <author>Peter A. Geer</author>
+    <email>pageer@skepticats.com</email>
+    <debuggerclient persistentWatches="0" persistentBreakpoints="0" >No Debugger</debuggerclient>
+    <exclude cvsignore="false" >.svn</exclude>
+    <teamdata>
+      <taskleaders/>
+      <subprojectleaders/>
+      <mailinglist address="" />
+    </teamdata>
+    <events/>
+    <item url="pages/showitem.php" uploadstatus="1" />
+    <item url="plugins/bot_block.php" uploadstatus="1" />
+    <item url="themes/clean/images/" uploadstatus="1" />
+    <item url="themes/clean/scripts/" uploadstatus="1" />
+    <item url="themes/clean/styles/main.css" uploadstatus="1" />
+    <item url="themes/default/templates/sidebar_panel_tpl.php" uploadstatus="1" />
   </project>
 </webproject>

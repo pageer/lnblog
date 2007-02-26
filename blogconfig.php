@@ -105,11 +105,6 @@ if (file_exists($cfg_file)) {
 	}
 }
 
-if (defined("DOCUMENT_ROOT") && ! is_dir(DOCUMENT_ROOT) &&  
-    (! defined("CHECK_DOCUMENT_ROOT") || CHECK_DOCUMENT_ROOT == true) ) {
-	echo "The document root is defined as ".DOCUMENT_ROOT.", but the is_dir(DOCUMENT_ROOT) check failed.  Your installation is broken.  Edit your ".FS_PLUGIN_CONFIG." file to reflect the correct document root directory or ensure that PHP can read that directory and its parent.<br />This message was generated from the file ".__FILE__;
-}
-
 # Define config files for various parts of the plugin framework.
 @define("FS_PLUGIN_CONFIG", "fsconfig.php");
 
@@ -117,6 +112,11 @@ if (defined("DOCUMENT_ROOT") && ! is_dir(DOCUMENT_ROOT) &&
 # directory in the path.  So we can just include userdata/fsconfig.php and not
 # have to worry about the exact path.
 @include_once(USER_DATA."/".FS_PLUGIN_CONFIG);
+
+if (defined("DOCUMENT_ROOT") && ! is_dir(DOCUMENT_ROOT) &&  
+    (! defined("CHECK_DOCUMENT_ROOT") || CHECK_DOCUMENT_ROOT == true) ) {
+	echo "The document root is defined as ".DOCUMENT_ROOT.", but the is_dir(DOCUMENT_ROOT) check failed.  Your installation is broken.  Edit your ".FS_PLUGIN_CONFIG." file to reflect the correct document root directory or ensure that PHP can read that directory and its parent.<br />This message was generated from the file ".__FILE__;
+}
 
 # If we do not have the INSTALL_ROOT defined from a previously included
 # pathconfig.php, then we need to take care of that.  We'll try to get the
@@ -209,11 +209,18 @@ define("PACKAGE_NAME", "LnBlog");
 # Constant: PACKAGE_VERSION
 # The version number of the software.  This is a string in the format 
 # "1.2.3".  Note that each number may be more than one digit.
-define("PACKAGE_VERSION", "0.8.2");
+define("PACKAGE_VERSION", "0.9.0");
+
+# Constant: REQUIRED_VERSION
+# The minimum software version required by your blog to properly
+# support this versino of LnBlog.  In other words, if your blog is
+# at less than this version number, you should upgrade it from the
+# main admin page.
+define("REQUIRED_VERSION", "0.9.0");
 
 # Constant: PACKAGE_URL
 # The full URL of the LnBlog project home page.
-define("PACKAGE_URL", "http://www.skepticats.com/lnblog/");
+define("PACKAGE_URL", "http://lnblog.skepticats.com/");
 
 # Add I18N support here, as this is currently the earliest we can do it.
 # Refer to the lib/i18n.php file for details.
@@ -330,6 +337,18 @@ if (ini_get("default_mimetype")) {
 # characters.  By *default*, this is not set.  When it is set *and* the 
 # iconv extension is enabled, then the dates will be converted from this 
 # character set to the <DEFAULT_CHARSET>.
+
+# Constant: UPLOAD_IGNORE_UNINITIALIZED
+# Work around browsers that don't send form elements for undisplayed uploads.
+#
+# This constand works around a bug raised while testing under Konqueror.  When 
+# an entry was posted without ever showing the file upload box, i.e. the advanced
+# posting options were never expanded, the browser did not send any form field for
+# the upload field.  This resulted in an invalid field error raised by LnBlog instead
+# of the expected empty file.  
+#
+# If you get "invalid field name - upload not initiated" errors when you try to 
+# post an entry,but were not trying to upload a file with it, then set this to true.
 
 /*
 Constant: LOCALPATH_TO_URI_MATCH_RE

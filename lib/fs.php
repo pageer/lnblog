@@ -133,7 +133,7 @@ class FS {
 	#
 	# Returns:
 	# The octal UNIX permissions used when creating PHP scripts.
-	function scriptMode($mdoe=false) {
+	function scriptMode($mode=false) {
 		if ($mode) $this->script_mode = $mode;
 		return $this->script_mode;
 	}

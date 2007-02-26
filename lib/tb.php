@@ -88,6 +88,8 @@ class Trackback extends LnBlogObject {
 		return $no_escape ? $ret : htmlspecialchars($ret);
 	}
 	
+	function description() { }
+	
 	# Method: getParent
 	# Gets a copy of the parent object.
 	#
@@ -127,22 +129,8 @@ class Trackback extends LnBlogObject {
 	# Get the URI for various functions
 
 	function uri($type) {
-		switch ($type) {
-			case "permalink":
-			case "trackback":
-				return localpath_to_uri(dirname($this->file)).
-				       "#".$this->getAnchor();
-			case "delete":
-				$qs_arr = array();
-				$parent = $this->getParent();
-				$entry_type = is_a($this, 'Article') ? 'article' : 'entry';
-				$qs_arr['blog'] = $parent->parentID();
-				$qs_arr[$entry_type] = $parent->entryID();
-				$qs_arr['delete'] = $this->getAnchor();
-				return make_uri(INSTALL_ROOT_URL."pages/delcomment.php", $qs_arr);
-				#return localpath_to_uri(dirname($this->file)).
-				#       "?delete=".$this->getAnchor();
-		}
+		$uri = create_uri_object($this);
+		return $uri->$type();
 	}
 
 	# Method: getPostData

@@ -1004,6 +1004,28 @@ function get_entry_from_uri($uri) {
 	return $ent;
 }
 
+##############################################
+# Section: HTML String Convenience Functions #
+##############################################
+
+# Function: ahref
+# Creates markup for a hyperlink.
+#
+# Parameters:
+# href    - The URL to link to.
+# text    - The main link text.
+# attribs - An associative array of additional attributes, with the key as the
+#           attribute name.
+function ahref($href, $text, $attribs=false) {
+	$text = htmlspecialchars($text);
+	$base = "<a href=\"$href\"";
+	if ($attribs) {
+		foreach ($attribs as $key=>$val)
+			$base .= " $key=\"$val\"";
+	}
+	return "$base>$text</a>";
+}
+
 
 if (! function_exists('is_a')) {
 	function is_a($obj, $class) {

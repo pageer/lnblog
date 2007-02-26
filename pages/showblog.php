@@ -35,10 +35,13 @@ function show_blog_page(&$blog) {
 
 if ( isset($_GET['action']) ) {
 	if ( strtolower($_GET['action']) == 'newentry' ) {
-		include('newentry.php');
+		include('pages/entryedit.php');
+		exit;
+	} elseif ( strtolower($_GET['action']) == 'delentry' ) {
+		include('pages/delentry.php');
 		exit;
 	} elseif ( strtolower($_GET['action']) == 'edit' ) {
-		include('updateblog.php');
+		include('pages/updateblog.php');
 		exit;
 	} elseif ( strtolower($_GET['action']) == 'login' ) {
 		include('bloglogin.php');
@@ -47,19 +50,19 @@ if ( isset($_GET['action']) ) {
 		include('bloglogout.php');
 		exit;
 	} elseif ( strtolower($_GET['action']) == 'upload' ) {
-		include('fileupload.php');
+		include('pages/fileupload.php');
 		exit;
 	} elseif ( strtolower($_GET['action']) == 'sitemap' ) {
 		include('sitemap.php');
 		exit;
 	} elseif ( strtolower($_GET['action']) == 'useredit' ) {
-		include('editlogin.php');
+		include('pages/editlogin.php');
 		exit;
 	} elseif ( strtolower($_GET['action']) == 'plugins' ) {
 		include('plugin_setup.php');
 		exit;
 	} elseif ( strtolower($_GET['action']) == 'tags' ) {
-		include('tagsearch.php');
+		include('pages/tagsearch.php');
 		exit;
 	} elseif ( strtolower($_GET['action']) == 'pluginload' ) {
 		include('plugin_loading.php');
@@ -68,7 +71,7 @@ if ( isset($_GET['action']) ) {
 		include('userinfo.php');
 		exit;
 	} elseif ( strtolower($_GET['action']) == 'managereply' ) {
-		include('manage_replies.php');
+		include('pages/manage_replies.php');
 		exit;
 	}
 }

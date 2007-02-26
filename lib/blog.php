@@ -1024,7 +1024,7 @@ class Blog extends LnBlogObject {
 		$ret = create_directory_wrappers($path, BLOG_ARTICLES);
 		$files = array_merge($files, $ret);
 		
-		$path = $this->home_path.PATH_DELIM.BLOG_ENTRY_PATH;
+		$path = mkpath($this->home_path, BLOG_ENTRY_PATH);
 		$ret = create_directory_wrappers($path, BLOG_ENTRIES);
 		$files = array_merge($files, $ret);
 		$dir_list = scan_directory($path, true);
@@ -1039,20 +1039,25 @@ class Blog extends LnBlogObject {
 				$files = array_merge($files, $ret);
 				$month_list = scan_directory($month_path, true);
 				foreach ($month_list as $ent) {
-					$ent_path = $month_path.PATH_DELIM.$ent;
-					$cmt_path = $ent_path.PATH_DELIM.ENTRY_COMMENT_DIR;
-					$tb_path = $ent_path.PATH_DELIM.ENTRY_TRACKBACK_DIR;
+					$ent_path = mkpath($month_path, $ent);
+					$cmt_path = mkpath($ent_path, ENTRY_COMMENT_DIR);
+					$tb_path = mkpath($ent_path, ENTRY_TRACKBACK_DIR);
+					$pb_path = mkpath($ent_path, ENTRY_PINGBACK_DIR);
 					$ret = create_directory_wrappers($ent_path, ENTRY_BASE);
 					$files = array_merge($files, $ret);
 					$ret = create_directory_wrappers($cmt_path, ENTRY_COMMENTS);
 					$files = array_merge($files, $ret);
 					$ret = create_directory_wrappers($tb_path, ENTRY_TRACKBACKS);
 					$files = array_merge($files, $ret);
+					$ret = create_directory_wrappers($pb_path, ENTRY_PINGBACKS);
+					$files = array_merge($files, $ret);
 				}
 			}
 		}
 		$path = $this->home_path.PATH_DELIM.BLOG_ARTICLE_PATH;
 		$ret = create_directory_wrappers($path, BLOG_ARTICLES);
+		$path = $this->home_path.PATH_DELIM.BLOG_DRAFT_PATH;
+		$ret = create_directory_wrappers($path, ENTRY_DRAFTS);
 		$files = array_merge($files, $ret);
 		$dir_list = scan_directory($path, true);
 		foreach ($dir_list as $ar) {
@@ -1088,8 +1093,9 @@ class Blog extends LnBlogObject {
 		$dir_list = scan_directory($start_dir, true);
 		$ret = true;
 		foreach ($dir_list as $dir) {
+			#$ext = substr($dir, strlen($dir) - 4);
 			$path = $start_dir.PATH_DELIM.$dir;
-			$ret &= $fs->chmod($path, $fs->defaultMode() );
+			$ret &= $fs->chmod($path, $fs->directoryMode() );
 			$ret &= $this->fixDirectoryPermissions($path);
 		}
 		$fs->destruct();
@@ -1152,6 +1158,9 @@ class Blog extends LnBlogObject {
 		
 		$ret = create_directory_wrappers($blog_path, BLOG_BASE, $inst_path);
 		$ret &= create_directory_wrappers($ent_path, BLOG_ENTRIES);
+		 
+		$this->sw_version = PACKAGE_VERSION;
+		$this->last_upgrade = date('r');
 		 
 		$ret = $this->writeBlogData();
 		$fs->destruct();

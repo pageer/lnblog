@@ -1,6 +1,6 @@
 <?php if (isset($FORM_MESSAGE)) { ?>
 <p><strong style="color: red"><?php echo $FORM_MESSAGE; ?></strong></p>
-<?php } ?>                                                               
+<?php } ?>
 <form method="post" action="<?php echo $FORM_ACTION; ?>">
 <fieldset>
 <legend style="font-weight: bold"><?php p_("Path Information"); ?></legend>
@@ -16,8 +16,10 @@ PACKAGE_NAME);?></p>
 </div>
 <h3><?php p_("Subdomain root and main domain");?></h3>
 <p>
-<?php pf_("If you plan to put blogs on subdomains, %s also needs to know your domain name and your subdomain root directory.  Normally, your host will create a directory for each subdomain you have, and the subdomain root is the directory in which those directories are stored.  For examlpe, if you have subdomains 'bob.example.com' and 'jeff.example.com', which are stored in the directories /home/whatever/www/bob and /home/whatever/www/jeff, then your subdomain root would be /home/whatever/www.", PACKAGE_NAME);?><br />
-<?php pf_("If your host does not support subdomains, or if you do not plan to use them with %s, then leave these boxes empty.", PACKAGE_NAME);?>
+<?php pf_("If your host does not support subdomains, or if you do not plan to use them with %s, then skip this section.", PACKAGE_NAME);?>
+</p>
+<p id="subdom_desc">
+<?php pf_("If you plan to put blogs on subdomains, %s also needs to know your domain name and your subdomain root directory.  Normally, your host will create a directory for each subdomain you have, and the subdomain root is the directory in which those directories are stored.  For examlpe, if you have subdomains 'bob.example.com' and 'jeff.example.com', which are stored in the directories /home/whatever/www/bob and /home/whatever/www/jeff, then your subdomain root would be /home/whatever/www.", PACKAGE_NAME);?>
 </p>
 <div>
 <label for="subdomroot"><?php p_("Subdomain root directory");?></label>
@@ -29,7 +31,7 @@ PACKAGE_NAME);?></p>
 </div>
 </fieldset>
 <h3><?php p_("Configure File Writing"); ?></h3>
-<p><?php pf_('Before using %s, you must configure file writing support.  You can choose from "native" file writing functions or <abbr title="File Transfer Protocol">FTP</abbr> file writing.  In some cases, you must also choose appropriate file permissions.  The correct choice depends on the configuration of your web server.  As a general rule, if you are running PHP as an Apache module and have <strong>safe_mode</strong> enabled, then you must use <abbr title="File Transfer Protocol">FTP</abbr>.  If you are running PHP as CGI using suexec, then you should choose native file writing with default permissions.  You can use the option buttons below to guide your choice.', 
+<p id="filewrite_desc"><?php pf_('Before using %s, you must configure file writing support.  You can choose from "native" file writing functions or <abbr title="File Transfer Protocol">FTP</abbr> file writing.  In some cases, you must also choose appropriate file permissions.  The correct choice depends on the configuration of your web server.  As a general rule, if you are running PHP as an Apache module and have <strong>safe_mode</strong> enabled, then you must use <abbr title="File Transfer Protocol">FTP</abbr>.  If you are running PHP as CGI using suexec, then you should choose native file writing with default permissions.  You can use the option buttons below to guide your choice.', 
 PACKAGE_NAME, PACKAGE_NAME); ?></p>
 <fieldset>
 <legend style="font-weight: bold"><?php p_("Common configurations");?></legend>

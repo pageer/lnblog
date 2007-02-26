@@ -1,6 +1,7 @@
 <?php
 
-# Plugin: 
+# Plugin: Articles
+#
 
 class Articles extends Plugin {
 
@@ -49,36 +50,39 @@ class Articles extends Plugin {
 		if (! $blg->isBlog()) return false;
 		
 		$art_list = $blg->getArticleList();
+		$tpl = NewTemplate("sidebar_panel_tpl.php");
+		$items = array();
+
+		if (count($art_list) > 0) {
 		
-		if (count($art_list) > 0) { 
-			if ($this->header) { /* Suppress empty header */ ?>
-<h3><a href="<?php echo $blg->uri('articles'); ?>/"><?php echo $this->header; ?></a></h3><?php
-			} ?>
-<ul>
-<?php	
-			foreach($art_list as $dir) { ?>
-<li><a href="<?php echo $dir["link"]; ?>"><?php echo htmlspecialchars($dir["title"]); ?></a></li>
-<?php 
-			} # End foreach loop 
-			if (is_file($blg->home_path.PATH_DELIM.$this->custom_links)) {
-				$data = file($blg->home_path.PATH_DELIM.$this->custom_links);
-				foreach ($data as $line) {
-?><li><?php echo $line;?></li><?php
-				}
+			if ($this->header) {
+				$tpl->set("PANEL_TITLE",
+				          ahref($blg->uri('articles'), $this->header));
 			}
-			if ($this->static_link) { /*Optionally show link to article index*/?>
-<li style="margin-top: 0.5em"><a href="<?php echo $blg->uri('articles'); ?>"><?php echo $this->showall_text;?></a></li><?php
+			
+			foreach ($art_list as $art) {
+				$items[] = ahref($art['link'], htmlspecialchars($art['title']));
+			}
+			
+			if ( is_file(mkpath($blg->home_path, $this->custom_links)) ) {
+				$data = file(mkpath($blg->home_path, $this->custom_links));
+				foreach ($data as $line) $items[] = $line;
+			}
+			
+			if ($this->static_link) {
+				$items[] = array('description'=>ahref($blg->uri('articles'), $this->showall_text),
+				                 'style'=>'margin-top: 0.5em');
 			} 
+		
 			if ($SYSTEM->canModify($blg, $u)) {
-?><li style="margin-top: 0.5em"><a href="<?php echo $blg->uri('editfile', 'file='.$this->custom_links, 'list=yes');?>"><?php p_("Add custom links");?></a></li>
-<?php
-			}?>
-</ul>
-<?php 	
-		} elseif ($SYSTEM->canModify($blg, $u)) { ?>
-<ul><li style="margin-top: 0.5em"><a href="<?php 
-	echo $blg->uri('editfile', 'file='.$this->custom_links, 'list=yes');?>"><?php p_("Add custom links");?></a></li></ul><?php
-		} # End if block 
+				$items[] = array('description'=>ahref($blg->uri('editfile', $this->custom_links),
+				                                      _("Add custom links")),
+				                 'style'=>'margin-top: 0.5em');
+			}
+
+			$tpl->set('PANEL_LIST', $items);
+			echo $tpl->process();
+		}
 	}  # End function
 	
 }

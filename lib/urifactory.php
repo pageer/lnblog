@@ -18,79 +18,41 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-/*
-class AbstractURIFactory extends LnBlogObject {
-	
-	function AbstractURIFactory() {}
-	
-	function getURI(&$object, &$type) {
-		$type = strtolower(get_class($object));
-		
-		switch ($type) {
-			case "blog":
-				$conc_obj = new BlogURIFactory($object);
-				break;
-			case "blogentry":
-				$conc_obj = new BlogEntryURIFactory($object);
-				break;
-			case "article":
-				$conc_obj = new ArticleURIFactory($object);
-				break;
-			case "blogcomment":
-				$conc_obj = new BlogCommentURIFactory($object);
-				break;
-			case "trackback":
-				$conc_obj = new TrackbackURIFactory($object);
-				break;
-			case "pingback":
-				$conc_obj = new PingbackURIFactory($object);
-				break;
-		}
-		
-		return $conc_obj;
-	}
-}
-*/
+# Function: create_uri_object
+# Gets the appropriate URI generator class for a given object and type.  
+# Basically, this the lazy dynamic programmer's version of a factory pattern.
+#
+# Parameters:
+# object - The object for which to get a URI generator.  The class of the object
+#          determines the class returned.  Note that this function supports 
+#          one level of inheritance, i.e. if the class doesn't have a URI class
+#          of its own, the parent class's is used.
+# type   - Optional boolean that determines what kind of URI we're using, e.g.
+#          querystring, htaccess, or wrapper scripts.  If not specified, then
+#          the value of the URI_TYPE configuration constant is used.
+#
+# Returns:
+# A URI generator object.  The exact object type is determined by the parameters
+# to this function call.
 function create_uri_object(&$object, $type=false) {
 	$objtype = get_class($object);
+	$partype = get_parent_class($object);
 	if (!$type) $type = URI_TYPE;
 	switch ($type) {
 		case "querystring":
-			$creator = $objtype."URIQueryString";
-			return new $creator($object);
+			$type_ext = "URIQueryString";
 			break;
 		case "htaccess":
-			$creator = $objtype."URIhtaccess";
-			return new $creator($object);
+			$type_ext = "URIhtaccess";
 			break;
 		default:
-			$creator = $objtype."URIWrapper";
-			return new $creator($object);
+			$type_ext = "URIWrapper";
 	}
+	$creator = $objtype.$type_ext;
+	if (! class_exists($creator)) $creator = $partype.$type_ext;
+	return new $creator($object);
 }
-/*
-class BlogURIFactory extends LnBlogObject {
-	
-	function BlogURIFactory(&$blog) {
-		$this->object = $blog;
-	}
-	
-	function doFactory($type=false) {
-		if (!$type) $type = URI_TYPE;
-		switch ($type) {
-			case "querystring":
-				return new BlogURIQueryString($this->object);
-				break;
-			case "htaccess":
-				return new BlogURIhtaccess($this->object);
-				break;
-			default:
-				return new BlogURIWrapper($this->object);
-		}
-	}
-	
-}
-*/
+
 class BlogURIWrapper extends LnBlogObject {
 	
 	function BlogURIWrapper(&$blog) {
@@ -101,16 +63,16 @@ class BlogURIWrapper extends LnBlogObject {
 	
 	function setEscape($val) { $this->separator = $val ? "&amp;" : "&"; }
 	
-	function peramlink() { return $this->base_uri; }
+	function permalink() { return $this->base_uri; }
 	function base() { return $this->base_uri; }
 	function blog() { return $this->base_uri; }
 	function page() { return $this->base_uri; }
 	
 	function articles() { return $this->base_uri.BLOG_ARTICLE_PATH."/"; }
 	function entries() { return $this->base_uri.BLOG_ENTRY_PATH."/"; }
-	function archives() { return $this->base_uri.BLOG_ENTRY_PATH."/"; }
+	function archives() { return $this->entries(); }
 	function drafts() { return $this->base_uri.BLOG_DRAFT_PATH."/"; }
-	function listdrafts() { return $this->base_uri.BLOG_DRAFT_PATH."/"; }
+	function listdrafts() { return $this->drafts(); }
 	
 	function year($year) { 	
 		return $this->base_uri.BLOG_ENTRY_PATH.sprintf("/%04d/", $year);
@@ -134,7 +96,7 @@ class BlogURIWrapper extends LnBlogObject {
 		$qs = '';
 		if (is_array($qs_arr)) {
 			foreach ($qs_arr as $key=>$val) {
-				$qs = $this->separator."$key=$val";
+				$qs .= $this->separator."$key=$val";
 			}
 		}
 		return $this->base_uri."?action=$action".$qs;
@@ -144,9 +106,19 @@ class BlogURIWrapper extends LnBlogObject {
 	function addarticle() {
 		return $this->wrapper("newentry", array("type"=>"article"));
 	}
+	function delentry($entryid) {
+		return $this->wrapper("delentry", array('entry'=>$entryid));
+	}
 	function upload() { return $this->wrapper("upload"); }
 	function edit() { return $this->wrapper("edit"); }
 	function manage_reply() { return $this->wrapper("managereply"); }
+	function manage_all() { return $this->wrapper("managereply"); }
+	function manage_year($year) {
+		return $this->wrapper("managereply", array('year'=>$year));
+	}
+	function manage_month($year, $month) {
+		return $this->wrapper("managereply", array('year'=>$year, 'month'=>$month));
+	}
 	function login() { return $this->wrapper("login"); }
 	function logout() { return $this->wrapper("logout"); }
 	function editfile() { return $this->wrapper("editfile"); }
@@ -171,6 +143,8 @@ class BlogEntryURIWrapper extends LnBlogObject {
 		$this->base_uri = localpath_to_uri(dirname($ent->file));
 		$this->separator = "&amp;";
 	}
+	
+	function setEscape($val) { $this->separator = $val ? "&amp;" : "&"; }
 	
 	function permalink() {
 		$ent =& $this->object;
@@ -220,23 +194,7 @@ class BlogEntryURIWrapper extends LnBlogObject {
 	function pingback() { return $this->base_uri.ENTRY_PINGBACK_DIR."/"; }
 	function upload() {return $this->base_uri."/?action=upload"; }
 	
-	function edit() {
-		return $this->base_uri."?action=edit";
-		/*
-		$ent =& $this->object;
-		if ($ent->isDraft()) {
-			$entry_type = 'draft';
-		} else {
-			$entry_type = is_a($ent, 'Article') ? 'article' : 'entry';
-		}
-		return $this->base_uri."?$entry_type=".$ent->entryID();
-		*/
-		#$qs_arr['blog'] = $this->parentID();
-		#$qs_arr[$entry_type] = $this->entryID();
-		#return make_uri(INSTALL_ROOT_URL."pages/entryedit.php", 
-		#                array("blog"     =>$this->parentID(), 
-		#                      $entry_type=>$this->entryID()));
-	}
+	function edit() { return $this->base_uri."?action=edit"; }
 	
 	function delete() {
 		$ent =& $this->object;
@@ -253,6 +211,50 @@ class BlogEntryURIWrapper extends LnBlogObject {
 	function manage_reply() {
 		return $this->base_uri."?action=managereplies";
 	}
+	function managereply() { return $this->manage_reply(); }
 }
 
+class BlogCommentURIWrapper extends LnBlogObject {
+	function BlogCommentURIWrapper(&$ent) {
+		$this->object = $ent;
+		$this->base_uri = localpath_to_uri(dirname($ent->file));
+		$this->separator = "&amp;";
+	}
+	
+	function setEscape($val) { $this->separator = $val ? "&amp;" : "&"; }
+	
+	function permalink() { return $this->base_uri."#".$this->object->getAnchor(); }
+	function comment() { return $this->permalink(); }
+	function delete() {
+		$qs_arr = array();
+		$parent = $this->object->getParent();
+		$entry_type = is_a($this->object, 'Article') ? 'article' : 'entry';
+		$qs_arr['blog'] = $parent->parentID();
+		$qs_arr[$entry_type] = $parent->entryID();
+		$qs_arr['delete'] = $this->object->getAnchor();
+		return make_uri(INSTALL_ROOT_URL."pages/delcomment.php", $qs_arr);
+	}
+}
+
+class TrackbackURIWrapper extends LnBlogObject {
+	function TrackbackURIWrapper(&$ent) {
+		$this->object = $ent;
+		$this->base_uri = localpath_to_uri(dirname($ent->file));
+		$this->separator = "&amp;";
+	}
+	
+	function setEscape($val) { $this->separator = $val ? "&amp;" : "&"; }
+
+	function trackback() { return $this->base_uri."#".$this->object->getAnchor(); }
+	function permalink() { return $this->trackback(); }
+	function delete() {
+		$qs_arr = array();
+		$parent = $this->object->getParent();
+		$entry_type = is_a($this->object, 'Article') ? 'article' : 'entry';
+		$qs_arr['blog'] = $parent->parentID();
+		$qs_arr[$entry_type] = $parent->entryID();
+		$qs_arr['delete'] = $this->object->getAnchor();
+		return make_uri(INSTALL_ROOT_URL."pages/delcomment.php", $qs_arr);
+	}
+}
 ?>

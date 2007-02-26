@@ -70,28 +70,6 @@ class Pingback extends Trackback {
 		$id .= '/#'.$this->getAnchor();
 	}
 	
-	# Method: uri
-	# Get the URI for various functions
-
-	function uri($type) {
-		switch ($type) {
-			case "permalink":
-			case "pingback":
-				return localpath_to_uri(dirname($this->file)).
-				       "#".$this->getAnchor();
-			case "delete":
-				$qs_arr = array();
-				$parent = $this->getParent();
-				$entry_type = is_a($this, 'Article') ? 'article' : 'entry';
-				$qs_arr['blog'] = $parent->parentID();
-				$qs_arr[$entry_type] = $parent->entryID();
-				$qs_arr['delete'] = $this->getAnchor();
-				return make_uri(INSTALL_ROOT_URL."pages/delcomment.php", $qs_arr);
-				#return localpath_to_uri(dirname($this->file)).
-				#       "?delete=".$this->getAnchor();
-		}
-	}
-	
 	# Method: insert
 	# Stores the pingback data in a file.  It is assumed that the source, 
 	# target, title, and excerpt properties are set externally.
@@ -246,9 +224,9 @@ class Pingback extends Trackback {
 		return $tpl->process();
 	}
 	
-	# The following Trackback methods are not to be inherited by subclasses.  
-	# However, PHP4 does not have a way to express this.  Therefore I'll just 
-	# put them here and give them an empty implementation.
+	# The following Trackback methods are private and are not to be inherited by
+	# subclasses.  However, PHP4 does not have a way to express this.  Therefore
+	# I'll just put them here and give them an empty implementation.
 	function incomingPing() { return false; }
 	function send() { return false; }
 	function receive() { return false; }

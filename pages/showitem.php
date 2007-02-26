@@ -48,7 +48,7 @@ function show_comment_page(&$blg, &$ent, &$usr) {
 		$content = '<p>'._('Comments are closed on this entry.').'</p>';
 	}
 	$content .= $comm_output;
-	
+
 	$PAGE->addScript("entry.js");
 	
 	return $content;

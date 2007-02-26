@@ -23,7 +23,8 @@
  * register, and fire events.  It also has contains other general-purpose
  * methods, such as simple XML serialization.
  */
-
+require_once("lib/xml.php");
+ 
 class LnBlogObject {
 	
 	function LnBlogObject() {}
