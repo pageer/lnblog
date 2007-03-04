@@ -17,6 +17,12 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
+if (isset($_GET['action']) && $_GET['action'] == 'edit') {
+	include('entryedit.php');
+	exit;
+}
+
 session_start();
 
 require_once("config.php");
@@ -25,7 +31,7 @@ require_once("lib/creators.php");
 function draft_item_markup(&$ent) {
 	global $blog;
 	$del_uri = $ent->uri('delete');
-	$edit_uri = $ent->uri('edit');
+	$edit_uri = $ent->uri('editDraft');
 	$title = $ent->subject ? $ent->subject : $ent->date;
 	$ret = '<a href="'.$edit_uri.'">'.$title.'</a> '.
 	       '(<a href="'.$del_uri.'">'._("Delete").'</a>)';

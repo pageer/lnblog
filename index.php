@@ -90,9 +90,10 @@ if (! $SYSTEM->hasAdministrator()) {
 }
 
 if ( POST('upgrade') && POST('upgrade_btn') ) {
-	if (is_absolute(POST('upgrade'))) $upgrade_path = trim(POST('upgrade'));
-	else $upgrade_path = calculate_document_root().PATH_DELIM.trim(POST('upgrade'));
-	$b = NewBlog($upgrade_path);
+	#if (is_absolute(POST('upgrade'))) $upgrade_path = trim(POST('upgrade'));
+	#else $upgrade_path = calculate_document_root().PATH_DELIM.trim(POST('upgrade'));
+	#$b = NewBlog($upgrade_path);
+	$b = NewBlog(POST('upgrade'));
 	$file_list = $b->upgradeWrappers();
 	if (empty($file_list)) {
 		$status = spf_("Upgrade of %s completed successfully.",

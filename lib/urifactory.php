@@ -195,6 +195,11 @@ class BlogEntryURIWrapper extends LnBlogObject {
 	function upload() {return $this->base_uri."/?action=upload"; }
 	
 	function edit() { return $this->base_uri."?action=edit"; }
+	function editDraft() {
+		$b = NewBlog();
+		return make_uri($b->uri('drafts'), 
+		                array('action'=>'edit', 'draft'=>$this->object->entryID()));
+	}
 	
 	function delete() {
 		$ent =& $this->object;

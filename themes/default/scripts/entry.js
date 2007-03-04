@@ -1,5 +1,5 @@
 function comm_del(ctrl, label) {
-	var res = window.confirm("Really delete "+label+"?");
+	var res = window.confirm(strings.get('entry_deleteConfirm', label));
 	if (res) {
 		if (ctrl.href.lastIndexOf('?') >= 0) {
 			ctrl.href=ctrl.href+'&conf=yes';

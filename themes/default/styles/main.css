@@ -184,11 +184,11 @@ background image.  Let this be replaced with the underline on hover.
 	background-repeat: repeat-x;
 }
 */
-
+/*
 #pagecontent a:hover {
 	background-image: none;
 }
-
+*/
 
 a.anchor:link {
 	color: white;

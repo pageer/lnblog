@@ -433,6 +433,7 @@ class BlogEntry extends Entry {
 	*/
 	function isDraft($path=false) {
 		if (! $path) $path = dirname($this->file);
+		if (file_exists($path)) $path = realpath($path);
 		return ( $this->isEntry($path) &&
 		         basename(dirname($path)) == BLOG_DRAFT_PATH );
 	}

@@ -224,5 +224,6 @@ $title = $is_art ? _("New Article") : _("New Entry");
 $PAGE->title = sprintf("%s - %s", $blg->name, $title);
 $PAGE->addStylesheet("form.css", "entry.css");
 $PAGE->addScript("editor.js");
+$PAGE->addScript(lang_js());
 $PAGE->display($page_body, &$blg);
 ?>

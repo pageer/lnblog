@@ -49,6 +49,7 @@ function show_comment_page(&$blg, &$ent, &$usr) {
 	}
 	$content .= $comm_output;
 
+	$PAGE->addScript(lang_js());
 	$PAGE->addScript("entry.js");
 	
 	return $content;
@@ -61,6 +62,7 @@ function show_pingback_page(&$blg, &$ent, &$usr) {
 	global $PAGE;
 
 	$PAGE->title = $ent->title() . " - " . $blg->title();
+	$PAGE->addScript(lang_js());
 	$PAGE->addStylesheet("reply.css");
 	$PAGE->addScript("entry.js");
 	$body = show_pingbacks($ent, $usr);
@@ -77,6 +79,7 @@ function show_trackback_page(&$blg, &$ent, &$usr) {
 	global $PAGE;
 	
 	$PAGE->title = $ent->title() . " - " . $blg->title();
+	$PAGE->addScript(lang_js());
 	$PAGE->addStylesheet("reply.css");
 	$PAGE->addScript("entry.js");
 	$body = show_trackbacks($ent, $usr);
@@ -198,6 +201,7 @@ function show_entry_page(&$blg, &$ent, &$usr) {
 		$PAGE->addLink(array('rel'=>'pingback',
 							 'href'=>INSTALL_ROOT_URL."xmlrpc.php"));
 	}
+	$PAGE->addScript(lang_js());
 	$PAGE->addScript("entry.js");
 	$PAGE->addStylesheet("reply.css");
 	$PAGE->addStylesheet("entry.css");

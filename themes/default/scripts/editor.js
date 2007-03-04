@@ -303,9 +303,9 @@ function upload_add_link(e) {
 	if (prompt_text) {
 
 		if (is_img) {
-			var res = window.prompt("Add image "+this.value+".\nEnter image description:");
+			var res = window.prompt(strings.get('editor_addImageDesc', this.value));
 		} else {
-			var res = window.prompt("Add link to "+this.value+".\nEnter link text:");
+			var res = window.prompt(strings.get('editor_addLinkDesc', this.value));
 		}
 
 	} else {

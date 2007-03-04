@@ -750,7 +750,7 @@ function create_directory_wrappers($path, $type, $instpath="") {
 			$config_level = 1;
 			break;
 		case ENTRY_DRAFTS:
-			$filelist = array("index"=>"pages/showdraft");
+			$filelist = array("index"=>"pages/showdrafts");
 			$config_level = 1;
 			break;
 	}
@@ -855,7 +855,7 @@ function getlink($name, $type=false) {
 	             mkpath(INSTALL_ROOT,"themes","default",$l_type,$name) ) ) {
 		return INSTALL_ROOT_URL."themes/default/".$l_type."/".$name;
 
-	# Last case: nothing found, so return the empty string.
+	# Last case: nothing found, so return the original string.
 	} else {
 		return $name;
 	}
