@@ -73,15 +73,11 @@ class Page extends LnBlogObject {
 	function Page($ref=false) {
 	
 		$this->raiseEvent("OnInit");
-		#if ($ref !== false) 
 		$this->display_object = &$ref;
 		$this->doctype = DEFAULT_DOCTYPE;
-		# Set the default style sheets.
-		$this->stylesheets = array("main.css");
-		$this->inline_stylesheets = array();
+		$this->stylesheets = array();
 		$this->rssfeeds = array();
 		$this->scripts = array();
-		$this->inline_scripts = array();
 		$this->metatags = array();
 		$this->headers = array();
 		$this->links = array();
@@ -92,6 +88,7 @@ class Page extends LnBlogObject {
 		$this->charset = DEFAULT_CHARSET;
 
 		$this->addScript("lnblog_lib.js");
+		$this->addStylesheet("main.css");
 		
 		$this->raiseEvent("InitComplete");		
 	}
@@ -119,7 +116,7 @@ class Page extends LnBlogObject {
 		$num_args = func_num_args();
 		$arg_list = func_get_args();
 		for ($i = 0; $i < $num_args; $i++) {
-			$this->stylesheets[] = $arg_list[$i];
+			$this->stylesheets[] = array('link'=>$arg_list[$i]);
 		}
 	}
 	
@@ -136,7 +133,7 @@ class Page extends LnBlogObject {
 		$num_args = func_num_args();
 		$arg_list = func_get_args();
 		for ($i = 0; $i < $num_args; $i++) {
-			$this->inline_stylesheets[] = $arg_list[$i];
+			$this->stylesheets[] = array('text'=>$arg_list[$i]);
 		}
 	}
 
@@ -193,7 +190,27 @@ class Page extends LnBlogObject {
 	       The default is text/javascript.
 	*/
 	function addInlineScript($text, $type="text/javascript") {
-		$this->inline_scripts[] = array("text"=>$text, "type"=>$type);
+		$this->scripts[] = array("text"=>$text, "type"=>$type);
+	}
+	
+	/* 
+	Method: addScriptFirst
+	Like <addScript>, except adds the script at the *beginning* of the list of
+	scripts to be inserted.  Use this for initialization of configuration
+	scripts that need to run before other things.
+	*/
+	function addScriptFirst($href, $type="text/javascript") {
+		$scr = array("href"=>$href, "type"=>$type);
+		array_unshift($this->scripts, $scr);
+	}
+	
+	/*
+	Method: addInlineScriptFirst
+	Like <addScriptFirst>, except for inline scripts.
+	*/
+	function addInlineScriptFirst($text, $type="text/javascript") {
+		$scr = array("text"=>$text, "type"=>$type);
+		array_unshift($this->scripts, $scr);
 	}
 	
 	/*
@@ -277,9 +294,9 @@ class Page extends LnBlogObject {
 		$head->set("METADATA", $this->metatags);
 		$head->set("RSSFEEDS", $this->rssfeeds);
 		$head->set("STYLESHEETS",$this->stylesheets);
-		$head->set("INLINE_STYLESHEETS",$this->inline_stylesheets);
+		#$head->set("INLINE_STYLESHEETS",$this->inline_stylesheets);
 		$head->set("SCRIPTS",$this->scripts);
-		$head->set("INLINE_SCRIPTS",$this->inline_scripts);
+		#$head->set("INLINE_SCRIPTS",$this->inline_scripts);
 		$head->set("LINKS", $this->links);
 		
 		if (get_class($blog)) $blog->exportVars(&$head);

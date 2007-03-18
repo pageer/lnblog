@@ -19,7 +19,7 @@ if (! empty($TAGS)) { ?>
 	<li><?php p_("Topics");?>: <?php 
 		$out = "";
 		foreach ($TAGS as $key=>$tag) 
-			$out .= ($out=="" ? "" : ", ").'<a href="'.$TAG_LINK.'?tag='.$tag.'">'.$tag.'</a>'; 
+			$out .= ($out=="" ? "" : ", ").'<a href="'.make_uri($TAG_LINK,array('tag'=>urlencode($tag))).'">'.$tag.'</a>'; 
 		echo $out;
 ?></li>
 <?php } ?>
@@ -40,7 +40,7 @@ if (! empty($TAGS)) { ?>
 <?php } ?>
 <?php if (! empty($COMMENTCOUNT) || ! empty($ALLOW_COMMENT) || 
           ! empty($TRACKBACKCOUNT) || ! empty($ALLOW_TRACKBACKS) ) { ?>
-<ul>
+<ul class="replies">
 <?php if ( ! empty($COMMENTCOUNT) ) { ?>
 <li><a href="<?php echo $COMMENT_LINK; ?>"><?php p_('View reader comments');?> (<?php echo $COMMENTCOUNT; ?>)</a></li>
 <?php } elseif (empty($ALLOW_COMMENT)) { ?> 
@@ -53,7 +53,7 @@ if ( ! empty($PINGBACKCOUNT) ) { ?>
 <li><a href="<?php echo $PINGBACK_LINK; ?>"><?php p_('View Pingbacks');?> (<?php echo $PINGBACKCOUNT; ?>)</a></li>
 <?php } 
 if (! empty($ALLOW_TRACKBACKS)) { ?>
-<li><?php p_('TrackBack <abbr title="Uniform Resource Locator">URL</abbr>');?>: <a href="<?php echo $TRACKBACK_LINK; ?>"><?php echo $TRACKBACK_LINK; ?></a></li>
+<li><a href="<?php echo $TRACKBACK_LINK; ?>"><?php p_('TrackBack <abbr title="Uniform Resource Locator">URL</abbr>');?></a></li>
 <?php } ?>
 </ul>
 <?php } ?>

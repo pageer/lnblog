@@ -13,7 +13,7 @@ function comm_del(ctrl, label) {
 function mark_all() {
 	var boxes = document.getElementsByTagName('input');
 	for (i = 0; i < boxes.length; i++) {
-		if (boxes[i].class = 'markbox') {
+		if (boxes[i].class == 'markbox') {
 			boxes[i].checked = !boxes[i].checked;
 		}
 	}

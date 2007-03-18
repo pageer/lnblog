@@ -59,7 +59,7 @@ if (isset($COMMENT_SHOWEMAIL)) echo "checked=\"checked\""; ?> />
 <input title="<?php p_("Remember me");?>" id="remember" name="remember" type="checkbox" checked="checked" />
 </div>
 <div class="form_buttons">
-<input class="comment_submit" name="submit" id="commentsubmit" type="submit" value="<?php p_("Post comment"); ?>" />
+<input class="comment_submit" name="submit" id="submit" type="submit" value="<?php p_("Post comment"); ?>" />
 <!--<input name="clear" id="clear" type="reset" value="<?php p_("Clear"); ?>" />-->
 </div>
 <?php $EVENT_REGISTER->activateEventFull($tmp=false, "commentform", "FormEnd");?>

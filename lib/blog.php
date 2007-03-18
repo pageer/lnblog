@@ -1024,6 +1024,22 @@ class Blog extends LnBlogObject {
 		$ret = create_directory_wrappers($path, BLOG_ARTICLES);
 		$files = array_merge($files, $ret);
 		
+		$dir_list = scan_directory($path, true);
+		foreach ($dir_list as $art) {
+			$ent_path = mkpath($path, $art);
+			$cmt_path = mkpath($ent_path, ENTRY_COMMENT_DIR);
+			$tb_path = mkpath($ent_path, ENTRY_TRACKBACK_DIR);
+			$pb_path = mkpath($ent_path, ENTRY_PINGBACK_DIR);
+			$ret = create_directory_wrappers($ent_path, ARTICLE_BASE);
+			$files = array_merge($files, $ret);
+			$ret = create_directory_wrappers($cmt_path, ENTRY_COMMENTS, 'article');
+			$files = array_merge($files, $ret);
+			$ret = create_directory_wrappers($tb_path, ENTRY_TRACKBACKS, 'article');
+			$files = array_merge($files, $ret);
+			$ret = create_directory_wrappers($pb_path, ENTRY_PINGBACKS, 'article');
+			$files = array_merge($files, $ret);
+		}
+		
 		$path = mkpath($this->home_path, BLOG_ENTRY_PATH);
 		$ret = create_directory_wrappers($path, BLOG_ENTRIES);
 		$files = array_merge($files, $ret);

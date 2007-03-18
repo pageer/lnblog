@@ -39,14 +39,22 @@ class TrackbackValidator extends Plugin {
 	function check_for_link(&$param) {
 		$url = parse_url($param->url);
 		
-		if (!$url || ! isset($url['host'])) return false;
+		# The trackback is not to a valid URL.
+		
+		if ( !$url || 
+		     ! isset($url['host']) ||
+		     strpos($param->url, "http://") !== 0 ) { 
+			$param->url = '';
+			return false;
+		}
+		
 		
 		if ( $this->allow_self && $url['host'] == SERVER("SERVER_NAME") ) {
 			return true;
 		}
+
 		$ent = $param->getParent();
 		$data = $this->fetch_page($param->url);
-		
 		# If the permalink is in the page, it's legitimate, so return true.
 		if (strpos($data, $ent->permalink()) > 0) {
 			return true;

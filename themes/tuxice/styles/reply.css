@@ -4,35 +4,30 @@
 	margin-top: 1%;
 }
 
-
-.fullcomment {
-	border-bottom: thin dotted black;
-}
-
-.commentheader h3, .commentfooter ul {
+.comment h3,
+ul {
 	padding: 0px;
 	margin: 0px;
 }
 
-.commentfooter {
+ul.footer,
+ul.admin {
 	font-size: 80%;
 }
 
-.commentfooter li {
+ul.footer li,
+ul.admin li {
 	list-style-type: none;
 }
 
-.commentdata {
-	padding: 1%;
-}
 
-.commentfooter li.commenturl, .commentfooter li.commentname {
+ul.admin li {
 	display: inline;
-	margin-right: 1%;
+	margin-right: 1em;
 }
 
 /* TrackBack styles */
-.tblist {
+ol {
 	background: white;
 	border: 1px solid black;
 }

@@ -28,53 +28,7 @@
 session_start();
 require_once("config.php");
 require_once("lib/creators.php");
-
-# Convert anchor names to objects and check the delete permissions on them.
-# Returns false if the conversion or security check fails.
-function get_response_object($anchor, &$usr) {
-	global $SYSTEM;
-
-	if ( preg_match('/^comment/', $anchor) ) {
-		$ret = NewBlogComment($anchor);
-		if (! $ret->isComment()) $ret = false;
-	} elseif ( preg_match('/^trackback/', $anchor) ) {
-		$ret = NewTrackback($anchor);
-		if (! $ret->isTrackback()) $ret = false;
-	} elseif ( preg_match('/^pingback/', $anchor) ) {
-		$ret = NewPingback($anchor);
-		if (! $ret->isPingback()) $ret = false;
-	} else {
-		$ret = false;
-	}
-
-	# If ret is a valid object, but usr doesn't have delete permission, then
-	# return false.
-	if ( $ret && ! $SYSTEM->canDelete($ret, $usr) ) $ret = false;
-
-	return $ret;
-}
-
-# Perform deletion on an array of object.  Returns an array of objects for which
-# the deletion failed.
-function do_delete(&$obj_arr) {
-	$ret = array();
-	foreach ($obj_arr as $resp) {
-		$status = $resp->delete();
-		if (! $status) $ret[] = $resp;
-	}
-	return $ret;
-}
-
-# Convenience function to get markup for an HTML list.
-function get_list_text(&$obj) {
-	if (! is_object($obj)) {
-		return '<li>'.$obj."</li>\n";
-	} else {
-		return '<li>'.$obj->getAnchor().
-		       '<a href="'.$obj->permalink().'">'.
-		       $obj->title()."</a></li>\n";
-	}
-}
+require_once("pagelib.php");
 
 global $PAGE;
 

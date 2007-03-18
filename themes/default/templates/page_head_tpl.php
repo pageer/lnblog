@@ -33,31 +33,38 @@ $xml_lang = str_replace("_", "-", LANGUAGE); ?>
 <link rel="alternate" title="<?php echo $rssel["title"]; ?>" type="<?php echo $rssel["type"]; ?>" href="<?php echo $rssel["href"]; ?>" />
 <?php } ?>
 <?php 
-foreach ($STYLESHEETS as $css) { 
-	$link = getlink($css, LINK_STYLESHEET); 
-	if ($link) { ?>
+foreach ($STYLESHEETS as $css) {
+	if (isset($css['link'])) {
+		$link = getlink($css['link'], LINK_STYLESHEET); 
+		if ($link) { ?>
 <link rel="stylesheet" type="text/css" href="<?php echo $link; ?>" />
 <?php 
-	} 
-}
-foreach ($INLINE_STYLESHEETS as $css) { ?>
+		}
+	} elseif (isset($css['text'])) {
+?>
 <style type="text/css">
-<?php echo $css; ?>
+<?php echo $css['text']; ?>
 </style>
-<?php 
+<?php
+	}
 }
+
 foreach ($SCRIPTS as $js) {
-	$link = getlink($js["href"], LINK_SCRIPT); 
-	if ($link) { ?>
+	if (isset($js['href'])) {
+		$link = getlink($js["href"], LINK_SCRIPT); 
+		if ($link) { ?>
 <script type="<?php echo $js["type"]; ?>" src="<?php echo $link; ?>"></script>
 <?php 
-	} 
-} 
-foreach ($INLINE_SCRIPTS as $js) { ?>
+		}
+	} elseif (isset($js['text'])) {
+?>
 <script type="<?php echo $js["type"]; ?>">
 <?php echo $js["text"]; ?>
 </script>
-<?php } ?>
+<?php
+	}
+} 
+?>
 </head>
 <?php include(BASIC_LAYOUT_TEMPLATE); ?>
 </html>

@@ -1,0 +1,22 @@
+Document: Quick Start
+
+Section: Installation
+
+Here is the long version of the installation instructions.  Please
+note that you will have to know how PHP is set up on your server in
+order to properly answer some of these questions.
+
+- 1) Extract te LnBlog archive to an appropriately named directory (e.g. "LnBlog") your hard drive.
+- 2) Upload that directory to the web root directory on your server.
+- 3) Point your favorite web browser to the URL of that directory.
+- 4) The file writing configuration page will be displayed.  First, check that the document root directory for your server has been properly detected.
+- 5) Next, enter your subdomain information.  If you do not plan to put LnBlog blogs on different subdomains, you can skip this section.  If you do want to put blogs on multiple subdomains, you must enter your domain name and the directory on the server where your subdomain root directories is stored.  Often, this is either the parent directory of or the same as your document root directory.
+- 6) Lastly, you must decide how you want LnBlog to write your data files.  This is where you need to know how your host is configured.  You can use the option buttons to select from a few common configurations.  If you are lucky and your host runs PHP under your user account, then you will have no worries.  If they run PHP as an Apache module, you will either have to write files through an FTP account (for which you must supply the login information) or manually create directories and set file permissions.  If your host has PHP's *safe_mode* enabled, then the only way to write files is through FTP.
+
+All this information will be stored in the fsconfig.php file which will be created in your LnBlog/userdata directory on the server.  If at any time you want to go back and change this information, just delete that file and start the process over again.  This will not affect any blog entries you've created with LnBlog.
+
+Section: Getting Started
+
+Now that LnBlog is configured and can write its data files, it's time to set up a user account.  You should be directed to do this as soon as you have completed the file writing setup.  The first account you create will be the administrator account and will have the ability to create new blogs, new users, and basically change any setting within LnBlog.  User accounts you create after this will not be able to do this.
+
+The new user form should be fairly self-explanatory.  Just fill in the fields as you see fit.  The only required fields are the username and password.  Please note that LnBlog will create a directory for your username under which all your files will be kept, so do not put any spaces, punctuation, or special characters in your username.  If you want those, put them in yoru real name field, which is what readers will see on your posts.

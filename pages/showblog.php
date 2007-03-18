@@ -33,6 +33,33 @@ function show_blog_page(&$blog) {
 	return $ret;
 }
 
+function script_path($name) {
+	if ( defined("BLOG_ROOT") && 
+	     file_exists(BLOG_ROOT.'/scripts/'.$name) ) {
+		
+		return BLOG_ROOT.'/scripts/'.$name;
+		
+	# Second case: Try the userdata directory
+	} elseif ( defined('THEME_NAME') && defined('USER_DATA_PATH') &&
+	           file_exists(USER_DATA_PATH.'/themes/'.THEME_NAME.'/scripts/'.$name) ) {
+		return USER_DATA_PATH."/themes/".THEME_NAME."/scripts/".$name;
+
+	# Third case: check the current theme directory
+	} elseif ( defined('INSTALL_ROOT') && defined('THEME_NAME') && 
+	           file_exists(INSTALL_ROOT."/themes/".THEME_NAME.'/scripts/'.$name) ) {
+		return IINSTALL_ROOT."/themes/".THEME_NAME.'/scripts/'.$name;
+
+	# Fourth case: try the default theme
+	} elseif ( defined('INSTALL_ROOT') && 
+	           file_exists(INSTALL_ROOT."/themes/default/scripts/$name") ) {
+		return INSTALL_ROOT."/themes/default/scripts/$name";
+
+	# Last case: nothing found, so return the original string.
+	} else {
+		return $name;
+	}
+}
+
 if ( isset($_GET['action']) ) {
 	if ( strtolower($_GET['action']) == 'newentry' ) {
 		include('pages/entryedit.php');
@@ -73,7 +100,15 @@ if ( isset($_GET['action']) ) {
 	} elseif ( strtolower($_GET['action']) == 'managereply' ) {
 		include('pages/manage_replies.php');
 		exit;
-	}
+	} 
+} elseif ( isset($_GET['script']) ) {
+	$file = script_path($_GET['script']);
+	if (file_exists($file)) readfile($file);
+	else echo "Failure";
+	exit;
+} elseif ( isset($_GET['plugin']) ) {
+	require_once("plugins/".$_GET['plugin'].".php");
+	exit;
 }
 
 session_start();

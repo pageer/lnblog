@@ -1,3 +1,17 @@
+17-Mar-2007: version 0.9.0
+- Added PHP wrapping to solbe cross-domain JavaScript problems.
+
+13-Mar-2007:
+- Fixed TrackbackValidator plugin to block trackbacks that have a non-URL in the
+URL field.
+- Fixed TrackBack receiving improperly showing a full page.
+
+09-Mar-2007:
+- Fixed Pingback errors by adding pingback() method to Trackback URI class.
+- Fixed bad mass delete code.
+- Added hybrid URI class as a work-around for JavaScritp Single Origin Policy
+problems on entry edit plugins.
+
 26-Feb-2007:
 - Added wrapper upgrade check to loginops sidebar plugin.
 - Comments, trackbacks, pingbacks, and user files are now XML.

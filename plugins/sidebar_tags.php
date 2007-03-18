@@ -46,7 +46,7 @@ class TagList extends Plugin {
 <ul>
 <?php
 		foreach ($blg->tag_list as $tag) { 
-?><li><a href="<?php echo $blg->uri('tags', 'tag='.urlencode($tag));?>">
+?><li><a href="<?php echo $blg->uri('tags', urlencode($tag));?>">
 <?php echo htmlspecialchars($tag);?></a><?php
 			if ($this->show_feeds) {
 				$topic = preg_replace('/\W/','',$tag);

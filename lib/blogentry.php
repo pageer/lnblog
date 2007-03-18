@@ -928,29 +928,16 @@ class BlogEntry extends Entry {
 	}
 
 	/*
-	Method: get
-	Get the HTML to use to display the object.
-
-	Parameters:
-	show_edit_controls - *Optional* boolean determining if the edit, delete,
-	                     etc. links should be displayed.  *Defaults* to false.
-
-	Returns:
-	A string containing the markup.
-	*/
-	function get($show_edit_controls=false) {
-		ob_start();
-		$this->raiseEvent("OnOutput");
-		$ret = ob_get_contents();
-		ob_end_clean();
+	Method: exportVars
+	Sets template variables with the entry data.
 	
-		$tmp = NewTemplate($this->template_file);
+	Parameters:
+	tmp - The template we wish to populate.
+	*/
+	function exportVars(&$tmp, $show_edit_controls=false) {
 		$blog = $this->getParent();
-		$usr = NewUser($this->uid);
-		$usr->exportVars($tmp);
-		
+
 		$tmp->set("SUBJECT", $this->subject);
-		$tmp->set("TITLE", $this->subject);  # For article compatibility.
 		$tmp->set("POSTDATE", $this->prettyDate($this->post_ts) );
 		$tmp->set("POST_TIMESTAMP", $this->post_ts);
 		$tmp->set("EDITDATE", $this->prettyDate() );
@@ -978,11 +965,41 @@ class BlogEntry extends Entry {
 		$tmp->set("PINGBACKCOUNT", $this->getPingbackCount() );
 		$tmp->set("PINGBACK_LINK", $this->uri('pingback'));
 		$tmp->set("SHOW_CONTROLS", $show_edit_controls);
+		
+		# RSS compatibility variables
+		$tmp->set("TITLE", $this->title());
+		$tmp->set("LINK", $this->permalink());
+		$tmp->set("DESCRIPTION", $this->description());
+		$tmp->set("CATEGORY", $this->tags());
 
 		foreach ($this->custom_fields as $fld=>$desc) {
 			$tmp->set(strtoupper($fld), isset($this->$fld) ? $this->$fld : '');
 			$tmp->set(strtoupper($fld)."_DESC", $desc);
 		}
+	}
+	
+	/*
+	Method: get
+	Get the HTML to use to display the object.
+
+	Parameters:
+	show_edit_controls - *Optional* boolean determining if the edit, delete,
+	                     etc. links should be displayed.  *Defaults* to false.
+
+	Returns:
+	A string containing the markup.
+	*/
+	function get($show_edit_controls=false) {
+		ob_start();
+		$this->raiseEvent("OnOutput");
+		$ret = ob_get_contents();
+		ob_end_clean();
+	
+		$tmp = NewTemplate($this->template_file);
+		$blog = $this->getParent();
+		$usr = NewUser($this->uid);
+		$usr->exportVars($tmp);
+		$this->exportVars($tmp, $show_edit_controls);
 		
 		$ret .= $tmp->process();
 		ob_start();
@@ -1297,6 +1314,30 @@ class BlogEntry extends Entry {
 		return $this->getReplies($params);
 	}
 	
+	# Method: getFriendlyPingbacks
+	# Gets the "friendly" pingbacks for an entry, i.e. pingbacks that come from
+	# URLs on the same blog as this entry.
+	#
+	# Returns: 
+	# An associative array with two keys, "local" and "remote".  Each element is
+	# an array of Pingback objects with the "friendly" pings in the "local"
+	# array and others in the "remote" array.
+	
+	function getFriendlyPingbacks() {
+		$pings = $this->getPingbacks();
+		$ret = array('local'=>array(), 'remote'=>array());
+		$target = parse_url($this->permalink());
+		foreach ($pings as $key=>$p) {
+			$source = parse_url($p->source);
+			if ($source['host'] == $target['host']) {
+				$ret['local'][] = $p;
+			} else {
+				$ret['remote'][] = $p;
+			}
+		}
+		return $ret;
+	}
+	
 	# Method: sendPings
 	# Scans the links in the current entry, determines which are 
 	# pingback-enabled, and sends a pingback ping to those links.
@@ -1332,7 +1373,7 @@ class BlogEntry extends Entry {
 				$msg = new xmlrpcmsg('pingback.ping', $parms);
 				
 				$client = new xmlrpc_client($path, $host, $port);
-				#$client->setDebug(1);
+				if (defined("XMLRPC_SEND_PING_DEBUG")) $client->setDebug(1);
 				$result = $client->send($msg);
 				$ret[] = array('uri'=>$uri, 'response'=>$result);
 			}

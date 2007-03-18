@@ -51,8 +51,21 @@
 	background-color: white;
 }
 
-.blogentry .footer,
-.article   .footer,
+.footer .replies {
+	font-size: 100%;
+	font-weight: bold;
+	/*
+	border: thin solid gray;
+	border-top: none;
+	*/
+}
+
+.footer .replies li {
+	display: inline;
+	margin-right: 1em;
+}
+
+.footer .postadmin,
 .postdata {
 	font-size: 80%;
 }

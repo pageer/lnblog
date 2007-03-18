@@ -14,9 +14,11 @@ Section: Features
 - Blacklist comment and trackback spammers by IP address or subnet.
 - RSS feeds for entries and for comments on each entry.
 - Static articles.
+- Draft entries.
 - Send and receive trackbacks.
 - Multiple user accounts.
 - Multiple weblogs.
+- Put blogs on multiple subdomains.
 - Upload files to blogs, entries, and articles.
 - Can work with PHP's *safe_mode* turned on.
 - Use a dialect of BBCode to post entries.

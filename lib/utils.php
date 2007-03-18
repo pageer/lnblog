@@ -763,6 +763,9 @@ function create_directory_wrappers($path, $type, $instpath="") {
 	foreach ($filelist as $file=>$content) {
 		$curr_file = $current.$file.".php";
 		$ret = $fs->write_file($curr_file, $head.$content.$tail);
+		#if ($type == ARTICLE_BASE) {
+		#	echo "$current_file: $ret\n";
+		#}
 		if (! $ret) $ret_list[] = $curr_file;
 	}
 
@@ -834,31 +837,40 @@ function getlink($name, $type=false) {
 	
 	$blog = NewBlog();
 	
-	# First case: check the blog directory
+	# Check the blog directory
 	if ( defined("BLOG_ROOT") && 
 	     file_exists(BLOG_ROOT.PATH_DELIM.$l_type.PATH_DELIM.$name) ) {
 		
-		return $blog->uri('base').$l_type."/".$name;
+		$ret = $blog->uri('base').$l_type."/".$name;
 		
-	# Second case: Try the userdata directory
+	# Try the userdata directory
 	} elseif ( file_exists(USER_DATA_PATH.PATH_DELIM."themes".PATH_DELIM.THEME_NAME.
 	                       PATH_DELIM.$l_type.PATH_DELIM.$name) ) {
-		return INSTALL_ROOT_URL.USER_DATA."/themes/".THEME_NAME."/".$l_type."/".$name;
+		$ret = INSTALL_ROOT_URL.USER_DATA."/themes/".THEME_NAME."/".$l_type."/".$name;
 
-	# Third case: check the current theme directory
+	# Check the current theme directory
 	} elseif ( file_exists(INSTALL_ROOT.PATH_DELIM."themes".PATH_DELIM.THEME_NAME.
 	                       PATH_DELIM.$l_type.PATH_DELIM.$name) ) {
-		return INSTALL_ROOT_URL."themes/".THEME_NAME."/".$l_type."/".$name;
+		$ret = INSTALL_ROOT_URL."themes/".THEME_NAME."/".$l_type."/".$name;
 
-	# Fourth case: try the default theme
+	# Try the default theme
 	} elseif ( file_exists(
 	             mkpath(INSTALL_ROOT,"themes","default",$l_type,$name) ) ) {
-		return INSTALL_ROOT_URL."themes/default/".$l_type."/".$name;
+		$ret = INSTALL_ROOT_URL."themes/default/".$l_type."/".$name;
 
 	# Last case: nothing found, so return the original string.
 	} else {
-		return $name;
+		$ret = $name;
 	}
+	
+	$urlinfo = parse_url($ret);
+	if (isset($urlinfo['host']) && 
+	    $l_type == LINK_SCRIPT &&
+	    SERVER("SERVER_NAME") != $urlinfo['host']) {
+		$ret = $blog->uri('script', $name);
+	}
+	
+	return $ret;
 }
 
 # Function: sanitize
@@ -1026,6 +1038,9 @@ function ahref($href, $text, $attribs=false) {
 	return "$base>$text</a>";
 }
 
+##########################################
+# Section: PHP 5 compatibility functions #
+##########################################
 
 if (! function_exists('is_a')) {
 	function is_a($obj, $class) {

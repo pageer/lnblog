@@ -27,8 +27,10 @@ if ($files !== true) {
 	if (isset($_GET["month"])) {
 		$do_output = true;
 	}
+} elseif (isset($_GET['month']) && isset($_GET['plugin'])) {
+	$do_output = true;
 }
-	
+		
 require_once("lib/utils.php");
 
 # Add this really massive if statements to that we don't end up declaring the 
@@ -64,6 +66,20 @@ class SidebarCalendar extends Plugin {
 		}
 		
 		if ($do_output) $this->put_calendar();
+	}
+
+	function self_uri($arr=false) {
+		$ret = localpath_to_uri(__FILE__);
+		$urlinfo = parse_url($ret);
+		if ( isset($urlinfo['host']) && 
+			 SERVER("SERVER_NAME") != $urlinfo['host'] ) {
+			$blog = NewBlog();
+			$ret = $blog->uri('plugin',
+			                  str_replace(".php", "", basename(__FILE__)), 
+			                  $arr);
+		}
+	
+		return $ret;
 	}
 
 	function add_style(&$param) {
@@ -188,9 +204,10 @@ class SidebarCalendar extends Plugin {
 		echo '<p class="calendar">'."\n";
 
 		echo '<a href="#" onclick="return sndReq(\''.
-		      localpath_to_uri(__FILE__).'?blog='.$blog->blogid.
-		      '&amp;month= '.($month > 1 ? $month-1 : 12).
-		      '&amp;year='.($month > 1 ? $year : $year-1).'\')">&lt;&lt;</a> ';
+		      $this->self_uri( array('blog'=>$blog->blogid,
+		                             'month'=>($month > 1 ? $month-1 : 12),
+		                             'year'=>($month > 1 ? $year : $year-1))).
+		     '\')">&lt;&lt;</a> ';
 		
 		$months = $blog->getMonthList($year);
 		if (calendar_binsearch_monthlist($months, $year, $month, 0, count($months))) {
@@ -208,9 +225,10 @@ class SidebarCalendar extends Plugin {
 		}
 
 		echo ' <a href="#" onclick="return sndReq(\''.
-		      localpath_to_uri(__FILE__).'?blog='.$blog->blogid.
-		      '&amp;month='.($month < 12 ? $month+1 : 1).', '.
-		      '&amp;year='.($month < 12 ? $year : $year+1).'\')">&gt;&gt;</a>';
+		      $this->self_uri(array('blog'.$blog->blogid,
+		                            'month'=>($month < 12 ? $month+1 : 1),
+		                            'year'=>($month < 12 ? $year : $year+1))).
+		      '\')">&gt;&gt;</a>';
 
 		echo "</p>\n";
 
@@ -231,132 +249,6 @@ class SidebarCalendar extends Plugin {
 
 		return true;
 
-
-
-
-#		$year_list = $blog->getyearList();
-#		$month_list = $blog->getMonthList($year);
-#
-#		$ts = strtotime($year."-".$month."-01");
-#		
-#		# Populate an array of weeks.  Each week is a 7 element array 
-#		# containing the day of the month.
-#		$weeks = array();
-#		$curr_week = array_fill(0, 7, '');
-#		$curr_day = date("w", $ts);
-#		for ($i=1; $i<=$days; $i++) {
-#			$curr_week[$curr_day] = $i;
-#			if ($curr_day == 6) {
-#				
-#				$weeks[] = $curr_week;
-#				$curr_week = array_fill(0, 7, '');
-#				
-#				# Pick a Sunday to use to get day names.
-#				if (! isset($first_sunday)) $first_sunday = $i + 1;
-#			}
-#			$curr_day = ($curr_day + 1) % 7;
-#		}
-#		$weeks[] = $curr_week;
-#		
-#		# Generate a list of day names.
-#		$week_names = array();
-#		for ($i=$first_sunday; $i < $first_sunday + 7; $i++) {
-#			$week_names[] = "<th>".fmtdate("%a",
-#			                  strtotime("$year-$month-".sprintf("%02d", $i)))."</th>";
-#		}
-#
-#		$links = array($days);
-#		$entries = $blog->getMonth($year, $month);
-#		foreach ($entries as $ent) {
-#			$day = date("j", $ent->post_ts);
-#			if (! isset($links[intval($day)]) ) {
-#				$links[intval($day)] = '<a href="'.$blog->getURL().
-#					BLOG_ENTRY_PATH."/$year/$month/day.php?day=$day\">$day</a>";
-#			}
-#		}
-#
-#		if ($this->caption) echo "<h3>".$this->caption."</h3>\n";
-#	
-#		$gets = '';
-#		if (count($_GET) > 0) {
-#			foreach ($_GET as $name=>$val) {
-#				$gets = $name."=".$val."&amp;";
-#			}
-#		}
-#	
-#		if ($month == "12") {
-#			$qsnext = array("year"=>$year+1, "month"=>"01");
-#			$qsprev = array("year"=>$year, "month"=>"11");
-#			$labelnext = fmtdate("%b", strtotime(($year+1)."-01-01") );
-#			$labelprev = fmtdate("%b", strtotime($year."-11-01") );
-#
-#		} elseif ($month == "01") {
-#			$qsnext = array("year"=>$year, "month"=>"02");
-#			$qsprev = array("year"=>$year-1, "month"=>"12");
-#			$labelnext = fmtdate("%b", strtotime($year."-02-01") );
-#			$labelprev = fmtdate("%b", strtotime(($year - 1)."-12-01") );
-#		} else {
-#			$qsnext = array("year"=>$year, "month"=>sprintf("%02d", $month + 1));
-#			$qsprev = array("year"=>$year, "month"=>sprintf("%02d", $month - 1));
-#			$labelnext = fmtdate("%b", strtotime($year."-".($month + 1)."-01") );
-#			$labelprev = fmtdate("%b", strtotime($year."-".($month - 1)."-01") );
-#		}
-#		
-#		if (is_dir(mkpath(BLOG_ROOT,BLOG_ENTRY_PATH, $qsnext['year'], $qsnext['month']))) {
-#			$next_link = ' <a class="rlink" href="'.make_uri(false,$qsnext,false).
-#			             '">'.$labelnext.'&nbsp;&gt;&gt;</a>';
-#		} else {
-#			$next_link = "<span class=\"rlink\">$labelnext&nbsp;&gt;&gt;</span>";
-#		}
-#		
-#		$prev_link = '<a class="llink" href="'.make_uri(false,$qsprev,false).
-#		             '">&lt;&lt;&nbsp;'.$labelprev.'</a> ';
-#		
-#		#echo '<div class="panel">';
-#		echo '<p class="calendar">';
-#		echo $prev_link;
-#		if ( $blog->getMonthCount($year,$month) ) {
-#			echo "<a href=\"".$blog->uri('listmonth', $year, $month).">".fmtdate("%B", $ts)."</a>";
-#		} else {
-#			echo fmtdate("%B", $ts);
-#		}
-#		echo "&nbsp;";
-#		if ( is_dir( mkpath(BLOG_ROOT,BLOG_ENTRY_PATH,$year) ) ) {
-#			echo '<a href="'.$blog->uri('listyear', $year).">".fmtdate("%Y", $ts)."</a>";
-#		} else {
-#			echo fmtdate("%Y", $ts);
-#		}
-#		echo $next_link;
-#		echo '</p>';
-#
-#		
-#		echo "<table class=\"calendar\">\n";
-#		echo "<tr>";
-#		foreach ($week_names as $name) echo $name;
-#		echo "</tr>";
-#	
-#		foreach ($weeks as $week) {
-#			echo "<tr>\n";
-#			for ($i=0; $i<=6; $i++) {
-#				$cls = ($week[$i] == date('j') ? ' class="today"' : '');
-#				if (isset($links[$week[$i]])) {
-#					echo '<td'.$cls.'>'.$links[$week[$i]].'</td>';
-#				} else {
-#					echo '<td'.$cls.'>'.$week[$i].'</td>';
-#				}
-#			}
-#			echo "</tr>";
-#		}
-#		echo "</table>";
-#		echo '<p class="calendar">'.
-#		     '<a style="margin-right: 5%" '.
-#		     'href="'.$blog->uri('archives').'">'._('Archives').'</a> ';
-#		if ($this->show_all) {
-#			echo '<a style="margin-left: 5%" '.
-#			     'href="'.$blog->uri('listall').'">'.
-#			     _('Show all').'</a>';
-#		}
-#		echo '</p>';
 	}
 	
 	function show_page() {
@@ -371,6 +263,7 @@ class SidebarCalendar extends Plugin {
 
 	function link_ajax_js() {
 		global $PAGE;
+		$blog = NewBlog();
 		$PAGE->addScript("calendar_ajax.js");
 	}
 
@@ -398,19 +291,20 @@ function calendar_binsearch_monthlist(&$arr, $year, $month, $start, $len) {
 
 global $PLUGIN_MANAGER;
 if (! $PLUGIN_MANAGER->plugin_config->value('sidebarcalendar', 'creator_output', 0)) {
-	$sb =& new SidebarCalendar();
+	$sbc =& new SidebarCalendar();
 }
-
 
 } # End massive if statement
 
 if ($do_output) {
-	$sb =& new SidebarCalendar();
-	$sb->show_page();
+#echo $do_output ? "yes" : "no";
+	$sbc =& new SidebarCalendar();
+	#$sbc->show_page();
+	$sbc->put_calendar(true);
 } else {
 	global $PLUGIN_MANAGER;
 	if (! $PLUGIN_MANAGER->plugin_config->value('sidebarcalendar', 'creator_output', 0)) {
-		$sb =& new SidebarCalendar();
+		$sbc =& new SidebarCalendar();
 	}
 }
 ?>

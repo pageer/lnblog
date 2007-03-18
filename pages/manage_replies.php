@@ -30,56 +30,9 @@ require_once("pagelib.php");
 require_once("lib/creators.php");
 require_once("pagelib.php");
 
-# Convenience function to get markup for an HTML list.
-function get_list_text(&$obj) {
-	if (! is_object($obj)) {
-		return '<li>'.$obj."</li>\n";
-	} else {
-		return '<li>'.$obj->getAnchor().
-		       ' - <a href="'.$obj->permalink().'">'.
-		       $obj->title()."</a></li>\n";
-	}
-}
-
-# Perform deletion on an array of object.  Returns an array of objects for which
-# the deletion failed.
-function do_delete(&$obj_arr) {
-	$ret = array();
-	foreach ($obj_arr as $resp) {
-		$status = $resp->delete();
-		if (! $status) $ret[] = $resp;
-	}
-	return $ret;
-}
-
 function get_display_markup(&$item, $count) {
 	$ret = '<a href="'.$item->permalink().'">'.$item->title()."</a>";
 	$ret .= reply_boxes($count, $item);
-	return $ret;
-}
-
-# Convert anchor names to objects and check the delete permissions on them.
-# Returns false if the conversion or security check fails.
-function get_response_object($anchor, &$usr) {
-	global $SYSTEM;
-
-	if ( preg_match('/^comment/', $anchor) ) {
-		$ret = NewBlogComment($anchor);
-		if (! $ret->isComment()) $ret = false;
-	} elseif ( preg_match('/^trackback/', $anchor) ) {
-		$ret = NewTrackback($anchor);
-		if (! $ret->isTrackback()) $ret = false;
-	} elseif ( preg_match('/^pingback/', $anchor) ) {
-		$ret = NewPingback($anchor);
-		if (! $ret->isPingback()) $ret = false;
-	} else {
-		$ret = false;
-	}
-
-	# If ret is a valid object, but usr doesn't have delete permission, then
-	# return false.
-	if ( $ret && ! $SYSTEM->canDelete($ret, $usr) ) $ret = false;
-
 	return $ret;
 }
 
@@ -87,7 +40,12 @@ function has_posted_responses() {
 	if (POST('responselist')) {
 		return true;
 	} elseif (POST('responseid0')) {
-		return true;
+		$count = 0;
+		while (POST("responseid$count")) $count++;
+		for ($i = 0; $i <= $count; $i++) {
+			if (POST("response$i")) 	return true;
+		}
+		return false;
 	} else {
 		return false;
 	}
@@ -95,6 +53,7 @@ function has_posted_responses() {
 
 function get_posted_responses(&$response_array, &$denied_array) {
 	$index = 1;
+	$u = NewUser();
 	
 	if (POST('responselist')) {
 	
@@ -332,6 +291,9 @@ function handle_deletes() {
 			$message = _("Unable to delete the following responses.  Do you want to try again?");
 			$message .= $list;
 		} else {
+			# Success!  Clear the PASS_DATA_ID to prevent erroneous errors
+			# when the page reloads.
+			$tpl->set("PASS_DATA_ID", "");
 			return true;
 		}
 	
@@ -376,7 +338,10 @@ $PAGE->setDisplayObject($main_obj);
 if (has_posted_responses()) {
 	$body = handle_deletes();
 	if ($body === true) {
-		$PAGE->redirect(make_uri(false, false, false, '&'));
+		#$PAGE->redirect(make_uri(false, false, false, '&'));
+		# It seems that the POST data is passed on when you redirect to the same
+		# page.  You learn something new every day.
+		$body = show_reply_list($main_obj);
 	}
 } else {
 	$body = show_reply_list($main_obj);
@@ -384,5 +349,4 @@ if (has_posted_responses()) {
 
 $PAGE->title = $blog->title()." - "._('Manage replies');
 $PAGE->display($body, &$blog);
-
 ?>

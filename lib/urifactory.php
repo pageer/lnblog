@@ -39,6 +39,9 @@ function create_uri_object(&$object, $type=false) {
 	$partype = get_parent_class($object);
 	if (!$type) $type = URI_TYPE;
 	switch ($type) {
+		case "hybrid":
+			$type_ext = "URIHybrid";
+			break;
 		case "querystring":
 			$type_ext = "URIQueryString";
 			break;
@@ -48,8 +51,17 @@ function create_uri_object(&$object, $type=false) {
 		default:
 			$type_ext = "URIWrapper";
 	}
+	
+	# If the object class and URI type is not available, try the parent class.
 	$creator = $objtype.$type_ext;
 	if (! class_exists($creator)) $creator = $partype.$type_ext;
+	
+	# Neither the object nor parent class have the selected URI type, try
+	# dropping back to the default URI type.
+	$default_ext = "URIWrapper";
+	if (! class_exists($creator)) $creator = $objtype.$default_ext;
+	if (! class_exists($creator)) $creator = $partype.$default_ext;
+	
 	return new $creator($object);
 }
 
@@ -125,16 +137,61 @@ class BlogURIWrapper extends LnBlogObject {
 	function edituser() { return $this->wrapper("useredit"); }
 	function pluginconfig() { return $this->wrapper("plugins"); }
 	function pluginload() { return $this->wrapper("pluginload"); }
-	function tags() { return $this->wrapper("tags"); }
+	function tags($tag=false) { 
+		if ($tag) {
+			if (strpos($tag, "=")) {
+				$data = explode("=", $tag);
+				$tag = array($data[0]=>$data[1]);
+			} else {
+				$tag = array("tag"=>$tag);
+			}
+			return $this->wrapper("tags", $tag);
+		} else {
+			return $this->wrapper("tags"); 
+		}
+	}
+	
+	# These functions provide wrappers for cross-domain scripting.
+	function script($script) { return $this->base_uri."?script=$script"; }
+	function plugin($plug, $qs_arr=false) {
+		$qs = "plugin=$plug";
+		if (is_array($qs_arr)) {
+			foreach ($qs_arr as $key=>$val) {
+				$qs .= $this->separator."$key=$val";
+			}
+		}
+		return $this->base_uri."?$qs"; 
+	}
 
 }
 
-class BlogURIhtaccess {
+class BlogURIhtaccess extends BlogURIWrapper {
+
+}
+
+class BlogURIQueryString extends BlogURIWrapper {
 	
 }
 
-class BlogURIQueryString {
+class BlogURIHybrid extends BlogURIWrapper {
 	
+	function BlogURIHybrid(&$blog) {
+		$this->object = $blog;
+		$this->base_uri = localpath_to_uri($blog->home_path);
+		$this->install_uri = INSTALL_ROOT_URL;
+		$this->separator = "&amp;";
+	}
+	
+	function addentry() { 
+		return make_uri($this->install_uri."pages/entryedit.php", 
+	                    array("blog"=>$this->object->blogid));
+	}
+	function addarticle() {
+		return make_uri($this->install_uri."pages/entryedit.php", 
+	                    array("blog"=>$this->object->blogid,
+		                      "type"=>"article"));
+	}
+
 }
 
 class BlogEntryURIWrapper extends LnBlogObject {
@@ -219,6 +276,28 @@ class BlogEntryURIWrapper extends LnBlogObject {
 	function managereply() { return $this->manage_reply(); }
 }
 
+class BlogEntryURIHybrid extends BlogEntryURIWrapper {
+	
+	function BlogEntryURIHybrid(&$ent) {
+		$this->object = $ent;
+		$this->base_uri = localpath_to_uri(dirname($ent->file));
+		$this->install_uri = INSTALL_ROOT_URL;
+		$this->separator = "&amp;";
+	}
+	
+	function edit() { 
+		$b = NewBlog();
+		return make_uri($b->uri("addentry"), 
+		                array('entry'=>$this->object->entryID()));
+	}
+	
+	function editDraft() {
+		$b = NewBlog();
+		return make_uri($b->uri("addentry"), 
+		                array('draft'=>$this->object->entryID()));
+	}
+}
+
 class BlogCommentURIWrapper extends LnBlogObject {
 	function BlogCommentURIWrapper(&$ent) {
 		$this->object = $ent;
@@ -251,6 +330,8 @@ class TrackbackURIWrapper extends LnBlogObject {
 	function setEscape($val) { $this->separator = $val ? "&amp;" : "&"; }
 
 	function trackback() { return $this->base_uri."#".$this->object->getAnchor(); }
+	function pingback() { return $this->base_uri."#".$this->object->getAnchor(); }
+	
 	function permalink() { return $this->trackback(); }
 	function delete() {
 		$qs_arr = array();
@@ -261,5 +342,6 @@ class TrackbackURIWrapper extends LnBlogObject {
 		$qs_arr['delete'] = $this->object->getAnchor();
 		return make_uri(INSTALL_ROOT_URL."pages/delcomment.php", $qs_arr);
 	}
+	
 }
 ?>
