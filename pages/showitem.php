@@ -223,7 +223,7 @@ function script_path($name) {
 
 	# Fourth case: try the default theme
 	} elseif ( defined('INSTALL_ROOT') && 
-	           file_exists(INSTALL_ROOT."/themes/default/scripts/$name") ) ) {
+	           file_exists(INSTALL_ROOT."/themes/default/scripts/$name") ) {
 		return INSTALL_ROOT."/themes/default/scripts/$name";
 
 	# Last case: nothing found, so return the original string.

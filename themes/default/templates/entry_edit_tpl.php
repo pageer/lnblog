@@ -14,14 +14,14 @@ if ($SYSTEM->sys_ini->value("entryconfig", "AllowInitUpload", 1) > 0) {
 }
 ?>
 <form id="postform" method="post" action="<?php echo $FORM_ACTION; ?>" enctype="<?php echo $enctype;?>" accept-charset="<?php echo DEFAULT_CHARSET;?>">
-<div>
-<label class="basic_form_label" for="subject"><?php p_("Subject"); ?></label>
+<div class="entry_subject">
+<label for="subject"><?php p_("Subject"); ?></label>
 <input id="subject" name="subject" accesskey="s" title="<?php p_("Subject");?>" type="text" size="40" <?php 
 if (isset($SUBJECT)) { ?>value="<?php echo $SUBJECT; ?> " <?php } ?><?php
 if (isset($GET_SHORT_PATH)) { ?>onblur="set_article_path();"<?php } ?>/>
 </div>
-<div>
-<label class="basic_form_label" for="tags"><?php p_("Topics"); ?></label>
+<div class="entry_tags">
+<label for="tags"><?php p_("Topics"); ?></label>
 <input id="tags" name="tags" accesskey="t" title="<?php p_("Topics");?>" type="text" size="40" <?php 
 if (isset($TAGS)) { ?>value="<?php echo $TAGS; ?>" <?php } ?>/>
 <select id="tag_list" title="<?php p_("Add topic");?>" accesskey="p">

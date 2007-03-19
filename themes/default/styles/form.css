@@ -145,3 +145,11 @@ h4 {
 	margin-top: 2px;
 	margin-bottom: 2px;
 }
+
+/* Entry edit form styles */
+div.entry_subject label { width: 20%; }
+div.entry_subject input { width: 70%; }
+
+div.entry_tags label  { width: 20%; }
+div.entry_tags input  { width: 55%; }
+div.entry_tags select { width: 20%; }
