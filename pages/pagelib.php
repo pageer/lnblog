@@ -137,7 +137,7 @@ function handle_uploads(&$ent) {
 		# In particular, this intended to regenerate the RSS2 feed after uploading
 		# a file from the edit form, so that the enclosure information will be 
 		# set correctly.
-		$ent->raiseEvent("UpdateComplete");
+		if (! $ent->isDraft()) $ent->raiseEvent("UpdateComplete");
 		return true;
 	}
 }
