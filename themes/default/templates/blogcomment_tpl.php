@@ -51,13 +51,15 @@ if (isset($USER_ID)) {
 	<?php 
 	} 
 } # End user info display 
-# Show the administrative links.
-if ($SHOW_CONTROLS) { 
-	foreach ($CONTROL_BAR as $item) {
-?>
-<li class="admin"><?php echo $item; ?></li>
-<?php 
-	}
-} 
-?>
+
+	# Show the administrative links.
+	if ($SHOW_CONTROLS) { ?>
+	<li>
+		<ul class="controlbar">
+		<?php foreach ($CONTROL_BAR as $item) {	?>
+		<li><?php echo $item; ?></li>
+		<?php } /* End foreach */ ?>
+		</ul>
+	</li>
+	<?php } /* End admin links */ ?>
 </ul>

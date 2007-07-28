@@ -232,33 +232,7 @@ if ($year && $month && $day) {
 	$body = show_base_archives($blog);
 	
 }
-/*
-	if (strtolower(GET('list')) == 'yes') {
-		show_year_entries($blog, $tpl, $year);
-		$footer_text = '<a id="list_toggle" href="'.
-					make_uri(false, array("list"=>"no"), false).'">'.
-					_("Show month list").'</a>';
-	} else {
-		show_month_list($blog, $tpl, $year);
-		$footer_text = '<a href="'.make_uri(false, array("list"=>"yes"), false).'">'.
-						_("Show entry list").'</a>';
-	}
-	
-}
-*/
 
-#$footer_text .= " | ".
-#	'<a href="'.$blog->uri('archives').'/">'.
-#	_("Back to main archives").'</a>';
-	
-#$usr = NewUser();
-#if ($SYSTEM->canModify($blog, $usr))
-#	$footer_text .= ' | <a href="'.$blog->uri('manage_reply', 'year='.$year).'">'.
-#	                _("Manage replies").'</a><br />';
-
-#$tpl->set("LIST_FOOTER", $footer_text);
-
-#$body = $tpl->process();
 if (GET('ajax')) {
 	echo $body;
 } else {

@@ -76,7 +76,7 @@ function nativefs_test() {
 		spf_("Create new files: %s", $ret['write'] ? "yes" : "no")."<br />".
 		spf_("Delete files: %s", $ret['delete'] ? "yes" : "no")."<br />".
 		spf_("File owner: %s", $ret['user'])."<br />".
-		spf_("File owner: %s", $ret['group']);
+		spf_("File group: %s", $ret['group']);
 
 	return $ret;
 }
@@ -236,7 +236,15 @@ if ( has_post() ) {
 	                "permscript"=>"FS_SCRIPT_MODE");
 	foreach ($fields as $key=>$val) {
 		if (POST($key)) {
-			define($val, trim(POST($key)));
+			if (preg_match("/FS_.*_MODE/", $key)) {
+				$num = trim(POST($key));
+				#echo "<br>$num<br>";
+				$num = octdec((int)$num);
+				#echo "<br>$num<br>";
+				define($val, $num);
+			} else {
+				define($val, trim(POST($key)));
+			}
 		}
 	}
 	
@@ -306,7 +314,8 @@ if ( has_post() ) {
 			@$ret = $fs->mkdir_rec(INSTALL_ROOT.PATH_DELIM.USER_DATA);
 		}
 		if (is_dir(INSTALL_ROOT.PATH_DELIM.USER_DATA)) {
-			@$ret = $fs->write_file(INSTALL_ROOT.PATH_DELIM.USER_DATA.PATH_DELIM.FS_PLUGIN_CONFIG, $content);
+		
+			$ret = $fs->write_file(INSTALL_ROOT.PATH_DELIM.USER_DATA.PATH_DELIM.FS_PLUGIN_CONFIG, $content);
 			$fs->destruct();
 		}
 		

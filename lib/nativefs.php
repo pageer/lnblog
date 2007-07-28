@@ -31,15 +31,14 @@
   3) We must somehow correlate the local path to the FTP path.
 */
 
-require_once("blogconfig.php");
-require_once("lib/fs.php");
+require_once("fs.php");
 
 class NativeFS extends FS {
 
 	function NativeFS() {
-		$this->default_mode = FS_DEFAULT_MODE;
-		$this->script_mode = FS_SCRIPT_MODE;
-		$this->directory_mode = FS_DIRECTORY_MODE;
+		$this->default_mode = defined("FS_DEFAULT_MODE") ? FS_DEFAULT_MODE : 0000;
+		$this->script_mode = defined("FS_SCRIPT_MODE") ? FS_SCRIPT_MODE : 0000;
+		$this->directory_mode = defined("FS_DIRECTORY_MODE") ? FS_DIRECTORY_MODE : 0000;;
 	}
 	
 	function destruct() {}
@@ -66,12 +65,9 @@ class NativeFS extends FS {
 	function mkdir_rec($dir, $mode=false) {
 		$parent = dirname($dir);
 		if ( $parent == $dir ) return false;
-		#if (! $mode) $mode = $this->directory_mode;
-		#$old_mask = umask(0000);
 		if (! is_dir($parent) )	$ret = $this->mkdir_rec($parent, $mode);
 		else $ret = true;
 		if ($ret) $ret = $this->mkdir($dir, $mode);
-		#umask($old_mask);
 		return $ret;
 	}
 
@@ -121,9 +117,14 @@ class NativeFS extends FS {
 			fclose($fh);
 		} else $ret = false;
 
-		if ($mask) umask($old_umask);
+		if ($mask) {
+			umask($old_umask);
+			$this->chmod($path, $mask);
+		}
 		
 		return $ret;
+		#return $this->isScript($path)?"yes":"no";
+		#return decoct($mask);
 	}
 
 }

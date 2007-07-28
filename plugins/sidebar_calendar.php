@@ -3,7 +3,6 @@
 # Determine if blogconfig.php has already been loaded.  
 # If not, we will need to compensate for this.
 $files = get_included_files();
-#print_r($files);
 foreach ($files as $f) {
 	if (strstr($f, "blogconfig.php")) {
 		$files = true;
@@ -61,11 +60,36 @@ class SidebarCalendar extends Plugin {
 			# and rely on explicit invocation for output.
 		} else {
 			$this->registerEventHandler("sidebar", "OnOutput", "put_calendar");
-			$this->registerEventHandler("page", "OnOutput", "add_style");
-			$this->registerEventHandler('page', 'OnOutput', 'link_ajax_js');
 		}
+		$this->registerEventHandler("page", "OnOutput", "add_style");
+		$this->registerEventHandler('page', 'OnOutput', 'link_ajax_js');
 		
 		if ($do_output) $this->put_calendar();
+	}
+
+	function get_date_vars() {
+		$blog = NewBlog();
+		if (! $blog->isBlog() ) return false;
+
+		$year = GET("year");
+		$month = sprintf("%02d", GET("month"));
+		$day = GET("day") ? GET('day') : 1;
+		if ($year && $month) {
+			$days = date("t", strtotime($year."-".$month."-01"));
+		} elseif (preg_match("/.*".BLOG_ENTRY_PATH."\/(\d{4})\/(\d{2})\/.*/", 
+		                      current_uri() )) {	
+			$year = preg_replace("/.*".BLOG_ENTRY_PATH."\/(\d{4})\/(\d{2})\/.*/",
+			                     "$1", current_uri() );
+			$month = preg_replace("/.*".BLOG_ENTRY_PATH."\/(\d{4})\/(\d{2})\/.*/",
+			                      "$2", current_uri() );
+			$days = date("t", strtotime($year."-".$month."-01"));
+		} else {
+			$year = date("Y");
+			$month = date("m");
+			$days = date("t");
+		}
+		
+		return array($year, $month, $day);
 	}
 
 	function self_uri($arr=false) {
@@ -77,6 +101,8 @@ class SidebarCalendar extends Plugin {
 			$ret = $blog->uri('plugin',
 			                  str_replace(".php", "", basename(__FILE__)), 
 			                  $arr);
+		} else {
+			$ret = make_uri($ret, $arr);
 		}
 	
 		return $ret;
@@ -172,83 +198,86 @@ class SidebarCalendar extends Plugin {
 		return $ret;
 	}
 	
-	function put_calendar($nodiv=false) {
+	function buildOutput($nodiv=false) {
 		$blog = NewBlog();
 		if (! $blog->isBlog() ) return false;
-	
-		$year = GET("year");
-		$month = sprintf("%02d", GET("month"));
-		$day = GET("day") ? GET('day') : 1;
-		if ($year && $month) {
-			$days = date("t", strtotime($year."-".$month."-01"));
-		} elseif (preg_match("/.*".BLOG_ENTRY_PATH."\/(\d{4})\/(\d{2})\/.*/", 
-		                      current_uri() )) {	
-			$year = preg_replace("/.*".BLOG_ENTRY_PATH."\/(\d{4})\/(\d{2})\/.*/",
-			                     "$1", current_uri() );
-			$month = preg_replace("/.*".BLOG_ENTRY_PATH."\/(\d{4})\/(\d{2})\/.*/",
-			                      "$2", current_uri() );
-			$days = date("t", strtotime($year."-".$month."-01"));
-		} else {
-			$year = date("Y");
-			$month = date("m");
-			$days = date("t");
-		}
 
+		list($year, $month, $day) = $this->get_date_vars();
+
+		$content = '';
+		
 		$date_ts = mktime(0, 0, 0, $month, $day, $year);
 		
-		if (! $nodiv) {
-			if ($this->caption) echo "<h3>".$this->caption."</h3>\n";
-			echo '<div id="calendar" class="panel">'."\n";
-		}
-		
-		echo '<p class="calendar">'."\n";
+		$content .= '<p class="calendar">'."\n";
 
-		echo '<a href="#" onclick="return sndReq(\''.
-		      $this->self_uri( array('blog'=>$blog->blogid,
-		                             'month'=>($month > 1 ? $month-1 : 12),
-		                             'year'=>($month > 1 ? $year : $year-1))).
-		     '\')">&lt;&lt;</a> ';
+		$content .= '<a href="#" onclick="return sndReq(\''.
+		            $this->self_uri( array('blog'=>$blog->blogid,
+		                                   'month'=>($month > 1 ? $month-1 : 12),
+		                                   'year'=>($month > 1 ? $year : $year-1))).
+		            '\')">&lt;&lt;</a> ';
 		
 		$months = $blog->getMonthList($year);
 		if (calendar_binsearch_monthlist($months, $year, $month, 0, count($months))) {
-			echo '<a href="'.$blog->uri('listmonth', $year, $month).'">'.
-			     fmtdate("%B", $date_ts)."</a> ".
-			     '<a href="'.$blog->uri('listyear', $year).'">'.
-			     fmtdate("%Y", $date_ts).'</a>';
+			$content .= '<a href="'.$blog->uri('listmonth', $year, $month).'">'.
+			            fmtdate("%B", $date_ts)."</a> ".
+			            '<a href="'.$blog->uri('listyear', $year).'">'.
+			            fmtdate("%Y", $date_ts).'</a>';
 		} else {
-			echo fmtdate("%B", $date_ts)." ";
+			$content .= fmtdate("%B", $date_ts)." ";
 			if ($months) {
-				echo '<a href="'.$blog->uri('listyear', $year).'">'.fmtdate("%Y", $date_ts).'</a>';
+				$content .= '<a href="'.$blog->uri('listyear', $year).'">'.fmtdate("%Y", $date_ts).'</a>';
 			} else {
-				echo fmtdate('%Y', $date_ts);
+				$content .= fmtdate('%Y', $date_ts);
 			}
 		}
 
-		echo ' <a href="#" onclick="return sndReq(\''.
-		      $this->self_uri(array('blog'.$blog->blogid,
-		                            'month'=>($month < 12 ? $month+1 : 1),
-		                            'year'=>($month < 12 ? $year : $year+1))).
-		      '\')">&gt;&gt;</a>';
+		$content .= ' <a href="#" onclick="return sndReq(\''.
+		            $this->self_uri(array('blog'=>$blog->blogid,
+		                                  'month'=>($month < 12 ? $month+1 : 1),
+		                                  'year'=>($month < 12 ? $year : $year+1))).
+		            '\')">&gt;&gt;</a>';
 
-		echo "</p>\n";
+		$content .= "</p>\n";
 
-		echo $this->get_calendar_string($year, $month, 1);
+		$content .= $this->get_calendar_string($year, $month, 1);
 
-		echo '<p class="calendar">'.
-		     '<a style="margin-right: 5%" '.
-		     'href="'.$blog->uri('archives').'">'._('Archives').'</a> ';
+		$content .= '<p class="calendar">'.
+		            '<a style="margin-right: 5%" '.
+		            'href="'.$blog->uri('archives').'">'._('Archives').'</a> ';
 		if ($this->show_all) {
-			echo '<a style="margin-left: 5%" '.
-			     'href="'.$blog->uri('listall').'">'.
-			     _('Show all').'</a>';
+			$content .= '<a style="margin-left: 5%" '.
+			            'href="'.$blog->uri('listall').'">'.
+			            _('Show all').'</a>';
 		}
 
-		echo '</p>';
+		$content .= '</p>';
 
-		if (! $nodiv) echo "</div>\n";
+		if ($nodiv !== true) {
+			$tpl = NewTemplate("sidebar_panel_tpl.php");
+			if ($this->caption) $tpl->set('PANEL_TITLE', $this->caption);
+			$tpl->set('PANEL_ID', "calendar");
+			$tpl->set('PANEL_CLASS', "panel");
+			$tpl->set('PANEL_CONTENT', $content);
+			$content = $tpl->process();
+		}
 
-		return true;
+		return $content;
 
+	}
+	
+	function put_calendar($nodiv=false) {
+	
+		echo $this->buildOutput($nodiv);
+		/*
+		$datevars = $this->get_date_vars();
+		$curr_date = ( $datevars(0) == date("Y")
+	
+		if ($nodiv !== true &&  ) {
+			$this->outputCache();
+		} else {
+			
+		}
+		*/
 	}
 	
 	function show_page() {
@@ -297,9 +326,7 @@ if (! $PLUGIN_MANAGER->plugin_config->value('sidebarcalendar', 'creator_output',
 } # End massive if statement
 
 if ($do_output) {
-#echo $do_output ? "yes" : "no";
 	$sbc =& new SidebarCalendar();
-	#$sbc->show_page();
 	$sbc->put_calendar(true);
 } else {
 	global $PLUGIN_MANAGER;

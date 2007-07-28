@@ -8,6 +8,7 @@
 # PANEL_ID      - An ID to apply to the panel.
 # PANEL_CLASS   - The CSS class to apply to the panel.
 # PANEL_TITLE   - Title text to be put in a heading above the main panel.
+# TITLE_LINK    - A URL which the title text should be a link to.
 # PANEL_LIST    - An array of strings or arrays for the panel body.  If set,
 #                 indicates that the panel should be an *unordered* list with
 #                 each member of the array representing a list item.  If an item
@@ -18,39 +19,45 @@
 #                 PANEL_LIST nor PANEL_NUMLIST are set.  In this case, the main
 #                 body of the panel is a DIV tag.
 
-function show_item(&$item) {
-	if (is_array($item)) {
-		$ret = "<li";
-		foreach ($item as $key=>$val) {
-			if ($key != 'description') $ret .= " $key=\"$val\"";
+if (! function_exists('sidebar_panel_show_item')) {
+	function sidebar_panel_show_item(&$item) {
+		if (is_array($item)) {
+			$ret = "<li";
+			foreach ($item as $key=>$val) {
+				if ($key != 'description') $ret .= " $key=\"$val\"";
+			}
+			$ret .= ">".$item['description']."</li>\n";
+		} else {
+			$ret = "<li>$item</li>\n";
 		}
-		$ret .= ">".$item['description']."</li>\n";
-	} else {
-		$ret = "<li>$item</li>\n";
+		return $ret;
 	}
-	return $ret;
 }
 
 if (isset($PANEL_ID)) $id_markup = ' id="'.$PANEL_ID.'"';
 else $id_markup = '';
 
-if (isset($PANEL_CLASS)) $class_markup = ' id="'.$PANEL_CLASS.'"';
+if (isset($PANEL_CLASS)) $class_markup = ' class="'.$PANEL_CLASS.'"';
 else $class_markup = '';
 
 if (isset($PANEL_TITLE)) {
-	echo "<h3>$PANEL_TITLE</h3>\n";
+	if (isset($TITLE_LINK)) {
+		echo "<h3><a href=\"$TITLE_LINK\">$PANEL_TITLE</a></h3>\n";
+	} else {
+		echo "<h3>$PANEL_TITLE</h3>\n";
+	}
 }
 
 if (isset($PANEL_LIST)) {
 	echo "<ul".$id_markup.$class_markup.">\n";
 	foreach ($PANEL_LIST as $item) {
-		echo show_item($item);
+		echo sidebar_panel_show_item($item);
 	}
 	echo "</ul>\n";
 } elseif (isset($PANEL_NUMLIST)) {
 	echo "<ol".$id_markup.$class_markup.">\n";
 	foreach ($PANEL_NUMLIST as $item) {
-		echo show_item($item);
+		echo sidebar_panel_show_item($item);
 	}
 	echo "</ol>\n";
 } else {

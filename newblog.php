@@ -31,6 +31,7 @@ session_start();
 require_once("blogconfig.php");
 require_once("lib/creators.php");
 require_once("pages/pagelib.php");
+require_once("lib/path.php");
 
 global $PAGE;
 
@@ -66,8 +67,10 @@ $tpl->set("UPDATE_TITLE", _("Create new weblog"));
 # If the user doesn't give us an absolute path, assume it's relative
 # to the DOCUMENT_ROOT.  We put it down here so that the form data
 # gets displayed as it was entered.
-if (! is_absolute($blog->home_path)) {
-	$blog->home_path = calculate_document_root().PATH_DELIM.$blog->home_path;
+$p = new Path($blog->home_path);
+if (! $p->isAbsolute($blog->home_path)) {
+	$p->Path(calculate_document_root(),$blog->home_path);
+	$blog->home_path = $p->get();
 }
 
 if ( has_post() ) {

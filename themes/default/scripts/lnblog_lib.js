@@ -27,6 +27,10 @@ var lnblog = {
 		return request;
 	},
 	
+	getJSONObject: function (json) {
+		return eval(json);
+	},
+	
 	insertAtCursor: function (myField, myValue) {
 		//IE support
 		if (document.selection) {
@@ -71,6 +75,18 @@ var lnblog = {
 	}
 
 };
+
+function LnBlogAJAX() {
+	this.http = lnblog.createRequestObject();
+	
+	this.send = function (uri, handler) {
+		this.http.open('get', uri);
+		this.onreadystatechange = handler;
+		this.httpsend(null);
+		return false;
+	};
+
+}
 
 lnblog.addEvent(window, 'load', function() {
 	if (typeof strings != 'undefined') {

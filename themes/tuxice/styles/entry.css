@@ -37,9 +37,11 @@
 
 /* Keeps large images withing the paragraph so they don't spill out 
    of the box for this post. */
+/*
 .blogentry .body p {
 	clear: both;
 }
+*/
 
 .blogentry .body img {
 	display: block;
@@ -77,9 +79,10 @@
 	list-style-type: none;
 }
 
-.blogadmin, ul.postadmin li {
+.blogadmin, ul.postadmin li,
+.controlbar li {
 	display: inline;
-	margin-right: 1%;
+	padding-right: 1%;
 }
 
 .blogentry  div.blogentrybody {

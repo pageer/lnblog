@@ -47,9 +47,10 @@
 ul.inline li,
 .postadmin li,
 .bloguser, 
-.bloguserurl {
+.bloguserurl,
+.controlbar li {
 	display: inline;
-	margin-right: 1%;
+	padding-right: 1%;
 }
 
 /* Add a little padding so that the entry text doesn't run into the edge of the

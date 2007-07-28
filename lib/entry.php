@@ -136,7 +136,7 @@ class Entry extends LnBlogObject{
 		if ($list) {
 			$this->tags = implode(TAG_SEPARATOR, $list);
 		} else {
-			if (! $this->tags) return false;
+			if (! $this->tags) return array();
 			$ret = explode(TAG_SEPARATOR, $this->tags);
 			foreach ($ret as $key=>$val) {
 				$ret[$key] = trim($val);
@@ -198,23 +198,11 @@ class Entry extends LnBlogObject{
 	slash, it will be interpreted as relative to the DOCUMENT_ROOT, if it is set.
 	*/
 	function absolutizeBBCodeURI($data, $current_uri) {
-		$blog = $this->getParent();
-		$ret = preg_replace("/\[img(-?\w+)?=([^\/\:]+)\]/",
-		                    "[img$1=".$current_uri."$2]", $data);
-		$ret = preg_replace("/\[url=([^\/\:@]+)\]/", 
-		                    "[url=".$current_uri."$1]", $ret);
-		if (defined("DOCUMENT_ROOT")) {
-			$ret = preg_replace("/\[img(-?\w+)?=\/([^\:]+)\]/",
-			          "[img$1=".localpath_to_uri(DOCUMENT_ROOT)."$2]", $ret);
-			$ret = preg_replace("/\[url=\/([^\:@]+)\]/", 
-			          "[url=".localpath_to_uri(DOCUMENT_ROOT)."$1]", $ret);
-		}
-		if (is_a($blog, 'Blog')) {
-			$ret = preg_replace("/\[img(-?\w+)?=([^\:]+)\]/",
-			                    "[img$1=".$blog->uri('base')."$2]", $ret);
-			$ret = preg_replace("/\[url=([^\:@]+)\]/", 
-			                    "[url=".$blog->uri('base')."$1]", $ret);
-		}
+
+		$ret = preg_replace_callback("/\[img(-?\w+)?=([^\]\:]+)\]/",
+		                             array($this, 'fixBBCodeURI'), $data);
+		$ret = preg_replace_callback("/\[url=([^\:@]+)\]/", 
+		                             array($this, 'fixBBCodeURI'), $ret);
 		return $ret;
 	}
 
@@ -231,24 +219,56 @@ class Entry extends LnBlogObject{
 	according to the same rules as apply with <absolutizeBBCodeURI>.
 	*/
 	function absolutizeHTMLURI($data, $current_uri) {
-		$blog = $this->getParent();
-		$ret = preg_replace("/src=['\"]([^\/\:]+)['\"]/",
-		                    "src=\"".$current_uri."$1\"", $data);
-		$ret = preg_replace("/href=['\"]([^\/\:@]+)['\"]/",
-		                    "href=\"".$current_uri."$1\"", $ret);
-		if (defined("DOCUMENT_ROOT")) {
-			$ret = preg_replace("/src=['\"]\/([^\:]+)['\"]/", 
-		                    "src=\"".localpath_to_uri(DOCUMENT_ROOT)."$1\"", $ret);
-			$ret = preg_replace("/href=['\"]\/([^\:@]+)['\"]/", 
-		                    "href=\"".localpath_to_uri(DOCUMENT_ROOT)."$1\"", $ret);
-		}
-		if (is_a($blog, 'Blog')) {
-			$ret = preg_replace("/src=['\"]([^\:]+)['\"]/",
-			                    "src=\"".$blog->uri('base')."$1\"", $ret);
-			$ret = preg_replace("/href=['\"]([^\:@]+)['\"]/", 
-			                    "href=\"".$blog->uri('base')."$1\"", $ret);
-		}
+		$ret = preg_replace_callback("/src=['\"]([^\:]+)['\"]/",
+		                             array($this, 'fixHTMLURI'), $data);
+		$ret = preg_replace_callback("/href=['\"]([^\:@]+)['\"]/", 
+		                             array($this, 'fixHTMLURI'), $ret);
 		return $ret;
+	}
+
+	function fixURI($args) {
+		if (count($args) == 3) {
+			$uri = $args[2];
+		} else {
+			$uri = $args[1];
+		}
+		
+		$parent = $this->getParent();
+		$searchpath = array($this->localpath());
+		$upload_dirs = explode(",", FILE_UPLOAD_TARGET_DIRECTORIES);
+		foreach ($upload_dirs as $dir) {
+			$searchpath[] = mkpath($parent->home_path, $dir);
+		}
+		$searchpath[] = $parent->home_path;
+		
+		$temp_uri = str_replace("/", PATH_DELIM, $uri);
+		
+		foreach ($searchpath as $path) {
+			if (file_exists(mkpath($path, $temp_uri))) {
+				$uri = localpath_to_uri(mkpath($path, $temp_uri));
+				break;
+			}
+		}
+	
+		return $uri;
+	}
+	
+	function fixBBCodeURI($args) {
+		$uri = $this->fixURI($args);
+		if (count($args) == 3) {
+			return '[img'.$args[1].'='.$uri.']';
+		} else {
+			return '[url='.$uri.']';
+		}
+	}
+	
+	function fixHTMLURI($args) {
+		$uri = $this->fixURI($args);
+		if (count($args) == 3) {
+			return 'src="'.$uri.'"';
+		} else {
+			return 'href="'.$uri.'"';
+		}
 	}
 
 	/*
@@ -499,6 +519,17 @@ class Entry extends LnBlogObject{
 			return $data[0];
 		}
 	}
+	
+	# Method: getSummary
+	# Gets a summary of the entry.  Returns the *abstract* property if it is
+	# set or the first HTML paragraph otherwise.	
+	function getSummary() {
+		if ($this->abstract) return $this->markup($this->abstract);
+		
+		$data = $this->markup();
+		$endpos = strpos($data, "</p>");
+		return substr($data, 0, $endpos)."</p>";
+	}
 
 	# Method: prettyDate
 	# Get a human-readable date from a timestamp.
@@ -547,14 +578,14 @@ class Entry extends LnBlogObject{
 			$this->deserializeXML($this->file);
 		}
 
-		if (! $this->abstract) $this->abstract = $this->getAbstract();
+		#if (! $this->abstract) $this->abstract = $this->getAbstract();
 		if (is_subclass_of($this, 'BlogEntry')) {
 			$this->id = str_replace(PATH_DELIM, '/', 
 			                        substr(dirname($this->file), 
-									        strlen(DOCUMENT_ROOT)));
+			                        strlen(calculate_document_root()) ) );
 		} else {
 			$this->id = str_replace(PATH_DELIM, '/', 
-			                        substr($this->file, strlen(DOCUMENT_ROOT)));
+			                        substr($this->file, strlen(calculate_document_root())) );
 		}
 		return $this->data;
 	}

@@ -17,6 +17,7 @@ $EVENT_REGISTER->activateEventFull($tmp=false, "banner", "OnOutput");
 # things here won't have any effect.
 $EVENT_REGISTER->activateEventFull($tmp=false, "banner", "OutputComplete");
 ?>
+<div style="clear:both"></div>
 </div>
 <!-- Main page content -->
 <div id="pagecontent">

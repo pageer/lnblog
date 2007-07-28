@@ -190,6 +190,9 @@ class RSS2FeedGenerator extends Plugin {
 		                 "comments.xml", "text");
 		$this->addOption("topic_feeds", _("Generate feeds for each topic"),
 		                 true, 'checkbox');
+		$this->addOption("cat_suffix", 
+		                 _("Suffix to append to category for top feed files"),
+		                 "_news.xml", "text");
 		$this->getConfig();
 		#if (! defined("RSS2GENERATOR_GUID_IS_PERMALINK"))
 		#	define("RSS2GENERATOR_GUID_IS_PERMALINK", $this->guid_is_permalink);
@@ -292,7 +295,8 @@ class RSS2FeedGenerator extends Plugin {
 			$feed->link_stylesheet = $this->feed_style;
 			$feed->link_xslsheet = $this->feed_xsl;
 			$topic = preg_replace('/\W/', '', $tag);
-			$path = mkpath($blog->home_path,BLOG_FEED_PATH,$topic.'_'.$this->feed_file);
+			#$path = mkpath($blog->home_path,BLOG_FEED_PATH,$topic.'_'.$this->feed_file);
+			$path = mkpath($blog->home_path,BLOG_FEED_PATH,$topic.$this->cat_suffix);
 			$feed_url = localpath_to_uri($path);
 
 			$feed->url = $feed_url;

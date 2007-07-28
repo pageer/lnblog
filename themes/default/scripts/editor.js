@@ -299,8 +299,18 @@ function LBCodeEditor() {
 			}
 		}
 	
+		var components = new Array();
+		var splitchar = '';
+		if (this.value.indexOf("\\") > 0 && this.value.indexOf("/") < 0) {
+			splitchar = "\\";
+		} else {
+			splitchar = "/";
+		}
+		components = this.value.split(splitchar);
+		var fname = components[components.length - 1];
+	
 		var prompt_text = false;  // Prompt user for descriptive text.
-								  // The alternative is just using the filename.
+		                          // The alternative is just using the filename.
 	
 		if (prompt_text) {
 	
@@ -311,25 +321,32 @@ function LBCodeEditor() {
 			}
 	
 		} else {
-			res = this.value;
+			res = fname;
 		}
 		
 		if (res) {
 			var body = document.getElementById('body');
 			if (is_img) {
 				if (document.getElementById('input_mode').value == 1) {
-					lnblog.insertAtCursor(body, '[img='+this.value+']'+res+'[/img]');
+					lnblog.insertAtCursor(body, '[img='+fname+']'+res+'[/img]');
 				} else {
-					lnblog.insertAtCursor(body, '<img src="'+this.value+'" alt="'+res+'" title="'+res+'" />');
+					lnblog.insertAtCursor(body, "<img src=\""+fname+"\" alt=\""+res+"\" title=\""+res+"\" />");
 				}
 			} else {
 				if (document.getElementById('input_mode').value == 1) {
-					lnblog.insertAtCursor(body, '[url='+this.value+']'+res+'[/url]');
+					lnblog.insertAtCursor(body, '[url='+fname+']'+res+'[/url]');
 				} else {
-					lnblog.insertAtCursor(body, '<a href="'+this.value+'">'+res+'</a>');
+					lnblog.insertAtCursor(body, "<a href=\""+fname+"\">"+res+"</a>");
 				}
 			}
 		}
+	}
+	
+	function articleSet(e) {
+		var path = document.getElementById('articlepath');
+		var isart = document.getElementById('publisharticle');
+		if (isart.checked) path.style.display = 'block';
+		else path.style.display = 'none';
 	}
 	
 	this.document_add_all_events = function (e) {
@@ -356,7 +373,46 @@ function LBCodeEditor() {
 		var tagsel = document.getElementById('tag_list');
 		lnblog.addEvent(tagsel, 'change', topic_add_tag);
 		
+		var pubart = document.getElementById('publisharticle');
+		if (pubart) {
+			lnblog.addEvent(pubart, 'change', articleSet);
+			articleSet();
+		}
+		
+		var preview = document.getElementById('preview');
+		lnblog.addEvent(preview, 'click', 
+			function(e) {
+				var has_files = false;
+				var i = 1;
+				var max_uploads = 20;
+				var upld;
+			
+				postform = document.getElementById('postform');
+				
+				while (upld = document.getElementById('upload'+i) && i < max_uploads) {
+					if (upld.value) {
+						has_files = true;
+						break;
+					}
+					i++;
+				}
+				
+				if (has_files) {
+					var ret = window.confirm(strings.editor_submitWithFiles);
+					if (ret) {
+					
+						postform.action = postform.action + '&save=draft';
+						return true;
+					} else {
+						return false;
+					}
+				} else {
+					return true;
+				}
+			});
+		
 		document.getElementById('subject').focus();
+		
 		return true;
 	}
 	

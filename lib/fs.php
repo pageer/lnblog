@@ -24,7 +24,6 @@ An abstract class for writing to the filesystem.  We use this to access the
 concrete subclasses for native filesystem and FTP access.  Maybe one day 
 there will be some other useful method for filesystem access....
 */
-require_once("blogconfig.php");
 
 class FS {
 

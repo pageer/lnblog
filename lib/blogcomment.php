@@ -358,10 +358,14 @@ class BlogComment extends Entry {
 		# administrative items, such as the delete link.
 		$this->control_bar = array();
 		# Add the delete link.
-		$this->control_bar[] = '<a href="'.$this->uri("delete").
-			'" onclick="return comm_del(this,\''.$this->getAnchor()
-			.'\');">'._("Delete").'</a>';
-
+		#$this->control_bar[] = '<a href="'.$this->uri("delete").
+		#	'" onclick="return comm_del(this,\''.$this->getAnchor()
+		#	.'\');">'._("Delete").'</a>';
+		
+		$this->control_bar[] = 
+			ahref($this->uri("delete"), _("Delete"),
+		          array('class'=>'deletelink')); #, 'id'=>$this->globalID()));
+		
 		ob_start();
 		$this->raiseEvent("OnOutput");
 		$ret .= ob_get_contents();

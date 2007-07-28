@@ -55,15 +55,14 @@ class BlogEntry extends Entry {
 
 	function BlogEntry ($path="", $revision=ENTRY_DEFAULT_FILE) {
 		
+		$this->initVars();
 		$this->raiseEvent("OnInit");
 		
-		$this->initVars();
 		$this->getFile($path, $revision, 
 		               array('entry', 'draft'), 
 		               array(BLOG_ENTRY_PATH, BLOG_DRAFT_PATH),
 		               array('/^\d{4}\/\d{2}\/\d{2}_\d{4}\d?\d?$/',
 		                     '/^\d{2}_\d{4}\d?\d?$/'));
-		
 		
 		if ( file_exists($this->file) ) {
 			$this->readFileData();
@@ -94,7 +93,7 @@ class BlogEntry extends Entry {
 		$this->allow_comment = true;
 		$this->allow_tb = true;
 		$this->allow_pingback = true;
-		$this->template_file = ENTRY_TEMPLATE;
+		$this->template_file = "blogentry_summary_tpl.php";
 		$this->custom_fields = array();
 		$this->exclude_fields = array("exclude_fields", "metadata_fields",
 		                              "template_file", "file");
@@ -497,119 +496,10 @@ class BlogEntry extends Entry {
 	
 	function uri($type) {
 		$uri = create_uri_object($this);
+		$args = func_get_args();
 		
-		return $uri->$type();
-		
-		/*
-		$args = array();
-		for ($i=1; $i < func_num_args(); $i++) {
-			$args[$i] = func_get_arg($i);
-		}
-		
-		# This is hideously ugly, but convenient based on the need for 
-		# backware compatibility.
-		if (func_num_args() == 1) {
-			return $uri->$type();
-		} elseif (func_num_args() == 2) {
-			return $uri->$type($args[1]);
-		} elseif (func_num_args() == 3) {
-			return $uri->$type($args[1], $args[2]);
-		} elseif (func_num_args() == 4) {
-			return $uri->$type($args[1], $args[2], $args[3]);
-		} else {
-			return false;
-		}
-		*/
+		return $uri->$type($args);
 	}
-	
-	/*
-	function uri($type) {
-		$dir_uri = localpath_to_uri($this->localpath());
-		
-		$qs_arr = array();
-		
-		if (func_num_args() > 1) {
-			$num_args = func_num_args();
-			for ($i = 2; $i < $num_args; $i++) {
-				$var = func_get_arg($i);
-				$arr = explode("=", $var, 2);
-				if (count($arr) == 2) {
-					$qs_arr[$arr[0]] = $arr[1];
-				}
-			}
-		}
-		
-		switch ($type) {
-			case "permalink":
-			case "entry":
-			case "page": 
-				$pretty_file = $this->calcPrettyPermalink();
-				if ($pretty_file)
-					$pretty_file = dirname($this->localpath()).PATH_DELIM.$pretty_file;
-				if ( file_exists($pretty_file) ) {
-					# Check for duplicated entry subjects.
-					$base_path = substr($pretty_file, 0, strlen($pretty_file)-5);
-					$i = 2;
-					if ( file_exists( $base_path.$i.".php") ) {
-						while ( file_exists( $base_path.$i.".php" ) ) {
-							$contents = file_get_contents($base_path.$i.".php");
-							if (strpos($contents, basename(dirname($this->file)))) {
-								return localpath_to_uri($base_path.$i.".php");
-							}
-							$i++;
-						}
-						return $dir_uri;
-					} else {
-						return localpath_to_uri($pretty_file);
-					}
-				} else {
-					$pretty_file = $this->calcPrettyPermalink(true);
-					if ($pretty_file)
-						$pretty_file = dirname($this->localpath()).PATH_DELIM.$pretty_file;
-					if ( file_exists($pretty_file) ) {
-						return localpath_to_uri($pretty_file);
-					} else {
-						return $dir_uri;
-					}
-				}
-			#case "send_tb":     return $dir_uri."trackback.php?send_ping=yes";
-			case "send_tb":     return $dir_uri.ENTRY_TRACKBACK_DIR."/?action=ping";
-			case "get_tb":      return $dir_uri.ENTRY_TRACKBACK_DIR."/index.php";
-			case "trackback":   return $dir_uri.ENTRY_TRACKBACK_DIR."/";
-			case "pingback":    return $dir_uri.ENTRY_PINGBACK_DIR."/";
-			case "upload":      return $dir_uri."/?action=upload";
-			case "edit":
-				if ($this->isDraft()) {
-					$entry_type = 'draft';
-				} else {
-					$entry_type = is_a($this, 'Article') ? 'article' : 'entry';
-				}
-				$qs_arr['blog'] = $this->parentID();
-				$qs_arr[$entry_type] = $this->entryID();
-				return make_uri(INSTALL_ROOT_URL."pages/entryedit.php", 
-				                array("blog"     =>$this->parentID(), 
-				                      $entry_type=>$this->entryID()));
-			case "delete":     
-				if ($this->isDraft()) {
-					$entry_type = 'draft';
-				} else {
-					$entry_type = is_a($this, 'Article') ? 'article' : 'entry';
-				}
-				$qs_arr['blog'] = $this->parentID();
-				$qs_arr[$entry_type] = $this->entryID();
-				return make_uri(INSTALL_ROOT_URL."pages/delentry.php", $qs_arr);
-			case "manage_reply": 
-				return make_uri(INSTALL_ROOT_URL."pages/manage_replies.php",
-				                array("blog"=>$this->parentID(), 
-				                      "entry"=>$this->entryID()));
-			case "comment":     return $dir_uri.ENTRY_COMMENT_DIR."/";
-			case "commentpage": return $dir_uri.ENTRY_COMMENT_DIR."/index.php";
-			case "base":        return $dir_uri;
-			case "basepage":    return $dir_uri."index.php";
-		}
-		return $dir_uri;
-	}
-	*/
 	
 	function getByPath ($path, $revision=ENTRY_DEFAULT_FILE) {
 		$file_path = $path.PATH_DELIM.$revision;
@@ -935,15 +825,24 @@ class BlogEntry extends Entry {
 	tmp - The template we wish to populate.
 	*/
 	function exportVars(&$tmp, $show_edit_controls=false) {
+		global $PLUGIN_MANAGER;
+	
 		$blog = $this->getParent();
-
+		
 		$tmp->set("SUBJECT", $this->subject);
 		$tmp->set("POSTDATE", $this->prettyDate($this->post_ts) );
 		$tmp->set("POST_TIMESTAMP", $this->post_ts);
 		$tmp->set("EDITDATE", $this->prettyDate() );
 		$tmp->set("EDIT_TIMESTAMP", $this->timestamp);
-		$tmp->set("ABSTRACT", $this->abstract);
+		$tmp->set("ABSTRACT", $this->getSummary());
 		$tmp->set("TAGS", $this->tags());
+		
+		$tagurls = array();
+		foreach ($this->tags() as $tag) {
+			$tagurls[htmlspecialchars($tag)] = $blog->uri("tags", urlencode($tag));
+		}
+		$tmp->set("TAG_URLS", $tagurls);
+		
 		$tmp->set("BODY", $this->markup() );
 		$tmp->set("ENCLOSURE", $this->enclosure);
 		$tmp->set("ENCLOSURE_DATA", $this->getEnclosure());
@@ -965,6 +864,17 @@ class BlogEntry extends Entry {
 		$tmp->set("PINGBACKCOUNT", $this->getPingbackCount() );
 		$tmp->set("PINGBACK_LINK", $this->uri('pingback'));
 		$tmp->set("SHOW_CONTROLS", $show_edit_controls);
+		$tmp->set("USE_ABSTRACT", $blog->front_page_abstract);
+		
+		# Added so the template can know whether or not to advertise RSS feeds.
+		if ($PLUGIN_MANAGER->pluginLoaded("RSS2FeedGenerator")) {
+			$gen = new RSS2FeedGenerator();
+			if ($gen->comment_file) {
+				$feed_uri = localpath_to_uri(mkpath($this->localpath(),$gen->comment_file));
+				$tmp->set("COMMENT_RSS_ENABLED");
+				$tmp->set("COMMENT_FEED_LINK", $feed_uri);
+			}
+		}
 		
 		# RSS compatibility variables
 		$tmp->set("TITLE", $this->title());
@@ -980,7 +890,7 @@ class BlogEntry extends Entry {
 	
 	/*
 	Method: get
-	Get the HTML to use to display the object.
+	Get the HTML to use to display the entry summary.
 
 	Parameters:
 	show_edit_controls - *Optional* boolean determining if the edit, delete,
@@ -1000,6 +910,42 @@ class BlogEntry extends Entry {
 		$usr = NewUser($this->uid);
 		$usr->exportVars($tmp);
 		$this->exportVars($tmp, $show_edit_controls);
+		
+		$ret .= $tmp->process();
+		ob_start();
+		$this->raiseEvent("OutputComplete");
+		$ret .= ob_get_contents();
+		ob_end_clean();
+		return $ret;
+	}
+
+	/*
+	Method: getFull
+	Get the HTML to use to display the full entry page.
+
+	Parameters:
+	show_edit_controls - *Optional* boolean determining if the edit, delete,
+	                     etc. links should be displayed.  *Defaults* to false.
+
+	Returns:
+	A string containing the markup.
+	*/
+	function getFull($show_edit_controls=false) {
+		ob_start();
+		$this->raiseEvent("OnOutput");
+		$ret = ob_get_contents();
+		ob_end_clean();
+	
+		$tmp = NewTemplate('blogentry_tpl.php');
+		$blog = $this->getParent();
+		$usr = NewUser($this->uid);
+		$usr->exportVars($tmp);
+		$this->exportVars($tmp, $show_edit_controls);
+		$tmp->set("COMMENTS", $this->getComments());
+		$tmp->set("TRACKBACKS", $this->getTrackbacks());
+		$pings = $this->getPingbacksByType();
+		$tmp->set("PINGBACKS", $pings['remote']);
+		$tmp->set("LOCAL_PINGBACKS", $pings['local']);
 		
 		$ret .= $tmp->process();
 		ob_start();
@@ -1050,7 +996,9 @@ class BlogEntry extends Entry {
 	}
 	
 	# Method: getReplyArray
-	# Get an array of replies of a particular type.
+	# Get an array of replies of a particular type.  This is for internal use
+	# only.  Call getComments(), getTrackbacks(), getPingbacks, or getReplies()
+	# instead of this.  
 	#
 	# Parameters:
 	# params - An associative array of settings, as in <getReplyCount>.  In 
@@ -1096,7 +1044,7 @@ class BlogEntry extends Entry {
 		
 		return $reply_array;
 	}
-	
+
 	/*
 	Method: getAllReplies
 	Gets an array of all replies to this entry.
@@ -1104,52 +1052,12 @@ class BlogEntry extends Entry {
 	Returns:
 	An array of BlogComment, Trackback, and Pingback objects.
 	*/
-	function getAllReplies() {
+	function getReplies() {
 		$repls = array();
-		$repls = array_merge($repls, $this->getCommentArray());
-		$repls = array_merge($repls, $this->getTrackbackArray());
-		$repls = array_merge($repls, $this->getPingbackArray());
+		$repls = array_merge($repls, $this->getComments());
+		$repls = array_merge($repls, $this->getTrackbacks());
+		$repls = array_merge($repls, $this->getPingbacks());
 		return $repls;
-	}
-	
-	# Method: getReplies
-	# Gets the HTML markup to display to list a given type of reply.
-	#
-	# Parameters:
-	# params - An associative array of parameters, as in <getReplyArray>.  In 
-	#          addition, it requires the 'itemclass' and 'listtitle' keys to be
-	#          set.  These are the CSS class applied to each reply and the title
-	#          given to the whole reply list, respectively.  There is also an 
-	#          optional "listclass" key that gives the CSS class to apply to 
-	#          the list.
-	#
-	# Returns:
-	# A string of HTML markup to send to the client.
-	
-	function getReplies($params) {
-		$replies = $this->getReplyArray($params);
-		$ret = "";
-		if ($replies) {
-			$reply_text = array();
-			foreach ($replies as $reply) {
-				$reply_text[] = $reply->get();
-			}
-		}
-
-		# Suppress markup entirely if there are no replies of the given type.
-		if (isset($reply_text)) {
-			$tpl = NewTemplate(LIST_TEMPLATE);
-			$tpl->set("ITEM_CLASS", $params['itemclass']);
-			if (isset($params['listclass'])) {
-				$tpl->set("LIST_CLASS", $params['listclass']);
-			}
-			$tpl->set("ORDERED");
-			$tpl->set("LIST_TITLE", $params['listtitle']);
-			$tpl->set("ITEM_LIST", $reply_text);
-			$ret = $tpl->process();
-		}
-
-		return $ret;
 	}
 	
 	# Comment handling functions.
@@ -1168,7 +1076,7 @@ class BlogEntry extends Entry {
 	}
 
 	/*
-	Method: getCommentArray
+	Method: getComments
 	Gets all the comment objects for this entry.
 
 	Parameters:
@@ -1178,31 +1086,15 @@ class BlogEntry extends Entry {
 	Returns:
 	An array of BlogComment object.
 	*/
-	function getCommentArray($sort_asc=true) {
+	function getComments($sort_asc=true) {
 		$params = array('path'=>ENTRY_COMMENT_DIR, 'ext'=>COMMENT_PATH_SUFFIX, 'altext'=>'.txt',
 		                'creator'=>'NewBlogComment', 'sort_asc'=>$sort_asc);
 		return $this->getReplyArray($params);
 	}
-
-	/*
-	Method: getComments
-	Get the HTML markup to display the entire list of comments for this entry.
-
-	Parameters:
-	sort_asc - *Optional* boolean (true by default) determining whether the
-	           comments should be sorted in ascending order by date.
 	
-	Returns:
-	A string of HTML markup.
-	*/
-	function getComments($sort_asc=true) {
-		$title = spf_('Comments on <a href="%s">%s</a>', 
-		              $this->permalink(), $this->subject);
-		$params = array('path'=>ENTRY_COMMENT_DIR, 'ext'=>COMMENT_PATH_SUFFIX, 'altext'=>'.txt',
-		                'creator'=>'NewBlogComment', 'sort_asc'=>$sort_asc,
-		                'itemclass'=>'fullcomment', 'listtitle'=>$title);
-		return $this->getReplies($params);
-	}
+	# Method: getCommentArray
+	# Compatibility function, alias for getComments
+	function getCommentArray($sort_asc=true) { return $this->getComments($sort_asc); }
 
 	# TrackBack handling functions.
 
@@ -1220,9 +1112,8 @@ class BlogEntry extends Entry {
 	}
 
 	/*
-	Method: getTrackbackArray
-	Get an array of Trackback objects that contains all TrackBacks for 
-	this entry.
+	Method: getTrackbacks
+	Get an array that contains all TrackBacks for this entry.
 
 	Parameters:
 	sort_asc - *Optional* boolean (true by default) determining whether the
@@ -1231,33 +1122,16 @@ class BlogEntry extends Entry {
 	Returns:
 	An array of Trackback objects.
 	*/
-	function getTrackbackArray($sort_asc=true) {
+	function getTrackbacks($sort_asc=true) {
 		$params = array('path'=>ENTRY_TRACKBACK_DIR, 
 		                'ext'=>TRACKBACK_PATH_SUFFIX,
 		                'creator'=>'NewTrackback', 'sort_asc'=>$sort_asc);
 		return $this->getReplyArray($params);
 	}
-
-	/*
-	Method: getTrackbacks
-	Get some HTML that displays the TrackBacks for this entry.
-
-	Parameters:
-	sort_asc - *Optional* boolean (true by default) determining whether the
-	           trackbacks should be sorted in ascending order by date.
 	
-	Returns:
-	A string of markup.
-	*/				  
-	function getTrackbacks($sort_asc=true) {
-		$title = spf_('Trackbacks on <a href="%s">%s</a>', 
-		              $this->permalink(), $this->subject);
-		$params = array('path'=>ENTRY_TRACKBACK_DIR, 'ext'=>TRACKBACK_PATH_SUFFIX,
-		                'creator'=>'NewTrackback', 'sort_asc'=>$sort_asc,
-		                'itemclass'=>'trackback', 'listclass'=>'tblist',
-		                'listtitle'=>$title);
-		return $this->getReplies($params);
-	}
+	# Method: getTrackbackArray
+	# Compatibility function, alias for getTrackbacks
+	function getTrackbackArray($sort_asc=true) { return $this->getTrackbacks($sort_asc); }
 	
 	# Pingback handling functions
 	
@@ -1275,9 +1149,8 @@ class BlogEntry extends Entry {
 	}
 
 	/*
-	Method: getPingbackArray
-	Get an array of Pingback objects that contains all Pingbacks for 
-	this entry.
+	Method: getPingbacks
+	Get an array that contains all Pingbacks for this entry.
 
 	Parameters:
 	sort_asc - *Optional* boolean (true by default) determining whether the
@@ -1286,44 +1159,27 @@ class BlogEntry extends Entry {
 	Returns:
 	An array of Pingback objects.
 	*/
-	function getPingbackArray($sort_asc=true) {
+	function getPingbacks($sort_asc=true) {
 		$params = array('path'=>ENTRY_PINGBACK_DIR, 
 		                'ext'=>PINGBACK_PATH_SUFFIX,
 		                'creator'=>'NewPingback', 'sort_asc'=>$sort_asc);
 		return $this->getReplyArray($params);
 	}
-
-	/*
-	Method: getPingbacks
-	Get some HTML that displays the Pingbacks for this entry.
-
-	Parameters:
-	sort_asc - *Optional* boolean (true by default) determining whether the
-	           pingbacks should be sorted in ascending order by date.
 	
-	Returns:
-	A string of markup.
-	*/				  
-	function getPingbacks($sort_asc=true) {
-		$title = spf_('Pingbacks on <a href="%s">%s</a>', 
-		              $this->permalink(), $this->subject);
-		$params = array('path'=>ENTRY_PINGBACK_DIR, 'ext'=>PINGBACK_PATH_SUFFIX,
-		                'creator'=>'NewPingback', 'sort_asc'=>$sort_asc,
-		                'itemclass'=>'pingback', 'listclass'=>'pblist',
-		                'listtitle'=>$title);
-		return $this->getReplies($params);
-	}
+	# Method: getPingbackArray
+	# Compatibility function, alias for getPingbacks
+	function getPingbackArray($sort_asc=true) { return $this->getPingbacks($sort_asc); }
 	
-	# Method: getFriendlyPingbacks
-	# Gets the "friendly" pingbacks for an entry, i.e. pingbacks that come from
-	# URLs on the same blog as this entry.
+	# Method: getPingbacksByType
+	# Gets the local and remote pingbacks for an entry, i.e. pingbacks that come
+	# from URLs on the same blog as this entry and others.
 	#
 	# Returns: 
 	# An associative array with two keys, "local" and "remote".  Each element is
 	# an array of Pingback objects with the "friendly" pings in the "local"
 	# array and others in the "remote" array.
 	
-	function getFriendlyPingbacks() {
+	function getPingbacksByType() {
 		$pings = $this->getPingbacks();
 		$ret = array('local'=>array(), 'remote'=>array());
 		$target = parse_url($this->permalink());
@@ -1353,33 +1209,38 @@ class BlogEntry extends Entry {
 		
 		$urls = $this->extractLinks($local);
 
-		$ping = NewPingback();
 		$ret = array();
 
 		foreach ($urls as $uri) {
 			
-			$pb_server = $ping->checkPingbackEnabled($uri);
+			$pb_server = Pingback::checkPingbackEnabled($uri);
 
 			if ($pb_server) {
-			
-				$linkdata = parse_url($pb_server);
-
-				$host = isset($linkdata['host']) ? $linkdata['host'] : SERVER("SERVER_NAME");
-				$path = isset($linkdata['path']) ? $linkdata['path'] : '';
-				$port = isset($linkdata['port']) ? $linkdata['port'] : 80;
-				
-				$parms = array(new xmlrpcval($this->permalink(), 'string'), 
-				               new xmlrpcval($uri, 'string'));
-				$msg = new xmlrpcmsg('pingback.ping', $parms);
-				
-				$client = new xmlrpc_client($path, $host, $port);
-				if (defined("XMLRPC_SEND_PING_DEBUG")) $client->setDebug(1);
-				$result = $client->send($msg);
+				$result = $this->sendPingback($pb_server, $uri);
 				$ret[] = array('uri'=>$uri, 'response'=>$result);
 			}
 			
 		}
 		return $ret;
+	}
+	
+	function sendPingback($uri, $target) {
+		
+		$linkdata = parse_url($uri);
+
+		$host = isset($linkdata['host']) ? $linkdata['host'] : $_SERVER["SERVER_NAME"];
+		$path = isset($linkdata['path']) ? $linkdata['path'] : '';
+		$port = isset($linkdata['port']) ? $linkdata['port'] : 80;
+	
+		$parms = array(new xmlrpcval($this->permalink(), 'string'), 
+		               new xmlrpcval($target, 'string'));
+		$msg = new xmlrpcmsg('pingback.ping', $parms);
+		
+		$client = new xmlrpc_client($path, $host, $port);
+		if (defined("XMLRPC_SEND_PING_DEBUG")) $client->setDebug(1);
+		$result = $client->send($msg);
+		
+		return $result;
 	}
 	
 	# Method: pingExists
@@ -1393,7 +1254,7 @@ class BlogEntry extends Entry {
 	# otherwise.
 	
 	function pingExists ($uri) {
-		$pings = $this->getPingbackArray();
+		$pings = $this->getPingbacks();
 		if (! $pings) return false;
 		foreach ($pings as $p) {
 			if ($p->source == $uri) return true;

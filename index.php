@@ -90,9 +90,7 @@ if (! $SYSTEM->hasAdministrator()) {
 }
 
 if ( POST('upgrade') && POST('upgrade_btn') ) {
-	#if (is_absolute(POST('upgrade'))) $upgrade_path = trim(POST('upgrade'));
-	#else $upgrade_path = calculate_document_root().PATH_DELIM.trim(POST('upgrade'));
-	#$b = NewBlog($upgrade_path);
+	
 	$b = NewBlog(POST('upgrade'));
 	$file_list = $b->upgradeWrappers();
 	if (empty($file_list)) {
@@ -118,7 +116,8 @@ if ( POST('upgrade') && POST('upgrade_btn') ) {
 	$tpl->set("REGISTER_STATUS", $status);
 	
 } elseif ( POST('fixperm') && POST('fixperm_btn') ) {
-	if (is_absolute(POST('fixperm'))) $fixperm_path = trim(POST('fixperm'));
+	$p = NewPath();
+	if ($p->isAbsolute(POST('fixperm'))) $fixperm_path = trim(POST('fixperm'));
 	else $fixperm_path = calculate_document_root().PATH_DELIM.trim(POST('fixperm'));
 	$b = NewBlog(POST($fixperm_path));
 	$upgrade_status = $b->fixDirectoryPermissions();

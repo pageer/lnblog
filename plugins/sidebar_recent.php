@@ -5,7 +5,7 @@ class Recent extends Plugin {
 		global $SYSTEM;
 		
 		$this->plugin_desc = _("Show some of the more recent posts in the sidebar.");
-		$this->plugin_version = "0.2.0";
+		$this->plugin_version = "0.3.0";
 		$this->addOption("old_header", 
 			_("Header for main blog page (entries not on main page)"), 
 			_("Older Entries"));
@@ -14,8 +14,14 @@ class Recent extends Plugin {
 			_("Recent Entries"));
 		$this->addOption("num_entries", 
 			_("Number of entries to show"), "Blog default", "text");
+		$this->addOption("only_recent",
+			_("Show the most recent entries on the front page (same links as entry pages)"),
+			  false, "checkbox");
 		$this->addOption("show_main",
 			_("Show link to main blog page"), true, "checkbox");
+		$this->addOption("enable_cache",
+			_("Enable plugin output caching"),
+			  true, "checkbox");
 		
 		$this->addOption('no_event',
 			_('No event handlers - do output when plugin is created'),
@@ -24,34 +30,36 @@ class Recent extends Plugin {
 			
 		$this->getConfig();
 		
-		if ( $this->no_event || 
-		     $SYSTEM->sys_ini->value("plugins","EventForceOff", 0) ) {
-			# If either of these is true, then don't set the event handler
-			# and rely on explicit invocation for output.
+		$blg = NewBlog();
+		if ($blg->isBlog()) {
+			$this->cache_base_path = $blg->home_path;
 		} else {
-			$this->registerEventHandler("sidebar", "OnOutput", "output");
+			$this->cache_base_path = false;
 		}
 		
-		if ($do_output) $this->output();
+		if ( ! ($this->no_event ||
+		        $SYSTEM->sys_ini->value("plugins","EventForceOff", 0)) ) {
+			$this->registerEventHandler("sidebar", "OnOutput", "outputCache");
+		}
+		$this->registerStandardInvalidators();
+		
+		if ($do_output) $this->outputCache();
 	}
 
-	function output($parm=false) {
+	function buildOutput(&$blg, $is_index=false) {
 		
-		$blg = NewBlog();
-		if (! $blg->isBlog()) return false;
 		if ( !($this->num_entries > 0) ) $this->num_entries = false; 
-		
+
 		# Show some of the more recent entries.  If we're on the "front page"
 		# of the blog, then show the next set of entries.  Otherwise, show the 
 		# most recent entries.
-		$is_index = ( current_url() == $blg->uri('blog') || 
-		              current_url() == $blg->uri('blog')."index.php");
-
 		if ($is_index) {
 			$next_list = $blg->getNextMax($this->num_entries);
 		} else {
 			$next_list = $blg->getRecent($this->num_entries);
 		}
+
+		ob_start();
 
 		if ( count($next_list) > 0 ) { 
 			if ($is_index) {
@@ -77,7 +85,67 @@ class Recent extends Plugin {
 </ul>
 <?php 
 		}  # End outer if
-	} #End function init_output
+		
+		$content = ob_get_contents();
+		ob_end_clean();
+		return $content;
+		
+	} #End function
+
+	function cachepath($new=false) { 
+		if ($this->cache_base_path) {
+			if ($new) {
+				return mkpath($this->cache_base_path, "cache", get_class($this)."_old_output.cache");
+			} else {
+				return mkpath($this->cache_base_path, "cache", get_class($this)."_new_output.cache");
+			}
+		} else {
+			return false;
+		}
+	}
+	
+	function invalidateCache($obj=false) {
+
+		$f = NewFS();
+		
+		$paths = array($this->cachepath(true), $this->cachepath(false));
+		
+		foreach ($paths as $cache_path) {
+			if (file_exists($cache_path)) {
+				$f->delete($cache_path);
+			}
+		}
+	}
+
+	function outputCache($obj=false) {
+
+		if (! is_a($obj, 'Blog')) $b = NewBlog();
+		else $b =& $obj;
+		$f = NewFS();
+
+		$is_index = ( current_url() == $b->uri('blog') || 
+		              current_url() == $b->uri('blog')."index.php" );
+		$is_index = $is_index && ! $this->only_recent;
+
+		if (! $this->enable_cache) {
+			echo $this->buildOutput($b, $is_index);
+		} else {
+			$cache_path = $this->cachepath($b);
+			
+			$vals = array(true, false);
+			foreach ($vals as $v) {
+				$cache_path = $this->cachepath($v);
+				if ($cache_path && ! file_exists($cache_path)) {
+					$content = $this->buildOutput($b, $v);
+					if (! is_dir(dirname($cache_path))) $f->mkdir(dirname($cache_path));
+					$f->write_file($cache_path, $content);
+				}
+			}
+			
+			if (file_exists($this->cachepath($is_index)))
+				readfile($this->cachepath($is_index));
+		}
+	}
 
 }
 

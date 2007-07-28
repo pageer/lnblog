@@ -341,14 +341,14 @@ if (ini_get("default_mimetype")) {
 # Constant: UPLOAD_IGNORE_UNINITIALIZED
 # Work around browsers that don't send form elements for undisplayed uploads.
 #
-# This constand works around a bug raised while testing under Konqueror.  When 
+# This constant works around a bug raised while testing under Konqueror.  When 
 # an entry was posted without ever showing the file upload box, i.e. the advanced
 # posting options were never expanded, the browser did not send any form field for
 # the upload field.  This resulted in an invalid field error raised by LnBlog instead
 # of the expected empty file.  
 #
 # If you get "invalid field name - upload not initiated" errors when you try to 
-# post an entry,but were not trying to upload a file with it, then set this to true.
+# post an entry, but were not trying to upload a file with it, then set this to true.
 
 /*
 Constant: LOCALPATH_TO_URI_MATCH_RE
@@ -433,6 +433,12 @@ The corresponding replacement expression to <URI_TO_LOCALPATH_MATCH_RE>.
 #
 # *Default* is false.
 @define("EDITOR_SHOW_SYMBOLS", false);
+
+# Constant: FILE_UPLOAD_TARGET_DIRECTORIES
+# A comma-separated string of target location options for file uploads.
+# These will be used in the search path when trying to absolutize relative 
+# URIs in entries.  The 
+define("FILE_UPLOAD_TARGET_DIRECTORIES", "files");
 
 ########################################
 # Section: User Authentication

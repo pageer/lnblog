@@ -17,7 +17,7 @@
 <div class="footer">
 	<ul>
 		<li class="articledate"><?php pf_("Published %s", $POSTDATE); ?></li>
-<?php if ($EDITDATE != $POSTDATE) { /* Add uuan edit date, if applicable. */?>
+<?php if ($EDITDATE != $POSTDATE) { /* Add an edit date, if applicable. */?>
 		<li class="articledate"><?php pf_("Updated %s", $EDITDATE); ?></li>
 <?php } ?>
 <?php if (! isset($NO_USER_PROFILE)) { /* Display profile link or not */ ?>
@@ -39,7 +39,7 @@
 </ul>
 <?php	}
 if ($SHOW_CONTROLS) { ?>
-<ul class="postadmin">
+<ul class="contolbar">
 <li><a href="<?php echo $UPLOAD_LINK; ?>"><?php p_("Upload File");?></a></li>
 <li><a href="<?php echo $EDIT_LINK; ?>"><?php p_("Edit");?></a></li>
 <li><a href="<?php echo $DELETE_LINK; ?>"><?php p_("Delete");?></a></li>

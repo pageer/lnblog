@@ -29,6 +29,8 @@
 require_once("lib/lnblogobject.php");
 #require_once("lib/creators.php");
 
+class PluginSettings { }
+
 class Plugin extends LnBlogObject{
 
 	/*	Property: plugin_desc
@@ -158,6 +160,12 @@ class Plugin extends LnBlogObject{
 				echo '<input name="'.$mem.'" id="'.$mem.'" type="text" value="'.$this->$mem.'" />';
 				echo '<input name="'.$mem.'_upload" id="'.$mem.'_upload" type="file" />';
 				echo "</div>\n";
+			} elseif ($config["control"] == "textarea") {
+				echo '<div>';
+				echo '<label for="'.$mem.'">'.$config["description"].'</label>';
+				echo '<textarea name="'.$mem.'" id="'.$mem.'" rows="10" cols="50">'.$this->$mem.'</textarea>';
+				echo "</div>\n";
+
 			} else { 
 				echo '<div>';
 				echo '<label for="'.$mem.'">'.$config["description"].'</label>';
@@ -189,10 +197,10 @@ class Plugin extends LnBlogObject{
 	function updateConfig() {
 		if (! $this->member_list) return false;
 		if (defined("BLOG_ROOT")) {
-			$parser = NewINIParser(BLOG_ROOT.PATH_DELIM."plugins.ini");
+			$parser = NewConfigFile(BLOG_ROOT.PATH_DELIM."plugins.xml");
 			$ul_path = BLOG_ROOT;
 		} else {
-			$parser = NewINIParser(USER_DATA_PATH.PATH_DELIM."plugins.ini");
+			$parser = NewConfigFile(USER_DATA_PATH.PATH_DELIM."plugins.xml");
 			$ul_path = USER_DATA_PATH;
 		}
 		foreach ($this->member_list as $mem=>$config) {
@@ -224,7 +232,7 @@ class Plugin extends LnBlogObject{
 		return $ret;
 	}
 	
-	# Metod: getConfig
+	# Method: getConfig
 	# Reads the configuration data for the plugin from a file and stores it
 	# in class variables.  
 	
@@ -237,6 +245,125 @@ class Plugin extends LnBlogObject{
 			if ($val == "1" || $val == "0") $this->$mem = intval($val);
 			else $this->$mem = $val;
 		}
+	}
+	
+	function convertINItoXML() {
+		
+	}
+	
+	# Section: Cache management functions
+	
+	# Method: cachepath
+	# Gets the path to the cache file for this plugin.  Note that there is, by default, only 
+	# one such file per plugin.  Plugins that need more must override this method.
+	# 
+	# Parameters:
+	# obj - The object to which the cache applies.  In the default implementation, this is 
+	#       the current blog.  Plugins which want to store cache data in an entry directory,
+	#       or a path based on some other object, must *override* this method.
+	#
+	# Returns:
+	# A string representing the local filesystem path to which cach data will be written.
+	# In the default implementation, this has the form BLOGROOT/cache/PLUGINCLASS_output.cache.
+	
+	function cachepath(&$obj) {
+		if (method_exists($obj, "isBlog") && $obj->isBlog())
+			return mkpath($obj->home_path, "cache", get_class($this)."_output.cache");
+			else return false;
+	}
+
+	# Method: invalidateCache
+	# Invalidates, i.e. deletes, the cache file for this plugin.
+	#
+	# Parameters:
+	# obj - Same as for <cachepath>.  If not specified, the current blog is used.  Note that
+	#       this parameter is passed on to <cachepath> and so can be used for implementing
+	#       multi-file caches.
+
+	function invalidateCache($obj=false) {
+		if ( ! is_a($obj, 'Blog')) $b =& NewBlog();
+		else $b = $obj;
+		$f = NewFS();
+		
+		$cache_path = $this->cachepath($b);
+		if (file_exists($cache_path)) {
+			return $f->delete($cache_path);
+		} else return true;
+	}
+	
+	# Method: buildOutput
+	# Method called by <outputCache> to regenerate cache data.  Plugins using the
+	# standard cache system *must* override this method to do their output.
+	#
+	# Parameters: 
+	# obj - An object to which this cache applies, as with <invalidateCache> and others.
+	#
+	# Returns:
+	# A string of data to send to the client.
+	
+	function buildOutput($obj) { return ''; }
+	
+	# Method: outputCache
+	# Dumps the contents of the cache file to the browser.  If the cache file exists, then
+	# the data comes from there.  Otherwise, <buildOutput> is called and the result used to
+	# create a fresh cache file.  Note that if the class has an enable_cache member and it is
+	# set to false, then the cache will be bypassed and only the result of <buildOutput> will
+	# be sent to the browser.
+	# 
+	# Parameters:
+	# obj - Object to which the cache applies.
+	
+	function outputCache($obj=false) {
+
+		if (! is_a($obj, 'Blog')) $b = NewBlog();
+		else $b =& $obj;
+		$f = NewFS();
+
+		if (isset($this->enable_cache) && ! $this->enable_cache) {
+			echo $this->buildOutput($b);
+		} else {
+			$cache_path = $this->cachepath($b);
+
+			if ($cache_path && ! file_exists($cache_path)) {
+				$content = $this->buildOutput($b);
+				if (! is_dir(dirname($cache_path))) {
+					$f->mkdir_rec(dirname($cache_path));
+				}
+				if (is_dir(dirname($cache_path)))
+					$f->write_file($cache_path, $content);
+			}
+	
+			if (file_exists($cache_path)) readfile($cache_path);
+		}
+	}
+	
+	# Method: registerStandardInvalidators
+	# Registers the standard set of cache invalidator events.  This registers the <invalidateCache>
+	# method as an event handler for the UpdateComplete, InsertComplete, and DeleteComplete 
+	# events for the BlogEntry and Article classes, as well as the UpdateComplete event of the
+	# blog class.
+	
+	function registerStandardInvalidators() {
+		$this->registerEventHandler("blogentry", "UpdateComplete", "invalidateCache");
+		$this->registerEventHandler("blogentry", "InsertComplete", "invalidateCache");
+		$this->registerEventHandler("blogentry", "DeleteComplete", "invalidateCache");
+		$this->registerEventHandler("article", "UpdateComplete", "invalidateCache");
+		$this->registerEventHandler("article", "InsertComplete", "invalidateCache");
+		$this->registerEventHandler("article", "DeleteComplete", "invalidateCache");
+		$this->registerEventHandler("blog", "UpdateComplete", "invalidateCache");
+	}
+	
+	# Method: getCache
+	# Returns the contents of the cache file as a string.
+	#
+	# Parameters:
+	# obj - Object to which the cache applies.
+	#
+	# Returns:
+	# A string with the contents of the cache file.
+	
+	function getCache($obj=false) {
+		
 	}
 	
 }

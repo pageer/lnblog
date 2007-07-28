@@ -45,7 +45,7 @@ class FTPFS extends FS {
 	function FTPFS($host=false, $user=false, $pass=false) {
 		$this->default_mode = FS_DEFAULT_MODE;
 		$this->script_mode = FS_SCRIPT_MODE;
-		$this->directory_mode = FS_DIRECTORYY_MODE;
+		$this->directory_mode = FS_DIRECTORY_MODE;
 
 		if ($host) $this->host = $host;
 		elseif (defined("FTPFS_HOST")) $this->host = FTPFS_HOST;
@@ -204,7 +204,11 @@ class FTPFS extends FS {
 	function chmod($path, $mode) {
 		if (! $this->connected() ) return false;
 		$path = $this->localpathToFSPath($path);
-		$ret = ftp_chmod($this->connection, $mode, $path);
+		if (function_exists(ftp_chmod)) {
+			$ret = ftp_chmod($this->connection, $mode, $path);
+		} else {
+			$ret = ftp_site($this->connection, "CHMOD $mode $path");
+		}
 		return $ret;
 	}
 

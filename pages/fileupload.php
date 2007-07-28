@@ -19,10 +19,8 @@
 */
 
 # File: fileupload.php
-# Used to upload a file to the web server.
-#
-# This is included by the uploadfile.php wrapper script for weblogs, 
-# blog entries, and articles.
+# Used to upload a file to the web server.  This is used to upload files
+# to entries, profiles, and the blog itself.
 
 session_start();
 
@@ -31,10 +29,14 @@ require_once("lib/creators.php");
 
 global $PAGE;
 
+$num_fields = 5;
+$target_under_blog = "";
+
 $blog = NewBlog();
 $ent = NewBlogEntry();
 $usr = NewUser();
 $tpl = NewTemplate(UPLOAD_TEMPLATE);
+$tpl->set("NUM_UPLOAD_FIELDS", $num_fields);
 
 $target = false;
 if ( isset($_GET["profile"]) &&  
@@ -44,6 +46,7 @@ if ( isset($_GET["profile"]) &&
 	$target = $ent->localpath();
 } elseif ($SYSTEM->canModify($blog, $usr)) {
 	$target = $blog->home_path;
+	if ($target_under_blog) $target = mkpath($target, $target_under_blog);
 }
 
 # Check that the user is logged in.
@@ -52,7 +55,10 @@ if (! $usr->checkLogin()) $target = false;
 if ($target) {
 
 	$file_name = "filename";
-	$f = NewFileUpload($file_name, $target);
+	$files = array();
+	for ($i = 1; $i <= $num_fields; $i++) {
+		$files[] = NewFileUpload($file_name.$i, $target);
+	}
 	
 	$query_string = isset($_GET["blog"])?"?blog=".$_GET["blog"]:'';
 	$query_string .= isset($_GET["profile"]) ?
@@ -65,16 +71,22 @@ if ($target) {
 	$size = str_replace("M", "000000", $size);
 	$tpl->set("MAX_SIZE", $size);
 	$tpl->set("FILE", $file_name);
-	$tpl->set("TARGET_URL", localpath_to_uri($f->destdir) );
+	$tpl->set("TARGET_URL", localpath_to_uri($files[0]->destdir) );
 
-	if ($f->status() == FILEUPLOAD_NOT_INITIALIZED) {
-		$msg = spf_("Select a file to upload to the current directory.  The file size limit is %s.",
-		               ini_get("upload_max_filesize"));
-		$tpl->set("UPLOAD_MESSAGE", $msg);
-	} else {
-		$tpl->set("UPLOAD_MESSAGE", $f->errorMessage() );
-		if ( $f->completed() ) $f->moveFile();
+	$msg = '';
+	foreach ($files as $f) {
+		if ($f->status() != FILEUPLOAD_NOT_INITIALIZED && $f->size > 0) {
+			$err = $f->errorMessage();
+			if ($msg) $msg .= "<br />";
+			$msg .= $err;
+			if ( $f->completed() ) $f->moveFile();
+		}
 	}
+	if (! $msg) {
+		$msg .= spf_("Select files to upload to the above location.  The file size limit is %s.",
+		             ini_get("upload_max_filesize"));
+	}
+	$tpl->set("UPLOAD_MESSAGE", $msg);
 	$body = $tpl->process();
 
 } else {

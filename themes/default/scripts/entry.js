@@ -30,3 +30,30 @@ function mark_type(itemtype) {
 		}
 	}
 }
+
+var http = new LnBlogAJAX();
+
+function reply_delete () {
+	var topli = this.parentNode.parentNode.parentNode;
+	var boxes = topli.getElementsByTagName('input');
+	for (var i = 0; i < boxes.length; i++) {
+		if (boxes[i].getAttribute('type') == 'hidden') {
+			//window.alert(boxes[i].getAttribute('value'));
+			
+		}
+	}
+	return false;
+}
+
+function attachDeleteHandlers() {
+	var dellinks = document.getElementsByTagName('a');
+	for (var i = 0; i < dellinks.length; i++) {
+		if (dellinks[i].getAttribute('class') == 'deletelink') {
+			//lnblog.addEvent(dellinks[i], 'click', reply_delete);
+			//dellinks[i].addEventListener('click', reply_delete, true);
+			dellinks[i].onclick = reply_delete;
+		}
+	}
+}
+
+lnblog.addEvent(window, 'load', attachDeleteHandlers);

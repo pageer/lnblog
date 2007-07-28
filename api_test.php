@@ -90,18 +90,18 @@ echo "Doing method $method\n";
 	switch ($method) {
 		case "blogger.newPost":
 			$params = array(new xmlrpcval("1234567", "string"), 
-			             new xmlrpcval($_POST['entid'], "string"),
-							 new xmlrpcval($_POST['username'], 'string'),
-							 new xmlrpcval($_POST['password'], 'string'),
-							 new xmlrpcval($_POST['data'], 'string'),
-							 new xmlrpcval(true, 'boolean'));
+			                new xmlrpcval($_POST['entid'], "string"),
+			                new xmlrpcval($_POST['username'], 'string'),
+			                new xmlrpcval($_POST['password'], 'string'),
+			                new xmlrpcval($_POST['data'], 'string'),
+			                new xmlrpcval(true, 'boolean'));
 			break;
 		case "blogger.deletePost":
 			$params = array(new xmlrpcval("1234567", "string"), 
-			             new xmlrpcval($_POST['entid'], "string"),
-							 new xmlrpcval($_POST['username'], 'string'),
-							 new xmlrpcval($_POST['password'], 'string'),
-							 new xmlrpcval(true, 'boolean'));
+			                new xmlrpcval($_POST['entid'], "string"),
+			                new xmlrpcval($_POST['username'], 'string'),
+			                new xmlrpcval($_POST['password'], 'string'),
+			                new xmlrpcval(true, 'boolean'));
 			break;
 		case "blogger.editPost":
 			$params = array(new xmlrpcval("1234567", "string"), 

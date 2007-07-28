@@ -19,4 +19,42 @@ Section: Getting Started
 
 Now that LnBlog is configured and can write its data files, it's time to set up a user account.  You should be directed to do this as soon as you have completed the file writing setup.  The first account you create will be the administrator account and will have the ability to create new blogs, new users, and basically change any setting within LnBlog.  User accounts you create after this will not be able to do this.
 
-The new user form should be fairly self-explanatory.  Just fill in the fields as you see fit.  The only required fields are the username and password.  Please note that LnBlog will create a directory for your username under which all your files will be kept, so do not put any spaces, punctuation, or special characters in your username.  If you want those, put them in yoru real name field, which is what readers will see on your posts.
+The new user form should be fairly self-explanatory.  Just fill in the fields as you see fit.  The only required fields are the username and password, but you if you want to receive e-mail notification of comments, you must supply an e-mail address. If you do not want your e-mail address displayed to readers, you can give a contact URL, which is simply HTML code that will be displayed as your contact link.
+ 
+Please note that LnBlog will create a directory for your username under which all your files will be kept, so do not put any spaces, punctuation, or special characters in your username.  If you want those, put them in your real name field, which is what readers will see on your posts.
+ 
+Section: Administration page
+ 
+After creating your first user account, you will be asked to log in and then redirected to the administration page.  In the future, you can access this page by going to the URL of your LnBlog directory, i.e. the same URL you used to start the initial configuration.  Please note that only an LnBlog administrator, like your first user account, can access this page.
+ 
+You can use the administration page to add new users, new blogs, and change various configuration settings.  The settings on this page will effect all blogs you manage with LnBlog.
+ 
+Section: Creating a blog
+ 
+To create your first blog, start by clicking the "new blog" link on the administration page.  This will take you to the new blog page where you can fill in the details.
+ 
+There are a number of fields on the new blog page that require some explanation.  First is the *blog path*.  This is the path on the web server where your blog will live.  Normally, this is relative to the *document root* on your web server, so if you give "myblog" as the path, then your blog will be stored at the URL http://yourhost.com/myblog/.  However, if you have set up LnBlog to support subdomains *and* you have a subdomain myblog.yourhost.com, *then* LnBlog will interpret "myblog" as meaning the path to the URL http://myblog.yourhost.com/.  
+ 
+The next two fields, *blog owner* and *additional allowed writers* both related to user security.  The *blog owner* is the username of that account with primary control of the blog.  This user can change all settings of the blog and edit all entries.  If you only have one user account so far, then that account will be filled in by default.
+ 
+The *additional allowed writers* is a comma-separated list of other users who can add new posts to the blog.  For example, if you had users bobsmith and janedoe, you might put "bobsmith,janedoe" in this box.  This would allow both those users to post new entries to the blog.  However, they would not be able to change blog settings like the theme or enabled plugins.  In addition, they will only be able to edit entries that they created.
+ 
+The next few fields are fairly self-explanatory: *blog name* and *description*.  These are simply the name of your blog and a short description that are displayed to users.  
+ 
+The *theme* is a set of templates, stylesheets, and scripts that determine how your blog pages look.  Please note that you can change your theme at any time and the changes will take effect immediately - no need to "republish" pages - so you can try out different themes to get an idea of what they look like.
+ 
+The next two fields should be fairly obvious as well.  They simply determine how many entries are displayed on the front page of your blog and how many are placed in your RSS feeds at a time.  This influences the size of the homepage and RSS feeds, but other than that it's just a matter of perference how many entries you would like in those locations.
+ 
+The next option, *send pingbacks when posting entries*, controls when your blog will send Pingbacks.  Pingback is a notification technology that allows one blog to notify another that a link to it has been posted.  So if I write a post linking to one of your blog entries, my blog will send a Pingback ping to your blog, telling it the URL of my post and the URL of your post that I linked to.  Your blog can then do things like send you an e-mail notification or add the link to a list to display with your entry.
+ 
+This setting can take one of three values: never, always, or new entries only.  To disable sending pingbacks by default, set this to *never*.  To always send pingbacks when posting, set it to *always*.  If you want to send pingbacks when you first post an entry, but not if you edit it later, then set this to "new entries only."  Please bear in mind that you can turn Pingback sending on and off on a per-post basis simply by clicking a checkbox, so this is simply for setting a convenient default.
+ 
+The *allow enclosures in entries* setting is another convenience setting.  Turning this off will disable the enclosure box on the entry editing page.  This is simply to get it out of the way if you don't use it.  If you *do* want to do podcasting, leave this checked and your entry edit page will have a box to enter the URL of your audio file.
+ 
+Lastly, we have the *default markup for entries and articles* setting.  Again, this can be changed on a per-entry basis, so this is just for setting a convenient defaults.  The markup type can be: HTML, LBCode, or auto-markup.  HTML is means that the entry will be raw HTML code, so you are responsible for making it valid, etc.  Auto-markup is, effectively, plain text.  It will convert your line-breaks in HTML BR and P tags and make any links you post clickable, but that's it.  LBCode is a variant of the BBCode markup that is popular on web forums.  It treats line breaks like auto-markup, but also allows you to post links with arbitrary text, use bold, italics, underlines, colored text, and so forth.
+ 
+Once you have set all the options to your liking, click the "submit" button to create your blog.  If all goes well, you should be redirected to your new, empty blog page.
+ 
+Section: Posting an entry
+
+Now that you've got your blog, it's time to start filling it up.

@@ -61,14 +61,14 @@ class FileUpload extends LnBlogObject {
 				$this->tempname = $_FILES[$field]['tmp_name'];
 				$this->size = $_FILES[$field]['size'];
 				$this->mimetype = $_FILES[$field]['type'];
-				if (php_version_at_least("4.2.0")) 
+				if (isset($_FILES[$field]['error'])) 
 					$this->error = $_FILES[$field]['error'];
 			} else {
 				$this->destname = $_FILES[$field]['name'][$index];
 				$this->tempname = $_FILES[$field]['tmp_name'][$index];
 				$this->size = $_FILES[$field]['size'][$index];
 				$this->mimetype = $_FILES[$field]['type'][$index];
-				if (php_version_at_least("4.2.0")) 
+				if (isset($_FILES[$field]['error'])) 
 					$this->error = $_FILES[$field]['error'][$index];
 			}
 			$this->error = FILEUPLOAD_NO_ERROR;
@@ -86,7 +86,7 @@ class FileUpload extends LnBlogObject {
 
 		if ($this->error == FILEUPLOAD_NOT_INITIALIZED) return $this->error;
 
-		if (php_version_at_least("4.2.0")) {
+		if (defined("UPLOAD_ERR_OK")) {
 			switch ($this->error) {
 				case UPLOAD_ERR_OK:
 					$ret = FILEUPLOAD_NO_ERROR;

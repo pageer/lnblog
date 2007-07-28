@@ -10,7 +10,7 @@
 class SimpleXMLWriter {
 
 	function SimpleXMLWriter(&$object) {
-		$this->object = $object;
+		$this->object =& $object;
 		$this->exclude_list = array();
 		$this->cdata_list = array();
 	}
@@ -39,39 +39,42 @@ class SimpleXMLWriter {
 
 	function cdata() {
 		$list = func_get_args();
-		$this->cdata_list = array_merge($this->exclude_list, $list);
+		$this->cdata_list = array_merge($this->cdata_list, $list);
 	}
 
-	function serialize_array(&$arr, $tag) {
-		if (count($arr) == 0) return '';
-
-		$ret = "<$tag>\n";
+	function serializeArray(&$arr, $tag) {
+		
+		$ret = "<$tag type=\"array\">\n";
+		
 		if (substr($tag, strlen($tag) - 1, 1) == 's') {
 			$newtag = substr($tag, 0, strlen($tag) - 1);
 		} else {
 			$newtag = "elem";
 		}
-		foreach ($arr as $val) {
+		foreach ($arr as $key=>$val) {
+			if (! is_numeric($key)) $currtag = $key;
+			else $currtag = $newtag;
 			if (is_array($val)) {
-				$ret .= $this->serialize_array($val, $newtag);
+				$ret .= SimpleXMLWriter::serializeArray($val, $currtag);
 			} else {
-				$ret .= "<$newtag>".htmlspecialchars($val)."</$newtag>\n";
+				$ret .= "<$currtag>".htmlspecialchars($val)."</$currtag>\n";
 			}
 		}
 		$ret .= "</$tag>\n";
 		return $ret;
 	}
 
-	function serialize() {
-		$ret = '<?xml version="1.0" encoding="utf-8"?>'."\n";
-		$ret .= '<'.get_class($this->object).">\n";
-		foreach ($this->object as $field=>$value) {
+	function serializeObject(&$obj) {
+		$ret = '<'.get_class($obj).">\n";
+		foreach ($obj as $field=>$value) {
 			if (! in_array($field, $this->exclude_list) &&
 			      (! is_string($value) || $value !== '') ) {
 				if (is_bool($value)) {
-					$ret .= "<$field>".($value ? "1" : "0")."</$field>\n";
+					$ret .= "<$field type=\"bool\">".($value ? "true" : "false")."</$field>\n";
+				} elseif (is_int($value)) {
+					$ret .= "<$field type=\"int\">$value</$field>\n";
 				} elseif (is_array($value)) {
-					$ret .= $this->serialize_array($value, $field);
+					$ret .= SimpleXMLWriter::serializeArray($value, $field);
 				} elseif (in_array($field, $this->cdata_list)) {
 					$ret .="<$field><![CDATA[$value]]></$field>\n";
 				} else {
@@ -80,6 +83,18 @@ class SimpleXMLWriter {
 			}
 		}
 		$ret .= '</'.get_class($this->object).">\n";
+		return $ret;
+	}
+
+	function serialize() {
+		$ret = '<?xml version="1.0" encoding="utf-8"?>'."\n";
+		if (is_object($this->object)) {
+			$ret .= $this->serializeObject($this->object);
+		} elseif (is_array($this->object)) {
+			$ret .= $this->serializeArray($this->object, "array");
+		} else {
+			$ret .= "<item>".$this->object."</item>\n";
+		}
 		return $ret;
 	}
 }
@@ -152,10 +167,14 @@ class SimpleXMLReader {
 	function make_array(&$arr) {
 		$ret = array();
 		foreach ($arr as $a) {
-			if (! isset($a['children']) || count($a['children']) == 0) {
-				$ret[] = $a['text'];
-			} else {
+			if ( isset($a['children']) ) {
 				$ret[] = $this->make_array($a['children']);
+			} else {
+				if ($this->getOption('assoc_arrays')) {
+					$ret[$a['tag']] = $a['text'];
+				} else {
+					$ret[] = SimpleXMLReader::getVal($a);
+				}
 			}
 		}
 		return $ret;
@@ -167,17 +186,46 @@ class SimpleXMLReader {
 		$this->populateObject($obj);
 		return $obj;
 	}
+	
+	function getVal(&$childnode) {
+		if ( isset($childnode['attributes']['TYPE']) ) {
+			$type = $childnode['attributes']['TYPE'];
+			switch($type) {
+				case 'int':
+					return (int)$childnode['text'];
+					break;
+				case 'string':
+				default:
+					return $childnode['text'];
+			}
+		} else {
+			return $childnode['text'];
+		}
+	}
+	
+	function setVal(&$obj, $node) {
+		$tag = $node['tag'];
+		if (isset($obj->$tag) && is_bool($obj->$tag)) {
+			$obj->$tag = (bool)$node['text'];
+		} elseif (isset($obj->$tag) && is_int($obj->$tag)) {
+			$obj->$tag = (int)$node['text'];
+		} elseif (isset($obj->$tag) && is_string($obj->$tag)) {
+			$obj->$tag = (string)$node['text'];
+		} else {
+			$obj->$tag = SimpleXMLReader::getVal($node);
+		}
+	}
 
 	function populateObject(&$obj) {
-
+		if (! isset($this->domtree['children'])) return;
 		foreach ($this->domtree['children'] as $child) {
-		#for ($i=0; $i < count($this->domtree['children']); $i++) {
-		#$child = $this->domtree['children'][$i];
-			if (! isset($child['children']) || count($child['children']) == 0) {
-				#$prop = $child['tag'];
-				$obj->$child['tag'] = $child['text'];
-			} else {
+			if ( isset($child['children']) ) {
 				$obj->$child['tag'] = $this->make_array($child['children']);
+			} elseif ( isset($child['attributes']['TYPE']) && 
+			           $child['attributes']['TYPE'] == 'array' ) {
+				$obj->$child['tag'] = array();
+			} else {
+				SimpleXMLReader::setVal($obj, $child);
 			}
 		}
 	}

@@ -84,10 +84,10 @@ if (has_post()) {
 	$PLUGIN_MANAGER->exclude_list = $disabled; #implode(",", $disabled);
 	$PLUGIN_MANAGER->load_first = $lfirst; #implode(",", $first);
 	
-	if (defined("BLOG_ROOT")) $file = BLOG_ROOT.PATH_DELIM."plugins.ini";
-	else $file = USER_DATA_PATH.PATH_DELIM."plugins.ini";
+	if (defined("BLOG_ROOT")) $file = BLOG_ROOT.PATH_DELIM."plugins.xml";
+	else $file = USER_DATA_PATH.PATH_DELIM."plugins.xml";
 	
-	$parser = NewINIParser($file);
+	$parser = NewConfigFile($file);
 	$parser->setValue("Plugin_Manager", "exclude_list", implode(",",$disabled));
 	$parser->setValue("Plugin_Manager", "load_first", implode(",",$lfirst));
 	$ret = $parser->writeFile();

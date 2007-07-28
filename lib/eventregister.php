@@ -162,6 +162,7 @@ class EventRegister {
 	 *            handlers.
 	 * raisecls - The name of the class the event belongs to.
 	 * event    - The name of the event.
+	 * data     - An *optional* array of data parameters for the event handler.
 	 *
 	 * Returns:
 	 * False if the event does not exist, true otherwise.
@@ -170,55 +171,52 @@ class EventRegister {
 	 * <activateEvent>
 	 */
 
-	function activateEventFull(&$param, $raisecls, $event) {
+	function activateEventFull(&$param, $raisecls, $event, $data=false) {
+		if (!$data) $data = array();
+	
 		$rcls = strtolower($raisecls);
 		$ename = strtolower($event);
 		if (! $this->isEvent($rcls,$ename)) return false;
-#echo '<pre>';
-#print_r($this->event_list);
-#echo '</pre>';
+
 		$keys = array_keys($this->event_list[$rcls][$ename]);
-		#foreach ($this->event_list[$rcls][$ename] as $classname=>$handlers) {
+		
 		foreach ($keys as $classname) {
 
 			if ( class_exists($classname) && 
 			     $this->event_list[$rcls][$ename][$classname]['instance'] ) {
+			
 				if (isset($this->event_list[$rcls][$ename][$classname]['object'])) {
+				
 					$tmp_class =& $this->event_list[$rcls][$ename][$classname]['object'];
+
 					if ( strtolower(get_class($tmp_class)) != $classname) {
 						$tmp_class = new $classname;
-						#echo "Didn't work: $classname<br />\n";
 					}
+					
 				} else {
 					$tmp_class = new $classname;
 				}
+			
 			} else {
 				$tmp_class = false;
 			}
-
-			#if (get_class($tmp_class) != strtolower($classname)) 
-			#	echo "<p>Class: $classname != ".get_class($tmp_class)."</p>";
-
+			
 			foreach ($this->event_list[$rcls][$ename][$classname]['instance'] as $hnd) {
-			#echo '<p>'."$rcls -> $ename -> $classname<br />".
-			#		get_class($tmp_class).': '.
-			#     (is_object($tmp_class)?"yes":"no").'<br />'.
-			#	  (method_exists($tmp_class, $hnd)?"yes":"no").': '.
-			#	  $hnd.'</p>';
-	
 				if ( method_exists($tmp_class, $hnd) ) {
-					$tmp_class->$hnd($param);
+					$tmp_class->$hnd($param, $data);
 				} else {
-					call_user_func($hnd, $param);
+					call_user_func($hnd, $param, $data);
 				}
+				
 			}
+			
 			foreach ($this->event_list[$rcls][$ename][$classname]['static'] as $hnd) {
 				$methods = get_class_methods($classname);
 				$ret = array_search(strtolower($hnd),$methods);
 				if ($ret !== false && $ret !== null) {
-					call_user_func(array($classname, $hnd), $param);
+					call_user_func(array($classname, $hnd), $param, $data);
 				} else {
-					call_user_func($hnd, $param);
+					call_user_func($hnd, $param, $data);
 				}
 			}
 		}
@@ -232,6 +230,7 @@ class EventRegister {
 	 * raiser - The object which is raising the event.  This is passed by 
 	 *          reference to the event handler.
 	 * event  - The name of the event.
+	 * params - An *optional*  array of parameters to pass to the event handler.
 	 *
 	 * Returns:
 	 * False if the event does not exist, true otherwise.
@@ -240,9 +239,10 @@ class EventRegister {
 	 * <activateEventFull>
 	 */
 
-	function activateEvent(&$raiser, $event) {
+	function activateEvent(&$raiser, $event, $params=false) {
+		if (!$params) $params = array();
 		return $this->activateEventFull($raiser, 
-		             strtolower(get_class($raiser)), $event);
+		             strtolower(get_class($raiser)), $event, $params);
 	}
 }
 

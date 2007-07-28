@@ -13,6 +13,10 @@ html, body { height: 100%; }  /* Use the whole page. */
 	border: 1px solid black;
 	background-color: #6b85b0;  /* A grayish-blue. */
 	background-repeat: no-repeat;
+	margin: 0;
+	padding: 0;
+	float: left;
+	clear: both;
 }
 
 /* Menubar - right underneath the banner, same width. */
@@ -21,6 +25,10 @@ html, body { height: 100%; }  /* Use the whole page. */
 	border: 1px solid black;
 	background: #cdcdcd; /* A darker gray. */
 	border-top: none;
+	margin: 0;
+	padding: 0;
+	float: left;
+	clear: both;
 }
 
 /* Page content area - left side of page, with margins. */
@@ -46,12 +54,15 @@ html, body { height: 100%; }  /* Use the whole page. */
    at the beginning. */
 #menubar h1, #menubar h2 {
 	font-size: 100%;
-	display: inline;
+	float: left;
+	clear: left;
+	margin: 0;
 }
 
 #menubar ul {
-	display: inline;
+	float: left;
 	padding-left: 2em;
+	margin: 0;
 }
 
 #menubar ul li {
@@ -61,6 +72,12 @@ html, body { height: 100%; }  /* Use the whole page. */
 	margin-right: 1em;
 }
 
+#menubar > .location > li{
+	margin: 0;
+}
+#menubar > .location > li:before {
+	content: "\00BB \0020";
+}
 
 /***** Sidebar styles *****/
 
@@ -116,8 +133,8 @@ html, body { height: 100%; }  /* Use the whole page. */
 	width: 92%;
 } 
 
-#sidebar ul li a:hover, 
-#sidebar ul li:hover {
+#sidebar > ul > li a:hover, 
+#sidebar > ul > li:hover {
 	background-color: white;
 }
 
@@ -133,6 +150,19 @@ html, body { height: 100%; }  /* Use the whole page. */
 	border: 0;
 }
 
+.description {
+	font-size: 80%;
+}
+
+#blogroll ul li ul li {
+	list-style-type: square;
+	list-style-position: inside;
+}
+
+#blogroll > ul,
+#blogroll > ul > li {
+	margin: 0;
+}
 
 /***** Banner styles *****/
 
@@ -149,6 +179,16 @@ html, body { height: 100%; }  /* Use the whole page. */
 	color: white;
 }
 
+.bannerpanel,
+.menupanel {
+	float: right;
+	width: 20em;
+}
+
+#banner .bannerpanel form,
+#banner .bannerpanel fieldset {
+	width: 100%;
+}
 /***** Link styles *****/
 
 /* Base link style: blue text, no underline.

@@ -169,14 +169,14 @@ function show_entry_page(&$blg, &$ent, &$usr) {
 	# Get the entry AFTER posting the comment so that the comment count is right.
 	$PAGE->title = $ent->title() . " - " . $blg->title();
 	$show_ctl = $SYSTEM->canModify($ent, $usr) && $usr->checkLogin();
-	$content =  $ent->get($show_ctl);
+	$content =  $ent->getFull($show_ctl);
 	
 	if ($SYSTEM->sys_ini->value("entryconfig", "GroupReplies", 0)) {
 		$content .= show_all_replies($ent, $usr);
 	} else {
-		$content .= show_trackbacks($ent, $usr);
-		$content .= show_pingbacks($ent, $usr);
-		$content .= show_comments($ent, $usr);
+		#$content .= show_trackbacks($ent, $usr);
+		#$content .= show_pingbacks($ent, $usr);
+		#$content .= show_comments($ent, $usr);	
 	}
 	
 	# Add comment form if applicable.
@@ -185,7 +185,7 @@ function show_entry_page(&$blg, &$ent, &$usr) {
 	if ($ent->enclosure) {
 		$enc = $ent->getEnclosure();
 		if ($enc) {
-			$enc_arr = array("rel"=>_('enclosure'), 
+			$enc_arr = array("rel"=>'enclosure', 
 							 "href"=>$enc['url'], 
 							 "type"=>$enc['type']);
 			$PAGE->addLink($enc_arr);

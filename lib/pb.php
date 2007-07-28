@@ -219,9 +219,23 @@ class Pingback extends Trackback {
 		$tpl->set("PB_IP", $this->ip);
 		$tpl->set("PB_TITLE", $this->title);
 		$tpl->set("PB_EXCERPT", $this->excerpt);
+		$tpl->set("PB_LOCAL", $this->isLocal());
 		
 		$this->raiseEvent("OutputComplete");
 		return $tpl->process();
+	}
+	
+	# Method: isLocal
+	# Determines whether or not the pingback is to an entry on the 
+	# current blog and/or server.
+	#
+	# Returns:
+	# True if the source and target are on the same host, false otherwise.
+	
+	function isLocal() {
+		$source_info = parse_url($this->source);
+		$target_info = parse_url($this->target);
+		return $source_info['host'] == $target_info['host'];
 	}
 	
 	# The following Trackback methods are private and are not to be inherited by
@@ -299,7 +313,7 @@ class Pingback extends Trackback {
 	
 	function checkPingbackEnabled($url) {
 		# First check the page headers.
-		$pageheaders = $this->fetchPage($url, true);
+		$pageheaders = Pingback::fetchPage($url, true);
 		$pingback_server = '';
 		$text_data = false;
 		
@@ -328,7 +342,7 @@ class Pingback extends Trackback {
 		}
 		
 		if (! $pingback_server && $text_data) {
-			$pagedata = $this->fetchPage($url);
+			$pagedata = Pingback::fetchPage($url);
 			$ret = preg_match('|<link rel="pingback" href="([^"]+)" ?/?>|',
 				              $pagedata, $matches);
 			if ($ret) {

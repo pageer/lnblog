@@ -136,17 +136,13 @@ function get_archive_objects(&$blog, $type) {
 function get_reply_objects(&$main_obj, $type) {
 	switch ($type) {
 		case 'comment':
-			if (is_a($main_obj, 'Blog')) return $main_obj->getComments();
-			else return $main_obj->getCommentArray();
+			return $main_obj->getComments();
 		case 'trackback':
-			if (is_a($main_obj, 'Blog')) return $main_obj->getTrackbacks();
-			else return $main_obj->getTrackbackArray();
+			return $main_obj->getTrackbacks();
 		case 'pingback':
-			if (is_a($main_obj, 'Blog')) return $main_obj->getPingbacks();
-			else return $main_obj->getPingbackArray();
+			return $main_obj->getPingbacks();
 		default:
-			if (is_a($main_obj, 'Blog')) return $main_obj->getReplies();
-			else return $main_obj->getAllReplies();
+			return $main_obj->getReplies();
 	}
 }
 

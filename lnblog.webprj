@@ -53,7 +53,6 @@
     <item modified_time="1155949272" url="lib/system.php" uploadstatus="1" />
     <item modified_time="1163514066" url="lib/tb.php" uploadstatus="1" />
     <item modified_time="1156204448" url="lib/template.php" uploadstatus="1" />
-    <item modified_time="1148797430" url="lib/textsearch.php" uploadstatus="1" />
     <item modified_time="1156373812" url="lib/upload.php" uploadstatus="1" />
     <item modified_time="1163225446" url="lib/user.php" uploadstatus="1" />
     <item modified_time="1174083664" url="lib/utils.php" uploadstatus="1" />
@@ -84,19 +83,18 @@
     <item modified_time="1148797430" url="plugins/readme.txt" uploadstatus="1" />
     <item modified_time="1163532856" url="plugins/reply_notifier.php" uploadstatus="1" />
     <item modified_time="1163220764" url="plugins/rss1_generator.php" uploadstatus="1" />
-    <item modified_time="1163613946" url="plugins/rss2_generator.php" uploadstatus="1" />
-    <item modified_time="1153512192" url="plugins/rss_links.php" uploadstatus="1" />
+    <item modified_time="1177729263" url="plugins/rss2_generator.php" uploadstatus="1" />
     <item modified_time="1160614552" url="plugins/sidebar_archives.php" uploadstatus="1" />
     <item modified_time="1164224153" url="plugins/sidebar_articles.php" uploadstatus="1" />
-    <item modified_time="1174102272" url="plugins/sidebar_calendar.php" uploadstatus="1" />
+    <item modified_time="1177728786" url="plugins/sidebar_calendar.php" uploadstatus="1" />
     <item modified_time="1153512220" url="plugins/sidebar_googlesearch.php" uploadstatus="1" />
     <item modified_time="1160614672" url="plugins/sidebar_loginlink.php" uploadstatus="1" />
     <item modified_time="1160614660" url="plugins/sidebar_loginops.php" uploadstatus="1" />
-    <item modified_time="1160604146" url="plugins/sidebar_news.php" uploadstatus="1" />
+    <item modified_time="1177984704" url="plugins/sidebar_news.php" uploadstatus="1" />
     <item modified_time="1160612804" url="plugins/sidebar_poweredby.php" uploadstatus="1" />
     <item modified_time="1163221192" url="plugins/sidebar_recent.php" uploadstatus="1" />
     <item modified_time="1160614528" url="plugins/sidebar_search.php" uploadstatus="1" />
-    <item modified_time="1163204798" url="plugins/sidebar_tags.php" uploadstatus="1" />
+    <item modified_time="1177729468" url="plugins/sidebar_tags.php" uploadstatus="1" />
     <item modified_time="1153862256" url="plugins/trackbackrdf.php" uploadstatus="1" />
     <item modified_time="1156283836" url="plugins/trackback_validator.php" uploadstatus="1" />
     <item url="themes/" uploadstatus="1" />
@@ -134,35 +132,35 @@
     <item modified_time="1162594384" url="themes/default/styles/main.css" uploadstatus="1" />
     <item modified_time="1160794896" url="themes/default/styles/reply.css" uploadstatus="1" />
     <item modified_time="1163792939" url="themes/default/styles/rss.css" uploadstatus="1" />
-    <item url="themes/default/templates/" uploadstatus="1" />
-    <item modified_time="1153514068" url="themes/default/templates/archive_layout_tpl.php" uploadstatus="1" />
-    <item modified_time="1163202976" url="themes/default/templates/article_tpl.php" uploadstatus="1" />
-    <item modified_time="1153377238" url="themes/default/templates/basic_layout_tpl.php" uploadstatus="1" />
-    <item modified_time="1157664158" url="themes/default/templates/blog_admin_tpl.php" uploadstatus="1" />
-    <item modified_time="1160794504" url="themes/default/templates/blogcomment_tpl.php" uploadstatus="1" />
-    <item modified_time="1163204202" url="themes/default/templates/blogentry_tpl.php" uploadstatus="1" />
-    <item modified_time="1158266184" url="themes/default/templates/blog_modify_tpl.php" uploadstatus="1" />
-    <item modified_time="1157664520" url="themes/default/templates/blog_path_tpl.php" uploadstatus="1" />
-    <item modified_time="1174083210" url="themes/default/templates/comment_form_tpl.php" uploadstatus="1" />
-    <item modified_time="1148797430" url="themes/default/templates/confirm_tpl.php" uploadstatus="1" />
-    <item modified_time="1154037022" url="themes/default/templates/css_editor_tpl.php" uploadstatus="1" />
-    <item modified_time="1148797430" url="themes/default/templates/docroot_test_tpl.php" uploadstatus="1" />
-    <item modified_time="1174268310" url="themes/default/templates/entry_edit_tpl.php" uploadstatus="1" />
-    <item modified_time="1148797430" url="themes/default/templates/file_edit_tpl.php" uploadstatus="1" />
-    <item modified_time="1148797430" url="themes/default/templates/fs_config_tpl.php" uploadstatus="1" />
-    <item modified_time="1148797430" url="themes/default/templates/ftproot_test_tpl.php" uploadstatus="1" />
-    <item modified_time="1161208548" url="themes/default/templates/js_editor.php" uploadstatus="1" />
-    <item modified_time="1158720742" url="themes/default/templates/list_tpl.php" uploadstatus="1" />
-    <item modified_time="1153119772" url="themes/default/templates/login_create_tpl.php" uploadstatus="1" />
-    <item modified_time="1148797430" url="themes/default/templates/login_tpl.php" uploadstatus="1" />
-    <item modified_time="1154657860" url="themes/default/templates/page_head_tpl.php" uploadstatus="1" />
-    <item modified_time="1156371376" url="themes/default/templates/pingback_tpl.php" uploadstatus="1" />
-    <item modified_time="1148797430" url="themes/default/templates/plugin_layout_tpl.php" uploadstatus="1" />
-    <item modified_time="1148797430" url="themes/default/templates/plugin_load_config_tpl.php" uploadstatus="1" />
-    <item modified_time="1148797430" url="themes/default/templates/send_trackback_tpl.php" uploadstatus="1" />
-    <item modified_time="1160794938" url="themes/default/templates/trackback_tpl.php" uploadstatus="1" />
-    <item modified_time="1148797430" url="themes/default/templates/upload_form_tpl.php" uploadstatus="1" />
-    <item modified_time="1153119772" url="themes/default/templates/user_info_tpl.php" uploadstatus="1" />
+    <item documentFolder="true" url="themes/default/templates/" uploadstatus="0" />
+    <item modified_time="1153514068" url="themes/default/templates/archive_layout_tpl.php" uploadstatus="0" />
+    <item modified_time="1163202976" url="themes/default/templates/article_tpl.php" uploadstatus="0" />
+    <item modified_time="1153377238" url="themes/default/templates/basic_layout_tpl.php" uploadstatus="0" />
+    <item modified_time="1157664158" url="themes/default/templates/blog_admin_tpl.php" uploadstatus="0" />
+    <item modified_time="1160794504" url="themes/default/templates/blogcomment_tpl.php" uploadstatus="0" />
+    <item modified_time="1163204202" url="themes/default/templates/blogentry_tpl.php" uploadstatus="0" />
+    <item modified_time="1158266184" url="themes/default/templates/blog_modify_tpl.php" uploadstatus="0" />
+    <item modified_time="1157664520" url="themes/default/templates/blog_path_tpl.php" uploadstatus="0" />
+    <item modified_time="1174083210" url="themes/default/templates/comment_form_tpl.php" uploadstatus="0" />
+    <item modified_time="1148797430" url="themes/default/templates/confirm_tpl.php" uploadstatus="0" />
+    <item modified_time="1154037022" url="themes/default/templates/css_editor_tpl.php" uploadstatus="0" />
+    <item modified_time="1148797430" url="themes/default/templates/docroot_test_tpl.php" uploadstatus="0" />
+    <item modified_time="1174268310" url="themes/default/templates/entry_edit_tpl.php" uploadstatus="0" />
+    <item modified_time="1148797430" url="themes/default/templates/file_edit_tpl.php" uploadstatus="0" />
+    <item modified_time="1148797430" url="themes/default/templates/fs_config_tpl.php" uploadstatus="0" />
+    <item modified_time="1148797430" url="themes/default/templates/ftproot_test_tpl.php" uploadstatus="0" />
+    <item modified_time="1161208548" url="themes/default/templates/js_editor.php" uploadstatus="0" />
+    <item modified_time="1158720742" url="themes/default/templates/list_tpl.php" uploadstatus="0" />
+    <item modified_time="1153119772" url="themes/default/templates/login_create_tpl.php" uploadstatus="0" />
+    <item modified_time="1148797430" url="themes/default/templates/login_tpl.php" uploadstatus="0" />
+    <item modified_time="1154657860" url="themes/default/templates/page_head_tpl.php" uploadstatus="0" />
+    <item modified_time="1156371376" url="themes/default/templates/pingback_tpl.php" uploadstatus="0" />
+    <item modified_time="1148797430" url="themes/default/templates/plugin_layout_tpl.php" uploadstatus="0" />
+    <item modified_time="1148797430" url="themes/default/templates/plugin_load_config_tpl.php" uploadstatus="0" />
+    <item modified_time="1148797430" url="themes/default/templates/send_trackback_tpl.php" uploadstatus="0" />
+    <item modified_time="1160794938" url="themes/default/templates/trackback_tpl.php" uploadstatus="0" />
+    <item modified_time="1148797430" url="themes/default/templates/upload_form_tpl.php" uploadstatus="0" />
+    <item modified_time="1153119772" url="themes/default/templates/user_info_tpl.php" uploadstatus="0" />
     <item url="themes/skepticats/" uploadstatus="1" />
     <item url="themes/skepticats/images/" uploadstatus="1" />
     <item modified_time="1148797430" url="themes/skepticats/images/logo.png" uploadstatus="1" />
@@ -237,21 +235,13 @@
     <item modified_time="1163221648" url="themes/tuxice/templates/article_tpl.php" uploadstatus="1" />
     <item modified_time="1155894744" url="themes/tuxice/templates/basic_layout_tpl.php" uploadstatus="1" />
     <item modified_time="1148797428" url="themes/tuxice/templates/blogcomment_tpl.php" uploadstatus="1" />
-    <item modified_time="1173411383" url="themes/tuxice/templates/blogentry_tpl.php" uploadstatus="1" />
     <item modified_time="1148797428" url="themes/tuxice/templates/include_menubar.php" uploadstatus="1" />
     <item url="userdata/" uploadstatus="0" />
     <item url="userdata/pageer/" uploadstatus="0" />
     <item modified_time="1163303558" url="userdata/pageer/passwd.php" uploadstatus="0" />
-    <item modified_time="1163303558" url="userdata/pageer/user.ini" uploadstatus="0" />
-    <item url="userdata/plugins/" uploadstatus="0" />
-    <item modified_time="1162861360" url="userdata/plugins/bot_block.php" uploadstatus="0" />
-    <item modified_time="1163282192" url="userdata/plugins/sidebar_contact.php" uploadstatus="0" />
-    <item modified_time="1162861530" url="userdata/plugins/sidebar_recentcomments.php" uploadstatus="0" />
     <item modified_time="1161387162" url="userdata/groups.ini" uploadstatus="0" />
-    <item modified_time="1152399198" url="userdata/ip_ban.txt" uploadstatus="0" />
     <item modified_time="1163225400" url="userdata/profile.ini" uploadstatus="0" />
     <item modified_time="1162346636" url="userdata/system.ini" uploadstatus="0" />
-    <item modified_time="1163215562" url="userdata/userconfig.cfg" uploadstatus="0" />
     <item url="xmlrpc/" uploadstatus="1" />
     <item modified_time="1148797428" url="xmlrpc/ChangeLog" uploadstatus="1" />
     <item modified_time="1148797428" url="xmlrpc/NEWS" uploadstatus="1" />
@@ -292,15 +282,9 @@
     <toolbars>toolbars/</toolbars>
     <annotations/>
     <item modified_time="1163200716" url="lib/xml.php" uploadstatus="1" />
-    <item modified_time="1162861718" url="userdata/plugins.ini" uploadstatus="1" />
     <item modified_time="1164770828" url="lnblog.webprj" uploadstatus="0" />
     <item modified_time="1163221296" url="themes/skepticats/styles/entry.css" uploadstatus="1" />
     <item modified_time="1164080706" url="themes/default/styles/rss.xsl" uploadstatus="1" />
-    <item modified_time="1163304188" url="userdata/pageer/face.jpg" uploadstatus="0" />
-    <item modified_time="1163437036" url="userdata/pageer/profile.htm" uploadstatus="0" />
-    <item modified_time="1163305252" url="userdata/plugins/sidebar_profile.php" uploadstatus="1" />
-    <item modified_time="1163710948" url="userdata/feed_generator.php" uploadstatus="1" />
-    <item modified_time="1162576390" url="userdata/menubar_breadcrumbs.php" uploadstatus="1" />
     <item url="themes/smooth/styles/entry.css" uploadstatus="1" />
     <item modified_time="1165883941" url="plugins/linksleeve.php" uploadstatus="1" />
     <item url="lib/blog-mysql.php" uploadstatus="1" />
@@ -312,10 +296,9 @@
     <item url="pages/manage_replies.php" uploadstatus="1" />
     <item url="themes/default/scripts/fs_setup.js" uploadstatus="1" />
     <item url="themes/default/scripts/lnblog_lib.js" uploadstatus="1" />
-    <item url="themes/default/templates/manage_replies_tpl.php" uploadstatus="1" />
+    <item url="themes/default/templates/manage_replies_tpl.php" uploadstatus="0" />
     <item url="xmlrpc.php" uploadstatus="1" />
     <item url="pages/showdrafts.php" uploadstatus="1" />
-    <item modified_time="1174099925" url="lib/urifactory.php" uploadstatus="1" />
     <item url="pages/entryedit.php" uploadstatus="1" />
     <item url="xmlrpc/compat/" uploadstatus="1" />
     <item url="xmlrpc/compat/array_key_exists.php" uploadstatus="1" />
@@ -345,6 +328,198 @@
     <item url="themes/clean/images/" uploadstatus="1" />
     <item url="themes/clean/scripts/" uploadstatus="1" />
     <item url="themes/clean/styles/main.css" uploadstatus="1" />
-    <item url="themes/default/templates/sidebar_panel_tpl.php" uploadstatus="1" />
+    <item url="themes/default/templates/sidebar_panel_tpl.php" uploadstatus="0" />
+    <item url="themes/default/templates/blogentry_summary_tpl.php" uploadstatus="1" />
+    <item url="lib/xmlini.php" uploadstatus="1" />
+    <item url="themes/tuxice/templates/blogentry_summary_tpl.php" uploadstatus="1" />
+    <item url="themes/tuxice/templates/blogentry_tpl.php" uploadstatus="1" />
+    <item url="docs/quickstart.txt" uploadstatus="1" />
+    <item url="locale/" uploadstatus="1" />
+    <item url="po/" uploadstatus="1" />
+    <item url="po/messages.pot" uploadstatus="1" />
+    <item url="themes/default/scripts/en.js" uploadstatus="1" />
+    <item url="themes/default/scripts/fssetup.js" uploadstatus="1" />
+    <item url="themes/default/scripts/gui.js.php" uploadstatus="1" />
+    <item url="themes/default/scripts/showyear.js" uploadstatus="1" />
+    <item url="themes/default/styles/old/" uploadstatus="1" />
+    <item url="themes/default/styles/old/article.css" uploadstatus="1" />
+    <item url="themes/default/styles/old/banner.css" uploadstatus="1" />
+    <item url="themes/default/styles/old/blogentry.css" uploadstatus="1" />
+    <item url="themes/default/styles/old/calendar.css" uploadstatus="1" />
+    <item url="themes/default/styles/old/comment.css" uploadstatus="1" />
+    <item url="themes/default/styles/old/content.css" uploadstatus="1" />
+    <item url="themes/default/styles/old/form.css" uploadstatus="1" />
+    <item url="themes/default/styles/old/global.css" uploadstatus="1" />
+    <item url="themes/default/styles/old/main.css" uploadstatus="1" />
+    <item url="themes/default/styles/old/menubar.css" uploadstatus="1" />
+    <item url="themes/default/styles/old/reply.css" uploadstatus="1" />
+    <item url="themes/default/styles/old/rss.css" uploadstatus="1" />
+    <item url="themes/default/styles/old/sidebar.css" uploadstatus="1" />
+    <item url="themes/default/styles/old/structure.css" uploadstatus="1" />
+    <item url="themes/default/styles/old/trackback.css" uploadstatus="1" />
+    <item url="themes/default/styles/article.css" uploadstatus="1" />
+    <item url="themes/default/styles/banner.css" uploadstatus="1" />
+    <item url="themes/default/styles/blogentry.css" uploadstatus="1" />
+    <item url="themes/default/styles/comment.css" uploadstatus="1" />
+    <item url="themes/default/styles/content.css" uploadstatus="1" />
+    <item url="themes/default/styles/Copy of rss.xsl" uploadstatus="1" />
+    <item url="themes/default/styles/global.css" uploadstatus="1" />
+    <item url="themes/default/styles/menubar.css" uploadstatus="1" />
+    <item url="themes/default/styles/sidebar.css" uploadstatus="1" />
+    <item url="themes/default/styles/structure.css" uploadstatus="1" />
+    <item url="themes/default/styles/trackback.css" uploadstatus="1" />
+    <item url="themes/default/templates/include_banner.php" uploadstatus="1" />
+    <item url="themes/default/templates/include_footer.php" uploadstatus="1" />
+    <item url="themes/default/templates/include_menubar.php" uploadstatus="1" />
+    <item url="themes/default/templates/include_sidebar.php" uploadstatus="1" />
+    <item url="themes/default/templates/send_trackback_tpl_new.php" uploadstatus="1" />
+    <item url="themes/skepticats/scripts/" uploadstatus="1" />
+    <item url="themes/skepticats/styles/comment.css" uploadstatus="1" />
+    <item url="themes/smooth/scripts/" uploadstatus="1" />
+    <item url="themes/terminal/images/" uploadstatus="1" />
+    <item url="themes/terminal/scripts/" uploadstatus="1" />
+    <item url="themes/tuxice/scripts/" uploadstatus="1" />
+    <item url="sitemap.php" uploadstatus="1" />
+    <item url="plugins/blogroll.php" uploadstatus="1" />
+    <item url="lib/markupgenerator.php" uploadstatus="1" />
+    <item url="tests/" uploadstatus="1" />
+    <item url="tests/simpletest/" uploadstatus="1" />
+    <item url="tests/simpletest/authentication.php" uploadstatus="1" />
+    <item url="tests/simpletest/browser.php" uploadstatus="1" />
+    <item url="tests/simpletest/collector.php" uploadstatus="1" />
+    <item url="tests/simpletest/compatibility.php" uploadstatus="1" />
+    <item url="tests/simpletest/cookies.php" uploadstatus="1" />
+    <item url="tests/simpletest/detached.php" uploadstatus="1" />
+    <item url="tests/simpletest/docs/" uploadstatus="1" />
+    <item url="tests/simpletest/dumper.php" uploadstatus="1" />
+    <item url="tests/simpletest/encoding.php" uploadstatus="1" />
+    <item url="tests/simpletest/errors.php" uploadstatus="1" />
+    <item url="tests/simpletest/exceptions.php" uploadstatus="1" />
+    <item url="tests/simpletest/expectation.php" uploadstatus="1" />
+    <item url="tests/simpletest/extensions/" uploadstatus="1" />
+    <item url="tests/simpletest/form.php" uploadstatus="1" />
+    <item url="tests/simpletest/frames.php" uploadstatus="1" />
+    <item url="tests/simpletest/HELP_MY_TESTS_DONT_WORK_ANYMORE" uploadstatus="1" />
+    <item url="tests/simpletest/http.php" uploadstatus="1" />
+    <item url="tests/simpletest/invoker.php" uploadstatus="1" />
+    <item url="tests/simpletest/LICENSE" uploadstatus="1" />
+    <item url="tests/simpletest/mock_objects.php" uploadstatus="1" />
+    <item url="tests/simpletest/page.php" uploadstatus="1" />
+    <item url="tests/simpletest/parser.php" uploadstatus="1" />
+    <item url="tests/simpletest/README" uploadstatus="1" />
+    <item url="tests/simpletest/reflection_php4.php" uploadstatus="1" />
+    <item url="tests/simpletest/reflection_php5.php" uploadstatus="1" />
+    <item url="tests/simpletest/remote.php" uploadstatus="1" />
+    <item url="tests/simpletest/reporter.php" uploadstatus="1" />
+    <item url="tests/simpletest/scorer.php" uploadstatus="1" />
+    <item url="tests/simpletest/selector.php" uploadstatus="1" />
+    <item url="tests/simpletest/shell_tester.php" uploadstatus="1" />
+    <item url="tests/simpletest/simpletest.php" uploadstatus="1" />
+    <item url="tests/simpletest/socket.php" uploadstatus="1" />
+    <item url="tests/simpletest/tag.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/" uploadstatus="1" />
+    <item url="tests/simpletest/test_case.php" uploadstatus="1" />
+    <item url="tests/simpletest/unit_tester.php" uploadstatus="1" />
+    <item url="tests/simpletest/url.php" uploadstatus="1" />
+    <item url="tests/simpletest/user_agent.php" uploadstatus="1" />
+    <item url="tests/simpletest/VERSION" uploadstatus="1" />
+    <item url="tests/simpletest/web_tester.php" uploadstatus="1" />
+    <item url="tests/simpletest/xml.php" uploadstatus="1" />
+    <item url="tests/simpletest/docs/en/" uploadstatus="1" />
+    <item url="tests/simpletest/docs/fr/" uploadstatus="1" />
+    <item url="tests/simpletest/docs/en/authentication_documentation.html" uploadstatus="1" />
+    <item url="tests/simpletest/docs/en/browser_documentation.html" uploadstatus="1" />
+    <item url="tests/simpletest/docs/en/docs.css" uploadstatus="1" />
+    <item url="tests/simpletest/docs/en/expectation_documentation.html" uploadstatus="1" />
+    <item url="tests/simpletest/docs/en/form_testing_documentation.html" uploadstatus="1" />
+    <item url="tests/simpletest/docs/en/group_test_documentation.html" uploadstatus="1" />
+    <item url="tests/simpletest/docs/en/index.html" uploadstatus="1" />
+    <item url="tests/simpletest/docs/en/mock_objects_documentation.html" uploadstatus="1" />
+    <item url="tests/simpletest/docs/en/overview.html" uploadstatus="1" />
+    <item url="tests/simpletest/docs/en/partial_mocks_documentation.html" uploadstatus="1" />
+    <item url="tests/simpletest/docs/en/reporter_documentation.html" uploadstatus="1" />
+    <item url="tests/simpletest/docs/en/unit_test_documentation.html" uploadstatus="1" />
+    <item url="tests/simpletest/docs/en/web_tester_documentation.html" uploadstatus="1" />
+    <item url="tests/simpletest/docs/fr/authentication_documentation.html" uploadstatus="1" />
+    <item url="tests/simpletest/docs/fr/browser_documentation.html" uploadstatus="1" />
+    <item url="tests/simpletest/docs/fr/docs.css" uploadstatus="1" />
+    <item url="tests/simpletest/docs/fr/expectation_documentation.html" uploadstatus="1" />
+    <item url="tests/simpletest/docs/fr/form_testing_documentation.html" uploadstatus="1" />
+    <item url="tests/simpletest/docs/fr/group_test_documentation.html" uploadstatus="1" />
+    <item url="tests/simpletest/docs/fr/index.html" uploadstatus="1" />
+    <item url="tests/simpletest/docs/fr/mock_objects_documentation.html" uploadstatus="1" />
+    <item url="tests/simpletest/docs/fr/overview.html" uploadstatus="1" />
+    <item url="tests/simpletest/docs/fr/partial_mocks_documentation.html" uploadstatus="1" />
+    <item url="tests/simpletest/docs/fr/reporter_documentation.html" uploadstatus="1" />
+    <item url="tests/simpletest/docs/fr/server_stubs_documentation.html" uploadstatus="1" />
+    <item url="tests/simpletest/docs/fr/unit_test_documentation.html" uploadstatus="1" />
+    <item url="tests/simpletest/docs/fr/web_tester_documentation.html" uploadstatus="1" />
+    <item url="tests/simpletest/extensions/pear_test_case.php" uploadstatus="1" />
+    <item url="tests/simpletest/extensions/phpunit_test_case.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/acceptance_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/adapter_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/all_tests.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/authentication_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/browser_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/collector_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/compatibility_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/cookies_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/detached_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/dumper_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/encoding_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/errors_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/exceptions_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/expectation_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/form_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/frames_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/http_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/interfaces_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/live_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/mock_objects_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/page_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/parse_error_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/parser_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/reflection_php4_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/reflection_php5_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/remote_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/shell_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/shell_tester_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/simpletest_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/socket_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/support/" uploadstatus="1" />
+    <item url="tests/simpletest/test/tag_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/test_groups.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/test_with_parse_error.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/unit_tester_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/unit_tests.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/url_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/user_agent_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/visual_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/web_tester_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/xml_test.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/support/collector/" uploadstatus="1" />
+    <item url="tests/simpletest/test/support/latin1_sample" uploadstatus="1" />
+    <item url="tests/simpletest/test/support/spl_examples.php" uploadstatus="1" />
+    <item url="tests/simpletest/test/support/supplementary_upload_sample.txt" uploadstatus="1" />
+    <item url="tests/simpletest/test/support/upload_sample.txt" uploadstatus="1" />
+    <item url="tests/simpletest/test/support/collector/collectable.1" uploadstatus="1" />
+    <item url="tests/simpletest/test/support/collector/collectable.2" uploadstatus="1" />
+    <item url="tests/testsuite.php" uploadstatus="1" />
+    <item url="tests/utils_test.php" uploadstatus="1" />
+    <item url="lib/path.php" uploadstatus="1" />
+    <item url="tests/path_test.php" uploadstatus="1" />
+    <item url="tests/temp/" uploadstatus="1" />
+    <item url="tests/simplexmlwriter_test.php" uploadstatus="1" />
+    <item url="tests/simplexmlreader_test.php" uploadstatus="1" />
+    <item url="tests/nativefs_test.php" uploadstatus="1" />
+    <item url="tests/ftpfs_test.php" uploadstatus="1" />
+    <item url="tests/system_test.php" uploadstatus="1" />
+    <item url="templates/" uploadstatus="1" />
+    <item url="lib/server.php" uploadstatus="1" />
+    <item url="tests/server_test.php" uploadstatus="1" />
+    <item url="lib/uri.php" uploadstatus="1" />
+    <item url="tests/uri_test.php" uploadstatus="1" />
+    <item url="tests/blog_test.php" uploadstatus="1" />
+    <item url="tests/blogentry_test.php" uploadstatus="1" />
   </project>
 </webproject>

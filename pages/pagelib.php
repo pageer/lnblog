@@ -99,86 +99,6 @@ function handle_comment(&$ent, $use_comm_link=false) {
 
 }
 
-# Function: handle_uploads
-# Handles uploads that are sent when an entry is edited.  It checks the file 
-# uploads and moves them to the entry directory.
-#
-# Parameters:
-# ent - The entry we're editing.
-#
-# Returns:
-# If all uploads are successful, returns true.  Otherwise, returns an array
-# of error messages, one element for each upload error.
-
-function handle_uploads(&$ent) {
-	global $SYSTEM;
-	$err = array();
-	$num_uploads = $SYSTEM->sys_ini->value("entryconfig",	"AllowInitUpload", 1);
-	
-	for ($i=1; $i<=$num_uploads; $i++) {
-		$upld = NewFileUpload('upload'.$i, $ent->localpath());
-		if ( $upld->completed() ) {
-			$upld->moveFile();
-		} elseif ( ( $upld->status() != FILEUPLOAD_NO_FILE && 
-		             $upld->status() != FILEUPLOAD_NOT_INITIALIZED ) ||
-		           ( $upld->status() == FILEUPLOAD_NOT_INITIALIZED &&
-		            ! defined("UPLOAD_IGNORE_UNINITIALIZED") ) ) {
-			$ret = false;
-			$err[] = $upld->errorMessage();
-		}
-	}
-	
-	if ($err) {
-		return $err;
-	} else {
-		# This event is raised here as sort of a hack.  The idea is that some
-		# plugins will need information on uploaded files, but can only get that 
-		# when an event is raised by the entry.
-		# In particular, this intended to regenerate the RSS2 feed after uploading
-		# a file from the edit form, so that the enclosure information will be 
-		# set correctly.
-		if (! $ent->isDraft()) $ent->raiseEvent("UpdateComplete");
-		return true;
-	}
-}
-
-# Function: handle_pingback_pings
-# Handles pingbacks for an entry.  Sends pingbacks to the appropriate links
-# in the entry body, and returns an error string, if applicable.
-#
-# Parameters:
-# ent - The entry in question.
-#
-# Returns:
-# An error string.  If there were no errors sending any pingbacks, then the 
-# null string is returned.
-
-function handle_pingback_pings(&$ent) {
-	global $SYSTEM;
-	
-	if (! $ent->allow_pingback) return '';
-	
-	$local = $SYSTEM->sys_ini->value("entryconfig", "AllowLocalPingback", 1);
-	$results = $ent->sendPings($local);
-	$errors = array();
-	$err = '';
-
-	foreach ($results as $res) {
-		if ($res['response']->faultCode()) {
-			$errors[] = spf_('URI: %s', $res['uri']).'<br />'.
-			            spf_("Error %d: %s<br />", 
-			                 $res['response']->faultCode(), 
-			                 $res['response']->faultString());
-		}
-	}
-
-	if ($errors) {
-		$err = _("Failed to send the following pingbacks:").
-		       '<br />'.implode("\n<br />", $errors);
-	}
-	return $err;
-}
-
 # Function: entry_set_template
 # Sets variables in an entry template for display.
 #
@@ -224,6 +144,7 @@ function blog_set_template(&$tpl, &$blog) {
 	$tpl->set("BLOG_DEFAULT_MARKUP", $blog->default_markup);
 	$tpl->set("BLOG_AUTO_PINGBACK", $blog->auto_pingback);
 	$tpl->set("BLOG_GATHER_REPLIES", $blog->gather_replies);
+	$tpl->set("BLOG_FRONT_PAGE_ABSTRACT", $blog->front_page_abstract);
 }
 
 # Function: blog_get_post_data
@@ -244,31 +165,35 @@ function blog_get_post_data(&$blog) {
 	$blog->default_markup = POST("blogmarkup");
 	$blog->auto_pingback = POST('pingback');
 	$blog->gather_replies = POST('replies')?1:0;
+	$blog->front_page_abstract = POST('use_abstract')?1:0;
 }
 
 function show_comments(&$ent, &$usr, $sort_asc=true) {
 
 	$title = spf_('Comments on <a href="%s">%s</a>', 
 	              $ent->permalink(), htmlspecialchars($ent->subject));
-	$params = array('path'=>ENTRY_COMMENT_DIR, 'ext'=>COMMENT_PATH_SUFFIX, 'altext'=>'.txt',
-	                'creator'=>'NewBlogComment', 'sort_asc'=>$sort_asc,
-	                'itemclass'=>'comment', 'listtitle'=>$title,
-	                'typename'=>_("comments"));
-	return show_replies($ent, $usr, $params);
+#	$params = array('path'=>ENTRY_COMMENT_DIR, 'ext'=>COMMENT_PATH_SUFFIX, 'altext'=>'.txt',
+#	                'creator'=>'NewBlogComment', 'sort_asc'=>$sort_asc,
+#	                'itemclass'=>'comment', 'listtitle'=>$title,
+#	                'typename'=>_("comments"));
+	$cmts = $ent->getComments();
+	return show_replies($ent, $usr, $cmts);
 
 }
 
 function show_trackbacks(&$ent, &$usr, $sort_asc=true) {
 	$title = spf_('Trackbacks on <a href="%s">%s</a>', 
 	              $ent->permalink(), $ent->subject);
-	$params = array('path'=>ENTRY_TRACKBACK_DIR, 'ext'=>TRACKBACK_PATH_SUFFIX,
-	                'creator'=>'NewTrackback', 'sort_asc'=>$sort_asc,
-	                'itemclass'=>'trackback', 'listclass'=>'tblist',
-	                'listtitle'=>$title, 'typename'=>_("TrackBacks"));
+#	$params = array('path'=>ENTRY_TRACKBACK_DIR, 'ext'=>TRACKBACK_PATH_SUFFIX,
+#	                'creator'=>'NewTrackback', 'sort_asc'=>$sort_asc,
+#	                'itemclass'=>'trackback', 'listclass'=>'tblist',
+#	                'listtitle'=>$title, 'typename'=>_("TrackBacks"));
+	$tbs = $ent->getTrackbacks();
 	return show_replies($ent, $usr, $params);
 }
 
-function show_pingbacks(&$ent, &$usr, $sort_asc=true) {
+/*
+function show_pingbacks(&$ent, &$usr, $sort_asc=true, ) {
 	$title = spf_('Pingbacks on <a href="%s">%s</a>', 
 	              $ent->permalink(), $ent->subject);
 	$params = array('path'=>ENTRY_PINGBACK_DIR, 'ext'=>PINGBACK_PATH_SUFFIX,
@@ -276,6 +201,27 @@ function show_pingbacks(&$ent, &$usr, $sort_asc=true) {
 	                'itemclass'=>'pingback', 'listclass'=>'pblist',
 	                'listtitle'=>$title, 'typename'=>_("Pingbacks"));
 	return show_replies($ent, $usr, $params);
+}
+*/
+
+function show_pingbacks(&$ent, &$usr, $sort_asc=true) {
+	$title = spf_('Pingbacks on <a href="%s">%s</a>', 
+	              $ent->permalink(), $ent->subject);
+	
+#	$params = array('path'=>ENTRY_PINGBACK_DIR, 'ext'=>PINGBACK_PATH_SUFFIX,
+#	                'creator'=>'NewPingback', 'sort_asc'=>$sort_asc,
+#	                'itemclass'=>'pingback', 'listclass'=>'pblist',
+#	                'listtitle'=>$title, 'typename'=>_("Pingbacks"));
+	$pbs = $ent->getPingbacks();
+	return show_replies($ent, $usr, $params);
+}
+
+function show_remote_pingbacks(&$ent, &$usr, $sort_asc=true) {
+	
+}
+
+function show_friendly_pingbacks(&$ent, &$usr, $sort_asc=true) {
+	
 }
 
 function reply_boxes($idx, &$obj) {
@@ -293,14 +239,13 @@ function reply_boxes($idx, &$obj) {
 # Gets the HTML for replies of the given type in a list.
 #
 # Parameters:
-# ent    - A reference to the entry for which to get replies.
-# usr    - A reference to the current user.
-# params - An array of configuration parameters.
+# ent     - A reference to the entry for which to get replies.
+# usr     - A reference to the current user.
+# replies - An array of reply objects.
 
-function show_replies(&$ent, &$usr, $params) {
+function show_replies(&$ent, &$usr, &$replies) {
 	global $SYSTEM;
 
-	$replies = $ent->getReplyArray($params);
 	$ret = "";
 	$count = 1;
 	if ($replies) {
@@ -320,10 +265,12 @@ function show_replies(&$ent, &$usr, $params) {
 	# Suppress markup entirely if there are no replies of the given type.
 	if (isset($reply_text)) {
 
-
 		$tpl = NewTemplate(LIST_TEMPLATE);
 		
 		if ($SYSTEM->canModify($reply, $usr)) {
+			
+			$typename = '';
+			
 			$tpl->set("FORM_HEADER", "<p>".
 			          spf_("Delete marked %s", $params['typename']).' '.
 			          '<input type="submit" value="'._("Delete").'" />'.

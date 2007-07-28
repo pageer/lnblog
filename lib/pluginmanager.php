@@ -81,10 +81,10 @@ class PluginManager {
 	 */
 
 	function getConfig() {
-		$global_config = NewINIParser(USER_DATA_PATH.PATH_DELIM."plugins.ini");
+		$global_config = NewConfigFile(USER_DATA_PATH.PATH_DELIM."plugins.xml");
 		$blog_path = get_blog_path();
 		if ($blog_path) {
-			$blog_config = NewINIParser($blog_path.PATH_DELIM."plugins.ini");
+			$blog_config = NewConfigFile($blog_path.PATH_DELIM."plugins.xml");
 			$blog_config->merge($global_config);
 			$this->plugin_config =& $blog_config;
 		} else $this->plugin_config =& $global_config;
@@ -113,6 +113,20 @@ class PluginManager {
 		return $plugin_classes;
 	}
 
+	/* Method: pluginLoaded
+	 * Determine if a specific plugin has been loaded.
+	 *
+	 * Parameters:
+	 * plugin_name - The name of the plugin class to check.
+	 * 
+	 * Returns:
+	 * True if the plugin class is loaded, false otherwise.
+	 */
+	function pluginLoaded($plugin_name) {
+		if (class_exists($plugin_name)) return true;
+		else return false;
+	}
+
 	/* Method: getFileList
 	 * List all the plugin files that get loaded.
 	 *
@@ -131,15 +145,17 @@ class PluginManager {
 		foreach ($plugin_dir_list as $dir) {
 			if (! is_dir($dir)) continue;
 			$dirhand = opendir($dir);
-			$dir_list = array();
-			while ( false !== ($ent = readdir($dirhand)) ) {
-				if (is_file($dir.PATH_DELIM.$ent) && 
-				    strtolower(substr($ent, strrpos($ent,"."))) == ".php") {
-					$file_list[] = $ent;
+			if ($dirhand) {
+				$dir_list = array();
+				while ( false !== ($ent = readdir($dirhand)) ) {
+					if (is_file($dir.PATH_DELIM.$ent) && 
+						strtolower(substr($ent, strrpos($ent,"."))) == ".php") {
+						$file_list[] = $ent;
+					}
+	
 				}
-
+				closedir($dirhand);
 			}
-			closedir($dirhand);		
 		}
 		$file_list = array_unique($file_list);
 		sort($file_list);

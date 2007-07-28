@@ -39,8 +39,17 @@ class SidebarSearch extends Plugin {
 	function SidebarSearch($do_output=0) {
 		global $SYSTEM;
 		$this->plugin_desc = _("Search for terms in blog entries.");
-		$this->plugin_version = "0.1.1";
+		$this->plugin_version = "0.2.0";
 		$this->addOption("caption", _("Caption for search panel"), _("Search"));
+		$this->addOption("label", _("Search field label"), _('Search this weblog'));
+		$this->addOption("use_google", _("Search through Google"), false, "checkbox");
+		$this->addOption("show_in", 
+		                 _("Show search box in what part of page"), 
+		                 "sidebar", "select", 
+		                 array("sidebar"=>_("Sidebar"), 
+		                       "banner"=>_("Banner"), 
+		                       "menubar"=>_("Menubar"))
+		                );
 
 		$this->addOption('no_event',
 			_('No event handlers - do output when plugin is created'),
@@ -49,12 +58,18 @@ class SidebarSearch extends Plugin {
 
 		$this->getConfig();
 
-		if ( $this->no_event || 
-		     $SYSTEM->sys_ini->value("plugins","EventForceOff", 0) ) {
-			# If either of these is true, then don't set the event handler
-			# and rely on explicit invocation for output.
-		} else {
-			$this->registerEventHandler("sidebar", "OnOutput", "sidebar_panel");
+		if ( ! ($this->no_event || 
+		        $SYSTEM->sys_ini->value("plugins","EventForceOff", 0)) ) {
+			switch ($this->show_in) {
+				case "banner":
+					$this->registerEventHandler("banner", "OnOutput", "sidebar_panel");
+					break;
+				case "menubar":
+					$this->registerEventHandler("menubar", "OnOutput", "sidebar_panel");
+					break;
+				default:
+					$this->registerEventHandler("sidebar", "OnOutput", "sidebar_panel");
+			}
 		}
 		
 		if ($do_output) $this->sidebar_panel();
@@ -64,18 +79,41 @@ class SidebarSearch extends Plugin {
 	function sidebar_panel($param=false) {
 		$blg = NewBlog();
 		if (! $blg->isBlog()) return true;
+		
 		$tooltip = _("Search for posts containing a space-separated list of words. If the search sting is enclosed in forward slashes, it will be treated as a regular expression.");
-		if ($this->caption) { /* Suppress empty header */ ?>
+		
+		switch ($this->show_in) {
+			case "banner": $class = "bannerpanel"; break;
+			case "menubar": $class = "menupanel"; break; 
+			default: "panel";
+		}
+		
+		if ($this->caption && $this->show_in == 'sidebar') { /* Suppress empty header */ ?>
 <h3><?php echo $this->caption; ?></h3><?php
 		} ?>
-<div class="panel">
-<label for="sb_search_terms" title="<?php echo $tooltip;?>"><?php p_('Search this weblog');?></label>
+<div class="<?php echo $class;?>">
+<?php if ($this->use_google) { /* Use the Google search form */ ?>
+<form method="get" action="http://www.google.com/search">
+<fieldset style="border: 0">
+<?php if ($this->label) { ?>
+<label for="sb_search_terms" title="<?php echo $tooltip;?>"><?php echo $this->label;?></label>
+<?php } ?>
+<input type="text" name="q" />
+<input type="hidden" name="as_sitesearch" value="<?php echo $blg->getURL(); ?>" />
+<input type="submit" name="btnG" value="<?php p_("Search"); ?>" />
+</fieldset>
+</form>
+<?php } else { /* Use the built-in search. */ ?>
 <form method="post" action="<?php echo INSTALL_ROOT_URL;?>plugins/sidebar_search.php?blog=<?php echo $blg->blogid;?>&amp;show=sb_search_results">
 <fieldset style="border: 0">
+<?php if ($this->label) { ?>
+<label for="sb_search_terms" title="<?php echo $tooltip;?>"><?php echo $this->label;?></label>
+<?php } ?>
 <input type="text" id="sb_search_terms" name="sb_search_terms" title="<?php echo $tooltip; ?>" />
 <input type="submit" id="sb_search_submit" name="sb_search_submit" value="<?php p_("Search"); ?>" />
 </fieldset>
 </form>
+<?php } ?>
 </div><?php
 	}
 

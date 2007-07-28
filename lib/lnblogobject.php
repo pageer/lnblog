@@ -23,7 +23,7 @@
  * register, and fire events.  It also has contains other general-purpose
  * methods, such as simple XML serialization.
  */
-require_once("lib/xml.php");
+require_once("xml.php");
  
 class LnBlogObject {
 	
@@ -78,7 +78,8 @@ class LnBlogObject {
 	 * Raises the given event name for this class.
 	 *
 	 * Parameters:
-	 * name - The name of the event.
+	 * name   - The name of the event.
+	 * params - Any number of additional parameters may be passed to this method.
 	 *
 	 * Returns:
 	 * True on success, false on failure.
@@ -86,7 +87,9 @@ class LnBlogObject {
 	 
 	function raiseEvent($name) {
 		global $EVENT_REGISTER;
-		return $EVENT_REGISTER->activateEvent($this, $name); 
+		$params = func_get_args();
+		array_splice($params, 0, 1);
+		return $EVENT_REGISTER->activateEvent($this, $name, $params); 
 	}
 
 	/* Method: registerEventHandler

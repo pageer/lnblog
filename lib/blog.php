@@ -22,7 +22,7 @@ require_once("lib/utils.php");
 require_once("blogconfig.php");
 require_once("lib/creators.php");
 require_once("lib/lnblogobject.php");
-require_once("lib/urifactory.php");
+require_once("lib/uri.php");
 
 /* Class: Blog
  * The "master" class which represents a weblog.  Nearly all functions are 
@@ -48,6 +48,13 @@ require_once("lib/urifactory.php");
  * OnArticelError   - Fired before populating template when on an error.
  */
 
+# Constant: ROOT_ID
+# Defines the magic string that denotes a blog on the server's document root.
+# Normally, LnBlog uses the document root-relative path to the blog as the blog
+# identifier, but this is the empty string for the document root.  Therefore, 
+# this constant sets a magic value to use.
+@define("ROOT_ID", ".");
+
 class Blog extends LnBlogObject {
 
 	var $name;
@@ -71,30 +78,11 @@ class Blog extends LnBlogObject {
 	var $custom_fields;
 
 	function Blog($path="") {
-		
-		$this->raiseEvent("OnInit");
-	
-		if ( !$path && isset($_GET['blog']) ) $path = sanitize(GET("blog"));
-		$path = trim($path);
 
 		if ($path) {
-			if (is_dir($path)) {
-				$this->home_path = realpath($path);
-				$root = calculate_server_root($this->home_path);
-				$this->blogid = substr($this->home_path, strlen($root));
-			} else {
-				$this->home_path = $this->get_blog_path($path);
-				$this->blogid = $path;
-			}
-
-		} elseif (defined("BLOG_ROOT")) { 
-			$this->home_path = BLOG_ROOT;
-			$root = calculate_server_root($this->home_path);
-			$this->blogid = substr($this->home_path, strlen($root));
+			$this->getPathFromPassedValue($path);
 		} else {
-			$this->home_path = getcwd();
-			$root = calculate_server_root($this->home_path);
-			$this->blogid = substr($this->home_path, strlen($root));
+			$this->getPathFromEnvironment();
 		}
 		
 		# Canonicalize the home path.
@@ -102,6 +90,16 @@ class Blog extends LnBlogObject {
 			$this->home_path = realpath($this->home_path);
 		}
 
+		$this->setFieldDefaults();
+		$this->raiseEvent("OnInit");
+
+		$this->readBlogData();
+		
+		$this->raiseEvent("InitComplete");
+
+	}
+	
+	function setFieldDefaults() {
 		# System configuration information.
 		$this->sw_version = '';
 		$this->last_upgrade = '';
@@ -119,6 +117,7 @@ class Blog extends LnBlogObject {
 		$this->owner = ADMIN_USER;
 		$this->write_list = array();
 		$this->tag_list = array();
+		$this->front_page_abstract = false;
 		
 		$this->auto_pingback = true;
 		$this->gather_replies = true;
@@ -128,10 +127,40 @@ class Blog extends LnBlogObject {
 		$this->last_article = false;
 		
 		$this->custom_fields = array();
-		$this->readBlogData();
+	}
+	
+	function getPathFromEnvironment() {
+		if (isset($_GET['blog']) ) $path = trim(sanitize($_GET["blog"]));
+		else $path = '';
 		
-		$this->raiseEvent("InitComplete");
-
+		if ($path) {
+			$this->getPathFromPassedValue($path);
+		} elseif (defined("BLOG_ROOT")) { 
+			$this->home_path = BLOG_ROOT;
+			$this->setBlogID();
+		} else {
+			$this->home_path = getcwd();
+			$this->setBlogID();
+		}
+	}
+	
+	function getPathFromPassedValue($path) {
+		if ($path == ROOT_ID) {
+			$this->home_path = calculate_document_root();
+			$this->blogid = ROOT_ID;
+		} elseif (is_dir($path)) {
+			$this->home_path = realpath($path);
+			$this->setBlogID();
+		} else {
+			$this->home_path = $this->get_blog_path($path);
+			$this->blogid = $path;
+		}
+	}
+	
+	function setBlogID() {
+		$root = calculate_server_root($this->home_path);
+		$this->blogid = substr($this->home_path, strlen($root));
+		if (! $this->blogid) $this->blogid = ROOT_ID;
 	}
 	
 	#######################################################
@@ -148,10 +177,10 @@ class Blog extends LnBlogObject {
 	}
 	
 	function get_blog_path($id) {
-		global $SYSTEM;
+		$system = System::instance();
 		$path = test_server_root($id);
 		if ( ! is_dir($path) ) {
-			$path = $SYSTEM->sys_ini->value("bloglist", $id);
+			$path = $system->sys_ini->value("bloglist", $id);
 			if (! is_dir($path)) {
 				echo spf_("Unable to locate blogID %s.  Make sure the ID is correct or add an entry to the [bloglist] section of system.ini.", $id);
 				return false;
@@ -167,9 +196,10 @@ class Blog extends LnBlogObject {
 	Returns:
 	True if the blog metadata exists, false otherwise.
 	*/
-	function isBlog() {
-		return file_exists($this->home_path.PATH_DELIM.BLOG_CONFIG_PATH) ||
-		       file_exists($this->home_path.PATH_DELIM.'blogdata.txt');
+	function isBlog($blog=false) {
+	
+		return file_exists(Path::get($this->home_path, BLOG_CONFIG_PATH)) ||
+		       file_exists(Path::get($this->home_path.PATH_DELIM.'blogdata.txt'));
 	}
 
 	function getParent() { return false; }
@@ -266,7 +296,7 @@ class Blog extends LnBlogObject {
 		$props = array("name", "description", "image", "max_entries", 
 		               "max_rss", "allow_enclosure", "theme", "owner", 
 		               "default_markup", "write_list", "tag_list",
-		               "gather_replies", "auto_pingback");
+		               "gather_replies", "auto_pingback", "front_page_abstract");
 		foreach ($props as $key) {
 			if (is_array($this->$key)) {
 				$ini->setValue("blog", $key, implode(",", $this->$key));
@@ -395,6 +425,8 @@ class Blog extends LnBlogObject {
 		
 		if (! $dir_list) return array();
 		
+		rsort($dir_list);
+		
 		foreach ($dir_list as $file) {
 			if ( $ent->isEntry($curr_dir.PATH_DELIM.$file) ) {
 				$ent_list[] = $file;
@@ -462,6 +494,7 @@ class Blog extends LnBlogObject {
 		}
 		$ent_list = array();
 		$dir_list = scan_directory($curr_dir, true);
+		rsort($dir_list);
 		
 		if (! $dir_list) return array();
 		
@@ -487,6 +520,7 @@ class Blog extends LnBlogObject {
 	*/
 	function getYearList() {
 		$year_list = scan_directory($this->home_path.PATH_DELIM.BLOG_ENTRY_PATH, true);
+		if ($year_list) rsort($year_list);
 		$ret = array();
 		foreach ($year_list as $yr) {
 			$ret[] = array("year"=>$yr, 
@@ -516,7 +550,7 @@ class Blog extends LnBlogObject {
 				$year = sanitize(GET("year"), "/\D/");
 			} else $year = basename(getcwd());
 		}
-		$month_list = scan_directory($this->home_path.PATH_DELIM.BLOG_ENTRY_PATH.PATH_DELIM.$year, true);
+		$month_list = scan_directory(mkpath($this->home_path, BLOG_ENTRY_PATH, $year), true);
 		rsort($month_list);
 		$ret = array();
 		foreach ($month_list as $mo) {
@@ -792,7 +826,7 @@ class Blog extends LnBlogObject {
 	*/
 	function getArticles() {
 		$art = NewArticle();
-		$art_path = mkpath($this->home_path, BLOG_ARTICLE_PATH);
+		$art_path = Path::get($this->home_path, BLOG_ARTICLE_PATH);
 		$art_list = scan_directory($art_path);
 		$ret = array();
 		foreach ($art_list as $dir) {
@@ -973,6 +1007,7 @@ class Blog extends LnBlogObject {
 		$tpl->set("BLOG_ALLOW_ENC", $this->allow_enclosure);
 		$tpl->set("BLOG_GATHER_REPLIES", $this->gather_replies);
 		$tpl->set("BLOG_AUTO_PINGBACK", $this->auto_pingback);
+		$tpl->set("BLOG_FRONT_PAGE_ABSTRACT", $this->front_page_abstract);
 	}
 
 	/*
@@ -1131,57 +1166,59 @@ class Blog extends LnBlogObject {
 		
 		$this->raiseEvent("OnInsert");
 		$fs = NewFS();
-		# Get the installation directory, then create and get the blog
-		# directory.  These directories are added to the include_path using
-		# a config file that is copied to all entry directories.
-		# It is assumed that this will only be run from the install directory.
+
 		$this->name = htmlentities($this->name);
 		$this->description = htmlentities($this->description);
 		
 		$inst_path = getcwd();
-		if ($path) $this->home_path = canonicalize($path);
-		$this->home_path = canonicalize($this->home_path);
+		$p = new Path($path ? $path : $this->home_path);
+		$this->home_path = $p->getCanonical();
 
-		# Try to create the home path.  Since this may fail due to permissions
-		# problems with nativefs, suppress errors.
-		if (! is_dir($this->home_path)) {
-			@$ret = $fs->mkdir_rec($this->home_path);
-			if (! $ret) return false;
+		@$ret = $this->createBlogDirectories(&$fs, $inst_path);
+		
+		$this->setBlogID();
+		
+		if ($ret) {
+			$this->sw_version = PACKAGE_VERSION;
+			$this->last_upgrade = date('r');
+				
+			$ret = $this->writeBlogData();
+			$fs->destruct();
+			$this->raiseEvent("InsertComplete");
 		}
 		
-		# Now that we have the path, set the blogid.
-		if (defined("DOCUMENT_ROOT")) {
-			$this->blogid = substr($this->home_path, strlen(DOCUMENT_ROOT));
-		} else {
-			$this->blogid = '';
-		}
-		
-		chdir($this->home_path);
-		$this->home_path = getcwd();
-		$blog_path = $this->home_path;
-		$ent_path = $this->home_path.PATH_DELIM.BLOG_ENTRY_PATH;
-		if (! is_dir($ent_path) ) {
-			$ret = $fs->mkdir_rec($ent_path);
-			if (! $ret) return false;
-		}
-		$rss_path = $this->home_path.PATH_DELIM.BLOG_FEED_PATH;
-		if (! is_dir($rss_path) ) {
-			$ret = $fs->mkdir_rec($rss_path);
-			if (! $ret) return false;
-		}
-		$blog_templ_dir = $blog_path.PATH_DELIM.BLOG_TEMPLATE_DIR;
-		$sys_templ_dir = $inst_path.PATH_DELIM.BLOG_TEMPLATE_DIR;
-		
-		$ret = create_directory_wrappers($blog_path, BLOG_BASE, $inst_path);
-		$ret &= create_directory_wrappers($ent_path, BLOG_ENTRIES);
-		 
-		$this->sw_version = PACKAGE_VERSION;
-		$this->last_upgrade = date('r');
-		 
-		$ret = $this->writeBlogData();
-		$fs->destruct();
-		$this->raiseEvent("InsertComplete");
 		return $ret;
+	}
+	
+	function createBlogDirectories(&$fs, $inst_path) {
+
+		$ret = $this->createNonExistentDirectory($fs, $this->home_path);
+		if ($ret) {
+			$result = create_directory_wrappers($this->home_path, BLOG_BASE, $inst_path);
+			# Returns an array of errors, so convert empty array to true.
+			$ret &= (empty($result) ? true : false);
+		}
+
+		$p = new Path($this->home_path, BLOG_ENTRY_PATH);
+		$ret &= $this->createNonExistentDirectory($fs, $p->get());
+
+		if ($ret) {
+			$result = create_directory_wrappers($p->get(), BLOG_ENTRIES);
+			$ret &= (empty($result) ? true : false);
+		}
+		$ret &= $this->createNonExistentDirectory($fs, 
+			Path::get($this->home_path, BLOG_FEED_PATH));
+
+		return $ret;
+	}
+	
+	function createNonExistentDirectory(&$fs, $dir) {
+		if (! is_dir($dir) ) {
+			$ret = $fs->mkdir_rec($dir);
+			return $ret;
+		} else {
+			return true;
+		}
 	}
 	
 	# Method: update
@@ -1204,7 +1241,8 @@ class Blog extends LnBlogObject {
 	}
 	
 	# Method: delete
-	# Removes an existing weblog.
+	# Removes an existing weblog.  This only deletes the blog data file, making this a 
+	# non-blog directory.  It does not totally destroy the data.
 	# 
 	# Returns:
 	# True on success, false on failure.
@@ -1212,15 +1250,15 @@ class Blog extends LnBlogObject {
 	function delete () {
 		$this->raiseEvent("OnDelete");
 		$fs = NewFS();
-		$source = $this->home_path.PATH_DELIM.BLOG_CONFIG_PATH;
 		if (KEEP_EDIT_HISTORY) {
-			if (! is_dir($this->home_path.PATH_DELIM.BLOG_DELETED_PATH) )
-				$fs->mkdir_rec($this->home_path.PATH_DELIM.BLOG_DELETED_PATH);
-			$target = $this->home_path.PATH_DELIM.BLOG_DELETED_PATH.PATH_DELIM.
-			          BLOG_CONFIG_PATH."-".date(ENTRY_PATH_FORMAT_LONG);
-			$ret = $fs->rename($source, $target);
+			$p = new Path($this->home_path, BLOG_DELETED_PATH);
+			if (! is_dir($p->get()) )
+				$fs->mkdir_rec($p->get());
+			$p->Path($this->home_path, BLOG_DELETED_PATH,
+			         BLOG_CONFIG_PATH."-".date(ENTRY_PATH_FORMAT_LONG));
+			$ret = $fs->rename(Path::get($this->home_path, BLOG_CONFIG_PATH), $p->get());
 		} else {
-			$fs->delete($source);
+			$ret = $fs->rmdir_rec($this->home_path);
 		}
 		$fs->destruct();
 		$this->raiseEvent("DeleteComplete");

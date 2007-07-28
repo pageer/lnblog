@@ -47,7 +47,7 @@ function script_path($name) {
 	# Third case: check the current theme directory
 	} elseif ( defined('INSTALL_ROOT') && defined('THEME_NAME') && 
 	           file_exists(INSTALL_ROOT."/themes/".THEME_NAME.'/scripts/'.$name) ) {
-		return IINSTALL_ROOT."/themes/".THEME_NAME.'/scripts/'.$name;
+		return INSTALL_ROOT."/themes/".THEME_NAME.'/scripts/'.$name;
 
 	# Fourth case: try the default theme
 	} elseif ( defined('INSTALL_ROOT') && 
@@ -104,10 +104,14 @@ if ( isset($_GET['action']) ) {
 } elseif ( isset($_GET['script']) ) {
 	$file = script_path($_GET['script']);
 	if (file_exists($file)) readfile($file);
-	else echo "Failure";
+	else echo "Failed to find $file";
 	exit;
 } elseif ( isset($_GET['plugin']) ) {
-	require_once("plugins/".$_GET['plugin'].".php");
+	require_once("config.php");
+	ini_set("include_path", 
+        ini_get('include_path').PATH_SEPARATOR.USER_DATA_PATH);
+	define("PLUGIN_DO_OUTPUT", true);
+	require("plugins/".$_GET['plugin'].".php");
 	exit;
 }
 

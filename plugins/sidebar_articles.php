@@ -36,13 +36,14 @@ class Articles extends Plugin {
 			# If either of these is true, then don't set the event handler
 			# and rely on explicit invocation for output.
 		} else {
-			$this->registerEventHandler("sidebar", "OnOutput", "output");
+			$this->registerEventHandler("sidebar", "OnOutput", "outputCache");
 		}
+		$this->registerStandardInvalidators();
 		
 		if ($do_output) $this->output();
 	}
 	
-	function output($parm=false) {
+	function buildOutput($parm=false) {
 		global $SYSTEM;
 		
 		$blg = NewBlog();
@@ -81,8 +82,8 @@ class Articles extends Plugin {
 			}
 
 			$tpl->set('PANEL_LIST', $items);
-			echo $tpl->process();
-		}
+			return $tpl->process();
+		} else return '';
 	}  # End function
 	
 }

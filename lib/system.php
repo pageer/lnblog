@@ -10,11 +10,25 @@
 # it is very convenient and doesn't cause any design problems for the time
 # being.
 
+require_once("iniparser.php");
+require_once("path.php");
+
 class System {
 	
 	function System() {
-		$this->group_ini = NewINIParser(USER_DATA_PATH.PATH_DELIM."groups.ini");
-		$this->sys_ini = NewINIParser(USER_DATA_PATH.PATH_DELIM."system.ini");
+		$this->userdata = defined("USER_DATA_PATH")?USER_DATA_PATH:"";
+	
+		$this->group_ini = new INIParser(Path::get($this->userdata, "groups.ini"));
+		$this->sys_ini = new INIParser(Path::get($this->userdata, "system.ini"));
+
+	}
+	
+	function instance() {
+		static $static_instance;
+		if (! isset($static_instance)) {
+			$static_instance = new System();
+		}
+		return $static_instance;
 	}
 	
 	# Method: registerBlog
@@ -62,6 +76,26 @@ class System {
 		return $ret;
 	}
 	
+	# Method: getThemeList
+	# Gets a list of installed system and user themes.
+	#
+	# Returns:
+	# An array of theme names.
+	function getThemeList() {
+		$dir = scan_directory(mkpath(INSTALL_ROOT,"themes"), true);
+		if (is_dir(mkpath(USER_DATA_PATH,"themes"))) {
+			$user_dir = scan_directory(mkpath(USER_DATA_PATH,"themes"), true);
+			if ($user_dir) $dir = array_merge($dir, $user_dir);
+		}
+		if (defined("BLOG_ROOT") && is_dir(mkpath(BLOG_ROOT,"themes"))) {
+			$blog_dir = scan_directory(mkpath(BLOG_ROOT,"themes"), true);
+			if ($blog_dir) $dir = array_merge($dir, $blog_dir);
+		}
+		$dir = array_unique($dir);
+		sort($dir);
+		return $dir;
+	}
+	
 	# Method: getUserBlogs
 	# Gets the list of blogs to which a given user can add posts.
 	#
@@ -92,13 +126,12 @@ class System {
 		if (! is_dir(USER_DATA_PATH)) return false;
 		$dirhand = opendir(USER_DATA_PATH);
 		
+		$u = NewUser();
+		
 		$ret = array();
 		while ( false !== ($ent = readdir($dirhand)) ) {
 			# Should we check for user.ini, passwd.php, or both?
-			if ($ent != "." && $ent != ".." &&
-			    file_exists(mkpath(USER_DATA_PATH,$ent,"user.xml"))) {
-					$ret[] = NewUser($ent);
-			}
+			if ($u->exists($ent)) $ret[] = NewUser($ent);
 		}
 		closedir($dirhand);
 		return $ret;
@@ -271,6 +304,8 @@ class System {
 		return $ret;
 	}
 	
+	# Method: canModify
+	# Like <canAddTo>, except determines if the user can perform updates.
 	function canModify(&$parm, $usr=false) {
 		$ret = false;
 		if (!$usr) $usr = NewUser();
@@ -283,11 +318,158 @@ class System {
 		return $ret;
 	}
 	
+	# Method: canDelete
+	# Like <canAddTo>, except determines if the user can delete the object.
 	function canDelete($parm, $usr=false) {
 		return $this->canModify($parm,$usr);
 	}
+	
+########## Junk code ###############3
+
+	# Function: uri_to_localpath
+	# The reverse of <localpath_to_uri>, this function takes a URI handled by LnBlog
+	# and converts it into a local path to the file or directory in question.  This
+	# function assumes that the URI is fully qualified, e.g. 
+	# |http://somehost.com/somepath/somefile.ext
+	# Note that this may or may not play well with Apache .htaccess files.
+	#
+	# Parameters:
+	# uri - The URI to convert.
+	#
+	# Returns:
+	# A string containing the local path referenced by the URI.  Not that this path
+	# may or may not exist.
+	
+	function uri_to_localpath($uri) {
+	
+		$url_bits = parse_url($uri);
+		if (! $url_bits) return '';
+		
+		#$protocol = isset($url_bits['scheme']) ? $url_bits['scheme'] : '';
+		#$domain = isset($url_bits['host']) ? $url_bits['host'] : '';
+		$path = isset($url_bits['path']) ? $url_bits['path'] : '';
+			
+		# Account for user home directories in path.  Please note that this is 
+		# an ugly, ugly hack to make this function work when I'm testing on my
+		# local workstation, where I use ~/www for by web root.
+		if ( preg_match(URI_TO_LOCALPATH_MATCH_RE, $path) ) {
+			$path = preg_replace(URI_TO_LOCALPATH_MATCH_RE, URI_TO_LOCALPATH_REPLACE_RE, $path);
+		}
+		
+		if (defined("DOMAIN_NAME") && defined("SUBDOMAIN_ROOT") &&
+			isset($url_bits['host']) && 
+			preg_match('/'.str_replace('.','\.',DOMAIN_NAME).'$/', DOMAIN_NAME) &&
+			strpos($url_bits['host'], DOMAIN_NAME) > 1) {
+				
+			$pos = strpos($url_bits['host'], DOMAIN_NAME);
+			$tmp_path = substr($url_bits['host'], 0, $pos - 1);
+			$path = mkpath(SUBDOMAIN_ROOT, $tmp_path, $path);
+		} else {
+			$path = mkpath(DOCUMENT_ROOT, $path);
+		}
+		
+		$p = new Path($path);
+		return $p->getCanonical();
+		
+	}
+	
+	# Function: calculate_document_root
+# An alternate way to find the document root.  This one works by comparing
+# the current URL on the server to the current directory.  The idea is that
+# we can find the location of the current URL in the path and remove it to
+# get the document root.  Note that this function IS case-sensitive.
+#
+# Returns:
+# The calculated document root path.
+
+function calculate_document_root() {
+
+	# Bail out if DOCUMENT_ROOT is already defined.
+	if ( defined("DOCUMENT_ROOT") ) return DOCUMENT_ROOT;
+
+	# Get the current URL and the path to the file.
+	$curr_uri = current_uri();
+	$curr_file = getcwd().PATH_DELIM.basename($curr_uri);
+	if (! file_exists($curr_file)) $curr_file = getcwd();
+	if (PATH_DELIM != "/") $curr_uri = str_replace("/", PATH_DELIM, $curr_uri);
+
+	if ( preg_match(URI_TO_LOCALPATH_MATCH_RE, $curr_uri) ) {
+		$curr_uri = preg_replace(URI_TO_LOCALPATH_MATCH_RE, URI_TO_LOCALPATH_REPLACE_RE,$curr_uri);
+	}
+
+	# Find the location 
+	$pos = strpos($curr_file, $curr_uri);
+	while (! $pos && strlen($curr_uri) > 1) {
+		$curr_uri = dirname($curr_uri);
+		$pos = strpos($curr_file, $curr_uri);
+	}
+	return substr($curr_file, 0, $pos + 1);
+	
 }
 
-$SYSTEM = new System();
+function calculate_server_root($path, $assume_subdomain=false) {
 
+	$ret = '';
+
+	if ($this->subdomainroot && $this->docroot) {
+
+		# If the path doesn't start with either the subdomain or document
+		# root, then something is very, very wrong, so we need to bail 
+		# the hell out and do it loud!
+		if ( ! (strpos($path, DOCUMENT_ROOT)  === 0 ||
+		        strpos($path, SUBDOMAIN_ROOT) === 0) ) {
+			echo "Bad file passed to calculate_server_root() in ".__FILE__.
+			     ".  The path '".$path."' is not under the document root (".
+				  DOCUMENT_ROOT.") or the subdomain root (".SUBDOMAIN_ROOT.
+				  ").  Cannot get server root.";
+			return false;
+		}
+
+		# Case 1 - The document root and subdomain root aretitle the same.
+		if (SUBDOMAIN_ROOT == DOCUMENT_ROOT) {
+
+			$ret = DOCUMENT_ROOT;
+
+		# Case 2 - The document root is inside subdomain root.
+		} elseif (strpos(DOCUMENT_ROOT, SUBDOMAIN_ROOT) === 0) {
+			
+			# If the path contains the document root, assume that we're NOT 
+			# in a subdomain.
+			$ret = ( strpos($path, DOCUMENT_ROOT) === 0) ? 
+			       DOCUMENT_ROOT: SUBDOMAIN_ROOT;
+
+		# Case 3 - The subdomain root is inside the document root.
+		} elseif (strpos(SUBDOMAIN_ROOT, DOCUMENT_ROOT) === 0) {
+
+			# If the path is in the document root, but not the subdomain
+			# root, then we're definitely not in a subdomain.
+			if (strpos($path, DOCUMENT_ROOT) === 0 &&
+			    strpos($path, SUBDOMAIN_ROOT) === false) {
+				$ret = DOCUMENT_ROOT;
+			} else {
+				# Otherwise, there's no way to tell if the directory is a subdomain
+				# without hitting the network, so just pass the decision to the caller.
+				$ret = $assume_subdomain ? SUBDOMAIN_ROOT : DOCUMENT_ROOT;
+			}
+
+		# Case 4 - The two directories are independent.
+		} else {
+			# If path is under the document, return that.  Otherwise, return the 
+			# subdomain root.  This ends up the same as case 2.
+			$ret = ( strpos($path, DOCUMENT_ROOT) === 0) ? 
+			       DOCUMENT_ROOT: SUBDOMAIN_ROOT;
+		}
+
+	} else {
+		$ret = calculate_document_root();
+	}
+
+	return $ret;
+
+}
+
+
+}
+
+$SYSTEM = System::instance();
 ?>

@@ -1,11 +1,10 @@
 <?php
 # Template: blogentry_tpl.php
-# Contains the markup and display logic for blog entries.  
-# Most of the tricky stuff here is for conditional display.
-?>
-<?php /* Display the title as a heading with a permalink to the entry. */ ?>
+# Contains the markup and display logic for fuill blog entries, including 
+# replies.  Most of the tricky stuff here is for conditional display.
+/* Display the title as a heading with a permalink to the entry. */ ?>
 <div class="blogentry">
-<h2 class="header"><a href="<?php echo $PERMALINK; ?>"><?php echo $SUBJECT; ?></a></h2>
+<h2 class="header"><?php echo $SUBJECT; ?></h2>
 <div class="body">
 <?php echo $BODY; ?>
 </div>
@@ -17,13 +16,13 @@ if (! empty($ENCLOSURE_DATA) ) { ?>
 <p>
 <?php 
 # If the enclosure is an audio file, then refer to it as a podcast.
-if (strpos($ENCLOSURE_DATA['type'], "audio") !== false) {
+if ( strpos($ENCLOSURE_DATA['type'], "audio") !== false || 
+     strpos($ENCLOSURE_DATA['type'], "video") !== false ) {
 	p_("Download this podcast");
 } else {
 	p_("Download attached file");
-}?>: <a href="<?php echo $ENCLOSURE_DATA['url'];?>">
-<?php echo basename($ENCLOSURE_DATA['url']);?></a> 
-(<?php pf_("Type: %s, size: %d bytes", $ENCLOSURE_DATA['type'], $ENCLOSURE_DATA['length']);?>)
+}?>: <a href="<?php echo $ENCLOSURE_DATA['url'];?>"><?php echo basename($ENCLOSURE_DATA['url']);?></a> 
+<?php pf_("(Type: %s, size: %d bytes)", $ENCLOSURE_DATA['type'], $ENCLOSURE_DATA['length']);?>
 </p>
 <?php } /* End enclosure block */ ?>
 <ul class="postdata">
@@ -31,48 +30,83 @@ if (strpos($ENCLOSURE_DATA['type'], "audio") !== false) {
 	<li><?php p_("Topics");?>: <?php 
 		$out = "";
 		foreach ($TAGS as $key=>$tag) 
-			$out .= ($out=="" ? "" : ", ").
-			         '<a href="'.make_uri($TAG_LINK,array('tag'=>urlencode($tag))).'">'.
-			         htmlspecialchars($tag).'</a>'; 
+			foreach ($TAG_URLS as $tag=>$url) 
+			$out .= ($out=="" ? "" : ", ").'<a href="'.$url.'">'.$tag.'</a>'; 
 		echo $out;
 ?></li>
-<?php } ?>
+<?php } /* End tag block */ ?>
 	<li class="blogdate"><?php pf_("Posted %s", $POSTDATE); ?></li>
-<?php if (! isset($NO_USER_PROFILE)) { /* Display profile link or not */?>
-	<li class="bloguser"><?php pf_("By %s", '<a href="'.$PROFILE_LINK.'">'.$USER_DISPLAY_NAME.'</a>');?></li>
-<?php } else { /* Use old e-mail link for user name */ ?>
-<?php if ( isset($USER_EMAIL) ) { ?>
-	<li class="bloguser"><?php pf_("By %s", '<a href="mailto:'.$USER_EMAIL.'">'.$USER_DISPLAY_NAME.'</a>'); ?></li>
-<?php } else { ?>
-	<li class="bloguser"><?php pf_("By %s", $USER_DISPLAY_NAME); ?></li>
-<?php } ?>
+<?php
+	if (! isset($NO_USER_PROFILE)) {
+		$name_link = sprintf('<a href="mailto:%s">%s</a>', $PROFILE_LINK, $USER_DISPLAY_NAME);
+	} elseif (isset($USER_EMAIL)) {
+		$name_link = sprintf('<a href="mailto:%s">%s</a>', $USER_EMAIL, $USER_DISPLAY_NAME);
+	} else {
+		$name_link = $USER_DISPLAY_NAME;
+	}
+?>
+	<li class="bloguser"><?php pf_("By %s", $name_link); ?></li>
 <?php if (isset($USER_HOMEPAGE)) { ?>
 	<li class="bloguserurl">(<a href="<?php echo $USER_HOMEPAGE; ?>"><?php echo $USER_HOMEPAGE; ?></a>)</li>
 <?php } ?>
-<?php } /* End user if block */ ?>
 </ul>
 <?php if ($SHOW_CONTROLS) { ?>
-<ul class="postadmin">
+<ul class="controlbar">
 	<li><a href="<?php echo $PING_LINK; ?>"><?php p_("Send TrackBack Ping"); ?></a></li>
 	<li><a href="<?php echo $UPLOAD_LINK; ?>"><?php p_("Upload file"); ?></a></li>
 	<li><a href="<?php echo $EDIT_LINK; ?>"><?php p_("Edit"); ?></a></li>
 	<li><a href="<?php echo $DELETE_LINK; ?>"><?php p_("Delete"); ?></a></li>
 	<li><a href="<?php echo $MANAGE_REPLY_LINK; ?>"><?php p_("Manage replies"); ?></a></li>
 </ul>
-<?php } 
-if (! empty($ALLOW_TRACKBACKS)) { ?>
-<p><?php p_("TrackBack <abbr title=\"Uniform Resource Locator\">URL</abbr>"); ?>: <a href="<?php echo $TRACKBACK_LINK; ?>"><?php echo $TRACKBACK_LINK; ?></a></p>
-<?php } 
-if ( ! empty($COMMENTCOUNT) ) { ?>
-<h3><a href="<?php echo $COMMENT_LINK; ?>"><?php p_("View reader comments"); ?> (<?php echo $COMMENTCOUNT; ?>)</a></h3>
-<?php } elseif ($ALLOW_COMMENTS) { ?>
-<h3><a href="<?php echo $COMMENT_LINK; ?>"><?php p_("Post a comment"); ?></a></h3>
-<?php } ?>
-<?php if ( ! empty($TRACKBACKCOUNT) ) { ?>
-<h3><a href="<?php echo $SHOW_TRACKBACK_LINK; ?>"><?php p_("View TrackBacks"); ?> (<?php echo $TRACKBACKCOUNT; ?>)</a></h3>
-<?php } ?>
-<?php if ( ! empty($PINGBACKCOUNT) ) { ?>
-<h3><a href="<?php echo $PINGBACK_LINK; ?>"><?php p_("View Pingbacks"); ?> (<?php echo $PINGBACKCOUNT; ?>)</a></h3>
-<?php } ?>
+<?php } /* End control link block */ ?>
 </div>
+<p>
+<?php 
+if ($ALLOW_COMMENTS) {
+	pf_('You can reply to this entry by <a href="%s">leaving a comment</a> below.  ',
+	    $COMMENT_LINK);
+}
+if ($ALLOW_TRACKBACKS) {
+	pf_('You can <a href="%s">send TrackBack pings to this <acronym title="Uniform Resource Locator">URL</acronym></a>.  ', 
+	    $TRACKBACK_LINK);
+}
+if ($ALLOW_PINGBACKS) {
+	pf_('This entry accepts Pingbacks from other blogs.  ');
+}
+if ($COMMENT_RSS_ENABLED) {
+	pf_('You can follow comments on this entry by subscribing to the <a href="%s">RSS feed</a>.', 
+	    $COMMENT_FEED_LINK);
+}
+?>
+</p>
+<?php if (! empty($LOCAL_PINGBACKS)) { ?>
+<h4><?php p_("Related entries");?></h4>
+<ul>
+<?php foreach ($LOCAL_PINGBACKS as $p) { echo $p->get($SHOW_CONTROLS); } ?>
+</ul>
+<?php } /* End local pingback block */ 
+
+if ( ! empty($TRACKBACKS) ) { ?>
+<h3><?php p_("TrackBacks");?> 
+<a href="<?php echo $SHOW_TRACKBACK_LINK; ?>" title="<?php p_("TrackBack page");?>">#</a></h3>
+<ul>
+<?php foreach ($TRACKBACKS as $p) { echo $p->get($SHOW_CONTROLS); } ?>
+</ul>
+<?php } /* End TrackBack block */
+
+if ( ! empty($PINGBACKS) ) { ?>
+<h3><?php p_("Pingbacks");?> 
+<a href="<?php echo $SHOW_PINGBACK_LINK; ?>" title="<?php p_("PingBack page");?>">#</a></h3>
+<ul>
+<?php foreach ($PINGBACKS as $p) { echo $p->get($SHOW_CONTROLS); } ?>
+</ul>
+<?php } /* End Pingback block */
+
+if ( ! empty($COMMENTS) ) { ?>
+<h3><?php p_("Comments");?> 
+<a href="<?php echo $COMMENT_LINK; ?>" title="<?php p_("Comment page");?>">#</a></h3>
+<ul>
+<?php foreach ($COMMENTS as $p) { echo $p->get($SHOW_CONTROLS); } ?>
+</ul>
+<?php } /* End comment block */ ?>
 </div>

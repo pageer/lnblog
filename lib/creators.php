@@ -187,6 +187,13 @@ function NewIniParser($file=false) {
 	return new INIParser($file);
 }
 
+# Function: NewConfigFile
+# Creates an XML config file parser object.
+function NewConfigFile($file=false) {
+	require_once("xmlini.php");
+	return new XMLINI($file);
+}
+
 # Function: NewReply
 # Creates a new object based on a reply identifier.  The object is a 
 # BlogComment, Trackback, or Pinback.  The type of object is based on the 

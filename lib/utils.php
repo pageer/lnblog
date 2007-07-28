@@ -42,50 +42,6 @@ define("LINK_IMAGE", "images");
 define("LINK_STYLESHEET", "styles");
 define("LINK_SCRIPT", "scripts");
 
-# Function: canonicalize
-# Return the canonical path for a given file.  The file need no exist.
-# Removes all '.' and '..' components and returns an absolute path.
-#
-# Parameters:
-# path - The path to canoncialize.
-#
-# Returns:
-# The canonical path to the path parameter.
-
-function canonicalize ($path) {
-	if ( file_exists($path) ) return realpath($path);
-	# If the path is relative, prepend the current directory.
-	if (! is_absolute($path)) $path = getcwd().PATH_DELIM.$path;
-	$components = explode(PATH_DELIM, $path);
-	$ret = array();
-	$i = 0;
-	$last_item = false;
-	foreach ($components as $item) {
-		if ($item == '..') $i--;
-		elseif ($item != '.') $ret[$i++] = $item;
-	}
-	$ret = array_slice($ret, 0, $i);
-	$ret = implode(PATH_DELIM, $ret);
-	return $ret;
-}
-
-# Method: is_absolute
-# Return whether or not a path is absolute.
-#
-# Parameters:
-# path - The path to check.
-#
-# Returns:
-# True ic the path is absolute, false otherwise.
-
-function is_absolute($path) {
-	if (PATH_DELIM == "/") {
-		return ( substr($path, 0, 1) == "/" );
-	} else {
-		return ( substr($path, 1, 2) == ":\\" );
-	}
-}
-
 # Function: write_file
 # Write contents to a file.  Basically a wrapper around fopen and fwrite.
 # This function was rewritten to use the FS abstract interface.  For 
@@ -133,7 +89,7 @@ function mkdir_rec($path, $mode=false) {
 #
 # Parameters:
 # path      - The directory path to scan.
-# dirs_only - *Option* to list only the directories in the path.  
+# dirs_only - *Optional* parameter to list only the directories in the path.  
 #             The *default* is false.
 #
 # Returns: 
@@ -199,7 +155,7 @@ function calculate_server_root($path, $assume_subdomain=false) {
 		if ( ! (strpos($path, DOCUMENT_ROOT)  === 0 ||
 		        strpos($path, SUBDOMAIN_ROOT) === 0) ) {
 			echo "Bad file passed to calculate_server_root() in ".__FILE__.
-			     ".� The path '".$path."' is not under the document root (".
+			     ".  The path '".$path."' is not under the document root (".
 				  DOCUMENT_ROOT.") or the subdomain root (".SUBDOMAIN_ROOT.
 				  ").  Cannot get server root.";
 			return false;
@@ -250,7 +206,7 @@ function calculate_server_root($path, $assume_subdomain=false) {
 
 # Function: test_server_root
 # Tests a root-relative path against the document root and subdomain root 
-# directory and determines which one "works."  
+# directory and determines which one "works."
 #
 # Parameters:
 # path - The root-relative path to test.
@@ -278,21 +234,6 @@ function test_server_root($path, $assume_subdomain=false) {
 		if (file_exists($doc_path)) $ret = $doc_path;
 	}
 	return $ret;
-}
-
-# Function: php_version_at_least
-# Check that PHP is at least a certain version.
-#
-# Parameters:
-# ver - The target version number in "1.2.3" format.
-#
-# Returns:
-# True if that current PHP version is at least ver, false otherwise.
-
-function php_version_at_least($ver) {
-	$res = version_compare(phpversion(), $ver);
-	if ($res < 0) return false;
-	else return true;
 }
 
 # Function: SESSION
@@ -379,27 +320,6 @@ function GET($key, $val="") {
 	} else return false;
 }
 
-# Function: GETPOST
-# Like $_REQUEST.  This is the same as checking <POST> and then <GET>
-# and returning the first result.
-#
-# Parameters:
-# key - The key to return.
-#
-# Returns:
-# The value of $_POST[$key] if it is set, else $_GET[$key].  Returns false
-# if neither one is set.
-
-function GETPOST($key) {
-	if (isset($_POST[$key])) {
-		if (get_magic_quotes_gpc()) return stripslashes($_POST[$key]);
-		else return $_POST[$key];
-	} elseif (isset($_GET[$key])) { 
-		if (get_magic_quotes_gpc()) return stripslashes($_GET[$key]);
-		else return $_GET[$key];
-	} else return false;
-}
-
 # Function: has_post
 # Determine if there is any POST data.
 #
@@ -408,16 +328,6 @@ function GETPOST($key) {
 
 function has_post() {
 	return count($_POST);
-}
-
-# Function: has_post
-# Determine if there is any GET data.
-#
-# Returns:
-# True if $_GET has any members, false otherwise.
-
-function has_get() {
-	return count($_GET);
 }
 
 # Function: current_uri
@@ -470,8 +380,6 @@ function current_url() {
 	else $port = ":".$port;
 	return $protocol."://".$host.$port.$path;
 }
-
-
 
 # Function: localpath_to_uri
 # Convert a local path to a URI.
@@ -593,8 +501,8 @@ function uri_to_localpath($uri) {
 		$path = mkpath(DOCUMENT_ROOT, $path);
 	}
 	
-	$path = canonicalize($path);
-	return $path;
+	$p = new Path($path);
+	return $p->getCanonical();
 	
 }
 
@@ -606,7 +514,7 @@ function uri_to_localpath($uri) {
 # The numeric IP address of the client.
 
 function get_ip() {
-	if (isset($_SERVER['REMOTE_ADDR']))return $_SERVER["REMOTE_ADDR"];
+	if (isset($_SERVER['REMOTE_ADDR'])) return $_SERVER["REMOTE_ADDR"];
 	else return '127.0.0.1';
 }
 
@@ -671,15 +579,6 @@ function create_directory_wrappers($path, $type, $instpath="") {
 	switch ($type) {
 		case BLOG_BASE:
 			if (!is_dir($instpath)) return false;
-			#$filelist = array("index"=>"pages/showblog", "new"=>"pages/newentry",
-			#                  "newart"=>"pages/newentry", "edit"=>"updateblog",
-			#                  "login"=>"bloglogin", "logout"=>"bloglogout",
-			#                  "uploadfile"=>"pages/fileupload", "map"=>"sitemap",
-			#                  "useredit"=>"pages/editlogin", 
-			#                  "plugins"=>"plugin_setup", 
-			#                  "tags"=>"pages/tagsearch",
-			#                  "pluginload"=>"plugin_loading",
-			#                  "profile"=>"userinfo");
 			$filelist = array("index"=>"pages/showblog");
 			$removelist = array("new", "newart", "edit", "login", "logout", 
 			                    "uploadfile", "map", "useredit", "plugins",
@@ -696,7 +595,6 @@ function create_directory_wrappers($path, $type, $instpath="") {
 			}
 			break;
 		case BLOG_ENTRIES:
-			#$filelist = array("index"=>"pages/showarchive", "all"=>"pages/showall");
 			$filelist = array("index"=>"pages/showarchive");
 			$removelist = array("all");
 			$config_level = 1;
@@ -706,12 +604,10 @@ function create_directory_wrappers($path, $type, $instpath="") {
 			$config_level = 1;
 			break;
 		case YEAR_ENTRIES:
-			#$filelist = array("index"=>"pages/showyear");
 			$filelist = array("index"=>"pages/showarchive");
 			$config_level = 2;
 			break;
 		case MONTH_ENTRIES:
-			#$filelist = array("index"=>"pages/showmonth", "day"=>"pages/showday");
 			$filelist = array("index"=>"pages/showarchive");
 			$removelist = array("day");
 			$config_level = 3;
@@ -719,8 +615,6 @@ function create_directory_wrappers($path, $type, $instpath="") {
 		case ENTRY_BASE:
 			$filelist = array("index"=>"pages/showitem");
 			$removelist = array("edit", "delete", "trackback", "uploadfile");
-			                    #"uploadfile"=>"pages/fileupload",
-			                    #"trackback"=>"pages/tb_ping");
 			$config_level = 4;
 			break;
 		case ENTRY_COMMENTS:
@@ -739,9 +633,6 @@ function create_directory_wrappers($path, $type, $instpath="") {
 		case ARTICLE_BASE:
 			# The same as for entries, but for some reason, I never added a delete.
 			$filelist = array("index"=>"pages/showitem");
-			#$filelist = array("index"=>"pages/showentry", "edit"=>"pages/editentry",
-			#                  "uploadfile"=>"pages/fileupload",
-			#                  "trackback"=>"pages/tb_ping");
 			$removelist = array("edit", "trackback", "uploadfile", "trackback");
 			$config_level = 2;
 			break;
@@ -763,9 +654,6 @@ function create_directory_wrappers($path, $type, $instpath="") {
 	foreach ($filelist as $file=>$content) {
 		$curr_file = $current.$file.".php";
 		$ret = $fs->write_file($curr_file, $head.$content.$tail);
-		#if ($type == ARTICLE_BASE) {
-		#	echo "$current_file: $ret\n";
-		#}
 		if (! $ret) $ret_list[] = $curr_file;
 	}
 
