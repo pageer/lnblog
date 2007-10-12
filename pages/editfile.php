@@ -49,7 +49,7 @@ $relpath = INSTALL_ROOT;
 
 if ( GET("profile") == $u->username() ) {
 	$edit_ok = true;
-	$relpath = USER_DATA_PATH.PATH_DELIM.$u->username();
+	$relpath = Path::get(USER_DATA_PATH, $u->username());
 } elseif ($ent->isEntry() ) {
 	$PAGE->setDisplayObject($ent);
 	$relpath = $ent->localpath();
@@ -65,6 +65,8 @@ if ( GET("profile") == $u->username() ) {
 if (! $u->checkLogin()) $edit_ok = false;
 
 if (! $edit_ok) {
+var_dump($edit_ok);
+var_dump($_GET); exit;
 	if (SERVER("referer")) $PAGE->redirect(SERVER("referer"));
 	else {
 		header("HTTP/1.0 403 Forbidden");

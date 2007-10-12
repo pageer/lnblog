@@ -38,7 +38,7 @@ if ( strpos($ENCLOSURE_DATA['type'], "audio") !== false ||
 	<li class="blogdate"><?php pf_("Posted %s", $POSTDATE); ?></li>
 <?php
 	if (! isset($NO_USER_PROFILE)) {
-		$name_link = sprintf('<a href="mailto:%s">%s</a>', $PROFILE_LINK, $USER_DISPLAY_NAME);
+		$name_link = sprintf('<a href="%s">%s</a>', $PROFILE_LINK, $USER_DISPLAY_NAME);
 	} elseif (isset($USER_EMAIL)) {
 		$name_link = sprintf('<a href="mailto:%s">%s</a>', $USER_EMAIL, $USER_DISPLAY_NAME);
 	} else {

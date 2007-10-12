@@ -67,7 +67,7 @@ function show_pingback_page(&$blg, &$ent, &$usr) {
 	$PAGE->addScript("entry.js");
 	$body = show_pingbacks($ent, $usr);
 	if (! $body) $body = '<p>'.
-		spf_('There are no pingbacks for &s', 
+		spf_('There are no pingbacks for %s', 
 		     sprintf('<a href="%s">\'%s\'</a>',
 			         $ent->permalink(), $ent->subject)).'</p>';
 	return $body;

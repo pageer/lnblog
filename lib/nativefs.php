@@ -119,7 +119,7 @@ class NativeFS extends FS {
 
 		if ($mask) {
 			umask($old_umask);
-			$this->chmod($path, $mask);
+			@$this->chmod($path, $mask);
 		}
 		
 		return $ret;

@@ -259,7 +259,7 @@ class Pingback extends Trackback {
 	
 	function fetchPage($url, $headers=false) {
 		if (extension_loaded('curl')) {
-			
+
 			$hnd = curl_init();
 			curl_setopt($hnd, CURLOPT_URL, $url);
 			curl_setopt($hnd, CURLOPT_FOLLOWLOCATION, 1);
@@ -269,7 +269,7 @@ class Pingback extends Trackback {
 			$response = curl_exec($hnd);
 			
 		} else {
-			
+
 			$url_bits = parse_url($url);
 			$host = $url_bits['host'];
 			$path = isset($url_bits['path']) ? $url_bits['path'] : "/";

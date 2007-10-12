@@ -61,46 +61,54 @@ function script_path($name) {
 }
 
 if ( isset($_GET['action']) ) {
-	if ( strtolower($_GET['action']) == 'newentry' ) {
-		include('pages/entryedit.php');
-		exit;
-	} elseif ( strtolower($_GET['action']) == 'delentry' ) {
-		include('pages/delentry.php');
-		exit;
-	} elseif ( strtolower($_GET['action']) == 'edit' ) {
-		include('pages/updateblog.php');
-		exit;
-	} elseif ( strtolower($_GET['action']) == 'login' ) {
-		include('bloglogin.php');
-		exit;
-	} elseif ( strtolower($_GET['action']) == 'logout' ) {
-		include('bloglogout.php');
-		exit;
-	} elseif ( strtolower($_GET['action']) == 'upload' ) {
-		include('pages/fileupload.php');
-		exit;
-	} elseif ( strtolower($_GET['action']) == 'sitemap' ) {
-		include('sitemap.php');
-		exit;
-	} elseif ( strtolower($_GET['action']) == 'useredit' ) {
-		include('pages/editlogin.php');
-		exit;
-	} elseif ( strtolower($_GET['action']) == 'plugins' ) {
-		include('plugin_setup.php');
-		exit;
-	} elseif ( strtolower($_GET['action']) == 'tags' ) {
-		include('pages/tagsearch.php');
-		exit;
-	} elseif ( strtolower($_GET['action']) == 'pluginload' ) {
-		include('plugin_loading.php');
-		exit;
-	} elseif ( strtolower($_GET['action']) == 'profile' ) {
-		include('userinfo.php');
-		exit;
-	} elseif ( strtolower($_GET['action']) == 'managereply' ) {
-		include('pages/manage_replies.php');
-		exit;
-	} 
+	$action = strtolower($_GET['action']);
+	switch ($action) {
+		case 'newentry':
+			include('pages/entryedit.php');
+			exit;
+		case 'delentry':
+			include('pages/delentry.php');
+			exit;
+		case 'edit':
+			include('pages/updateblog.php');
+			exit;
+		case 'login':
+			include('bloglogin.php');
+			exit;
+		case 'logout':
+			include('bloglogout.php');
+			exit;
+		case 'upload':
+			include('pages/fileupload.php');
+			exit;
+		case 'sitemap':
+			include('sitemap.php');
+			exit;
+		case 'useredit':
+			include('pages/editlogin.php');
+			exit;
+		case 'plugins':
+			include('plugin_setup.php');
+			exit;
+		case 'tags':
+			include('pages/tagsearch.php');
+			exit;
+		case 'pluginload':
+			include('plugin_loading.php');
+			exit;
+		case 'profile':
+			include('userinfo.php');
+			exit;
+		case 'managereply':
+			include('pages/manage_replies.php');
+			exit;
+		case 'editfile':
+			include('pages/editfile.php');
+			exit;
+		default:
+			# Do nothing;
+			break;
+	}
 } elseif ( isset($_GET['script']) ) {
 	$file = script_path($_GET['script']);
 	if (file_exists($file)) readfile($file);

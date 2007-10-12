@@ -74,8 +74,7 @@ function create_uri_object(&$object, $type=false) {
 # to create other URIs.  URI strings should be built using this class.
 ###############################################################################
 
-class URI {
-	
+class URI extends LnBlogObject {
 	function URI() {
 		$this->protocol = 'http';
 		$this->host = isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '';
@@ -122,6 +121,14 @@ class URI {
 		       $this->getFragment();
 	}
 	
+	# Method: getRelative
+	# Gets a root-relative URI, i.e. no host, port, or protocol.
+	function getRelative() {
+		return $this->path.
+		       $this->getQueryString().
+		       $this->getFragment();
+	}
+	
 	# Method: getPrintable
 	# Like <get>, but returns a printable URI, i.e. with ampersands escaped.
 	function getPrintable() {
@@ -133,6 +140,13 @@ class URI {
 			$this->getFragment();
 	}
 	
+	# Method: getRelativePrintable
+	# Like <getPrintable>, but uses a relative URI.
+	function getRelativePrintable() {
+		return $this->path.
+			$this->getQueryString('&amp;').
+			$this->getFragment();
+	}
 	# Method: appendPath
 	# Appends a path componend to the URI path, adding or removing terminal/beginning
 	# slashes as appropriate.
@@ -161,13 +175,43 @@ class URI {
 		$this->query_string[$key] = $val;
 	}
 	
+	# Method: secure
+	# Set or get whether to use a secure, i.e. https, URL.
+	function secure($val='') {
+		if ($val === '') return $this->protocol == 'https';
+		else {
+			if ($this->protocol == 'https') $this->protocol = 'http';
+			else $this->protocol = 'https';
+			return $this->protocol;
+		}
+	}
 }
 
-class BlogURIWrapper extends LnBlogObject {
+class BlogURIWrapper extends URI {
 	
 	function BlogURIWrapper(&$blog) {
+		$this->URI();
+	
 		$this->object = $blog;
+		
 		$this->base_uri = localpath_to_uri($blog->home_path);
+		$url_bits = parse_url($this->base_uri);
+		$url_components = array('protocol'=>'scheme',
+		                        'host'=>'host', 'port'=>'port',
+		                        'path'=>'path', 'username'=>'user',
+		                        'password'=>'pass', 'path'=>'path',
+		                        'query_string'=>'query',
+		                        'fragment'=>'fragment');
+		foreach ($url_components as $key=>$val) {
+			if (isset($url_bits[$val])) {
+				if ($key == 'query_string') {
+					$this->{$key} = explode($url_bits[$val], '&');
+				} else {
+					$this->{$key} = $url_bits[$val];
+				}
+			}
+		}
+		
 		$this->separator = "&amp;";
 	}
 	
@@ -235,7 +279,7 @@ class BlogURIWrapper extends LnBlogObject {
 		return $this->wrapper("login");
 	}
 	function logout() { return $this->wrapper("logout"); }
-	function editfile() { return $this->wrapper("editfile"); }
+	function editfile($args) { return $this->wrapper("editfile", $args); }
 	function edituser() { return $this->wrapper("useredit"); }
 	function pluginconfig() { return $this->wrapper("plugins"); }
 	function pluginload() { return $this->wrapper("pluginload"); }

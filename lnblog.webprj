@@ -132,35 +132,35 @@
     <item modified_time="1162594384" url="themes/default/styles/main.css" uploadstatus="1" />
     <item modified_time="1160794896" url="themes/default/styles/reply.css" uploadstatus="1" />
     <item modified_time="1163792939" url="themes/default/styles/rss.css" uploadstatus="1" />
-    <item documentFolder="true" url="themes/default/templates/" uploadstatus="0" />
-    <item modified_time="1153514068" url="themes/default/templates/archive_layout_tpl.php" uploadstatus="0" />
-    <item modified_time="1163202976" url="themes/default/templates/article_tpl.php" uploadstatus="0" />
-    <item modified_time="1153377238" url="themes/default/templates/basic_layout_tpl.php" uploadstatus="0" />
-    <item modified_time="1157664158" url="themes/default/templates/blog_admin_tpl.php" uploadstatus="0" />
-    <item modified_time="1160794504" url="themes/default/templates/blogcomment_tpl.php" uploadstatus="0" />
-    <item modified_time="1163204202" url="themes/default/templates/blogentry_tpl.php" uploadstatus="0" />
-    <item modified_time="1158266184" url="themes/default/templates/blog_modify_tpl.php" uploadstatus="0" />
-    <item modified_time="1157664520" url="themes/default/templates/blog_path_tpl.php" uploadstatus="0" />
-    <item modified_time="1174083210" url="themes/default/templates/comment_form_tpl.php" uploadstatus="0" />
-    <item modified_time="1148797430" url="themes/default/templates/confirm_tpl.php" uploadstatus="0" />
-    <item modified_time="1154037022" url="themes/default/templates/css_editor_tpl.php" uploadstatus="0" />
-    <item modified_time="1148797430" url="themes/default/templates/docroot_test_tpl.php" uploadstatus="0" />
-    <item modified_time="1174268310" url="themes/default/templates/entry_edit_tpl.php" uploadstatus="0" />
-    <item modified_time="1148797430" url="themes/default/templates/file_edit_tpl.php" uploadstatus="0" />
-    <item modified_time="1148797430" url="themes/default/templates/fs_config_tpl.php" uploadstatus="0" />
-    <item modified_time="1148797430" url="themes/default/templates/ftproot_test_tpl.php" uploadstatus="0" />
-    <item modified_time="1161208548" url="themes/default/templates/js_editor.php" uploadstatus="0" />
-    <item modified_time="1158720742" url="themes/default/templates/list_tpl.php" uploadstatus="0" />
-    <item modified_time="1153119772" url="themes/default/templates/login_create_tpl.php" uploadstatus="0" />
-    <item modified_time="1148797430" url="themes/default/templates/login_tpl.php" uploadstatus="0" />
-    <item modified_time="1154657860" url="themes/default/templates/page_head_tpl.php" uploadstatus="0" />
-    <item modified_time="1156371376" url="themes/default/templates/pingback_tpl.php" uploadstatus="0" />
-    <item modified_time="1148797430" url="themes/default/templates/plugin_layout_tpl.php" uploadstatus="0" />
-    <item modified_time="1148797430" url="themes/default/templates/plugin_load_config_tpl.php" uploadstatus="0" />
-    <item modified_time="1148797430" url="themes/default/templates/send_trackback_tpl.php" uploadstatus="0" />
-    <item modified_time="1160794938" url="themes/default/templates/trackback_tpl.php" uploadstatus="0" />
-    <item modified_time="1148797430" url="themes/default/templates/upload_form_tpl.php" uploadstatus="0" />
-    <item modified_time="1153119772" url="themes/default/templates/user_info_tpl.php" uploadstatus="0" />
+    <item documentFolder="true" url="themes/default/templates/" uploadstatus="1" />
+    <item modified_time="1153514068" url="themes/default/templates/archive_layout_tpl.php" uploadstatus="1" />
+    <item modified_time="1163202976" url="themes/default/templates/article_tpl.php" uploadstatus="1" />
+    <item modified_time="1153377238" url="themes/default/templates/basic_layout_tpl.php" uploadstatus="1" />
+    <item modified_time="1157664158" url="themes/default/templates/blog_admin_tpl.php" uploadstatus="1" />
+    <item modified_time="1160794504" url="themes/default/templates/blogcomment_tpl.php" uploadstatus="1" />
+    <item modified_time="1163204202" url="themes/default/templates/blogentry_tpl.php" uploadstatus="1" />
+    <item modified_time="1158266184" url="themes/default/templates/blog_modify_tpl.php" uploadstatus="1" />
+    <item modified_time="1157664520" url="themes/default/templates/blog_path_tpl.php" uploadstatus="1" />
+    <item modified_time="1174083210" url="themes/default/templates/comment_form_tpl.php" uploadstatus="1" />
+    <item modified_time="1148797430" url="themes/default/templates/confirm_tpl.php" uploadstatus="1" />
+    <item modified_time="1154037022" url="themes/default/templates/css_editor_tpl.php" uploadstatus="1" />
+    <item modified_time="1148797430" url="themes/default/templates/docroot_test_tpl.php" uploadstatus="1" />
+    <item modified_time="1174268310" url="themes/default/templates/entry_edit_tpl.php" uploadstatus="1" />
+    <item modified_time="1148797430" url="themes/default/templates/file_edit_tpl.php" uploadstatus="1" />
+    <item modified_time="1148797430" url="themes/default/templates/fs_config_tpl.php" uploadstatus="1" />
+    <item modified_time="1148797430" url="themes/default/templates/ftproot_test_tpl.php" uploadstatus="1" />
+    <item modified_time="1161208548" url="themes/default/templates/js_editor.php" uploadstatus="1" />
+    <item modified_time="1158720742" url="themes/default/templates/list_tpl.php" uploadstatus="1" />
+    <item modified_time="1153119772" url="themes/default/templates/login_create_tpl.php" uploadstatus="1" />
+    <item modified_time="1148797430" url="themes/default/templates/login_tpl.php" uploadstatus="1" />
+    <item modified_time="1154657860" url="themes/default/templates/page_head_tpl.php" uploadstatus="1" />
+    <item modified_time="1156371376" url="themes/default/templates/pingback_tpl.php" uploadstatus="1" />
+    <item modified_time="1148797430" url="themes/default/templates/plugin_layout_tpl.php" uploadstatus="1" />
+    <item modified_time="1148797430" url="themes/default/templates/plugin_load_config_tpl.php" uploadstatus="1" />
+    <item modified_time="1148797430" url="themes/default/templates/send_trackback_tpl.php" uploadstatus="1" />
+    <item modified_time="1160794938" url="themes/default/templates/trackback_tpl.php" uploadstatus="1" />
+    <item modified_time="1148797430" url="themes/default/templates/upload_form_tpl.php" uploadstatus="1" />
+    <item modified_time="1153119772" url="themes/default/templates/user_info_tpl.php" uploadstatus="1" />
     <item url="themes/skepticats/" uploadstatus="1" />
     <item url="themes/skepticats/images/" uploadstatus="1" />
     <item modified_time="1148797430" url="themes/skepticats/images/logo.png" uploadstatus="1" />
@@ -296,7 +296,7 @@
     <item url="pages/manage_replies.php" uploadstatus="1" />
     <item url="themes/default/scripts/fs_setup.js" uploadstatus="1" />
     <item url="themes/default/scripts/lnblog_lib.js" uploadstatus="1" />
-    <item url="themes/default/templates/manage_replies_tpl.php" uploadstatus="0" />
+    <item url="themes/default/templates/manage_replies_tpl.php" uploadstatus="1" />
     <item url="xmlrpc.php" uploadstatus="1" />
     <item url="pages/showdrafts.php" uploadstatus="1" />
     <item url="pages/entryedit.php" uploadstatus="1" />
@@ -328,7 +328,7 @@
     <item url="themes/clean/images/" uploadstatus="1" />
     <item url="themes/clean/scripts/" uploadstatus="1" />
     <item url="themes/clean/styles/main.css" uploadstatus="1" />
-    <item url="themes/default/templates/sidebar_panel_tpl.php" uploadstatus="0" />
+    <item url="themes/default/templates/sidebar_panel_tpl.php" uploadstatus="1" />
     <item url="themes/default/templates/blogentry_summary_tpl.php" uploadstatus="1" />
     <item url="lib/xmlini.php" uploadstatus="1" />
     <item url="themes/tuxice/templates/blogentry_summary_tpl.php" uploadstatus="1" />

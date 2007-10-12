@@ -37,6 +37,7 @@ global $PAGE;
 
 $uid = GET("user");
 $uid = $uid ? $uid : POST("user");
+$uid = $uid ? $uid : basename(getcwd());
 $uid = preg_replace("/\W/", "", $uid);
 
 $usr = NewUser($uid);
@@ -54,7 +55,7 @@ $tpl->set("CUSTOM_VALUES", $usr->custom);
 
 $ret = $tpl->process();
 $user_file = mkpath(USER_DATA_PATH,$uid,"profile.htm");
-
+var_dump($user_file);
 if (file_exists($user_file)) {
 	$ret .= implode("\n", file($user_file));
 }

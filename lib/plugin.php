@@ -229,6 +229,7 @@ class Plugin extends LnBlogObject{
 			}
 		}
 		$ret = $parser->writeFile();
+		$this->invalidateCache();
 		return $ret;
 	}
 	

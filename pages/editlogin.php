@@ -81,8 +81,8 @@ $blog_qs = ($blog->isBlog() ? "blog=".$blog->blogid."&amp;" : "");
 $tpl->set("UPLOAD_LINK", 
           INSTALL_ROOT_URL."pages/fileupload.php?".
           $blog_qs."profile=".$usr->username() );
-$tpl->set("PROFILE_EDIT_LINK", $blog->uri("editfile", "file=profile.htm", 
-                                          'profile='.$usr->username() ) );
+$tpl->set("PROFILE_EDIT_LINK", $blog->uri("editfile", array("file"=>"profile.htm", 
+                                          'profile'=>$usr->username()) ) );
 $tpl->set("PROFILE_EDIT_DESC", _("Edit extra profile data") );
 $tpl->set("UPLOAD_DESC", _("Upload file to profile") );
 

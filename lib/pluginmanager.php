@@ -76,7 +76,7 @@ class PluginManager {
 	}
 
 	/* Method: getConfig
-	 * Gets configuration data for plugins from INI files.
+	 * Gets configuration data for plugins from XML files.
 	 * Merges the installation wide and per-blog settings if applicable.
 	 */
 

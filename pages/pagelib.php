@@ -189,7 +189,7 @@ function show_trackbacks(&$ent, &$usr, $sort_asc=true) {
 #	                'itemclass'=>'trackback', 'listclass'=>'tblist',
 #	                'listtitle'=>$title, 'typename'=>_("TrackBacks"));
 	$tbs = $ent->getTrackbacks();
-	return show_replies($ent, $usr, $params);
+	return show_replies($ent, $usr, $tbs);
 }
 
 /*
@@ -213,7 +213,7 @@ function show_pingbacks(&$ent, &$usr, $sort_asc=true) {
 #	                'itemclass'=>'pingback', 'listclass'=>'pblist',
 #	                'listtitle'=>$title, 'typename'=>_("Pingbacks"));
 	$pbs = $ent->getPingbacks();
-	return show_replies($ent, $usr, $params);
+	return show_replies($ent, $usr, $pbs);
 }
 
 function show_remote_pingbacks(&$ent, &$usr, $sort_asc=true) {
@@ -272,7 +272,7 @@ function show_replies(&$ent, &$usr, &$replies) {
 			$typename = '';
 			
 			$tpl->set("FORM_HEADER", "<p>".
-			          spf_("Delete marked %s", $params['typename']).' '.
+			          spf_("Delete marked %s", get_class($replies[0])).' '.
 			          '<input type="submit" value="'._("Delete").'" />'.
 			          '<input type="button" value="'._("Select all").
 			          '" onclick="mark_type(\''.$reply_type.'\')" />'.
@@ -287,12 +287,12 @@ function show_replies(&$ent, &$usr, &$replies) {
 			$tpl->set("FORM_ACTION", $url);
 		}
 		
-		$tpl->set("ITEM_CLASS", $params['itemclass']);
-		if (isset($params['listclass'])) {
-			$tpl->set("LIST_CLASS", $params['listclass']);
-		}
+		#$tpl->set("ITEM_CLASS", $params['itemclass']);
+		#if (isset($params['listclass'])) {
+		#	$tpl->set("LIST_CLASS", $params['listclass']);
+		#}
 		$tpl->set("ORDERED");
-		$tpl->set("LIST_TITLE", $params['listtitle']);
+		#$tpl->set("LIST_TITLE", $params['listtitle']);
 		$tpl->set("ITEM_LIST", $reply_text);
 		$ret = $tpl->process();
 	}

@@ -1212,10 +1212,11 @@ class BlogEntry extends Entry {
 		$ret = array();
 
 		foreach ($urls as $uri) {
-			
-			$pb_server = Pingback::checkPingbackEnabled($uri);
-
+			$p = NewPingback();
+			$pb_server = $p->checkPingbackEnabled($uri);
+var_dump($pb_server); exit;
 			if ($pb_server) {
+
 				$result = $this->sendPingback($pb_server, $uri);
 				$ret[] = array('uri'=>$uri, 'response'=>$result);
 			}
