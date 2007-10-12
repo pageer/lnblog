@@ -79,9 +79,9 @@ class BlogEntry extends Entry {
 		$this->uid = '';
 		$this->ip = get_ip();
 		$this->date = "";
-		$this->post_date = false;
-		$this->timestamp = "";
-		$this->post_ts = false;
+		$this->post_date = "";
+		$this->timestamp = 0;
+		$this->post_ts = 0;
 		#$this->mail_notify = true;
 		#$this->sent_ping = true;
 		$this->subject = "";
@@ -832,7 +832,7 @@ class BlogEntry extends Entry {
 		$tmp->set("SUBJECT", $this->subject);
 		$tmp->set("POSTDATE", $this->prettyDate($this->post_ts) );
 		$tmp->set("POST_TIMESTAMP", $this->post_ts);
-		$tmp->set("EDITDATE", $this->prettyDate() );
+		$tmp->set("EDITDATE", $this->prettyDate($this->timestamp) );
 		$tmp->set("EDIT_TIMESTAMP", $this->timestamp);
 		$tmp->set("ABSTRACT", $this->getSummary());
 		$tmp->set("TAGS", $this->tags());
@@ -1214,7 +1214,7 @@ class BlogEntry extends Entry {
 		foreach ($urls as $uri) {
 			$p = NewPingback();
 			$pb_server = $p->checkPingbackEnabled($uri);
-var_dump($pb_server); exit;
+
 			if ($pb_server) {
 
 				$result = $this->sendPingback($pb_server, $uri);
