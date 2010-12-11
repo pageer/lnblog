@@ -218,7 +218,7 @@ class BlogComment extends Entry {
 		if (! has_post()) return false;
 		$this->name = POST("username");
 		$this->email = POST("email");
-		$this->url = POST("url");
+		$this->url = POST("homepage");
 		$this->subject = POST("subject");
 		$this->data = POST("data");
 		$this->show_email = POST("showemail") ? true : false;

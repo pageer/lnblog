@@ -42,7 +42,7 @@ class FTPFS extends FS {
 	var $status;
 	var $ftp_root;
 	
-	function FTPFS($host=false, $user=false, $pass=false) {
+	public function __construct($host=false, $user=false, $pass=false) {
 		$this->default_mode = FS_DEFAULT_MODE;
 		$this->script_mode = FS_SCRIPT_MODE;
 		$this->directory_mode = FS_DIRECTORY_MODE;
@@ -73,7 +73,7 @@ class FTPFS extends FS {
 	# A non-tranparent destructor.  Needed to cleanly disconnect from the 
 	# FTP server.
 
-	function destruct() {
+	function __destruct() {
 		$this->disconnect();
 	}
 

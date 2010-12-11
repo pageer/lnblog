@@ -40,7 +40,7 @@ class Articles extends Plugin {
 		}
 		$this->registerStandardInvalidators();
 		
-		if ($do_output) $this->output();
+		if ($do_output) $this->buildOutput();
 	}
 	
 	function buildOutput($parm=false) {

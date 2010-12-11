@@ -208,7 +208,7 @@ function serialize_constants() {
 
 global $PAGE;
 
-if ( file_exists(INSTALL_ROOT.PATH_DELIM.USER_DATA.PATH_DELIM.FS_PLUGIN_CONFIG) ) {
+if ( file_exists(USER_DATA_PATH.PATH_DELIM.FS_PLUGIN_CONFIG) ) {
 	header("Location: index.php");
 	exit;
 }
@@ -236,11 +236,9 @@ if ( has_post() ) {
 	                "permscript"=>"FS_SCRIPT_MODE");
 	foreach ($fields as $key=>$val) {
 		if (POST($key)) {
-			if (preg_match("/FS_.*_MODE/", $key)) {
+			if (preg_match("/FS_.*_MODE/", $val)) {
 				$num = trim(POST($key));
-				#echo "<br>$num<br>";
 				$num = octdec((int)$num);
-				#echo "<br>$num<br>";
 				define($val, $num);
 			} else {
 				define($val, trim(POST($key)));
@@ -310,12 +308,12 @@ if ( has_post() ) {
 		
 		# Try to create the fsconfig file.  Suppress error messages so users
 		# don't get scared by expected permissions problems.
-		if (! is_dir(INSTALL_ROOT.PATH_DELIM.USER_DATA)) {
-			@$ret = $fs->mkdir_rec(INSTALL_ROOT.PATH_DELIM.USER_DATA);
+		if (! is_dir(USER_DATA_PATH)) {
+			@$ret = $fs->mkdir_rec(USER_DATA_PATH);
 		}
-		if (is_dir(INSTALL_ROOT.PATH_DELIM.USER_DATA)) {
+		if (is_dir(USER_DATA_PATH)) {
 		
-			$ret = $fs->write_file(INSTALL_ROOT.PATH_DELIM.USER_DATA.PATH_DELIM.FS_PLUGIN_CONFIG, $content);
+			$ret = $fs->write_file(USER_DATA_PATH.PATH_DELIM.FS_PLUGIN_CONFIG, $content);
 			$fs->destruct();
 		}
 		
@@ -323,10 +321,10 @@ if ( has_post() ) {
 			if (FS_PLUGIN == "ftpfs") {
 				$tpl->set("FORM_MESSAGE", sprintf(
 					_("Error: Could not create fsconfig.php file.  Make sure that the directory %s exists on the server and is writable to %s."),
-					INSTALL_ROOT.PATH_DELIM.USER_DATA, FTPFS_USER));
+					USER_DATA_PATH, FTPFS_USER));
 			} else {
 				$tpl->set("FORM_MESSAGE", sprintf(
-					_("Error: Could not create fsconfig.php file.  Make sure that the directory %s exists on the server and is writable to the web server user."), INSTALL_ROOT.PATH_DELIM.USER_DATA));
+					_("Error: Could not create fsconfig.php file.  Make sure that the directory %s exists on the server and is writable to the web server user."), USER_DATA_PATH));
 			}
 		} else {
 			header("Location: index.php");
@@ -353,5 +351,5 @@ $body = $tpl->process();
 $PAGE->addStylesheet("form.css");
 #$PAGE->addScript("lnblog_lib.js");
 $PAGE->addScript("fs_setup.js");
-$PAGE->display($body, &$blog);
+$PAGE->display($body);
 ?>

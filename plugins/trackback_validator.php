@@ -34,6 +34,8 @@ class TrackbackValidator extends Plugin {
 		                 _('Allow pings from pages that link to anything under the entry, not just the permalink.'),
 		                 true, 'checkbox');
 		$this->getConfig();
+		
+		$this->registerEventHandler("trackback", "POSTRetreived", "check_for_link");
 	}
 	
 	function check_for_link(&$param) {
@@ -54,7 +56,8 @@ class TrackbackValidator extends Plugin {
 		}
 
 		$ent = $param->getParent();
-		$data = $this->fetch_page($param->url);
+		require_once("lib/pb.php");
+		$data = Pingback::fetchPage($param->url);
 		# If the permalink is in the page, it's legitimate, so return true.
 		if (strpos($data, $ent->permalink()) > 0) {
 			return true;
@@ -74,49 +77,7 @@ class TrackbackValidator extends Plugin {
 		}
 	}
 	
-	function fetch_page($url) {
-		if (extension_loaded('curl')) {
-			
-			$hnd = curl_init();
-			curl_setopt($hnd, CURLOPT_URL, $url);
-			curl_setopt($hnd, CURLOPT_FOLLOWLOCATION, 1);
-			curl_setopt($hnd, CURLOPT_RETURNTRANSFER, 1);
-			curl_setopt($hnd, CURLOPT_HEADER, 1);
-			$response = curl_exec($hnd);
-			
-		} else {
-			
-			$url_bits = parse_url($url);
-			$host = $url_bits['host'];
-			$path = $url_bits['path'];
-			$port = isset($url_bits['port']) ? $url_bits['port'] : 80;
-			$query = isset($url_bits['query']) ? $url_bits['query'] : '';
-			
-			# Open a socket.
-			$fp = @fsockopen($host, $port);
-			if (!$fp) return false;
-	
-			# Create the HTTP request to be sent to the remote host.
-			if ($query) $path .= '?'.$query;
-			$data = "GET ".$path."\r\n".
-					"Host: ".$host."\r\n".
-					"Connection: close\r\n\r\n";
-			
-			# Send the data and then get back any response.
-			fwrite($fp, $data);
-			$response = '';
-
-			while (! feof($fp)) {
-				$s = fgets($fp);
-				$response .= $s;
-			}
-			fclose($fp);
-		}
-		return $response;
-	}
-	
 }
 
 $plug =& new TrackbackValidator();
-$plug->registerEventHandler("trackback", "POSTRetreived", "check_for_link");
 ?>

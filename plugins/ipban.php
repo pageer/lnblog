@@ -76,12 +76,12 @@ class IPBan extends Plugin {
 			if ($this->ban_del) {
 				$cb_link_loc =
 					' (<a href="'.make_uri($cmt->uri("delete"), array('banip'=>$cmt->ip)).'" '.
-					'onclick="this.href = this.href + \'&conf=yes\'; return window.confirm(\''.
+					'onclick="this.href = this.href + \'&amp;conf=yes\'; return window.confirm(\''.
 					spf_("Delete %s and ban IP address %s from submitting comments or trackbacks to this blog?", $cmt->getAnchor(), $cmt->ip).
 					'\');">'._("Delete &amp; Ban IP").'</a>) ';
 				$cb_link_glob = ' (<a href="'.
 					make_uri($cmt->uri("delete"),array('banip'=>$cmt->ip, 'global'=>'yes')).'" '.
-					'onclick="this.href = this.href + \'&conf=yes\'; return window.confirm(\''.
+					'onclick="this.href = this.href + \'&amp;conf=yes\'; return window.confirm(\''.
 					spf_("Delete %s and ban IP address %s from submitting comments or trackbacks to this entire site?", $cmt->getAnchor(), $cmt->ip).
 					'\');">'._("Delete &amp; Ban Globally").'</a>)';
 			} else {

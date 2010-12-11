@@ -18,8 +18,7 @@ if ($SYSTEM->sys_ini->value("entryconfig", "AllowInitUpload", 1) > 0) {
 <?php $title = _("Title or subject line for this entry");?>
 <label for="subject" title="<?php echo $title;?>"><?php p_("Subject"); ?></label>
 <input id="subject" name="subject" accesskey="s" title="<?php echo $title;?>" type="text" size="40" <?php 
-if (isset($SUBJECT)) { ?>value="<?php echo $SUBJECT; ?> " <?php } ?><?php
-if (isset($GET_SHORT_PATH)) { ?>onblur="set_article_path();"<?php } ?>/>
+if (isset($SUBJECT)) { ?>value="<?php echo $SUBJECT; ?> " <?php } ?> />
 </div>
 <div class="entry_tags">
 <?php $title = _("Comma-separated list of topics");?>

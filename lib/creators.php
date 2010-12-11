@@ -35,8 +35,8 @@
 # Function: NewFS
 # Creates a new filesystem access object.
 function NewFS() {
-	if ( file_exists(USER_DATA_PATH.PATH_DELIM.FS_PLUGIN_CONFIG) ) {
-		require_once(USER_DATA.PATH_DELIM.FS_PLUGIN_CONFIG);
+	if ( file_exists(mkpath(USER_DATA_PATH, FS_PLUGIN_CONFIG)) ) {
+		require_once(mkpath(USER_DATA_PATH, FS_PLUGIN_CONFIG));
 	} else {
 		if (!defined("FS_PLUGIN")) define("FS_PLUGIN", "nativefs");
 	}

@@ -177,7 +177,7 @@ function show_comments(&$ent, &$usr, $sort_asc=true) {
 #	                'itemclass'=>'comment', 'listtitle'=>$title,
 #	                'typename'=>_("comments"));
 	$cmts = $ent->getComments();
-	return show_replies($ent, $usr, $cmts);
+	return show_replies($ent, $usr, $cmts, $title);
 
 }
 
@@ -189,7 +189,7 @@ function show_trackbacks(&$ent, &$usr, $sort_asc=true) {
 #	                'itemclass'=>'trackback', 'listclass'=>'tblist',
 #	                'listtitle'=>$title, 'typename'=>_("TrackBacks"));
 	$tbs = $ent->getTrackbacks();
-	return show_replies($ent, $usr, $tbs);
+	return show_replies($ent, $usr, $tbs, $title);
 }
 
 /*
@@ -213,7 +213,7 @@ function show_pingbacks(&$ent, &$usr, $sort_asc=true) {
 #	                'itemclass'=>'pingback', 'listclass'=>'pblist',
 #	                'listtitle'=>$title, 'typename'=>_("Pingbacks"));
 	$pbs = $ent->getPingbacks();
-	return show_replies($ent, $usr, $pbs);
+	return show_replies($ent, $usr, $pbs, $title);
 }
 
 function show_remote_pingbacks(&$ent, &$usr, $sort_asc=true) {
@@ -226,7 +226,7 @@ function show_friendly_pingbacks(&$ent, &$usr, $sort_asc=true) {
 
 function reply_boxes($idx, &$obj) {
 	# Not sure if this should include a descriptive message or picture...
-	return '<span style="float: right">'.
+	return '<span>'.
 	       '<input type="hidden" '.
 	       'name="responseid'.$idx.'" id="'.get_class($obj).'id'.$idx.'" '.
 	       #'value="'.$obj->getAnchor().'" />'.
@@ -243,7 +243,7 @@ function reply_boxes($idx, &$obj) {
 # usr     - A reference to the current user.
 # replies - An array of reply objects.
 
-function show_replies(&$ent, &$usr, &$replies) {
+function show_replies(&$ent, &$usr, &$replies, $title) {
 	global $SYSTEM;
 
 	$ret = "";
@@ -287,12 +287,12 @@ function show_replies(&$ent, &$usr, &$replies) {
 			$tpl->set("FORM_ACTION", $url);
 		}
 		
-		#$tpl->set("ITEM_CLASS", $params['itemclass']);
+		$tpl->set("ITEM_CLASS", strtolower(get_class($replies[0])));
 		#if (isset($params['listclass'])) {
 		#	$tpl->set("LIST_CLASS", $params['listclass']);
 		#}
 		$tpl->set("ORDERED");
-		#$tpl->set("LIST_TITLE", $params['listtitle']);
+		$tpl->set("LIST_TITLE", $title);
 		$tpl->set("ITEM_LIST", $reply_text);
 		$ret = $tpl->process();
 	}

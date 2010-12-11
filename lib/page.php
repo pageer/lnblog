@@ -299,7 +299,7 @@ class Page extends LnBlogObject {
 		#$head->set("INLINE_SCRIPTS",$this->inline_scripts);
 		$head->set("LINKS", $this->links);
 		
-		if (get_class($blog)) $blog->exportVars(&$head);
+		if ($blog && get_class($blog)) $blog->exportVars(&$head);
 		$head->set("PAGE_CONTENT", $page_body);
 
 		echo $head->process();

@@ -252,6 +252,8 @@ class BlogURIWrapper extends URI {
 			foreach ($qs_arr as $key=>$val) {
 				$qs .= $this->separator."$key=$val";
 			}
+		} elseif ($qs_arr) {
+			$qs = $this->separator.$qs_arr;
 		}
 		return $this->base_uri."?action=$action".$qs;
 	}

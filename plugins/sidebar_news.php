@@ -161,6 +161,10 @@ class News extends Plugin {
 		global $PLUGIN_MANAGER;
 		global $PAGE;
 		
+		if (! is_object($param->display_object)) {
+			return false;
+		}
+		
 		$param = $PAGE;
 		$rss1_file = $PLUGIN_MANAGER->plugin_config->value(
 			"rss1feedgenerator", "feed_file", "news.rdf");

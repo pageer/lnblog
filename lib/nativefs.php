@@ -35,18 +35,25 @@ require_once("fs.php");
 
 class NativeFS extends FS {
 
-	function NativeFS() {
+	function __construct() {
 		$this->default_mode = defined("FS_DEFAULT_MODE") ? FS_DEFAULT_MODE : 0000;
 		$this->script_mode = defined("FS_SCRIPT_MODE") ? FS_SCRIPT_MODE : 0000;
 		$this->directory_mode = defined("FS_DIRECTORY_MODE") ? FS_DIRECTORY_MODE : 0000;;
 	}
 	
-	function destruct() {}
+	
+	function __destruct() {}
 
 	function localpathToFSPath($path) { return $path; }
 	function FSPathToLocalpath($path) { return $path; }
 
-	function chdir($dir) { return chdir($dir); }
+	function chdir($dir) {
+		return chdir($dir);
+	}
+	
+	public function getcwd() {
+		return getcwd();
+	}
 	
 	function mkdir($dir, $mode=false) { 
 		if (! $mode) $mode = $this->directory_mode;
@@ -73,7 +80,7 @@ class NativeFS extends FS {
 
 	function rmdir($dir) {
 		# We can't delete the current directory because we're still using it.
-		if ( realpath($dir) == getcwd() ) {
+		if ( realpath($dir) == $this->getcwd() ) {
 			chdir("..");
 		}
 		return rmdir($dir);
@@ -119,12 +126,10 @@ class NativeFS extends FS {
 
 		if ($mask) {
 			umask($old_umask);
-			@$this->chmod($path, $mask);
+			$this->chmod($path, $mask);
 		}
 		
 		return $ret;
-		#return $this->isScript($path)?"yes":"no";
-		#return decoct($mask);
 	}
 
 }

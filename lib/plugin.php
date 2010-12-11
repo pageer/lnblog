@@ -313,14 +313,19 @@ class Plugin extends LnBlogObject{
 	# 
 	# Parameters:
 	# obj - Object to which the cache applies.
+	# suppress_login - Don't display the cached data when the user is logged
+	#                  in.  This allows for users with different permission
+	#                  levels to still see different pages with caching on.
 	
-	function outputCache($obj=false) {
+	function outputCache($obj=false, $suppress_login=true) {
 
 		if (! is_a($obj, 'Blog')) $b = NewBlog();
 		else $b =& $obj;
+		$u = NewUser();
 		$f = NewFS();
 
-		if (isset($this->enable_cache) && ! $this->enable_cache) {
+		if ( (isset($this->enable_cache) && ! $this->enable_cache) ||
+		     $u->checkLogin() ) {
 			echo $this->buildOutput($b);
 		} else {
 			$cache_path = $this->cachepath($b);

@@ -654,6 +654,7 @@ function create_directory_wrappers($path, $type, $instpath="") {
 	foreach ($filelist as $file=>$content) {
 		$curr_file = $current.$file.".php";
 		$ret = $fs->write_file($curr_file, $head.$content.$tail);
+		var_dump($curr_file);
 		if (! $ret) $ret_list[] = $curr_file;
 	}
 

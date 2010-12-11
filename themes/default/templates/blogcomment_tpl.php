@@ -16,42 +16,37 @@
 <?php echo $BODY; ?>
 </div>
 <ul class="footer">
-<li class="commentdate"><?php pf_("Comment posted %s", $DATE); ?></li>
-<?php 
-# Here is where we display the user name and contact links.
-# Note that the display is different for logged-in users than for anonymous users.
-if (isset($USER_ID)) { 
-	# Display profile link or not.
-	if (! isset($NO_USER_PROFILE)) { ?>
-<li class="user"><?php pf_("By %s", '<a href="'.$PROFILE_LINK.'">'.$USER_DISPLAY_NAME.'</a>');?></li>
 <?php
-	# No profile link, so display the user's e-mail address, if present.
-	} else { ?>
-<li class="commentname">
-		<?php	if ( isset($USER_EMAIL) ) echo '<a href="mailto:'.$USER_EMAIL.'">'; ?>
-		<?php pf_("By <strong>%s</strong>", $USER_DISPLAY_NAME); ?>
-		<?php if ( isset($USER_EMAIL) ) echo '</a>';	?>
-</li>
-	<?php 
-	} # End user profile block
-	# Now display the user's homepage, if set.
-	if (isset($USER_HOMEPAGE)) { ?>
-<li class="commenturl">(<a href="<?php echo $USER_HOMEPAGE; ?>"><?php echo $USER_HOMEPAGE; ?></a>)</li>
-	<?php 
-	} 
-} else { 
-	/* If the user isn't logged in, display what was entered in the boxes. */ ?>
-	<li class="commentname">
-	<?php if ($EMAIL && $SHOW_MAIL) echo '<a href="mailto:'.$EMAIL.'">'; ?>
-	<?php pf_('By %s', $NAME); ?>
-	<?php if ($EMAIL && $SHOW_MAIL) echo '</a>'; ?>
-	</li>
-	<?php if ($URL) { ?>
-	<li class="commenturl">(<a href="<?php echo $URL; ?>"><?php echo $URL; ?></a>)</li>
-	<?php 
-	} 
-} # End user info display 
+if (isset($USER_ID)) {
+	if (! isset($NO_USER_PROFILE)) {
+		$show_name = '<a href="'.$PROFILE_LINK.'"><strong>'.$USER_DISPLAY_NAME.'</strong></a>';
+	} else {
+		$show_name = '<a href="mailto:'.$USER_EMAIL.'"><strong>'.$USER_DISPLAY_NAME.'</strong></a>';
+	}
+	
+	if (isset($USER_HOMEPAGE)) {
+		$show_url = "(<a href=\"$USER_HOMEPAGE\">$USER_HOMEPAGE</a>)";
+	} else {
+		$show_url = '';
+	}
+} else {
 
+	if ($EMAIL && $SHOW_MAIL) {
+		$show_name = '<a href="mailto:'.$EMAIL.'">'.$NAME.'</a>';
+	} else {
+		$show_name = $NAME;
+	}
+	
+	if ($URL) {
+		$show_url = "(<a href=\"$URL\">$URL</a>)";
+	} else {
+		$show_url = '';
+	}
+
+}
+?>
+<li><?php pf_("Posted by %s %s at %s", $show_name, $show_url, $DATE); ?></li>
+<?php
 	# Show the administrative links.
 	if ($SHOW_CONTROLS) { ?>
 	<li>

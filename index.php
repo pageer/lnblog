@@ -64,7 +64,7 @@ require_once("lib/utils.php");
 
 global $PAGE;
 
-if ( ! file_exists(INSTALL_ROOT.PATH_DELIM.USER_DATA.PATH_DELIM.FS_PLUGIN_CONFIG) ) {
+if ( ! file_exists(USER_DATA_PATH.PATH_DELIM.FS_PLUGIN_CONFIG) ) {
 	$PAGE->redirect("fs_setup.php");
 	exit;
 }

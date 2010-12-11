@@ -31,8 +31,8 @@ require_once("lib/creators.php");
 require_once("pagelib.php");
 
 function get_display_markup(&$item, $count) {
-	$ret = '<a href="'.$item->permalink().'">'.$item->title()."</a>";
-	$ret .= reply_boxes($count, $item);
+	$ret = reply_boxes($count, $item);
+	$ret .= '<a href="'.$item->permalink().'">'.$item->title()."</a>";
 	return $ret;
 }
 
@@ -300,7 +300,7 @@ function handle_deletes() {
 		$list = '';
 		
 		foreach ($response_array as $resp) {
-			$anchors .= ($anchors == '' ? '' : ',').$resp->getAnchor();
+			$anchors .= ($anchors == '' ? '' : ',').$resp->globalID();
 			$list .= get_list_text($resp);
 		}
 		

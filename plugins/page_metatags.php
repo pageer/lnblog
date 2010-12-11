@@ -15,7 +15,8 @@ class MetaData extends Plugin {
 	}
 
 	function addMetaTags(&$page) {
-		if (strtolower(get_class($page->display_object)) != "blog") {
+		if (! is_object($page->display_object) ||
+			  strtolower(get_class($page->display_object)) != "blog") {
 			return false;
 		}
 		$page->addMeta($page->display_object->description, "description");

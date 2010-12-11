@@ -40,8 +40,8 @@ if (isset($COMMENT_DATA)) echo $COMMENT_DATA;
 if (isset($COMMENT_NAME)) echo "value=\"$COMMENT_NAME\""; ?> />
 </div>
 <div>
-<label style="width: 40%" for="url"><?php p_("Homepage"); ?></label>
-<input title="<?php p_("URL");?>" id="url" name="url" accesskey="h" type="text" <?php 
+<label style="width: 40%" for="homepage"><?php p_("Homepage"); ?></label>
+<input title="<?php p_("URL");?>" id="homepage" name="homepage" accesskey="h" type="text" <?php 
 if (isset($COMMENT_URL)) echo "value=\"$COMMENT_URL\""; ?> />
 </div>
 <div>

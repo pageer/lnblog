@@ -203,10 +203,8 @@ class Pingback extends Trackback {
 
 		$this->control_bar = array();
 		$this->control_bar[] = 
-			'<a href="'.$del_link.'" '.
-			'onclick="return comm_del(this, \''.spf_("Delete %s?", $anchor).'\');">'
-			._("Delete").'</a>';
-		
+			'<a href="'.$del_link.'" class="deletelink">'._("Delete").'</a>';
+			
 		$this->raiseEvent("OnOutput");
 		$tpl->set("SHOW_EDIT_CONTROLS", $SYSTEM->canModify($this->getParent(), $u) && $u->checkLogin() );
 		$tpl->set("PB_SOURCE", $this->source);

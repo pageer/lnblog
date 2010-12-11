@@ -392,10 +392,11 @@ class Trackback extends LnBlogObject {
 		$this->control_bar = array();
 		$this->control_bar[] = 
 			'<a href="'.$del_link.'" '.
-			'onclick="return comm_del(this, \''.spf_("Delete %s?", $anchor).'\');">'
+			'class="deletelink">'.
+			_("Delete").'</a>';
+			#'onclick="return comm_del(this, \''.spf_("Delete %s?", $anchor).'\');">'
 			#'onclick="return window.confirm(\'Delete '.$anchor.'?\');">'
-			._("Delete").'</a>';
-		
+			
 		$this->raiseEvent("OnOutput");
 		$tpl->set("SHOW_EDIT_CONTROLS", $SYSTEM->canModify($this->getParent(), $u) && $u->checkLogin() );
 		$tpl->set("TB_URL", $this->url);

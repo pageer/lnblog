@@ -9,36 +9,44 @@
 	padding-left: 0;
 }
 
-.comment {
+.blogcomment {
 	border-bottom: thin dotted black;
 	margin-top: 2%;
 }
 
-.comment .header h3 {
+.blogcomment .header h3 {
 	padding: 0px;
 	margin: 0px;
 }
 
-.comment .footer {
+.blogcomment .footer {
 	font-size: 80%;
 	padding: 0px;
 	margin: 0px;
 }
 
-.comment .footer li {
+.blogcomment .footer li {
 	list-style-type: none;
 }
 
-.comment .data {
+.blogcomment .data {
 	padding: 1%;
 }
 
-.comment li.commenturl, 
+.blogcomment li.commenturl, 
 .reply li.commenturl, 
-.comment li.commentname,
-.reply li.commentname {
+.blogcomment li.commentname,
+.reply li.commentname,
+.repy .footer li,
+.blogcomment .footer li,
+.trackback .footer li,
+.pingback .footer li {
 	display: inline;
 	margin-right: 1%;
+}
+
+.controlbar {
+	display: block;
 }
 
 li.user a {

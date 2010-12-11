@@ -233,7 +233,7 @@ function LBCodeEditor() {
 		}
 	}
 	
-	this.set_article_path = function () {
+	function set_article_path(e) {
 		var subj = document.getElementById("subject").value;
 		var path = subj.toLowerCase();
 		if (document.getElementById("short_path").value) return true;
@@ -349,7 +349,7 @@ function LBCodeEditor() {
 		else path.style.display = 'none';
 	}
 	
-	this.document_add_all_events = function (e) {
+	 function document_add_all_events (e) {
 	
 		// Toggle the LBCode editor on or off depending on the markup setting.
 		var inputmode = document.getElementById('input_mode');
@@ -377,6 +377,10 @@ function LBCodeEditor() {
 		if (pubart) {
 			lnblog.addEvent(pubart, 'change', articleSet);
 			articleSet();
+		}
+		
+		if (document.getElementById('articlepath')) {
+			lnblog.addEvent(document.getElementById('subject'), 'blur', set_article_path);
 		}
 		
 		var preview = document.getElementById('preview');
@@ -416,8 +420,7 @@ function LBCodeEditor() {
 		return true;
 	}
 	
-	//document.onload = function (e) { window.alert("FOO"); }
-	lnblog.addEvent(window, 'load', this.document_add_all_events);
+	lnblog.addEvent(window, 'load', document_add_all_events);
 }
 
 var lbcode_editor = new LBCodeEditor();

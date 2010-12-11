@@ -1,7 +1,7 @@
 <?php
 /*
     LnBlog - A simple file-based weblog focused on design elegance.
-    Copyright (C) 2005 Peter A. Geer <pageer@skepticats.com>
+    Copyright (C) 2005-2011 Peter A. Geer <pageer@skepticats.com>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -82,7 +82,7 @@ if ( has_post() ) {
 		if ($ret) {
 			$ret = $SYSTEM->registerBlog($blog->blogid);
 			if ($ret) {
-				$PAGE->redirect($blog->getURL());
+				exit; $PAGE->redirect($blog->getURL());
 			} else {
 				$tpl->set("UPDATE_MESSAGE", _("Blog create but not registered.  This means the system will not list it on the admin pages.  Please try registering this blog by hand from the administration page."));
 			}

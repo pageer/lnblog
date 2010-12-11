@@ -25,25 +25,28 @@ concrete subclasses for native filesystem and FTP access.  Maybe one day
 there will be some other useful method for filesystem access....
 */
 
-class FS {
+abstract class FS {
 
 	var $default_mode;
 	var $directory_mode;
 	var $script_mode;
 
-	function FS() {}
+	public abstract function __construct();
+	public abstract function __destruct();
 	
 	# Method: destruct
 	# An explicitly called destructor because PHP 4 doesn't have proper destructors.
 	# Releases all resources the object is holding.
-	function destruct() {}
+	public function destruct() {
+		$this->__destruct();
+	}
 	
 	# Method: getcwd
 	# Get the working directory for the class.
 	#
 	# Returns;
 	# A string with the working directory reported by the filesystem functions.
-	function getcwd() {}
+	public abstract function getcwd();
 	
 	# Method: chdir
 	# Change working directory
@@ -53,7 +56,7 @@ class FS {
 	#
 	# Returns:
 	# True on success, false on failure.
-	function chdir($dir) {}
+	public abstract function chdir($dir);
 	
 	# Method: mkdir
 	# Create a new directory.  
@@ -65,7 +68,7 @@ class FS {
 	#
 	# Returns:
 	# False on failure, an unspecified non-false value on success.
-	function mkdir($dir, $mode=0777) {}
+	public abstract function mkdir($dir, $mode=0777);
 	
 	# Method: mkdir_rec
 	# Recursive version of <mkdir>.
@@ -77,7 +80,7 @@ class FS {
 	#
 	# Retruns:
 	# False on failure, a non-false value on success.
-	function mkdir_rec($dir, $mode=0777) {}
+	public abstract function mkdir_rec($dir, $mode=0777);
 	
 	# Method: rmdir
 	# Remove an empty directory.
@@ -87,7 +90,7 @@ class FS {
 	#
 	# Returns:
 	# True on success, false on failure.
-	function rmdir($dir) {}
+	public abstract function rmdir($dir);
 	
 	# Method: rmdir
 	# Recursive version of <rmdir>.
@@ -98,7 +101,7 @@ class FS {
 	#
 	# Returns:
 	# True on success, false on failure.
-	function rmdir_rec($dir) {}
+	public abstract function rmdir_rec($dir);
 	
 	# Method: chmod
 	# Change permissions on a file or directory.
@@ -109,7 +112,7 @@ class FS {
 	#
 	# Returns:
 	# False on failure, an unspecified non-false value on success.
-	function chmod($path, $mode) {}
+	public abstract function chmod($path, $mode);
 	
 	# Method: directoryMode
 	# Gets and sets the permissions to use when creating directories.
@@ -119,7 +122,7 @@ class FS {
 	#
 	# Returns:
 	# The octal UNIX permissions used when creating directories.
-	function directoryMode($mode=false) {
+	public function directoryMode($mode=false) {
 		if ($mode) $this->directory_mode = $mode;
 		return $this->directory_mode;
 	}
@@ -132,7 +135,7 @@ class FS {
 	#
 	# Returns:
 	# The octal UNIX permissions used when creating PHP scripts.
-	function scriptMode($mode=false) {
+	public function scriptMode($mode=false) {
 		if ($mode) $this->script_mode = $mode;
 		return $this->script_mode;
 	}
@@ -146,7 +149,7 @@ class FS {
 	#
 	# Returns:
 	# The octal UNIX permissions used when creating other files.
-	function defaultMode($mode=false) {
+	public function defaultMode($mode=false) {
 		if ($mode) $this->default_mode = $mode;
 		return $this->default_mode;
 	}
@@ -161,7 +164,7 @@ class FS {
 	# True if the file uses a known extension for PHP scripts, false otherwise.
 	# Currently, known extensions are of the form .phpX where X is empty or a 
 	# number.
-	function isScript($path) {
+	public function isScript($path) {
 		$filedata = pathinfo($path);
 		if ( isset($filedata['extension']) ) {
 			$ext = strtolower($filedata['extension']);
@@ -182,7 +185,7 @@ class FS {
 	#
 	# Returns:
 	# True on success, false on failure.
-	function copy($src, $dest) {}
+	public abstract function copy($src, $dest);
 	
 	# Method: rename
 	# Move or rename a file.
@@ -193,7 +196,7 @@ class FS {
 	#
 	# Returns:
 	# True on success, false on failure.
-	function rename($src, $dest) {}
+	public abstract function rename($src, $dest);
 	
 	# Method: delete
 	# Delete a single file.
@@ -203,7 +206,7 @@ class FS {
 	#
 	# Returns:
 	# True on success, false on failure.
-	function delete($src) {}
+	public abstract function delete($src);
 	
 	# Method: write_file
 	# Write a string to a new text file.
@@ -214,7 +217,7 @@ class FS {
 	#
 	# Returns:
 	# False on failure, an unspecified non-false value on success.
-	function write_file($path, $contents) {}
+	public abstract function write_file($path, $contents);
 
 }
 ?>

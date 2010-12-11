@@ -18,8 +18,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-# File: sitemap.php
-# Used to edit the site map in the menu bar.
+# File: editfile.php
+# Used to edit an arbitrary text file.
 #
 # This page provides a form and some simple JavaScript to create a list
 # of HTML links separated by newlines.  This is read by the standard menubar
@@ -43,6 +43,7 @@ $file = str_replace("..".PATH_DELIM, '', $file);
 $u = NewUser();
 $blog = NewBlog();
 $ent = NewBlogEntry();
+$p = new Path();
 
 $edit_ok = false;
 $relpath = INSTALL_ROOT;
@@ -65,8 +66,6 @@ if ( GET("profile") == $u->username() ) {
 if (! $u->checkLogin()) $edit_ok = false;
 
 if (! $edit_ok) {
-var_dump($edit_ok);
-var_dump($_GET); exit;
 	if (SERVER("referer")) $PAGE->redirect(SERVER("referer"));
 	else {
 		header("HTTP/1.0 403 Forbidden");
@@ -87,7 +86,12 @@ $tpl->set("FORM_ACTION", make_uri(false,false,false));
 if (isset($_GET["list"])) $tpl->set("PAGE_TITLE", _("Edit Link List"));
 else $tpl->set("PAGE_TITLE", _("Edit Text File"));
 
-$file = $relpath.PATH_DELIM.$file;
+if (substr($file, 0, 9) == 'userdata/') {
+	$p->Path(USER_DATA_PATH, substr($file, 9));
+} else {
+	$p->Path($relpath, $file);
+}
+$file = $p->get();
 
 if (has_post()) {
 

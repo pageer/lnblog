@@ -1,7 +1,7 @@
 <?php
 /*
     LnBlog - A simple file-based weblog focused on design elegance.
-    Copyright (C) 2005 Peter A. Geer <pageer@skepticats.com>
+    Copyright (C) 2005-2011 Peter A. Geer <pageer@skepticats.com>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -159,7 +159,7 @@ class Blog extends LnBlogObject {
 	
 	function setBlogID() {
 		$root = calculate_server_root($this->home_path);
-		$this->blogid = substr($this->home_path, strlen($root));
+		$this->blogid = trim(substr($this->home_path, strlen($root)),  DIRECTORY_SEPARATOR);
 		if (! $this->blogid) $this->blogid = ROOT_ID;
 	}
 	
@@ -1174,7 +1174,7 @@ class Blog extends LnBlogObject {
 		$p = new Path($path ? $path : $this->home_path);
 		$this->home_path = $p->getCanonical();
 
-		@$ret = $this->createBlogDirectories(&$fs, $inst_path);
+		$ret = $this->createBlogDirectories(&$fs, $inst_path);
 		
 		$this->setBlogID();
 		
@@ -1194,7 +1194,7 @@ class Blog extends LnBlogObject {
 
 		$ret = $this->createNonExistentDirectory($fs, $this->home_path);
 		if ($ret) {
-			$result = create_directory_wrappers($this->home_path, BLOG_BASE, $inst_path);
+			$result = create_directory_wrappers($this->home_path, BLOG_BASE, $this->home_path);
 			# Returns an array of errors, so convert empty array to true.
 			$ret &= (empty($result) ? true : false);
 		}

@@ -1,3 +1,10 @@
+06-Nov-2007:
+- Lots of fixes for things that broke in the process of refactoring.
+- Changed "url" field in comment form, as it made the new entry display script thing that
+the comment was an incoming pingback.  How long has THAT been broken?
+- Added search path for userdata directory.  The blogconfig.php script will now look for userdata
+in the LnBlog folder, or userdata, users, or profiles in the same directory as LnBlog.
+
 09-Jul-2007:
 - Lots of refactoring and added unit tests.
 - Added data typing to the XML storage routines.

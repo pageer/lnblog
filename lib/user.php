@@ -61,7 +61,7 @@ class User extends LnBlogObject {
 		
 			global $pwd;
 			global $salt;
-			include_once(USER_DATA."/".$uname."/passwd.php");
+			include_once(USER_DATA_PATH."/".$uname."/passwd.php");
 			$this->username = $uname;
 			$this->passwd = $pwd;
 			$this->salt = $salt;
@@ -157,7 +157,7 @@ class User extends LnBlogObject {
 			if ($blog->isBlog()) $qs = array('blog'=>$blog->blogid);
 			else $qs = false;
 			$tpl->set("PROFILE_LINK", 
-				make_uri(INSTALL_ROOT_URL.USER_DATA."/".$this->username."/", $qs));
+				make_uri(localpath_to_uri(USER_DATA_PATH."/".$this->username."/"), $qs));
 		} else {
 			$qs = array("user"=>$this->username);
 			if ($blog->isBlog()) $qs['blog'] = $blog->blogid;

@@ -26,34 +26,48 @@ global $PAGE;
 $blog = NewBlog();
 $PAGE->setDisplayObject($blog);
 
-$tags = GET("tag");
+$tags = htmlspecialchars(GET("tag"));
 $show_posts = GET("show") ? true : false;
 $limit = GET("limit") ? GET("limit") : 0;
 
-$tag_list = explode(",", $tags);
-
-if (! is_array($tag_list)) $tag_list = array();
-foreach ($tag_list as $key=>$val) {
-	$tag_list[$key] = trim($val);
-}
-
-$ret = $blog->getEntriesByTag($tag_list, $limit, true);
-if ($show_posts) {
-	$body = $blog->getWeblog();
-	$PAGE->addStylesheet("entry.css");
-} else {
+if (! $tags) {
+	
 	$links = array();
-	foreach ($ret as $ent) {
-		$links[] = array("link"=>$ent->permalink(), "title"=>$ent->subject);
+	foreach ($blog->tag_list as $tag) {
+		$links[] = array('link'=>$blog->uri('tags', $tag), 'title'=>ucwords($tag));
 	}
 	$tpl = NewTemplate(LIST_TEMPLATE);
-	$tpl->set("LIST_TITLE", _("Entries filed under: ").implode(", ", $tag_list));
-	$tpl->set("LIST_FOOTER", '<a href="?show=all&amp;tag='.$tags.'">'.
-	                         	_("Display all entries at once").'</a>');	
+	$tpl->set("LIST_TITLE", _("Topics for this weblog"));
 	$tpl->set("LINK_LIST", $links);
 	$body = $tpl->process();
+	
+} else {
+
+	$tag_list = explode(",", $tags);
+	
+	if (! is_array($tag_list)) $tag_list = array();
+	foreach ($tag_list as $key=>$val) {
+		$tag_list[$key] = trim($val);
+	}
+	
+	$ret = $blog->getEntriesByTag($tag_list, $limit, true);
+	if ($show_posts) {
+		$body = $blog->getWeblog();
+		$PAGE->addStylesheet("entry.css");
+	} else {
+		$links = array();
+		foreach ($ret as $ent) {
+			$links[] = array("link"=>$ent->permalink(), "title"=>$ent->subject);
+		}
+		$tpl = NewTemplate(LIST_TEMPLATE);
+		$tpl->set("LIST_TITLE", _("Entries filed under: ").implode(", ", $tag_list));
+		$tpl->set("LIST_FOOTER", '<a href="?show=all&amp;tag='.$tags.'">'.
+									_("Display all entries at once").'</a>');	
+		$tpl->set("LINK_LIST", $links);
+		$body = $tpl->process();
+	}
+	$PAGE->title = $blog->name.' - '._("Topic Search");
 }
 
-$PAGE->title = $blog->name.' - '._("Topic Search");
 $PAGE->display($body);
 ?>

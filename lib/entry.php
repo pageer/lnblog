@@ -18,10 +18,9 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-require_once("lib/utils.php");
-require_once("lib/lnblogobject.php");
-require_once("lib/xml.php");
-#require_once("lib/lbparse.php");
+require_once("utils.php");
+require_once("lnblogobject.php");
+require_once("xml.php");
 /*
 Class: Entry
 An abstract class representing entries of all types in the blog database.

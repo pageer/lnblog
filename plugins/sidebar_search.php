@@ -85,7 +85,7 @@ class SidebarSearch extends Plugin {
 		switch ($this->show_in) {
 			case "banner": $class = "bannerpanel"; break;
 			case "menubar": $class = "menupanel"; break; 
-			default: "panel";
+			default: $class = "panel";
 		}
 		
 		if ($this->caption && $this->show_in == 'sidebar') { /* Suppress empty header */ ?>

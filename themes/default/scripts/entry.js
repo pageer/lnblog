@@ -1,10 +1,11 @@
-function comm_del(ctrl, label) {
-	var res = window.confirm(strings.get('entry_deleteConfirm', label));
+function comm_del() {
+	var item = this.href.replace(/^.*delete=(.+)$/, "$1");
+	var res = window.confirm(strings.get('entry_deleteConfirm', item));
 	if (res) {
-		if (ctrl.href.lastIndexOf('?') >= 0) {
-			ctrl.href=ctrl.href+'&conf=yes';
+		if (this.href.lastIndexOf('?') >= 0) {
+			this.href=this.href+'&conf=yes';
 		} else {
-			ctrl.href=ctrl.href+'?conf=yes';
+			this.href=this.href+'?conf=yes';
 		}
 	}
 	return res;
@@ -51,7 +52,7 @@ function attachDeleteHandlers() {
 		if (dellinks[i].getAttribute('class') == 'deletelink') {
 			//lnblog.addEvent(dellinks[i], 'click', reply_delete);
 			//dellinks[i].addEventListener('click', reply_delete, true);
-			dellinks[i].onclick = reply_delete;
+			dellinks[i].onclick = comm_del; //reply_delete;
 		}
 	}
 }

@@ -108,10 +108,12 @@ class TagList extends Plugin {
 		if ($this->header) {
 			$tpl->set("PANEL_TITLE", $this->header);
 			if ($blg->isBlog()) {
-				$tpl->set("TITLE_LINK", 
+				$tpl->set("TITLE_LINK", $blg->uri('tags'));
+				/*$tpl->set("TITLE_LINK", 
 				          $blg->uri('plugin', 
 				                    str_replace(".php", '', 
 				                                basename(__FILE__))));
+				*/
 			}
 		}
 		

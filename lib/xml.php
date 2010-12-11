@@ -6,7 +6,6 @@
 # named for the object's class, with each property of the object having a 
 # tag of the same name.  Arrays are represented as an element with a number 
 # of generically-named child nodes.
-
 class SimpleXMLWriter {
 
 	function SimpleXMLWriter(&$object) {

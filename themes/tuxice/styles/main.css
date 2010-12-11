@@ -107,6 +107,8 @@ q { font-style: italic; }
 	border-bottom: 1px solid black;
 	margin: 0;
 	padding: 0;
+	float: left;
+	clear: both;
 }
 
 #menubar img {
@@ -118,12 +120,15 @@ q { font-style: italic; }
 
 #menubar h1, #menubar h2 {
 	font-size: 100%;
-	display: inline;
+	float: left;
+	clear: left;
+	margin: 0;
 }
 
 #menubar ul {
-	display: inline;
+	float: left;
 	padding-left: 2em;
+	margin: 0;
 }
 
 #menubar ul li {
@@ -131,6 +136,13 @@ q { font-style: italic; }
 	display: inline;
 	margin-left: 1em;
 	margin-right: 1em;
+}
+
+#menubar > .location > li{
+	margin: 0;
+}
+#menubar > .location > li:before {
+	content: "\00BB \0020";
 }
 
 /* Sidebar styles. */

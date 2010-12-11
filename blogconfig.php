@@ -13,10 +13,6 @@ ini_set("magic_quotes_runtime", "off");
 ##########################################
 # Section: Essentials
 
-# Constant: USER_DATA
-# Directory name where user data is stored. The standard name is "userdata".
-define("USER_DATA", "userdata");
-
 # Constant: PATH_DELIM
 # Path delimiter for local paths.  This is calculated at run-time and
 # is set to '/' for UNIX-like systems and '\' for Windows systems.
@@ -77,12 +73,31 @@ function load_plugin($plugin_name) {
 	return new $plugin_name(true);
 }
 
+# Load the userconfig.cfg file and determine the userdata path.
 $curr_dir = dirname(__FILE__);
+$parent_dir = dirname($curr_dir);
+$dir_names = array('userdata', 'users', 'profiles');
+
+foreach ($dir_names as $dir) {
+	if (is_dir(mkpath($parent_dir, $dir))) {
+		$data_path = mkpath($parent_dir, $dir);
+		define("USER_DATA", $dir);
+	}
+}
+# Constant: USER_DATA
+# Directory name where user data is stored. The standard name is "userdata".
+
+if (! isset($data_path)) {
+	$data_path = mkpath($curr_dir, 'userdata');
+	define("USER_DATA", "userdata");
+}
+
+# Set the path for system-wide user data files.
+define("USER_DATA_PATH", $data_path);
+
 $cfg_file = '';
-if (file_exists(mkpath($curr_dir,"userdata", "userconfig.cfg"))) {
-	$cfg_file = mkpath($curr_dir,"userdata", "userconfig.cfg");
-} elseif (file_exists(mkpath($curr_dir, "userconfig.cfg"))) {
-	$cfg_file = mkpath($curr_dir, "userconfig.cfg");
+if (file_exists(mkpath(USER_DATA_PATH, "userconfig.cfg"))) {
+	$cfg_file = mkpath(USER_DATA_PATH, "userconfig.cfg");
 }
 
 # Look for the userconfig.cfg and define any variables in it.
@@ -106,12 +121,12 @@ if (file_exists($cfg_file)) {
 }
 
 # Define config files for various parts of the plugin framework.
-@define("FS_PLUGIN_CONFIG", "fsconfig.php");
+define("FS_PLUGIN_CONFIG", "fsconfig.php");
 
 # Since we were able to include this file, we must already have the installation
 # directory in the path.  So we can just include userdata/fsconfig.php and not
 # have to worry about the exact path.
-@include_once(USER_DATA."/".FS_PLUGIN_CONFIG);
+@include_once(mkpath(USER_DATA_PATH, FS_PLUGIN_CONFIG));
 
 if (defined("DOCUMENT_ROOT") && ! is_dir(DOCUMENT_ROOT) &&  
     (! defined("CHECK_DOCUMENT_ROOT") || CHECK_DOCUMENT_ROOT == true) ) {
@@ -133,13 +148,6 @@ if (! defined("INSTALL_ROOT")) {
 	if (! defined("INSTALL_ROOT")) define("INSTALL_ROOT", getcwd());
 
 }
-/*if (! defined("BLOG_ROOT") && 
-      file_exists(get_blog_path().PATH_DELIM."pathconfig.php")) {
-	require_once("pathconfig.php");
-}*/
-
-# Set the path for system-wide user data files.
-define("USER_DATA_PATH", INSTALL_ROOT.PATH_DELIM.USER_DATA);
 
 # Check for the file's existence first, because it turns out this is 
 # actually faster when the file doesn't exist.
@@ -209,7 +217,7 @@ define("PACKAGE_NAME", "LnBlog");
 # Constant: PACKAGE_VERSION
 # The version number of the software.  This is a string in the format 
 # "1.2.3".  Note that each number may be more than one digit.
-define("PACKAGE_VERSION", "0.9.0");
+define("PACKAGE_VERSION", "1.0.0");
 
 # Constant: REQUIRED_VERSION
 # The minimum software version required by your blog to properly
