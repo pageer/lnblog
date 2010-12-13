@@ -54,13 +54,11 @@ function NewFS() {
 # Function: NewPage
 # Creates a new page object.
 function NewPage($ref=false) {
-	require_once("page.php");
 	return new Page($ref);
 }
 # Function: NewBlog
 # Creates a new blog object
 function NewBlog($param=false) {
-	require_once("blog.php");
 	return new Blog($param);
 }
 
@@ -95,10 +93,8 @@ function NewEntry($param=false) {
 	}
 	
 	if ($entid) {
-		require_once("blogentry.php");
 		return new BlogEntry($entid);
 	} elseif ($artid) {
-		require_once("article.php");
 		return new Article($artid);
 	}
 	return false;
@@ -107,21 +103,18 @@ function NewEntry($param=false) {
 # Function: NewBlogEntry
 # Creates a new blog entry object.
 function NewBlogEntry($param=false) {
-	require_once("blogentry.php");
 	return new BlogEntry($param);
 }
 
 # Function: NewArticle
 # Creates a new article object
 function NewArticle($param=false) {
-	require_once("article.php");
 	return new Article($param);
 }
 
 # Function: NewBlogComment
 # Creates a new BlogComment on an entry or article.
 function NewBlogComment($param=false) {
-	require_once("blogcomment.php");
 	return new BlogComment($param);
 }
 
@@ -139,7 +132,6 @@ function NewTemplate($tpl="") {
 # usr - The *optional* username of the user represented by this object.
 # pwd - The *optional* associated password.
 function NewUser($usr=false, $pwd=false) {
-	require_once("user.php");
 	$s_usr = SESSION(CURRENT_USER);
 	$c_usr = COOKIE(CURRENT_USER);
 	if (!$usr && $c_usr) {
@@ -183,14 +175,12 @@ function NewPingback($param=false) {
 # Function: NewIniParser
 # Creates a new INI file parser object.
 function NewIniParser($file=false) {
-	require_once("iniparser.php");
 	return new INIParser($file);
 }
 
 # Function: NewConfigFile
 # Creates an XML config file parser object.
 function NewConfigFile($file=false) {
-	require_once("xmlini.php");
 	return new XMLINI($file);
 }
 
@@ -208,5 +198,3 @@ function NewReply($id) {
 		return NewPingback($id);
 	}
 }
-
-?>

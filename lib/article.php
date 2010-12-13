@@ -1,7 +1,7 @@
 <?php 
 /*
     LnBlog - A simple file-based weblog focused on design elegance.
-    Copyright (C) 2005 Peter A. Geer <pageer@skepticats.com>
+    Copyright (C) 2005-2011 Peter A. Geer <pageer@skepticats.com>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
