@@ -10,13 +10,33 @@
 # files to remove the escape characters.
 ini_set("magic_quotes_runtime", "off");
 
+function lib_autoload($className) {
+	$file = implode(DIRECTORY_SEPARATOR, array(dirname(__FILE__), 'lib', strtolower($className).'.php'));
+	if (file_exists($file)) {
+		require $file;
+	}
+}
+
+function class_autoload($className) {
+	$folders = array('persistence', 'controllers');
+	foreach ($folders as $fld) {
+		$fileName = array(dirname(__FILE__), $fld, $className.'.class.php');
+		$file = implode(DIRECTORY_SEPARATOR, $fileName);
+		if (file_exists($file)) {
+			require $file;
+		}
+	}
+}
+
+spl_autoload_register('lib_autoload');
+spl_autoload_register('class_autoload');
+
 ##########################################
 # Section: Essentials
 
 # Constant: PATH_DELIM
-# Path delimiter for local paths.  This is calculated at run-time and
-# is set to '/' for UNIX-like systems and '\' for Windows systems.
-define("PATH_DELIM", strtoupper(substr(PHP_OS,0,3)=='WIN')?'\\':'/');
+# Alias for DIRECTORY_SEPARATOR
+define("PATH_DELIM", DIRECTORY_SEPARATOR);
 
 # Function: mkpath
 # A globally accessible convenience function that takes a variable number
@@ -26,9 +46,7 @@ define("PATH_DELIM", strtoupper(substr(PHP_OS,0,3)=='WIN')?'\\':'/');
 # A string with each of the arguments separated by PATH_DELIM.
 function mkpath() {
 	$args = func_get_args();
-	$ret = implode(PATH_DELIM, $args);
-	$ret = str_replace(PATH_DELIM.PATH_DELIM, PATH_DELIM, $ret);
-	return $ret;
+	return Path::mk($args);
 }
 
 # Function: get_blog_path
@@ -137,16 +155,7 @@ if (defined("DOCUMENT_ROOT") && ! is_dir(DOCUMENT_ROOT) &&
 # pathconfig.php, then we need to take care of that.  We'll try to get the
 # blog's pathconfig.php file, and failing that, we'll just use the cwd.
 if (! defined("INSTALL_ROOT")) {
-
-	if ( get_blog_path() ) {
-		$temp = ini_get('include_path');
-		ini_set('include_path', get_blog_path());
-		require_once('pathconfig.php');
-		ini_set('include_path', $temp);
-	}
-
-	if (! defined("INSTALL_ROOT")) define("INSTALL_ROOT", getcwd());
-
+	define("INSTALL_ROOT", dirname(__FILE__));
 }
 
 # Check for the file's existence first, because it turns out this is 

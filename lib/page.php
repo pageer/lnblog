@@ -33,8 +33,6 @@ OnOutput       - Fired when processing for HTML output starts.
 OutputComplete - Fired after the HTML output has been performed.
 */
 
-require_once("lib/lnblogobject.php");
-
 class Page extends LnBlogObject {
 
 	/*
@@ -43,54 +41,50 @@ class Page extends LnBlogObject {
 	The type of object *will vary* from page to page and may be set to false
 	on some pages.  For most pages, it will be the current Blog object, but 
 	BlogEntry and Article object are also common. */
-	var $display_object;
+	public $display_object = null;
 	/*
 	Property: doctype
 	String holding the DOCTYPE for the page.  Should normally be set using a 
 	named constant. */
-	var $doctype;
+	public $doctype = DEFAULT_DOCTYPE;
 	/*
 	Property: title
 	A string used for the page title. */
-	var $title;
+	public $title = '';
 	/*
 	Property: mime_type
 	Represents the MIME type of the page. */
-	var $mime_type;
+	public $mime_type = DEFAULT_MIME_TYPE;
 	/*
 	Property: charset
 	Holds the character encoding to use for the page. */
-	var $charset;
-	var $rssfeeds;
-	var $stylesheets;
-	var $inline_stylesheets;
-	var $scripts;
-	var $inline_scripts;
-	var $metatags;
-	var $headers;
-	var $links;
+	public $charset = DEFAULT_CHARSET;
+	public $rssfeeds = array();
+	public $stylesheets = array();
+	public $inline_stylesheets = array();
+	public $scripts = array();
+	public $inline_scripts = array();
+	public $metatags = array();
+	public $headers = array();
+	public $links = array();
 	
-	function Page($ref=false) {
+	public function __construct($ref=null) {
 	
 		$this->raiseEvent("OnInit");
-		$this->display_object = &$ref;
-		$this->doctype = DEFAULT_DOCTYPE;
-		$this->stylesheets = array();
-		$this->rssfeeds = array();
-		$this->scripts = array();
-		$this->metatags = array();
-		$this->headers = array();
-		$this->links = array();
-		
-		$this->title = '';
-
-		$this->mime_type = DEFAULT_MIME_TYPE;
-		$this->charset = DEFAULT_CHARSET;
+		$this->display_object = $ref;
 
 		$this->addScript("lnblog_lib.js");
 		$this->addStylesheet("main.css");
 		
 		$this->raiseEvent("InitComplete");		
+	}
+	
+	public function instance() {
+		static $inst;
+		if (! isset($inst)) {
+			$inst = new Page();
+		}
+		return $inst;
 	}
 	
 	# Method: setDisplayObject
@@ -99,7 +93,7 @@ class Page extends LnBlogObject {
 	# Parameters:
 	# ref - A reference to the object to set.
 	
-	function setDisplayObject(&$ref) {
+	public function setDisplayObject(&$ref) {
 		$this->display_object = $ref;
 	}
 
@@ -112,7 +106,7 @@ class Page extends LnBlogObject {
 	filename of a CSS file.
 	*/
 
-	function addStylesheet() {
+	public function addStylesheet() {
 		$num_args = func_num_args();
 		$arg_list = func_get_args();
 		for ($i = 0; $i < $num_args; $i++) {
@@ -129,7 +123,7 @@ class Page extends LnBlogObject {
 	to use for the inline styles.
 	*/
 
-	function addInlineStylesheet() {
+	public function addInlineStylesheet() {
 		$num_args = func_num_args();
 		$arg_list = func_get_args();
 		for ($i = 0; $i < $num_args; $i++) {
@@ -145,7 +139,7 @@ class Page extends LnBlogObject {
 	attribs - An associative array, with each key corresponding to an attribute
 	          of the link with the corresponding value as the value.
 	*/
-	function addLink($attribs) {
+	public function addLink($attribs) {
 		if (count($attribs) == 0) return false;
 		$this->links[] = $attribs;
 	}
@@ -161,7 +155,7 @@ class Page extends LnBlogObject {
 	title - The title for the feed.
 	*/
 
-	function addRSSFeed($href, $type, $title) {
+	public function addRSSFeed($href, $type, $title) {
 		$this->rssfeeds[] = array("href"=>$href, "type"=>$type, 
 		                          "title"=>$title);
 	}
@@ -176,7 +170,7 @@ class Page extends LnBlogObject {
 	       The default is text/javascript.
 	*/
 
-	function addScript($href, $type="text/javascript") {
+	public function addScript($href, $type="text/javascript") {
 		$this->scripts[] = array("href"=>$href, "type"=>$type);
 	}
 
@@ -189,7 +183,7 @@ class Page extends LnBlogObject {
 	type - *Optional* MIME type of the script.  
 	       The default is text/javascript.
 	*/
-	function addInlineScript($text, $type="text/javascript") {
+	public function addInlineScript($text, $type="text/javascript") {
 		$this->scripts[] = array("text"=>$text, "type"=>$type);
 	}
 	
@@ -199,7 +193,7 @@ class Page extends LnBlogObject {
 	scripts to be inserted.  Use this for initialization of configuration
 	scripts that need to run before other things.
 	*/
-	function addScriptFirst($href, $type="text/javascript") {
+	public function addScriptFirst($href, $type="text/javascript") {
 		$scr = array("href"=>$href, "type"=>$type);
 		array_unshift($this->scripts, $scr);
 	}
@@ -208,7 +202,7 @@ class Page extends LnBlogObject {
 	Method: addInlineScriptFirst
 	Like <addScriptFirst>, except for inline scripts.
 	*/
-	function addInlineScriptFirst($text, $type="text/javascript") {
+	public function addInlineScriptFirst($text, $type="text/javascript") {
 		$scr = array("text"=>$text, "type"=>$type);
 		array_unshift($this->scripts, $scr);
 	}
@@ -222,7 +216,7 @@ class Page extends LnBlogObject {
 	name      - *Optional* name attribute.
 	httpequiv - *Optional* http-equiv attribute.
 	*/
-	function addMeta($content, $name=false, $httpequiv=false) {
+	public function addMeta($content, $name=false, $httpequiv=false) {
 		$this->metatags[] = array("content"=>$content, "name"=>$name, 
 		                          "http-equiv"=>$httpequiv);
 	}
@@ -235,7 +229,7 @@ class Page extends LnBlogObject {
 	name    - The header name.
 	content - The content of the header.
 	*/
-	function addHeader($name, $content) {
+	public function addHeader($name, $content) {
 		$this->headers[$name] = $content;
 	}
 	
@@ -247,7 +241,7 @@ class Page extends LnBlogObject {
 	url - The target URL to which to redirect.
 	*/
 	
-	function redirect($url) {
+	public function redirect($url) {
 		$url = str_replace(array("\r","\n",'%0d','%0D','%0a','%0A'), '', $url);
 		header("Location: ".$url);
 		exit;
@@ -262,7 +256,7 @@ class Page extends LnBlogObject {
 	delay - *Optional* delay of refresh.  Default is 0.
 	*/
 	
-	function refresh($url, $delay=0) {
+	public function refresh($url, $delay=0) {
 		$url = str_replace(array("\r","\n",'%0d','%0D','%0a','%0A'), '', $url);
 		if (! is_int($delay)) $delay = 0;
 		header("Refresh: ".$delay."; URL=".$url);
@@ -273,7 +267,7 @@ class Page extends LnBlogObject {
 	Displays the page, i.e. sends it to the browser.
 	*/
 
-	function display($page_body, $blog=false) {
+	public function display($page_body, $blog=false) {
 		$this->raiseEvent("OnOutput");
 
 		$content_type = $this->mime_type."; charset=".$this->charset;
@@ -310,6 +304,6 @@ class Page extends LnBlogObject {
 	
 }
 
-$PAGE = new Page();
+$PAGE = Page::instance();
 
 ?>

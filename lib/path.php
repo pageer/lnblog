@@ -1,47 +1,61 @@
 <?php
-require_once("server.php");
 
 class Path {
 	
-	function Path() {
-		$this->sep = DIRECTORY_SEPARATOR;
+	const WINDOWS_SEP = '\\';
+	const UNIX_SEP = '/';
+	
+	public static $sep = DIRECTORY_SEPARATOR;
+	public $path = array();
+	
+	public function __construct() {
 		$this->path = func_get_args();
 	}
 	
-	function hasWindowsSep($path) {
-		$c1 = chr(strtoupper(substr($path,0,1)));
-		$c2 = substr($path,1,2);
-		return ( $c1 >= ord("A") && $c1 <= ord("Z") && ($c2 == ':\\' || $c2 == ":" ) );
+	public static function mk($arr=null) {
+		$p = new Path();
+		if (is_array($arr)) {
+			$p->path = $arr;
+		} else {
+			$p->path = func_get_args();
+		}
+		return $p->get();
 	}
 	
-	function isAbsolute($path) {
-		switch($this->sep) {
-			case '\\': 
+	public function hasWindowsSep($path) {
+		$c1 = chr(strtoupper(substr($path,0,1)));
+		$c2 = substr($path,1,2);
+		return ( $c1 >= ord("A") && $c1 <= ord("Z") && ($c2 == ':'.self::WINDOWS_SEP || $c2 == ":" ) );
+	}
+	
+	public function isAbsolute($path) {
+		switch(self::$sep) {
+			case self::WINDOWS_SEP: 
 				$c1 = ord(strtoupper(substr($path,0,1)));
 				$c2 = substr($path,1,1);
 				return ( $c1 >= ord("A") && $c1 <= ord("Z") && $c2 == ':');
-			case '/':
-				return substr($path,0,1) == '/';
+			case self::UNIX_SEP:
+				return substr($path,0,1) == self::UNIX_SEP;
 		}
 	}
 	
-	function implodePath($sep, $path) {
+	public function implodePath($sep, $path) {
 		$ret = implode($sep, $path);
 		return str_replace($sep.$sep, $sep, $ret);
 	}
 	
-	function get() {
+	public function get() {
 		if (func_num_args() == 0) {
-			return $this->implodePath($this->sep, $this->path);
+			return $this->implodePath(self::$sep, $this->path);
 		} else {
 			$args = func_get_args();
-			return Path::implodePath(DIRECTORY_SEPARATOR, $args);
+			return Path::implodePath(self::$sep, $args);
 		}
 	}
 	
-	function getCanonical() {
+	public function getCanonical() {
 		$str = $this->get();
-		$components = explode($this->sep, $str);
+		$components = explode(self::$sep, $str);
 		$ret = '';
 		
 		for ($i = count($components) - 1; $i > 0; $i--) {
@@ -49,7 +63,7 @@ class Path {
 				case ''   : break;
 				case '.'  : break;
 				case '..' : $i--; break;
-				default   : $ret = $this->sep.$components[$i].$ret;
+				default   : $ret = self::$sep.$components[$i].$ret;
 			}
 		}
 		
@@ -62,35 +76,35 @@ class Path {
 		return $ret;
 	}
 	
-	function urlSlashes($striproot=false) {
+	public function urlSlashes($striproot=false) {
 		$path = $this->get();
 		if ($striproot && strpos($path,$striproot) === 0) {
 			$path = substr($path, strlen($striproot));
 		}
 			
-		if ($this->sep != '/') {
+		if (self::$sep != '/') {
 			if ($this->isAbsolute($path)) $path = substr($path, 2);
-			$path = str_replace($this->sep, '/', $path);
+			$path = str_replace(self::$sep, '/', $path);
 		}
 		return $path;
 	}
 	
-	function stripPrefix($prefix) {
+	public function stripPrefix($prefix) {
 		$ret = $this->get();
 		if ($this->hasPrefix($prefix)) $ret = substr($ret, strlen($prefix));
 		return $ret;
 	}
 	
-	function hasPrefix($prefix) {
+	public function hasPrefix($prefix) {
 		return strpos($this->get(), $prefix) === 0;
 	}
 	
-	function append($dir) {
+	public function append($dir) {
 		$args = func_get_args();
 		$this->path = array_merge($this->path, $args);
 	}
 	
-	function appendSlash($path) {
+	public function appendSlash($path) {
 		$server = Server::instance();
 		if (substr($path, -1) != $server->dirSep()) {
 			return $path.$server->dirSep();
@@ -99,7 +113,7 @@ class Path {
 		}
 	}
 	
-	function toURL() {
+	public function toURL() {
 		$sys = Server::instance();
 
 		if (file_exists($this->get())) {
@@ -163,4 +177,3 @@ class Path {
 		return $url_path;
 	}
 }
-?>

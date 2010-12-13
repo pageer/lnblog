@@ -15,7 +15,7 @@ require_once("path.php");
 
 class System {
 	
-	function System() {
+	public function __construct() {
 		$this->userdata = defined("USER_DATA_PATH")?USER_DATA_PATH:"";
 	
 		$this->group_ini = new INIParser(Path::get($this->userdata, "groups.ini"));
@@ -23,7 +23,7 @@ class System {
 
 	}
 	
-	function instance() {
+	public function instance() {
 		static $static_instance;
 		if (! isset($static_instance)) {
 			$static_instance = new System();
@@ -44,7 +44,7 @@ class System {
 	# True if the blog is registered correctly or is already registered,
 	# false if it fails to register.
 	
-	function registerBlog($blogid) {
+	public function registerBlog($blogid) {
 		$list = trim($this->sys_ini->value("register", "BlogList"));
 		if (! $list) $list = array();
 		else $list = explode(",", $list);
@@ -65,7 +65,7 @@ class System {
 	# Returns:
 	# An array of blog objects.  
 	
-	function getBlogList() {
+	public function getBlogList() {
 		$list = trim($this->sys_ini->value("register", "BlogList"));
 		if (! $list) return array();
 		$list = explode(",", $list);
@@ -81,7 +81,7 @@ class System {
 	#
 	# Returns:
 	# An array of theme names.
-	function getThemeList() {
+	public function getThemeList() {
 		$dir = scan_directory(mkpath(INSTALL_ROOT,"themes"), true);
 		if (is_dir(mkpath(USER_DATA_PATH,"themes"))) {
 			$user_dir = scan_directory(mkpath(USER_DATA_PATH,"themes"), true);
@@ -105,7 +105,7 @@ class System {
 	# Returns:
 	# An array of Blog objects.
 	
-	function getUserBlogs($usr) {
+	public function getUserBlogs($usr) {
 		$list = $this->getBlogList();
 		$ret = array();
 		foreach ($list as $blog) {
@@ -122,7 +122,7 @@ class System {
 	# Returns:
 	# An array of user objects.  
 	
-	function getUserList() {
+	public function getUserList() {
 		if (! is_dir(USER_DATA_PATH)) return false;
 		$dirhand = opendir(USER_DATA_PATH);
 		
@@ -146,7 +146,7 @@ class System {
 	# Returns:
 	# An array of group names.
 	
-	function getGroupList() {
+	public function getGroupList() {
 		return $this->group_ini->getSectionNames();
 	}
 	
@@ -159,7 +159,7 @@ class System {
 	# Returns:
 	# An array of group names.
 	
-	function getGroups($usrid) {
+	public function getGroups($usrid) {
 		$groups = $this->group_ini->getSectionNames();
 		$ret = array();
 		foreach ($groups as $grp) {
@@ -181,7 +181,7 @@ class System {
 	# Returns:
 	# True if usrid is in grp or if everyone is in grp, false otherwise.
 	
-	function inGroup($usrid, $grp) {
+	public function inGroup($usrid, $grp) {
 		$members = $this->group_ini->value($grp, "Members");
 		$list = explode(',', $members);
 		return in_array($usrid, $list) || in_array('*', $list);
@@ -196,7 +196,7 @@ class System {
 	# Returns:
 	# True if the group exists, false otherwise.
 	
-	function groupExists($grp) {
+	public function groupExists($grp) {
 		$grp = trim($grp);
 		$groups = $this->group_ini->getSectionNames();
 		return in_array($grp, $groups);
@@ -214,7 +214,7 @@ class System {
 	# then the return value is true.  If the group does not exist, the value 
 	# is false.
 	
-	function addToGroup(&$usr, $group) {
+	public function addToGroup(&$usr, $group) {
 		$ret = false;
 		$userid = $usr->username();
 		
@@ -242,7 +242,7 @@ class System {
 	# True if the user defined by the ADMIN_USER constant exists or if there is
 	# at least one existing user in the administrators group, false otherwise.
 
-	function hasAdministrator() {
+	public function hasAdministrator() {
 		global $SYSTEM;
 		$has_admin = file_exists(mkpath(USER_DATA_PATH,ADMIN_USER,"passwd.php"));
 		if (! $has_admin) {
@@ -267,7 +267,7 @@ class System {
 	# Returns:
 	# True if the user is the object's owner, false otherwise.
 	
-	function isOwner($usrid, $obj) {
+	public function isOwner($usrid, $obj) {
 		if (isset($obj->uid)) $owner = $obj->uid;
 		elseif (isset($obj->owner)) $owner = $obj->owner;
 		else $owner = false;
@@ -283,7 +283,7 @@ class System {
 	# usr  - A User object for the user whose permissions we want to check.
 	# Returns:
 	# True if the 
-	function canAddTo($parm, $usr=false) {
+	public function canAddTo($parm, $usr=false) {
 		$ret = false;
 		if (!$usr) $usr = NewUser();
 		
@@ -306,7 +306,7 @@ class System {
 	
 	# Method: canModify
 	# Like <canAddTo>, except determines if the user can perform updates.
-	function canModify(&$parm, $usr=false) {
+	public function canModify(&$parm, $usr=false) {
 		$ret = false;
 		if (!$usr) $usr = NewUser();
 		if ( $this->inGroup($usr->username(), 'administrators') ||
@@ -320,7 +320,7 @@ class System {
 	
 	# Method: canDelete
 	# Like <canAddTo>, except determines if the user can delete the object.
-	function canDelete($parm, $usr=false) {
+	public function canDelete($parm, $usr=false) {
 		return $this->canModify($parm,$usr);
 	}
 	

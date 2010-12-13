@@ -253,34 +253,6 @@ class Blog extends LnBlogObject {
 			$path = $this->home_path.PATH_DELIM.'blogdata.txt';
 			$config_data = file($path);
 		}
-		
-		# If we aren't using the old-style ad hoc storage format, then 
-		# we will exit here.
-		# THIS IS OBSELETE.  Code below here should be removed in a
-		# future release.
-		if (empty($config_data)) return false;
-
-		foreach ($config_data as $line) {
-			# Split the string on the equal sign.  We skip the limit 
-			# parameter for the sake of compatibility.
-			$line_data = explode("=", $line);
-			$key = strtolower(trim($line_data[0]));
-			$line_data[0] = "";
-			$data = trim(implode("", $line_data));
-			# Now find the correct key and set the associated property.
-			switch ($key) {
-				case "name": $this->name = $data; break;
-				case "description": $this->description = $data; break;
-				case "image": $this->image = $data; break;
-				case "max entries": $this->max_entries = $data; break;
-				case "max rss": $this->max_rss = $data; break;
-				case "theme": $this->theme = $data; break;
-				case "owner": $this->owner = $data; break;
-				case "write list": $this->write_list = explode(",", $data); break;
-				case "tags": $this->tag_list = explode(TAG_SEPARATOR, $data); break;
-			}
-			
-		}
 	}
 
 	/*
@@ -1169,12 +1141,11 @@ class Blog extends LnBlogObject {
 
 		$this->name = htmlentities($this->name);
 		$this->description = htmlentities($this->description);
-		
-		$inst_path = getcwd();
+
 		$p = new Path($path ? $path : $this->home_path);
 		$this->home_path = $p->getCanonical();
 
-		$ret = $this->createBlogDirectories(&$fs, $inst_path);
+		$ret = $this->createBlogDirectories(&$fs, INSTALL_ROOT);
 		
 		$this->setBlogID();
 		
@@ -1194,7 +1165,7 @@ class Blog extends LnBlogObject {
 
 		$ret = $this->createNonExistentDirectory($fs, $this->home_path);
 		if ($ret) {
-			$result = create_directory_wrappers($this->home_path, BLOG_BASE, $this->home_path);
+			$result = create_directory_wrappers($this->home_path, BLOG_BASE, $inst_path);
 			# Returns an array of errors, so convert empty array to true.
 			$ret &= (empty($result) ? true : false);
 		}

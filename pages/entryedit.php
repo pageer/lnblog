@@ -75,7 +75,7 @@ require_once("pages/pagelib.php");
 # null string is returned.
 
 function handle_pingback_pings(&$ent) {
-	global $SYSTEM;
+	$SYSTEM = System::instance();
 	
 	if (! $ent->allow_pingback) return '';
 	
@@ -184,7 +184,7 @@ function handle_save(&$ent, &$blg, &$errors, $is_draft) {
 	return $ret;
 }
 
-global $PAGE;
+$PAGE = Page::instance();
 
 $blg = NewBlog();
 $u = NewUser();
