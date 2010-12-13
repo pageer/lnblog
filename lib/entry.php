@@ -32,57 +32,57 @@ class Entry extends LnBlogObject{
 
 	# Property: id
 	# An ID for the object that is unique across the class (not used).
-	var $id;
+	public $id;
 	# Property: uid
 	# The user ID of this object's owner.
-	var $uid;
+	public $uid;
 	# Property: ip
 	# The IP address logged for this object at last modification.
-	var $ip;
+	public $ip;
 	# Property: date
 	# The human-readable date when the object was last modified.
-	var $date;
+	public $date;
 	# Property: timestamp
 	# The UNIX timestamp when the object was last modified.
-	var $timestamp;
+	public $timestamp;
 	# Property: post_date
 	# Human-readable date when the object was created.
-	var $post_date;
+	public $post_date;
 	# Property: post_ts
 	# UNIX timestamp when the object was created.
-	var $post_ts;
+	public $post_ts;
 	# Property: subject
 	# The subject text associated with this object.
-	var $subject;
+	public $subject;
 	# Property: abstract
 	# An abstract of the text of this object (not used).
-	var $abstract;
+	public $abstract;
 	# Property: tags
 	# A comma-delimited list of tags applied to this entry.
-	var $tags = "";
+	public $tags = "";
 	# Property: data
 	# The main text data of this object.  May be one of several different 
 	# kinds of markup.
-	var $data;
+	public $data;
 	# Property: file
 	# The path to the file that holds data for this entry.  Note that this is
 	# specific to filesystem storage and is for internal use only.
-	var $file;
+	public $file;
 	# Property: has_html
 	# Holds the type of markup used in the data property.  This can be one
 	# of several defined constants, includine <MARKUP_NONE>, <MARKUP_BBCODE>, 
 	# and <MARKUP_HTML>.
-	var $has_html = MARKUP_NONE;
+	public $has_html = MARKUP_NONE;
 	# Property: custom_fields
 	# An array of custom fields for the entry, with keys being the field name
 	# for use in the data structure and configuration files and the value
 	# being a short description to display to the user.
-	var $custom_fields = array();
+	public $custom_fields = array();
 	# Property: metadata_fields
 	# An array of property->var pairs.  These are the object member 
 	# variable names and the data file variable names respectively.
 	# They are used to retreive data from persistent storage.
-	var $metadata_fields = array("id"=>"PostID", "uid"=>"UserID",
+	public $metadata_fields = array("id"=>"PostID", "uid"=>"UserID",
 		"date"=>"Date", "post_date"=>"PostDate", 
 		"timestamp"=>"Timestamp", "post_ts"=>"PostTimeStemp", 
 		"ip"=>"IP", "subject"=>"Subject", "has_html"=>"HasHTML",
@@ -99,7 +99,7 @@ class Entry extends LnBlogObject{
 	Returns:
 	A string containing the title of this object.
 	*/
-	function title($no_escape=false) {
+	public function title($no_escape=false) {
 		$ret = $this->subject ? $this->subject : NO_SUBJECT;
 		return $no_escape ? $ret : htmlspecialchars($ret);
 	}
@@ -112,7 +112,7 @@ class Entry extends LnBlogObject{
 	Returns:
 	A string containing HTML code for the item's text.
 	*/
-	function description() { return $this->markup(); }
+	public function description() { return $this->markup(); }
 		
 	/*
 	Method: data
@@ -120,7 +120,7 @@ class Entry extends LnBlogObject{
 	to a true value (i.e. a non-empty string), then this value is set to the
 	data property.  Otherwise, the data property is returned.
 	*/
-	function data($value=false) {
+	public function data($value=false) {
 		if ($value) $this->data = $value;
 		else return $this->data;
 	}
@@ -130,7 +130,7 @@ class Entry extends LnBlogObject{
 	Set or return an array of tags for this entry.  Each tag is an arbitrary 
 	string entered by the user with no inherent meaning.
 	*/
-	function tags($list=false) {
+	public function tags($list=false) {
 		if ($list) {
 			$this->tags = implode(TAG_SEPARATOR, $list);
 		} else {
@@ -148,7 +148,7 @@ class Entry extends LnBlogObject{
 	Abstract function that returns the object's permalink.  
 	Child classes *must* over-ride this.
 	*/
-	function permalink() { return ""; }
+	public function permalink() { return ""; }
 
 	/*
 	Method: getParent
@@ -157,7 +157,7 @@ class Entry extends LnBlogObject{
 	BlogEntry or Article for BlogComment or TrackBack objects.
 	Child classes *must* over-ride this method.
 	*/
-	function getParent() { return false; }
+	public function getParent() { return false; }
 	
 	/*
 	Method: baselink
@@ -167,7 +167,7 @@ class Entry extends LnBlogObject{
 	Returns:
 	An absolute URI.
 	*/
-	function baselink() { return $this->uri(); }
+	public function baselink() { return $this->uri(); }
 	
 	/*
 	Method: queryStringToID
@@ -175,7 +175,7 @@ class Entry extends LnBlogObject{
 	for an object.  
 	Child classes *must* over-ride this function.
 	*/
-	function queryStringToID() { return false; }
+	public function queryStringToID() { return false; }
 
 	/*
 	Method: absolutizeBBCodeURI
@@ -195,7 +195,7 @@ class Entry extends LnBlogObject{
 	blog root, if there is a current blog, and if the given URI starts with a 
 	slash, it will be interpreted as relative to the DOCUMENT_ROOT, if it is set.
 	*/
-	function absolutizeBBCodeURI($data, $current_uri) {
+	public function absolutizeBBCodeURI($data, $current_uri) {
 
 		$ret = preg_replace_callback("/\[img(-?\w+)?=([^\]\:]+)\]/",
 		                             array($this, 'fixBBCodeURI'), $data);
@@ -216,7 +216,7 @@ class Entry extends LnBlogObject{
 	The markup in the data parameter with href and src attributes absolutized
 	according to the same rules as apply with <absolutizeBBCodeURI>.
 	*/
-	function absolutizeHTMLURI($data, $current_uri) {
+	public function absolutizeHTMLURI($data, $current_uri) {
 		$ret = preg_replace_callback("/src=['\"]([^\:]+)['\"]/",
 		                             array($this, 'fixHTMLURI'), $data);
 		$ret = preg_replace_callback("/href=['\"]([^\:@]+)['\"]/", 
@@ -224,7 +224,7 @@ class Entry extends LnBlogObject{
 		return $ret;
 	}
 
-	function fixURI($args) {
+	public function fixURI($args) {
 		if (count($args) == 3) {
 			$uri = $args[2];
 		} else {
@@ -251,7 +251,7 @@ class Entry extends LnBlogObject{
 		return $uri;
 	}
 	
-	function fixBBCodeURI($args) {
+	public function fixBBCodeURI($args) {
 		$uri = $this->fixURI($args);
 		if (count($args) == 3) {
 			return '[img'.$args[1].'='.$uri.']';
@@ -260,7 +260,7 @@ class Entry extends LnBlogObject{
 		}
 	}
 	
-	function fixHTMLURI($args) {
+	public function fixHTMLURI($args) {
 		$uri = $this->fixURI($args);
 		if (count($args) == 3) {
 			return 'src="'.$uri.'"';
@@ -284,7 +284,7 @@ class Entry extends LnBlogObject{
 	ampersands converted into their corresponding HTML entities.  This will
 	cause them to display in a web page as characters, not HTML markup.
 	*/
-	function stripHTML($data) {
+	public function stripHTML($data) {
 		
 		if (UNICODE_ESCAPE_HACK) {
 			$ret = htmlentities($data);
@@ -299,7 +299,7 @@ class Entry extends LnBlogObject{
 	# Removes all markup (both HTML and LBCode tags) from the entry data 
 	# and returns just plain text.
 
-	function getPlainText() {
+	public function getPlainText() {
 		if ($this->has_html == MARKUP_HTML) {
 			$ret = strip_tags($this->data);
 		} elseif ($this->has_html == MARKUP_BBCODE) {
@@ -310,7 +310,7 @@ class Entry extends LnBlogObject{
 		return $ret;
 	}
 
-	function addHTML($data, $use_nofollow=false) {
+	public function addHTML($data, $use_nofollow=false) {
 		$ret = $data;
 		$patterns[0] = "/((http|https|ftp):\/\/\S*)/i";
 		$patterns[1] = '/\r\n(\r\n)+/';
@@ -347,7 +347,7 @@ class Entry extends LnBlogObject{
 	#	return '<p>'.$p->parse().'</p>';
 	#}
 	
-	function bbcodeToHTML($data, $strip=false) {
+	public function bbcodeToHTML($data, $strip=false) {
 		$ret = $data;
 		
 		$patterns[0] = "/\[url=(\S+)\](.+)\[\/url\]/Usi";
@@ -469,7 +469,7 @@ class Entry extends LnBlogObject{
 	# Returns:
 	# A string with markup applied.
 	
-	function markup($data="", $use_nofollow=false) {
+	public function markup($data="", $use_nofollow=false) {
 		if (! $data) $data = $this->data;
 		switch ($this->has_html) {
 			case MARKUP_NONE:
@@ -500,7 +500,7 @@ class Entry extends LnBlogObject{
 	#
 	# A string containing the abstract text, with all markup stripped out.
 
-	function getAbstract($numchars=500) {
+	public function getAbstract($numchars=500) {
 		if (!$this->data || $numchars < 1) return '';
 		if ($this->has_html == MARKUP_BBCODE) {
 			$data = $this->bbcodeToHTML($this->data, true);
@@ -521,7 +521,7 @@ class Entry extends LnBlogObject{
 	# Method: getSummary
 	# Gets a summary of the entry.  Returns the *abstract* property if it is
 	# set or the first HTML paragraph otherwise.	
-	function getSummary() {
+	public function getSummary() {
 		if ($this->abstract) return $this->markup($this->abstract);
 		
 		$data = $this->markup();
@@ -538,7 +538,7 @@ class Entry extends LnBlogObject{
 	# Returns:
 	# A string with a formatted, localized date.
 
-	function prettyDate($ts=false) {
+	public function prettyDate($ts=false) {
 		$date_ts = $ts ? $ts : $this->timestamp;
 		# If we don't aren't passed a timestamp and don't already have one,
 		# then just use the current time.
@@ -568,7 +568,7 @@ class Entry extends LnBlogObject{
 	# Returns:
 	# The body of the entry as a string.
 	
-	function readFileData() {
+	public function readFileData() {
 
 		if (substr($this->file, strlen($this->file)-4) != ".xml") {
 			$this->readOldFile();
@@ -588,7 +588,7 @@ class Entry extends LnBlogObject{
 		return $this->data;
 	}
 
-	function readOldFile() {
+	public function readOldFile() {
 		$data = file($this->file);
 		$file_data = "";
 		if (! $data) $file_data = false;
@@ -620,7 +620,7 @@ class Entry extends LnBlogObject{
 	# Returns:
 	# True if the file write is successful, false otherwise.
 	
-	function writeFileData() {
+	public function writeFileData() {
 		$fs = NewFS();
 
 		if (defined("USE_OLD_ENTRY_FORMAT")) {
@@ -635,7 +635,7 @@ class Entry extends LnBlogObject{
 		return $ret;
 	}
 	
-	function writeOldFile() {
+	public function writeOldFile() {
 		$header = '';
 		foreach ($this->custom_fields as $fld=>$desc) {
 			$this->metadata_fields[$fld] = $fld;
