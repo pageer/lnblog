@@ -37,7 +37,7 @@ OutputComplete - Fired after output has finished being generated.
 
 class Article extends BlogEntry {
 
-	function Article($path="", $revision=ENTRY_DEFAULT_FILE) {
+	public function __construct($path="", $revision=ENTRY_DEFAULT_FILE) {
 		$this->raiseEvent("OnInit");
 		
 		$this->initVars();
@@ -67,7 +67,7 @@ class Article extends BlogEntry {
 	True if object is a valid article, false otherwise.
 	*/
 
-	function isArticle($path=false) {
+	public function isArticle($path=false) {
 		if (!$path) $path = dirname($this->file);
 		return $this->isEntry($path) && strpos($path, BLOG_ARTICLE_PATH) !== false;
 	}
@@ -86,7 +86,7 @@ class Article extends BlogEntry {
 	True on success, false on failure.
 	*/
 
-	function setSticky($show=true) {
+	public function setSticky($show=true) {
 		$f = NewFS();
 		
 		if ($show) 
@@ -109,7 +109,7 @@ class Article extends BlogEntry {
 	*/
 	
 
-	function isSticky($path=false) {
+	public function isSticky($path=false) {
 		return ($this->isArticle($path) && 
 		        file_exists($path ? $path : 
 		                    (dirname($this->file).PATH_DELIM.STICKY_PATH) ) );
@@ -127,7 +127,7 @@ class Article extends BlogEntry {
 	subject of the article.
 	*/
 
-	function readSticky($path) {
+	public function readSticky($path) {
 	
 		$old_path = $this->file;
 		if (is_dir($path)) $this->file = $path.PATH_DELIM.ENTRY_DEFAULT_FILE;
@@ -155,7 +155,7 @@ class Article extends BlogEntry {
 	Returns:
 	A string containing the unique ID of this article.
 	*/
-	function entryID() {
+	public function entryID() {
 		return basename(dirname($this->file));
 	}
 
@@ -173,7 +173,7 @@ class Article extends BlogEntry {
 	A string to use for the path to the article.
 	*/
 
-	function getPath($curr_ts=false, $just_name=false, $long_format=false) {
+	public function getPath($curr_ts=false, $just_name=false, $long_format=false) {
 		if (! $curr_ts) {
 			$path = strtolower($this->subject);
 			$path = preg_replace("/\s+/", "_", $path);
@@ -203,7 +203,7 @@ class Article extends BlogEntry {
 	True on success, false on failure.
 	*/
 
-	function insert ($blog, $dir_path=false, $from_draft=false) {
+	public function insert ($blog, $dir_path=false, $from_draft=false) {
 
 		$this->raiseEvent("OnInsert");
 		if (!$this->uid) {
@@ -251,9 +251,9 @@ class Article extends BlogEntry {
 	
 	# This is to allow inheritance of update and delete methods without 
 	# creating wrapper scripts.
-	function calcPrettyPermalink($use_broken_regex=false) { return false; }
+	public function calcPrettyPermalink($use_broken_regex=false) { return false; }
 
-	function permalink($html_escape=true) {
+	public function permalink($html_escape=true) {
 		if (! USE_WRAPPER_SCRIPTS && 
 		    ! file_exists(BLOG_ROOT.PATH_DELIM.".htaccess") ) {
 			$path = localpath_to_uri(INSTALL_ROOT);
