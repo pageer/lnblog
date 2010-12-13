@@ -8,10 +8,12 @@
 # of generically-named child nodes.
 class SimpleXMLWriter {
 
-	function SimpleXMLWriter(&$object) {
-		$this->object =& $object;
-		$this->exclude_list = array();
-		$this->cdata_list = array();
+	public $object = null;
+	public $exclude_list = array();
+	public $cdata_list = array();
+
+	public function __construct(&$object) {
+		$this->object = $object;
 	}
 
 	# Method:
@@ -21,7 +23,7 @@ class SimpleXMLWriter {
 	# Parameters:
 	# An arbitrary number of strings, each matching the name of a property.
 
-	function exclude() {
+	public function exclude() {
 		$list = func_get_args();
 		$this->exclude_list = array_merge($this->exclude_list, $list);
 	}
@@ -36,12 +38,12 @@ class SimpleXMLWriter {
 	# Parameters:
 	# An arbitrary number of strings, each matching the name of a property.
 
-	function cdata() {
+	public function cdata() {
 		$list = func_get_args();
 		$this->cdata_list = array_merge($this->cdata_list, $list);
 	}
 
-	function serializeArray(&$arr, $tag) {
+	public function serializeArray(&$arr, $tag) {
 		
 		$ret = "<$tag type=\"array\">\n";
 		
@@ -63,7 +65,7 @@ class SimpleXMLWriter {
 		return $ret;
 	}
 
-	function serializeObject(&$obj) {
+	public function serializeObject(&$obj) {
 		$ret = '<'.get_class($obj).">\n";
 		foreach ($obj as $field=>$value) {
 			if (! in_array($field, $this->exclude_list) &&
@@ -85,7 +87,7 @@ class SimpleXMLWriter {
 		return $ret;
 	}
 
-	function serialize() {
+	public function serialize() {
 		$ret = '<?xml version="1.0" encoding="utf-8"?>'."\n";
 		if (is_object($this->object)) {
 			$ret .= $this->serializeObject($this->object);
@@ -104,19 +106,21 @@ class SimpleXMLWriter {
 
 class SimpleXMLReader {
 	
-	function SimpleXMLReader($file) {
+	public $file = '';
+	public $domtree = false;
+	protected $stack = array();
+	protected $stack_length = 0;
+	protected $options = array();
+	
+	public function __construct($file) {
 		$this->file = $file;
-		$this->domtree = false;
-		$this->stack = array();
-		$this->stack_length = 0;
-		$this->options = array();
 	}
 
-	function setOption($name, $value=true) {
+	public function setOption($name, $value=true) {
 		$this->options[$name] = $value;
 	}
 
-	function getOption($name) {
+	public function getOption($name) {
 		if (isset($this->options[$name])) {
 			return $this->options[$name];
 		} else {
@@ -124,12 +128,12 @@ class SimpleXMLReader {
 		}
 	}
 
-	function do_open($parser, $tag, $attributes) {
+	public function do_open($parser, $tag, $attributes) {
 		$new = array('tag'=>strtolower($tag), 'attributes'=>$attributes, 'text'=>'');
 		$this->stack_length = array_push($this->stack, $new);
 	}
 
-	function do_close($parser, $tag) {
+	public function do_close($parser, $tag) {
 		$full = array_pop($this->stack);
 		$this->stack_length--;
 		if ($this->stack_length > 0) {
@@ -139,14 +143,14 @@ class SimpleXMLReader {
 		}
 	}
 
-	function do_cdata($parser, $data) {
+	public function do_cdata($parser, $data) {
 		if ($this->getOption('no_blank_cdata')) {
 			if (! trim($data)) return false;
 		}
 		$this->stack[$this->stack_length-1]['text'] .= $data;	
 	}
 	
-	function parse() {
+	public function parse() {
 		if (is_file($this->file)) {
 			$data = file_get_contents($this->file);
 		} else {
@@ -163,7 +167,7 @@ class SimpleXMLReader {
 		xml_parser_free($this->parser);
 	}
 
-	function make_array(&$arr) {
+	public function make_array(&$arr) {
 		$ret = array();
 		foreach ($arr as $a) {
 			if ( isset($a['children']) ) {
@@ -179,14 +183,14 @@ class SimpleXMLReader {
 		return $ret;
 	}
 
-	function makeObject($class=false) {
+	public function makeObject($class=false) {
 		if (! $class) $class = $this->domtree['tag'];
 		$obj = new $class;
 		$this->populateObject($obj);
 		return $obj;
 	}
 	
-	function getVal(&$childnode) {
+	public function getVal(&$childnode) {
 		if ( isset($childnode['attributes']['TYPE']) ) {
 			$type = $childnode['attributes']['TYPE'];
 			switch($type) {
@@ -202,7 +206,7 @@ class SimpleXMLReader {
 		}
 	}
 	
-	function setVal(&$obj, $node) {
+	public function setVal(&$obj, $node) {
 		$tag = $node['tag'];
 		if (isset($obj->$tag) && is_bool($obj->$tag)) {
 			$obj->$tag = (bool)$node['text'];
@@ -215,7 +219,7 @@ class SimpleXMLReader {
 		}
 	}
 
-	function populateObject(&$obj) {
+	public function populateObject(&$obj) {
 		if (! isset($this->domtree['children'])) return;
 		foreach ($this->domtree['children'] as $child) {
 			if ( isset($child['children']) ) {
