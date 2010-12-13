@@ -18,7 +18,6 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 require_once("lib/creators.php");
-require_once("lib/blogentry.php");
 
 /*
 Class: Article
@@ -269,4 +268,3 @@ class Article extends BlogEntry {
 	}
 
 }
-?>

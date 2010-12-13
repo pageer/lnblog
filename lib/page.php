@@ -305,5 +305,3 @@ class Page extends LnBlogObject {
 }
 
 $PAGE = Page::instance();
-
-?>

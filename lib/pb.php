@@ -356,4 +356,3 @@ class Pingback extends Trackback {
 	}
 
 }
-?>

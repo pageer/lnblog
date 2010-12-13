@@ -213,4 +213,3 @@ abstract class FS {
 	public abstract function write_file($path, $contents);
 
 }
-?>

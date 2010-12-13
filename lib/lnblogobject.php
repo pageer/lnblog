@@ -205,4 +205,3 @@ class LnBlogObject {
 		return $ret;
 	 }
 }
-?>

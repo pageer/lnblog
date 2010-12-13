@@ -33,8 +33,6 @@
 # Ihnerits:
 # <LnBlogObject>
 
-require_once("lib/lnblogobject.php");
-
 class PHPTemplate extends LnBlogObject {
 
 	var $file;   # The name of the template file to use.
@@ -112,5 +110,3 @@ class PHPTemplate extends LnBlogObject {
 	}
 
 }
-
-?>

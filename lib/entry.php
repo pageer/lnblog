@@ -19,7 +19,6 @@
 */
 
 require_once("utils.php");
-require_once("lnblogobject.php");
 require_once("xml.php");
 /*
 Class: Entry
@@ -650,4 +649,3 @@ class Entry extends LnBlogObject{
 	}
 
 }
-?>

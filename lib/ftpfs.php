@@ -32,7 +32,6 @@
 */
 
 require_once("blogconfig.php");
-require_once("lib/fs.php");
 
 class FTPFS extends FS {
 	

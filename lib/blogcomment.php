@@ -21,7 +21,6 @@
 require_once("blogconfig.php");
 require_once("lib/utils.php");
 require_once("lib/creators.php");
-require_once("lib/entry.php");
 
 /*
 Class: BlogComment
@@ -417,5 +416,3 @@ class BlogComment extends Entry {
 	}
 	
 }
-
-?>

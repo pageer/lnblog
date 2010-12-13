@@ -230,4 +230,3 @@ function stupid_mime_get_extensions($filename) {
 	if (!count($ret)) $ret = false;
 	return $ret;
 }
-?>

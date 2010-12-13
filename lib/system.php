@@ -10,9 +10,6 @@
 # it is very convenient and doesn't cause any design problems for the time
 # being.
 
-require_once("iniparser.php");
-require_once("path.php");
-
 class System {
 	
 	public function __construct() {
@@ -472,4 +469,3 @@ function calculate_server_root($path, $assume_subdomain=false) {
 }
 
 $SYSTEM = System::instance();
-?>

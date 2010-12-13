@@ -344,4 +344,3 @@ class TrackbackURIWrapper extends LnBlogObject {
 	}
 	
 }
-?>

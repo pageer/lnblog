@@ -19,7 +19,6 @@
 */
 
 require_once("lib/utils.php");
-require_once("lib/lnblogobject.php");
 
 # Class: FileUpload
 # Handles file uploads via HTTP POSTs.
@@ -194,5 +193,3 @@ class FileUpload extends LnBlogObject {
 		return $ret;
 	}
 }
-
-?>

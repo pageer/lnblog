@@ -126,5 +126,3 @@ function spf_() {
 	$args[0] = _($args[0]);
 	return call_user_func_array("sprintf", $args);
 }
-
-?>

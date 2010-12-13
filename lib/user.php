@@ -29,7 +29,6 @@
 define("USER_PROFILE_FILE", "user.xml");
 
 require_once("lib/utils.php");
-require_once("lib/lnblogobject.php");
 
 class User extends LnBlogObject {
 
@@ -460,4 +459,3 @@ class User extends LnBlogObject {
 	}
 
 }
-?>

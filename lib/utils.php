@@ -945,5 +945,3 @@ if (! function_exists('file_get_contents')) {
 		return $ret;
 	}
 }
-
-?>

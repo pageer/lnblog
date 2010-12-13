@@ -247,4 +247,3 @@ class EventRegister {
 }
 
 $EVENT_REGISTER = new EventRegister();
-?>

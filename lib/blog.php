@@ -21,7 +21,6 @@
 require_once("lib/utils.php");
 require_once("blogconfig.php");
 require_once("lib/creators.php");
-require_once("lib/lnblogobject.php");
 require_once("lib/uri.php");
 
 /* Class: Blog
@@ -1266,4 +1265,3 @@ class Blog extends LnBlogObject {
 	}
 
 }
-?>

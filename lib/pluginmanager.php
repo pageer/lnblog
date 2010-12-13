@@ -18,8 +18,6 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-require_once("lib/plugin.php");
-
 /* Class: PluginManager
  * A class to load and manage plugins.
  */
@@ -220,4 +218,3 @@ class PluginManager {
 
 $PLUGIN_MANAGER = new PluginManager();
 $PLUGIN_MANAGER->loadPlugins();
-?>

@@ -488,4 +488,3 @@ class Trackback extends LnBlogObject {
 		return $id;
 	}
 }
-?>

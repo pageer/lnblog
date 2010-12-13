@@ -26,9 +26,6 @@
  * <LnBlogObject>
  */
 
-require_once("lib/lnblogobject.php");
-#require_once("lib/creators.php");
-
 class PluginSettings { }
 
 class Plugin extends LnBlogObject{
@@ -373,5 +370,3 @@ class Plugin extends LnBlogObject{
 	}
 	
 }
-
-?>
