@@ -31,23 +31,21 @@
   3) We must somehow correlate the local path to the FTP path.
 */
 
-require_once("fs.php");
-
 class NativeFS extends FS {
 
-	function __construct() {
+	public function __construct() {
 		$this->default_mode = defined("FS_DEFAULT_MODE") ? FS_DEFAULT_MODE : 0000;
 		$this->script_mode = defined("FS_SCRIPT_MODE") ? FS_SCRIPT_MODE : 0000;
 		$this->directory_mode = defined("FS_DIRECTORY_MODE") ? FS_DIRECTORY_MODE : 0000;;
 	}
 	
 	
-	function __destruct() {}
+	public function __destruct() {}
 
-	function localpathToFSPath($path) { return $path; }
-	function FSPathToLocalpath($path) { return $path; }
+	public function localpathToFSPath($path) { return $path; }
+	public function FSPathToLocalpath($path) { return $path; }
 
-	function chdir($dir) {
+	public function chdir($dir) {
 		return chdir($dir);
 	}
 	
@@ -55,7 +53,7 @@ class NativeFS extends FS {
 		return getcwd();
 	}
 	
-	function mkdir($dir, $mode=false) { 
+	public function mkdir($dir, $mode=false) { 
 		if (! $mode) $mode = $this->directory_mode;
 		if ($mode) {
 			$old_mask = umask(0000);
@@ -69,7 +67,7 @@ class NativeFS extends FS {
 		return $ret;
 	}
 
-	function mkdir_rec($dir, $mode=false) {
+	public function mkdir_rec($dir, $mode=false) {
 		$parent = dirname($dir);
 		if ( $parent == $dir ) return false;
 		if (! is_dir($parent) )	$ret = $this->mkdir_rec($parent, $mode);
@@ -78,7 +76,7 @@ class NativeFS extends FS {
 		return $ret;
 	}
 
-	function rmdir($dir) {
+	public function rmdir($dir) {
 		# We can't delete the current directory because we're still using it.
 		if ( realpath($dir) == $this->getcwd() ) {
 			chdir("..");
@@ -86,7 +84,7 @@ class NativeFS extends FS {
 		return rmdir($dir);
 	}
 
-	function rmdir_rec($dir) {
+	public function rmdir_rec($dir) {
 		if (! is_dir($dir)) return $this->delete($dir);
 		$dirhand = opendir($dir);
 		$ret = true;
@@ -102,15 +100,15 @@ class NativeFS extends FS {
 		return $ret;	
 	}
 
-	function chmod($path, $mode) {
+	public function chmod($path, $mode) {
 		return chmod($path, $mode);
 	}
 
-	function copy($src, $dest)   { return copy($src, $dest); }
-	function rename($src, $dest) { return rename($src, $dest); }
-	function delete($src)        { return unlink($src); }
+	public function copy($src, $dest)   { return copy($src, $dest); }
+	public function rename($src, $dest) { return rename($src, $dest); }
+	public function delete($src)        { return unlink($src); }
 
-	function write_file($path, $contents) {
+	public function write_file($path, $contents) {
 		$mask = $this->isScript($path) ? $this->script_mode : $this->default_mode;
 		
 		if ($mask) {
@@ -133,4 +131,3 @@ class NativeFS extends FS {
 	}
 
 }
-?>
