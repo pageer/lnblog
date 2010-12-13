@@ -27,9 +27,9 @@ there will be some other useful method for filesystem access....
 
 abstract class FS {
 
-	var $default_mode;
-	var $directory_mode;
-	var $script_mode;
+	public $default_mode;
+	public $directory_mode;
+	public $script_mode;
 
 	public abstract function __construct();
 	public abstract function __destruct();
