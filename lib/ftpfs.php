@@ -36,11 +36,11 @@ require_once("lib/fs.php");
 
 class FTPFS extends FS {
 	
-	var $host;
-	var $username;
-	var $connection;
-	var $status;
-	var $ftp_root;
+	public $host = '';
+	public $username = '';
+	public $connection = null;
+	public $status = false;
+	public $ftp_root = '';;
 	
 	public function __construct($host=false, $user=false, $pass=false) {
 		$this->default_mode = FS_DEFAULT_MODE;
@@ -73,7 +73,7 @@ class FTPFS extends FS {
 	# A non-tranparent destructor.  Needed to cleanly disconnect from the 
 	# FTP server.
 
-	function __destruct() {
+	public function __destruct() {
 		$this->disconnect();
 	}
 
@@ -83,7 +83,7 @@ class FTPFS extends FS {
 	# It defaults to two levels above the INSTALL_ROOT, i.e. it 
 	# assumes that the web root is one level below the FTP root.
 
-	function localpathToFSPath($path) {
+	public function localpathToFSPath($path) {
 		$char1 = substr($path, 0, 1);
 		$char2 = substr($path, 1, 1);
 		# Check if $path is relative.
@@ -99,20 +99,20 @@ class FTPFS extends FS {
 		return $ret;
 	}
 
-	function FSPathToLocalpath($path) {
+	public function FSPathToLocalpath($path) {
 		$ret = $path;
 		if ( PATH_DELIM != '/' ) $ret = substr_replace(PATH_DELIM, '/', $ret);
 		$ret = realpath($this->ftp_root.PATH_DELIM.$ret);
 		return $ret;
 	}
 
-	function connected() {
+	public function connected() {
 		if ($this->status) $ret = ($this->connection !== false);
 		else $ret = false;
 		return $ret;
 	}
 
-	function reconnect($password=false) {
+	public function reconnect($password=false) {
 		if (!$password) $password = FTPFS_PASSWORD;
 		if ($this->connected() ) ftp_close($this->connection);
 
@@ -130,25 +130,25 @@ class FTPFS extends FS {
 		return $this->status;
 	}
 
-	function disconnect() {
+	public function disconnect() {
 		ftp_close($this->connection);
 	}
 	
-	function getcwd() {
+	public function getcwd() {
 		if ($this->connected() ) $ret = ftp_pwd($this->connection);
 		else $ret = false;
 		$ret = $this->FSPathToLocalpath($ret);
 		return $ret;
 	}
 	
-	function chdir($dir) {
+	public function chdir($dir) {
 		$dir = $this->localpathToFSPath($dir);
 		if ($this->connected() ) $ret = ftp_chdir($this->connection, $dir);
 		else $ret = false;
 		return $ret;
 	}
 	
-	function mkdir($dir, $mode=false) {
+	public function mkdir($dir, $mode=false) {
 		if (! $mode) $mode = $this->directory_mode;
 		$dir = $this->localpathToFSPath($dir);
 		if ($this->connected() ) {
@@ -160,7 +160,7 @@ class FTPFS extends FS {
 		return $ret;
 	}
 
-	function mkdir_rec($dir, $mode=false) {
+	public function mkdir_rec($dir, $mode=false) {
 		if (! $this->connected() ) return false;
 		if (! $mode) $mode = $this->directory_mode;
 		$parent = dirname($dir);
@@ -171,7 +171,7 @@ class FTPFS extends FS {
 		return $ret;
 	}
 
-	function rmdir($dir) {
+	public function rmdir($dir) {
 		# This condition accounts for the possibility that we are trying to 
 		# delete the current directory with history saving disabled.  
 		# We need to chdir() before doing that because the current directory 
@@ -185,7 +185,7 @@ class FTPFS extends FS {
 		return $ret;
 	}
 
-	function rmdir_rec($dir) {
+	public function rmdir_rec($dir) {
 		if (! is_dir($dir)) return $this->delete($dir);
 		$dirhand = opendir($dir);
 		$ret = true;
@@ -201,7 +201,7 @@ class FTPFS extends FS {
 		return $ret;	
 	}
 
-	function chmod($path, $mode) {
+	public function chmod($path, $mode) {
 		if (! $this->connected() ) return false;
 		$path = $this->localpathToFSPath($path);
 		if (function_exists(ftp_chmod)) {
@@ -212,7 +212,7 @@ class FTPFS extends FS {
 		return $ret;
 	}
 
-	function copy($src, $dest) {
+	public function copy($src, $dest) {
 		if (! $this->connected() ) return false;
 
 		$ftp_dest = $this->localpathToFSPath($dest);
@@ -226,7 +226,7 @@ class FTPFS extends FS {
 		return $ret;
 	}
 
-	function rename($src, $dest) {
+	public function rename($src, $dest) {
 		if (! $this->connected() ) return false;
 		$ftp_src = $this->localpathToFSPath($src);
 		$ftp_dest = $this->localpathToFSPath($dest);
@@ -234,14 +234,14 @@ class FTPFS extends FS {
 		return $ret;
 	}
 
-	function delete($src) {
+	public function delete($src) {
 		if (! $this->connected() ) return false;
 		$ftp_src = $this->localpathToFSPath($src);
 		$ret = ftp_delete($this->connection, $ftp_src);
 		return $ret;
 	}
 
-	function write_file($path, $contents) {
+	public function write_file($path, $contents) {
 		if (! $this->connected() ) return false;
 		$temp = tmpfile();
 		$ret = fwrite($temp, $contents);
@@ -265,5 +265,3 @@ class FTPFS extends FS {
 	}
 
 }
-
-?>
