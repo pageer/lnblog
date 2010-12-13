@@ -551,7 +551,6 @@ class BlogEntry extends Entry {
 		if (! $ret) {
 			
 			$ret = $fs->rename($target, $source);
-			$fs->destruct();
 			return false;
 			
 		} else {
@@ -564,7 +563,7 @@ class BlogEntry extends Entry {
 				if (! file_exists($subfile)) $this->makePrettyPermalink();
 			}
 		}
-		$fs->destruct();
+
 		$this->raiseEvent("UpdateComplete");
 		return $ret;
 	}
@@ -601,7 +600,6 @@ class BlogEntry extends Entry {
 		} else {
 			$ret = $fs->rmdir_rec($this->localpath());
 		}
-		$fs->destruct();
 		
 		$this->raiseEvent("DeleteComplete");
 		

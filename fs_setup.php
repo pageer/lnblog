@@ -312,9 +312,7 @@ if ( has_post() ) {
 			@$ret = $fs->mkdir_rec(USER_DATA_PATH);
 		}
 		if (is_dir(USER_DATA_PATH)) {
-		
 			$ret = $fs->write_file(USER_DATA_PATH.PATH_DELIM.FS_PLUGIN_CONFIG, $content);
-			$fs->destruct();
 		}
 		
 		if (! $ret) {

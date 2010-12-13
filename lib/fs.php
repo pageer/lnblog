@@ -34,13 +34,6 @@ abstract class FS {
 	public abstract function __construct();
 	public abstract function __destruct();
 	
-	# Method: destruct
-	# An explicitly called destructor because PHP 4 doesn't have proper destructors.
-	# Releases all resources the object is holding.
-	public function destruct() {
-		$this->__destruct();
-	}
-	
 	# Method: getcwd
 	# Get the working directory for the class.
 	#

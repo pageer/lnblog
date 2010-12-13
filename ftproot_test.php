@@ -113,8 +113,6 @@ if ($user && $pass && $hostname) {
 		$test_status = ftp_file_exists($test_file, $ftp);
 		$ftp_path = $ftp->localpathToFSPath($test_file);
 
-		$ftp->destruct();
-
 	} else $error_message = _("Unable to connect to FTP server.");
 }
 

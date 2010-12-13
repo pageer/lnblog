@@ -95,7 +95,6 @@ class Article extends BlogEntry {
 		elseif (file_exists(dirname($this->file).PATH_DELIM.STICKY_PATH))
 			$ret = $f->delete(dirname($this->file).PATH_DELIM.STICKY_PATH);
 		else $ret = true;
-		$f->destruct();
 		return $ret;
 	}
 

@@ -58,7 +58,6 @@ define("LINK_SCRIPT", "scripts");
 function write_file($path, $contents) {
 	$fs = NewFS();
 	$ret = $fs->write_file($path, $contents);
-	$fs->destruct();
 	return $ret;
 }
 
@@ -668,7 +667,6 @@ function create_directory_wrappers($path, $type, $instpath="") {
 		}
 	}
 
-	$fs->destruct();
 	return $ret_list;
 }
 

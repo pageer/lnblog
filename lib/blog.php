@@ -1121,7 +1121,6 @@ class Blog extends LnBlogObject {
 			$ret &= $fs->chmod($path, $fs->directoryMode() );
 			$ret &= $this->fixDirectoryPermissions($path);
 		}
-		$fs->destruct();
 		return $ret;
 	}
 
@@ -1154,7 +1153,6 @@ class Blog extends LnBlogObject {
 			$this->last_upgrade = date('r');
 				
 			$ret = $this->writeBlogData();
-			$fs->destruct();
 			$this->raiseEvent("InsertComplete");
 		}
 		
@@ -1231,7 +1229,6 @@ class Blog extends LnBlogObject {
 		} else {
 			$ret = $fs->rmdir_rec($this->home_path);
 		}
-		$fs->destruct();
 		$this->raiseEvent("DeleteComplete");
 		return $ret;
 	}

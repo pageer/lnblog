@@ -633,7 +633,6 @@ class Entry extends LnBlogObject{
 		if (! is_dir(dirname($this->file)) ) 
 			$fs->mkdir_rec(dirname($this->file)); 
 		$ret = $fs->write_file($this->file, $file_data);
-		$fs->destruct();
 		return $ret;
 	}
 	

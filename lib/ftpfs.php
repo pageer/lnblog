@@ -40,7 +40,7 @@ class FTPFS extends FS {
 	public $username = '';
 	public $connection = null;
 	public $status = false;
-	public $ftp_root = '';;
+	public $ftp_root = '';
 	
 	public function __construct($host=false, $user=false, $pass=false) {
 		$this->default_mode = FS_DEFAULT_MODE;

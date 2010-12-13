@@ -41,7 +41,6 @@
 
 require_once("lib/utils.php");
 require_once("lib/creators.php");
-require_once("lib/lnblogobject.php");
 
 class Trackback extends LnBlogObject {
 
@@ -367,11 +366,10 @@ class Trackback extends LnBlogObject {
 		$fs = NewFS();
 		if (! is_dir( dirname($path) ) ) {
 			$fs->mkdir_rec(dirname($path));
-		};
+		}
 		$this->file = $path;
 		$data = $this->serializeXML();
 		$ret = $fs->write_file($path, $data);
-		$fs->destruct();
 		return $ret;
 	}
 
@@ -424,7 +422,6 @@ class Trackback extends LnBlogObject {
 		if (file_exists($this->file)) {
 			$fs = NewFS();
 			$ret = $fs->delete($this->file);
-			$fs->destruct();
 		} else $ret = false;
 		$this->raiseEvent("DeleteComplete");
 		return $ret;

@@ -163,7 +163,6 @@ class RSS2 {
 		$fs = NewFS();
 		$content = $this->get();
 		$ret = $fs->write_file($path, $content);
-		$fs->destruct();
 		return $ret;
 	}
 

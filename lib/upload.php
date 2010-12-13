@@ -141,7 +141,6 @@ class FileUpload extends LnBlogObject {
 		if (is_file($this->tempname)) $tmp_path = $this->tempname;
 		else $tmp_path = $tmp_dir.PATH_DELIM.$this->tempname;
 		$ret = $fs->copy($tmp_path, $this->destdir.PATH_DELIM.$this->destname);
-		$fs->destruct();
 		if ($ret) $this->raiseEvent("MoveComplete");
 		return $ret;
 	}

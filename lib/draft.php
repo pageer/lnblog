@@ -53,7 +53,6 @@ class Draft extends BlogEntry {
 		if (file_exists($this->file)) {
 			$fs = NewFS();
 			$ret = $fs->delete($this->file);
-			$fs->destruct();
 		} else $ret = false;
 		return $ret;
 	}

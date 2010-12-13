@@ -157,7 +157,6 @@ class BlogComment extends Entry {
 		} else {
 			$ret = $fs->delete($this->file);
 		}
-		$fs->destruct();
 		$this->raiseEvent("DeleteComplete");
 		return $ret;
 	}
