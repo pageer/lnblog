@@ -116,10 +116,17 @@ if ( isset($_GET['action']) ) {
 	exit;
 } elseif ( isset($_GET['plugin']) ) {
 	require_once("config.php");
-	ini_set("include_path", 
-        ini_get('include_path').PATH_SEPARATOR.USER_DATA_PATH);
+	#ini_set("include_path", 
+    #    ini_get('include_path').PATH_SEPARATOR.USER_DATA_PATH);
 	define("PLUGIN_DO_OUTPUT", true);
-	require("plugins/".$_GET['plugin'].".php");
+	$paths = array(@BLOG_ROOT, USER_DATA_PATH, INSTALL_ROOT);
+	foreach ($paths as $path) {
+		$plugin = Path::mk($path, 'plugins', $_GET['plugin'].".php");
+		if (file_exists($plugin)) {
+			require $plugin;
+			exit;
+		}
+	}
 	exit;
 }
 
