@@ -75,11 +75,9 @@ require_once("pages/pagelib.php");
 # null string is returned.
 
 function handle_pingback_pings(&$ent) {
-	$SYSTEM = System::instance();
-	
 	if (! $ent->allow_pingback) return '';
 	
-	$local = $SYSTEM->sys_ini->value("entryconfig", "AllowLocalPingback", 1);
+	$local = System::instance()->sys_ini->value("entryconfig", "AllowLocalPingback", 1);
 	$results = $ent->sendPings($local);
 	$errors = array();
 	$err = '';
@@ -112,9 +110,8 @@ function handle_pingback_pings(&$ent) {
 # of error messages, one element for each upload error.
 
 function handle_uploads(&$ent) {
-	global $SYSTEM;
 	$err = array();
-	$num_uploads = $SYSTEM->sys_ini->value("entryconfig",	"AllowInitUpload", 1);
+	$num_uploads = System::instance()->sys_ini->value("entryconfig",	"AllowInitUpload", 1);
 	
 	for ($i=1; $i<=$num_uploads; $i++) {
 		$upld = NewFileUpload('upload'.$i, $ent->localpath());

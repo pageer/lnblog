@@ -120,5 +120,3 @@ define("LOGIN_TOKEN", "lToken");
 define("LAST_LOGIN_TIME", "lastLTime");
 define("CURRENT_USER", "uName");
 define("PW_HASH", "uHash");
-
-?>

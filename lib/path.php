@@ -105,17 +105,14 @@ class Path {
 	}
 	
 	public function appendSlash($path) {
-		$server = Server::instance();
-		if (substr($path, -1) != $server->dirSep()) {
-			return $path.$server->dirSep();
+		if (substr($path, -1) != self::$sep) {
+			return $path.self::$sep;
 		} else {
 			return $path;
 		}
 	}
 	
 	public function toURL() {
-		$sys = Server::instance();
-
 		if (file_exists($this->get())) {
 			$full_path = realpath($path);
 			# Add a trailing slash if the path is a directory.

@@ -18,7 +18,7 @@ function lib_autoload($className) {
 }
 
 function class_autoload($className) {
-	$folders = array('persistence', 'controllers');
+	$folders = array('lib', 'persistence', 'controllers');
 	foreach ($folders as $fld) {
 		$fileName = array(dirname(__FILE__), $fld, $className.'.class.php');
 		$file = implode(DIRECTORY_SEPARATOR, $fileName);

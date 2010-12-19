@@ -23,7 +23,7 @@ require_once("lib/utils.php");
 # Class: FileUpload
 # Handles file uploads via HTTP POSTs.
 # Handling the upload is a three-step process.  First, you need to create an 
-# instance of the class, passing it the form field name and optional 
+# instance of the class, passing it the upload array and optional 
 # destination directory and upload array index.  After that, you check if the
 # upload completed successfully, and based on that check, either move the file
 # to the permanent location or emit an error message.
@@ -36,34 +36,30 @@ require_once("lib/utils.php");
 
 class FileUpload extends LnBlogObject {
 	
-	var $field;
-	var $destdir;
-	var $destname;
-	var $tempname;
-	var $size;
-	var $mimetype;
-	var $error;
+	public $field = '';
+	public $destdir = '';
+	public $destname = '';
+	public $tempname = '';
+	public $size = 0;
+	public $mimetype = '';
+	public $error = FILEUPLOAD_NOT_INITIALIZED;
 
-	function FileUpload($field, $dir=false, $index=false) {
+	public function __construct($file, $dir=false, $index=false) {
 		$this->raiseEvent("OnInit");
 		if (!$dir) $this->destdir = getcwd();
 		else $this->destdir = $dir;
 		$this->field = $field;
-		$this->destname = '';
-		$this->tempname = '';
-		$this->size = 0;
-		$this->mimetype = '';
-		$this->error = FILEUPLOAD_NOT_INITIALIZED;
-		if (isset($_FILES[$field])) {
+		
+		if (! empty($file)) {
 			if ($index === false) {
-				$this->destname = $_FILES[$field]['name'];
-				$this->tempname = $_FILES[$field]['tmp_name'];
-				$this->size = $_FILES[$field]['size'];
-				$this->mimetype = $_FILES[$field]['type'];
-				if (isset($_FILES[$field]['error'])) 
-					$this->error = $_FILES[$field]['error'];
+				$this->destname = $file['name'];
+				$this->tempname = $file['tmp_name'];
+				$this->size = $file['size'];
+				$this->mimetype = $file['type'];
+				if (isset($file['error'])) 
+					$this->error = $file['error'];
 			} else {
-				$this->destname = $_FILES[$field]['name'][$index];
+				$this->destname = $file['name'][$index];
 				$this->tempname = $_FILES[$field]['tmp_name'][$index];
 				$this->size = $_FILES[$field]['size'][$index];
 				$this->mimetype = $_FILES[$field]['type'][$index];
