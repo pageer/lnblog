@@ -27,7 +27,5 @@ class MetaData extends Plugin {
 	}
 }
 
-$meta =& new MetaData();
+$meta = new MetaData();
 $meta->registerEventHandler("page", "OnOutput", "addMetaTags");
-
-?>

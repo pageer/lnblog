@@ -140,5 +140,4 @@ $blog = NewBlog();
 $PAGE->setDisplayObject($blog);
 
 $content = show_blog_page($blog);
-$PAGE->display($content, &$blog);
-?>
+$PAGE->display($content, $blog);

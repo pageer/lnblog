@@ -57,6 +57,5 @@ class LnBlogAd extends Plugin {
 
 global $PLUGIN_MANAGER;
 if (! $PLUGIN_MANAGER->plugin_config->value('lnblogad', 'creator_output', 0)) {
-	$plug =& new LnBlogAd();
+	$plug = new LnBlogAd();
 }
-?>

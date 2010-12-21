@@ -127,6 +127,5 @@ class SiteMap extends Plugin {
 	}
 
 }
-$map =& new SiteMap(0);
+$map = new SiteMap(0);
 $map->registerEventHandler("loginops", "PluginOutput", "showLink");
-?>

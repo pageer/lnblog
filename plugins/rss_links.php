@@ -73,6 +73,5 @@ class RSSLinks extends Plugin {
 
 }
 
-$lnk =& new RSSLinks();
+$lnk = new RSSLinks();
 $lnk->registerEventHandler("page", "OnOutput", "linkFeeds");
-?>

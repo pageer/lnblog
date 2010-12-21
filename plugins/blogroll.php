@@ -141,7 +141,7 @@ class Blogroll extends Plugin {
 		ob_end_clean();
 
 		$PAGE->title = spf_("Blogroll - ", $blog->name);
-		$PAGE->display($body, &$blog);
+		$PAGE->display($body, $blog);
 	}
 	
 	function add_stylesheet() {
@@ -171,12 +171,11 @@ class Blogroll extends Plugin {
 } /* End massive if statement */
 
 if (defined("PLUGIN_DO_OUTPUT")) {
-	$plug =& new Blogroll();
+	$plug = new Blogroll();
 	$plug->output_page();
 } else {
 	global $PLUGIN_MANAGER;
 	if (! $PLUGIN_MANAGER->plugin_config->value('blogroll', 'creator_output', 0)) {
-		$plug =& new Blogroll();
+		$plug = new Blogroll();
 	}
 }
-?>

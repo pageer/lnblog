@@ -38,10 +38,18 @@
 
 class EventRegister {
 
-	var $event_list;
+	public $event_list;
 
-	function EventRegister() {
+	public function __construct() {
 		$this->event_list = array();
+	}
+
+	public static function instance() {
+		static $inst;
+		if (empty($inst)) {
+			$inst = new EventRegister();
+		}
+		return $inst;
 	}
 
 	/* 
@@ -171,7 +179,7 @@ class EventRegister {
 	 * <activateEvent>
 	 */
 
-	function activateEventFull(&$param, $raisecls, $event, $data=false) {
+	function activateEventFull($param, $raisecls, $event, $data=false) {
 		if (!$data) $data = array();
 	
 		$rcls = strtolower($raisecls);
@@ -246,4 +254,4 @@ class EventRegister {
 	}
 }
 
-$EVENT_REGISTER = new EventRegister();
+$EVENT_REGISTER = EventRegister::instance();

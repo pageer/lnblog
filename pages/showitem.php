@@ -280,25 +280,24 @@ if ($tb->incomingPing() && strtolower(GET('action')) != 'ping') {
 
 } elseif ( strtolower(GET("action")) == 'ping' ) {
 
-	$content = show_trackback_ping_page(&$blg, &$ent, &$usr);
+	$content = show_trackback_ping_page($blg, $ent, $usr);
 
 } elseif ( $page_type == 'pingback' || $page_type == ENTRY_PINGBACK_DIR) {
 
-	$content = show_pingback_page(&$blg, &$ent, &$usr);
+	$content = show_pingback_page($blg, $ent, $usr);
 
 } elseif ( $page_type == 'trackback' || $page_type == ENTRY_TRACKBACK_DIR ) {
 
-	$content = show_trackback_page(&$blg, &$ent, &$usr);
+	$content = show_trackback_page($blg, $ent, $usr);
 
 } elseif ( $page_type == 'comment' || $page_type == ENTRY_COMMENT_DIR ) {
 
-	$content = show_comment_page(&$blg, &$ent, &$usr);
+	$content = show_comment_page($blg, $ent, $usr);
 
 } else {
 
-	$content = show_entry_page(&$blg, &$ent, &$usr);
+	$content = show_entry_page($blg, $ent, $usr);
 
 }
 
 $PAGE->display($content);
-?>

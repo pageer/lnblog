@@ -5,15 +5,7 @@
 	echo $PREVIEW_DATA;
 } ?>
 <fieldset>
-<?php
-global $SYSTEM;
-if ($SYSTEM->sys_ini->value("entryconfig", "AllowInitUpload", 1) > 0) {
-	$enctype = 'multipart/form-data';
-} else {
-	$enctype = 'application/x-www-form-urlencoded';
-}
-?>
-<form id="postform" method="post" action="<?php echo $FORM_ACTION; ?>" enctype="<?php echo $enctype;?>" accept-charset="<?php echo DEFAULT_CHARSET;?>">
+<form id="postform" method="post" action="<?php echo $FORM_ACTION; ?>" enctype="multipart/form-data" accept-charset="<?php echo DEFAULT_CHARSET;?>">
 <div class="entry_subject">
 <?php $title = _("Title or subject line for this entry");?>
 <label for="subject" title="<?php echo $title;?>"><?php p_("Subject"); ?></label>
@@ -48,14 +40,13 @@ if (isset($URL)) { ?>value="<?php echo $URL; ?>" <?php } ?>/>
 <?php } ?>
 <?php 
 global $EVENT_REGISTER;
-global $SYSTEM;
 
 if ($EVENT_REGISTER->hasHandlers("posteditor", "ShowControls")) {
 	$EVENT_REGISTER->activateEventFull($tmp=false, "posteditor", "ShowControls");
 } else {
 	$use_js_editor = true;
 }
-if (isset($use_js_editor) && ! $SYSTEM->sys_ini->value('entryconfig', 'EditorOnBottom', 0)) {
+if (isset($use_js_editor) && ! System::instance()->sys_ini->value('entryconfig', 'EditorOnBottom', 0)) {
 	include("js_editor.php");
 }
 ?>
@@ -63,7 +54,7 @@ if (isset($use_js_editor) && ! $SYSTEM->sys_ini->value('entryconfig', 'EditorOnB
 <textarea id="body" name="body" accesskey="d" title="<?php p_("Post data");?>" rows="18" cols="40"><?php if (isset($DATA)) echo $DATA; ?></textarea>
 </div>
 <?php
-if (isset($use_js_editor) && $SYSTEM->sys_ini->value('entryconfig', 'EditorOnBottom', 0)) {
+if (isset($use_js_editor) && System::instance()->sys_ini->value('entryconfig', 'EditorOnBottom', 0)) {
 	include("js_editor.php");
 }
 ?>
@@ -77,7 +68,7 @@ if (isset($use_js_editor) && $SYSTEM->sys_ini->value('entryconfig', 'EditorOnBot
 </div>
 <?php } ?>
 <?php
-$num_uploads = $SYSTEM->sys_ini->value("entryconfig", "AllowInitUpload", 1);
+$num_uploads = System::instance()->sys_ini->value("entryconfig", "AllowInitUpload", 1);
 
 if ($num_uploads > 0) {
 ?>
@@ -92,7 +83,7 @@ if ($num_uploads > 0) {
 for ($i=1; $i<=$num_uploads; $i++) { ?>
 <div>
 <label for="upload<?php echo $i;?>"><?php p_("Upload file");?></label>
-<input type="file" name="upload<?php echo $i;?>" id="upload<?php echo $i;?>" />
+<input type="file" name="upload[]" id="upload<?php echo $i;?>" />
 </div>
 <?php } # End upload for
 if ($ALLOW_ENCLOSURE || ! empty($ENCLOSURE)) { /* Add optional enclosure box.*/?>
@@ -115,9 +106,9 @@ if (isset($STICKY)) { /* Checkbox to make articles "sticky". */ ?>
 <select id="input_mode" name="input_mode" title="<?php echo $title;?>">
 <option value="<?php echo MARKUP_NONE;?>"<?php if ($HAS_HTML == MARKUP_NONE){
 echo ' selected="selected"';}?>><?php p_("Auto-markup");?></option>
-<option value="<? echo MARKUP_BBCODE;?>"<?php if ($HAS_HTML == MARKUP_BBCODE){
+<option value="<?php echo MARKUP_BBCODE;?>"<?php if ($HAS_HTML == MARKUP_BBCODE){
 echo ' selected="selected"';}?>><?php p_("LBcode");?></option>
-<option value="<? echo MARKUP_HTML;?>"<?php if ($HAS_HTML == MARKUP_HTML){
+<option value="<?php echo MARKUP_HTML;?>"<?php if ($HAS_HTML == MARKUP_HTML){
 echo ' selected="selected"';}?>><?php p_("HTML");?></option>
 </select>
 </div>

@@ -320,18 +320,18 @@ function calendar_binsearch_monthlist(&$arr, $year, $month, $start, $len) {
 
 global $PLUGIN_MANAGER;
 if (! $PLUGIN_MANAGER->plugin_config->value('sidebarcalendar', 'creator_output', 0)) {
-	$sbc =& new SidebarCalendar();
+	$sbc = new SidebarCalendar();
 }
 
 } # End massive if statement
 
 if ($do_output) {
-	$sbc =& new SidebarCalendar();
+	$sbc = new SidebarCalendar();
 	$sbc->put_calendar(true);
 } else {
 	global $PLUGIN_MANAGER;
 	if (! $PLUGIN_MANAGER->plugin_config->value('sidebarcalendar', 'creator_output', 0)) {
-		$sbc =& new SidebarCalendar();
+		$sbc = new SidebarCalendar();
 	}
 }
 ?>

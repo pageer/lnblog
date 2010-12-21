@@ -181,21 +181,19 @@ class SidebarSearch extends Plugin {
 		$body = $tpl->process();
 
 		$PAGE->title = spf_("Search results - ", $blog->name);
-		$PAGE->display($body, &$blog);
+		$PAGE->display($body, $blog);
 	}
 
 }
 
 } # End massive if statement
 
-$sbsearch =& new SidebarSearch();
+$sbsearch = new SidebarSearch();
 if ($do_output) {
 	$sbsearch->show_page();
 } else {
 global $PLUGIN_MANAGER;
 	if (! $PLUGIN_MANAGER->plugin_config->value('sidebarsearch', 'creator_output', 0)) {
-		$sb =& new SidebarSearch();
+		$sb = new SidebarSearch();
 	}
 }
-
-?>

@@ -46,7 +46,7 @@ class Recent extends Plugin {
 		if ($do_output) $this->outputCache();
 	}
 
-	function buildOutput(&$blg, $is_index=false) {
+	function buildOutput($blg, $is_index=false) {
 		
 		if ( !($this->num_entries > 0) ) $this->num_entries = false; 
 
@@ -117,7 +117,7 @@ class Recent extends Plugin {
 		}
 	}
 
-	function outputCache($obj=false) {
+	function outputCache($obj=false, $suppress_login = true) {
 
 		if (! is_a($obj, 'Blog')) $b = NewBlog();
 		else $b =& $obj;
@@ -151,7 +151,5 @@ class Recent extends Plugin {
 
 global $PLUGIN_MANAGER;
 if (! $PLUGIN_MANAGER->plugin_config->value('recent', 'creator_output', 0)) {
-	$rec =& new Recent();
+	$rec = new Recent();
 }
-
-?>

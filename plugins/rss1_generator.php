@@ -199,7 +199,7 @@ class RSS1FeedGenerator extends Plugin {
 
 }
 
-$gen =& new RSS1FeedGenerator();
+$gen = new RSS1FeedGenerator();
 $gen->registerEventHandler("blogcomment", "InsertComplete", "updateCommentRSS1");
 $gen->registerEventHandler("blogcomment", "UpdateComplete", "updateCommentRSS1");
 $gen->registerEventHandler("blogcomment", "DeleteComplete", "updateCommentRSS1");
@@ -212,5 +212,3 @@ if ($gen->topic_feeds) {
 	$gen->registerEventHandler("blogentry", "UpdateComplete", "updateBlogRSS1ByEntryTopic");
 	$gen->registerEventHandler("blogentry", "DeleteComplete", "updateBlogRSS1ByEntryTopic");
 }
-
-?>

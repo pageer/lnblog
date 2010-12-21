@@ -113,14 +113,18 @@ function handle_uploads(&$ent) {
 	$err = array();
 	$num_uploads = System::instance()->sys_ini->value("entryconfig",	"AllowInitUpload", 1);
 	
-	for ($i=1; $i<=$num_uploads; $i++) {
-		$upld = NewFileUpload('upload'.$i, $ent->localpath());
+	$uploads = FileUpload::initUploads($_FILES['upload'], $ent->localpath());
+
+	foreach ($uploads as $upld) {
 		if ( $upld->completed() ) {
-			$upld->moveFile();
+			$ret = $upld->moveFile();
+			if (! $ret) {
+				$err[] = _('Error moving uploaded file');
+			}
 		} elseif ( ( $upld->status() != FILEUPLOAD_NO_FILE && 
-		             $upld->status() != FILEUPLOAD_NOT_INITIALIZED ) ||
-		           ( $upld->status() == FILEUPLOAD_NOT_INITIALIZED &&
-		            ! defined("UPLOAD_IGNORE_UNINITIALIZED") ) ) {
+					 $upld->status() != FILEUPLOAD_NOT_INITIALIZED ) ||
+				   ( $upld->status() == FILEUPLOAD_NOT_INITIALIZED &&
+					! defined("UPLOAD_IGNORE_UNINITIALIZED") ) ) {
 			$ret = false;
 			$err[] = $upld->errorMessage();
 		}
@@ -154,11 +158,9 @@ function handle_save(&$ent, &$blg, &$errors, $is_draft) {
 		$ret = $ent->saveDraft($blg);
 	} else {
 		if (! $ent->isEntry()) {
-			if (is_a($ent, 'Article')) {
-				$ret = $ent->insert($blg, POST('short_path'));
-				if ($ret && is_a($ent, 'Article')) $ent->setSticky(POST('sticky'));
-			}
-			else $ret = $ent->insert($blg);
+			if (is_a($ent, 'Article')) $ent->setPath(POST('short_path'));
+			$ret = $ent->insert($blg);
+			if ($ret && is_a($ent, 'Article')) $ent->setSticky(POST('sticky'));
 		} elseif ($ent->isDraft()) {
 			$ret = $ent->publishDraft($blg);
 		} else {
@@ -327,6 +329,6 @@ $title = $is_art ? _("New Article") : _("New Entry");
 $PAGE->title = sprintf("%s - %s", $blg->name, $title);
 $PAGE->addStylesheet("form.css", "entry.css");
 $PAGE->addScript("editor.js");
+$PAGE->addScript("upload.js");
 $PAGE->addScript(lang_js());
-$PAGE->display($page_body, &$blg);
-?>
+$PAGE->display($page_body, $blg);

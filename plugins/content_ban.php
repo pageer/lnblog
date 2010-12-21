@@ -104,8 +104,7 @@ class ContentBan extends Plugin {
 
 }
 
-$ban =& new ContentBan();
+$ban = new ContentBan();
 $ban->registerEventHandler("blogcomment", "OnInsert", "clearData");
 $ban->registerEventHandler("trackback", "POSTRetreived", "clearTBData");
 $ban->registerEventHandler("loginops", "PluginOutput", "sidebarLink");
-?>

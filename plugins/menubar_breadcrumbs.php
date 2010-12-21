@@ -98,5 +98,4 @@ class Breadcrumbs extends Plugin {
 	}
 	
 }
-$map =& new Breadcrumbs();
-?>
+$map = new Breadcrumbs();

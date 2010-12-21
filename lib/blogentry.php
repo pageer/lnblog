@@ -616,7 +616,7 @@ class BlogEntry extends Entry {
 	Returns:
 	True on success, false on failure.
 	*/
-	public function insert (&$blog, $from_draft=false) {
+	public function insert ($blog, $from_draft=false) {
 	
 		if (! $this->uid) {
 			$usr = NewUser();

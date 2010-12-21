@@ -190,11 +190,10 @@ class IPBan extends Plugin {
 
 }
 
-$ban =& new IPBan();
+$ban = new IPBan();
 $ban->registerEventHandler("blogcomment", "OnOutput", "addBanLink");
 $ban->registerEventHandler("blogcomment", "OnInsert", "clearData");
 $ban->registerEventHandler("trackback", "OnOutput", "addBanLink");
 $ban->registerEventHandler("trackback", "POSTRetreived", "clearTBData");
 $ban->registerEventHandler("loginops", "PluginOutput", "sidebarLink");
 $ban->registerEventHandler("page", "OnOutput", "banIP");
-?>

@@ -440,7 +440,7 @@ class BlogEntryURIHybrid extends BlogEntryURIWrapper {
 		                array('entry'=>$this->object->entryID()));
 	}
 	
-	function editDraft() {
+	function editDraft($preview=false) {
 		$b = NewBlog();
 		return make_uri($b->uri("addentry"), 
 		                array('draft'=>$this->object->entryID()));

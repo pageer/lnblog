@@ -15,12 +15,12 @@ class System {
 	public function __construct() {
 		$this->userdata = defined("USER_DATA_PATH")?USER_DATA_PATH:"";
 	
-		$this->group_ini = new INIParser(Path::get($this->userdata, "groups.ini"));
-		$this->sys_ini = new INIParser(Path::get($this->userdata, "system.ini"));
+		$this->group_ini = new INIParser(Path::mk($this->userdata, "groups.ini"));
+		$this->sys_ini = new INIParser(Path::mk($this->userdata, "system.ini"));
 
 	}
 	
-	public function instance() {
+	public static function instance() {
 		static $static_instance;
 		if (! isset($static_instance)) {
 			$static_instance = new System();

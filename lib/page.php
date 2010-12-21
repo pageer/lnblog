@@ -74,12 +74,13 @@ class Page extends LnBlogObject {
 		$this->display_object = $ref;
 
 		$this->addScript("lnblog_lib.js");
+		$this->addScript("jquery.js");
 		$this->addStylesheet("main.css");
 		
 		$this->raiseEvent("InitComplete");		
 	}
 	
-	public function instance() {
+	public static function instance() {
 		static $inst;
 		if (! isset($inst)) {
 			$inst = new Page();
@@ -293,7 +294,7 @@ class Page extends LnBlogObject {
 		#$head->set("INLINE_SCRIPTS",$this->inline_scripts);
 		$head->set("LINKS", $this->links);
 		
-		if ($blog && get_class($blog)) $blog->exportVars(&$head);
+		if ($blog && get_class($blog)) $blog->exportVars($head);
 		$head->set("PAGE_CONTENT", $page_body);
 
 		echo $head->process();

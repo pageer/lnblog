@@ -186,5 +186,4 @@ class Linksleeve extends Plugin {
 	}
 
 }
-$plug =& new Linksleeve();
-?>
+$plug = new Linksleeve();

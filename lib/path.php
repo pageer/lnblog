@@ -39,17 +39,17 @@ class Path {
 		}
 	}
 	
-	public function implodePath($sep, $path) {
+	public static function implodePath($sep, $path) {
 		$ret = implode($sep, $path);
 		return str_replace($sep.$sep, $sep, $ret);
 	}
 	
 	public function get() {
 		if (func_num_args() == 0) {
-			return $this->implodePath(self::$sep, $this->path);
+			return self::implodePath(self::$sep, $this->path);
 		} else {
 			$args = func_get_args();
-			return Path::implodePath(self::$sep, $args);
+			return self::implodePath(self::$sep, $args);
 		}
 	}
 	

@@ -139,7 +139,7 @@ class TagList extends Plugin {
 		$tpl->set("ITEM_LIST", $list);
 
 		$PAGE->title = spf_("Blogroll - ", $blog->name);
-		$PAGE->display($tpl->process(), &$blog);
+		$PAGE->display($tpl->process(), $blog);
 	
 	}
 
@@ -148,12 +148,12 @@ class TagList extends Plugin {
 } /* End massive if statement */
 
 if (defined("PLUGIN_DO_OUTPUT")) {
-	$plug =& new TagList();
+	$plug = new TagList();
 	$plug->output_page();
 } else {
 	global $PLUGIN_MANAGER;
 	if (! $PLUGIN_MANAGER->plugin_config->value('taglist', 'creator_output', 0)) {
-		$plug =& new TagList();
+		$plug = new TagList();
 	}
 }
 ?>

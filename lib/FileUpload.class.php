@@ -43,12 +43,25 @@ class FileUpload extends LnBlogObject {
 	public $size = 0;
 	public $mimetype = '';
 	public $error = FILEUPLOAD_NOT_INITIALIZED;
+	
+	public static function initUploads($file, $dir) {
+		$ret = array();
+		if (is_array($file['tmp_name'])) {
+			$i = 0;
+			while (isset($file['tmp_name'][$i])) {
+				$ret[] = new FileUpload($file, $dir, $i++);
+			}
+		} else {
+			$ret[] = new FileUpload($file, $dir);
+		}
+		return $ret;
+	}
 
 	public function __construct($file, $dir=false, $index=false) {
 		$this->raiseEvent("OnInit");
 		if (!$dir) $this->destdir = getcwd();
 		else $this->destdir = $dir;
-		$this->field = $field;
+		$this->field = $file;
 		
 		if (! empty($file)) {
 			if ($index === false) {
@@ -60,11 +73,11 @@ class FileUpload extends LnBlogObject {
 					$this->error = $file['error'];
 			} else {
 				$this->destname = $file['name'][$index];
-				$this->tempname = $_FILES[$field]['tmp_name'][$index];
-				$this->size = $_FILES[$field]['size'][$index];
-				$this->mimetype = $_FILES[$field]['type'][$index];
-				if (isset($_FILES[$field]['error'])) 
-					$this->error = $_FILES[$field]['error'][$index];
+				$this->tempname = $file['tmp_name'][$index];
+				$this->size = $file['size'][$index];
+				$this->mimetype = $file['type'][$index];
+				if (isset($file['error'])) 
+					$this->error = $file['error'][$index];
 			}
 			$this->error = FILEUPLOAD_NO_ERROR;
 		}
@@ -106,8 +119,9 @@ class FileUpload extends LnBlogObject {
 		
 		if (is_file($this->tempname)) $tmp_path = $this->tempname;
 		else $tmp_path = mkpath(ini_get("upload_tmp_dir"), $this->tempname);
-		if (! is_uploaded_file($tmp_path) || ! $this->tempname) {
+		if ( ! $this->tempname || (! is_uploaded_file($tmp_path) && ! is_file($this->tempname)) ) {
 			$ret = FILEUPLOAD_NO_FILE;
+			var_dump($tmp_path, $this->tempname, is_uploaded_file($tmp_path), file_exists($this->tempname));
 		}
 		
 		return $ret;

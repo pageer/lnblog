@@ -104,9 +104,7 @@ class ReplyNotifier extends Plugin {
 
 }
 
-$notifier =& new ReplyNotifier();
+$notifier = new ReplyNotifier();
 $notifier->registerEventHandler("blogcomment", "InsertComplete", "comment_notify");
 $notifier->registerEventHandler("trackback", "ReceiveComplete", "trackback_notify");
 $notifier->registerEventHandler("pingback", "InsertComplete", "pingback_notify");
-
-?>

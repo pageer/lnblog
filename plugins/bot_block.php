@@ -97,5 +97,4 @@ window.addEventListener('load', addIt, false);
 
 }
 
-$cftok =& new BotBlock();
-?>
+$cftok = new BotBlock();

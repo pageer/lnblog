@@ -79,5 +79,4 @@ class TrackbackValidator extends Plugin {
 	
 }
 
-$plug =& new TrackbackValidator();
-?>
+$plug = new TrackbackValidator();

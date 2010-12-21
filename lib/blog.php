@@ -56,25 +56,32 @@ require_once("lib/uri.php");
 
 class Blog extends LnBlogObject {
 
-	var $name;
-	var $home_path;
-	var $image;
-	var $theme;
-	var $max_entries = BLOG_MAX_ENTRIES;
-	var $max_rss = BLOG_MAX_ENTRIES;
-	var $allow_enclosure = 1;
-	var $default_markup = MARKUP_BBCODE;
-	var $owner = ADMIN_USER;
-	var $write_list;
-	var $tag_list;
+	public $name = '';
+	public $description = '';
+	public $home_path = '';
+	public $image = '';
+	public $theme = 'default';
+	public $max_entries = BLOG_MAX_ENTRIES;
+	public $max_rss = BLOG_MAX_ENTRIES;
+	public $allow_enclosure = 1;
+	public $default_markup = MARKUP_BBCODE;
+	public $owner = ADMIN_USER;
+	public $write_list = array();
+	public $tag_list = array();
 	
-	var $auto_pingback;
-	var $gather_replies;
+	public $auto_pingback = true;
+	public $gather_replies = true;
+	public $front_page_abstract = false;
 	
-	var $entrylist;
-	var $last_blogentry;
-	var $last_article;
-	var $custom_fields;
+	# System configuration information.
+	public $sw_version = '';
+	public $last_upgrade = '';
+	public $url_method = '';
+	
+	public $entrylist = array();
+	public $last_blogentry = null;
+	public $last_article = null;
+	public $custom_fields = array();
 
 	function Blog($path="") {
 
@@ -89,7 +96,6 @@ class Blog extends LnBlogObject {
 			$this->home_path = realpath($this->home_path);
 		}
 
-		$this->setFieldDefaults();
 		$this->raiseEvent("OnInit");
 
 		$this->readBlogData();
@@ -98,35 +104,7 @@ class Blog extends LnBlogObject {
 
 	}
 	
-	function setFieldDefaults() {
-		# System configuration information.
-		$this->sw_version = '';
-		$this->last_upgrade = '';
-		$this->url_method = '';
-		
-		# Various default blog properties go here.
-		$this->name = '';
-		$this->description = '';
-		$this->image = '';
-		$this->max_entries = BLOG_MAX_ENTRIES;
-		$this->max_rss = BLOG_MAX_ENTRIES;
-		$this->allow_enclosure = 1;
-		$this->default_markup = MARKUP_BBCODE;
-		$this->theme = "default";
-		$this->owner = ADMIN_USER;
-		$this->write_list = array();
-		$this->tag_list = array();
-		$this->front_page_abstract = false;
-		
-		$this->auto_pingback = true;
-		$this->gather_replies = true;
-		
-		$this->entrylist = array();
-		$this->last_blogentry = false;
-		$this->last_article = false;
-		
-		$this->custom_fields = array();
-	}
+
 	
 	function getPathFromEnvironment() {
 		if (isset($_GET['blog']) ) $path = trim(sanitize($_GET["blog"]));
@@ -197,8 +175,8 @@ class Blog extends LnBlogObject {
 	*/
 	function isBlog($blog=false) {
 	
-		return file_exists(Path::get($this->home_path, BLOG_CONFIG_PATH)) ||
-		       file_exists(Path::get($this->home_path.PATH_DELIM.'blogdata.txt'));
+		return file_exists(Path::mk($this->home_path, BLOG_CONFIG_PATH)) ||
+		       file_exists(Path::mk($this->home_path.PATH_DELIM.'blogdata.txt'));
 	}
 
 	function getParent() { return false; }
@@ -1143,7 +1121,7 @@ class Blog extends LnBlogObject {
 		$p = new Path($path ? $path : $this->home_path);
 		$this->home_path = $p->getCanonical();
 
-		$ret = $this->createBlogDirectories(&$fs, INSTALL_ROOT);
+		$ret = $this->createBlogDirectories($fs, INSTALL_ROOT);
 		
 		$this->setBlogID();
 		

@@ -74,6 +74,6 @@ class LoginLink extends Plugin {
 
 global $PLUGIN_MANAGER;
 if (! $PLUGIN_MANAGER->plugin_config->value('loginlink', 'creator_output', 0)) {
-	$plug =& new LoginLink();
+	$plug = new LoginLink();
 }
 ?>

@@ -90,6 +90,6 @@ class Articles extends Plugin {
 
 global $PLUGIN_MANAGER;
 if (! $PLUGIN_MANAGER->plugin_config->value('articles', 'creator_output', 0)) {
-	$art =& new Articles();
+	$art = new Articles();
 }
 ?>

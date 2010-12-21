@@ -233,6 +233,5 @@ class News extends Plugin {
 
 global $PLUGIN_MANAGER;
 if (! $PLUGIN_MANAGER->plugin_config->value('news', 'creator_output', 0)) {
-	$newsfeeds =& new News();
+	$newsfeeds = new News();
 }
-?>

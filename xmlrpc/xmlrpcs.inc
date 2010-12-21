@@ -1,7 +1,7 @@
 <?php
 // by Edd Dumbill (C) 1999-2002
 // <edd@usefulinc.com>
-// $Id: xmlrpcs.inc,v 1.65 2006/08/23 14:52:33 ggiunta Exp $
+// $Id: xmlrpcs.inc,v 1.71 2008/10/29 23:41:28 ggiunta Exp $
 
 // Copyright (c) 1999,2000,2002 Edd Dumbill.
 // All rights reserved.
@@ -38,8 +38,41 @@
 	// XML RPC Server class
 	// requires: xmlrpc.inc
 
+	$GLOBALS['xmlrpcs_capabilities'] = array(
+		// xmlrpc spec: always supported
+		'xmlrpc' => new xmlrpcval(array(
+			'specUrl' => new xmlrpcval('http://www.xmlrpc.com/spec', 'string'),
+			'specVersion' => new xmlrpcval(1, 'int')
+		), 'struct'),
+		// if we support system.xxx functions, we always support multicall, too...
+		// Note that, as of 2006/09/17, the following URL does not respond anymore
+		'system.multicall' => new xmlrpcval(array(
+			'specUrl' => new xmlrpcval('http://www.xmlrpc.com/discuss/msgReader$1208', 'string'),
+			'specVersion' => new xmlrpcval(1, 'int')
+		), 'struct'),
+		// introspection: version 2! we support 'mixed', too
+		'introspection' => new xmlrpcval(array(
+			'specUrl' => new xmlrpcval('http://phpxmlrpc.sourceforge.net/doc-2/ch10.html', 'string'),
+			'specVersion' => new xmlrpcval(2, 'int')
+		), 'struct')
+	);
 
 	/* Functions that implement system.XXX methods of xmlrpc servers */
+	$_xmlrpcs_getCapabilities_sig=array(array($GLOBALS['xmlrpcStruct']));
+	$_xmlrpcs_getCapabilities_doc='This method lists all the capabilites that the XML-RPC server has: the (more or less standard) extensions to the xmlrpc spec that it adheres to';
+	$_xmlrpcs_getCapabilities_sdoc=array(array('list of capabilities, described as structs with a version number and url for the spec'));
+	function _xmlrpcs_getCapabilities($server, $m=null)
+	{
+		$outAr = $GLOBALS['xmlrpcs_capabilities'];
+		// NIL extension
+		if ($GLOBALS['xmlrpc_null_extension']) {
+			$outAr['nil'] = new xmlrpcval(array(
+				'specUrl' => new xmlrpcval('http://www.ontosys.com/xml-rpc/extensions.php', 'string'),
+				'specVersion' => new xmlrpcval(1, 'int')
+			), 'struct');
+		}
+		return new xmlrpcresp(new xmlrpcval($outAr, 'struct'));
+	}
 
 	// listMethods: signature was either a string, or nothing.
 	// The useless string variant has been removed
@@ -61,8 +94,7 @@
 				$outAr[]=&new xmlrpcval($key, 'string');
 			}
 		}
-		$v=&new xmlrpcval($outAr, 'array');
-		return new xmlrpcresp($v);
+		return new xmlrpcresp(new xmlrpcval($outAr, 'array'));
 	}
 
 	$_xmlrpcs_methodSignature_sig=array(array($GLOBALS['xmlrpcArray'], $GLOBALS['xmlrpcString']));
@@ -323,7 +355,12 @@
 			'function' => '_xmlrpcs_multicall',
 			'signature' => $_xmlrpcs_multicall_sig,
 			'docstring' => $_xmlrpcs_multicall_doc,
-			'signature_docs' => $_xmlrpcs_multicall_sdoc)
+			'signature_docs' => $_xmlrpcs_multicall_sdoc),
+		'system.getCapabilities' => array(
+			'function' => '_xmlrpcs_getCapabilities',
+			'signature' => $_xmlrpcs_getCapabilities_sig,
+			'docstring' => $_xmlrpcs_getCapabilities_doc,
+			'signature_docs' => $_xmlrpcs_getCapabilities_sdoc)
 	);
 
 	$GLOBALS['_xmlrpcs_occurred_errors'] = '';
@@ -367,7 +404,8 @@
 				// NB: this code will NOT work on php < 4.0.2: only 2 params were used for error handlers
 				if(is_array($GLOBALS['_xmlrpcs_prev_ehandler']))
 				{
-					$GLOBALS['_xmlrpcs_prev_ehandler'][0]->$GLOBALS['_xmlrpcs_prev_ehandler'][1]($errcode, $errstring, $filename, $lineno, $context);
+					// the following works both with static class methods and plain object methods as error handler
+					call_user_func_array($GLOBALS['_xmlrpcs_prev_ehandler'], array($errcode, $errstring, $filename, $lineno, $context));
 				}
 				else
 				{
@@ -526,7 +564,16 @@
 		{
 			if ($data === null)
 			{
-				$data = isset($GLOBALS['HTTP_RAW_POST_DATA']) ? $GLOBALS['HTTP_RAW_POST_DATA'] : '';
+				// workaround for a known bug in php ver. 5.2.2 that broke $HTTP_RAW_POST_DATA
+				$ver = phpversion();
+				if ($ver[0] >= 5)
+				{
+					$data = file_get_contents('php://input');
+				}
+				else
+				{
+					$data = isset($GLOBALS['HTTP_RAW_POST_DATA']) ? $GLOBALS['HTTP_RAW_POST_DATA'] : '';
+				}
 			}
 			$raw_data = $data;
 
@@ -585,7 +632,7 @@
 				// http compression of output: only
 				// if we can do it, and we want to do it, and client asked us to,
 				// and php ini settings do not force it already
-				$php_no_self_compress = ini_get('zlib.output_compression') == '' && (ini_get('output_handler') != 'ob_gzhandler');
+				$php_no_self_compress = !ini_get('zlib.output_compression') && (ini_get('output_handler') != 'ob_gzhandler');
 				if($this->compress_response && function_exists('gzencode') && $resp_encoding != ''
 					&& $php_no_self_compress)
 				{
@@ -627,9 +674,10 @@
 		* @param string $function the php function that will get invoked
 		* @param array $sig the array of valid method signatures
 		* @param string $doc method documentation
+		* @param array $sigdoc the array of valid method signatures docs (one string per param, one for return type)
 		* @access public
 		*/
-		function add_to_map($methodname,$function,$sig=null,$doc='')
+		function add_to_map($methodname,$function,$sig=null,$doc=false,$sigdoc=false)
 		{
 			$this->dmap[$methodname] = array(
 				'function'	=> $function,
@@ -638,6 +686,10 @@
 			if ($sig)
 			{
 				$this->dmap[$methodname]['signature'] = $sig;
+			}
+			if ($sigdoc)
+			{
+			    $this->dmap[$methodname]['signature_docs'] = $sigdoc;
 			}
 		}
 
@@ -792,7 +844,7 @@
 					/// @todo we should parse q=0.x preferences instead of getting first charset specified...
 					$client_accepted_charsets = explode(',', strtoupper($_SERVER['HTTP_ACCEPT_CHARSET']));
 					// Give preference to internal encoding
-					$known_charsets = array($this->internal_encoding, 'UTF-8', 'ISO-8859-1', 'US-ASCII');
+					$known_charsets = array($GLOBALS['xmlrpc_internalencoding'], 'UTF-8', 'ISO-8859-1', 'US-ASCII');
 					foreach ($known_charsets as $charset)
 					{
 						foreach ($client_accepted_charsets as $accepted)
@@ -872,6 +924,7 @@
 				}
 				/// @BUG this will fail on PHP 5 if charset is not specified in the xml prologue,
 				// the encoding is not UTF8 and there are non-ascii chars in the text...
+				/// @todo use an ampty string for php 5 ???
 				$parser = xml_parser_create($req_encoding);
 			}
 			else
@@ -882,7 +935,18 @@
 			xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, true);
 			// G. Giunta 2005/02/13: PHP internally uses ISO-8859-1, so we have to tell
 			// the xml parser to give us back data in the expected charset
-			xml_parser_set_option($parser, XML_OPTION_TARGET_ENCODING, $GLOBALS['xmlrpc_internalencoding']);
+			// What if internal encoding is not in one of the 3 allowed?
+			// we use the broadest one, ie. utf8
+			// This allows to send data which is native in various charset,
+			// by extending xmlrpc_encode_entitites() and setting xmlrpc_internalencoding
+			if (!in_array($GLOBALS['xmlrpc_internalencoding'], array('UTF-8', 'ISO-8859-1', 'US-ASCII')))
+			{
+				xml_parser_set_option($parser, XML_OPTION_TARGET_ENCODING, 'UTF-8');
+			}
+			else
+			{
+				xml_parser_set_option($parser, XML_OPTION_TARGET_ENCODING, $GLOBALS['xmlrpc_internalencoding']);
+			}
 
 			if ($this->functions_parameters_type != 'xmlrpcvals')
 				xml_set_element_handler($parser, 'xmlrpc_se', 'xmlrpc_ee_fast');
@@ -932,7 +996,6 @@
 					{
 						$this->debugmsg("\n+++PARSED+++\n".var_export($m, true)."\n+++END+++");
 					}
-
 					$r = $this->execute($m);
 				}
 			}

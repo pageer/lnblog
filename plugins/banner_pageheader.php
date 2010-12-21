@@ -58,6 +58,5 @@ class PageHeader extends Plugin {
 
 global $PLUGIN_MANAGER;
 if (! $PLUGIN_MANAGER->plugin_config->value('pageheader', 'creator_output', 0)) {
-	$plug =& new PageHeader();
+	$plug = new PageHeader();
 }
-?>

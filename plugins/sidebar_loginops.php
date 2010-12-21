@@ -83,7 +83,5 @@ class LoginOps extends Plugin {
 
 global $PLUGIN_MANAGER;
 if (! $PLUGIN_MANAGER->plugin_config->value('loginops', 'creator_output', 0)) {
-	$plug =& new LoginOps();
+	$plug = new LoginOps();
 }
-
-?>

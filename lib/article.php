@@ -36,6 +36,8 @@ OutputComplete - Fired after output has finished being generated.
 */
 
 class Article extends BlogEntry {
+	
+	protected $article_path = '';
 
 	public function __construct($path="", $revision=ENTRY_DEFAULT_FILE) {
 		$this->raiseEvent("OnInit");
@@ -188,6 +190,10 @@ class Article extends BlogEntry {
 			else return $year.PATH_DELIM.$month.PATH_DELIM.$base;
 		}
 	}
+	
+	public function setPath($path) {
+		$this->article_path = $path;
+	}
 
 	/*
 	Method: insert
@@ -195,7 +201,6 @@ class Article extends BlogEntry {
 
 	Parameters:
 	blog       - The blog object into which the article should be inserted.
-	dir_path   - *Optional* directory name to use for the article.
 	from_draft - Indicates that the article is based on a draft entry, not
 	             taken directly from user input.
 	
@@ -203,7 +208,7 @@ class Article extends BlogEntry {
 	True on success, false on failure.
 	*/
 
-	public function insert ($blog, $dir_path=false, $from_draft=false) {
+	public function insert ($blog, $from_draft=false) {
 
 		$this->raiseEvent("OnInsert");
 		if (!$this->uid) {
@@ -213,9 +218,10 @@ class Article extends BlogEntry {
 	
 		$curr_ts = time();
 		$basepath = $blog->home_path.PATH_DELIM.BLOG_ARTICLE_PATH;
+		$dir_path = $this->article_path;
 		
 		if (! is_dir($basepath)) create_directory_wrappers($basepath, BLOG_ARTICLES);
-		if (!$dir_path) $dir_path = $this->getPath();
+		if (! $dir_path) $dir_path = $this->getPath();
 		$dir_path = $basepath.PATH_DELIM.$dir_path;
 		if ($from_draft) {
 			$fs = NewFS();

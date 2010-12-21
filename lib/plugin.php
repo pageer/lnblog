@@ -264,7 +264,7 @@ class Plugin extends LnBlogObject{
 	# A string representing the local filesystem path to which cach data will be written.
 	# In the default implementation, this has the form BLOGROOT/cache/PLUGINCLASS_output.cache.
 	
-	function cachepath(&$obj) {
+	function cachepath($obj) {
 		if (method_exists($obj, "isBlog") && $obj->isBlog())
 			return mkpath($obj->home_path, "cache", get_class($this)."_output.cache");
 			else return false;
@@ -279,7 +279,7 @@ class Plugin extends LnBlogObject{
 	#       multi-file caches.
 
 	function invalidateCache($obj=false) {
-		if ( ! is_a($obj, 'Blog')) $b =& NewBlog();
+		if ( ! is_a($obj, 'Blog')) $b = NewBlog();
 		else $b = $obj;
 		$f = NewFS();
 		

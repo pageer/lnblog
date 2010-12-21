@@ -65,8 +65,6 @@ class DisableComments extends Plugin {
 	}
 
 }
-$obj =& new DisableComments();
+$obj = new DisableComments();
 $obj->registerEventHandler("blogentry", "InitComplete", "disable");
 $obj->registerEventHandler("article", "InitComplete", "disable");
-
-?>

@@ -335,7 +335,7 @@ class RSS2FeedGenerator extends Plugin {
 
 }
 
-$gen =& new RSS2FeedGenerator();
+$gen = new RSS2FeedGenerator();
 $gen->registerEventHandler("blogcomment", "InsertComplete", "updateCommentRSS2");
 $gen->registerEventHandler("blogcomment", "UpdateComplete", "updateCommentRSS2");
 $gen->registerEventHandler("blogcomment", "DeleteComplete", "updateCommentRSS2");
@@ -348,4 +348,3 @@ if ($gen->topic_feeds) {
 	$gen->registerEventHandler("blogentry", "UpdateComplete", "updateBlogRSS2ByEntryTopic");
 	$gen->registerEventHandler("blogentry", "DeleteComplete", "updateBlogRSS2ByEntryTopic");
 }
-?>
