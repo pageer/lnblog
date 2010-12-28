@@ -87,11 +87,10 @@ if (isset($_GET["list"])) $tpl->set("PAGE_TITLE", _("Edit Link List"));
 else $tpl->set("PAGE_TITLE", _("Edit Text File"));
 
 if (substr($file, 0, 9) == 'userdata/') {
-	$p->Path(USER_DATA_PATH, substr($file, 9));
+	$file = Path::mk(USER_DATA_PATH, substr($file, 9));
 } else {
-	$p->Path($relpath, $file);
+	$file = Path::mk($relpath, $file);
 }
-$file = $p->get();
 
 if (has_post()) {
 
@@ -106,9 +105,9 @@ if (has_post()) {
 	}
 	
 } else {
-
-	if (file_exists($file)) {
-		$data = implode("", file($file));	
+	
+	if (is_file($file)) {
+		$data = file_get_contents($file);
 	} else {
 		$data = "";
 		if (! GET('map')) {

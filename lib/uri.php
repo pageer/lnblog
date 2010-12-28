@@ -279,7 +279,10 @@ class BlogURIWrapper extends URI {
 		return $this->wrapper("login");
 	}
 	function logout() { return $this->wrapper("logout"); }
-	function editfile($args) { return $this->wrapper("editfile", $args); }
+	function editfile($args) {
+		if (! is_array($args)) $args = array('file'=> $args);
+		return $this->wrapper("editfile", $args);
+	}
 	function edituser() { return $this->wrapper("useredit"); }
 	function pluginconfig() { return $this->wrapper("plugins"); }
 	function pluginload() { return $this->wrapper("pluginload"); }

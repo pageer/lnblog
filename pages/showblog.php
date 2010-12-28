@@ -80,8 +80,8 @@ $action_map = array(
 if ( isset($_GET['action']) && isset($action_map[$_GET['action']]) ) {
 	
 	$action = str_replace('/', DIRECTORY_SEPARATOR, $action_map[$_GET['action']]);
-	$filepath = Path::mk(dirname(__FILE__), $action);
-	include $file_path;
+	$filepath = Path::mk(INSTALL_ROOT, $action);
+	include $filepath;
 	exit;
 	
 } elseif ( isset($_GET['script']) ) {
