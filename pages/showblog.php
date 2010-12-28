@@ -60,61 +60,39 @@ function script_path($name) {
 	}
 }
 
-if ( isset($_GET['action']) ) {
-	$action = strtolower($_GET['action']);
-	switch ($action) {
-		case 'newentry':
-			include('pages/entryedit.php');
-			exit;
-		case 'delentry':
-			include('pages/delentry.php');
-			exit;
-		case 'edit':
-			include('pages/updateblog.php');
-			exit;
-		case 'login':
-			include('bloglogin.php');
-			exit;
-		case 'logout':
-			include('bloglogout.php');
-			exit;
-		case 'upload':
-			include('pages/fileupload.php');
-			exit;
-		case 'sitemap':
-			include('sitemap.php');
-			exit;
-		case 'useredit':
-			include('pages/editlogin.php');
-			exit;
-		case 'plugins':
-			include('plugin_setup.php');
-			exit;
-		case 'tags':
-			include('pages/tagsearch.php');
-			exit;
-		case 'pluginload':
-			include('plugin_loading.php');
-			exit;
-		case 'profile':
-			include('userinfo.php');
-			exit;
-		case 'managereply':
-			include('pages/manage_replies.php');
-			exit;
-		case 'editfile':
-			include('pages/editfile.php');
-			exit;
-		default:
-			# Do nothing;
-			break;
-	}
+$action_map = array(
+	'newentry'   => 'pages/entryedit.php',
+	'delentry'   => 'pages/delentry.php',
+	'edit'       => 'pages/updateblog.php',
+	'login'      => 'bloglogin.php',
+	'logout'     => 'bloglogout.php',
+	'upload'     => 'pages/fileupload.php',
+	'sitemape'   => 'sitemap.php',
+	'useredit'   => 'pages/editlogin.php',
+	'plugins'    => 'plugin_setup.php',
+	'tags'       => 'pages/tagsearch.php',
+	'pluginload' => 'plugin_loading.php',
+	'profile'    => 'userinfo.php',
+	'managereply'=> 'pages/manage_replies.php',
+	'editfile'   => 'pages/editfile.php'
+);
+
+if ( isset($_GET['action']) && isset($action_map[$_GET['action']]) ) {
+	
+	$action = str_replace('/', DIRECTORY_SEPARATOR, $action_map[$_GET['action']]);
+	$filepath = Path::mk(dirname(__FILE__), $action);
+	include $file_path;
+	exit;
+	
 } elseif ( isset($_GET['script']) ) {
+	
 	$file = script_path($_GET['script']);
 	if (file_exists($file)) readfile($file);
-	else echo "Failed to find $file";
+	else echo "// Failed to find $file";
 	exit;
+	
 } elseif ( isset($_GET['plugin']) ) {
+	
 	require_once("config.php");
 	#ini_set("include_path", 
     #    ini_get('include_path').PATH_SEPARATOR.USER_DATA_PATH);
@@ -131,13 +109,11 @@ if ( isset($_GET['action']) ) {
 }
 
 session_start();
-require_once("config.php");
-require_once("lib/creators.php");
-
-global $PAGE;
+require_once "config.php";
+require_once Path::mk(INSTALL_ROOT, "lib", "creators.php");
 
 $blog = NewBlog();
-$PAGE->setDisplayObject($blog);
+Page::instance()->setDisplayObject($blog);
 
 $content = show_blog_page($blog);
-$PAGE->display($content, $blog);
+Page::instance()->display($content, $blog);

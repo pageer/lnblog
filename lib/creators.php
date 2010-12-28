@@ -154,7 +154,6 @@ function NewUser($usr=false, $pwd=false) {
 # dir   - Thfile:///home/Tallgeese/pageer/www/LnBlog/lib/creators.phpe *optional* target directory.
 # index - The *optional* index of this upload for file upload arrays.
 function NewFileUpload($field, $dir=false, $index=false) {
-	require_once("upload.php");
 	return new FileUpload($field, $dir, $index);
 }
 

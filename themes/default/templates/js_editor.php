@@ -32,7 +32,7 @@
 -->
 </div>
 <?php if (EDITOR_SHOW_INLINE_BOXES) { /* Hide the edit boxes. */ ?>
-<p onclick="lbcode_editor.toggle_show('editboxes', this);"><strong><?php p_("Inline editor boxes");?></strong><a href="#dummy" >(+)</a></p>
+<p onclick="return lbcode_editor.toggle_show('editboxes', this);"><strong><?php p_("Inline editor boxes");?></strong><a href="#dummy" >(+)</a></p>
 <div id="editboxes">
 <label for="desc_txt" title="<?php p_('Text to be displayed on page'); ?>"><?php p_('Text'); ?></label>
 <input type="text" id="desc_txt" accesskey="t" title="<?php p_('Text to be displayed on page'); ?>" />

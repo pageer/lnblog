@@ -29,10 +29,8 @@ session_start();
 require_once("config.php");
 require_once("lib/creators.php");
 
-global $PAGE;
-
 $blog = NewBlog();
-$PAGE->setDisplayObject($blog);
+Page::instance()->setDisplayObject($blog);
 
 $year_dir = basename(getcwd());
 $title = $blog->name." - ".$year_dir;
@@ -47,7 +45,5 @@ $LINK_LIST = $blog->getArticleList(false, false);
 $tpl->set("LINK_LIST", $LINK_LIST);
 $body = $tpl->process();
 
-$PAGE->title = $title;
-$PAGE->display($body, &$blog);
-
-?>
+Page::instance()->title = $title;
+Page::instance()->display($body, $blog);

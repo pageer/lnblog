@@ -1,5 +1,8 @@
 function LBCodeEditor() {
 	
+	var that = this;
+	var self = this;
+	
 	this.short_forms = Array();
 	this.abbrev_phrases = Array();
 	this.acronym_phrases = Array();
@@ -231,6 +234,8 @@ function LBCodeEditor() {
 			cnt.style.display = "none";
 			caller.innerHTML = "(+)";
 		}
+		
+		return false;
 	}
 	
 	function set_article_path(e) {
@@ -284,7 +289,7 @@ function LBCodeEditor() {
 		}
 	}
 	
-	function upload_add_link(e) {
+	this.upload_add_link = function (e) {
 		var ext = this.value.replace(/^(.*)(\..+)$/, "$2");
 		var img_exts = new Array('.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff', '.tif');
 		var is_img = false;
@@ -340,6 +345,7 @@ function LBCodeEditor() {
 				}
 			}
 		}
+		return false;
 	}
 	
 	function articleSet(e) {
@@ -349,7 +355,7 @@ function LBCodeEditor() {
 		else path.style.display = 'none';
 	}
 	
-	 function document_add_all_events (e) {
+	function document_add_all_events (e) {
 	
 		// Toggle the LBCode editor on or off depending on the markup setting.
 		var inputmode = document.getElementById('input_mode');
@@ -366,7 +372,7 @@ function LBCodeEditor() {
 		var uploads = document.getElementsByTagName('input');
 		for (i=0; i< uploads.length; i++) {
 			if (uploads[i].type == 'file') {
-				lnblog.addEvent(uploads[i], 'change', upload_add_link);
+				lnblog.addEvent(uploads[i], 'change', self.upload_add_link);
 			}
 		}
 		

@@ -39,10 +39,8 @@ if (isset($URL)) { ?>value="<?php echo $URL; ?>" <?php } ?>/>
 </div>
 <?php } ?>
 <?php 
-global $EVENT_REGISTER;
-
-if ($EVENT_REGISTER->hasHandlers("posteditor", "ShowControls")) {
-	$EVENT_REGISTER->activateEventFull($tmp=false, "posteditor", "ShowControls");
+if (EventRegister::instance()->hasHandlers("posteditor", "ShowControls")) {
+	EventRegister::instance()->activateEventFull($tmp=false, "posteditor", "ShowControls");
 } else {
 	$use_js_editor = true;
 }
@@ -60,46 +58,47 @@ if (isset($use_js_editor) && System::instance()->sys_ini->value('entryconfig', '
 ?>
 <fieldset id="entry_settings">
 <legend><?php p_("Entry settings");?><a href="#dummy">(-)</a></legend>
-<?php if (! isset($IS_PUBLISHED)) { ?>
+<?php if (! isset($IS_PUBLISHED)): ?>
 <div>
 <?php $title = _("Publish this as an article instead of a regular blog entry");?>
 <label for="publisharticle" title="<?php echo $title;?>"><?php p_("Publish as article");?></label>
 <input type="checkbox" id="publisharticle" <?php if (isset($GET_SHORT_PATH)) { echo 'checked="checked"'; }?> />
 </div>
-<?php } ?>
-<?php
-$num_uploads = System::instance()->sys_ini->value("entryconfig", "AllowInitUpload", 1);
+<?php endif; ?>
 
-if ($num_uploads > 0) {
-?>
 <div>
 <?php $title = _("If this is checked, then when you add an item to be uploaded, a link or image tag for it will be added in the body of the entry at the current cursor location.");?>
 <label for="adduploadlink" title="<?php echo $title;?>"><?php p_("Insert link when adding uploads");?></label>
 <input type="checkbox" id="adduploadlink"  title="<?php echo $title;?>" <?php if (! empty($INSERT_LINKS)) echo 'checked="checked"'; ?> />
 </div>
-<?php
-}
 
-for ($i=1; $i<=$num_uploads; $i++) { ?>
-<div>
-<label for="upload<?php echo $i;?>"><?php p_("Upload file");?></label>
-<input type="file" name="upload[]" id="upload<?php echo $i;?>" />
+<?php if ($num_uploads = System::instance()->sys_ini->value("entryconfig", "AllowInitUpload", 1)): ?>
+<div class="upload_field">
+	<?php for ($i = 1; $i <= $num_uploads; $i++): ?>
+	<div>
+		<label for="upload<?php echo $i;?>">Select file</label>
+		<input type="file" name="upload[]" id="upload<?php echo $i;?>" />
+	</div>
+	<?php endfor; ?>
 </div>
-<?php } # End upload for
-if ($ALLOW_ENCLOSURE || ! empty($ENCLOSURE)) { /* Add optional enclosure box.*/?>
+<?php endif; ?>
+
+<?php if ($ALLOW_ENCLOSURE || ! empty($ENCLOSURE)): /* Add optional enclosure box.*/?>
 <div>
 <?php $title = _('Enter the URL of the MP3 or other media file for this post.  If you are uploading the file to this post, you can enter just the filename.');?>
 <label for="enclosure" title="<?php echo $title;?>"><?php p_("Enclosure/Podcast URL");?></label>
 <input type="text" name="enclosure" id="enclosure" title="<?php echo $title;?>" value="<?php if (isset($ENCLOSURE)) echo $ENCLOSURE;?>" />
 </div>
-<?php } # End enclosure
-if (isset($STICKY)) { /* Checkbox to make articles "sticky". */ ?>
+<?php endif; ?>
+
+<?php if (isset($STICKY)): /* Checkbox to make articles "sticky". */ ?>
 <div>
 <?php $title = _("Show a link to this in the articles panel of the sidebar");?>
 <label for="sticky" title="<?php echo $title;?>"><?php p_("Show in sidebar"); ?></label>
 <input id="sticky" name="sticky" title="<?php echo $title;?>" type="checkbox" <?php if ($STICKY) { ?> checked="checked" <?php } ?> />
 </div>
-<?php } /* End sticky */ ?>
+<?php endif; ?>
+
 <div>
 <?php $title = _("Set the markup type for this entry.  Auto-markup is plain text with clickable URLs, LBcode is a dialect of the BBcode markup popular on web forums, and HTML is raw HTML code.");?>
 <label for="input_mode" title="<?php echo $title;?>"><?php p_("Markup type");?></label>
