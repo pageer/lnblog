@@ -38,16 +38,18 @@ require_once("lib/tb.php");
 
 class Pingback extends Trackback {
 	
-	function Pingback($path=false) {
+	public $target = '';
+	public $source = '';
+	public $title = '';
+	public $excerpt = '';
+	public $ip = '';
+	public $ping_date = '';
+	public $timestamp = '';
+	public $file = '';
+	
+	public function __construct($path=false) {
 		$this->raiseEvent("OnInit");
 		
-		$this->target = '';
-		$this->source = '';
-		$this->title = '';
-		$this->excerpt = '';
-		$this->ip = '';
-		$this->ping_date = '';
-		$this->timestamp = '';
 		$this->file = $path;
 		if ($this->file) {
 			if (! is_file($this->file)) 
@@ -239,10 +241,10 @@ class Pingback extends Trackback {
 	# The following Trackback methods are private and are not to be inherited by
 	# subclasses.  However, PHP4 does not have a way to express this.  Therefore
 	# I'll just put them here and give them an empty implementation.
-	function incomingPing() { return false; }
-	function send() { return false; }
-	function receive() { return false; }
-	function getPostData() { return false; }
+	#function incomingPing() { return false; }
+	#function send() { return false; }
+	#function receive() { return false; }
+	#function getPostData() { return false; }
 	
 	# Method: fetchPage
 	# Requests a URL from a remote host and returns the resulting data.

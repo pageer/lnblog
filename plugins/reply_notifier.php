@@ -88,6 +88,14 @@ class ReplyNotifier extends Plugin {
 		if (! $param->source || ! $param->target) return false;
 
 		$parent = $param->getParent();
+		
+		# Don't notify for pings to the author's other entries.
+		if ($param->isLocal()) {
+			$ent = get_entry_from_uri($param->source);
+			if ($ent->uid == $parent->uid) {
+				return false;
+			}
+		}
 
 		$subject = spf_("Pingback on %s", $parent->subject);
 		$data = _("A new Pingback ping has been received.\n").
