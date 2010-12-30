@@ -236,6 +236,5 @@ if ($year && $month && $day) {
 if (GET('ajax')) {
 	echo $body;
 } else {
-	$PAGE->display($body, &$blog);
+	$PAGE->display($body, $blog);
 }
-?>

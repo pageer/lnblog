@@ -524,19 +524,18 @@ function get_ip() {
 # don't think anything else accounts for this yet.
 
 function config_php_string($levels) {
-	$ret  = "<?php\n";
-	$ret .= 'if (! defined("PATH_SEPARATOR") ) define("PATH_SEPARATOR", strtoupper(substr(PHP_OS,0,3)==\'WIN\')?\';\':\':\');'."\n";
+	$ret = 'if (! defined("PATH_SEPARATOR") ) define("PATH_SEPARATOR", strtoupper(substr(PHP_OS,0,3)==\'WIN\')?\';\':\':\');'."\n";
+	$ret .= 'if (! defined("BLOG_ROOT")) define("BLOG_ROOT", dirname(__FILE__)';
 	if ($levels > 0) {
-		$ret .= '$blogrootpath = getcwd();'."\n";
-		$ret .= 'for ($i=1; $i<='.$levels.'; $i++) $blogrootpath = dirname($blogrootpath);'."\n";
-	} else {
-		$ret .= 'if(! defined("BLOG_ROOT")) define("BLOG_ROOT", getcwd());'."\n";
+		$ret .= ".'";
+		for ($i = 1; $i <= $levels; $i++) {
+			$ret .= DIRECTORY_SEPARATOR.'..';
+		}
+		$ret .= "'";
 	}
-	$ret .= 'if (! defined("BLOG_ROOT")) define("BLOG_ROOT", $blogrootpath);'."\n";
-	$ret .= 'ini_set(\'include_path\', ini_get(\'include_path\').PATH_SEPARATOR.BLOG_ROOT);'."\n";
-	$ret .= 'require_once("pathconfig.php");'."\n";
-	$ret .= 'require_once("blogconfig.php");'."\n";
-	$ret .= '?>';
+	$ret .= ");\n";
+	$ret .= 'require_once(BLOG_ROOT.DIRECTORY_SEPARATOR."pathconfig.php");'."\n";
+	$ret .= 'require_once(INSTALL_ROOT.DIRECTORY_SEPARATOR."blogconfig.php");'."\n";
 	return $ret;
 }
 
@@ -544,9 +543,8 @@ function pathconfig_php_string($inst_root, $inst_url, $blog_url) {
 	$config_data = "<?php\n";
 	$config_data .= '@define("INSTALL_ROOT", \''.$inst_root."');\n";
 	$config_data .= '@define("INSTALL_ROOT_URL", \''.$inst_url."');\n";
-	#$config_data .= '@define("BLOG_ROOT_URL", \''.$blog_url."');\n";
-	$config_data .= 'ini_set(\'include_path\', ini_get(\'include_path\').PATH_SEPARATOR.INSTALL_ROOT);';
-	$config_data .= "\n?>";
+	$config_data .= '@define("BLOG_ROOT_URL", \''.$blog_url."');\n";
+	#$config_data .= 'ini_set(\'include_path\', ini_get(\'include_path\').PATH_SEPARATOR.INSTALL_ROOT);';
 	return $config_data;
 }
 
@@ -560,10 +558,6 @@ function pathconfig_php_string($inst_root, $inst_url, $blog_url) {
 function create_directory_wrappers($path, $type, $instpath="") {
 
 	$fs = NewFS();
-
-	$head = "<?php\nrequire_once(\"config.php\");\ninclude(\"";
-	$tail = ".php\");\n?>";
-
 	$blog_templ_dir = "BLOG_ROOT.'".PATH_DELIM.BLOG_TEMPLATE_DIR."'";
 	$sys_templ_dir = "INSTALL_ROOT.'".PATH_DELIM.BLOG_TEMPLATE_DIR."'";
 
@@ -577,7 +571,7 @@ function create_directory_wrappers($path, $type, $instpath="") {
 
 	switch ($type) {
 		case BLOG_BASE:
-			var_dump(is_dir(realpath($instpath)), is_dir('C:\\inetpub\\wwwroot\\lnblog'), $instpath);
+			#var_dump(is_dir(realpath($instpath)), is_dir('C:\\inetpub\\wwwroot\\lnblog'), $instpath);
 			if (!is_dir($instpath)) return false;
 			$filelist = array("index"=>"pages/showblog");
 			$removelist = array("new", "newart", "edit", "login", "logout", 
@@ -587,7 +581,7 @@ function create_directory_wrappers($path, $type, $instpath="") {
 			if (! file_exists($current."pathconfig.php")) {
 				$inst_root = realpath($instpath);
 				$blog_root = realpath($path);
-				var_dump($inst_root, $blog_root);
+				#var_dump($inst_root, $blog_root);
 				$inst_url = localpath_to_uri($inst_root);
 				$blog_url = localpath_to_uri($blog_root);
 				$config_data = pathconfig_php_string($inst_root, $inst_url, $blog_url);
@@ -648,14 +642,23 @@ function create_directory_wrappers($path, $type, $instpath="") {
 	}
 	# Write the config.php file, with the appropriate level of distance
 	# from the blog root.
-	$ret = $fs->write_file($current."config.php", 
-	                       config_php_string($config_level));
-	if (! $ret) $ret_list[] = $current."config.php";
+	#$ret = $fs->write_file($current."config.php", 
+	#                       config_php_string($config_level));
+	#if (! $ret) $ret_list[] = $current."config.php";
 
 	foreach ($filelist as $file=>$content) {
 		$curr_file = $current.$file.".php";
-		$ret = $fs->write_file($curr_file, $head.$content.$tail);
+		$body = "<?php\n";
+		$body .= config_php_string($config_level);
+		$body .= "include(INSTALL_ROOT.DIRECTORY_SEPARATOR.\"".
+			str_replace('/', DIRECTORY_SEPARATOR, $content).".php\");\n";
+
+		$ret = $fs->write_file($curr_file, $body);
 		if (! $ret) $ret_list[] = $curr_file;
+	}
+
+	if (file_exists($current."config.php")) {
+		$fs->delete($current."config.php");
 	}
 
 	if (isset($removelist) && is_array($removelist)) {

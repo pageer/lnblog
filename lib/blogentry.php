@@ -772,7 +772,7 @@ class BlogEntry extends Entry {
 					$i++;
 				}
 			}
-			$ret = write_file($path, "<?php chdir('".$dir_path."'); include('config.php'); include('index.php'); ?>");
+			$ret = write_file($path, "<?php include(dirname(__FILE__).DIRECTORY_SEPARATOR.'".$dir_path.".DIRECOTRY_SEPARATOR.'index.php');");
 		} else $ret = false;
 		return $ret;
 	}

@@ -1051,6 +1051,18 @@ class Blog extends LnBlogObject {
 					$files = array_merge($files, $ret);
 					$ret = create_directory_wrappers($pb_path, ENTRY_PINGBACKS);
 					$files = array_merge($files, $ret);
+					
+					# Update the "pretty permalink" wrapper scripts
+					$ppl_files = glob(Path::mk($month_path, '*.php'));
+					foreach ($ppl_files as $ppl) {
+						$content = file_get_contents($ppl);
+						$matches = array();
+						if (preg_match("/chdir\('([\d_]+)'\)/", $content, $matches)) {
+							$content = '<?php include dirname(__FILE__).DIRECTORY_SEPARATOR."'.
+								$matches[1].'".DIRECTORY_SEPARATOR."index.php";';
+							write_file($ppl, $content);
+						}
+					}
 				}
 			}
 		}
