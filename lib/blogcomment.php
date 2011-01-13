@@ -366,7 +366,7 @@ class BlogComment extends Entry {
 		
 		ob_start();
 		$this->raiseEvent("OnOutput");
-		$ret .= ob_get_contents();
+		$ret = ob_get_contents();
 		ob_end_clean();
 		
 		$t = NewTemplate(COMMENT_TEMPLATE);

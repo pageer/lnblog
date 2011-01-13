@@ -33,6 +33,7 @@
 .blogentry .body {
 	border: 1px dotted black;
 	background-color: white;
+	padding: 5px;
 }
 
 /* Keeps large images withing the paragraph so they don't spill out 

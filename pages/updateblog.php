@@ -76,5 +76,4 @@ $tpl->set("UPDATE_TITLE", sprintf(_("Update %s"), $blog->name));
 $body = $tpl->process();
 $PAGE->title = spf_("Update blog - %s", $blog->name);
 $PAGE->addStylesheet("form.css");
-$PAGE->display($body, &$blog);
-?>
+$PAGE->display($body, $blog);

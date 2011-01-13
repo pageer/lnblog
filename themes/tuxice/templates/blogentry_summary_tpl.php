@@ -2,29 +2,26 @@
 <div class="header">
 <h2><a href="<?php echo $PERMALINK; ?>"><?php echo $SUBJECT; ?></a></h2>
 <ul class="postdata">
-	<li class="blogdate"><?php pf_('Posted %s', $POSTDATE); ?></li>
-<?php
-	if (! isset($NO_USER_PROFILE)) {
-		$name_link = sprintf('<a href="%s">%s</a>', $PROFILE_LINK, $USER_DISPLAY_NAME);
-	} elseif (isset($USER_EMAIL)) {
-		$name_link = sprintf('<a href="mailto:%s">%s</a>', $USER_EMAIL, $USER_DISPLAY_NAME);
-	} else {
-		$name_link = $USER_DISPLAY_NAME;
-	}
-?>
-	<li class="bloguser"><?php pf_("By %s", $name_link); ?></li>
-<?php if (isset($USER_HOMEPAGE)) { ?>
-	<li class="bloguserurl">(<a href="<?php echo $USER_HOMEPAGE; ?>"><?php echo $USER_HOMEPAGE; ?></a>)</li>
-<?php } 
+	<?php
+		if (! isset($NO_USER_PROFILE)) {
+			$name_link = sprintf('<a href="%s">%s</a>', $PROFILE_LINK, $USER_DISPLAY_NAME);
+		} elseif (isset($USER_EMAIL)) {
+			$name_link = sprintf('<a href="mailto:%s">%s</a>', $USER_EMAIL, $USER_DISPLAY_NAME);
+		} else {
+			$name_link = $USER_DISPLAY_NAME;
+		}
+	?>
+	<li class="blogdate"><?php pf_('Posted %1$s by %2$s', $POSTDATE, $name_link ); ?></li> 
 
-if (! empty($TAGS)) { ?>
-	<li><?php p_("Topics");?>: <?php 
-		$out = "";
-		foreach ($TAGS as $key=>$tag) 
-			$out .= ($out=="" ? "" : ", ").'<a href="'.make_uri($TAG_LINK,array('tag'=>urlencode($tag))).'">'.$tag.'</a>'; 
-		echo $out;
-?></li>
-<?php } ?>
+<?php if (! empty($TAGS)): ?>
+	<li><?php p_("Topics");?>: 
+	<?php foreach ($TAGS as $key=>$tag):?>
+		<a href="<?php echo make_uri($TAG_LINK,array('tag'=>urlencode($tag)))?>">
+			<?php echo $tag?>
+		</a><?php echo (@$i++ < count($TAGS)-1 ? ', ' : '')?>
+	<?php endforeach; ?>
+	</li>
+<?php endif; ?>
 </ul>
 </div>
 <div class="body">

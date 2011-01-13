@@ -21,9 +21,8 @@
 # Function: show_comment_page
 # Show the page of comments on the entry.
 function show_comment_page(&$blg, &$ent, &$usr) {
-	global $PAGE;
 	
-	$PAGE->title = $ent->title() . " - " . $blg->title();
+	Page::instance()->title = $ent->title() . " - " . $blg->title();
 	
 	# This code will detect if a comment has been submitted and, if so,
 	# will add it.  We do this before printing the comments so that a 
@@ -43,14 +42,14 @@ function show_comment_page(&$blg, &$ent, &$usr) {
 		$content = show_comments($ent, $usr);
 		# Extra styles to add.  Build the list as we go to keep from including more
 		# style sheets than we need to.
-		$PAGE->addStylesheet("reply.css");
+		Page::instance()->addStylesheet("reply.css");
 	} elseif (! $ent->allow_comment) {
 		$content = '<p>'._('Comments are closed on this entry.').'</p>';
 	}
 	$content .= $comm_output;
 
-	$PAGE->addScript(lang_js());
-	$PAGE->addScript("entry.js");
+	Page::instance()->addScript(lang_js());
+	Page::instance()->addScript("entry.js");
 	
 	return $content;
 
@@ -59,12 +58,11 @@ function show_comment_page(&$blg, &$ent, &$usr) {
 # Function: show_pingback_page
 # Show the page of Pingbacks for the entry.
 function show_pingback_page(&$blg, &$ent, &$usr) {
-	global $PAGE;
-
-	$PAGE->title = $ent->title() . " - " . $blg->title();
-	$PAGE->addScript(lang_js());
-	$PAGE->addStylesheet("reply.css");
-	$PAGE->addScript("entry.js");
+	
+	Page::instance()->title = $ent->title() . " - " . $blg->title();
+	Page::instance()->addScript(lang_js());
+	Page::instance()->addStylesheet("reply.css");
+	Page::instance()->addScript("entry.js");
 	$body = show_pingbacks($ent, $usr);
 	if (! $body) $body = '<p>'.
 		spf_('There are no pingbacks for %s', 
@@ -76,12 +74,11 @@ function show_pingback_page(&$blg, &$ent, &$usr) {
 # Function: show_trackback_page
 # Shows the page of TrackBacks for the entry.
 function show_trackback_page(&$blg, &$ent, &$usr) {
-	global $PAGE;
 	
-	$PAGE->title = $ent->title() . " - " . $blg->title();
-	$PAGE->addScript(lang_js());
-	$PAGE->addStylesheet("reply.css");
-	$PAGE->addScript("entry.js");
+	Page::instance()->title = $ent->title() . " - " . $blg->title();
+	Page::instance()->addScript(lang_js());
+	Page::instance()->addStylesheet("reply.css");
+	Page::instance()->addScript("entry.js");
 	$body = show_trackbacks($ent, $usr);
 	if (! $body) {
 		$body = '<p>'.spf_('There are no trackbacks for %s',
@@ -94,12 +91,10 @@ function show_trackback_page(&$blg, &$ent, &$usr) {
 # Function: show_trackback_ping_page
 # Show the page from which users can send a TrackBack ping.
 function show_trackback_ping_page(&$blog, &$ent, &$usr) {
-	global $SYSTEM;
-	global $PAGE;
 	
 	$tpl = NewTemplate("send_trackback_tpl.php");
 
-	if ($SYSTEM->canModify($ent, $usr) && $usr->checkLogin()) {
+	if (System::instance()->canModify($ent, $usr) && $usr->checkLogin()) {
 		$tb = NewTrackback();
 		
 		# Set default values for the trackback properties.
@@ -124,7 +119,7 @@ function show_trackback_ping_page(&$blog, &$ent, &$usr) {
 					$refresh_time = 5;
 					$tpl->set("ERROR_MESSAGE", 
 					          spf_("Trackback ping succeded.  You will be returned to the entry in %d seconds.", $refresh_time));
-					$PAGE->refresh($ent->permalink(), $refresh_time);
+					Page::instance()->refresh($ent->permalink(), $refresh_time);
 				} else {
 					$tpl->set("ERROR_MESSAGE", 
 					          spf_('Error %s: %s', $ret['error'], $ret['message']).
@@ -147,8 +142,8 @@ function show_trackback_ping_page(&$blog, &$ent, &$usr) {
 	}
 
 	
-	$PAGE->title = _("Send Trackback Ping");
-	$PAGE->addStyleSheet("form.css");
+	Page::instance()->title = _("Send Trackback Ping");
+	Page::instance()->addStyleSheet("form.css");
 
 	return $tpl->process();	
 }
@@ -156,8 +151,6 @@ function show_trackback_ping_page(&$blog, &$ent, &$usr) {
 # Function: show_entry_page
 # Handles displaying the main permalink for a BlogEntry or Article.
 function show_entry_page(&$blg, &$ent, &$usr) {
-	global $SYSTEM;
-	global $PAGE;
 	
 	# Here we include and call handle_comment() to output a comment form, add a 
 	# comment if one has been posted, and set "remember me" cookies.
@@ -167,11 +160,11 @@ function show_entry_page(&$blg, &$ent, &$usr) {
 	}
 	
 	# Get the entry AFTER posting the comment so that the comment count is right.
-	$PAGE->title = $ent->title() . " - " . $blg->title();
-	$show_ctl = $SYSTEM->canModify($ent, $usr) && $usr->checkLogin();
+	Page::instance()->title = $ent->title() . " - " . $blg->title();
+	$show_ctl = System::instance()->canModify($ent, $usr) && $usr->checkLogin();
 	$content =  $ent->getFull($show_ctl);
 	
-	if ($SYSTEM->sys_ini->value("entryconfig", "GroupReplies", 0)) {
+	if (System::instance()->sys_ini->value("entryconfig", "GroupReplies", 0)) {
 		$content .= show_all_replies($ent, $usr);
 	} else {
 		#$content .= show_trackbacks($ent, $usr);
@@ -188,19 +181,19 @@ function show_entry_page(&$blg, &$ent, &$usr) {
 			$enc_arr = array("rel"=>'enclosure', 
 							 "href"=>$enc['url'], 
 							 "type"=>$enc['type']);
-			$PAGE->addLink($enc_arr);
+			Page::instance()->addLink($enc_arr);
 		}
 	}
 	
 	if ($ent->allow_pingback) {
-		$PAGE->addHeader("X-Pingback", INSTALL_ROOT_URL."xmlrpc.php");
-		$PAGE->addLink(array('rel'=>'pingback',
+		Page::instance()->addHeader("X-Pingback", INSTALL_ROOT_URL."xmlrpc.php");
+		Page::instance()->addLink(array('rel'=>'pingback',
 							 'href'=>INSTALL_ROOT_URL."xmlrpc.php"));
 	}
-	$PAGE->addScript(lang_js());
-	$PAGE->addScript("entry.js");
-	$PAGE->addStylesheet("reply.css");
-	$PAGE->addStylesheet("entry.css");
+	Page::instance()->addScript(lang_js());
+	Page::instance()->addScript("entry.js");
+	Page::instance()->addStylesheet("reply.css");
+	Page::instance()->addStylesheet("entry.css");
 	
 	return $content;
 }
@@ -250,12 +243,10 @@ require_once("config.php");
 require_once("lib/creators.php");
 require_once("pages/pagelib.php");
 
-global $PAGE;
-
 $ent = NewEntry();
 $blg = NewBlog();
 $usr = NewUser();
-$PAGE->setDisplayObject($ent);
+Page::instance()->setDisplayObject($ent);
 
 $page_type = strtolower(GET('show'));
 if (! $page_type) {
@@ -300,4 +291,4 @@ if ($tb->incomingPing() && strtolower(GET('action')) != 'ping') {
 
 }
 
-$PAGE->display($content);
+Page::instance()->display($content);

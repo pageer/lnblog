@@ -303,7 +303,7 @@ class System {
 	
 	# Method: canModify
 	# Like <canAddTo>, except determines if the user can perform updates.
-	public function canModify(&$parm, $usr=false) {
+	public function canModify($parm, $usr=false) {
 		$ret = false;
 		if (!$usr) $usr = NewUser();
 		if ( $this->inGroup($usr->username(), 'administrators') ||

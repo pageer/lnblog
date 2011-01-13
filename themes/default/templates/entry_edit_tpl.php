@@ -1,9 +1,11 @@
-<?php if (isset($HAS_UPDATE_ERROR)) { ?>
+<?php if (isset($HAS_UPDATE_ERROR)): ?>
 <h3><?php echo $UPDATE_ERROR_MESSAGE; ?></h3>
-<?php } ?>
-<?php if (isset($PREVIEW_DATA)) {
-	echo $PREVIEW_DATA;
-} ?>
+<?php endif; ?>
+
+<div class="entry_preview">
+<?php echo @$PREVIEW_DATA; ?>
+</div>
+
 <fieldset>
 <form id="postform" method="post" action="<?php echo $FORM_ACTION; ?>" enctype="multipart/form-data" accept-charset="<?php echo DEFAULT_CHARSET;?>">
 <div class="entry_subject">
@@ -12,6 +14,7 @@
 <input id="subject" name="subject" accesskey="s" title="<?php echo $title;?>" type="text" size="40" <?php 
 if (isset($SUBJECT)) { ?>value="<?php echo $SUBJECT; ?> " <?php } ?> />
 </div>
+
 <div class="entry_tags">
 <?php $title = _("Comma-separated list of topics");?>
 <label for="tags" title="<?php echo $title;?>"><?php p_("Topics"); ?></label>
@@ -19,25 +22,28 @@ if (isset($SUBJECT)) { ?>value="<?php echo $SUBJECT; ?> " <?php } ?> />
 if (isset($TAGS)) { ?>value="<?php echo $TAGS; ?>" <?php } ?>/>
 <select id="tag_list" title="<?php p_("Add topic");?>">
 <option value="" selected="selected"><?php p_("Add topic:");?></option>
-<?php foreach ($BLOG_TAGS as $tag) { ?>
+<?php foreach ($BLOG_TAGS as $tag): ?>
 	<option value="<?php echo $tag;?>"><?php echo $tag;?></option>
-<?php } ?>
+<?php endforeach; ?>
 </select>
 </div>
+
 <div id="articlepath">
 <?php $title = _("The last part of the URL path for this article");?>
 <label class="basic_form_label" for="short_path" title="<?php echo $title;?>"><?php p_("Article path"); ?></label>
 <input id="short_path" name="short_path" title="<?php echo $title;?>" type="text" size="40" <?php 
 if (isset($URL)) { ?>value="<?php echo $URL; ?>" <?php } ?>/>
 </div>
-<?php if (isset($GET_ABSTRACT)) { ?>
+
+<?php if (isset($GET_ABSTRACT)): ?>
 <div>
 <?php $title = _("An abstract or summary paragraph for this entry");?>
 <label class="basic_form_label" title="<?php echo $title;?>" for="abstract"><?php p_("Abstract"); ?></label>
 <input id="abstract" name="abstract" title="<?php echo $title;?>" type="text" size="40" <?php 
 if (isset($URL)) { ?>value="<?php echo $URL; ?>" <?php } ?>/>
 </div>
-<?php } ?>
+<?php endif; ?>
+
 <?php 
 if (EventRegister::instance()->hasHandlers("posteditor", "ShowControls")) {
 	EventRegister::instance()->activateEventFull($tmp=false, "posteditor", "ShowControls");
@@ -49,7 +55,7 @@ if (isset($use_js_editor) && ! System::instance()->sys_ini->value('entryconfig',
 }
 ?>
 <div>
-<textarea id="body" name="body" accesskey="d" title="<?php p_("Post data");?>" rows="18" cols="40"><?php if (isset($DATA)) echo $DATA; ?></textarea>
+<textarea id="body" name="body" accesskey="d" title="<?php p_("Post data");?>" rows="18" cols="40"><?php echo @$DATA; ?></textarea>
 </div>
 <?php
 if (isset($use_js_editor) && System::instance()->sys_ini->value('entryconfig', 'EditorOnBottom', 0)) {
@@ -111,37 +117,45 @@ echo ' selected="selected"';}?>><?php p_("LBcode");?></option>
 echo ' selected="selected"';}?>><?php p_("HTML");?></option>
 </select>
 </div>
+
 <div>
 <?php $title = _("Allow readers to post comments on this entry");?>
 <label for="comments" title="<?php echo $title;?>"><?php p_("Allow comments");?></label>
 <input id="comments" name="comments" title="<?php echo $title;?>" type="checkbox" <?php if (! (isset($COMMENTS) && !$COMMENTS) ) { 
 ?>checked="checked"<?php } ?> />
 </div>
+
 <div>
 <?php $title = _("Allow this entry to receive TrackBack pings from other blogs");?>
 <label for="trackbacks" title="<?php echo $title;?>"><?php p_("Allow TrackBacks");?></label>
 <input id="trackbacks" name="trackbacks" title="<?php echo $title;?>" type="checkbox" <?php if (! (isset($TRACKBACKS) && !$TRACKBACKS) ) { 
 ?>checked="checked"<?php } ?> />
 </div>
+
 <div>
 <?php $title = _("Allow this entry to receive Pingback pings from other blogs");?>
 <label for="pingbacks" title="<?php echo $title;?>"><?php p_("Allow Pingbacks");?></label>
 <input id="pingbacks" name="pingbacks" title="<?php echo $title;?>" type="checkbox" <?php if (! (isset($PINGBACKS) && !$PINGBACKS) ) { 
 ?>checked="checked"<?php } ?> />
 </div>
+
 <div>
 <?php $title = spf_("If this box is checked, then after the entry is published, %s will attempt to send Pingback pings to any URLs in the body of the post.", PACKAGE_NAME);?>
 <label for="send_pingbacks" title="<?php echo $title;?>"><?php p_("Send Pingbacks after posting");?></label>
-<input id="send_pingbacks" name="send_pingbacks" title="<?php echo $title;?>" type="checkbox" <?php if (! (isset($SEND_PINGBACKS) && !$SEND_PINGBACKS) ) { 
+<input id="send_pingbacks" name="send_pingbacks" title="<?php echo $title;?>" type="checkbox" <?php if ( @$SEND_PINGBACKS === false ) { 
 ?>checked="checked"<?php } ?> />
 </div>
+
 </fieldset>
+
 <div class="threebutton">
 <input name="submit" id="submit" type="submit" value="<?php p_("Publish");?>" />
-<?php if (! isset($IS_PUBLISHED)) { ?>
+<?php if (! isset($IS_PUBLISHED)): ?>
 <input name="draft" id="draft" type="submit" value="<?php p_("Save Draft");?>" />
-<?php } ?>
+<?php endif; ?>
 <input name="preview" id="preview" type="submit" value="<?php p_("Preview");?>" />
 </div>
+
 </form>
+
 </fieldset>

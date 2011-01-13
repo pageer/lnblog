@@ -5,7 +5,7 @@
 }
 
 .comment h3,
-ul {
+replies.ul {
 	padding: 0px;
 	margin: 0px;
 }
@@ -27,7 +27,7 @@ ul.admin li {
 }
 
 /* TrackBack styles */
-ol {
+replies.ol {
 	background: white;
 	border: 1px solid black;
 }
