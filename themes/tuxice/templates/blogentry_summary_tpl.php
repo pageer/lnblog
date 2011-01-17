@@ -25,10 +25,7 @@
 </ul>
 </div>
 <div class="body">
-<?php 
-if ($USE_ABSTRACT) echo $ABSTRACT; 
-else echo $BODY;
-?>
+<?php echo $USE_ABSTRACT ? $ABSTRACT : $BODY;?>
 </div>
 <div class="footer">
 <?php if ($SHOW_CONTROLS) { ?>
