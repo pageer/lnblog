@@ -104,8 +104,6 @@ class Blog extends LnBlogObject {
 
 	}
 	
-
-	
 	function getPathFromEnvironment() {
 		if (isset($_GET['blog']) ) $path = trim(sanitize($_GET["blog"]));
 		else $path = '';
@@ -113,7 +111,7 @@ class Blog extends LnBlogObject {
 		if ($path) {
 			$this->getPathFromPassedValue($path);
 		} elseif (defined("BLOG_ROOT")) { 
-			$this->home_path = BLOG_ROOT;
+			$this->home_path = realpath(BLOG_ROOT);
 			$this->setBlogID();
 		} else {
 			$this->home_path = getcwd();
@@ -126,6 +124,7 @@ class Blog extends LnBlogObject {
 			$this->home_path = calculate_document_root();
 			$this->blogid = ROOT_ID;
 		} elseif (is_dir($path)) {
+			$path = realpath($path);
 			$this->home_path = realpath($path);
 			$this->setBlogID();
 		} else {

@@ -2,10 +2,9 @@
 
 class Breadcrumbs extends Plugin {
 
-	var $link_file;
+	public $link_file;
 
-	function Breadcrumbs($do_output=0) {
-		global $SYSTEM;
+	public function __construct($do_output=0) {
 
 		$this->plugin_desc = _("Show a \"bread-crumb\" trail indicating the user's current location in the blog.");
 		$this->plugin_version = "0.1.0";
@@ -16,13 +15,13 @@ class Breadcrumbs extends Plugin {
 
 		$this->addOption('no_event',
 			_('No event handlers - do output when plugin is created'),
-			$SYSTEM->sys_ini->value("plugins","EventDefaultOff", 0), 
+			System::instance()->sys_ini->value("plugins","EventDefaultOff", 0), 
 			'checkbox');
 
 		$this->getConfig();
 
 		if ( $this->no_event || 
-		     $SYSTEM->sys_ini->value("plugins","EventForceOff", 0) ) {
+		     System::instance()->sys_ini->value("plugins","EventForceOff", 0) ) {
 			# If either of these is true, then don't set the event handler
 			# and rely on explicit invocation for output.
 		} else {
@@ -32,12 +31,11 @@ class Breadcrumbs extends Plugin {
 		if ($do_output) $this->output();
 	}
 
-	function list_wrap($uri, $text) {
+	public function list_wrap($uri, $text) {
 		return '<li><a href="'.$uri.'">'.$text."</a></li>\n";
 	}
 
-	function output($parm=false) {
-		global $SYSTEM;
+	public function output($parm=false) {
 		
 		$blog = NewBlog();
 		$ent = NewEntry();
@@ -45,13 +43,14 @@ class Breadcrumbs extends Plugin {
 
 		$ret = '';
 
-		$path = $_SERVER['PHP_SELF'];
+		$path = trim($_SERVER['PHP_SELF'], '/');
 		$pos = strpos($path, $blog->blogid);
 		if ($pos !== false) $path = substr($path, $pos+strlen($blog->blogid));
-		
+	var_dump($path, $pos, $blog->blogid);	
 		$tok = strtok($path, '/');
 	
 		while ($tok !== false) {
+var_dump($tok);
 			if ($tok == BLOG_ENTRY_PATH) {
 				$ret .= $this->list_wrap($blog->uri('archives'), _("Archives"));
 			} elseif ($tok == BLOG_ARTICLE_PATH) {
