@@ -46,11 +46,10 @@ class Breadcrumbs extends Plugin {
 		$path = trim($_SERVER['PHP_SELF'], '/');
 		$pos = strpos($path, $blog->blogid);
 		if ($pos !== false) $path = substr($path, $pos+strlen($blog->blogid));
-	var_dump($path, $pos, $blog->blogid);	
+		
 		$tok = strtok($path, '/');
 	
 		while ($tok !== false) {
-var_dump($tok);
 			if ($tok == BLOG_ENTRY_PATH) {
 				$ret .= $this->list_wrap($blog->uri('archives'), _("Archives"));
 			} elseif ($tok == BLOG_ARTICLE_PATH) {

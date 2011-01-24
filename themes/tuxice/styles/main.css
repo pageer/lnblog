@@ -4,7 +4,9 @@ menu bar, and sidebar.  It does not include the blog entries, comments, forums, 
 */
 
 html, body {
-	background: #0066E3;
+	background-color: #566eff;
+	background-image: url(../images/page-bg.png);
+	background-repeat: repeat-x;
 	height: 100%;
 	width: 100%;
 	margin: 0px;
