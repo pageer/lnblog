@@ -28,46 +28,46 @@ Inherits:
 <LnBlogObject>
 */
 
-class Entry extends LnBlogObject{
+abstract class Entry extends LnBlogObject{
 
 	# Property: id
 	# An ID for the object that is unique across the class (not used).
-	public $id;
+	public $id = '';
 	# Property: uid
 	# The user ID of this object's owner.
-	public $uid;
+	public $uid = '';
 	# Property: ip
 	# The IP address logged for this object at last modification.
-	public $ip;
+	public $ip = '';
 	# Property: date
 	# The human-readable date when the object was last modified.
-	public $date;
+	public $date = '';
 	# Property: timestamp
 	# The UNIX timestamp when the object was last modified.
-	public $timestamp;
+	public $timestamp = 0;
 	# Property: post_date
 	# Human-readable date when the object was created.
-	public $post_date;
+	public $post_date = '';
 	# Property: post_ts
 	# UNIX timestamp when the object was created.
-	public $post_ts;
+	public $post_ts = 0;
 	# Property: subject
 	# The subject text associated with this object.
-	public $subject;
+	public $subject = '';
 	# Property: abstract
 	# An abstract of the text of this object (not used).
-	public $abstract;
+	public $abstract = '';
 	# Property: tags
 	# A comma-delimited list of tags applied to this entry.
 	public $tags = "";
 	# Property: data
 	# The main text data of this object.  May be one of several different 
 	# kinds of markup.
-	public $data;
+	public $data = '';
 	# Property: file
 	# The path to the file that holds data for this entry.  Note that this is
 	# specific to filesystem storage and is for internal use only.
-	public $file;
+	public $file = '';
 	# Property: has_html
 	# Holds the type of markup used in the data property.  This can be one
 	# of several defined constants, includine <MARKUP_NONE>, <MARKUP_BBCODE>, 

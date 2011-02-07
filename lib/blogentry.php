@@ -48,8 +48,6 @@ class BlogEntry extends Entry {
 	public $allow_comment = true;
 	public $allow_tb = true;
 	public $has_html;
-	#var $mail_notify = true;
-	#var $sent_ping = true;
 	public $abstract;
 
 	public function __construct($path="", $revision=ENTRY_DEFAULT_FILE) {
@@ -74,19 +72,6 @@ class BlogEntry extends Entry {
 	# This is for INTERNAL USE ONLY and exists mainly to pass on the 
 	# variables to subclasses without having to call the entire constructor.
 	public function initVars() {
-		$this->id = '';
-		$this->uid = '';
-		$this->ip = get_ip();
-		$this->date = "";
-		$this->post_date = "";
-		$this->timestamp = 0;
-		$this->post_ts = 0;
-		#$this->mail_notify = true;
-		#$this->sent_ping = true;
-		$this->subject = "";
-		$this->tags = "";
-		$this->data = "";
-		$this->abstract = "";
 		$this->enclosure = '';
 		$this->has_html = MARKUP_BBCODE;
 		$this->allow_comment = true;
@@ -211,7 +196,6 @@ class BlogEntry extends Entry {
 	Returns:
 	A Blog object.
 	*/
-	
 	public function getParent() {
 		if (file_exists($this->file)) {
 			$dir = $this->file;
@@ -1093,7 +1077,9 @@ class BlogEntry extends Entry {
 	
 	# Method: getCommentArray
 	# Compatibility function, alias for getComments
-	public function getCommentArray($sort_asc=true) { return $this->getComments($sort_asc); }
+	public function getCommentArray($sort_asc=true) {
+		return $this->getComments($sort_asc);
+	}
 
 	# TrackBack handling functions.
 
@@ -1130,7 +1116,9 @@ class BlogEntry extends Entry {
 	
 	# Method: getTrackbackArray
 	# Compatibility function, alias for getTrackbacks
-	public function getTrackbackArray($sort_asc=true) { return $this->getTrackbacks($sort_asc); }
+	public function getTrackbackArray($sort_asc=true) {
+		return $this->getTrackbacks($sort_asc);
+	}
 	
 	# Pingback handling functions
 	
@@ -1167,7 +1155,9 @@ class BlogEntry extends Entry {
 	
 	# Method: getPingbackArray
 	# Compatibility function, alias for getPingbacks
-	public function getPingbackArray($sort_asc=true) { return $this->getPingbacks($sort_asc); }
+	public function getPingbackArray($sort_asc=true) {
+		return $this->getPingbacks($sort_asc);
+	}
 	
 	# Method: getPingbacksByType
 	# Gets the local and remote pingbacks for an entry, i.e. pingbacks that come

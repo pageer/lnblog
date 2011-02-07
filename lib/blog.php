@@ -1057,8 +1057,8 @@ class Blog extends LnBlogObject {
 						$content = file_get_contents($ppl);
 						$matches = array();
 						if (preg_match("/chdir\('([\d_]+)'\)/", $content, $matches)) {
-							$content = '<?php include dirname(__FILE__).DIRECTORY_SEPARATOR."'.
-								$matches[1].'".DIRECTORY_SEPARATOR."index.php";';
+							$content = '<?php $path = dirname(__FILE__).DIRECTORY_SEPARATOR."'.
+								$matches[1].'".DIRECTORY_SEPARATOR; chdir($path); include "$path/index.php";';
 							write_file($ppl, $content);
 						}
 					}

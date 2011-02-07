@@ -5,7 +5,16 @@ $(document).ready( function () {
 		var fieldset = field;
 		var num_fields = 0;
 		
-		var button_markup = ''; //'<button class="insert_upload_link_btn">Insert Link</button>';
+		var uploadLinkClick = function () {
+			// FIXME: Cheap, cheap hack
+			var chkState = $('#adduploadlink').attr('checked');
+			$('#adduploadlink').attr('checked', true);
+			$(this).prev().change();
+			$('#adduploadlink').attr('checked', chkState);
+			return false;
+		};
+		
+		var button_markup = '<button>Insert Link</button>';
 		
 		// Add the "Add Field" button
 		var btn_markup = '<div><label for="add_upload">File uploads</label>' +
@@ -19,26 +28,29 @@ $(document).ready( function () {
 				.each( function () {
 					var num = parseInt($(this).attr('id').replace(/upload/, ''));
 					if (num > num_fields) num_fields = num;
-					if (editor) $(this).after(button_markup);
+					if (editor) {
+						$(this).change(editor.upload_add_link);
+						var btnElem = $(button_markup).click(uploadLinkClick);
+						$(this).after(btnElem);
+					}
 				} );
 		}
 		var addField = function () {
-			var linkBtn = $('<button>Insert Link</button>').click( function () {
-				
-			});
-			
 			var cls = editor ? '' : ' class="none"';
 			num_fields++;
-			var markup = '<div><label'+cls+' for="upload'+num_fields+'">Select file</label>' + 
+			var markup = '<div>' +
+						 '<label'+cls+' for="upload'+num_fields+'">Select file</label>' + 
 						 '<input type="file" name="upload[]" id="upload'+num_fields+'" />';
 			if (editor) {
 				markup += button_markup;
 			}
 			markup += '</div>';
+			elems = $(markup);
 			
-			$(fieldset).append(markup);
+			$(fieldset).append(elems);
 			if (editor) {
-				$(fieldset).find("input[type='file']").change(editor.upload_add_link);
+				$(elems).find("input[type='file']").change(editor.upload_add_link);
+				$(elems).find("button").click(uploadLinkClick);
 			}
 			return false;
 		}
@@ -47,16 +59,6 @@ $(document).ready( function () {
 			addField();
 			return false;
 		});
-		
-		if (editor) {
-			$(fieldset).find('.insert_upload_link_btn').click( function () {
-				//editor.upload_add_link($(this).prev());
-				return editor.upload_add_link();
-				//alert($(this).prev());
-				return false;
-			} );
-		}
-		
 	}
 	
 	$('.upload_field').each( function (index) {

@@ -12,3 +12,9 @@ File:    kami23-librariatux.png
 Author:  kami23
 License: Creative Commons BY-NC-SA
 Link:    http://tux.crystalxp.net/en.id.20338-kami23-librariatux.html
+
+File:     santang-shinobux.png
+Author:   Santang (Browse Tux)
+Category: Tux G2
+License:  Creative Commons BY-NC-SA
+Link:     http://tux.crystalxp.net/en.id.19555-santang-shinobux.html
