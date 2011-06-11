@@ -89,6 +89,17 @@ abstract class Entry extends LnBlogObject{
 		"tags"=>"Tags", "custom"=>"Custom");
 
 	/*
+	Method: localpath
+	Get the path to this entry's directory on the local filesystem.  Note 
+	that this is specific to file-based storage and so should only be
+	called internally.
+
+	Returns:
+	A string representing a path to the object or false on failure.
+	*/
+	protected abstract function localpath();
+
+	/*
 	Method: title
 	An RSS compatibility method for getting the title of an entry.
 	
@@ -199,7 +210,7 @@ abstract class Entry extends LnBlogObject{
 
 		$ret = preg_replace_callback("/\[img(-?\w+)?=([^\]\:]+)\]/",
 		                             array($this, 'fixBBCodeURI'), $data);
-		$ret = preg_replace_callback("/\[url=([^\:@]+)\]/", 
+		$ret = preg_replace_callback("/\[url=([^\:@\]]+)\]/", 
 		                             array($this, 'fixBBCodeURI'), $ret);
 		return $ret;
 	}
