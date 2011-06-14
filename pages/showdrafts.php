@@ -60,5 +60,4 @@ $tpl->set("ITEM_LIST", $linklist);
 $body = $tpl->process();
 
 $PAGE->title = $title;
-$PAGE->display($body, &$blog);
-?>
+$PAGE->display($body, $blog);

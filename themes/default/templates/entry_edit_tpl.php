@@ -149,7 +149,7 @@ echo ' selected="selected"';}?>><?php p_("HTML");?></option>
 </fieldset>
 
 <div class="threebutton">
-<input name="submit" id="submit" type="submit" value="<?php p_("Publish");?>" />
+<input name="post" id="post" type="submit" value="<?php p_("Publish");?>" />
 <?php if (! isset($IS_PUBLISHED)): ?>
 <input name="draft" id="draft" type="submit" value="<?php p_("Save Draft");?>" />
 <?php endif; ?>

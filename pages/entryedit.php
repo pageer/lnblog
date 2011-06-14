@@ -183,6 +183,41 @@ function handle_save(&$ent, &$blg, &$errors, $is_draft) {
 	return $ret;
 }
 
+function init_template($blog, $entry, $is_article = false) {
+	$tpl = NewTemplate(ENTRY_EDIT_TEMPLATE);
+	
+	if ($entry) {
+		entry_set_template($tpl, $entry);
+		$tpl->set("SEND_PINGBACKS", $blog->auto_pingback == 'all');
+	} else if ($is_article) {
+		$tpl->set("GET_SHORT_PATH");
+		$tpl->set("STICKY", true);
+		$tpl->set("COMMENTS", false);
+		$tpl->set("TRACKBACKS", false);
+		$tpl->set("PINGBACKS", false);
+	} else {
+		$tpl->set("SEND_PINGBACKS", $blog->auto_pingback != 'none');
+		$tpl->set("HAS_HTML", $blog->default_markup);
+	}
+	
+	$tpl->set("ALLOW_ENCLOSURE", $blog->allow_enclosure);
+	sort($blog->tag_list);
+	$tpl->set("BLOG_TAGS", $blog->tag_list);
+	
+	$tpl->set("FORM_ACTION", make_uri(false,false,false) );
+	$blog->exportVars($tpl);
+	
+	return $tpl;
+}
+
+function check_perms($blog, $entry, $user) {
+	$sys = System::instance();
+	return $user->checkLogin() && (
+	         ($entry != false && $sys->canAddTo($blog, $user)) ||
+		     ($entry == false && $sys->canModify($entry, $user))
+	       );
+}
+
 $PAGE = Page::instance();
 
 $blg = NewBlog();
@@ -199,37 +234,13 @@ if ($ent === false) {
 
 $is_art = ( GET('type')=='article' || is_a($ent, 'Article') );
 
-$tpl = NewTemplate(ENTRY_EDIT_TEMPLATE);
-if (! $do_new) {
-	entry_set_template($tpl, $ent);
-} elseif ($is_art) {
-	$tpl->set("GET_SHORT_PATH");
-	$tpl->set("STICKY", true);
-	$tpl->set("COMMENTS", false);
-	$tpl->set("TRACKBACKS", false);
-	$tpl->set("PINGBACKS", false);
-}
+$tpl = init_template($blg, $ent, $is_art);
 
-$tpl->set("ALLOW_ENCLOSURE", $blg->allow_enclosure);
-sort($blg->tag_list);
-$tpl->set("BLOG_TAGS", $blg->tag_list);
-
-if ($do_new) {
-	$tpl->set("SEND_PINGBACKS", $blg->auto_pingback != 'none');
-	$tpl->set("HAS_HTML", $blg->default_markup);
-} else {
-	$tpl->set("SEND_PINGBACKS", $blg->auto_pingback == 'all');
-}
-$tpl->set("FORM_ACTION", make_uri(false,false,false) );
-$blg->exportVars($tpl);
-
-if ( POST('submit') || POST('draft') ) {
+if ( POST('post') || POST('draft') ) {
 	
 	$err = false;
 	
-	if ($u->checkLogin() && 
-	    ( ($do_new && $SYSTEM->canAddTo($blg, $u)) ||
-		  (! $do_new && $SYSTEM->canModify($ent, $u)) ) ) {
+	if (check_perms($blg, $ent, $u)) {
 		
 		if ($do_new) {
 			$ent = $is_art ? NewArticle() : NewBlogEntry();
@@ -302,17 +313,23 @@ if ( POST('submit') || POST('draft') ) {
 	if (isset($_GET['save']) && $_GET['save'] == 'draft') {
 		$errs = '';
 		$ret = handle_save($blg->$last_var, $blg, $errs, true);
-		$uri = create_uri_object($blg->$last_var);
-		$uri->separator = '&';
-	#echo $uri->editDraft(true);
-		$PAGE->redirect($uri->editDraft(true));
-		exit;
+		if (! GET('ajax')) {
+			$uri = create_uri_object($blg->$last_var);
+			$uri->separator = '&';
+			$PAGE->redirect($uri->editDraft(true));
+			exit;
+		}
 	}
 	
 	$u->exportVars($tpl);
 	$blg->raiseEvent($is_art?"OnArticlePreview":"OnEntryPreview");
 	entry_set_template($tpl, $blg->$last_var);
-	$tpl->set("PREVIEW_DATA", $blg->$last_var->get() );
+	if (GET('ajax')) {
+		echo $blg->$last_var->get();
+		exit;
+	} else {
+		$tpl->set("PREVIEW_DATA", $blg->$last_var->get() );
+	}
 
 } elseif ( empty($_POST) && ! $u->checkLogin() ) {
 	header("HTTP/1.0 403 Forbidden");
@@ -328,6 +345,7 @@ if (empty($page_body)) $page_body = $tpl->process();
 $title = $is_art ? _("New Article") : _("New Entry");
 $PAGE->title = sprintf("%s - %s", $blg->name, $title);
 $PAGE->addStylesheet("form.css", "entry.css");
+$PAGE->addScript("jquery.form.js");
 $PAGE->addScript("editor.js");
 $PAGE->addScript("upload.js");
 $PAGE->addScript(lang_js());

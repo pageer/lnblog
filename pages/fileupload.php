@@ -27,7 +27,7 @@ session_start();
 require_once("config.php");
 require_once("lib/creators.php");
 
-$num_fields = 5;
+$num_fields = 1;
 $target_under_blog = "";
 
 $blog = NewBlog();

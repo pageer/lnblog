@@ -390,6 +390,7 @@ function LBCodeEditor() {
 		}
 		
 		var preview = document.getElementById('preview');
+		/*
 		lnblog.addEvent(preview, 'click', 
 			function(e) {
 				var has_files = false;
@@ -420,7 +421,7 @@ function LBCodeEditor() {
 					return true;
 				}
 			});
-		
+		*/
 		document.getElementById('subject').focus();
 		
 		return true;
@@ -430,3 +431,41 @@ function LBCodeEditor() {
 }
 
 var lbcode_editor = new LBCodeEditor();
+
+$(document).ready(function () {
+	$("#postform input[type='submit']").click(function () {
+		$("#postform input[type='submit']").attr('rel', '');
+		$(this).attr('rel', 'clicked');
+	});
+	$('#postform').submit(function () {
+		if ($('#preview').attr('rel') == 'clicked') {
+			var form_url = $('#postform').attr('action');
+			form_url += (form_url.indexOf('?') >= 0) ? '&' : '?';
+			form_url += 'preview=yes&ajax=1';
+			
+			var has_files = false;
+			$("#postform input[type='file']").each(function () {
+				if ($(this).val() != '') {
+					has_files = true;
+				}
+			});
+			
+			if (has_files) {
+				var ret = window.confirm(strings.editor_submitWithFiles);
+				if (ret) {
+					form_url += '&save=draft'
+				} else {
+					return false;
+				}
+			}
+			
+			var options = {
+				target: '.entry_preview',
+				url: form_url
+			};
+			$('#postform').ajaxSubmit(options);
+			return false;
+		}
+		return true;
+	});
+});
