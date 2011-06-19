@@ -71,13 +71,13 @@ if (isset($use_js_editor) && System::instance()->sys_ini->value('entryconfig', '
 <input type="checkbox" id="publisharticle" <?php if (isset($GET_SHORT_PATH)) { echo 'checked="checked"'; }?> />
 </div>
 <?php endif; ?>
-
+<!--
 <div>
 <?php $title = _("If this is checked, then when you add an item to be uploaded, a link or image tag for it will be added in the body of the entry at the current cursor location.");?>
 <label for="adduploadlink" title="<?php echo $title;?>"><?php p_("Insert link when adding uploads");?></label>
 <input type="checkbox" id="adduploadlink"  title="<?php echo $title;?>" <?php if (! empty($INSERT_LINKS)) echo 'checked="checked"'; ?> />
 </div>
-
+-->
 <?php if ($num_uploads = System::instance()->sys_ini->value("entryconfig", "AllowInitUpload", 1)): ?>
 <div class="upload_field">
 	<?php for ($i = 1; $i <= $num_uploads; $i++): ?>

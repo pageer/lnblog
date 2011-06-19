@@ -531,6 +531,8 @@ $.fn.ajaxSubmit = function(options) {
 			if (s && s.dataFilter) {
 				data = s.dataFilter(data, type);
 			}
+			alert(type);
+			alert(data);
 			if (typeof data === 'string') {
 				if (type === 'json' || !type && ct.indexOf('json') >= 0) {
 					data = parseJSON(data);

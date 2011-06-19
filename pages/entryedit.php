@@ -92,8 +92,8 @@ function handle_pingback_pings(&$ent) {
 	}
 
 	if ($errors) {
-		$err = _("Failed to send the following pingbacks:").
-		       '<br />'.implode("\n<br />", $errors);
+		$err = "<p>"._("Failed to send the following pingbacks:").
+		       '<br />'.implode("\n<br />", $errors)."</p>";
 	}
 	return $err;
 }
@@ -195,6 +195,7 @@ function init_template($blog, $entry, $is_article = false) {
 		$tpl->set("COMMENTS", false);
 		$tpl->set("TRACKBACKS", false);
 		$tpl->set("PINGBACKS", false);
+		$tpl->set("HAS_HTML", $blog->default_markup);
 	} else {
 		$tpl->set("SEND_PINGBACKS", $blog->auto_pingback != 'none');
 		$tpl->set("HAS_HTML", $blog->default_markup);
@@ -218,6 +219,45 @@ function check_perms($blog, $entry, $user) {
 	       );
 }
 
+function handle_post($blg, &$ent, $u, $do_new, $is_art) {
+
+	$result = array('errors'=> false, 'warnings'=> '');
+	
+	if ($do_new) {
+		$ent = $is_art ? NewArticle() : NewBlogEntry();
+	}
+	$ent->getPostData();
+	
+	// Bail on security error
+	if (! check_perms($blg, $ent, $u)) {
+		$result['errors'] = spf_("Permission denied: user %s cannot update this entry.", $u->username());
+		return $result;
+	}
+	
+	$ret = false;
+	// Bail on empty post
+	if (! $ent->data) {
+		$result['errors'] = _("Error: entry contains no data.");
+		return $result;
+	}
+	
+	$ret = handle_save($ent, $blg, $result['warnings'], POST('draft'));
+	if (! $ret) {
+		$result['errors'] = _("Error: unable to update entry.");
+
+		# Check for pingback-enabled links and send them pings.
+		if ( POST("send_pingbacks") && ! POST('draft') ) {
+			$result['warnings'] .= handle_pingback_pings($ent);
+		}
+	}
+	
+	if ($result['warnings']) {
+		$result['warnings'] = "<h4>"._("Entry created, but with errors")."</h4>".$result['warnings'];
+	}
+	
+	return $result;
+}
+
 $PAGE = Page::instance();
 
 $blg = NewBlog();
@@ -238,59 +278,18 @@ $tpl = init_template($blg, $ent, $is_art);
 
 if ( POST('post') || POST('draft') ) {
 	
-	$err = false;
+	$res = handle_post($blg, $ent, $u, $do_new, $is_art);
 	
-	if (check_perms($blg, $ent, $u)) {
-		
-		if ($do_new) {
-			$ent = $is_art ? NewArticle() : NewBlogEntry();
-		}
-		
-		$ent->getPostData();
-		
-		if ($ent->data) {
-
-			$page_body = '';
-			$ret = handle_save($ent, $blg, $page_body, POST('draft'));
-			
-			if ($ret) {
-
-				# Check for pingback-enabled links and send them pings.
-				if ( $ret && POST("send_pingbacks") && ! POST('draft') ) {
-					$err = handle_pingback_pings($ent);
-					if (! isset($page_body)) $page_body = '';
-					$page_body .= "<p>".$err."</p>";
-				}
-				
-				if (isset($page_body)) {
-					$refresh_delay = 10;
-					$page_body = "<h4>"._("Entry created, but with errors")."</h4>".
-					        $page_body."\n<p>".
-							spf_('You will be redirected to <a href="%s">the new entry</a> in %d seconds.',
-							     $ent->permalink(), $refresh_delay)."</p>";
-					$PAGE->refresh($ent->permalink(), $refresh_delay);
-				}
-				
-			} else { 
-				$err = _("Error: unable to update entry.");
-			}
-				
-		} else {
-			$err = _("Error: entry contains no data.");
-		}
-		
-	} else {
-		if ($do_new) {
-			$ent = NewBlogEntry();
-			$ent->getPostData();
-		}
-		$err = spf_("Permission denied: user %s cannot update this entry.", $u->username());
-	}
-	
-	if ($err) {
+	if ($res['errors']) {
 		$tpl->set("HAS_UPDATE_ERROR");
-		$tpl->set("UPDATE_ERROR_MESSAGE", $err);
+		$tpl->set("UPDATE_ERROR_MESSAGE", $res['errors']);
 		entry_set_template($tpl, $ent);
+	} elseif ($res['warnings']) {
+		$refresh_delay = 10;
+		$page_body = $res['warnings']."<p>".
+					 spf_('You will be redirected to <a href="%s">the new entry</a> in %d seconds.',
+					 $ent->permalink(), $refresh_delay)."</p>";
+		$PAGE->refresh($ent->permalink(), $refresh_delay);
 	} elseif ( POST('draft') ) {
 		$PAGE->redirect($blg->uri('listdrafts'));
 	} else {
@@ -300,17 +299,15 @@ if ( POST('post') || POST('draft') ) {
 } elseif (POST('preview') || GET('preview')) {
 	
 	$last_var = $is_art ? 'last_article' : 'last_blogentry';
-	
 	if ($do_new) {
-		if ($is_art) $blg->$last_var = NewArticle();
-		else $blg->$last_var = NewBlogEntry();
+		$blg->$last_var = $is_art ? NewArticle() : NewBlogEntry();
 	} else {
 		$blg->$last_var = $ent;
 	}
 	
 	$blg->$last_var->getPostData();
 	
-	if (isset($_GET['save']) && $_GET['save'] == 'draft') {
+	if (GET('save') == 'draft') {
 		$errs = '';
 		$ret = handle_save($blg->$last_var, $blg, $errs, true);
 		if (! GET('ajax')) {
@@ -324,8 +321,13 @@ if ( POST('post') || POST('draft') ) {
 	$u->exportVars($tpl);
 	$blg->raiseEvent($is_art?"OnArticlePreview":"OnEntryPreview");
 	entry_set_template($tpl, $blg->$last_var);
+	
 	if (GET('ajax')) {
-		echo $blg->$last_var->get();
+		$response = array(
+			'id' => $blg->$last_var->entryID(),
+			'content' => rawurlencode($blg->$last_var->get())
+		);
+		echo json_encode($response);
 		exit;
 	} else {
 		$tpl->set("PREVIEW_DATA", $blg->$last_var->get() );

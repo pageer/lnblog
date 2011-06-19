@@ -296,6 +296,9 @@ function LBCodeEditor() {
 	
 		var check_add = document.getElementById("adduploadlink");
 		if (check_add && ! check_add.checked) return false;
+		
+		// Cheap, cheap hack since we're no longer doing auto-add.
+		if (e !== true) return false;
 	
 		for (i=0; i< img_exts.length; i++) {
 			if (img_exts[i] == ext) {
@@ -369,12 +372,14 @@ function LBCodeEditor() {
 		toggle_post_settings();
 	
 		// Add event handlers to file upload boxes.
+		/*
 		var uploads = document.getElementsByTagName('input');
 		for (i=0; i< uploads.length; i++) {
 			if (uploads[i].type == 'file') {
 				lnblog.addEvent(uploads[i], 'change', self.upload_add_link);
 			}
 		}
+		*/
 		
 		var tagsel = document.getElementById('tag_list');
 		lnblog.addEvent(tagsel, 'change', topic_add_tag);
@@ -458,10 +463,27 @@ $(document).ready(function () {
 					return false;
 				}
 			}
-			
+
 			var options = {
 				target: '.entry_preview',
-				url: form_url
+				url: form_url,
+				dataType: 'json',
+				success: function (response, statusText, xhr, $form) {
+					$('.entry_preview').html(unescape(response.content));
+					if (response.id.match(/draft/)) {
+						var form_url = $('#postform').attr('action')
+						form_url += form_url.match(/draft=/) ? '' : '&draft='+response.id;
+						form_url += form_url.match(/preview=1/) ? '' : '&preview=yes';
+						form_url += form_url.match(/ajax=1/) ? '' : 'ajax=1';
+						$('#postform').attr('action', form_url);
+					}
+					
+				},
+				beforeSubmit: function () {
+					alert("qua?");
+				}
+				
+
 			};
 			$('#postform').ajaxSubmit(options);
 			return false;
