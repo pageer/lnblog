@@ -478,12 +478,7 @@ $(document).ready(function () {
 						$('#postform').attr('action', form_url);
 					}
 					
-				},
-				beforeSubmit: function () {
-					alert("qua?");
 				}
-				
-
 			};
 			$('#postform').ajaxSubmit(options);
 			return false;
