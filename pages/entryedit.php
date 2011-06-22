@@ -244,13 +244,13 @@ function handle_post($blg, &$ent, $u, $do_new, $is_art) {
 	$ret = handle_save($ent, $blg, $result['warnings'], POST('draft'));
 	if (! $ret) {
 		$result['errors'] = _("Error: unable to update entry.");
-
+	} else {
 		# Check for pingback-enabled links and send them pings.
 		if ( POST("send_pingbacks") && ! POST('draft') ) {
 			$result['warnings'] .= handle_pingback_pings($ent);
 		}
 	}
-	
+
 	if ($result['warnings']) {
 		$result['warnings'] = "<h4>"._("Entry created, but with errors")."</h4>".$result['warnings'];
 	}

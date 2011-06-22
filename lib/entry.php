@@ -97,7 +97,7 @@ abstract class Entry extends LnBlogObject{
 	Returns:
 	A string representing a path to the object or false on failure.
 	*/
-	protected abstract function localpath();
+	protected function localpath() {}
 
 	/*
 	Method: title

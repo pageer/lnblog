@@ -890,8 +890,10 @@ function get_entry_from_uri($uri) {
 	} elseif (is_file($local_path)) {
 		$dir_path = dirname($local_path);
 		$content = file($local_path);
-	
-		if (preg_match("/chdir\('([^']+)'\)/", $content[0], $matches)) {
+		
+		$re = "/DIRECTORY_SEPARATOR.'(\d+_\d+)'.DIRECTORY_SEPARATOR/";
+		
+		if (preg_match($re, $content[0], $matches)) {
 			$dir = $matches[1];
 		} else $dir = '';
 		$dir = mkpath($dir_path, $dir);
