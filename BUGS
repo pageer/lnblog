@@ -1,5 +1,0 @@
-This file lists bugs known to exist at release time.  If you find a bug in this 
-release that is NOT mentioned in the list, then please report it.
-
-Version 0.8.2:
-- The Blog uri() method is incomplete.  It's missing a "showmonth" case. 

@@ -1,3 +1,16 @@
+21-Jun-2011: version 1.0.0
+- 0000017: [Improvement] Add an "insert link" button for uploads (pageer) - resolved.
+- 0000021: [Defect] Breadcrumb plugin double entry name when on entry page (pageer) - resolved.
+- 0000010: [Defect] Wrapper scripts should not rely on include_path (pageer) - resolved.
+- 0000011: [Defect] Too many wrapper scripts (pageer) - resolved.
+- 0000019: [Defect] Recent entries sidebar link broken when short tags is off (pageer) - resolved.
+- 0000004: [Defect] Don't notify on friendly pingbacks (pageer) - resolved.
+- 0000001: [Task] Dynamic file upload fields (pageer) - resolved.
+- 0000018: [Defect] Article sidebar custom links edit link broken (pageer) - resolved.
+- 0000013: [Vulnerability] Directory traversal vulnerability (pageer) - resolved.
+- 0000009: [Defect] New blog PHP wrappers aren't created (pageer) - resolved.
+- 0000008: [Defect] Warnings on fs setup (pageer) - resolved.
+
 06-Nov-2007:
 - Lots of fixes for things that broke in the process of refactoring.
 - Changed "url" field in comment form, as it made the new entry display script thing that
