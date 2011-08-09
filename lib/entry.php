@@ -20,50 +20,45 @@
 
 require_once("utils.php");
 require_once("xml.php");
-/*
-Class: Entry
-An abstract class representing entries of all types in the blog database.
 
-Inherits:
-<LnBlogObject>
-*/
-
+/**
+ * An abstract class representing entries of all types in the blog database.
+ */
 abstract class Entry extends LnBlogObject{
 
-	# Property: id
-	# An ID for the object that is unique across the class (not used).
+	/** @var string An ID for the object that is unique across the class (not used). */
 	public $id = '';
-	# Property: uid
-	# The user ID of this object's owner.
+	
+	/** @var string The user ID of this object's owner. */
 	public $uid = '';
-	# Property: ip
-	# The IP address logged for this object at last modification.
+	
+	/** @var string The IP address logged for this object at last modification. */
 	public $ip = '';
-	# Property: date
-	# The human-readable date when the object was last modified.
+	
+	/** @var string The human-readable date when the object was last modified. */
 	public $date = '';
-	# Property: timestamp
-	# The UNIX timestamp when the object was last modified.
+	
+	/** @var int The UNIX timestamp when the object was last modified. */
 	public $timestamp = 0;
-	# Property: post_date
-	# Human-readable date when the object was created.
+	
+	/** @var string Human-readable date when the object was created. */
 	public $post_date = '';
-	# Property: post_ts
-	# UNIX timestamp when the object was created.
+	
+	/** @var int UNIX timestamp when the object was created. */
 	public $post_ts = 0;
-	# Property: subject
-	# The subject text associated with this object.
+	
+	/** @var string The subject text associated with this object. */
 	public $subject = '';
-	# Property: abstract
-	# An abstract of the text of this object (not used).
+	
+	/** @var string An abstract of the text of this object (not used). */
 	public $abstract = '';
-	# Property: tags
-	# A comma-delimited list of tags applied to this entry.
+	
+	/** @var string A comma-delimited list of tags applied to this entry. */
 	public $tags = "";
-	# Property: data
-	# The main text data of this object.  May be one of several different 
-	# kinds of markup.
+	
+	/** @var string The main text data of this object.  May be one of several different kinds of markup. */
 	public $data = '';
+	
 	# Property: file
 	# The path to the file that holds data for this entry.  Note that this is
 	# specific to filesystem storage and is for internal use only.
@@ -188,287 +183,6 @@ abstract class Entry extends LnBlogObject{
 	*/
 	public function queryStringToID() { return false; }
 
-	/*
-	Method: absolutizeBBCodeURI
-	A function to search LBCode marked-up text and convert the URIs in
-	links and images from relative to absolute.
-
-	Parameters:
-	data        - The string containing the LBCode markup to absolutize.
-	current_uri - The URI to which the relative links are relative.
-
-	Returns:
-	A string with the markup in the data parameter, but with relative img and
-	url tags converted to absolute URIs.  If the relative URI contains no 
-	slashes, colons, or ampersands, the relative URI given will be interpreted
-	as under the under the current_uri parameter.  If it contains slashes, but
-	no colons or ampersands, it will interpreted as relative to the
-	blog root, if there is a current blog, and if the given URI starts with a 
-	slash, it will be interpreted as relative to the DOCUMENT_ROOT, if it is set.
-	*/
-	public function absolutizeBBCodeURI($data, $current_uri) {
-
-		$ret = preg_replace_callback("/\[img(-?\w+)?=([^\]\:]+)\]/",
-		                             array($this, 'fixBBCodeURI'), $data);
-		$ret = preg_replace_callback("/\[url=([^\:@\]]+)\]/", 
-		                             array($this, 'fixBBCodeURI'), $ret);
-		return $ret;
-	}
-
-	/*
-	Method: absolutizeHTMLURI
-	A version of <absolutizeBBCodeURI> that works with HTML markup.
-
-	Parameters:
-	data        - The string containing the HTML markup to absolutize.
-	current_uri - The URI to which the relative links are relative.
-
-	Returns:
-	The markup in the data parameter with href and src attributes absolutized
-	according to the same rules as apply with <absolutizeBBCodeURI>.
-	*/
-	public function absolutizeHTMLURI($data, $current_uri) {
-		$ret = preg_replace_callback("/src=['\"]([^\:]+)['\"]/",
-		                             array($this, 'fixHTMLURI'), $data);
-		$ret = preg_replace_callback("/href=['\"]([^\:@]+)['\"]/", 
-		                             array($this, 'fixHTMLURI'), $ret);
-		return $ret;
-	}
-
-	public function fixURI($args) {
-		if (count($args) == 3) {
-			$uri = $args[2];
-		} else {
-			$uri = $args[1];
-		}
-		
-		$parent = $this->getParent();
-		$searchpath = array($this->localpath());
-		$upload_dirs = explode(",", FILE_UPLOAD_TARGET_DIRECTORIES);
-		foreach ($upload_dirs as $dir) {
-			$searchpath[] = mkpath($parent->home_path, $dir);
-		}
-		$searchpath[] = $parent->home_path;
-		
-		$temp_uri = str_replace("/", PATH_DELIM, $uri);
-		
-		foreach ($searchpath as $path) {
-			if (file_exists(mkpath($path, $temp_uri))) {
-				$uri = localpath_to_uri(mkpath($path, $temp_uri));
-				break;
-			}
-		}
-	
-		return $uri;
-	}
-	
-	public function fixBBCodeURI($args) {
-		$uri = $this->fixURI($args);
-		if (count($args) == 3) {
-			return '[img'.$args[1].'='.$uri.']';
-		} else {
-			return '[url='.$uri.']';
-		}
-	}
-	
-	public function fixHTMLURI($args) {
-		$uri = $this->fixURI($args);
-		if (count($args) == 3) {
-			return 'src="'.$uri.'"';
-		} else {
-			return 'href="'.$uri.'"';
-		}
-	}
-
-	/*
-	Method: stripHTML
-	Strip HTML code out of a string.  Note that the <UNICODE_ESCAPE_HACK>
-	configuration constant can be used to switch between using the PHP
-	htmlentities() and htmlspecialchars() functions to sanitize input.
-	This is because htmlentities() has a nasty habit of mangling Unicode.
-
-	Parameters:
-	data - The string to strip.
-
-	Returns:
-	A copy of data with HTML special characters such as angle brackets and
-	ampersands converted into their corresponding HTML entities.  This will
-	cause them to display in a web page as characters, not HTML markup.
-	*/
-	public function stripHTML($data) {
-		
-		if (UNICODE_ESCAPE_HACK) {
-			$ret = htmlentities($data);
-			$ret = preg_replace("/&amp;(#\d+);/Usi", "&$1;", $ret);
-			$ret = preg_replace("/&amp;(\w{2,7});/Usi", "&$1;", $ret);
-		} else {
-			$ret = htmlspecialchars($data);
-		}
-		return $ret;
-	}
-
-	# Removes all markup (both HTML and LBCode tags) from the entry data 
-	# and returns just plain text.
-
-	public function getPlainText() {
-		if ($this->has_html == MARKUP_HTML) {
-			$ret = strip_tags($this->data);
-		} elseif ($this->has_html == MARKUP_BBCODE) {
-			$patterns = array('/\[.+\]/Usi', '/\[\/.+\]/Usi');
-			$replacements = array('', '', '', '');
-			$ret = preg_replace($patterns, $replacements, $this->data);
-		} else $ret = $this->data;
-		return $ret;
-	}
-
-	public function addHTML($data, $use_nofollow=false) {
-		$ret = $data;
-		$patterns[0] = "/((http|https|ftp):\/\/\S*)/i";
-		$patterns[1] = '/\r\n(\r\n)+/';
-		$patterns[2] = '/\n\n/';
-		$patterns[3] = '/\n/';
-		if ($use_nofollow) {
-			$replacements[0] = '<a href="$1" rel="nofollow">$1</a>';
-		} else {
-			$replacements[0] = '<a href="$1">$1</a>';
-		}
-		$replacements[1] = '</p><p>';
-		$replacements[2] = '</p><p>';
-		$replacements[3] = '<br />';
-		ksort($patterns);
-		ksort($replacements);
-		$ret = preg_replace($patterns, $replacements, $ret);
-		$ret = "<p>".$ret."</p>";
-		return $ret;
-	}
-
-	# Method: bbcodeToHTML
-	# Converts LBCode markup into HTML.
-	#
-	# Parameters:
-	# data  - The data string to convert.
-	# strip - *Optional* boolean indicating if the LBCode should just be
-	#         stripped rather than converted.  Defaults to false.
-	#
-	# Returns:
-	# A string with the converted text.
-	
-	#function bbcodeToHTML2($data, $strip=false) {
-	#	$p = new LBParser($data);
-	#	return '<p>'.$p->parse().'</p>';
-	#}
-	
-	public function bbcodeToHTML($data, $strip=false) {
-		$ret = $data;
-		
-		$patterns[0] = "/\[url=(\S+)\](.+)\[\/url\]/Usi";
-		$patterns[1] = "/\[img=(.+)](.+)\[\/img\]/Usi";
-		$patterns[2] = "/\[ab=(.+)\](.+)\[\/ab\]/Usi";
-		$patterns[3] = "/\[ac=(.+)\](.+)\[\/ac\]/Usi";
-		$patterns[4] = "/\[quote\](.+)\[\/quote\]/Usi";
-		$patterns[5] = "/\[quote=(.+)\](.+)\[\/quote\]/Usi";
-		$patterns[6] = "/\[b\](.+)\[\/b\]/Usi";
-		$patterns[7] = "/\[i\](.+)\[\/i\]/Usi";
-		$patterns[8] = "/\[u\](.+)\[\/u\]/Usi";
-		$patterns[9] = '/\[q\](.+)\[\/q\]/Usi';
-		$patterns[10] = '/\[q=(.+)\](.+)\[\/q\]/Usi';
-		$patterns[11] = "/(\r?\n\s*)?\[list\]\s*\r?\n(.+)\[\/list\](\s*\r?\n)?/si";
-		$patterns[12] = "/(\r?\n\s*)?\[numlist\]\s*\r?\n(.+)\[\/numlist\](\s*\r?\n)?/si";
-		$patterns[13] = "/\[\*\](.*)\r?\n/Usi";
-		$patterns[14] = "/\[code\](.*)\[\/code\]/Usi";
-		$patterns[15] = "/\[t\](.*)\[\/t\]/Usi";
-		$patterns[16] = "/\[img-left=(.+)\](.+)\[\/img-left\]/Usi";
-		$patterns[17] = "/\[img-right=(.+)\](.+)\[\/img-right\]/Usi";
-		$patterns[18] = "/\[h\](.*)\[\/h\]/Usi";
-		$patterns[19] = "/\[color=(.+)\](.+)\[\/color\]/Usi";
-
-		
-		$whitespace_patterns[0] = '/\r\n\r\n/';
-		$whitespace_patterns[1] = '/\n\n/';
-		$whitespace_patterns[2] = '/\r\n/';
-		$whitespace_patterns[3] = '/\n/';
-		$whitespace_patterns[4] = '/\t/';
-		
-		/*
-		$code_patterns[0] = '/(<code.*)<\/p><p>(.*<\/code>)/U';
-		$code_patterns[1] = '/(<code.*)<br \/>(.*<\/code>)/U';
-		$code_replacements[0] = '$1'."\n\n".'$2';
-		$code_replacements[1] = '$1'."\n".'$2';
-		*/
-		
-		if ($strip) {
-			$replacements[0] = '$2';
-			$replacements[1] = '';
-			$replacements[2] = '$2';
-			$replacements[3] = '$2';
-			$replacements[4] = '$1';
-			$replacements[5] = '$2';
-			$replacements[6] = '$1';
-			$replacements[7] = '$1';
-			$replacements[8] = '$1';
-			$replacements[9] = '$1';
-			$replacements[10] = '$2';
-			$replacements[11] = '$2';
-			$replacements[12] = '$2';
-			$replacements[13] = '$1';
-			$replacements[14] = '$1';
-			$replacements[15] = '$1';
-			$replacements[16] = '';
-			$replacements[17] = '';
-			$replacements[18] = '$1';
-			$replacements[19] = '$2';
-			
-			$whitespace_replacements[0] = "\r\n\r\n";
-			$whitespace_replacements[1] = "\n\n";
-			$whitespace_replacements[2] = "\r\n";
-			$whitespace_replacements[3] = "\n";
-			$whitespace_replacements[4] = "\t";
-			
-			
-		} else {
-			$replacements[0] = '<a href="$1">$2</a>';
-			$replacements[1] = '<img alt="$2" title="$2" src="$1" />';
-			$replacements[2] = '<abbr title="$1">$2</abbr>';
-			$replacements[3] = '<acronym title="$1">$2</acronym>';
-			$replacements[4] = '</p><blockquote><p>$1</p></blockquote><p>';
-			$replacements[5] = '</p><blockquote cite="$1"><p>$2</p></blockquote><p>';
-			$replacements[6] = '<strong>$1</strong>';
-			$replacements[7] = '<em>$1</em>';
-			$replacements[8] = '<span style="text-decoration: underline;">$1</span>';
-			$replacements[9] = '<q>$1</q>';
-			$replacements[10] = '<q cite="$1">$2</q>';
-			$replacements[11] = '</p><ul>$2</ul><p>';
-			$replacements[12] = '</p><ol>$2</ol><p>';
-			$replacements[13] = '<li>$1</li>';
-			$replacements[14] = '<code>$1</code>';
-			$replacements[15] = '<tt>$1</tt>';
-			$replacements[16] = '<img alt="$2" title="$2" style="float: left; clear: none;" src="$1" />';
-			$replacements[17] = '<img alt="$2" title="$2" style="float: right; clear: none;" src="$1" />';
-			$replacements[18] = '</p><h'.LBCODE_HEADER_WEIGHT.'>$1</h'.LBCODE_HEADER_WEIGHT.'><p>';
-			$replacements[19] = '<span style="color: $1">$2</span>';
-			
-			$whitespace_replacements[0] = '</p><p>';
-			$whitespace_replacements[1] = '</p><p>';
-			$whitespace_replacements[2] = '<br />';
-			$whitespace_replacements[3] = '<br />';
-			$whitespace_replacements[4] = '&nbsp;&nbsp;&nbsp;';
-			
-		}
-		
-		ksort($patterns);
-		ksort($replacements);
-		$ret = preg_replace($patterns, $replacements, $ret);
-		$ret = preg_replace($whitespace_patterns, $whitespace_replacements, $ret);
-		
-		if (! $strip) {
-			$ret = "<p>".$ret."</p>";
-			# Strip out extraneous empty paragraphs.
-			$ret = preg_replace('/<p><\/p>/', '', $ret);
-		}
-	
-		return $ret;
-	}
-
 	# Method: markup
 	# Apply appropriate markup to the entry data.
 	#
@@ -482,21 +196,9 @@ abstract class Entry extends LnBlogObject{
 	
 	public function markup($data="", $use_nofollow=false) {
 		if (! $data) $data = $this->data;
-		switch ($this->has_html) {
-			case MARKUP_NONE:
-				$ret = $this->stripHTML($data);
-				$ret = $this->addHTML($ret, $use_nofollow);
-				break;
-			case MARKUP_BBCODE:
-				$ret = $this->absolutizeBBCodeURI($data, $this->baselink() );
-				$ret = $this->stripHTML($ret);
-				$ret = $this->bbcodeToHtml($ret);
-				break;
-			case MARKUP_HTML:
-				$ret = $this->absolutizeHTMLURI($data, $this->baselink());
-				break;
-		}
-		return $ret;
+		$processor = TextProcessor::get($this->has_html, $this, $data);
+		$processor->use_nofollow = $use_nofollow;
+		return $processor->getHTML();
 	}
 
 	# Method: getAbstract

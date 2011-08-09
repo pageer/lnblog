@@ -29,6 +29,13 @@ class PluginManager {
 	var $load_first;
 	var $load_list;
 	var $plugin_config;
+	
+	static function instance() {
+		if (! isset($GLOBALS['PLUGINMANAGER'])) {
+			$GLOBALS['PLUGINMANAGER'] = new PluginManager();
+		}
+		return $GLOBALS['PLUGINMANAGER'];
+	}
 
 	function PluginManager() {
 	
