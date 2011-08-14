@@ -2,11 +2,11 @@
 class AutoMarkupTextProcessor extends TextProcessor {
 	
 	public $filter_id = MARKUP_NONE;
+	public $filter_name = 'Auto-markup';
 	public $use_nofollow = false;
 	
-	
 	public function toHTML() {
-		$this->formatted = $this->sanitizeText($this->text);
+		$this->formatted = $this->sanitizeText($this->formatted);
 		
 		$patterns[0] = "/((http|https|ftp):\/\/\S*)/i";
 		$patterns[1] = '/\r\n(\r\n)+/';

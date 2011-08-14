@@ -1,6 +1,7 @@
 <?php
 class LBCodeTextProcessor extends TextProcessor {
 	public $filter_id = MARKUP_BBCODE;
+	public $filter_name = 'LBCode';
 	public $strip = false;
 	
 	protected function fixURI($args) {
@@ -20,7 +21,7 @@ class LBCodeTextProcessor extends TextProcessor {
 	protected function toHTML() {
 		if ($this->entry) {
 			$this->formatted = preg_replace_callback("/\[img(-?\w+)?=([^\]\:]+)\]/",
-													 array($this, 'fixURI'), $this->text);
+													 array($this, 'fixURI'), $this->formatted);
 			$this->formatted = preg_replace_callback("/\[url=([^\:@\]]+)\]/", 
 													 array($this, 'fixURI'), $this->formatted);
 		}
@@ -126,9 +127,9 @@ class LBCodeTextProcessor extends TextProcessor {
 		$this->formatted = preg_replace($whitespace_patterns, $whitespace_replacements, $this->formatted);
 		
 		if (! $this->strip) {
-			$ret = "<p>".$this->formatted."</p>";
+			$this->formatted = "<p>".$this->formatted."</p>";
 			# Strip out extraneous empty paragraphs.
-			$ret = preg_replace('/<p><\/p>/', '', $this->formatted);
+			$this->formatted = preg_replace('/<p><\/p>/', '', $this->formatted);
 		}
 	}
 	

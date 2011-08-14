@@ -1,6 +1,7 @@
 <?php
 class HTMLTextProcessor extends TextProcessor {
 	public $filter_id = MARKUP_HTML;
+	public $filter_name = 'HTML';
 	
 	protected function fixURI($args) {
 		if (count($args) == 3) {
@@ -19,7 +20,7 @@ class HTMLTextProcessor extends TextProcessor {
 	public function toHTML() {
 		if ($this->entry) {
 			$this->formatted = preg_replace_callback("/src=['\"]([^\:]+)['\"]/",
-													 array($this, 'fixURI'), $this->text);
+													 array($this, 'fixURI'), $this->formatted);
 			$this->formatted = preg_replace_callback("/href=['\"]([^\:@]+)['\"]/", 
 													 array($this, 'fixURI'), $this->formatted);
 		}

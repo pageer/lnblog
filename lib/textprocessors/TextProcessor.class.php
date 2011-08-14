@@ -15,9 +15,12 @@ abstract class TextProcessor {
 	protected $entry = null;
 	/**
 	 * @var int The ID fo the text filter.
-	 * 
 	 */
 	public $filter_id = 0;
+	/**
+	 * @var string The human-readable name of the filter.
+	 */
+	public $filter_name = '';
 	
 	abstract protected function toHTML();
 	
@@ -41,6 +44,20 @@ abstract class TextProcessor {
 		}
 		# Throw an exception if we don't find the filter.
 		throw new Exception('Text filter ' . $markup_type . ' not found!');
+	}
+	
+	/**
+	 * Convenience function that returns a map of filter IDs to names.
+	 * 
+	 * @return array    An associative array mapping filter IDs to filter names.
+	 */
+	static public function getFilterList() {
+		$filters = self::getAvailableFilters();
+		$ret = array();
+		foreach ($filters as $filt) {
+			$ret[$filt->filter_id] = $filt->filter_name;
+		}
+		return $ret;
 	}
 	
 	/**
@@ -87,13 +104,14 @@ abstract class TextProcessor {
 	
 	public function setText($text) {
 		$this->text = $text;
+		$this->formatted = $text;
 	}
 	
 	public function getRawText() {
 		return $this->text;
 	}
 	
-	public function setEntry(Entry $entry) {
+	public function setEntry(Entry $entry = null) {
 		$this->entry = $entry;
 	}
 	

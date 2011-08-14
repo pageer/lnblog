@@ -14,6 +14,9 @@ class AuthorBio extends Plugin {
 		$this->addOption('picture_url', _('URL of your profile photo'), '');
 		$this->addOption('bio', _('Bio to display'), '', 'textarea');
 		
+		$options = TextProcessor::getFilterList();
+		$this->addOption('markup_type', 'Markup format', MARKUP_HTML, 'select', $options);
+		
 		$this->addOption('no_event',
 			_('No event handlers - do output when plugin is created'),
 			System::instance()->sys_ini->value("plugins","EventDefaultOff", 0), 
@@ -45,10 +48,11 @@ class AuthorBio extends Plugin {
 		</div>
 		<?php endif; ?>
 		<div>
-			<?php echo $this->bio;?>
+			<?php echo TextProcessor::get($this->markup_type, null, $this->bio)->getHTML();?>
 		</div>
 		<?php
 		$content = ob_get_clean();
+		$tpl->set('PANEL_CLASS', 'panel');
 		$tpl->set('PANEL_CONTENT', $content);
 		echo $tpl->process();
 	}
