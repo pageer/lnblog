@@ -56,7 +56,6 @@ class TrackbackValidator extends Plugin {
 		}
 
 		$ent = $param->getParent();
-		require_once("lib/pb.php");
 		$data = Pingback::fetchPage($param->url);
 		# If the permalink is in the page, it's legitimate, so return true.
 		if (strpos($data, $ent->permalink()) > 0) {

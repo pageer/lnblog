@@ -220,7 +220,7 @@ abstract class Entry extends LnBlogObject{
 		} elseif ($this->has_html == MARKUP_HTML) {
 			$data = strip_tags($this->data);
 		} else {
-			$data = $this->stripHTML($this->data);
+			$data = TextProcessor::get(MARKUP_NONE, $this, $this->data)->getHTML();
 		}
 		
 		$data = explode("\n", $data);

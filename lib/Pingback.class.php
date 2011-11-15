@@ -34,8 +34,6 @@
 # OnOutput        - Fired when starting to process for display.
 # OutputComplete  - Fired when output is sent to the client.
 
-require_once("lib/tb.php");
-
 class Pingback extends Trackback {
 	
 	public $target = '';

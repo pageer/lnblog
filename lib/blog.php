@@ -72,6 +72,7 @@ class Blog extends LnBlogObject {
 	public $auto_pingback = true;
 	public $gather_replies = true;
 	public $front_page_abstract = false;
+	public $front_page_entry = '';
 	
 	# System configuration information.
 	public $sw_version = '';
@@ -244,7 +245,8 @@ class Blog extends LnBlogObject {
 		$props = array("name", "description", "image", "max_entries", 
 		               "max_rss", "allow_enclosure", "theme", "owner", 
 		               "default_markup", "write_list", "tag_list",
-		               "gather_replies", "auto_pingback", "front_page_abstract");
+		               "gather_replies", "auto_pingback", "front_page_abstract",
+					   "front_page_entry");
 		foreach ($props as $key) {
 			if (is_array($this->$key)) {
 				$ini->setValue("blog", $key, implode(",", $this->$key));
@@ -966,12 +968,20 @@ class Blog extends LnBlogObject {
 	A string holding the HTML to display.
 	*/
 	function getWeblog () {
-		global $SYSTEM;
 		$ret = "";
 		$u = NewUser();
+		
+		if ($this->front_page_entry) {
+			$ent = NewEntry($this->front_page_entry);
+			if ($ent->isEntry()) {
+				$show_ctl = System::instance()->canModify($ent, $u) && $u->checkLogin();
+				return $ent->get($show_ctl);
+			}
+		}
+		
 		if (! $this->entrylist) $this->getRecent();
 		foreach ($this->entrylist as $ent) {
-			$show_ctl = $SYSTEM->canModify($ent, $u) && $u->checkLogin();
+			$show_ctl = System::instance()->canModify($ent, $u) && $u->checkLogin();
 			$ret .= $ent->get($show_ctl);
 		}
 		if (! $ret) $ret = "<p>"._("There are no entries for this weblog.")."</p>";

@@ -220,16 +220,20 @@ class BlogComment extends Entry {
 		$this->subject = POST("subject");
 		$this->data = POST("data");
 		$this->show_email = POST("showemail") ? true : false;
+		
+		$processor = TextProcessor::get(MARKUP_NONE, $this);
+		
 		foreach ($this->custom_fields as $fld=>$desc) {
 			$this->$fld = POST($fld);
-			$this->$fld = $this->stripHTML($this->$fld);
+			$processor->setText($this->$fld);
+			$this->$fld = $processor->getHTML($this->$fld);
 		}
 		# Note: Don't strip HTML from the comment data, because we do that 
 		# when we add in the links and other markup.
-		$this->name = $this->stripHTML($this->name);
-		$this->email = $this->stripHTML($this->email);
-		$this->url = $this->stripHTML($this->url);
-		$this->subject = $this->stripHTML($this->subject);
+		$this->name = $processor->getHTML($this->name);
+		$this->email = $processor->getHTML($this->email);
+		$this->url = $processor->getHTML($this->url);
+		$this->subject = $processor->getHTML($this->subject);
 		
 		if (! $this->uid) {
 			$u = NewUser();

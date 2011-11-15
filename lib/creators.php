@@ -160,14 +160,12 @@ function NewFileUpload($field, $dir=false, $index=false) {
 # Function: NewTrackback
 # Creates a new trackback object.
 function NewTrackback($param=false) {
-	require_once("tb.php");
 	return new Trackback($param);
 }
 
 # Function: NewPingback
 # Creates a new pingback object.
 function NewPingback($param=false) {
-	require_once("pb.php");
 	return new Pingback($param);
 }
 

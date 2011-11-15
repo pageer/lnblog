@@ -145,6 +145,7 @@ function blog_set_template(&$tpl, &$blog) {
 	$tpl->set("BLOG_AUTO_PINGBACK", $blog->auto_pingback);
 	$tpl->set("BLOG_GATHER_REPLIES", $blog->gather_replies);
 	$tpl->set("BLOG_FRONT_PAGE_ABSTRACT", $blog->front_page_abstract);
+	$tpl->set("BLOG_MAIN_ENTRY", $blog->front_page_entry);
 }
 
 # Function: blog_get_post_data
@@ -166,6 +167,7 @@ function blog_get_post_data(&$blog) {
 	$blog->auto_pingback = POST('pingback');
 	$blog->gather_replies = POST('replies')?1:0;
 	$blog->front_page_abstract = POST('use_abstract')?1:0;
+	$blog->front_page_entry = POST('main_entry');
 }
 
 function show_comments(&$ent, &$usr, $sort_asc=true) {

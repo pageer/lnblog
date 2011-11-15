@@ -102,20 +102,46 @@ abstract class TextProcessor {
 		$this->text = $text;
 	}
 	
+	/**
+	 * Set the initia text to process
+	 * 
+	 * @param string $text The text to format
+	 */
 	public function setText($text) {
 		$this->text = $text;
 		$this->formatted = $text;
 	}
 	
+	/**
+	 * Get the initial text passed for processing.
+	 * 
+	 * @return string    The raw text
+	 */
 	public function getRawText() {
 		return $this->text;
 	}
 	
+	/**
+	 * Set the entry object against which URIs will be resolved.
+	 * 
+	 * @param Entry   $entry The entry object for resolution
+	 */
 	public function setEntry(Entry $entry = null) {
 		$this->entry = $entry;
 	}
 	
-	public function getHTML() {
+	/**
+	 * Get the formatted HTML text.
+	 * 
+	 * @param string $text Optional text to translate.  Convenience parameter used
+	 *                     for multiple calls on the same processor instance.
+	 * 
+	 * @return string    The formatted HTML
+	 */
+	public function getHTML($text = null) {
+		if ($text !== null) {
+			$this->setText($text);
+		}
 		$this->toHTML();
 		return $this->formatted;
 	}

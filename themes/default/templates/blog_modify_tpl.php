@@ -75,6 +75,10 @@ foreach ($dir as $theme) { ?>
 <label for="use_abstract"><?php p_("Show only summaries on front page");?></label>
 <input id="use_abstract" name="use_abstract" type="checkbox" <?php if ($BLOG_FRONT_PAGE_ABSTRACT) echo 'checked="checked"';?> />
 </div>
+<div>
+<label for="main_entry"><?php p_("Article to show as front page");?></label>
+<input id="main_entry" name="main_entry" type="input" size="20" value="<?php echo $BLOG_MAIN_ENTRY;?>" />
+</div>
 <fieldset>
 <legend style="font-weight: bold"><?php p_("Default settings for blog entries");?></legend>
 <div>
