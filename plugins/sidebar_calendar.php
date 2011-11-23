@@ -3,9 +3,10 @@
 # Determine if blogconfig.php has already been loaded.  
 # If not, we will need to compensate for this.
 $files = get_included_files();
+$has_config = false;
 foreach ($files as $f) {
 	if (strstr($f, "blogconfig.php")) {
-		$files = true;
+		$has_config = true;
 		break;
 	}
 }
@@ -15,7 +16,7 @@ foreach ($files as $f) {
 # that it is the parent of the current directory), adjust the include_path, and 
 # then include blogconfig.php to do the rest.
 $do_output = false;
-if ($files !== true) {
+if ($has_config !== true) {
 	session_start();
 	$instdir = dirname(getcwd());
 	#define("INSTALL_ROOT", $instdir);
@@ -26,10 +27,10 @@ if ($files !== true) {
 	if (isset($_GET["month"])) {
 		$do_output = true;
 	}
-} elseif (isset($_GET['month']) && isset($_GET['plugin'])) {
+} elseif (isset($_GET['month']) && isset($_GET['plugin']) && defined('PLUGIN_DO_OUTPUT')) {
 	$do_output = true;
 }
-		
+
 require_once("lib/utils.php");
 
 # Add this really massive if statements to that we don't end up declaring the 
