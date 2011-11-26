@@ -69,7 +69,7 @@ class BlogComment extends Entry {
 		                              'file');
 		$this->metadata_fields = array("id"=>"postid", "uid"=>"userid",
 			"name"=>"name", "email"=>"e-mail", "url"=>"url",
-			"show_email"=>"show_email", "date"=>"date", "post_date"=>"postdate",
+			"show_email"=>"show_email", "date"=>"date", 
 			"timestamp"=>"timestamp", "post_ts"=>"posttimestamp",
 			"ip"=>"ip", "subject"=>"subject");
 		

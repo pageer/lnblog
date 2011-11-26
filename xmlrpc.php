@@ -1043,7 +1043,7 @@ function mt_getRecentPostTitles($params) {
 			$arr = array();
 			foreach ($entries as $ent) {
 				$post = array();
-				$post['dateCreated'] = new xmlrpcval($ent->post_date, 'dateTime.iso8601');
+				$post['dateCreated'] = new xmlrpcval(fmdate(ENTRY_DATE_FORMAT, $ent->post_ts), 'dateTime.iso8601');
 				$post['userid'] = new xmlrpcval($ent->uid, 'string');
 				$post['postid'] = new xmlrpcval($ent->globalID(), 'string');
 				$post['title'] = new xmlrpcval($ent->subject, 'string');

@@ -82,8 +82,7 @@ class BlogEntry extends Entry {
 		$this->exclude_fields = array("exclude_fields", "metadata_fields",
 		                              "template_file", "file");
 		$this->metadata_fields = array("id"=>"postid", "uid"=>"userid", 
-			"date"=>"date", "post_date"=>"postdate",
-			"timestamp"=>"timestamp", "post_ts"=>"posttimestamp",
+			"date"=>"date", "timestamp"=>"timestamp", "post_ts"=>"posttimestamp",
 			"ip"=>"ip", "subject"=>"subject",
 			"abstract"=>"abstract", "allow_comment"=>"allowcomment",
 			"has_html"=>"hashtml", "tags"=>"tags", 
@@ -637,13 +636,7 @@ class BlogEntry extends Entry {
 		create_directory_wrappers($dir_path.PATH_DELIM.ENTRY_PINGBACK_DIR, ENTRY_PINGBACKS);
 				
 		$this->file = $dir_path.PATH_DELIM.ENTRY_DEFAULT_FILE;
-		# Set the timestamp and date, plus the ones for the original post, if
-		# this is a new entry.
-		$this->date = fmtdate(ENTRY_DATE_FORMAT, $curr_ts);
-		if (! $this->post_date) 
-			$this->post_date = fmtdate(ENTRY_DATE_FORMAT, $curr_ts);
-		$this->timestamp = $curr_ts;
-		if (! $this->post_ts) $this->post_ts = $curr_ts;
+		$this->set_dates($curr_ts);
 		$this->ip = get_ip();
 
 		$ret = $this->writeFileData();
@@ -656,6 +649,17 @@ class BlogEntry extends Entry {
 
 		return $ret;
 		
+	}
+	
+	protected function set_dates($curr_ts = null) {
+		# Set the timestamp and date, plus the ones for the original post, if
+		# this is a new entry.
+		$curr_ts = $curr_ts ? $curr_ts : time();
+		$this->date = fmtdate(ENTRY_DATE_FORMAT, $curr_ts);
+		$this->timestamp = $curr_ts;
+		if (! $this->post_ts) {
+			$this->post_ts = $curr_ts;
+		}
 	}
 	
 	/* 
@@ -697,7 +701,9 @@ class BlogEntry extends Entry {
 			$ret &= $fs->mkdir_rec($path);
 			$this->file = mkpath($path, ENTRY_DEFAULT_FILE);
 		}
-	
+		
+		$this->set_dates($ts);
+		
 		if (! $this->uid) {
 			$usr = NewUser();
 			$this->uid = $usr->username();

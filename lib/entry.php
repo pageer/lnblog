@@ -41,9 +41,6 @@ abstract class Entry extends LnBlogObject{
 	/** @var int The UNIX timestamp when the object was last modified. */
 	public $timestamp = 0;
 	
-	/** @var string Human-readable date when the object was created. */
-	public $post_date = '';
-	
 	/** @var int UNIX timestamp when the object was created. */
 	public $post_ts = 0;
 	
@@ -78,8 +75,7 @@ abstract class Entry extends LnBlogObject{
 	# variable names and the data file variable names respectively.
 	# They are used to retreive data from persistent storage.
 	public $metadata_fields = array("id"=>"PostID", "uid"=>"UserID",
-		"date"=>"Date", "post_date"=>"PostDate", 
-		"timestamp"=>"Timestamp", "post_ts"=>"PostTimeStemp", 
+		"date"=>"Date", "timestamp"=>"Timestamp", "post_ts"=>"PostTimeStemp", 
 		"ip"=>"IP", "subject"=>"Subject", "has_html"=>"HasHTML",
 		"tags"=>"Tags", "custom"=>"Custom");
 
@@ -298,6 +294,14 @@ abstract class Entry extends LnBlogObject{
 			$this->id = str_replace(PATH_DELIM, '/', 
 			                        substr($this->file, strlen(calculate_document_root())) );
 		}
+		
+		if (! $this->post_ts) {
+			$this->post_ts = filemtime($this->file);
+		}
+		if (! $this->timestamp) {
+			$this->timestamp = filemtime($this->file);
+		}
+		
 		return $this->data;
 	}
 

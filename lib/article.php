@@ -239,7 +239,6 @@ class Article extends BlogEntry {
 
 		$this->file = $dir_path.PATH_DELIM.ENTRY_DEFAULT_FILE;
 		$this->date = fmtdate(ENTRY_DATE_FORMAT, $curr_ts);
-		if (! $this->post_date) $this->post_date = fmtdate(ENTRY_DATE_FORMAT, $curr_ts);
 		$this->timestamp = $curr_ts;
 		if (! $this->post_ts) $this->post_ts = $curr_ts;
 		$this->ip = get_ip();
