@@ -931,22 +931,3 @@ function ahref($href, $text, $attribs=false) {
 	return "$base>$text</a>";
 }
 
-##########################################
-# Section: PHP 5 compatibility functions #
-##########################################
-
-if (! function_exists('is_a')) {
-	function is_a($obj, $class) {
-		$cls = strtolower(get_class($obj));
-		$class = strtolower(trim($class));
-		return ($cls == $class);
-	}
-}
-
-if (! function_exists('file_get_contents')) {
-	function file_get_contents($path) {
-		$ret = file($path);
-		if ($ret) $ret = implode('', $ret);
-		return $ret;
-	}
-}
