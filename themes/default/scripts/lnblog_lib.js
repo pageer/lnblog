@@ -16,17 +16,6 @@ var lnblog = {
 		}
 	},
 	
-	createRequestObject: function () {
-		var request;
-		var browser = navigator.appName;
-		if (browser == "Microsoft Internet Explorer") {
-			request = new ActiveXObject("Microsoft.XMLHTTP");
-		} else {
-			request = new XMLHttpRequest();
-		}
-		return request;
-	},
-	
 	getJSONObject: function (json) {
 		return eval(json);
 	},
@@ -75,18 +64,6 @@ var lnblog = {
 	}
 
 };
-
-function LnBlogAJAX() {
-	this.http = lnblog.createRequestObject();
-	
-	this.send = function (uri, handler) {
-		this.http.open('get', uri);
-		this.onreadystatechange = handler;
-		this.httpsend(null);
-		return false;
-	};
-
-}
 
 lnblog.addEvent(window, 'load', function() {
 	if (typeof strings != 'undefined') {

@@ -32,8 +32,6 @@ function mark_type(itemtype) {
 	}
 }
 
-var http = new LnBlogAJAX();
-
 function reply_delete () {
 	var topli = this.parentNode.parentNode.parentNode;
 	var boxes = topli.getElementsByTagName('input');
