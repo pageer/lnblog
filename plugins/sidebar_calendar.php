@@ -211,11 +211,11 @@ class SidebarCalendar extends Plugin {
 		
 		$content .= '<p class="calendar">'."\n";
 
-		$content .= '<a href="#" onclick="return sndReq(\''.
-		            $this->self_uri( array('blog'=>$blog->blogid,
+		$content .= '<a class="calendar-nav-link" href="'.
+					$this->self_uri( array('blog'=>$blog->blogid,
 		                                   'month'=>($month > 1 ? $month-1 : 12),
 		                                   'year'=>($month > 1 ? $year : $year-1))).
-		            '\')">&lt;&lt;</a> ';
+		            '">&lt;&lt;</a> ';
 		
 		$months = $blog->getMonthList($year);
 		if (calendar_binsearch_monthlist($months, $year, $month, 0, count($months))) {
@@ -232,11 +232,11 @@ class SidebarCalendar extends Plugin {
 			}
 		}
 
-		$content .= ' <a href="#" onclick="return sndReq(\''.
+		$content .= ' <a class="calendar-nav-link" href="'.
 		            $this->self_uri(array('blog'=>$blog->blogid,
 		                                  'month'=>($month < 12 ? $month+1 : 1),
 		                                  'year'=>($month < 12 ? $year : $year+1))).
-		            '\')">&gt;&gt;</a>';
+		            '">&gt;&gt;</a>';
 
 		$content .= "</p>\n";
 
@@ -292,9 +292,28 @@ class SidebarCalendar extends Plugin {
 	}
 
 	function link_ajax_js() {
-		global $PAGE;
 		$blog = NewBlog();
-		$PAGE->addScript("calendar_ajax.js");
+		ob_start();
+		?>
+		$(document).ready(function () {
+			var bindLinks = function (scope) {
+				var link = scope.href;
+				$('#calendar').css('cursor', 'wait');
+				$('#calendar').load(link, function (data) {
+					$('#calendar').css('cursor', 'default');
+					$('.calendar-nav-link').click(function () {
+						return bindLinks(this);
+					});
+				});
+				return false;
+			};
+			$('.calendar-nav-link').click(function () {
+				return bindLinks(this);
+			});
+		});
+		<?php
+		$script = ob_get_clean();
+		Page::instance()->addInlineScript($script);
 	}
 
 }
