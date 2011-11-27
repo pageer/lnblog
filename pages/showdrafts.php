@@ -34,7 +34,8 @@ function draft_item_markup(&$ent) {
 	$edit_uri = $ent->uri('editDraft');
 	$title = $ent->subject ? $ent->subject : $ent->date;
 	$ret = '<a href="'.$edit_uri.'">'.$title.'</a> '.
-	       '(<a href="'.$del_uri.'">'._("Delete").'</a>)';
+	       '<span style="font-size: 80%; color: gray;">' . date("Y-m-d", $ent->post_ts) .
+	       '</span> (<a href="'.$del_uri.'">'._("Delete").'</a>)';
 	return $ret;
 }
 

@@ -764,7 +764,16 @@ class Blog extends LnBlogObject {
 				$ret[] = NewEntry(mkpath($art_path,$dir));
 			}
 		}
+		usort($ret, array($this, '_sort_by_date'));
 		return $ret;
+	}
+	
+	protected function _sort_by_date($e1, $e2) {
+		if ($e1->post_ts == $e2->post_ts) {
+			return 0;
+		} else {
+			return $e1->post_ts < $e2->post_ts ? -1 : 1;
+		}
 	}
 
 	/*
