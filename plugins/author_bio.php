@@ -44,7 +44,7 @@ class AuthorBio extends Plugin {
 		?>
 		<?php if ($this->picture_url): ?>
 		<div>
-			<img src="<?php echo $this->picture_url;?>" alt="" />
+			<img src="<?php echo $this->picture_url;?>" alt="" style="display: block; margin: 0 auto"/>
 		</div>
 		<?php endif; ?>
 		<div>
