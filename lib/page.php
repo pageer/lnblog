@@ -77,6 +77,8 @@ class Page extends LnBlogObject {
 		$this->addScript("lnblog_lib.js");
 		$this->addStylesheet("main.css");
 		
+		$this->addInlineScript('window.INSTALL_ROOT = "'.INSTALL_ROOT_URL.'"');
+		
 		$this->raiseEvent("InitComplete");		
 	}
 	

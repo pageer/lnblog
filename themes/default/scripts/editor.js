@@ -469,7 +469,7 @@ $(document).ready(function () {
 				url: form_url,
 				dataType: 'json',
 				success: function (response, statusText, xhr, $form) {
-					$('.entry_preview').html(unescape(response.content));
+					$('.entry_preview').html(unescape(response.content)).unblock();
 					if (response.id.match(/draft/)) {
 						var form_url = $('#postform').attr('action')
 						form_url += form_url.match(/draft=/) ? '' : '&draft='+response.id;
@@ -479,7 +479,18 @@ $(document).ready(function () {
 					}
 					
 				}
-			};
+			}
+			
+			$('.entry_preview').block({
+				message: '<img src="'+window.INSTALL_ROOT+'/themes/default/images/ajax-loader.gif"> Loading...',
+				css: {
+					border: '1px solid black',
+				},
+				overlayCSS: {
+					backgroundColor: '#dcdcdc'
+				}
+			});
+			
 			$('#postform').ajaxSubmit(options);
 			return false;
 		}

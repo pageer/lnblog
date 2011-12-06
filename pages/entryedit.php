@@ -348,6 +348,7 @@ $title = $is_art ? _("New Article") : _("New Entry");
 $PAGE->title = sprintf("%s - %s", $blg->name, $title);
 $PAGE->addStylesheet("form.css", "entry.css");
 $PAGE->addScript("jquery.form.js");
+$PAGE->addScript("jquery.blockUI.js");
 $PAGE->addScript("editor.js");
 $PAGE->addScript("upload.js");
 $PAGE->addScript(lang_js());
