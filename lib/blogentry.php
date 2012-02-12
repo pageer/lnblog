@@ -45,6 +45,8 @@ POSTRetrieved  - Fired after data has been retreived from an HTTP POST.
 
 class BlogEntry extends Entry {
 	
+	const AUTO_PUBLISH_FILE = 'puslish.txt';
+	
 	public $allow_comment = true;
 	public $allow_tb = true;
 	public $has_html;
@@ -636,7 +638,8 @@ class BlogEntry extends Entry {
 		create_directory_wrappers($dir_path.PATH_DELIM.ENTRY_PINGBACK_DIR, ENTRY_PINGBACKS);
 				
 		$this->file = $dir_path.PATH_DELIM.ENTRY_DEFAULT_FILE;
-		$this->set_dates($curr_ts);
+		$this->post_ts = $curr_ts;
+		$this->setDates($curr_ts);
 		$this->ip = get_ip();
 
 		$ret = $this->writeFileData();
@@ -651,7 +654,7 @@ class BlogEntry extends Entry {
 		
 	}
 	
-	protected function set_dates($curr_ts = null) {
+	protected function setDates($curr_ts = null) {
 		# Set the timestamp and date, plus the ones for the original post, if
 		# this is a new entry.
 		$curr_ts = $curr_ts ? $curr_ts : time();
@@ -702,7 +705,7 @@ class BlogEntry extends Entry {
 			$this->file = mkpath($path, ENTRY_DEFAULT_FILE);
 		}
 		
-		$this->set_dates($ts);
+		$this->setDates($ts);
 		
 		if (! $this->uid) {
 			$usr = NewUser();
@@ -712,6 +715,51 @@ class BlogEntry extends Entry {
 		$ret = $this->writeFileData();
 		
 		return $ret;
+	}
+	
+	/**
+	 * Sets the date at which a draft should auto-publish
+	 *
+	 * @param 	string $date	The date to publish or null.
+	 */
+	public function setAutoPublishDate($date) {
+		$date_ts = strtotime($date);
+		$fs = NewFS();
+		$path = mkpath($this->localpath(), self::AUTO_PUBLISH_FILE);
+		var_dump($this->file, $date, $date_ts, $path);
+		if ($date_ts > time()) {
+			$fs->write_file($path, date('Y-m-d H:i:s', $date_ts));
+		} elseif (file_exists($path)) {
+			$fs->delete($path);
+		}
+	}
+	
+	/**
+	 * Get the auto-publish date
+	 * 
+	 * @return string	The date string when publication will happen or empty string.
+	 */
+	public function getAutoPublishDate() {
+		$path = mkpath($this->localpath(), self::AUTO_PUBLISH_FILE);
+		$ts = 0;
+		if (file_exists($path)) {
+			$ts = strtotime(trim(file_get_contents($path)));
+		}
+		return $ts ? date('Y-m-d H:i:s', $ts) : '';
+	}
+	
+	/**
+	 * Determine if a draft is ready to be auto-published
+	 * 
+	 * @return bool    True if the draft should be publised
+	 */
+	public function shouldAutoPublish() {
+		$path = mkpath($this->localpath(), self::AUTO_PUBLISH_FILE);
+		if (file_exists($path)) {
+			$ts = strtotime(trim(file_get_contents($path)));
+			return time() >= $ts;
+		}
+		return false;
 	}
 	
 	/*

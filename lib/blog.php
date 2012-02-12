@@ -84,7 +84,7 @@ class Blog extends LnBlogObject {
 	public $last_article = null;
 	public $custom_fields = array();
 
-	function Blog($path="") {
+	function __construct($path="") {
 
 		if ($path) {
 			$this->getPathFromPassedValue($path);
@@ -102,7 +102,6 @@ class Blog extends LnBlogObject {
 		$this->readBlogData();
 		
 		$this->raiseEvent("InitComplete");
-
 	}
 	
 	function getPathFromEnvironment() {
@@ -744,6 +743,30 @@ class Blog extends LnBlogObject {
 			}  # End year loop
 		}  # End archive loop
 		return $this->entrylist;
+	}
+
+	public function autoPublishDrafts() {
+		static $auto_publish_checked;// Don't do this more than once per request;
+		
+		if ($auto_publish_checked) {
+			return;
+		}
+		$auto_publish_checked = true;
+		
+		$art = NewBlogEntry();
+		$art_path = mkpath($this->home_path, BLOG_DRAFT_PATH);
+		
+		$art_list = scan_directory($art_path);
+		$ret = array();
+		foreach ($art_list as $dir) {
+			$pub_path = mkpath($art_path, $dir, BlogEntry::AUTO_PUBLISH_FILE);
+			if (file_exists($pub_path) && $art->isEntry($ent_path = mkpath($art_path, $dir))) {
+				$ent = NewEntry($ent_path);
+				if ($ent->shouldAutoPublish()) {
+					$ent->publishDraft($this);
+				}
+			}
+		}
 	}
 
 	/* 

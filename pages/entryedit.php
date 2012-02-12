@@ -156,6 +156,7 @@ function handle_uploads(&$ent) {
 function handle_save(&$ent, &$blg, &$errors, $is_draft) {
 	if ($is_draft) {
 		$ret = $ent->saveDraft($blg);
+		$ent->setAutoPublishDate(POST('autopublishdate'));
 	} else {
 		if (! $ent->isEntry()) {
 			if (is_a($ent, 'Article')) $ent->setPath(POST('short_path'));
@@ -201,6 +202,9 @@ function init_template($blog, $entry, $is_article = false) {
 		$tpl->set("HAS_HTML", $blog->default_markup);
 	}
 	
+	$auto_publish = POST('autopublishdate') ?: ($entry ? $entry->getAutoPublishDate() : '');
+	$tpl->set('AUTO_PUBLISH_DATE', $auto_publish);
+		
 	$tpl->set("ALLOW_ENCLOSURE", $blog->allow_enclosure);
 	sort($blog->tag_list);
 	$tpl->set("BLOG_TAGS", $blog->tag_list);

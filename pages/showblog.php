@@ -113,6 +113,7 @@ require_once "config.php";
 require_once Path::mk(INSTALL_ROOT, "lib", "creators.php");
 
 $blog = NewBlog();
+$blog->autoPublishDrafts();
 Page::instance()->setDisplayObject($blog);
 
 $content = show_blog_page($blog);
