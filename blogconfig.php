@@ -234,14 +234,14 @@ define("PACKAGE_NAME", "LnBlog");
 # Constant: PACKAGE_VERSION
 # The version number of the software.  This is a string in the format 
 # "1.2.3".  Note that each number may be more than one digit.
-define("PACKAGE_VERSION", "1.0.0");
+define("PACKAGE_VERSION", "1.1.0");
 
 # Constant: REQUIRED_VERSION
 # The minimum software version required by your blog to properly
-# support this versino of LnBlog.  In other words, if your blog is
+# support this version of LnBlog.  In other words, if your blog is
 # at less than this version number, you should upgrade it from the
 # main admin page.
-define("REQUIRED_VERSION", "0.9.0");
+define("REQUIRED_VERSION", "1.0.0");
 
 # Constant: PACKAGE_URL
 # The full URL of the LnBlog project home page.
@@ -262,6 +262,9 @@ define("PACKAGE_COPYRIGHT", _("Copyright (c) 2005, Peter A. Geer <pageer@skeptic
 # Section: Page DOCTYPEs
 # These are full, valid doctypes to use for pages.  See <DEFAULT_DOCTYPE>.
 
+# Constant: HTML_5
+# Full doctype for HTML 5
+define("HTML_5", "<!DOCTYPE html>");
 # Constant: XHTML_1_1
 # Full doctype for XHTML 1.1
 define("XHTML_1_1", "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"\n\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
@@ -309,8 +312,8 @@ define("HTML_3_2", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">");
 # Constant: DEFAULT_DOCTYPE
 # The DOCTYPE used by your markup.  
 #
-# The *default* is XHTML 1.0 Strict.
-@define("DEFAULT_DOCTYPE", XHTML_1_0_Strict);
+# The *default* is HTML 5.
+@define("DEFAULT_DOCTYPE", HTML_5);
 
 # Constant: LOGIN_EXPIRE_TIME
 # The expiration time for the login cookies.

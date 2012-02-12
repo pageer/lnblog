@@ -1,3 +1,14 @@
+12-Feb-2012: version 1.1.0
+- 0000006: [Task] Pluggable text filters (pageer) - resolved.
+- 0000031: [Improvement] Add "about me" sidebar plugin (pageer) - resolved.
+- 0000035: [Task] Allow non-blog main page (pageer) - resolved.
+- 0000036: [Defect] Calendar double display on month change (pageer) - resolved.
+- 0000038: [Improvement] Add date to drafts (pageer) - resolved.
+- 0000037: [Improvement] Port AJAX to jQuery (pageer) - resolved.
+- 0000039: [Improvement] Busy indicator for AJAX preview (pageer) - resolved.
+- 0000041: [Improvement] Ability to schedule publication (pageer) - resolved.
+- 0000042: [Task] Use HTML5 (pageer) - resolved.
+
 21-Jun-2011: version 1.0.0
 - 0000017: [Improvement] Add an "insert link" button for uploads (pageer) - resolved.
 - 0000021: [Defect] Breadcrumb plugin double entry name when on entry page (pageer) - resolved.

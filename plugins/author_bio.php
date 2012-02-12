@@ -47,6 +47,7 @@ class AuthorBio extends Plugin {
 		}
 		.bio_content {
 			font-size: 80%;
+			text-align: center;
 		}
 		<?php
 		if (0) { ?></style><?php }
