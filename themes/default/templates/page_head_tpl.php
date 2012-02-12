@@ -17,8 +17,9 @@
 # page body, which you may very well want to change, is in the 
 # <basic_layout_tpl.php> template.
 
-echo $DOCTYPE;
+#echo $DOCTYPE;
 $xml_lang = str_replace("_", "-", LANGUAGE); ?>
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $xml_lang; ?>" lang="<?php echo $xml_lang; ?>">
 <head>
 <title><?php echo $PAGE_TITLE; ?></title>

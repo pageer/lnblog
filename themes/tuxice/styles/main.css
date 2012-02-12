@@ -11,6 +11,7 @@ html, body {
 	width: 100%;
 	margin: 0px;
 	padding: 0px;
+	font: 12pt Arial, sans-serif;
 }
 
 /* Styles for the page content area. */
@@ -23,6 +24,7 @@ html, body {
 	float: right;
 	clear: right;
 	background: #f4f4f4;
+	border-radius: 5px;
 }
 
 a:link {
@@ -156,6 +158,8 @@ q { font-style: italic; }
 	float: left;
 	clear: left;
 	width: 27%;
+	border-radius: 5px;
+	border-collapse: collapse
 }
 
 #sidebar h1, #sidebar h2, #sidebar h4 {
@@ -170,10 +174,16 @@ q { font-style: italic; }
 	width: 95%;
 	padding-left: 5%;
 	color: white;
-	background: url(../images/background.png);
-	background-color: rgb(0, 75, 178);
-	background-repeat: repeat-y;
-	background-position: center right;
+	background: -o-linear-gradient(left, #014cb2, #f4f4f4);
+	background: -webkit-linear-gradient(left, #014cb2, #f4f4f4);
+	background: -moz-linear-gradient(left, #014cb2, #f4f4f4);
+	background: -ms-linear-gradient(left, #014cb2, #f4f4f4);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#014cb2', endColorstr='#f4f4f4', GradientType=1);
+}
+
+#sidebar :first-child {
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
 }
 
 #sidebar h3 a, #sidebar .panelheader a {
@@ -195,7 +205,8 @@ q { font-style: italic; }
 
 #sidebar .panel {
 	padding-left: 8%;
-	width: 92%;
+	padding-right: 8%;
+	width: 84%;
 }
 
 #sidebar ul li {

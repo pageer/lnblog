@@ -291,9 +291,7 @@ class Page extends LnBlogObject {
 		$head->set("METADATA", $this->metatags);
 		$head->set("RSSFEEDS", $this->rssfeeds);
 		$head->set("STYLESHEETS",$this->stylesheets);
-		#$head->set("INLINE_STYLESHEETS",$this->inline_stylesheets);
 		$head->set("SCRIPTS",$this->scripts);
-		#$head->set("INLINE_SCRIPTS",$this->inline_scripts);
 		$head->set("LINKS", $this->links);
 		
 		if ($blog && get_class($blog)) $blog->exportVars($head);

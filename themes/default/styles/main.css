@@ -121,6 +121,7 @@ html, body { height: 100%; }  /* Use the whole page. */
 
 #sidebar .panel {
 	padding-left: 8%;
+	padding-right: 8%;
 	width: 92%;
 }
 

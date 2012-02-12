@@ -11,9 +11,16 @@
 ini_set("magic_quotes_runtime", "off");
 
 function lib_autoload($className) {
-	$file = implode(DIRECTORY_SEPARATOR, array(dirname(__FILE__), 'lib', strtolower($className).'.php'));
-	if (file_exists($file)) {
-		require $file;
+	$files = array(
+		implode(DIRECTORY_SEPARATOR, array(dirname(__FILE__), 'lib', strtolower($className).'.php')),
+		implode(DIRECTORY_SEPARATOR, array(dirname(__FILE__), 'lib', strtolower($className).'class.php')),
+		implode(DIRECTORY_SEPARATOR, array(dirname(__FILE__), 'lib', $className.'class.php')),
+	);
+	foreach ($files as $file) {
+		if (file_exists($file)) {
+			require $file;
+			break;
+		}
 	}
 }
 
@@ -24,6 +31,7 @@ function class_autoload($className) {
 		$file = implode(DIRECTORY_SEPARATOR, $fileName);
 		if (file_exists($file)) {
 			require $file;
+			break;
 		}
 	}
 }

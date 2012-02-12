@@ -24,6 +24,8 @@ class AuthorBio extends Plugin {
 		
 		$this->getConfig();
 
+		Page::instance()->addInlineStylesheet($this->styles());
+		
 		if ( $this->no_event || 
 		     System::instance()->sys_ini->value("plugins","EventForceOff", 0) ) {
 			# If either of these is true, then don't set the event handler
@@ -35,6 +37,23 @@ class AuthorBio extends Plugin {
 		if ($do_output) $this->output();
 	}
 	
+	public function styles() {
+		ob_start();
+		// Hack for IDE syntax
+		if (0) { ?><style type="text/css"><?php } ?>
+		.bio_picture img {
+			border: 1px solid black;
+			box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, .5);
+		}
+		.bio_content {
+			font-size: 80%;
+		}
+		<?php
+		if (0) { ?></style><?php }
+		$ret = ob_get_clean();
+		return $ret;
+	}
+	
 	public function output() {
 		$tpl = NewTemplate('sidebar_panel_tpl.php');
 		
@@ -43,11 +62,11 @@ class AuthorBio extends Plugin {
 		ob_start();
 		?>
 		<?php if ($this->picture_url): ?>
-		<div>
+		<div class="bio_picture">
 			<img src="<?php echo $this->picture_url;?>" alt="" style="display: block; margin: 0 auto"/>
 		</div>
 		<?php endif; ?>
-		<div>
+		<div class="bio_content">
 			<?php echo TextProcessor::get($this->markup_type, null, $this->bio)->getHTML();?>
 		</div>
 		<?php
