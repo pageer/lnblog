@@ -726,7 +726,6 @@ class BlogEntry extends Entry {
 		$date_ts = strtotime($date);
 		$fs = NewFS();
 		$path = mkpath($this->localpath(), self::AUTO_PUBLISH_FILE);
-		var_dump($this->file, $date, $date_ts, $path);
 		if ($date_ts > time()) {
 			$fs->write_file($path, date('Y-m-d H:i:s', $date_ts));
 		} elseif (file_exists($path)) {
