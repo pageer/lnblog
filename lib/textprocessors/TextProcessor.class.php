@@ -21,6 +21,10 @@ abstract class TextProcessor {
 	 * @var string The human-readable name of the filter.
 	 */
 	public $filter_name = '';
+	/**
+	 * @var boolean Skip the surrounding markup, i.e. don't wrap in <P> tags.
+	 */
+	public $no_surround = false;
 	
 	abstract protected function toHTML();
 	

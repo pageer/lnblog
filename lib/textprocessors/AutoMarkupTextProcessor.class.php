@@ -23,7 +23,9 @@ class AutoMarkupTextProcessor extends TextProcessor {
 		ksort($patterns);
 		ksort($replacements);
 		$this->formatted = preg_replace($patterns, $replacements, $this->formatted);
-		$this->formatted = "<p>".$this->formatted."</p>";
+		if (! $this->no_surround) {
+			$this->formatted = "<p>".$this->formatted."</p>";
+		}
 	}
 	
 }

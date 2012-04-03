@@ -194,9 +194,10 @@ class SimpleXMLReader {
 		if ( isset($childnode['attributes']['TYPE']) ) {
 			$type = $childnode['attributes']['TYPE'];
 			switch($type) {
+				case 'bool':
+					return $childnode['text'] == 'true';
 				case 'int':
 					return (int)$childnode['text'];
-					break;
 				case 'string':
 				default:
 					return $childnode['text'];
@@ -209,7 +210,11 @@ class SimpleXMLReader {
 	public function setVal(&$obj, $node) {
 		$tag = $node['tag'];
 		if (isset($obj->$tag) && is_bool($obj->$tag)) {
-			$obj->$tag = (bool)$node['text'];
+			if (in_array(strtolower($node['text']), array('true', 'false'))) {
+				$obj->$tag = (strtolower($node['text']) == 'true');
+			} else {
+				$obj->$tag = (bool)$node['text'];
+			}
 		} elseif (isset($obj->$tag) && is_int($obj->$tag)) {
 			$obj->$tag = (int)$node['text'];
 		} elseif (isset($obj->$tag) && is_string($obj->$tag)) {

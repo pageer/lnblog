@@ -222,6 +222,7 @@ class BlogComment extends Entry {
 		$this->show_email = POST("showemail") ? true : false;
 		
 		$processor = TextProcessor::get(MARKUP_NONE, $this);
+		$processor->no_surround = true;
 		
 		foreach ($this->custom_fields as $fld=>$desc) {
 			$this->$fld = POST($fld);
@@ -391,12 +392,15 @@ class BlogComment extends Entry {
 		     $this->url != "" ) {
 			$this->url = "http://".$this->url;
 		}
+		$this->url = filter_var($this->url, FILTER_VALIDATE_URL);
+		
 		$t->set("URL", $this->url);
 		$t->set("NAME", $this->name);
 		$t->set("DATE", $this->prettyDate($this->post_ts) );
 		$t->set("EDITDATE", $this->prettyDate() );
 		if ($this->show_email || $usr->checkLogin()) {
 			$t->set("SHOW_MAIL", true);
+			$this->email = filter_var($this->email, FILTER_VALIDATE_EMAIL);
 			$t->set("EMAIL", $this->email);
 		} else {
 			$t->set("SHOW_MAIL", false);

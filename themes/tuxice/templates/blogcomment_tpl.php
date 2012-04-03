@@ -25,7 +25,7 @@
 	<?php } ?>
 <?php } else { ?>
 		<li class="commentname">By 
-		<?php if ($EMAIL)	{ ?>
+		<?php if ($EMAIL && $SHOW_MAIL)	{ ?>
 		<a href="mailto:<?php echo $EMAIL; ?>"><?php echo $NAME; ?></a>
 		<?php } else {?>
 		<?php echo $NAME; ?>

@@ -127,7 +127,9 @@ class LBCodeTextProcessor extends TextProcessor {
 		$this->formatted = preg_replace($whitespace_patterns, $whitespace_replacements, $this->formatted);
 		
 		if (! $this->strip) {
-			$this->formatted = "<p>".$this->formatted."</p>";
+			if (! $this->no_surround) {
+				$this->formatted = "<p>".$this->formatted."</p>";
+			}
 			# Strip out extraneous empty paragraphs.
 			$this->formatted = preg_replace('/<p><\/p>/', '', $this->formatted);
 		}
