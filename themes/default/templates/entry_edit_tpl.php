@@ -28,12 +28,14 @@ if (isset($TAGS)) { ?>value="<?php echo $TAGS; ?>" <?php } ?>/>
 </select>
 </div>
 
+<?php if (! $PUBLISHED): ?>
 <div id="articlepath">
 <?php $title = _("The last part of the URL path for this article");?>
 <label class="basic_form_label" for="short_path" title="<?php echo $title;?>"><?php p_("Article path"); ?></label>
 <input id="short_path" name="short_path" title="<?php echo $title;?>" type="text" size="40" <?php 
 if (isset($URL)) { ?>value="<?php echo $URL; ?>" <?php } ?>/>
 </div>
+<?php endif; ?>
 
 <?php if (isset($GET_ABSTRACT)): ?>
 <div>
@@ -64,14 +66,14 @@ if (isset($use_js_editor) && System::instance()->sys_ini->value('entryconfig', '
 ?>
 <fieldset id="entry_settings">
 <legend><?php p_("Entry settings");?><a href="#dummy">(-)</a></legend>
-<?php if (! isset($IS_PUBLISHED)): ?>
+<?php if (!$PUBLISHED): ?>
 <div>
 <?php $title = _("Publish this as an article instead of a regular blog entry");?>
 <label for="publisharticle" title="<?php echo $title;?>"><?php p_("Publish as article");?></label>
-<input type="checkbox" id="publisharticle" <?php if (isset($GET_SHORT_PATH)) { echo 'checked="checked"'; }?> />
+<input type="checkbox" id="publisharticle" name="publisharticle" <?php if (isset($GET_SHORT_PATH)) { echo 'checked="checked"'; }?> />
 </div>
 <?php endif; ?>
-<?php if (! isset($IS_PUBLISHED)): ?>
+<?php if (!$PUBLISHED): ?>
 <div>
 <?php
 $title = _("Auto-publish this entry at this date");
@@ -159,8 +161,10 @@ echo ' selected="selected"';}?>><?php p_("HTML");?></option>
 </fieldset>
 
 <div class="threebutton">
+<?php if ($PUBLISHED): ?>
+<input name="post" id="post" type="submit" value="<?php p_("Save");?>" />
+<?php else: ?>
 <input name="post" id="post" type="submit" value="<?php p_("Publish");?>" />
-<?php if (! isset($IS_PUBLISHED)): ?>
 <input name="draft" id="draft" type="submit" value="<?php p_("Save Draft");?>" />
 <?php endif; ?>
 <input name="preview" id="preview" type="submit" value="<?php p_("Preview");?>" />

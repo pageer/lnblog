@@ -421,6 +421,15 @@ class BlogEntry extends Entry {
 		         basename(dirname($path)) == BLOG_DRAFT_PATH );
 	}
 	
+	/**
+	 * Determine if the entry has been published.
+	 * @param string $path	The path to the entry
+	 * @return boolean Whether or not the entry exists and is not a draft
+	 */
+	public function isPublished($path=false) {
+		return $this->isEntry($path) && ! $this->isDraft();
+	}
+	
 	/*
 	Method: localpath
 	Get the path to this entry's directory on the local filesystem.  Note 
