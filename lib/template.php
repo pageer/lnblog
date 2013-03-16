@@ -34,79 +34,167 @@
 # <LnBlogObject>
 
 class PHPTemplate extends LnBlogObject {
+	
+	const ESC_HTML = 'htmlspecialchars';
+	const ESC_URL = 'urlencode';
 
-	var $file;   # The name of the template file to use.
-	var $vars;   # An array of variables to register in the template.
+	protected $file;   # The name of the template file to use.
+	protected $vars;   # An array of variables to register in the template.
+	
+	/** Whether HTML helpers should output their data in addition to returning it. */
+	public $helper_output = true;
 
-	function PHPTemplate($file="") {
+	public function __construct($file="") {
 		$this->file = $file;
 		$this->vars = array();
 	}
 
-	# Method: set
-	# Sets a template variable.
-	#
-	# Parameters:
-	# var - The name of the variable.
-	# val - *Optional* value for the variable.  *Defaults* to true.
-	#
-	# Returns:
-	# The value passed or true.
-	function set($var, $val=true) {
+	/**
+	 * Get a template var as a string.
+	 *
+	 * @param string $var The variable name
+	 * @param mixed $escape Whether/how to escape the data.
+	 * @return mixed The var value, or empty string if it is not set.
+	 */
+	public function get($var, $escape = false) {
+		$ret = '';
+		if (isset($this->vars[$var])) {
+			$ret = $this->vars[$var];
+		}
+		if ($ret && $escape) {
+			$ret = $this->escape($ret, $escape);
+		}
+		return $ret;
+	}
+	
+	/**
+	 * Same as get(), but echoes rather than return.
+	 */
+	public function raw($var, $escape = false) {
+		echo $this->get($var, $escape);
+	}
+	
+	/**
+	 * Same as get(), but echos rather than return and escapes HTML by default.
+	 */
+	public function put($var, $escape = self::ESC_HTML) {
+		echo $this->get($var, $escape);
+	}
+	
+	/**
+	 * Sets a template variable.
+	 *
+	 * @param string $var  The name of the variable.
+	 * @param mixed $val Optional value for the variable.  Defaults to true.
+	 * @return mixed The value passed or true.
+	 */
+	public function set($var, $val=true) {
 		return $this->vars[$var] = $val;
 	}
 	
-	# Method: unsetVar
-	# Unsets a previously set template variable.
-	#
-	# Parameters:
-	# var - The name of the variable to unset.
-	function unsetVar($var) {
+	/**
+	 * Unsets a previously set template variable.
+	 * 
+	 * @param string $var  The name of the variable to unset.
+	 */
+	public function unsetVar($var) {
 		unset($this->vars[$var]);
 	}
 
-	# Method: varSet
-	# Determine if a template variable has been set.
-	#
-	# Parameters:
-	# var - The name of a template variable.
-	# 
-	# Returns:
-	# True if var has been set, false otherwise.
-	function varSet($var) {
+	/**
+	 * Determine if a template variable has been set.
+	 * 
+	 * @param string $var  The name of a template variable.
+	 * @return boolean True if var has been set, false otherwise.
+	 */
+	public function varSet($var) {
 		return isset($this->vars[$var]);
 	}
 
-	# Method: reset
-	# Resets a template back to its empty state, clearing all variables and the file.
-	# 
-	# Parameters:
-	# file - An *optional* file name for the reset template.
-	function reset($file="") {
+	/**
+	 * Resets a template back to its empty state, clearing all variables and the file.
+	 *
+	 * @param string $file  An optional file name for the reset template.
+	 */
+	public function reset($file="") {
 		$this->file = $file;
 		$this->vars = array();
 	}
 
-	# Method: process
-	# Process the template and get the output.
-	# 
-	# Parameters:
-	# return_results - *Optional* boolean that determines whether the output should be 
-	#                  returned in a string instead of sent straight to the client.  
-	#                  *Default is true.
-	#
-	# Returns:
-	# A string containing the output if return_results is true.  Otherwise, it returns
-	# true on success and false on failure.
-	function process($return_results=true) {
+	/**
+	 * Process the template and get the output.
+	 *
+	 * @param boolean $return_results Determines whether the output should be returned
+	 *                                in a string instead of sent straight to the client.
+	 *                                Default is true.
+	 * @return string The output if return_results is true.  Otherwise, true on success and false on failure.
+	 */
+	public function process($return_results=true) {
 		ob_start();
 		extract($this->vars, EXTR_OVERWRITE);
-		include($this->file);
+		include $this->file;
 		if ($return_results) {
 			$ret = ob_get_contents();
 			ob_end_clean();
 			return $ret;
 		} else return ob_end_flush();
 	}
+	
+	public function escape($data, $method, $options = array()) {
+		switch ($method) {
+			case self::ESC_HTML:
+				return htmlspecialchars($data);
+			case self::ESC_URL:
+				return urnencode($data);
+		}
+		return '';
+	} 
+	
+	public function attributeValueEscape($val) {
+		return $this->escape($val, self::ESC_HTML);
+	}
+	
+	public function nodeContentEscape($val) {
+		return $this->escape($val, self::ESC_HTML);
+	}
+	
+	public function tag($name, $data=array()) {
+		if (is_string($data)) {
+			$data = array('content' => $data);
+		}
+		
+		$ret = "<".$name;
+		
+		foreach ($data as $attr=>$val) {
+			if ($attr != 'content') {
+				$ret .= ' '.$attr.'="'.$this->attributeValueEscape($val).'"';
+			}
+		}
+		
+		if (isset($data['content'])) {
+			$ret .= '>'.$this->nodeContentEscape($data['content']).'</'.$name.'>';
+		} else {
+			$ret .= ' />';
+		}
+		
+		if ($this->helper_output) {
+			echo $ret;
+		}
+		return $ret;
+	}
+	
+	public function link($src, $content, $data=array()) {
+		$data['content'] = $content;
+		$data['href'] = $src;
+		return $this->tag('a', $data);
+	}
 
+	public function maillink($address, $content, $data=array()) {
+		return $this->link('mailto:'.$address, $content, $data);
+	}
+	
+	public function img($src, $data=array()) {
+		$data['src'] = $src;
+		return $this->tag('img', $data);
+	}
 }

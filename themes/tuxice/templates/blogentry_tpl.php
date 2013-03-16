@@ -1,6 +1,6 @@
 <div class="blogentry">
 <div class="header">
-<h2><?php echo $SUBJECT; ?></h2>
+<h2><?php $this->put('SUBJECT') ?></h2>
 <ul class="postdata">
 	<?php
 		if (! isset($NO_USER_PROFILE)) {

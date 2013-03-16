@@ -96,6 +96,8 @@ function NewEntry($param=false) {
 		return new BlogEntry($entid);
 	} elseif ($artid) {
 		return new Article($artid);
+	} else {
+		return new BlogEntry();
 	}
 	return false;
 }
