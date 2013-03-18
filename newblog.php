@@ -69,8 +69,7 @@ $tpl->set("UPDATE_TITLE", _("Create new weblog"));
 # gets displayed as it was entered.
 $p = new Path($blog->home_path);
 if (! $p->isAbsolute($blog->home_path)) {
-	$p->Path(calculate_document_root(),$blog->home_path);
-	$blog->home_path = $p->get();
+	$blog->home_path = Path::mk(calculate_document_root(),$blog->home_path);
 }
 
 if ( has_post() ) {
@@ -82,7 +81,8 @@ if ( has_post() ) {
 		if ($ret) {
 			$ret = $SYSTEM->registerBlog($blog->blogid);
 			if ($ret) {
-				exit; $PAGE->redirect($blog->getURL());
+				$PAGE->redirect($blog->getURL());
+				exit;
 			} else {
 				$tpl->set("UPDATE_MESSAGE", _("Blog create but not registered.  This means the system will not list it on the admin pages.  Please try registering this blog by hand from the administration page."));
 			}

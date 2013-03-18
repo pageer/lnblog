@@ -73,7 +73,7 @@ function create_uri_object(&$object, $type=false) {
 ###############################################################################
 
 class URI extends LnBlogObject {
-	function URI() {
+	function __construct() {
 		$this->protocol = 'http';
 		$this->host = isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '';
 		$this->port = isset($_SERVER['SERVER_PORT']) ? $_SERVER['SERVER_PORT'] : 80;
@@ -188,11 +188,15 @@ class URI extends LnBlogObject {
 class BlogURIWrapper extends URI {
 	
 	function BlogURIWrapper(&$blog) {
-		$this->URI();
+		parent::__construct();
 	
 		$this->object = $blog;
 		
-		$this->base_uri = localpath_to_uri($blog->home_path);
+		if (defined("BLOG_ROOT_URL")) {
+			$this->base_uri = BLOG_ROOT_URL;
+		} else {
+			$this->base_uri = localpath_to_uri($blog->home_path);
+		}
 		$url_bits = parse_url($this->base_uri);
 		$url_components = array('protocol'=>'scheme',
 		                        'host'=>'host', 'port'=>'port',
