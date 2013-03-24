@@ -60,7 +60,7 @@ class LoginLink extends Plugin {
 <?php 
 		} else {
 ?>
-<p style="margin: 5%"><strong><a href="<?php echo $blg->uri('login'); ?>"><?php p_("User Login"); ?></a></strong></p>
+<p style="margin: 5%"><a href="<?php echo $blg->uri('login'); ?>"><?php p_("User Login"); ?></a></p>
 <?php
 		}
 		if ($this->admin_link) {

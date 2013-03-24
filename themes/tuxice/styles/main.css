@@ -181,9 +181,8 @@ q { font-style: italic; }
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#014cb2', endColorstr='#f4f4f4', GradientType=1);
 }
 
-#sidebar:first-child {
-	border-top-left-radius: 5px;
-	border-top-right-radius: 5px;
+#sidebar:first-child, #sidebar h3:first-of-type {
+	border-radius: 5px 5px 0 0;
 }
 
 #sidebar h3 a, #sidebar .panelheader a {

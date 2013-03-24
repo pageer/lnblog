@@ -5,6 +5,10 @@
 	padding-bottom: 2%;
 }
 
+.blogentry .header h2 {
+	margin: 0 0 5px 0;
+}
+
 .blogentryheader, .blogentryfooter, .blogentrybody {
 	clear: both;
 }
