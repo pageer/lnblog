@@ -73,23 +73,17 @@
 			<input type="checkbox" id="publisharticle" name="publisharticle" <?php if (isset($GET_SHORT_PATH)) { echo 'checked="checked"'; }?> />
 		</div>
 		<?php endif; ?>
-	<?php if (!$PUBLISHED): ?>
-	<div>
-	<?php
-	$title = _("Auto-publish this entry at this date");
-	$date_string = $AUTO_PUBLISH_DATE ? strftime('%Y-%m-%dT%H:%M:%S', strtotime($AUTO_PUBLISH_DATE)) : '';
-	?>
-	<label for="autopublishdate" title="<?php echo $title;?>"><?php p_("Auto-publish date");?></label>
-	<input type="datetime-local" id="autopublishdate" name="autopublishdate" value="<?php echo $date_string ; ?>" />
-	</div>
-	<? endif; ?>
-	<!--
-	<div>
-	<?php $title = _("If this is checked, then when you add an item to be uploaded, a link or image tag for it will be added in the body of the entry at the current cursor location.");?>
-	<label for="adduploadlink" title="<?php echo $title;?>"><?php p_("Insert link when adding uploads");?></label>
-	<input type="checkbox" id="adduploadlink"  title="<?php echo $title;?>" <?php if (! empty($INSERT_LINKS)) echo 'checked="checked"'; ?> />
-	</div>
-	-->
+		<?php if (!$PUBLISHED): ?>
+		<div>
+			<?php
+			$title = _("Auto-publish this entry at this date");
+			$date_string = $AUTO_PUBLISH_DATE ? strftime('%Y-%m-%dT%H:%M:%S', strtotime($AUTO_PUBLISH_DATE)) : '';
+			?>
+			<label for="autopublishdate" title="<?php echo $title;?>"><?php p_("Auto-publish date");?></label>
+			<input type="datetime-local" id="autopublishdate" name="autopublishdate" value="<?php echo $date_string ; ?>" />
+		</div>
+		<? endif; ?>
+		
 	<?php if ($num_uploads = System::instance()->sys_ini->value("entryconfig", "AllowInitUpload", 1)): ?>
 	<div class="upload_field">
 		<?php for ($i = 1; $i <= $num_uploads; $i++): ?>
