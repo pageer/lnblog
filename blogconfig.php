@@ -258,38 +258,6 @@ define("PACKAGE_DESCRIPTION", spf_("%s: a simple and (hopefully) elegant weblog"
 # The offical LnBlog copyright notice.
 define("PACKAGE_COPYRIGHT", _("Copyright (c) 2005, Peter A. Geer <pageer@skepticats.com>"));
 
-###############################################
-# Section: Page DOCTYPEs
-# These are full, valid doctypes to use for pages.  See <DEFAULT_DOCTYPE>.
-
-# Constant: HTML_5
-# Full doctype for HTML 5
-define("HTML_5", "<!DOCTYPE html>");
-# Constant: XHTML_1_1
-# Full doctype for XHTML 1.1
-define("XHTML_1_1", "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"\n\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
-# Constant: XHTML_1_0_Strict
-# Full doctype for XHTML 1.0 Strict
-define("XHTML_1_0_Strict", "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">");
-# Constant: XHTML_1_0_Transitional
-# Full doctype for XHTML 1.0 Transitional
-define("XHTML_1_0_Transitional", "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
-# Constant: XHTML_1_0_Frameset
-# Full doctype for XHTML 1.0 Frameset
-define("XHTML_1_0_Frameset", "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Frameset//EN\"\n\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd\">");
-# Constant: HTML_4_01_Strict
-# Full doctype for HTML 4.01 Strict
-define("HTML_4_01_Strict", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"\n\"http://www.w3.org/TR/html4/strict.dtd\">");
-# Constant: HTML_4_01_Transitional
-# Full doctype for HTML 4.01 Transitional
-define("HTML_4_01_Transitional", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n\"http://www.w3.org/TR/html4/loose.dtd\">");
-# Constant: HTML_4_01_Frameset
-# Full doctype for HTML 4.01 Frameset
-define("HTML_4_01_Frameset", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Frameset//EN\"\n\"http://www.w3.org/TR/html4/frameset.dtd\">");
-# Constant: HTML_3_2
-# Full doctype for HTML 3.2
-define("HTML_3_2", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">");
-
 ######################################
 # Section: Miscellaneous configuration
 # Assorted configuration constants that don't fit into any coherent category.
@@ -308,12 +276,6 @@ define("HTML_3_2", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">");
 # *Defaults* to true.  
 # *Note:* this is not yet implemented.
 @define("USE_WRAPPER_SCRIPTS", true);
-
-# Constant: DEFAULT_DOCTYPE
-# The DOCTYPE used by your markup.  
-#
-# The *default* is HTML 5.
-@define("DEFAULT_DOCTYPE", HTML_5);
 
 # Constant: LOGIN_EXPIRE_TIME
 # The expiration time for the login cookies.
@@ -449,18 +411,6 @@ The corresponding replacement expression to <URI_TO_LOCALPATH_MATCH_RE>.
 #
 # *Default* is 3.
 @define("LBCODE_HEADER_WEIGHT", 3);
-
-# Constant: EDITOR_HIDE_INLINE_BOXES
-# Shows the inline boxes used for old version of the JavaScript editor
-#
-# *Default* is false.
-@define("EDITOR_SHOW_INLINE_BOXES", false);
-
-# Constant: EDITOR_HIDE_SYMBOLS
-# Shows the the buttons to add entities for mathamatical symbols.
-#
-# *Default* is false.
-@define("EDITOR_SHOW_SYMBOLS", false);
 
 # Constant: FILE_UPLOAD_TARGET_DIRECTORIES
 # A comma-separated string of target location options for file uploads.
