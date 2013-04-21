@@ -84,16 +84,16 @@
 		</div>
 		<? endif; ?>
 		
-	<?php if ($num_uploads = System::instance()->sys_ini->value("entryconfig", "AllowInitUpload", 1)): ?>
-	<div class="upload_field">
-		<?php for ($i = 1; $i <= $num_uploads; $i++): ?>
-		<div>
-			<label for="upload<?php echo $i;?>">Select file</label>
-			<input type="file" name="upload[]" id="upload<?php echo $i;?>" />
+		<?php if ($num_uploads = System::instance()->sys_ini->value("entryconfig", "AllowInitUpload", 1)): ?>
+		<div class="upload_field">
+			<?php for ($i = 1; $i <= $num_uploads; $i++): ?>
+			<div>
+				<label for="upload<?php echo $i;?>">Select file</label>
+				<input type="file" name="upload[]" id="upload<?php echo $i;?>" />
+			</div>
+			<?php endfor; ?>
 		</div>
-		<?php endfor; ?>
-	</div>
-	<?php endif; ?>
+		<?php endif; ?>
 	
 	<?php if ($ALLOW_ENCLOSURE || ! empty($ENCLOSURE)): /* Add optional enclosure box.*/?>
 	<div>
