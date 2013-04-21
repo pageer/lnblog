@@ -46,19 +46,19 @@
 	</div>
 	<?php endif; ?>
 
-<?php 
-if (EventRegister::instance()->hasHandlers("posteditor", "ShowControls")) {
-	EventRegister::instance()->activateEventFull($tmp=false, "posteditor", "ShowControls");
-} else {
-	$use_js_editor = true;
-}
-if (isset($use_js_editor) && ! System::instance()->sys_ini->value('entryconfig', 'EditorOnBottom', 0)) {
-	include("js_editor.php");
-}
-?>
-<div>
-<textarea id="body" name="body" accesskey="d" title="<?php p_("Post data");?>" rows="18" cols="40"><?php echo @$DATA; ?></textarea>
-</div>
+	<?php 
+	if (EventRegister::instance()->hasHandlers("posteditor", "ShowControls")) {
+		EventRegister::instance()->activateEventFull($tmp=false, "posteditor", "ShowControls");
+	} else {
+		$use_js_editor = true;
+	}
+	if (isset($use_js_editor) && ! System::instance()->sys_ini->value('entryconfig', 'EditorOnBottom', 0)) {
+		include("js_editor.php");
+	}
+	?>
+	<div>
+		<textarea id="body" name="body" accesskey="d" title="<?php p_("Post data");?>" rows="18" cols="40"><?php echo @$DATA; ?></textarea>
+	</div>
 <?php
 if (isset($use_js_editor) && System::instance()->sys_ini->value('entryconfig', 'EditorOnBottom', 0)) {
 	include("js_editor.php");
