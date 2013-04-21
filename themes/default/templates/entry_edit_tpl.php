@@ -8,43 +8,43 @@
 
 <fieldset>
 <form id="postform" method="post" action="<?php echo $FORM_ACTION; ?>" enctype="multipart/form-data" accept-charset="<?php echo DEFAULT_CHARSET;?>">
-<div class="entry_subject">
-<?php $title = _("Title or subject line for this entry");?>
-<label for="subject" title="<?php echo $title;?>"><?php p_("Subject"); ?></label>
-<input id="subject" name="subject" accesskey="s" title="<?php echo $title;?>" type="text" size="40" <?php 
-if (isset($SUBJECT)) { ?>value="<?php echo $SUBJECT; ?> " <?php } ?> />
-</div>
+	<div class="entry_subject">
+		<?php $title = _("Title or subject line for this entry");?>
+		<label for="subject" title="<?php echo $title;?>"><?php p_("Subject"); ?></label>
+		<input id="subject" name="subject" accesskey="s" title="<?php echo $title;?>" type="text" size="40" <?php 
+		if (isset($SUBJECT)) { ?>value="<?php echo $SUBJECT; ?> " <?php } ?> />
+	</div>
 
-<div class="entry_tags">
-<?php $title = _("Comma-separated list of topics");?>
-<label for="tags" title="<?php echo $title;?>"><?php p_("Topics"); ?></label>
-<input id="tags" name="tags" accesskey="t" title="<?php echo $title;?>" type="text" size="40" <?php 
-if (isset($TAGS)) { ?>value="<?php echo $TAGS; ?>" <?php } ?>/>
-<select id="tag_list" title="<?php p_("Add topic");?>">
-<option value="" selected="selected"><?php p_("Add topic:");?></option>
-<?php foreach ($BLOG_TAGS as $tag): ?>
-	<option value="<?php echo $tag;?>"><?php echo $tag;?></option>
-<?php endforeach; ?>
-</select>
-</div>
+	<div class="entry_tags">
+		<?php $title = _("Comma-separated list of topics");?>
+		<label for="tags" title="<?php echo $title;?>"><?php p_("Topics"); ?></label>
+		<input id="tags" name="tags" accesskey="t" title="<?php echo $title;?>" type="text" size="40" <?php 
+		if (isset($TAGS)) { ?>value="<?php echo $TAGS; ?>" <?php } ?>/>
+		<select id="tag_list" title="<?php p_("Add topic");?>">
+			<option value="" selected="selected"><?php p_("Add topic:");?></option>
+			<?php foreach ($BLOG_TAGS as $tag): ?>
+				<option value="<?php echo $tag;?>"><?php echo $tag;?></option>
+			<?php endforeach; ?>
+		</select>
+	</div>
 
-<?php if (! $PUBLISHED): ?>
-<div id="articlepath">
-<?php $title = _("The last part of the URL path for this article");?>
-<label class="basic_form_label" for="short_path" title="<?php echo $title;?>"><?php p_("Article path"); ?></label>
-<input id="short_path" name="short_path" title="<?php echo $title;?>" type="text" size="40" <?php 
-if (isset($URL)) { ?>value="<?php echo $URL; ?>" <?php } ?>/>
-</div>
-<?php endif; ?>
+	<?php if (! $PUBLISHED): ?>
+	<div id="articlepath">
+		<?php $title = _("The last part of the URL path for this article");?>
+		<label class="basic_form_label" for="short_path" title="<?php echo $title;?>"><?php p_("Article path"); ?></label>
+		<input id="short_path" name="short_path" title="<?php echo $title;?>" type="text" size="40" <?php 
+		if (isset($URL)) { ?>value="<?php echo $URL; ?>" <?php } ?>/>
+	</div>
+	<?php endif; ?>
 
-<?php if (isset($GET_ABSTRACT)): ?>
-<div>
-<?php $title = _("An abstract or summary paragraph for this entry");?>
-<label class="basic_form_label" title="<?php echo $title;?>" for="abstract"><?php p_("Abstract"); ?></label>
-<input id="abstract" name="abstract" title="<?php echo $title;?>" type="text" size="40" <?php 
-if (isset($URL)) { ?>value="<?php echo $URL; ?>" <?php } ?>/>
-</div>
-<?php endif; ?>
+	<?php if (isset($GET_ABSTRACT)): ?>
+	<div>
+		<?php $title = _("An abstract or summary paragraph for this entry");?>
+		<label class="basic_form_label" title="<?php echo $title;?>" for="abstract"><?php p_("Abstract"); ?></label>
+		<input id="abstract" name="abstract" title="<?php echo $title;?>" type="text" size="40" <?php 
+		if (isset($URL)) { ?>value="<?php echo $URL; ?>" <?php } ?>/>
+	</div>
+	<?php endif; ?>
 
 <?php 
 if (EventRegister::instance()->hasHandlers("posteditor", "ShowControls")) {
