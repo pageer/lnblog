@@ -55,10 +55,12 @@ function LBCodeEditor() {
 		return false;
 	}
 	
-	this.two_parm = function (type, prompt_text, meta_text) {
+	this.two_parm = function (type, prompt_text, meta_text, defaults) {
 		
 		var desc_str;
 		var meta_str;
+		var desc_default = (defaults || {}).desc || '';
+		var meta_default = (defaults || {}).meta || '';
 		
 		if (document.getElementById("editboxes") &&
 			document.getElementById("editboxes").style.display == "block") {
@@ -66,7 +68,7 @@ function LBCodeEditor() {
 		} else if (lnblog.getSelection(document.getElementById("body"))) {
 			desc_str = lnblog.getSelection(document.getElementById("body"));
 		} else {
-			desc_str = window.prompt(prompt_text);
+			desc_str = window.prompt(prompt_text, desc_default);
 		}
 	
 		if (! desc_str) return false;
@@ -81,7 +83,7 @@ function LBCodeEditor() {
 					document.getElementById("editboxes").style.display == "block") {
 					meta_str = document.getElementById("meta_txt").value;
 				} else {
-					meta_str = window.prompt(meta_text);
+					meta_str = window.prompt(meta_text, meta_default);
 				}
 				if (! meta_str) return false;
 				if (type == 'ab') this.add_abbr(desc_str, meta_str);
@@ -93,7 +95,7 @@ function LBCodeEditor() {
 				document.getElementById("editboxes").style.display == "block") {
 				meta_str = document.getElementById("meta_txt").value;
 			} else {
-				meta_str = window.prompt(meta_text);
+				meta_str = window.prompt(meta_text, meta_default);
 			}
 		}
 		
@@ -107,11 +109,13 @@ function LBCodeEditor() {
 	
 	}
 	
-	this.opt_parm = function (type, prompt_text, meta_text) {
+	this.opt_parm = function (type, prompt_text, meta_text, defaults) {
 	
 		var desc_str;
 		var meta_str;
 		var data_str;
+		var prompt_default = (defaults || {}).prompt || '';
+		var meta_default = (defaults || {}).meta || '';
 		
 		if (document.getElementById("editboxes") &&
 			document.getElementById("editboxes").style.display == "block") {
@@ -119,7 +123,7 @@ function LBCodeEditor() {
 		} else if (lnblog.getSelection(document.getElementById("body"))) {
 			desc_str = lnblog.getSelection(document.getElementById("body"));
 		} else {
-			desc_str = window.prompt(prompt_text);
+			desc_str = window.prompt(prompt_text, prompt_default);
 		}
 	
 		if (! desc_str) return false;
@@ -128,7 +132,7 @@ function LBCodeEditor() {
 			document.getElementById("editboxes").style.display == "block") {
 			meta_str = document.getElementById("meta_txt").value;
 		} else {
-			meta_str = window.prompt(meta_text);
+			meta_str = window.prompt(meta_text, meta_default);
 		}
 	
 		if (! meta_str) meta_str = '';

@@ -7,7 +7,7 @@
 <button type="button" id="underline" accesskey="u" title="<?php p_('Underline');?>" onclick="lbcode_editor.one_parm('u', '<?php p_('Enter text to underline');?>');"><span style="text-decoration: underline"><?php p_("U");?></span></button>
 <button type="button" id="abr" accesskey="a" title="<?php p_('Abbreviation');?>" onclick="lbcode_editor.two_parm('ab', '<?php p_("Abbreviation");?>', '<?php p_("Full phrase for abbreviation");?>');"><?php p_('abbr');?></button>
 <button type="button" id="acr" accesskey="c" title="<?php p_('Acronym'); ?>" onclick="lbcode_editor.two_parm('ac', '<?php p_("Acronym/abbreviation");?>', '<?php p_("Full phrase for acronym");?>');"><?php p_('ac'); ?></button>
-<button type="button" id="url" accesskey="l" title="<?php p_('Hyperlink'); ?>" onclick="lbcode_editor.two_parm('url', '<?php p_("Link text");?>', '<?php p_("Link URL");?>');"><span style="color: blue; text-decoration: underline"><?php p_('link');?></span></button>
+<button type="button" id="url" accesskey="l" title="<?php p_('Hyperlink'); ?>" onclick="lbcode_editor.two_parm('url', '<?php p_("Link text");?>', '<?php p_("Link URL");?>', {meta: 'http://'});"><span style="color: blue; text-decoration: underline"><?php p_('link');?></span></button>
 <button type="button" id="code" accesskey="o" title="<?php p_('Code');?>" onclick="lbcode_editor.one_parm('code', '<?php p_("Text to mark as code");?>');"><code><?php p_('code');?></code></button>
 <button type="button" id="color" accesskey="c" title="<?php p_('Colored text'); ?>" onclick="lbcode_editor.set_color('<?php p_("Colored text");?>', '<?php p_("Color as a name, hex code, or rgb value");?>');">
 <span style="color:red"><?php p_('color');?></span>
@@ -31,40 +31,4 @@
 <button type="button" id="bq" accesskey="k" title="<?php p_('Blockquote'); ?>" onclick="lbcode_editor.opt_parm('quote', '<?php p_('Block quotation text');?>', '<?php p_("Optional citation");?>');">"<?php p_("bq");?>"</button>
 -->
 </div>
-<?php if (EDITOR_SHOW_INLINE_BOXES) { /* Hide the edit boxes. */ ?>
-<p onclick="return lbcode_editor.toggle_show('editboxes', this);"><strong><?php p_("Inline editor boxes");?></strong><a href="#dummy" >(+)</a></p>
-<div id="editboxes">
-<label for="desc_txt" title="<?php p_('Text to be displayed on page'); ?>"><?php p_('Text'); ?></label>
-<input type="text" id="desc_txt" accesskey="t" title="<?php p_('Text to be displayed on page'); ?>" />
-<label for="meta_txt" title="<?php p_('Link/image URL or abbreviation title'); ?>"><?php p_('Attribute'); ?></label>
-<input type="text" id="meta_txt" accesskey="r" title="<?php p_('Link/image URL or abbreviation title'); ?>" />
-</div>
-<?php } /* End edit box hiding */ ?>
-<?php if (EDITOR_SHOW_SYMBOLS) { /* Hide the math entity buttons. */ ?>
-<h4 onclick="lbcode_editor.toggle_show('mathent', this);"><?php p_("Special symbols");?><a href="#dummy" >(+)</a></h4>
-<div id="mathent">
-<?php
-$math_entities = array();
-$math_entities[_("Set Theory")] = array("weierp"=>_("Power set"), "isin"=>_("Set element"), 
-	"notin"=>_("Not set element"), "ni"=>_("Contains element"), "sub"=>_("Proper subset"), 
-	"sube"=>_("Subset"), "sup"=>_("Proper superset"), "supe"=>_("Superset"),
-	"nsub"=>_("Not subset"), "cap"=>_("Intersection"), "cup"=>_("Union"), "empty"=>_("Empty set"));
-$math_entities[_("Predicate Logic")] = array("and"=>_("And"), "or"=>_("Or"), "rArr"=>_("Implies"),
-	"equiv"=>_("Equivalence"), "there4"=>_("Therefore symbol"), "forall"=>_("Universal quantification"),
-	"exist"=>_("Existential quantification"), "mu"=>_("Mu"), "lambda"=>_("Lambda"));
-$math_entities[_("Comparison")] = array("cong"=>_("Approximately equal"), "ne"=>_("Not equal"), 
-	"le"=>_("Less than or equal to"), "ge"=>_("Greater than or equal to")); 
-$math_entities[_("General")] = array("bull"=>_("Bullet"), "sdot"=>_("Dot operator"), 
-	"lceil"=>_("Left ceiling"), "rceil"=>_("Right ceiling"), 
-	"lfloor"=>_("Left floor"), "rfloor"=>_("Right floor"));
-
-foreach ($math_entities as $type=>$vals) { ?>
-<p><strong><?php echo $type;?>:</strong>
-<?php	foreach ($vals as $ent=>$desc) { ?>
-<input type="button" title="<?php echo $desc;?>" onclick="lbcode_editor.insertEntity('<?php echo $ent;?>')" value="&<?php echo $ent;?>;" />
-<?php	} ?>
-</p>
-<?php } ?>
-</div>
-<?php } /* End math entity hiding */ ?>
 </div>
