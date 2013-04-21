@@ -65,14 +65,14 @@
 	}
 	?>
 	<fieldset id="entry_settings">
-	<legend><?php p_("Entry settings");?><a href="#dummy">(-)</a></legend>
-	<?php if (!$PUBLISHED): ?>
-	<div>
-	<?php $title = _("Publish this as an article instead of a regular blog entry");?>
-	<label for="publisharticle" title="<?php echo $title;?>"><?php p_("Publish as article");?></label>
-	<input type="checkbox" id="publisharticle" name="publisharticle" <?php if (isset($GET_SHORT_PATH)) { echo 'checked="checked"'; }?> />
-	</div>
-	<?php endif; ?>
+		<legend><?php p_("Entry settings");?><a href="#dummy">(-)</a></legend>
+		<?php if (!$PUBLISHED): ?>
+		<div>
+		<?php $title = _("Publish this as an article instead of a regular blog entry");?>
+		<label for="publisharticle" title="<?php echo $title;?>"><?php p_("Publish as article");?></label>
+		<input type="checkbox" id="publisharticle" name="publisharticle" <?php if (isset($GET_SHORT_PATH)) { echo 'checked="checked"'; }?> />
+		</div>
+		<?php endif; ?>
 	<?php if (!$PUBLISHED): ?>
 	<div>
 	<?php
