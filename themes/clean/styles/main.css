@@ -203,6 +203,7 @@ body {
 #banner .bannerpanel {
     position: absolute;
     right: 5px;
+    z-index: 1;
 }
 .menupanel {
 	float: right;
