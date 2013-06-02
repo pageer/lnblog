@@ -359,26 +359,36 @@ class BlogEntryURIWrapper extends LnBlogObject {
 	function setEscape($val) { $this->separator = $val ? "&amp;" : "&"; }
 	
 	function permalink() {
-		$ent =& $this->object;
+		$ent = $this->object;
 		$pretty_file = $ent->calcPrettyPermalink();
-		if ($pretty_file)
+		if ($pretty_file) {
 			$pretty_file = mkpath(dirname($ent->localpath()),$pretty_file);
+		}
 		if ( file_exists($pretty_file) ) {
 			# Check for duplicated entry subjects.
 			$base_path = substr($pretty_file, 0, strlen($pretty_file)-5);
 			$i = 2;
 			if ( file_exists( $base_path.$i.".php") ) {
+				$ret = $this->base_uri;
 				while ( file_exists( $base_path.$i.".php" ) ) {
 					$contents = file_get_contents($base_path.$i.".php");
 					if (strpos($contents, basename(dirname($ent->file)))) {
-						return localpath_to_uri($base_path.$i.".php");
+						$ret = localpath_to_uri($base_path.$i.".php");
+                        break;
 					}
 					$i++;
 				}
-				return $this->base_uri;
 			} else {
-				return localpath_to_uri($pretty_file);
+				$ret = localpath_to_uri($pretty_file);
 			}
+            if (defined('BLOG_ROOT_URL') && strpos($ret, $ent->getParent()->getURL()) !== 0) {
+                $bad_root = localpath_to_uri($ent->getParent()->home_path);
+                if (strpos($ret, $bad_root) === 0) {
+                    $new_root = substr($ret, strlen($bad_root));
+                    $ret = BLOG_ROOT_URL . $new_root;
+                }
+            }
+            return $ret;
 		} else {
 			$pretty_file = $ent->calcPrettyPermalink(true);
 			if ($pretty_file)
