@@ -52,15 +52,15 @@ if ( strpos($ENCLOSURE_DATA['type'], "audio") !== false ||
 </ul>
 <?php if ($SHOW_CONTROLS) { ?>
 <ul class="controlbar">
-	<li><a href="<?php echo $PING_LINK; ?>"><?php p_("Send TrackBack Ping"); ?></a></li>
-	<li><a href="<?php echo $UPLOAD_LINK; ?>"><?php p_("Upload file"); ?></a></li>
-	<li><a href="<?php echo $EDIT_LINK; ?>"><?php p_("Edit"); ?></a></li>
-	<li><a href="<?php echo $DELETE_LINK; ?>"><?php p_("Delete"); ?></a></li>
-	<li><a href="<?php echo $MANAGE_REPLY_LINK; ?>"><?php p_("Manage replies"); ?></a></li>
+	<li class="ping"><a href="<?php echo $PING_LINK; ?>"><?php p_("Send TrackBack Ping"); ?></a></li>
+	<li class="upload"><a href="<?php echo $UPLOAD_LINK; ?>"><?php p_("Upload file"); ?></a></li>
+	<li class="edit"><a href="<?php echo $EDIT_LINK; ?>"><?php p_("Edit"); ?></a></li>
+	<li class="delete"><a href="<?php echo $DELETE_LINK; ?>"><?php p_("Delete"); ?></a></li>
+	<li class="replies"><a href="<?php echo $MANAGE_REPLY_LINK; ?>"><?php p_("Manage replies"); ?></a></li>
 </ul>
 <?php } /* End control link block */ ?>
 </div>
-<p>
+<p class="comment-desc">
 <?php 
 if ($ALLOW_COMMENTS) {
 	pf_('You can reply to this entry by <a href="%s">leaving a comment</a> below.  ',

@@ -37,26 +37,26 @@ else echo $BODY;
 </ul>
 <?php if ($SHOW_CONTROLS) { ?>
 <ul class="controlbar">
-	<li><a href="<?php echo $PING_LINK; ?>"><?php p_("Send TrackBack Ping"); ?></a></li>
-	<li><a href="<?php echo $UPLOAD_LINK; ?>"><?php p_("Upload file"); ?></a></li>
-	<li><a href="<?php echo $EDIT_LINK; ?>"><?php p_("Edit"); ?></a></li>
-	<li><a href="<?php echo $DELETE_LINK; ?>"><?php p_("Delete"); ?></a></li>
-	<li><a href="<?php echo $MANAGE_REPLY_LINK; ?>"><?php p_("Manage replies"); ?></a></li>
+	<li class="ping"><a href="<?php echo $PING_LINK; ?>"><?php p_("Send TrackBack Ping"); ?></a></li>
+	<li class="upload"><a href="<?php echo $UPLOAD_LINK; ?>"><?php p_("Upload file"); ?></a></li>
+	<li class="edit"><a href="<?php echo $EDIT_LINK; ?>"><?php p_("Edit"); ?></a></li>
+	<li class="delete"><a href="<?php echo $DELETE_LINK; ?>"><?php p_("Delete"); ?></a></li>
+	<li class="replies"><a href="<?php echo $MANAGE_REPLY_LINK; ?>"><?php p_("Manage replies"); ?></a></li>
 </ul>
 <?php } 
 if (! empty($ALLOW_TRACKBACKS)) { ?>
-<p><?php p_("TrackBack <abbr title=\"Uniform Resource Locator\">URL</abbr>"); ?>: <a href="<?php echo $TRACKBACK_LINK; ?>"><?php echo $TRACKBACK_LINK; ?></a></p>
+<p class="trackback-url"><?php p_("TrackBack <abbr title=\"Uniform Resource Locator\">URL</abbr>"); ?>: <a href="<?php echo $TRACKBACK_LINK; ?>"><?php echo $TRACKBACK_LINK; ?></a></p>
 <?php } 
 if ( ! empty($COMMENTCOUNT) ) { ?>
-<h3><a href="<?php echo $COMMENT_LINK; ?>"><?php p_("View reader comments"); ?> (<?php echo $COMMENTCOUNT; ?>)</a></h3>
+<h3 class="comment-count"><a href="<?php echo $COMMENT_LINK; ?>"><?php p_("View reader comments"); ?> (<?php echo $COMMENTCOUNT; ?>)</a></h3>
 <?php } elseif ($ALLOW_COMMENTS) { ?>
-<h3><a href="<?php echo $COMMENT_LINK; ?>"><?php p_("Post a comment"); ?></a></h3>
+<h3 class="comment-count zero"><a href="<?php echo $COMMENT_LINK; ?>"><?php p_("Post a comment"); ?></a></h3>
 <?php } ?>
 <?php if ( ! empty($TRACKBACKCOUNT) ) { ?>
-<h3><a href="<?php echo $SHOW_TRACKBACK_LINK; ?>"><?php p_("View TrackBacks"); ?> (<?php echo $TRACKBACKCOUNT; ?>)</a></h3>
+<h3 class="trackback-count"><a href="<?php echo $SHOW_TRACKBACK_LINK; ?>"><?php p_("View TrackBacks"); ?> (<?php echo $TRACKBACKCOUNT; ?>)</a></h3>
 <?php } ?>
 <?php if ( ! empty($PINGBACKCOUNT) ) { ?>
-<h3><a href="<?php echo $PINGBACK_LINK; ?>"><?php p_("View Pingbacks"); ?> (<?php echo $PINGBACKCOUNT; ?>)</a></h3>
+<h3 class="pingback-count"><a href="<?php echo $PINGBACK_LINK; ?>"><?php p_("View Pingbacks"); ?> (<?php echo $PINGBACKCOUNT; ?>)</a></h3>
 <?php } ?>
 </div>
 </div>

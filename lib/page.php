@@ -46,7 +46,7 @@ class Page extends LnBlogObject {
 	Property: doctype
 	String holding the DOCTYPE for the page.  Should normally be set using a 
 	named constant. */
-	public $doctype = DEFAULT_DOCTYPE;
+	public $doctype = '<!DOCTYPE html>';
 	/*
 	Property: title
 	A string used for the page title. */
