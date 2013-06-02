@@ -83,6 +83,9 @@ class Blog extends LnBlogObject {
 	public $last_blogentry = null;
 	public $last_article = null;
 	public $custom_fields = array();
+    
+    # HACK: because the menubar is messed up and I'm too lazy to fix it properly.
+    public $skip_root = false;
 
 	function __construct($path="") {
 

@@ -68,7 +68,9 @@ class System {
 		$list = explode(",", $list);
 		$ret = array();
 		foreach ($list as $item) {
-			$ret[] = NewBlog($item);
+			$b = NewBlog($item);
+            $b->skip_root = true;
+			$ret[] = $b;
 		}
 		return $ret;
 	}
