@@ -275,7 +275,7 @@ $u = NewUser();
 $ent = NewEntry();
 
 // HACK: Don't suck out if the entry is published as an article.
-if ($ent->isDraft() && @$_POST['publisharticle']) {
+if ( @$_POST['publisharticle'] && $ent->isDraft()) {
 	$ent = NewArticle();
 }
 
