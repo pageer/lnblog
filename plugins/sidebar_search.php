@@ -42,6 +42,7 @@ class SidebarSearch extends Plugin {
 		$this->plugin_version = "0.2.0";
 		$this->addOption("caption", _("Caption for search panel"), _("Search"));
 		$this->addOption("label", _("Search field label"), _('Search this weblog'));
+		$this->addOption("label_in_box", _("Put label inside box (HTML5 only)"), false, "checkbox");
 		$this->addOption("use_google", _("Search through Google"), false, "checkbox");
 		$this->addOption("show_in", 
 		                 _("Show search box in what part of page"), 
@@ -95,10 +96,10 @@ class SidebarSearch extends Plugin {
 <?php if ($this->use_google) { /* Use the Google search form */ ?>
 <form method="get" action="http://www.google.com/search">
 <fieldset style="border: 0">
-<?php if ($this->label) { ?>
+<?php if ($this->label && ! $this->label_in_box) { ?>
 <label for="sb_search_terms" title="<?php echo $tooltip;?>"><?php echo $this->label;?></label>
 <?php } ?>
-<input type="text" name="q" />
+<input type="text" name="q" <?php if ($this->label_in_box) { ?>placeholder="<?php echo htmlspecialchars($this->label)?>"<? } ?>/>
 <input type="hidden" name="as_sitesearch" value="<?php echo $blg->getURL(); ?>" />
 <input type="submit" name="btnG" value="<?php p_("Search"); ?>" />
 </fieldset>
@@ -106,10 +107,10 @@ class SidebarSearch extends Plugin {
 <?php } else { /* Use the built-in search. */ ?>
 <form method="post" action="<?php echo INSTALL_ROOT_URL;?>plugins/sidebar_search.php?blog=<?php echo $blg->blogid;?>&amp;show=sb_search_results">
 <fieldset style="border: 0">
-<?php if ($this->label) { ?>
+<?php if ($this->label && ! $this->label_in_box) { ?>
 <label for="sb_search_terms" title="<?php echo $tooltip;?>"><?php echo $this->label;?></label>
 <?php } ?>
-<input type="text" id="sb_search_terms" name="sb_search_terms" title="<?php echo $tooltip; ?>" />
+<input type="text" id="sb_search_terms" name="sb_search_terms" title="<?php echo $tooltip; ?>" <?php if ($this->label_in_box) { ?>placeholder="<?php echo htmlspecialchars($this->label)?>"<? } ?> />
 <input type="submit" id="sb_search_submit" name="sb_search_submit" value="<?php p_("Search"); ?>" />
 </fieldset>
 </form>

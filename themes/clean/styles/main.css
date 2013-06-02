@@ -200,16 +200,14 @@ body {
 	color: white;
 }
 
-.bannerpanel,
+#banner .bannerpanel {
+    position: absolute;
+    right: 5px;
+}
 .menupanel {
 	float: right;
-	width: 20em;
 }
 
-#banner .bannerpanel form,
-#banner .bannerpanel fieldset {
-	width: 100%;
-}
 /***** Link styles *****/
 
 /* Base link style: blue text, no underline.
