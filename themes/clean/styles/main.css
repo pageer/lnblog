@@ -202,8 +202,10 @@ body {
 
 #banner .bannerpanel {
     position: absolute;
-    right: 5px;
+    right: 0;
+    top: 5px;
     z-index: 1;
+    text-align: right;
 }
 .menupanel {
 	float: right;
@@ -254,6 +256,9 @@ textarea:focus {
     #sidebar {
         float: none;
         width: 100%;
+    }
+    #banner {
+        font-size: 80%;
     }
 }
 
