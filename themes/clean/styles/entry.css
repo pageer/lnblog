@@ -82,6 +82,11 @@ ul.inline li,
     content: '- ';
 }
 
+.blogentry .comment-desc,
+.article .comment-desc {
+    display: none;
+}
+
 /* Add a little padding so that the entry text doesn't run into the edge of the
    page or othe relements. */
 .blogentry .body,
