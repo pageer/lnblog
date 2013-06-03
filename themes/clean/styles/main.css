@@ -171,6 +171,10 @@ body {
     width: auto;
 }
 
+#sidebar .biopicture img {
+    max-width: 100%;
+}
+
 .description {
 	font-size: 80%;
 }

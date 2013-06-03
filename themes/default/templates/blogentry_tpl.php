@@ -29,9 +29,9 @@ if ( strpos($ENCLOSURE_DATA['type'], "audio") !== false ||
 <?php if (! empty($TAGS)) { ?>
 	<li><?php p_("Topics");?>: <?php 
 		$out = "";
-		foreach ($TAGS as $key=>$tag) 
-			foreach ($TAG_URLS as $tag=>$url) 
+		foreach ($TAG_URLS as $tag=>$url) {
 			$out .= ($out=="" ? "" : ", ").'<a href="'.$url.'">'.$tag.'</a>'; 
+		}
 		echo $out;
 ?></li>
 <?php } /* End tag block */ ?>
