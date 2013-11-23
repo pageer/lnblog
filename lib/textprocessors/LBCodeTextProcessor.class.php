@@ -38,8 +38,8 @@ class LBCodeTextProcessor extends TextProcessor {
 		$patterns[8] = "/\[u\](.+)\[\/u\]/Usi";
 		$patterns[9] = '/\[q\](.+)\[\/q\]/Usi';
 		$patterns[10] = '/\[q=(.+)\](.+)\[\/q\]/Usi';
-		$patterns[11] = "/(\r?\n\s*)?\[list\]\s*\r?\n(.+)\[\/list\](\s*\r?\n)?/si";
-		$patterns[12] = "/(\r?\n\s*)?\[numlist\]\s*\r?\n(.+)\[\/numlist\](\s*\r?\n)?/si";
+		$patterns[11] = "/(\r?\n\s*)?\[list\]\s*\r?\n(.+)\[\/list\](\s*\r?\n)?/Usi";
+		$patterns[12] = "/(\r?\n\s*)?\[numlist\]\s*\r?\n(.+)\[\/numlist\](\s*\r?\n)?/Usi";
 		$patterns[13] = "/\[\*\](.*)\r?\n/Usi";
 		$patterns[14] = "/\[code\](.*)\[\/code\]/Usi";
 		$patterns[15] = "/\[t\](.*)\[\/t\]/Usi";
