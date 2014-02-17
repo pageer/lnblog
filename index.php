@@ -62,6 +62,12 @@ require_once("blogconfig.php");
 require_once("lib/creators.php");
 require_once("lib/utils.php");
 
+if (isset($_GET['r'])) {
+	$router = new RequestRouter($_GET['r']);
+	$router->route();
+	exit;
+}
+
 global $PAGE;
 
 if ( ! file_exists(USER_DATA_PATH.PATH_DELIM.FS_PLUGIN_CONFIG) ) {

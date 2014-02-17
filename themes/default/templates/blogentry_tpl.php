@@ -4,15 +4,15 @@
 # replies.  Most of the tricky stuff here is for conditional display.
 /* Display the title as a heading with a permalink to the entry. */ ?>
 <div class="blogentry">
-<h2 class="header"><?php echo $SUBJECT; ?></h2>
+<h2 class="header"><?php echo $SUBJECT?></h2>
 <div class="body">
-<?php echo $BODY; ?>
+<?php echo $BODY?>
 </div>
 <div class="footer">
 <?php
 # If there is an enclosure/podcast URL for this entry, this block will display a 
 # link to it with the file name, type, and size.
-if (! empty($ENCLOSURE_DATA) ) { ?>
+if (! empty($ENCLOSURE_DATA)) { ?>
 <p>
 <?php 
 # If the enclosure is an audio file, then refer to it as a podcast.

@@ -58,6 +58,6 @@ if (POST($ok_id)) {
 $body = $tpl->process();
 if ($blog->isBlog()) $PAGE->title = sprintf(_("%s - Logout"), $blog->name);
 else                 $PAGE->title = _("Administration - Logout");
-$PAGE->display($body, &$blog);
+$PAGE->display($body, $blog);
 
 ?>
