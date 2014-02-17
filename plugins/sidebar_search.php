@@ -36,7 +36,7 @@ if (! class_exists("SidebarSearch")) {  # Start massive if statement
 
 class SidebarSearch extends Plugin {
 
-	function SidebarSearch($do_output=0) {
+	public function __construct($do_output=0) {
 		global $SYSTEM;
 		$this->plugin_desc = _("Search for terms in blog entries.");
 		$this->plugin_version = "0.2.0";
@@ -89,33 +89,35 @@ class SidebarSearch extends Plugin {
 			default: $class = "panel";
 		}
 		
-		if ($this->caption && $this->show_in == 'sidebar') { /* Suppress empty header */ ?>
-<h3><?php echo $this->caption; ?></h3><?php
-		} ?>
-<div class="<?php echo $class;?>">
-<?php if ($this->use_google) { /* Use the Google search form */ ?>
-<form method="get" action="http://www.google.com/search">
-<fieldset style="border: 0">
-<?php if ($this->label && ! $this->label_in_box) { ?>
-<label for="sb_search_terms" title="<?php echo $tooltip;?>"><?php echo $this->label;?></label>
-<?php } ?>
-<input type="text" name="q" <?php if ($this->label_in_box) { ?>placeholder="<?php echo htmlspecialchars($this->label)?>"<? } ?>/>
-<input type="hidden" name="as_sitesearch" value="<?php echo $blg->getURL(); ?>" />
-<input type="submit" name="btnG" value="<?php p_("Search"); ?>" />
-</fieldset>
-</form>
-<?php } else { /* Use the built-in search. */ ?>
-<form method="post" action="<?php echo INSTALL_ROOT_URL;?>plugins/sidebar_search.php?blog=<?php echo $blg->blogid;?>&amp;show=sb_search_results">
-<fieldset style="border: 0">
-<?php if ($this->label && ! $this->label_in_box) { ?>
-<label for="sb_search_terms" title="<?php echo $tooltip;?>"><?php echo $this->label;?></label>
-<?php } ?>
-<input type="text" id="sb_search_terms" name="sb_search_terms" title="<?php echo $tooltip; ?>" <?php if ($this->label_in_box) { ?>placeholder="<?php echo htmlspecialchars($this->label)?>"<? } ?> />
-<input type="submit" id="sb_search_submit" name="sb_search_submit" value="<?php p_("Search"); ?>" />
-</fieldset>
-</form>
-<?php } ?>
-</div><?php
+		$placeholder = $this->label_in_box ? ('placeholder="' . htmlspecialchars($this->label).  '"') : '';
+		
+		if ($this->caption && $this->show_in == 'sidebar'): /* Suppress empty header */ ?>
+		<h3><?php echo $this->caption; ?></h3>
+		<?php endif; ?>
+		<div class="<?php echo $class?>">
+		<?php if ($this->use_google): /* Use the Google search form */ ?>
+		<form method="get" action="http://www.google.com/search">
+		<fieldset style="border: 0">
+			<?php if ($this->label && ! $this->label_in_box): ?>
+			<label for="sb_search_terms" title="<?php echo $tooltip?>"><?php echo $this->label?></label>
+			<?php endif; ?>
+			<input type="text" name="q" <?php echo $placeholder?> />
+			<input type="hidden" name="as_sitesearch" value="<?php echo $blg->getURL()?>" />
+			<input type="submit" name="btnG" value="<?php p_("Search"); ?>" />
+		</fieldset>
+		</form>
+		<?php else: /* Use the built-in search. */ ?>
+		<form method="post" action="<?php echo INSTALL_ROOT_URL;?>plugins/sidebar_search.php?blog=<?php echo $blg->blogid;?>&amp;show=sb_search_results">
+		<fieldset style="border: 0">
+			<?php if ($this->label && ! $this->label_in_box): ?>
+			<label for="sb_search_terms" title="<?php echo $tooltip?>"><?php echo $this->label?></label>
+			<?php endif; ?>
+			<input type="text" id="sb_search_terms" name="sb_search_terms" title="<?php echo $tooltip?>" <?php echo $placeholder?> />
+			<input type="submit" id="sb_search_submit" name="sb_search_submit" value="<?php p_("Search"); ?>" />
+		</fieldset>
+		</form>
+		<?php endif; ?>
+		</div><?php
 	}
 
 	function find_entries() {

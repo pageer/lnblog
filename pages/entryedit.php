@@ -161,7 +161,9 @@ function handle_save(&$ent, &$blg, &$errors, $is_draft, $is_art = false) {
 		if (! $ent->isEntry()) {
 			if (is_a($ent, 'Article')) $ent->setPath(POST('short_path'));
 			$ret = $ent->insert($blg);
-			if ($ret && is_a($ent, 'Article')) $ent->setSticky(POST('sticky'));
+			if ($ret && is_a($ent, 'Article')) {
+				$ent->setSticky(POST('sticky'));
+			}
 		} elseif ($ent->isDraft()) {
 			if ($is_art) {
 				$ret = $ent->publishDraftAsArticle($blg, POST('short_path'));
@@ -170,6 +172,9 @@ function handle_save(&$ent, &$blg, &$errors, $is_draft, $is_art = false) {
 			}
 		} else {
 			$ret = $ent->update();
+			if ($ret && is_a($ent, 'Article')) {
+				$ent->setSticky(POST('sticky'));
+			}
 		}
 		
 		if ($ret) $blg->updateTagList($ent->tags());
@@ -192,7 +197,7 @@ function init_template($blog, $entry, $is_article = false) {
 	$tpl = NewTemplate(ENTRY_EDIT_TEMPLATE);
 	$tpl->set('PUBLISHED', false);
 	
-	if ($entry) {
+	if ($entry->isEntry()) {
 		entry_set_template($tpl, $entry);
 		$tpl->set('PUBLISHED', $entry->isPublished());
 		$tpl->set("SEND_PINGBACKS", $blog->auto_pingback == 'all');
@@ -279,7 +284,7 @@ if ( @$_POST['publisharticle'] && $ent->isDraft()) {
 	$ent = NewArticle();
 }
 
-if ($ent === false) {
+if (! $ent->isEntry()) {
 	$do_new = true;
 	$PAGE->setDisplayObject($blg);
 } else {
