@@ -145,7 +145,7 @@ class PHPTemplate extends LnBlogObject {
 			case self::ESC_HTML:
 				return htmlspecialchars($data);
 			case self::ESC_URL:
-				return urnencode($data);
+				return urlencode($data);
 		}
 		return '';
 	} 

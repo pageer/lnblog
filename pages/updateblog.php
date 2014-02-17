@@ -41,29 +41,28 @@ elseif (GET("blogpath")) $blog_path = GET("blogpath");
 else $blog_path = false;
 
 $blog = NewBlog($blog_path);
-$usr = NewUser();
+$usr = User::get();
 $tpl = NewTemplate("blog_modify_tpl.php");
 $PAGE->setDisplayObject($blog);
+
+if (! $usr->checkLogin() || ! $SYSTEM->canModify($blog, $usr)) {
+	Page::instance()->error(403);
+}
 
 # NOTE - we should sanitize this input to avoid XSS attacks.  Then again, 
 # since this page is not publicly accessible, is that needed?
 
 if (has_post()) {
-	
-	if ($SYSTEM->canModify($blog, $usr) && $usr->checkLogin()) {
-		# Only the site administrator can change a blog owner.
-		if ($usr->username() == ADMIN_USER && POST("blogowner") ) {
-			$blog->owner = POST("blogowner");
-		}
-		blog_get_post_data($blog);
-	
-		$ret = $blog->update();
-		$SYSTEM->registerBlog($blog->blogid);
-		if (!$ret) $tpl->set("UPDATE_MESSAGE", _("Error: unable to update blog."));
-		else $PAGE->redirect($blog->getURL());
-	} else {
-		$tpl->set("UPDATE_MESSAGE", _("Error: user %s"));
+	# Only the site administrator can change a blog owner.
+	if ($usr->username() == ADMIN_USER && POST("blogowner") ) {
+		$blog->owner = POST("blogowner");
 	}
+	blog_get_post_data($blog);
+
+	$ret = $blog->update();
+	$SYSTEM->registerBlog($blog->blogid);
+	if (!$ret) $tpl->set("UPDATE_MESSAGE", _("Error: unable to update blog."));
+	else $PAGE->redirect($blog->getURL());
 }
 
 if ($usr->username() == ADMIN_USER) {

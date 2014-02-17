@@ -44,7 +44,12 @@ global $PAGE;
 $list_months = false;
 
 $blog = NewBlog();
+$usr = User::get();
 $PAGE->setDisplayObject($blog);
+
+if (! $usr->checkLogin() || ! $SYSTEM->canModify($blog, $usr)) {
+	Page::instance()->error(403);
+}
 
 $title = spf_("%s - Drafts", $blog->name);
 

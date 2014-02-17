@@ -1,7 +1,7 @@
 <?php
 /*
     LnBlog - A simple file-based weblog focused on design elegance.
-    Copyright (C) 2005 Peter A. Geer <pageer@skepticats.com>
+    Copyright (C) 2005-2013 Peter A. Geer <pageer@skepticats.com>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -294,13 +294,28 @@ class Page extends LnBlogObject {
 		$head->set("SCRIPTS",$this->scripts);
 		$head->set("LINKS", $this->links);
 		
-		if ($blog && get_class($blog)) $blog->exportVars($head);
+		if ($blog && is_a($blog, 'Blog')) $blog->exportVars($head);
 		$head->set("PAGE_CONTENT", $page_body);
 
 		echo $head->process();
 		
 		$this->raiseEvent("OutputComplete");
 		
+	}
+	
+	public function error($code) {
+		switch ($code) {
+			case 403:
+				$message = 'Forbidden';
+				break;
+			case 404:
+				$message = 'Not Found';
+				break;
+			default:
+				$message = '';
+		}
+		header("HTTP/1.0 $code $message");
+		exit;
 	}
 	
 }

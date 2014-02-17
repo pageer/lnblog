@@ -41,6 +41,26 @@ class User extends LnBlogObject {
 	var $default_group;
 	var $custom;
 	#var $user_list;
+	
+	public static function get($usr=false, $pwd=false) {
+		$s_usr = SESSION(CURRENT_USER);
+		$c_usr = COOKIE(CURRENT_USER);
+		if (!$usr && $c_usr) {
+			if ($s_usr == $c_usr || (! AUTH_USE_SESSION && $s_usr == '') ) {
+				$usr = $c_usr;
+			}
+		}
+		if ($usr && isset($_SESSION["user-".$usr])) {
+			return unserialize($_SESSION["user-".$usr]);
+		} else {
+			return new User($usr, $pwd);
+		}
+	}
+	
+	public static function logged_in() {
+		$user = self::get();
+		return $user->checkLogin();
+	}
 
 	function User($uname=false, $pw=false) {
 		global $SYSTEM;
@@ -84,33 +104,6 @@ class User extends LnBlogObject {
 			}
 			$_SESSION["user-".$uname] = serialize($this);
 			
-		} else {
-		# THIS IS OBSELETE.
-		# This is support for the old global passwd.php file.  It will
-		# eventually be removed, but will probably stick around until 
-		# version 1.0 at least.
-		
-			if (defined("INSTALL_ROOT")) {
-				if ( is_file(USER_DATA_PATH.PATH_DELIM."passwd.php") ) {
-					global $global_user_list;
-					$old_path = ini_get("include_path");
-					ini_set("include_path", $old_path.PATH_SEPARATOR.USER_DATA_PATH);
-					require_once(USER_DATA_PATH.PATH_DELIM."passwd.php");
-					ini_set("include_path", $old_path);
-					require_once(USER_DATA_PATH.PATH_DELIM."passwd.php");
-					$this->user_list = $global_user_list;
-				} else {
-					$this->user_list = array();
-				}
-			} else $this->user_list = array();
-			if ($uname && isset($this->user_list[$uname]) ) {
-				$this->username = $uname;
-				$this->passwd = $this->user_list[$uname]["pwd"];
-				$this->salt = $this->user_list[$uname]["salt"];
-				$this->fullname = $this->user_list[$uname]["fullname"];
-				$this->email = $this->user_list[$uname]["email"];
-				$this->homepage = $this->user_list[$uname]["homepage"];
-			}
 		}
 
 		if ($pw) $this->login($pw);
