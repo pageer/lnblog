@@ -73,7 +73,7 @@ class Page extends LnBlogObject {
 		$this->raiseEvent("OnInit");
 		$this->display_object = $ref;
 
-		$this->addScript("jquery-1.7.js");
+		$this->addScript("jquery-1.11.0.min.js");
 		$this->addScript("lnblog_lib.js");
 		$this->addStylesheet("main.css");
 		
@@ -188,6 +188,10 @@ class Page extends LnBlogObject {
 	*/
 	public function addInlineScript($text, $type="text/javascript") {
 		$this->scripts[] = array("text"=>$text, "type"=>$type);
+	}
+	
+	public function addExternalScript($href, $type="text/javascript") {
+		$this->scripts[] = array('href' => $href, 'type' => $type, 'external' => true);
 	}
 	
 	/* 

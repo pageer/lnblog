@@ -296,6 +296,8 @@ $is_art = !empty($_POST) ?
           !empty($_POST['publisharticle']) :
 		  ( GET('type')=='article' || is_a($ent, 'Article') );
 
+$ent->raiseEvent('OnUpdateUiInit');
+
 $tpl = init_template($blg, $ent, $is_art);
 
 if ( POST('post') || POST('draft') ) {

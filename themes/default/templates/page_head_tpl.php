@@ -51,7 +51,12 @@ foreach ($STYLESHEETS as $css) {
 
 foreach ($SCRIPTS as $js) {
 	if (isset($js['href'])) {
-		$link = getlink($js["href"], LINK_SCRIPT); 
+		unset($link);
+		if (!empty($js['external'])) {
+			$link = $js["href"];
+		} else {
+			$link = getlink($js["href"], LINK_SCRIPT);
+		}
 		if ($link) { ?>
 <script type="<?php echo $js["type"]; ?>" src="<?php echo $link; ?>"></script>
 <?php 
