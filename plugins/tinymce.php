@@ -45,8 +45,11 @@ class TinyMCEEditor extends Plugin {
 		Page::instance()->addExternalScript($this->url);
 		$init = $this->getInitString();
 		$scr  = "jQuery(document).ready(function() {
-			tinymce.init($init);
-			$('#input_mode').on('change.editor', function(e) {
+			var \$input_mode = $('#input_mode');
+			if (\$input_mode.val() == ".MARKUP_HTML.") {
+				tinymce.init($init);
+			}
+			\$input_mode.on('change.editor', function(e) {
 				var mode = $(this).val();
 				if (mode == ".MARKUP_HTML.") { // HTML mode
 					tinymce.init($init);
