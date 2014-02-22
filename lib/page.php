@@ -73,7 +73,11 @@ class Page extends LnBlogObject {
 		$this->raiseEvent("OnInit");
 		$this->display_object = $ref;
 
-		$this->addScript("jquery-1.11.0.min.js");
+		if (LOCAL_JQUERY_NAME) {
+			$this->addScript(LOCAL_JQUERY_NAME);
+		} else {
+			$this->addExternalScript('//code.jquery.com/jquery-1.11.0.min.js');
+		}
 		$this->addScript("lnblog_lib.js");
 		$this->addStylesheet("main.css");
 		

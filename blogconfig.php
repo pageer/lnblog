@@ -277,6 +277,10 @@ define("PACKAGE_COPYRIGHT", _("Copyright (c) 2005, Peter A. Geer <pageer@skeptic
 # *Note:* this is not yet implemented.
 @define("USE_WRAPPER_SCRIPTS", true);
 
+# Constant: LOCAL_JQUERY_NAME
+# The name of the local copy of jQuery.  If not specified, uses the jQuery CDN.
+define('LOCAL_JQUERY_NAME', '');
+
 # Constant: LOGIN_EXPIRE_TIME
 # The expiration time for the login cookies.
 #
