@@ -20,11 +20,12 @@ class TinyMCEEditor extends Plugin {
 				$ret = '
 					theme: "modern",
 					plugins: [
-						 "searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking",
-						 "save table contextmenu directionality emoticons template paste textcolor"
+						 "link image searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking",
+						 "hr charmap table contextmenu directionality emoticons template paste textcolor preview"
 				   ],
 				   content_css: "css/content.css",
-				   toolbar: "undo redo | bold italic underline | bullist numlist outdent indent | link image | print preview media fullpage | forecolor backcolor emoticons"
+				   toolbar: "bold italic underline | forecolor backcolor | link image media fullpage emoticons | bullist numlist | preview",
+				   removed_menuitems: "newdocument"
 				';
 				break;
 			default:
@@ -47,7 +48,7 @@ class TinyMCEEditor extends Plugin {
 			tinymce.init($init);
 			$('#input_mode').on('change.editor', function(e) {
 				var mode = $(this).val();
-				if (mode == 2) { // HTML mode
+				if (mode == ".MARKUP_HTML.") { // HTML mode
 					tinymce.init($init);
 				} else {
 					tinymce.remove();
