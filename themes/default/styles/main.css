@@ -36,6 +36,7 @@ html, body { height: 100%; }  /* Use the whole page. */
 	margin: 1% 1% 1% 1%;
 	width: 65%;
 	float: left;
+	position: relative;
 }
 
 /* Sidebar - Right side, with space between it and content area. */

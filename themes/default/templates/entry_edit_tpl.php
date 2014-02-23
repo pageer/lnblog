@@ -2,12 +2,15 @@
 <h3><?php echo $UPDATE_ERROR_MESSAGE?></h3>
 <?php endif; ?>
 
-<div class="entry_preview">
-<?php echo @$PREVIEW_DATA?>
+<div class="entry_preview" <?php echo !empty($PREVIEW_DATA) ? 'style="display:block"' : ''?>>
+	<a href="#" class="preview-close">[<?php p_('Close Preview')?>]</a>
+	<div class="preview-text"><?php echo @$PREVIEW_DATA?></div>
 </div>
 
 <fieldset>
-<form id="postform" method="post" action="<?php echo $FORM_ACTION?>" enctype="multipart/form-data" accept-charset="<?php echo DEFAULT_CHARSET?>">
+<form id="postform" method="post" action="<?php echo $FORM_ACTION?>"
+	  enctype="multipart/form-data" accept-charset="<?php echo DEFAULT_CHARSET?>"
+	  <?php echo !empty($PREVIEW_DATA) ? 'style="display:none"' : ''?>>
 	<div class="entry_subject">
 		<?php
 		$title = _("Title or subject line for this entry");

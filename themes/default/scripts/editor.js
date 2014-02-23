@@ -442,6 +442,11 @@ function LBCodeEditor() {
 var lbcode_editor = new LBCodeEditor();
 
 $(document).ready(function () {
+	$('.entry_preview .preview-close').on('click.preview', function (e) {
+		e.preventDefault();
+		$('.entry_preview').hide();
+		$('#postform').show();
+	});
 	$("#postform input[type='submit']").click(function () {
 		$("#postform input[type='submit']").attr('rel', '');
 		$(this).attr('rel', 'clicked');
@@ -473,7 +478,8 @@ $(document).ready(function () {
 				url: form_url,
 				dataType: 'json',
 				success: function (response, statusText, xhr, $form) {
-					$('.entry_preview').html(unescape(response.content));
+					$('.entry_preview').find('.preview-text').html(unescape(response.content)).end()
+					                   .find('.preview-overlay').remove();;
 					if (response.id.match(/draft/)) {
 						var form_url = $('#postform').attr('action')
 						form_url += form_url.match(/draft=/) ? '' : '&draft='+response.id;
@@ -481,14 +487,15 @@ $(document).ready(function () {
 						form_url += form_url.match(/ajax=1/) ? '' : 'ajax=1';
 						$('#postform').attr('action', form_url);
 					}
-					
 				}
 			}
 			
 			var markup = '<div class="preview-overlay"><div class="label"><img src="'+window.INSTALL_ROOT+'/themes/default/images/ajax-loader.gif"> Loading...</div></div>';
-			$('.entry_preview').prepend(markup);
+			$('.entry_preview').show()
+			                   .prepend(markup);
 			
-			$('#postform').ajaxSubmit(options);
+			$('#postform').hide()
+			              .ajaxSubmit(options);
 			return false;
 		}
 		return true;

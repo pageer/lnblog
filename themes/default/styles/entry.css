@@ -60,11 +60,6 @@ ul.inline li,
 	padding: 1%;
 }
 
-/* This indents the first line of each paragraph. */
-.blogentry .body p {
-	text-indent: 1em;
-}
-
 /* Display images as block elements so that they are seperated from the text
    by default.  Also, add a little margin around them.  This is especially 
 	helpful when the image is floated left or right, as it keeps the text from
@@ -76,7 +71,18 @@ ul.inline li,
 
 /* Overlay for entry preview on edit page*/
 .entry_preview {
-	position: relative;
+	display: none;
+	position: absolute;
+	box-shadow: 1px 1px 6px;
+	border-radius: 5px;
+	width: 100%;
+	background-color: #fff;
+	padding: 5px;
+}
+
+.entry_preview .preview-close {
+	position: absolute;
+	right: 5px;
 }
 
 .entry_preview .preview-overlay {
@@ -98,5 +104,5 @@ ul.inline li,
 	top: 40%;
 	border-radius: 5px;
 	background-color: #fff;
-	box-shadow: 1px 1px 1px;
+	box-shadow: 1px 1px 6px;
 }
