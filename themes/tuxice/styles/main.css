@@ -25,6 +25,7 @@ html, body {
 	clear: right;
 	background: #f4f4f4;
 	border-radius: 5px;
+	position: relative;
 }
 
 a:link {

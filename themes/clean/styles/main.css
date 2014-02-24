@@ -48,6 +48,7 @@ body {
 	width: 65%;
 	float: left;
     margin-top: 12px;
+	position: relative;
 }
 
 /* Sidebar - Right side, with space between it and content area. */
