@@ -281,6 +281,10 @@ define("PACKAGE_COPYRIGHT", _("Copyright (c) 2005, Peter A. Geer <pageer@skeptic
 # The name of the local copy of jQuery.  If not specified, uses the jQuery CDN.
 define('LOCAL_JQUERY_NAME', '');
 
+# Constant: DEFAULT_TIME_ZONE
+# Set the default time zone for use with date functions.
+@define('DEFAULT_TIME_ZONE', 'America/New_York');
+
 # Constant: LOGIN_EXPIRE_TIME
 # The expiration time for the login cookies.
 #
@@ -679,6 +683,9 @@ define("FILE_UPLOAD_TARGET_DIRECTORIES", "files");
 
 #----------------------------------------------------------------------------
 # This section should not normally need to be changed.
+
+# Set the time zone for date functions.
+date_default_timezone_set(DEFAULT_TIME_ZONE);
 
 if (! defined("BLOG_ROOT") && get_blog_path() ) {
 	define("BLOG_ROOT", get_blog_path());
