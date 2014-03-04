@@ -56,6 +56,10 @@ class AuthorBio extends Plugin {
 	}
 	
 	public function output() {
+		if (! $this->picture_url && ! $this->bio) {
+			return;
+		}
+		
 		$tpl = NewTemplate('sidebar_panel_tpl.php');
 		
 		$tpl->set('PANEL_TITLE', $this->title);

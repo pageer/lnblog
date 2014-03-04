@@ -773,4 +773,7 @@ require_once("lib/page.php");
 require_once('lib/system.php');
 require_once("lib/pluginmanager.php");
 
+# Initialize the plugins
+PluginManager::instance()->loadPlugins();
+
 ?>

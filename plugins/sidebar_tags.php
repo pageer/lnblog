@@ -3,9 +3,7 @@ if (! class_exists("Blogroll")) {  /* Start massive if statement */
 
 class TagList extends Plugin {
 
-	function TagList($do_output=0) {
-		global $SYSTEM;
-
+	public function __construct($do_output=0) {
 		$this->plugin_desc = _("Provides a list of links to view post for each tag used in the blog.");
 		$this->plugin_version = "0.3.0";
 		$this->addOption("header", _("Sidebar section heading"), _("Topics"));
@@ -16,13 +14,13 @@ class TagList extends Plugin {
 
 		$this->addOption('no_event',
 			_('No event handlers - do output when plugin is created'),
-			$SYSTEM->sys_ini->value("plugins","EventDefaultOff", 0), 
+			System::instance()->sys_ini->value("plugins","EventDefaultOff", 0), 
 			'checkbox');
 
 		$this->getConfig();
 
 		if ( $this->no_event || 
-		     $SYSTEM->sys_ini->value("plugins","EventForceOff", 0) ) {
+		     System::instance()->sys_ini->value("plugins","EventForceOff", 0) ) {
 			# If either of these is true, then don't set the event handler
 			# and rely on explicit invocation for output.
 		} else {
@@ -38,8 +36,7 @@ class TagList extends Plugin {
 	}
 
 	function buildList() {
-		global $PLUGIN_MANAGER;
-		$parser =& $PLUGIN_MANAGER->plugin_config;
+		$parser = PluginManager::instance()->plugin_config;
 		
 		$blg = NewBlog();
 		if (! $blg->isBlog() ) return false;
@@ -49,7 +46,10 @@ class TagList extends Plugin {
 		$base_feed_uri = $blg->uri('base').BLOG_FEED_PATH.'/';
 		
 		$links = array();
-		foreach ($blg->tag_list as $tag) { 
+		foreach ($blg->tag_list as $tag) {
+			if (! $tag) {
+				continue;
+			}
 			$l = '<a href="'.$blg->uri('tags', urlencode($tag)).'">'.
 			     htmlspecialchars($tag).'</a>';
 			if ($this->show_feeds) {
@@ -92,28 +92,25 @@ class TagList extends Plugin {
 
 	function buildOutput($parm=false) {
 
-		global $PLUGIN_MANAGER;
-		$parser =& $PLUGIN_MANAGER->plugin_config;
-		
 		$blg = NewBlog();
-		if (! $blg->isBlog() ) return false;
-		if (empty($blg->tag_list)) return false;
+		if (! $blg->isBlog() || empty($blg->tag_list)) {
+			return false;
+		}
 
 		$base_feed_path = $blg->home_path.PATH_DELIM.BLOG_FEED_PATH;
 		$base_feed_uri = $blg->uri('base').BLOG_FEED_PATH.'/';
 
 		$list = $this->buildList();
+		
+		if (! $list) {
+			return '';
+		}
 
 		$tpl = NewTemplate("sidebar_panel_tpl.php");
 		if ($this->header) {
 			$tpl->set("PANEL_TITLE", $this->header);
 			if ($blg->isBlog()) {
 				$tpl->set("TITLE_LINK", $blg->uri('tags'));
-				/*$tpl->set("TITLE_LINK", 
-				          $blg->uri('plugin', 
-				                    str_replace(".php", '', 
-				                                basename(__FILE__))));
-				*/
 			}
 		}
 		

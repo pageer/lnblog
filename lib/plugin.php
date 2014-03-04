@@ -28,14 +28,14 @@
 
 class PluginSettings { }
 
-class Plugin extends LnBlogObject{
+abstract class Plugin extends LnBlogObject{
 
 	/*	Property: plugin_desc
 	A short description of the plugin. */
-	var $plugin_desc;
+	public $plugin_desc;
 	/* Property: plugin_version
 	The version number of the plugin.  This should be in "1.2.3" format. */
-	var $plugin_version;
+	public $plugin_version;
 	/* Property: member_list
 	An associative array of arrays, with the form member=>settings, where 
 	member is the name of a member variable of your class and settings is an 
@@ -66,14 +66,14 @@ class Plugin extends LnBlogObject{
 	              and selection box controls, with each array element 
 	              representing an option for the user to select .
 	*/
-	var $member_list;
+	public $member_list;
 
 	/* Constructor:
 	Insert initialization code into the constructor.  You MUST OVERRIDE
 	the constructor for your concrete subclass (i.e. you must have an
 	explicit constructor). */
 
-	function Plugin() {
+	public function __construct() {
 		$this->plugin_desc = "Abstract plugin.";
 		$this->plugin_version = "0.0.0";
 		$this->member_list = array();
@@ -321,14 +321,19 @@ class Plugin extends LnBlogObject{
 		$u = NewUser();
 		$f = NewFS();
 
+		$content = $this->buildOutput($b);
+		
+		if (! $content && empty($this->allow_empty_output)) {
+			return;
+		}
+		
 		if ( (isset($this->enable_cache) && ! $this->enable_cache) ||
 		     $u->checkLogin() ) {
-			echo $this->buildOutput($b);
+			echo $content;
 		} else {
 			$cache_path = $this->cachepath($b);
 
 			if ($cache_path && ! file_exists($cache_path)) {
-				$content = $this->buildOutput($b);
 				if (! is_dir(dirname($cache_path))) {
 					$f->mkdir_rec(dirname($cache_path));
 				}
@@ -336,7 +341,9 @@ class Plugin extends LnBlogObject{
 					$f->write_file($cache_path, $content);
 			}
 	
-			if (file_exists($cache_path)) readfile($cache_path);
+			if (file_exists($cache_path)) {
+				readfile($cache_path);
+			}
 		}
 	}
 	

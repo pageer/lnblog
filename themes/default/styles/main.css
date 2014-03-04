@@ -166,6 +166,10 @@ html, body { height: 100%; }  /* Use the whole page. */
 	margin: 0;
 }
 
+#sidebar .login-link {
+	margin-left: 5%;
+}
+
 /***** Banner styles *****/
 
 #banner h1,

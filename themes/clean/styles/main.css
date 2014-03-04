@@ -190,6 +190,19 @@ body {
 	margin: 0;
 }
 
+#sidebar .login-link {
+	text-align: right;
+	float: right;
+	padding-right: 4%;
+}
+
+#sidebar .powered-by {
+	background-color: inherit;
+	border: none;
+	float: left;
+	padding-left: 4%;
+}
+
 /***** Banner styles *****/
 
 #banner h1,

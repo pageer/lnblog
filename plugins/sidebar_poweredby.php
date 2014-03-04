@@ -4,7 +4,7 @@ class LnBlogAd extends Plugin {
 	function LnBlogAd($do_output=0) {
 		global $SYSTEM;
 		$this->plugin_desc = _("Shameless link whoring.");
-		$this->plugin_version = "0.1.1";
+		$this->plugin_version = "0.2.0";
 		$this->use_footer = false;
 		$this->addOption("use_footer",
 			_("Put the advertising in the footer, not the sidebar"),
@@ -36,7 +36,7 @@ class LnBlogAd extends Plugin {
 	}
 	
 	function output() { ?>
-<div class="panel">
+<div class="panel powered-by">
 <a href="<?php echo PACKAGE_URL; ?>"><img alt="<?php pf_("Powered by %s", PACKAGE_NAME); ?>" title="<?php pf_("Powered by %s", PACKAGE_NAME); ?>" src="<?php echo getlink("logo.png", LINK_IMAGE); ?>" /></a>
 </div>
 <?php 

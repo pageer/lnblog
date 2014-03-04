@@ -30,14 +30,35 @@ class PluginManager {
 	var $load_list;
 	var $plugin_config;
 	
+	public $default_excluded = array(
+		'sidebar_archives.php',
+		'htaccess_generator.php',
+		'sidebar_googlesearch.php',
+	);
+	public $default_load_first = array(
+		"banner_pageheader.php",
+		"menubar_sitemap.php",
+		"sidebar_loginops.php",
+		"sidebar_recent.php",
+		"sidebar_articles.php",
+		"sidebar_calendar.php",
+		"sidebar_news.php",
+		"sidebar_search.php",
+		"sidebar_tags.php",
+	);
+	public $default_load_last = array(
+		'sidebar_poweredby.php',
+		'sidebar_loginlink.php',
+	);
+	
 	static function instance() {
-		if (! isset($GLOBALS['PLUGINMANAGER'])) {
-			$GLOBALS['PLUGINMANAGER'] = new PluginManager();
+		if (! isset($GLOBALS['PLUGIN_MANAGER'])) {
+			$GLOBALS['PLUGIN_MANAGER'] = new PluginManager();
 		}
-		return $GLOBALS['PLUGINMANAGER'];
+		return $GLOBALS['PLUGIN_MANAGER'];
 	}
 
-	function PluginManager() {
+	public function __construct() {
 	
 		# Merge the global and per-blog config to get a single INI object that
 		# all plugins can access.
@@ -46,17 +67,14 @@ class PluginManager {
 		$this->plugin_list = $this->getFileList();
 		# Get various settings to determine which plugins should be loaded and 
 		# in what order.
-		$defexcl = "sidebar_archives.php,htaccess_generator.php";
-		$excl = $this->plugin_config->value("Plugin_Manager", "exclude_list", $defexcl);
+		$excl = $this->plugin_config->value("Plugin_Manager", "exclude_list",
+											implode(',', $this->default_excluded));
 		$this->exclude_list = explode(",", $excl);
 		if (! is_array($this->exclude_list)) $this->exclude_list = array();
 		
-		$deflf = "banner_pageheader.php,menubar_sitemap.php,".
-		         "sidebar_loginops.php,sidebar_recent.php,".
-		         "sidebar_articles.php,sidebar_calendar.php,".
-		         "sidebar_news.php,sidebar_search.php,sidebar_tags.php,".
-		         "sidebar_loginlink.php,sidebar_poweredby.php";
-		$lf = $this->plugin_config->value("Plugin_Manager", "load_first", $deflf);
+
+		$lf = $this->plugin_config->value("Plugin_Manager", "load_first",
+										  implode(',', $this->default_load_first));
 		$this->load_first = explode(",", $lf);
 		
 		$this->load_list = array();
@@ -67,9 +85,21 @@ class PluginManager {
 				}
 			}
 		}
+		
+		$do_last = array();
 
 		foreach ($this->plugin_list as $val) {
-			if (! isset($this->load_list[$val])) $this->load_list[$val] = $val;
+			if (! isset($this->load_list[$val]) && ! in_array($val, $this->default_load_last)) {
+				$this->load_list[$val] = $val;
+			} elseif (in_array($val, $this->default_load_last)) {
+				$do_last[] = $val;
+			}
+		}
+		
+		foreach ($this->default_load_last as $val) {
+			if (in_array($val, $do_last)) {
+				$this->load_list[$val] = $val;
+			}
 		}
 		
 		foreach ($this->exclude_list as $val) {
@@ -128,8 +158,7 @@ class PluginManager {
 	 * True if the plugin class is loaded, false otherwise.
 	 */
 	function pluginLoaded($plugin_name) {
-		if (class_exists($plugin_name)) return true;
-		else return false;
+		return class_exists($plugin_name);
 	}
 
 	/* Method: getFileList
@@ -209,19 +238,20 @@ class PluginManager {
 	 * directory, false otherwise.
 	 */
 	function testFile($plug) {
-		$lnblog_path = mkpath(INSTALL_ROOT,'plugins',$plug);
-		if (file_exists($lnblog_path)) return true;
-		$userdata_path = mkpath(USER_DATA_PATH,'plugins',$plug);
-		if (file_exists($userdata_path)) return true;
+		$paths = array(
+			mkpath(INSTALL_ROOT,'plugins',$plug),
+			mkpath(USER_DATA_PATH,'plugins',$plug),
+		);
 		$blog = NewBlog();
 		if ($blog->isBlog()) {
-			$blog_path = mkpath($blog->home_path,'plugins',$plug);
-			if (file_exists($blog_path)) return true;
+			$paths[] = mkpath($blog->home_path,'plugins',$plug);
+		}
+		foreach ($paths as $path) {
+			if (file_exists($path)) {
+				return true;
+			}
 		}
 		return false;
 	}
 	
 }
-
-$PLUGIN_MANAGER = new PluginManager();
-$PLUGIN_MANAGER->loadPlugins();
