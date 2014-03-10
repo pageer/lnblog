@@ -5,7 +5,7 @@
 
 class Articles extends Plugin {
 
-	function Articles($do_output=0) {
+	function __construct($do_output=0) {
 		global $SYSTEM;
 		$this->plugin_desc = _("List the articles for a blog.");
 		$this->plugin_version = "0.2.4";
@@ -29,7 +29,7 @@ class Articles extends Plugin {
 			$SYSTEM->sys_ini->value("plugins","EventDefaultOff", 0), 
 			'checkbox');
 			
-		$this->getConfig();
+		parent::__construct();
 		
 		if ( $this->no_event || 
 		     $SYSTEM->sys_ini->value("plugins","EventForceOff", 0) ) {

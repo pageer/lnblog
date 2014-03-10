@@ -1,7 +1,7 @@
 <?php
 class LnBlogAd extends Plugin {
 
-	function LnBlogAd($do_output=0) {
+	function __construct($do_output=0) {
 		global $SYSTEM;
 		$this->plugin_desc = _("Shameless link whoring.");
 		$this->plugin_version = "0.2.0";
@@ -15,7 +15,7 @@ class LnBlogAd extends Plugin {
 			$SYSTEM->sys_ini->value("plugins","EventDefaultOff", 0), 
 			'checkbox');
 
-		$this->getConfig();
+		parent::__construct();
 
 		if ( $this->no_event || 
 		     $SYSTEM->sys_ini->value("plugins","EventForceOff", 0) ) {

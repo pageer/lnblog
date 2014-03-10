@@ -1,7 +1,7 @@
 <?php  
 class Recent extends Plugin {
 
-	function Recent($do_output=0) {
+	function __construct($do_output=0) {
 		global $SYSTEM;
 		
 		$this->plugin_desc = _("Show some of the more recent posts in the sidebar.");
@@ -28,7 +28,7 @@ class Recent extends Plugin {
 			$SYSTEM->sys_ini->value("plugins","EventDefaultOff", 0), 
 			'checkbox');
 			
-		$this->getConfig();
+		parent::__construct();
 		
 		$blg = NewBlog();
 		if ($blg->isBlog()) {

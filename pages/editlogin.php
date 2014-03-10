@@ -127,5 +127,5 @@ $body = $tpl->process();
 if (! defined("BLOG_ROOT")) $blog = false;;
 $PAGE->addStylesheet("form.css");
 $PAGE->title = $page_name;
-$PAGE->display($body, &$blog);
+$PAGE->display($body, $blog);
 ?>

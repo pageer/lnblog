@@ -8,7 +8,7 @@ class TinyMCEEditor extends Plugin {
 			array("basic"=>_("Basic"),"advanced"=>_("Advanced"))
 			);
 		$this->addOption("url", _('URL to TinyMCE'), '//tinymce.cachefly.net/4.0/tinymce.min.js');
-		$this->getConfig();
+		parent::__construct();
 	}
 	
 	protected function getInitString() {

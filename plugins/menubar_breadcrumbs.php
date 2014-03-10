@@ -18,7 +18,7 @@ class Breadcrumbs extends Plugin {
 			System::instance()->sys_ini->value("plugins","EventDefaultOff", 0), 
 			'checkbox');
 
-		$this->getConfig();
+		parent::__construct();
 
 		if ( $this->no_event || 
 		     System::instance()->sys_ini->value("plugins","EventForceOff", 0) ) {

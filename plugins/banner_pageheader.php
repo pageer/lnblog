@@ -8,7 +8,7 @@
 
 class PageHeader extends Plugin {
 
-	function PageHeader($do_output=0) {
+	function __construct($do_output=0) {
 		global $SYSTEM;
 
 		$this->plugin_desc = _("Output a banner for the page.");
@@ -21,7 +21,7 @@ class PageHeader extends Plugin {
 			$SYSTEM->sys_ini->value("plugins","EventDefaultOff", 0), 
 			'checkbox');
 
-		$this->getConfig();
+		parent::__construct();
 
 		if ( $this->no_event || 
 		     $SYSTEM->sys_ini->value("plugins","EventForceOff", 0) ) {

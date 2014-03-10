@@ -2,11 +2,11 @@
 
 class GoogleSearch extends Plugin {
 
-	function GoogleSearch() {
+	function __construct() {
 		$this->plugin_desc = _("Use Google to search the blog.");
 		$this->plugin_version = "0.1.1";
 		$this->addOption("caption", _("Caption for search panel"), _("Search"));
-		$this->getConfig();
+		parent::__construct();
 	}
 
 	function output() {

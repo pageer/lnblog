@@ -23,7 +23,7 @@
 
 class TrackbackValidator extends Plugin {
 
-	function TrackbackValidator() {
+	function __construct() {
 		$this->plugin_desc = _('Allow only TrackBacks that link to your URL in the page body.');
 		$this->plugin_version = '0.1.0';
 		
@@ -33,7 +33,7 @@ class TrackbackValidator extends Plugin {
 		$this->addOption('base_uri',
 		                 _('Allow pings from pages that link to anything under the entry, not just the permalink.'),
 		                 true, 'checkbox');
-		$this->getConfig();
+		parent::__construct();
 		
 		$this->registerEventHandler("trackback", "POSTRetreived", "check_for_link");
 	}

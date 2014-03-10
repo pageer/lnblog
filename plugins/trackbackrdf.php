@@ -1,9 +1,10 @@
 <?php
 class TrackbackRDF extends Plugin {
 	
-	function TrackbackRDF() {
+	function __construct() {
 		$this->plugin_desc = _("Add TrackBack auto-discovery RDF to entry pages.");
 		$this->plugin_version = "0.1.1";
+		parent::__construct();
 	}
 
 	function add_rdf(&$ent) {

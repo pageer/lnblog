@@ -22,7 +22,7 @@ class AuthorBio extends Plugin {
 			System::instance()->sys_ini->value("plugins","EventDefaultOff", 0), 
 			'checkbox');
 		
-		$this->getConfig();
+		parent::__construct();
 
 		Page::instance()->addInlineStylesheet($this->styles());
 		

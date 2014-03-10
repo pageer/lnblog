@@ -20,7 +20,7 @@
 
 class DisableComments extends Plugin {
 
-	function DisableComments() {
+	function __construct() {
 		$this->plugin_desc = _("Allows you to globally disable comments, trackbacks, or pingbacks for an entire blog.");
 		$this->plugin_version = "0.2.0";
 		$this->no_comment = "default";
@@ -38,7 +38,7 @@ class DisableComments extends Plugin {
 		$this->addOption("close_old", 
 				_("Close all replies on entries older than this many days"),
 				"", "text");
-		$this->getConfig();
+		parent::__construct();
 	}
 
 	function disable(&$param) {

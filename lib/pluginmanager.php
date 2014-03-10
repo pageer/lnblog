@@ -24,6 +24,8 @@
 
 class PluginManager {
 
+	protected static $registry = array();
+
 	var $plugin_list;
 	var $exclude_list;
 	var $load_first;
@@ -109,6 +111,13 @@ class PluginManager {
 		}
 		
 	}
+	
+	public function registerPlugin($obj) {
+		if ($obj instanceof Plugin) {
+			$name = get_class($obj);
+			self::$registry[$name] = $name;
+		}
+	}
 
 	/* Method: getConfig
 	 * Gets configuration data for plugins from XML files.
@@ -134,18 +143,7 @@ class PluginManager {
 	 */
 
 	function getPluginList() {
-		$classes = get_declared_classes();
-		$plugin_classes = array();
-		foreach ($classes as $cls) {
-			if ( class_exists($cls) && 
-			     in_arrayi("updateconfig", get_class_methods($cls)) &&
-			     in_arrayi("showconfig", get_class_methods($cls)) &&
-			     in_arrayi("getconfig", get_class_methods($cls)) ) {
-				$obj = new $cls;
-				if (is_subclass_of($obj, "Plugin")) $plugin_classes[] = $cls;
-			}
-		}
-		return $plugin_classes;
+		return self::$registry;
 	}
 
 	/* Method: pluginLoaded

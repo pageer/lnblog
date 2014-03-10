@@ -1,7 +1,7 @@
 <?php 
 require_once("lib/plugin.php");
 class BotBlock extends Plugin {
-	function BotBlock () {
+	function __construct() {
 		global $PAGE;
 		
 		$this->plugin_version = "0.2.0";
@@ -14,7 +14,7 @@ class BotBlock extends Plugin {
 		                 _('Include text CAPTCHA for user agents without JavaScript'),
 		                 true, 'checkbox');
 	
-		$this->getConfig();
+		parent::__construct();
 		
 		if ($this->block_links) {
 			$this->registerEventHandler("blogcomment", "OnInsert", "checkMarkup");

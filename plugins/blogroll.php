@@ -8,7 +8,7 @@ if (! class_exists("Blogroll")) {  # Start massive if statement
 require_once('lib/xml.php');
 class Blogroll extends Plugin {
 
-	function Blogroll($do_output=false) {
+	function __construct($do_output=false) {
 		global $SYSTEM;
 	
 		$this->plugin_version = "0.1.0";
@@ -28,7 +28,7 @@ class Blogroll extends Plugin {
 
 		$this->link_only = true;
 
-		$this->getConfig();
+		parent::__construct();
 
 		if ( $this->no_event || 
 		     $SYSTEM->sys_ini->value("plugins","EventForceOff", 0) ) {

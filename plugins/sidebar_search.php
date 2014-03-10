@@ -57,7 +57,7 @@ class SidebarSearch extends Plugin {
 			$SYSTEM->sys_ini->value("plugins","EventDefaultOff", 0), 
 			'checkbox');
 
-		$this->getConfig();
+		parent::__construct();
 
 		if ( ! ($this->no_event || 
 		        $SYSTEM->sys_ini->value("plugins","EventForceOff", 0)) ) {

@@ -25,14 +25,14 @@
 
 class IPBan extends Plugin {
 	
-	function IPBan() {
+	function __construct() {
 		$this->plugin_desc = _("Allows you to ban IP addresses from adding comments or trackbacks.");
 		$this->plugin_version = "0.2.4";
 		$this->addOption("ban_list", _("File to store list of banned IPs."),
 			"ip_ban.txt", "text");
 		$this->addOption("admin_local", _("Show per-blog ban link when administrator"), false, "checkbox");
 		$this->addOption("ban_del", _("Ban link both bans IP and deletes"), true, "checkbox");
-		$this->getConfig();
+		parent::__construct();
 		
 		# Call banIP() here so that it will get called on pages that never output, 
 		# e.g. when you do a JavaScript confirmation on a "delete and ban", which 

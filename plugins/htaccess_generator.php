@@ -12,6 +12,7 @@ class HTAccessGenerator extends Plugin {
 	function HTAccessGenerator() {
 		$this->plugin_desc = _("Adds handy .htaccess files to blogs.");
 		$this->plugin_version = "0.1.1";
+		parent::__construct();
 	}
 
 	function create_file(&$param) {

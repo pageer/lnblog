@@ -9,7 +9,7 @@
 
 class Archives extends Plugin {
 
-	function Archives($do_output=0) {
+	function __construct($do_output=0) {
 		global $SYSTEM;
 		$this->plugin_name = _("List the months of archives for a blog.");
 		$this->plugin_version = "0.2.1";
@@ -20,8 +20,8 @@ class Archives extends Plugin {
 			_('No event handlers - do output when plugin is created'),
 			$SYSTEM->sys_ini->value("plugins","EventDefaultOff", 0), 
 			'checkbox');
-						 
-		$this->getConfig();
+		
+		parent::__construct();
 		
 		if ( $this->no_event || 
 		     $SYSTEM->sys_ini->value("plugins","EventForceOff", 0) ) {

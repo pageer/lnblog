@@ -32,10 +32,10 @@ abstract class Plugin extends LnBlogObject{
 
 	/*	Property: plugin_desc
 	A short description of the plugin. */
-	public $plugin_desc;
+	public $plugin_desc = 'Abstract plugin';
 	/* Property: plugin_version
 	The version number of the plugin.  This should be in "1.2.3" format. */
-	public $plugin_version;
+	public $plugin_version = '0.0.0';
 	/* Property: member_list
 	An associative array of arrays, with the form member=>settings, where 
 	member is the name of a member variable of your class and settings is an 
@@ -66,7 +66,7 @@ abstract class Plugin extends LnBlogObject{
 	              and selection box controls, with each array element 
 	              representing an option for the user to select .
 	*/
-	public $member_list;
+	public $member_list = array();
 
 	/* Constructor:
 	Insert initialization code into the constructor.  You MUST OVERRIDE
@@ -74,9 +74,7 @@ abstract class Plugin extends LnBlogObject{
 	explicit constructor). */
 
 	public function __construct() {
-		$this->plugin_desc = "Abstract plugin.";
-		$this->plugin_version = "0.0.0";
-		$this->member_list = array();
+		PluginManager::instance()->registerPlugin($this);
 		if ($this->member_list) $this->getConfig();
 	}
 

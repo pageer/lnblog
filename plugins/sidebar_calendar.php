@@ -40,7 +40,7 @@ if (! class_exists("SidebarCalendar")) {  # Start massive if statement
 
 class SidebarCalendar extends Plugin {
 	
-	function SidebarCalendar($do_output=0) {
+	function __construct($do_output=0) {
 		global $SYSTEM;
 		$this->plugin_desc = _("Provides a link calendar for the sidebar.");
 		$this->plugin_version = "0.1.1";
@@ -53,7 +53,7 @@ class SidebarCalendar extends Plugin {
 			$SYSTEM->sys_ini->value("plugins","EventDefaultOff", 0), 
 			'checkbox');
 			
-		$this->getConfig();
+		parent::__construct();
 		
 		if ( $this->no_event || 
 		     $SYSTEM->sys_ini->value("plugins","EventForceOff", 0) ) {

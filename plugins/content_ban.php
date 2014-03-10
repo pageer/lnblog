@@ -20,7 +20,7 @@
 
 class ContentBan extends Plugin {
 	
-	function ContentBan() {
+	function __construct() {
 		$this->plugin_desc = _("Allows you to ban comments or trackbacks that match certain regular expressions.");
 		$this->plugin_version = "0.1.0";
 		$this->addOption("ban_list", _("File to store list of banned regular expressions (one RE per line)."),
@@ -28,7 +28,7 @@ class ContentBan extends Plugin {
 		$this->addOption("user_exempt",
 		                 _("Do not apply ban to logged-in users."),
 		                 false, "checkbox");
-		$this->getConfig();
+		parent::__construct();
 	}
 
 	# Write the ban list to disk.

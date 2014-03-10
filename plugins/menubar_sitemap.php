@@ -28,7 +28,7 @@ class SiteMap extends Plugin {
 
 	var $link_file;
 
-	function SiteMap($do_output=0) {
+	function __construct($do_output=0) {
 		global $SYSTEM;
 
 		$this->plugin_desc = _("Show a sitemap in the menubar");
@@ -50,7 +50,7 @@ class SiteMap extends Plugin {
 			$SYSTEM->sys_ini->value("plugins","EventDefaultOff", 0), 
 			'checkbox');
 
-		$this->getConfig();
+		parent::__construct();
 
 		if ( $this->no_event || 
 		     $SYSTEM->sys_ini->value("plugins","EventForceOff", 0) ) {

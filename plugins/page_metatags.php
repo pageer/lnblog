@@ -6,12 +6,12 @@
 
 class MetaData extends Plugin {
 
-	function MetaData() {
+	function __construct() {
 		$this->plugin_desc = _("Add some META tags to the page.");
 		$this->plugin_version = "0.2.0";
 		$this->addOption('meta_keywords', _("Keywords for search engines"),
 		                 "", "text");
-		$this->getConfig();
+		parent::__construct();
 	}
 
 	function addMetaTags(&$page) {

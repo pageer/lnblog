@@ -11,7 +11,7 @@
 
 class ReplyNotifier extends Plugin {
 	
-	function ReplyNotifier() {
+	function __construct() {
 		$this->plugin_desc = _("Sends an e-mail notification when a comment, TrackBack, or Pingback is submitted.");
 		$this->addOption("notify_comment", _("Send notification for comments"),
 		                 true, "checkbox");
@@ -20,6 +20,7 @@ class ReplyNotifier extends Plugin {
 		$this->addOption("notify_pingback", _("Send notification for Pingbacks"),
 		                 true, "checkbox");
 		$this->plugin_version = "0.1.1";
+		parent::__construct();
 	}
 
 	function send_message(&$ent, $subject, $data) {

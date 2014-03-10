@@ -1,9 +1,10 @@
 <?php
 class RSSLinks extends Plugin {
 
-	function RSSLinks() {
+	function __construct() {
 		$this->plugin_desc = _("Add HTML link elements to relevant RSS feeds.");
 		$this->plugin_version = "0.1.0";
+		parent::__construct();
 	}
 	
 	function linkFeeds(&$param) {

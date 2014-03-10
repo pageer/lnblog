@@ -101,7 +101,7 @@ class RSS1 {
 
 class RSS1FeedGenerator extends Plugin {
 
-	function RSS1FeedGenerator() {
+	function __construct() {
 		$this->plugin_desc = _("Create RSS 1.0 feeds for comments and blog entries.");
 		$this->plugin_version = "0.2.0";
 		$this->addOption("feed_file", _("The file name for the blog RSS feed"),
@@ -110,7 +110,7 @@ class RSS1FeedGenerator extends Plugin {
 		                 "comments.rdf", "text");
 		$this->addOption("topic_feeds", _("Generate feeds for each topic"),
 		                 true, 'checkbox');
-		$this->getConfig();
+		parent::__construct();
 	}
 
 	function updateCommentRSS1(&$cmt) {

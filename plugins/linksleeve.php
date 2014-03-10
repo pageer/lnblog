@@ -23,7 +23,7 @@ require_once("xmlrpc/xmlrpc.inc");
 
 class Linksleeve extends Plugin {
 
-	function Linksleeve() {
+	function __construct() {
 		$this->plugin_version = "0.1.0";
 		$this->plugin_desc = _("Submits reply data to Linksleeve anti-spam service.");
 		$this->addOption("check_comm", _("Check comment data"), true, "checkbox");
@@ -40,7 +40,7 @@ class Linksleeve extends Plugin {
 		                       2=>_("Notify for all")) );
 		$this->addOption("service_uri", _("LinkSleeve service URI"), 
 		                 "http://www.linksleeve.org/slv.php");
-		$this->getConfig();
+		parent::__construct();
 
 		if ($this->check_comm) {
 			$this->registerEventHandler("blogcomment", "OnInsert", "check_reply");

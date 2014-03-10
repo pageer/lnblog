@@ -172,7 +172,7 @@ class RSS2FeedGenerator extends Plugin {
 
 	var $guid_is_permalink;
 
-	function RSS2FeedGenerator() {
+	function __construct() {
 		$this->plugin_desc = _("Create RSS 2.0 feeds for comments and blog entries.");
 		$this->plugin_version = "0.3.1";
 		$this->guid_is_permalink = true;
@@ -192,7 +192,7 @@ class RSS2FeedGenerator extends Plugin {
 		$this->addOption("cat_suffix", 
 		                 _("Suffix to append to category for top feed files"),
 		                 "_news.xml", "text");
-		$this->getConfig();
+		parent::__construct();
 		#if (! defined("RSS2GENERATOR_GUID_IS_PERMALINK"))
 		#	define("RSS2GENERATOR_GUID_IS_PERMALINK", $this->guid_is_permalink);
 	}
