@@ -10,9 +10,9 @@ class HTMLTextProcessor extends TextProcessor {
 	
 	public function toHTML() {
 		if ($this->entry) {
-			$this->formatted = preg_replace_callback("/(src)=['\"]([^\:]+)['\"]/",
+			$this->formatted = preg_replace_callback("/(src)=['\"]([^\:]+)['\"]/U",
 													 array($this, 'fixURI'), $this->formatted);
-			$this->formatted = preg_replace_callback("/(href)=['\"]([^\:@]+)['\"]/", 
+			$this->formatted = preg_replace_callback("/(href)=['\"]([^\:@]+)['\"]/U", 
 													 array($this, 'fixURI'), $this->formatted);
 		}
 	}
