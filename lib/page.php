@@ -86,6 +86,23 @@ class Page extends LnBlogObject {
 		$this->raiseEvent("InitComplete");		
 	}
 	
+	/**
+	 * Add links to include jQuery UI.
+	 */
+	public function includeJqueryUi() {
+		if (LOCAL_JQUERYUI_NAME) {
+			$this->addScript(LOCAL_JQUERYUI_NAME);
+		} else {
+			$this->addExternalScript('//code.jquery.com/ui/1.10.4/jquery-ui.min.js');
+		}
+		if (LOCAL_JQUERYUI_THEME_NAME) {
+			$this->addStylesheet(LOCAL_JQUERYUI_THEME_NAME);
+		} else {
+			$theme = defined('JQUERYUI_THEME') ? JQUERYUI_THEME : DEFAULT_JQUERYUI_THEME;
+			$this->addExternalScript("//code.jquery.com/ui/1.10.4/themes/$theme/jquery-ui.css");
+		}
+	}
+	
 	public static function instance() {
 		static $inst;
 		if (! isset($inst)) {
@@ -194,8 +211,18 @@ class Page extends LnBlogObject {
 		$this->scripts[] = array("text"=>$text, "type"=>$type);
 	}
 	
+	/**
+	 * Add a script file from an external URL to the page.
+	 */
 	public function addExternalScript($href, $type="text/javascript") {
 		$this->scripts[] = array('href' => $href, 'type' => $type, 'external' => true);
+	}
+	
+	/**
+	 * Add a stylesheet from an external URL to the page.
+	 */
+	public function addExternalStylesheet($href) {
+		$this->stylesheets[] = array('link' => $href, 'external' => true);
 	}
 	
 	/* 

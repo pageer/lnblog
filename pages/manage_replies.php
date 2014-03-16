@@ -344,5 +344,5 @@ if (has_posted_responses()) {
 }
 
 $PAGE->title = $blog->title()." - "._('Manage replies');
-$PAGE->display($body, &$blog);
+$PAGE->display($body, $blog);
 ?>

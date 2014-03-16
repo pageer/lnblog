@@ -35,7 +35,7 @@ $xml_lang = str_replace("_", "-", LANGUAGE); ?>
 <?php 
 foreach ($STYLESHEETS as $css) {
 	if (isset($css['link'])) {
-		$link = getlink($css['link'], LINK_STYLESHEET); 
+		$link = !empty($css['external']) ? $css['link'] : getlink($css['link'], LINK_STYLESHEET); 
 		if ($link) { ?>
 <link rel="stylesheet" type="text/css" href="<?php echo $link; ?>" />
 <?php 
@@ -51,12 +51,7 @@ foreach ($STYLESHEETS as $css) {
 
 foreach ($SCRIPTS as $js) {
 	if (isset($js['href'])) {
-		unset($link);
-		if (!empty($js['external'])) {
-			$link = $js["href"];
-		} else {
-			$link = getlink($js["href"], LINK_SCRIPT);
-		}
+		$link = !empty($js['external']) ? $js["href"] : getlink($js["href"], LINK_SCRIPT);
 		if ($link) { ?>
 <script type="<?php echo $js["type"]; ?>" src="<?php echo $link; ?>"></script>
 <?php 

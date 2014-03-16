@@ -279,7 +279,20 @@ define("PACKAGE_COPYRIGHT", _("Copyright (c) 2005, Peter A. Geer <pageer@skeptic
 
 # Constant: LOCAL_JQUERY_NAME
 # The name of the local copy of jQuery.  If not specified, uses the jQuery CDN.
-define('LOCAL_JQUERY_NAME', '');
+@define('LOCAL_JQUERY_NAME', '');
+
+#Constant: LOCAL_JQUERYUI_NAME
+# The name of the local copy of jQUery UI.  If not specified, uses the jQuery CDN.
+@define('LOCAL_JQUERYUI_NAME', '');
+
+#Constant: LOCAL_JQUERYUI_NAME
+# The name of the local copy of jQUery UI theme CSS.  If not specified, uses the jQuery CDN.
+@define('LOCAL_JQUERYUI_THEME_NAME', '');
+
+# Constant: DEFAULT_JQUERYUI_THEME
+# The default theme to use for jQuery UI.  Individual themes can override this by setting
+# the JQUERYUI_THEME constant to the desired value.
+@define('DEFAULT_JQUERYUI_THEME', 'smoothness');
 
 # Constant: DEFAULT_TIME_ZONE
 # Set the default time zone for use with date functions.

@@ -48,6 +48,6 @@ $tpl->set("LINK_LIST", $LINK_LIST);
 $body = $tpl->process();
 
 $PAGE->title = $blog->name." - ".$title;
-$PAGE->display($body, &$blog);
+$PAGE->display($body, $blog);
 
 ?>

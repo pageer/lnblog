@@ -79,6 +79,6 @@ $body = $tpl->process();
 
 $PAGE->title = $is_art ? spf_("%s - Delete entry", $blog->name) : 
                          spf_("%s - Delete article", $blog->name);;
-$PAGE->display($body, &$blog);
+$PAGE->display($body, $blog);
 
 ?>
