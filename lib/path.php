@@ -19,7 +19,7 @@ class Path {
 		} else {
 			$p->path = func_get_args();
 		}
-		return $p->get();
+		return $p->getPath();
 	}
 	
 	public function hasWindowsSep($path) {
@@ -44,17 +44,17 @@ class Path {
 		return str_replace($sep.$sep, $sep, $ret);
 	}
 	
-	public function get() {
-		if (func_num_args() == 0) {
-			return self::implodePath(self::$sep, $this->path);
-		} else {
-			$args = func_get_args();
-			return self::implodePath(self::$sep, $args);
-		}
+	public function getPath() {
+		return self::implodePath(self::$sep, $this->path);
+	}
+	
+	public static function get() {
+		$args = func_get_args();
+		return self::implodePath(self::$sep, $args);
 	}
 	
 	public function getCanonical() {
-		$str = $this->get();
+		$str = $this->getPath();
 		$components = explode(self::$sep, $str);
 		$ret = '';
 		
@@ -77,7 +77,7 @@ class Path {
 	}
 	
 	public function urlSlashes($striproot=false) {
-		$path = $this->get();
+		$path = $this->getPath();
 		if ($striproot && strpos($path,$striproot) === 0) {
 			$path = substr($path, strlen($striproot));
 		}
@@ -90,13 +90,13 @@ class Path {
 	}
 	
 	public function stripPrefix($prefix) {
-		$ret = $this->get();
+		$ret = $this->getPath();
 		if ($this->hasPrefix($prefix)) $ret = substr($ret, strlen($prefix));
 		return $ret;
 	}
 	
 	public function hasPrefix($prefix) {
-		return strpos($this->get(), $prefix) === 0;
+		return strpos($this->getPath(), $prefix) === 0;
 	}
 	
 	public function append($dir) {
@@ -113,7 +113,7 @@ class Path {
 	}
 	
 	public function toURL() {
-		if (file_exists($this->get())) {
+		if (file_exists($this->getPath())) {
 			$full_path = realpath($path);
 			# Add a trailing slash if the path is a directory.
 			if (is_dir($full_path)) $full_path .= $s->dirSep();

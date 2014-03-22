@@ -1201,11 +1201,11 @@ class Blog extends LnBlogObject {
 			$ret &= (empty($result) ? true : false);
 		}
 
-		$p = new Path($this->home_path, BLOG_ENTRY_PATH);
-		$ret &= $this->createNonExistentDirectory($fs, $p->get());
+		$p = Path::get($this->home_path, BLOG_ENTRY_PATH);
+		$ret &= $this->createNonExistentDirectory($fs, $p);
 
 		if ($ret) {
-			$result = create_directory_wrappers($p->get(), BLOG_ENTRIES);
+			$result = create_directory_wrappers($p, BLOG_ENTRIES);
 			$ret &= (empty($result) ? true : false);
 		}
 		$ret &= $this->createNonExistentDirectory($fs, 
@@ -1253,12 +1253,13 @@ class Blog extends LnBlogObject {
 		$this->raiseEvent("OnDelete");
 		$fs = NewFS();
 		if (KEEP_EDIT_HISTORY) {
-			$p = new Path($this->home_path, BLOG_DELETED_PATH);
-			if (! is_dir($p->get()) )
+			$p = Path::get($this->home_path, BLOG_DELETED_PATH);
+			if (! is_dir($p)) {
 				$fs->mkdir_rec($p->get());
-			$p->Path($this->home_path, BLOG_DELETED_PATH,
+			}
+			$p = Path::get($this->home_path, BLOG_DELETED_PATH,
 			         BLOG_CONFIG_PATH."-".date(ENTRY_PATH_FORMAT_LONG));
-			$ret = $fs->rename(Path::get($this->home_path, BLOG_CONFIG_PATH), $p->get());
+			$ret = $fs->rename(Path::get($this->home_path, BLOG_CONFIG_PATH), $p);
 		} else {
 			$ret = $fs->rmdir_rec($this->home_path);
 		}

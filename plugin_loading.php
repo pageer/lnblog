@@ -52,8 +52,6 @@ function namefix($pg) {
 
 $user = NewUser();
 
-global $PLUGIN_MANAGER;
-
 if (defined("BLOG_ROOT")) {
 	$blg = NewBlog();
 	if (! $SYSTEM->canModify($blg, $user) || ! $user->checkLogin()) {
@@ -72,7 +70,7 @@ if (has_post()) {
 	$disabled = array();
 	$first = array();
 	
-	foreach ($PLUGIN_MANAGER->plugin_list as $plug) {
+	foreach (PluginManager::instance()->plugin_list as $plug) {
 		if (! POST(namefix($plug)."_en")) $disabled[] = $plug;
 		if (is_numeric(POST(namefix($plug)."_ord"))) 
 			$first[$plug] = POST(namefix($plug)."_ord");
@@ -81,8 +79,8 @@ if (has_post()) {
 	$lfirst = array();
 	foreach ($first as $key=>$val) $lfirst[] = $key;
 	
-	$PLUGIN_MANAGER->exclude_list = $disabled; #implode(",", $disabled);
-	$PLUGIN_MANAGER->load_first = $lfirst; #implode(",", $first);
+	PluginManager::instance()->exclude_list = $disabled; #implode(",", $disabled);
+	PluginManager::instance()->load_first = $lfirst; #implode(",", $first);
 	
 	if (defined("BLOG_ROOT")) $file = BLOG_ROOT.PATH_DELIM."plugins.xml";
 	else $file = USER_DATA_PATH.PATH_DELIM."plugins.xml";
@@ -103,15 +101,15 @@ if (has_post()) {
 # Create an array of arrays to send to the template for display.
 
 $disp_list = array();
-foreach ($PLUGIN_MANAGER->plugin_list as $plug) {
+foreach (PluginManager::instance()->plugin_list as $plug) {
 	$disp_list[namefix($plug)] = 
 		array("order"=>_("Unspecified"), 
-		      "enabled"=> !in_array($plug, $PLUGIN_MANAGER->exclude_list),
+		      "enabled"=> !in_array($plug, PluginManager::instance()->exclude_list),
 		      "file"=>$plug);
 }
 
 $i=1;
-foreach ($PLUGIN_MANAGER->load_first as $plug) {
+foreach (PluginManager::instance()->load_first as $plug) {
 	if (isset($disp_list[namefix($plug)])) 
 		$disp_list[namefix($plug)]["order"] = $i++;
 }
