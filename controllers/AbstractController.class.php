@@ -9,7 +9,7 @@ abstract class AbstractController extends Page {
     const PERM_CAN_DELETE = 'canDelete';
     const PERM_CAN_VIEW = 'canView';
     
-    protected $referece_object = null;
+    protected $reference_object = null;
     protected $current_user = null;
     protected $route = '';
     
