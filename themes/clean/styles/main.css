@@ -86,8 +86,13 @@ body {
 #menubar > .location > li{
 	margin: 0;
 }
+
 #menubar > .location > li:before {
 	content: "\00BB \0020";
+}
+
+#menubar > .location > :first-child:before {
+	content: "";
 }
 
 /***** Sidebar styles *****/
@@ -214,7 +219,8 @@ body {
 }
 
 #banner a:link,
-#banner a:visited {
+#banner a:visited,
+#banner ul {
 	color: white;
 }
 
