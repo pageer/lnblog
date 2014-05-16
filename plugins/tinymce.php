@@ -1,8 +1,10 @@
 <?php
 class TinyMCEEditor extends Plugin {
+	
+	protected $file_extensions = array('htm', 'html');
 
 	public function __construct() {
-		$this->plugin_desc = _("Use TinyMCE for the post editor");
+		$this->plugin_desc = _("Use TinyMCE for the post editor and file editor.");
 		$this->plugin_version = "0.1.0";
 		$this->addOption("theme", _("TinyMCE theme to use"),"advanced","select",
 			array("basic"=>_("Basic"),"advanced"=>_("Advanced"))
@@ -11,7 +13,8 @@ class TinyMCEEditor extends Plugin {
 		parent::__construct();
 	}
 	
-	protected function getInitString() {
+	protected function getInitString($selector) {
+		$selector = $selector ?: 'textarea#body';
 		switch ($this->theme) {
 			case "basic":
 				$ret = '';
@@ -32,7 +35,7 @@ class TinyMCEEditor extends Plugin {
 				$ret = '';
 		}
 		
-		$obj = '{selector: "textarea#body"';
+		$obj = '{selector: "'.$selector.'"';
 		if ($ret) {
 			$obj .= ", $ret";
 		}
@@ -41,11 +44,12 @@ class TinyMCEEditor extends Plugin {
 		return $obj;
 	}
 	
-	public function show_editor(&$param) {
+	public function show_editor($selector = '') {
 		Page::instance()->addExternalScript($this->url);
-		$init = $this->getInitString();
+		$init = $this->getInitString($selector);
 		$scr  = "jQuery(document).ready(function() {
-			var \$input_mode = $('#input_mode');
+			var \$input_mode = $('#input_mode'),
+			    unconditional_display = ".($selector ? 'true' : 'false').";
 			
 			// Style buttons plugin from http://blog.ionelmc.ro/2013/10/17/tinymce-formatting-toolbar-buttons/
 			tinyMCE.PluginManager.add('stylebuttons', function(editor, url) {
@@ -66,17 +70,21 @@ class TinyMCEEditor extends Plugin {
 				});
 			});
 			
-			if (\$input_mode.val() == ".MARKUP_HTML.") {
+			if (unconditional_display) {
 				tinymce.init($init);
-			}
-			\$input_mode.on('change.editor', function(e) {
-				var mode = $(this).val();
-				if (mode == ".MARKUP_HTML.") { // HTML mode
+			} else {
+				if (\$input_mode.val() == ".MARKUP_HTML.") {
 					tinymce.init($init);
-				} else {
-					tinymce.remove();
 				}
-			});
+				\$input_mode.on('change.editor', function(e) {
+					var mode = $(this).val();
+					if (mode == ".MARKUP_HTML.") { // HTML mode
+						tinymce.init($init);
+					} else {
+						tinymce.remove();
+					}
+				});
+			}
 		});";
 		//$scr .= $this->getInitString($this->theme);
 		Page::instance()->addInlineScript($scr);
@@ -86,9 +94,16 @@ class TinyMCEEditor extends Plugin {
 		$blog->default_markup = MARKUP_HTML;
 	}
 	
+	public function file_editor() {
+		$file_ext = pathinfo(GET('file'), PATHINFO_EXTENSION);
+		if (in_array($file_ext, $this->file_extensions)) {
+			$this->show_editor('textarea#output');
+		}
+	}
 }
 
 $plug = new TinyMCEEditor();
 $plug->registerEventHandler("posteditor", "ShowControls", "show_editor");
 $plug->registerEventHandler("blog", "InitComplete", "set_markup");
+$plug->registerEventHandler('page', 'FileEditorReady', 'file_editor')
 ?>

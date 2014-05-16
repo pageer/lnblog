@@ -137,6 +137,8 @@ basename(SITEMAP_FILE), PACKAGE_NAME));
 
 if (! defined("BLOG_ROOT")) $blog = false;
 
+Page::instance()->raiseEvent('FileEditorReady');
+
 $PAGE->title = _("Edit file");
 $PAGE->addStylesheet("form.css");
 $PAGE->display($tpl->process(), $blog);
