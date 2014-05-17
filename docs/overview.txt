@@ -21,11 +21,12 @@ rearranged simply by moving or renaming plugin files.
 
 Section: Requirements
 
-The only hard and fast requirements for LnBlog are PHP 4.1 and he ability to write files
-to the web server.  LnBlog *does* support running with *safe_mode* enabled by using FTP
-for file writing.  You can also choose to use the standard file writing functions.  
+LnBlog requires PHP 5.3 and  the ability to write files
+to the web server.  LnBlog *does* support running with *safe_mode* enabled by using an FTP
+connection to the local host.  However, it is preferable to simply use a server configuration
+that allows access to the filesystem.
 
-You can use any web server or operating system.  LnBlog is tested on Windows XP with IIS
+You can use any web server or operating system.  LnBlog is tested on Windows with IIS
 and Linux with Apache.  No database is required.  It currently works with both PHP4 and PHP5 
 and should be able to run under pretty much any PHP configuration.  The only required PHP
 extensions are PCRE and XML_Parser, both of which are enabled by default in PHP 4.2 and greater.
