@@ -5,7 +5,7 @@ class TinyMCEEditor extends Plugin {
 
 	public function __construct() {
 		$this->plugin_desc = _("Use TinyMCE for the post editor and file editor.");
-		$this->plugin_version = "0.1.0";
+		$this->plugin_version = "0.2.0";
 		$this->addOption("theme", _("TinyMCE theme to use"),"advanced","select",
 			array("basic"=>_("Basic"),"advanced"=>_("Advanced"))
 			);
