@@ -29,6 +29,10 @@
 <label for="homepage"><?php p_('Homepage');?></label>
 <input type="text" id="homepage" name="homepage" <?php if (isset($HOMEPAGE_VALUE)) echo 'value="'.$HOMEPAGE_VALUE.'" '; ?>/>
 </div>
+<div>
+<label for="profile_url"><?php p_('Custom profile URL (optional)');?></label>
+<input type="text" id="profile_url" name="profile_url" <?php if (isset($PROFILEPAGE_VALUE)) echo 'value="'.$PROFILEPAGE_VALUE.'" '; ?>/>
+</div>
 <?php foreach ($CUSTOM_FIELDS as $key=>$val) { ?>
 <div>
 <label for="<?php echo $key;?>"><?php echo htmlspecialchars($val);?></label>

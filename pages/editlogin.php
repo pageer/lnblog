@@ -76,6 +76,7 @@ $tpl->set("FORM_ACTION", current_file());
 $tpl->set("FULLNAME_VALUE", htmlentities($usr->name()) );
 $tpl->set("EMAIL_VALUE", htmlentities($usr->email()) );
 $tpl->set("HOMEPAGE_VALUE", htmlentities($usr->homepage()) );
+$tpl->set("PROFILEPAGE_VALUE", htmlentities($usr->profileUrl()) );
 
 $blog_qs = ($blog->isBlog() ? "blog=".$blog->blogid."&amp;" : "");
 $tpl->set("UPLOAD_LINK", 
@@ -112,6 +113,7 @@ if (has_post()) {
 	$usr->name(trim(POST('fullname')));
 	$usr->email(trim(POST('email')));
 	$usr->homepage(trim(POST('homepage')));
+	$usr->profileUrl(trim(POST('profile_url')));
 	
 	foreach ($section as $key=>$val) {
 		$usr->custom[$key] = trim(POST($key));

@@ -32,15 +32,15 @@ require_once("lib/utils.php");
 
 class User extends LnBlogObject {
 
-	var $username;
-	var $passwd;
-	var $salt;
-	var $fullname;
-	var $email;
-	var $homepage;
-	var $default_group;
-	var $custom;
-	#var $user_list;
+	public $username = '';
+	public $passwd = '';
+	public $salt = '';
+	public $fullname = '';
+	public $email = '';
+	public $homepage = '';
+	public $profile_page = '';
+	public $default_group = '';
+	public $custom = array();
 	
 	public static function get($usr=false, $pwd=false) {
 		$s_usr = SESSION(CURRENT_USER);
@@ -66,13 +66,6 @@ class User extends LnBlogObject {
 		global $SYSTEM;
 
 		$this->username = $uname ? $uname : '';
-		$this->passwd = '';
-		$this->salt = '';
-		$this->fullname = '';
-		$this->email = '';
-		$this->homepage = '';
-		$this->default_group = '';
-		$this->custom = array();
 		
 		$this->exclude_fields = array('salt', 'passwd', 'username');
 
@@ -122,6 +115,38 @@ class User extends LnBlogObject {
 		         realpath(mkpath(USER_DATA_PATH,$uname,"user.ini")) );
 	}
 	
+	# Method: profileUrl
+	# Get the URL to the user's profile page.
+	#
+	# Parameters:
+	# url - The new value to set.  If missing, just return current value.
+	public function profileUrl($url = null) {
+		if ($url !== null) {
+			$this->profile_page = $url;
+		} else {
+			return $this->profile_page;
+		}
+	}
+	
+	protected function defaultProfileUrl() {
+		$blog = NewBlog();
+		if (file_exists(mkpath(USER_DATA_PATH,$this->username,"index.php"))) {
+			$qs = $blog->isBlog() ? array('blog'=>$blog->blogid) : false;
+			$ret = make_uri(localpath_to_uri(USER_DATA_PATH."/".$this->username."/"), $qs);
+		} else {
+			$qs = array("user"=>$this->username);
+			if ($blog->isBlog()) {
+				$qs['blog'] = $blog->blogid;
+			}
+			$ret = make_uri(INSTALL_ROOT_URL."userinfo.php", $qs);
+		}
+		return $ret;
+	}
+	
+	public function getProfileUrl() {
+		$url = $this->profileUrl();
+		return $url ?: $this->defaultProfileUrl();
+	}
 
 	# Method: exportVars
 	# Convenience function to export relevant user data to a template.
@@ -131,7 +156,7 @@ class User extends LnBlogObject {
 	# 
 	# Parameters: 
 	# tpl - The template to put the data in, passed by reference.
-	function exportVars(&$tpl) {
+	function exportVars($tpl) {
 		if ($this->username) $tpl->set("USER_ID", $this->username);
 		if ($this->fullname) $tpl->set("USER_NAME", $this->fullname);
 		if ($this->email) $tpl->set("USER_EMAIL", $this->email);
@@ -143,19 +168,7 @@ class User extends LnBlogObject {
 		}
 		if ($this->homepage) $tpl->set("USER_HOMEPAGE", $this->homepage);
 		$tpl->set("USER_DISPLAY_NAME", $this->displayName() );
-		
-		$blog = NewBlog();
-		if (file_exists(mkpath(USER_DATA_PATH,$this->username,"index.php"))) {
-			if ($blog->isBlog()) $qs = array('blog'=>$blog->blogid);
-			else $qs = false;
-			$tpl->set("PROFILE_LINK", 
-				make_uri(localpath_to_uri(USER_DATA_PATH."/".$this->username."/"), $qs));
-		} else {
-			$qs = array("user"=>$this->username);
-			if ($blog->isBlog()) $qs['blog'] = $blog->blogid;
-			$tpl->set("PROFILE_LINK", 
-			          make_uri(INSTALL_ROOT_URL."userinfo.php", $qs));
-		}
+		$tpl->set("PROFILE_LINK", $this->getProfileUrl());
 	}
 
 	# Method: checkPassword
@@ -203,7 +216,9 @@ class User extends LnBlogObject {
 		#$ret = $ini->writeFile();
 		$data = $this->serializeXML();
 		$ret = write_file(mkpath(USER_DATA_PATH,$this->username,USER_PROFILE_FILE), $data);
-		if ($ret) $_SESSION["user-".$this->username] = serialize($this);
+		if ($ret) {
+			$_SESSION["user-".$this->username] = serialize($this);
+		}
 		return $ret;
 	}
 

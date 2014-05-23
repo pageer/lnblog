@@ -406,9 +406,6 @@ class BlogComment extends Entry {
 			$t->set("SHOW_MAIL", false);
 			$t->set("EMAIL", "");
 		}
-		$t->set("PROFILE_LINK", INSTALL_ROOT_URL."userinfo.php?user=".
-		                        $this->uid.
-		                        "&amp;blog=".$blog->blogid);
 		$t->set("ANCHOR", $this->getAnchor() );
 		$t->set("SHOW_CONTROLS", $show_edit_controls);
 		$t->set("BODY", $this->markup($this->data, COMMENT_NOFOLLOW) );
