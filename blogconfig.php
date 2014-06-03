@@ -234,7 +234,7 @@ define("PACKAGE_NAME", "LnBlog");
 # Constant: PACKAGE_VERSION
 # The version number of the software.  This is a string in the format 
 # "1.2.3".  Note that each number may be more than one digit.
-define("PACKAGE_VERSION", "1.1.0");
+define("PACKAGE_VERSION", "1.2.0");
 
 # Constant: REQUIRED_VERSION
 # The minimum software version required by your blog to properly
@@ -256,7 +256,7 @@ define("PACKAGE_DESCRIPTION", spf_("%s: a simple and (hopefully) elegant weblog"
 
 # Constant: PACKAGE_COPYRIGHT
 # The offical LnBlog copyright notice.
-define("PACKAGE_COPYRIGHT", _("Copyright (c) 2005, Peter A. Geer <pageer@skepticats.com>"));
+define("PACKAGE_COPYRIGHT", _("Copyright &copy; 2005 &ndash; 2014, Peter A. Geer <pageer@skepticats.com>"));
 
 ######################################
 # Section: Miscellaneous configuration

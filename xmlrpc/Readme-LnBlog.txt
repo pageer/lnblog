@@ -1,4 +1,4 @@
-This folder contains a the code for XMLRCP for PHP, version 1.2.1.  
+This folder contains a the code for XMLRCP for PHP, version 2.2.2.  
 This code is copyright (C) Edd Dumbill 1999-2002.
 
 The documentation, sample code, and so forth have been 

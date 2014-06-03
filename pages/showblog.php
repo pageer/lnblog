@@ -61,6 +61,7 @@ function script_path($name) {
 }
 
 $action_map = array(
+	'about'      => 'pages/about.php',
 	'newentry'   => 'pages/entryedit.php',
 	'delentry'   => 'pages/delentry.php',
 	'edit'       => 'pages/updateblog.php',
