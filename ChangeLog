@@ -1,3 +1,23 @@
+06-Jun-2014: version 1.2.0
+Bug report 1: Missing security checks (pageer) - Fixed  
+Enhancement 2: Allow non-sucky profile links 
+Bug report 4: Post as article checkbox doesn't work (pageer) - Fixed  
+Bug report 5: Publish/save buttons on published items (pageer) - Fixed  
+Bug report 24: Warnings issued with E_STRICT (pageer) - Fixed  
+Bug report 25: Pretty permalink URLs not recognized by pingback handler (pageer) - Fixed  
+Bug report 26: Errors in tuxice theme (pageer) - Fixed  
+Bug report 28: Relative upload URLs wrong with LBCode (pageer) - Fixed  
+Enhancement 42: Link button in LBCode editor should have default (pageer) - Fixed  
+Bug report 44: Multiple lists doesn't work (pageer) - Fixed  
+Bug report 45: Unchecking "show in sidebar" does nothing (pageer) - Fixed  
+Bug report 47: Add setting for time zone (pageer) - Fixed  
+Enhancement 49: Add "disabled by default" setting for plugins (pageer) - Closed
+Enhancement 51: New rich HTML editor (pageer) - Fixed  
+Enhancement 53: Don't output for plugins with no data (pageer) - Fixed  
+Bug report 54: Absolutizing of links in HTML mode broken (pageer) - Fixed  
+Feature request 56: Need an about page (pageer) - Fixed  
+Enhancement 57: TinyMCE for file editor (pageer) - Fixed  
+
 12-Feb-2012: version 1.1.0
 - 0000006: [Task] Pluggable text filters (pageer) - resolved.
 - 0000031: [Improvement] Add "about me" sidebar plugin (pageer) - resolved.
