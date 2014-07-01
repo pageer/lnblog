@@ -1,9 +1,17 @@
 <?php
+# Plugin: Blogroll
+# You can use this plugin to add a blogroll to your site.  It works as both a full-page
+# list and a sidebar panel.
+#
+# This plugin basically just reads an OPML file and creates a list of links from it.
+# Configuration options include the title for the sidebar panel as well as the heading
+# for the full-page view.  And, of course, there's the OPML file path.
+#
+# Note that the OPML file upload is independent of this plugin.  You can use the
+# "upload file" feature at the blog-level to upload the file and then point the
+# plugin to that path.
 
-# Add this really massive if statements to that we don't end up declaring the 
-# same class twice, i.e. if the page is called directly, this class will be defined 
-# when it first loads and then again when the plugins are loaded.
-if (! class_exists("Blogroll")) {  # Start massive if statement
+if (! class_exists("Blogroll")) {  # Start massive if statement to prevent multiple definition
 
 require_once('lib/xml.php');
 class Blogroll extends Plugin {
@@ -11,7 +19,7 @@ class Blogroll extends Plugin {
 	function __construct($do_output=false) {
 		global $SYSTEM;
 	
-		$this->plugin_version = "0.1.0";
+		$this->plugin_version = "0.1.1";
 		$this->plugin_desc = _("Creates a blogroll from an OPML file.");
 		$this->addOption("file", _("Blog roll file (in OPML format)"), '');
 		$this->addOption("caption",

@@ -1,14 +1,21 @@
 <?php
+# Plugin: TrackbackRDF
+# This simple little plugin just injects some TrackBack auto-discovery RDF code into
+# your blog entries.  This code will allow blogging software that supports auto-detecting
+# TrackBack URLs to automatically send TrackBacks to your entries.  Note that the code
+# will only be inserted for entries that have TrackBacks enabled.
 class TrackbackRDF extends Plugin {
 	
 	function __construct() {
 		$this->plugin_desc = _("Add TrackBack auto-discovery RDF to entry pages.");
-		$this->plugin_version = "0.1.1";
+		$this->plugin_version = "0.1.2";
 		parent::__construct();
 	}
 
 	function add_rdf(&$ent) {
-		if (! $ent->allow_tb) return false;
+		if (! $ent->allow_tb) {
+			return false;
+		}
 	?>
 <!--
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"

@@ -1,4 +1,7 @@
 <?php
+# Plugin: SidebarCalendar
+# This plugin adds a calendar to the sidebar with links to the days that have entries.
+# It allows the user to navigate between months, updating the calendar via AJAX calls.
 
 # Determine if blogconfig.php has already been loaded.  
 # If not, we will need to compensate for this.
@@ -36,27 +39,26 @@ require_once("lib/utils.php");
 # Add this really massive if statements to that we don't end up declaring the 
 # same class twice, i.e. if the page is called directly, this class will be defined 
 # when it first loads and then again when the plugins are loaded.
-if (! class_exists("SidebarCalendar")) {  # Start massive if statement
+if (! class_exists("SidebarCalendar")):  # Start massive if statement
 
 class SidebarCalendar extends Plugin {
 	
 	function __construct($do_output=0) {
-		global $SYSTEM;
 		$this->plugin_desc = _("Provides a link calendar for the sidebar.");
-		$this->plugin_version = "0.1.1";
+		$this->plugin_version = "0.1.2";
 		$this->addOption("caption", _("Title for calendar"), _("Calendar"));
 		$this->addOption("show_all", _("Include link to show all entries"),
 		                 false, "checkbox");
 		
 		$this->addOption('no_event',
 			_('No event handlers - do output when plugin is created'),
-			$SYSTEM->sys_ini->value("plugins","EventDefaultOff", 0), 
+			System::instance()->sys_ini->value("plugins","EventDefaultOff", 0), 
 			'checkbox');
 			
 		parent::__construct();
 		
 		if ( $this->no_event || 
-		     $SYSTEM->sys_ini->value("plugins","EventForceOff", 0) ) {
+		     System::instance()->sys_ini->value("plugins","EventForceOff", 0) ) {
 			# If either of these is true, then don't set the event handler
 			# and rely on explicit invocation for output.
 		} else {
@@ -267,18 +269,7 @@ class SidebarCalendar extends Plugin {
 	}
 	
 	function put_calendar($nodiv=false) {
-	
 		echo $this->buildOutput($nodiv);
-		/*
-		$datevars = $this->get_date_vars();
-		$curr_date = ( $datevars(0) == date("Y")
-	
-		if ($nodiv !== true &&  ) {
-			$this->outputCache();
-		} else {
-			
-		}
-		*/
 	}
 	
 	function show_page() {
@@ -338,19 +329,17 @@ function calendar_binsearch_monthlist(&$arr, $year, $month, $start, $len) {
 	}
 }
 
-global $PLUGIN_MANAGER;
-if (! $PLUGIN_MANAGER->plugin_config->value('sidebarcalendar', 'creator_output', 0)) {
+if (! PluginManager::instance()->plugin_config->value('sidebarcalendar', 'creator_output', 0)) {
 	$sbc = new SidebarCalendar();
 }
 
-} # End massive if statement
+endif; # End massive if statement
 
 if ($do_output) {
 	$sbc = new SidebarCalendar();
 	$sbc->put_calendar(true);
 } else {
-	global $PLUGIN_MANAGER;
-	if (! $PLUGIN_MANAGER->plugin_config->value('sidebarcalendar', 'creator_output', 0)) {
+	if (! PluginManager::instance()->plugin_config->value('sidebarcalendar', 'creator_output', 0)) {
 		$sbc = new SidebarCalendar();
 	}
 }

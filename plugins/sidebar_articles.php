@@ -1,14 +1,18 @@
 <?php
-
 # Plugin: Articles
+# A sidebar panel that displays your static articles.  It includes settings
+# for the panel title as well as to show a link to the article index page.
 #
+# This plugin also allows you to add a list of ad hoc links to it.  This is
+# done by simply editing the specified file.  The format is plain HTML, with
+# one link tag per line, same as the other "list of links" files.
 
 class Articles extends Plugin {
 
 	function __construct($do_output=0) {
 		global $SYSTEM;
 		$this->plugin_desc = _("List the articles for a blog.");
-		$this->plugin_version = "0.2.4";
+		$this->plugin_version = "0.2.5";
 		$this->header = _("Articles");
 		$this->static_link = true;
 		$this->custom_links = "links.htm";
@@ -88,8 +92,7 @@ class Articles extends Plugin {
 	
 }
 
-global $PLUGIN_MANAGER;
-if (! $PLUGIN_MANAGER->plugin_config->value('articles', 'creator_output', 0)) {
+if (! PluginManager::instance()->plugin_config->value('articles', 'creator_output', 0)) {
 	$art = new Articles();
 }
 ?>

@@ -1,4 +1,7 @@
 <?php
+# Plugin: Breadcrumbs
+# This plugin createa a breadcrumb trail in the page header.  It will display the
+# path components to an entry or article, with links to each listing page.
 
 class Breadcrumbs extends Plugin {
 
@@ -6,8 +9,8 @@ class Breadcrumbs extends Plugin {
 
 	public function __construct($do_output=0) {
 
-		$this->plugin_desc = _("Show a \"bread-crumb\" trail indicating the user's current location in the blog.");
-		$this->plugin_version = "0.1.0";
+		$this->plugin_desc = _('Show a "bread-crumb" trail indicating the user\'s current location in the blog.');
+		$this->plugin_version = "0.1.1";
 		$this->addOption("list_header", _("Heading at start of trail"),
 		                 _("Location"), "text");
 		$this->addOption("item_sep", _("Separator for location components (HTML)"),

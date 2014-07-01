@@ -1,4 +1,4 @@
-Format: 1.35
+Format: 1.52
 
 
 # You can add a title and sub-title to your menu like this:
@@ -8,6 +8,22 @@ Format: 1.35
 # You can add a footer to your documentation like this:
 # Footer: [text]
 # If you want to add a copyright notice, this would be the place to do it.
+
+# You can add a timestamp to your documentation like one of these:
+# Timestamp: Generated on month day, year
+# Timestamp: Updated mm/dd/yyyy
+# Timestamp: Last updated mon day
+#
+#   m     - One or two digit month.  January is "1"
+#   mm    - Always two digit month.  January is "01"
+#   mon   - Short month word.  January is "Jan"
+#   month - Long month word.  January is "January"
+#   d     - One or two digit day.  1 is "1"
+#   dd    - Always two digit day.  1 is "01"
+#   day   - Day with letter extension.  1 is "1st"
+#   yy    - Two digit year.  2006 is "06"
+#   yyyy  - Four digit year.  2006 is "2006"
+#   year  - Four digit year.  2006 is "2006"
 
 # These are indexes you deleted, so Natural Docs will not add them again
 # unless you remove them from this line.
@@ -37,136 +53,139 @@ Don't Index: Variables
 
 Group: User Documentation  {
 
-   File: Overview and Setup  (docs/overview.txt)
-   File: Feature List  (docs/features.txt)
-   File: To do list  (docs/todo.txt)
-   File: Translations  (docs/translations.txt)
-   File: Using Plugins  (docs/plugins.txt)
-   File: User Profiles  (docs/userprofiles.txt)
-   File: LBCode Markup  (docs/lbcode.txt)
+   File: Overview and Setup  (docs\overview.txt)
+   File: Feature List  (docs\features.txt)
+   File: Translations  (docs\translations.txt)
+   File: Using Plugins  (docs\plugins.txt)
+   File: User Profiles  (docs\userprofiles.txt)
+   File: LBCode Markup  (docs\lbcode.txt)
    }  # Group: User Documentation
 
 Group: Configuration  {
 
    File: blogconfig.php  (no auto-title, blogconfig.php)
-   File: constants.php  (lib/constants.php)
-   File: fsconfig.php  (docs/fsconfig.txt)
-   File: pathconfig.php  (docs/pathconfig.txt)
-   File: userconfig.cfg  (docs/userconfig.txt)
-   File: userconfig.php  (docs/userconfigphp.txt)
-   File: system.ini  (docs/systemini.txt)
+   File: constants.php  (lib\constants.php)
+   File: fsconfig.php  (docs\fsconfig.txt)
+   File: pathconfig.php  (docs\pathconfig.txt)
+   File: userconfig.cfg  (docs\userconfig.txt)
+   File: userconfig.php  (docs\userconfigphp.txt)
+   File: system.ini  (docs\systemini.txt)
    }  # Group: Configuration
-
-Group: Libraries  {
-
-   File: Article  (lib/article.php)
-   File: Blog  (lib/blog.php)
-   File: BlogComment  (lib/blogcomment.php)
-   File: BlogEntry  (lib/blogentry.php)
-   File: Creator Functions  (no auto-title, lib/creators.php)
-   File: disabled/lbcode.php  (lib/disabled/lbcode.php)
-   File: Draft  (lib/draft.php)
-   File: Entry  (lib/entry.php)
-   File: EventRegister  (lib/eventregister.php)
-   File: FileUpload  (lib/upload.php)
-   File: FS  (lib/fs.php)
-   File: IniParser  (lib/iniparser.php)
-   File: Internationalization  (no auto-title, lib/i18n.php)
-   File: lbcode.php  (lib/lbcode.php)
-   File: LnBlogObject  (lib/lnblogobject.php)
-   File: MIME Types  (no auto-title, lib/stupid_mime.php)
-   File: Page  (lib/page.php)
-   File: PHPTemplate  (lib/template.php)
-   File: Pingback  (lib/pb.php)
-   File: Plugin  (lib/plugin.php)
-   File: PluginManager  (lib/pluginmanager.php)
-   File: System  (lib/system.php)
-   File: Trackback  (lib/tb.php)
-   File: User  (lib/user.php)
-   File: Utilities  (lib/utils.php)
-   }  # Group: Libraries
-
-Group: Pages  {
-
-   File: blogpaths.php  (pages/blogpaths.php)
-   File: delcomment.php  (pages/delcomment.php)
-   File: delcomment.php  (pages/delcomment-old.php)
-   File: delentry.php  (pages/delentry.php)
-   File: editentry.php  (pages/editentry.php)
-   File: editlogin.php  (pages/editlogin.php)
-   File: fileupload.php  (pages/fileupload.php)
-   File: newentry.php  (pages/newentry.php)
-   File: pagelib.php  (pages/pagelib.php)
-   File: showall.php  (pages/showall.php)
-   File: showarchive.php  (pages/showarchive.php)
-   File: showarticles.php  (pages/showarticles.php)
-   File: showblog.php  (pages/showblog.php)
-   File: showcomments.php  (pages/showcomments.php)
-   File: showday.php  (pages/showday.php)
-   File: sitemap.php  (pages/editfile.php)
-   File: sitemap.php  (pages/sitemap.php)
-   File: updateblog.php  (pages/updateblog.php)
-   }  # Group: Pages
-
-Group: Blogging Services  {
-
-   File: blogger.php  (blogger.php)
-   File: blogger1_test.php  (blogger1_test.php)
-   File: metaweblog.php  (metaweblog.php)
-   File: metaweblog_test.php  (metaweblog_test.php)
-   File: pingback.php  (pingback.php)
-   File: pingback_test.php  (pingback_test.php)
-   }  # Group: Blogging Services
 
 Group: Administration Pages  {
 
+   File: api_test.php  (api_test.php)
+   File: basic_layout_tpl.php  (themes\clean\templates\basic_layout_tpl.php)
    File: bloglogin.php  (bloglogin.php)
    File: bloglogout.php  (bloglogout.php)
    File: docroot_test.php  (docroot_test.php)
    File: fs_setup.php  (fs_setup.php)
    File: ftproot_test.php  (ftproot_test.php)
    File: index.php  (index.php)
+   File: mantras-narutux-senin.png  (themes\tuxice\images\tux\CREDITS.txt)
    File: newblog.php  (newblog.php)
    File: newlogin.php  (newlogin.php)
    File: plugin_loading.php  (plugin_loading.php)
    File: plugin_setup.php  (plugin_setup.php)
-
-   Group: Userdata  {
-
-      File: RecentComments  (userdata/plugins/sidebar_recentcomments.php)
-      File: RSS2FeedGenerator  (userdata/feed_generator.php)
-      File: SiteMap  (userdata/plugins/menubar_breadcrumbs.php)
-      File: SiteMap  (userdata/menubar_breadcrumbs.php)
-      }  # Group: Userdata
-
    File: userinfo.php  (userinfo.php)
+   File: xmlrpc.php  (xmlrpc.php)
    }  # Group: Administration Pages
+
+Group: Other Pages  {
+
+   File: about.php  (pages\about.php)
+   File: blogpaths.php  (pages\blogpaths.php)
+   File: delcomment.php  (pages\delcomment.php)
+   File: delentry.php  (pages\delentry.php)
+   File: editfile.php  (pages\editfile.php)
+   File: editlogin.php  (pages\editlogin.php)
+   File: entryedit.php  (pages\entryedit.php)
+   File: fileupload.php  (pages\fileupload.php)
+   File: manage_replies.php  (pages\manage_replies.php)
+   File: pagelib.php  (pages\pagelib.php)
+   File: showall.php  (pages\showall.php)
+   File: showarticles.php  (pages\showarticles.php)
+   File: showblog.php  (pages\showblog.php)
+   File: showitem.php  (pages\showitem.php)
+   File: updateblog.php  (pages\updateblog.php)
+   }  # Group: Other Pages
+
+Group: Libraries  {
+
+   File: Article  (lib\article.php)
+   File: Blog  (lib\blog.php)
+   File: BlogComment  (lib\blogcomment.php)
+   File: BlogEntry  (lib\blogentry.php)
+   File: create_uri_object  (lib\urifactory.php)
+   File: Creator Functions  (no auto-title, lib\creators.php)
+   File: Draft  (lib\draft.php)
+   File: entry.php  (lib\entry.php)
+   File: EventRegister  (lib\eventregister.php)
+   File: FileUpload  (lib\FileUpload.class.php)
+   File: FS  (lib\fs.php)
+   File: IniParser  (lib\iniparser.php)
+   File: Internationalization  (no auto-title, lib\i18n.php)
+   File: LnBlogObject  (lib\lnblogobject.php)
+   File: LnBlogXMLConfig  (lib\xmlini.php)
+   File: MIME Types  (no auto-title, lib\stupid_mime.php)
+   File: Page  (lib\page.php)
+   File: PHPTemplate  (lib\template.php)
+   File: Pingback  (lib\Pingback.class.php)
+   File: Plugin  (lib\plugin.php)
+   File: PluginManager  (lib\pluginmanager.php)
+   File: SimpleXMLWriter  (lib\xml.php)
+   File: System  (lib\system.php)
+   File: Trackback  (lib\Trackback.class.php)
+   File: uri.php  (lib\uri.php)
+   File: User  (lib\user.php)
+   File: Utilities  (lib\utils.php)
+   }  # Group: Libraries
+
+Group: Standard Plugins  {
+
+   File: Plugin Template For Developers  (plugins\disabled\template.php)
+   File: Archives  (plugins\sidebar_archives.php)
+   File: Articles  (plugins\sidebar_articles.php)
+   File: Blogroll  (plugins\blogroll.php)
+   File: Bot Block  (plugins\bot_block.php)
+   File: Breadcrumbs  (plugins\menubar_breadcrumbs.php)
+   File: ContentBan  (plugins\content_ban.php)
+   File: DisableComments  (plugins\disable_comment.php)
+   File: HTAccessGenerator  (plugins\htaccess_generator.php)
+   File: IPBan  (plugins\ipban.php)
+   File: Linksleeve  (plugins\linksleeve.php)
+   File: LnBlogAd  (plugins\sidebar_poweredby.php)
+   File: LoginLink  (plugins\sidebar_loginlink.php)
+   File: LoginOps  (plugins\sidebar_loginops.php)
+   File: MetaData  (plugins\page_metatags.php)
+   File: News  (plugins\sidebar_news.php)
+   File: PageHeader  (plugins\banner_pageheader.php)
+   File: PrivateBlog  (plugins\private_blog.php)
+   File: Recent  (plugins\sidebar_recent.php)
+   File: ReplyNotifier  (plugins\reply_notifier.php)
+   File: RSS1FeedGenerator  (plugins\rss1_generator.php)
+   File: RSS2FeedGenerator  (plugins\rss2_generator.php)
+   File: SidebarCalendar  (plugins\sidebar_calendar.php)
+   File: SidebarSearch  (plugins\sidebar_search.php)
+   File: SiteMap  (plugins\menubar_sitemap.php)
+   File: TagList  (plugins\sidebar_tags.php)
+   File: TinyMCEEditor  (plugins\tinymce.php)
+   File: TrackbackRDF  (plugins\trackbackrdf.php)
+   File: TrackbackValidator  (plugins\trackback_validator.php)
+   }  # Group: Standard Plugins
+
+Group: Blogging Services  {
+
+   File: metaweblog.php  (metaweblog.php)
+   File: pingback_test.php  (pingback_test.php)
+   }  # Group: Blogging Services
 
 Group: Themes  {
 
-   File: archive_layout_tpl.php  (themes/default/templates/archive_layout_tpl.php)
-   File: basic_layout_tpl.php  (themes/default/templates/basic_layout_tpl.php)
-   File: page_head_tpl.php  (themes/default/templates/page_head_tpl.php)
+   File: archive_layout_tpl.php  (themes\default\templates\archive_layout_tpl.php)
+   File: basic_layout_tpl.php  (themes\default\templates\basic_layout_tpl.php)
+   File: page_head_tpl.php  (themes\default\templates\page_head_tpl.php)
    }  # Group: Themes
-
-Group: Plugins  {
-
-   File: Archives  (plugins/sidebar_archives.php)
-   File: ContentBan  (plugins/content_ban.php)
-   File: DisableComments  (plugins/disable_comment.php)
-   File: HTAccessGenerator  (plugins/htaccess_generator.php)
-   File: IPBan  (plugins/ipban.php)
-   File: Linksleeve  (plugins/linksleeve.php)
-   File: MetaData  (plugins/page_metatags.php)
-   File: PageHeader  (plugins/banner_pageheader.php)
-   File: ReplyNotifier  (plugins/reply_notifier.php)
-   File: RSS1FeedGenerator  (plugins/rss1_generator.php)
-   File: RSS2FeedGenerator  (plugins/rss2_generator.php)
-   File: SiteMap  (plugins/menubar_sitemap.php)
-   File: The code to run this page directly was more or less completely copied  (plugins/disabled/sidebar_poll.php)
-   File: TrackbackValidator  (plugins/trackback_validator.php)
-   File: unified_antispam.php  (plugins/disabled/unified_antispam.php)
-   }  # Group: Plugins
 
 Group: Index  {
 

@@ -1,9 +1,9 @@
 <?php
-
-# template.php - A template for LnBlog plugins.
-# Copyright (C) 2005, Peter A. Geer <pageer@skepticats.com>
-# You are free to use, modify, and redistribute the program as you like.
-
+# File: Plugin Template For Developers
+# This is a very basic, commented plugin template for instructional purposes.
+# You may use it as the basis for your own plugins if you wish.
+#
+# Section: Overview
 # This is a simple template for creating an LnBlog plugin.
 # This file illustrates the recommended way to create an LnBlog plugin,
 # but it is not the only way.  Be careful if you deviate from this design,
@@ -11,11 +11,10 @@
 #
 # If you want to contribute a plugin to be included with LnBlog, or if you
 # just want more information regarding plugins, please feel free to send me
-# an e-mail at pageer@skepticats.com or leave a comment at the LnBlog
+# an e-mail at <pageer@skepticats.com> or leave a comment at the LnBlog
 # home page.
-
-# Basic Design
-
+#
+# Section: Basic Design
 # LnBlog provides an abstract Plugin class.  This class defines not only the
 # interface of plugin classes, but some default configuration functionality.
 # It also provides a slightly simplified interface to the event system.  It 
@@ -24,13 +23,16 @@
 # you choose not to inherit from the Plugin class, your plugin will not be
 # recognized by the plugin manager and will therefore not be able to take
 # advantage of the built-in plugin configuration system.
-
+#
 # One further thing to note is that you absolutely MUST NOT have any 
 # characters, including whitespace, outside of the PHP tags.  The simple act
 # of including the plugin file should never create output.
 
+# Class: MyPlugin
+# As mentioned above, you class should extend the <Plugin> base class.
 class MyPlugin extends Plugin {
 
+	# Method: __construct
 	# Make sure that you provide a constructor for your class.
 	# The constructor should not take any arguments and should set the
 	# plugin_desc and plugin_version properties.  Anything else in the 
@@ -38,16 +40,17 @@ class MyPlugin extends Plugin {
 	# Note, however, that the constructor absolutely MUST NOT perform any
 	# output, as this will muck up the entire plugin system.
 
-	function MyPlugin() {
+	public function __construct() {
 		$this->plugin_desc = "My very own LnBlog plugin.";
 		$this->plugin_version = "0.1.0";
 
+		# Section: addOption()
 		# Here we will set up the plugin configuration system.
 		# The configuration methods are inherited from the Plugin base class
 		# and provide you with a method to get user input and persist it.
 		# To use the configuration system, you just need to call the 
 		# addOption method with the appropriate values.
-		
+		#
 		# The first argument for addOption is the variable name.  This will 
 		# be the name stored in the plugins.ini file.  It will also be used
 		# as the name of a member variable, so you will be able to access 
@@ -68,7 +71,8 @@ class MyPlugin extends Plugin {
 			_("The name to display"),
 			_("Bob Smith"), 
 			"text");
-
+		
+		# Section: getConfig()
 		# Lastly, we load the stored configuration for this plugin.
 		# Note that there is a global configuration for the LnBlog installation
 		# as well as a per-blog configuration.  The getConfig method will merge
@@ -77,6 +81,7 @@ class MyPlugin extends Plugin {
 		$this->getConfig();		
 	}
 	
+	# Method: myOutput
 	# Your plugin will probably need at least one callback function.
 	# For those unfamiliar with event-driven programming, a callback function
 	# is simply a function that is called by the event system when a certain
@@ -101,17 +106,25 @@ class MyPlugin extends Plugin {
 	# This function simply dumps some output to the screen, but you could
 	# obviously do more complicated things if you want.  Note that it is
 	# possible to escape to HTML mode inside the function body.
-	
-	function myOutput(&$param) {
+	#
+	# Parameters:
+	# $param - The $param argument is the object that is passed to the handler
+	#          by the event system.  This is, effectively, the object upon which
+	#          the event was invoked.  In this case, the handler is registered with
+	#          the blogentry OnOutput event, which means that $param will be a BlogEntry object.
+	public function myOutput($param) {
 ?>
 <p>My name is <?php echo $this->myname; ?>.  This is my plugin!</p>
 <?php
 	}
 
+	# Method: myStaticOutput
 	# This function will be used below to illustrate static methods.
 	# Note that this function does not use any member variables.
-
-	function myStaticOutput(&$param) {
+	#
+	# Parameters:
+	# $param - This is the same as the non-static version.
+	public static function myStaticOutput($param) {
 ?>
 <p>This is some static output.</p>
 <?php
@@ -119,12 +132,11 @@ class MyPlugin extends Plugin {
 
 }
 
+# Section: Instantiation
 # Here, outside the class declaration, is where we attach the callback
 # function to an event.  
 # First, we create an instance of the class. 
-
-$plug = new MyPlugin();
-
+#
 # After that, we can use the registerEventHandler() and 
 # registerStaticEventHandler() methods to attach the event handler and call
 # it as either a member function or a static function, respectively.
@@ -142,6 +154,7 @@ $plug = new MyPlugin();
 # as all code outside class and function declarations will be run when each
 # page is initialized, i.e. before anything else is done. 
 
+$plug = new MyPlugin();
 $plug->registerEventHandler("blogentry", "OnOutput", "myOutput");
 $plug->registerStaticEventHandler("page", "OnOutput", "myStaticOutput");
 ?>

@@ -1,8 +1,16 @@
-<?php  
+<?php
+# Plugin: Recent
+# Puts a list of recent entries in the sidebar.
+#
+# This plugin has several options.  In addition to heading text and number of entry
+# settings, there are options to configure the behavior when you're on the front page.
+# Because the most recent entries will, by definition, be on the front page of a blog,
+# the default behavior is to display older entries in that case, with a different entry
+# header.  There is also an option to show a link to the front page.
+
 class Recent extends Plugin {
 
 	function __construct($do_output=0) {
-		global $SYSTEM;
 		
 		$this->plugin_desc = _("Show some of the more recent posts in the sidebar.");
 		$this->plugin_version = "0.3.0";
@@ -25,7 +33,7 @@ class Recent extends Plugin {
 		
 		$this->addOption('no_event',
 			_('No event handlers - do output when plugin is created'),
-			$SYSTEM->sys_ini->value("plugins","EventDefaultOff", 0), 
+			System::instance()->sys_ini->value("plugins","EventDefaultOff", 0), 
 			'checkbox');
 			
 		parent::__construct();
@@ -38,7 +46,7 @@ class Recent extends Plugin {
 		}
 		
 		if ( ! ($this->no_event ||
-		        $SYSTEM->sys_ini->value("plugins","EventForceOff", 0)) ) {
+		        System::instance()->sys_ini->value("plugins","EventForceOff", 0)) ) {
 			$this->registerEventHandler("sidebar", "OnOutput", "outputCache");
 		}
 		$this->registerStandardInvalidators();
@@ -149,7 +157,6 @@ class Recent extends Plugin {
 
 }
 
-global $PLUGIN_MANAGER;
-if (! $PLUGIN_MANAGER->plugin_config->value('recent', 'creator_output', 0)) {
+if (! PluginManager::instance()->plugin_config->value('recent', 'creator_output', 0)) {
 	$rec = new Recent();
 }

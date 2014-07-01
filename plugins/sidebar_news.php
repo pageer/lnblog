@@ -1,10 +1,18 @@
 <?php
+# Plugin: News
+# This adds a sidebar panel for RSS feed links.  It can display the link to the
+# LnBlog RSS file as well as links to external services, including allowing
+# HTML code to embed external widgets.  Links can be displayed with or without
+# an RSS icon.
+#
+# This plugin also provides LINK elements in the page HEAD for the RSS feeds.
+# This also applies to both entry feeds and per-entry comment feeds.
+
 class News extends Plugin {
 
 	function __construct($do_output=0) {
-		global $SYSTEM;
 		$this->plugin_desc = _("List the RSS feeds for the current page.");
-		$this->plugin_version = "0.3.0";
+		$this->plugin_version = "0.3.1";
 		$this->addOption("header", 
 			_("Sidebar section heading"), 
 			_("News Feeds"));
@@ -22,13 +30,13 @@ class News extends Plugin {
 
 		$this->addOption('no_event',
 			_('No event handlers - do output when plugin is created'),
-			$SYSTEM->sys_ini->value("plugins","EventDefaultOff", 0), 
+			System::instance()->sys_ini->value("plugins","EventDefaultOff", 0), 
 			'checkbox');
 
 		parent::__construct();
 
 		if ( $this->no_event || 
-		     $SYSTEM->sys_ini->value("plugins","EventForceOff", 0) ) {
+		     System::instance()->sys_ini->value("plugins","EventForceOff", 0) ) {
 			# If either of these is true, then don't set the event handler
 			# and rely on explicit invocation for output.
 		} else {
@@ -40,22 +48,20 @@ class News extends Plugin {
 	}
 
 	function output() {
-		global $PLUGIN_MANAGER;
-		
 		$blg = NewBlog();
 		if (! $blg->isBlog() ) return false;
 		$ent = NewBlogEntry();
 	
-		$rss1_file = $PLUGIN_MANAGER->plugin_config->value(
+		$rss1_file = PluginManager::instance()->plugin_config->value(
 			"rss1feedgenerator", "feed_file", "news.rdf");	
-		$rss2_file = $PLUGIN_MANAGER->plugin_config->value(
+		$rss2_file = PluginManager::instance()->plugin_config->value(
 			"rss2feedgenerator", "feed_file", "news.xml");
 		$blog_feeds = BLOG_ROOT.PATH_DELIM.BLOG_FEED_PATH.PATH_DELIM;
 		$blog_feeds_url = $blg->uri('base').BLOG_FEED_PATH."/";
 	
-		$rss1_comments = $PLUGIN_MANAGER->plugin_config->value(
+		$rss1_comments = PluginManager::instance()->plugin_config->value(
 			"rss1feedgenerator", "comment_file", "comments.rdf");
-		$rss2_comments = $PLUGIN_MANAGER->plugin_config->value(
+		$rss2_comments = PluginManager::instance()->plugin_config->value(
 			"rss2feedgenerator", "comment_file", "comments.xml");
 		$entry_feeds = $ent->isEntry() ? 
 		               mkpath($ent->localpath(),ENTRY_COMMENT_DIR) : 
@@ -157,39 +163,37 @@ class News extends Plugin {
 		return $link;
 	}
 	
-	function linkFeeds(&$param) {
-		global $PLUGIN_MANAGER;
-		global $PAGE;
+	function linkFeeds($param) {
 		
 		if (! is_object($param->display_object)) {
 			return false;
 		}
 		
-		$param = $PAGE;
-		$rss1_file = $PLUGIN_MANAGER->plugin_config->value(
+		$param = Page::instance();
+		$rss1_file = PluginManager::instance()->plugin_config->value(
 			"rss1feedgenerator", "feed_file", "news.rdf");
-		$rss1_comments = $PLUGIN_MANAGER->plugin_config->value(
+		$rss1_comments = PluginManager::instance()->plugin_config->value(
 			"rss1feedgenerator", "comment_file", "comments.rdf");
-		$rss2_file = $PLUGIN_MANAGER->plugin_config->value(
+		$rss2_file = PluginManager::instance()->plugin_config->value(
 			"rss2feedgenerator", "feed_file", "news.xml");
-		$rss2_comments = $PLUGIN_MANAGER->plugin_config->value(
+		$rss2_comments = PluginManager::instance()->plugin_config->value(
 			"rss2feedgenerator", "comment_file", "comments.xml");
 			
 		$obj_type = strtolower(get_class($param->display_object));
 		if ($obj_type == 'blogentry' || $obj_type == 'article') {
 			# RSS 2 comments
 			$base_path = mkpath($param->display_object->localpath(),ENTRY_COMMENT_DIR);
-			$rss2_file = mkpath($base_path, $rss2_comments);
-			$rss1_file = mkpath($base_path, $rss1_comments);
+			$rss2_comments_file = mkpath($base_path, $rss2_comments);
+			$rss1_comments_file = mkpath($base_path, $rss1_comments);
 			
-			if (file_exists($rss2_comments) ) {
+			if (file_exists($rss2_comments_file) ) {
 				$param->addRSSFeed($param->display_object->uri('base').
 				                   ENTRY_COMMENT_DIR."/".$rss2_comments, 
 				                   "application/rss+xml", _("Comments - RSS 2.0"));
 			}
 
 			# RSS 1 comments
-			if (file_exists($rss1_comments) ) {
+			if (file_exists($rss1_comments_file) ) {
 				$param->addRSSFeed($param->display_object->uri('base').
 				                   ENTRY_COMMENT_DIR."/".$rss1_comments, 
 				                   "application/xml", _("Comments - RSS 1.0"));
@@ -231,7 +235,6 @@ class News extends Plugin {
 
 } 
 
-global $PLUGIN_MANAGER;
-if (! $PLUGIN_MANAGER->plugin_config->value('news', 'creator_output', 0)) {
+if (! PluginManager::instance()->plugin_config->value('news', 'creator_output', 0)) {
 	$newsfeeds = new News();
 }

@@ -1,10 +1,12 @@
 <?php
+# Plugin: LnBlogAd
+# A simple advertising banner.  This just displays a little icon and link
+# that tells people you're using LnBlog.
 class LnBlogAd extends Plugin {
 
 	function __construct($do_output=0) {
-		global $SYSTEM;
-		$this->plugin_desc = _("Shameless link whoring.");
-		$this->plugin_version = "0.2.0";
+		$this->plugin_desc = _("Shameless link whoring.  Put a link to LBlog on the page.");
+		$this->plugin_version = "0.2.1";
 		$this->use_footer = false;
 		$this->addOption("use_footer",
 			_("Put the advertising in the footer, not the sidebar"),
@@ -12,13 +14,13 @@ class LnBlogAd extends Plugin {
 
 		$this->addOption('no_event',
 			_('No event handlers - do output when plugin is created'),
-			$SYSTEM->sys_ini->value("plugins","EventDefaultOff", 0), 
+			System::instance()->sys_ini->value("plugins","EventDefaultOff", 0), 
 			'checkbox');
 
 		parent::__construct();
 
 		if ( $this->no_event || 
-		     $SYSTEM->sys_ini->value("plugins","EventForceOff", 0) ) {
+		     System::instance()->sys_ini->value("plugins","EventForceOff", 0) ) {
 			# If either of these is true, then don't set the event handler
 			# and rely on explicit invocation for output.
 		} else {
@@ -55,7 +57,6 @@ class LnBlogAd extends Plugin {
 	}
 }
 
-global $PLUGIN_MANAGER;
-if (! $PLUGIN_MANAGER->plugin_config->value('lnblogad', 'creator_output', 0)) {
+if (! PluginManager::instance()->plugin_config->value('lnblogad', 'creator_output', 0)) {
 	$plug = new LnBlogAd();
 }

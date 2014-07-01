@@ -1,6 +1,14 @@
 <?php
+# Plugin Author Bio
+# This plugin lets you display biographical information about the author in the sidebar.
+# It includes a configurable title and HTML text input as well as an option to display
+# a picture.
+#
+# Note that the picture URL is managed separately and can be any full URL.  You can
+# upload the picture using the "upload file" feature for the blog and select the URL
+# for that file.
 
-require_once('lib/xml.php');
+require_once 'lib/xml.php';
 class AuthorBio extends Plugin {
 	
 	public $title;
@@ -8,7 +16,7 @@ class AuthorBio extends Plugin {
 	public $bio;
 	
 	public function __construct($do_output=false) {
-		$this->plugin_version = '0.1.0';
+		$this->plugin_version = '0.1.1';
 		$this->plugin_desc = _('Display information about the author in the sidebar.');
 		$this->addOption('title', _('Sidebar box title'), _('About Me'));
 		$this->addOption('picture_url', _('URL of your profile photo'), '');
@@ -39,7 +47,7 @@ class AuthorBio extends Plugin {
 	
 	public function styles() {
 		ob_start();
-		// Hack for IDE syntax
+		// Hack for IDE syntax highlighting
 		if (0) { ?><style type="text/css"><?php } ?>
 		.bio_picture img {
 			border: 1px solid black;

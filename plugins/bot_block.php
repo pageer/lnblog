@@ -1,10 +1,21 @@
-<?php 
-require_once("lib/plugin.php");
+<?php
+# Plugin: Bot Block
+# This implements some simple counter-measures to prevent comment spam.  There are currently
+# two two options: link-blocking and a simple JavaScript CAPTCHA.
+#
+# The link-blocking feautre simply does what it says: it blocks any comment that
+# contains an HTML link.  So if the comment contains an A tag with an HREF attribute,
+# it will be rejected.
+#
+# The CAPTCHA is very simple and just involves some basic math.  If the
+# user has JavaScript enabled, it does the math automatically.  Otherwise,
+# it asks the user to do it.  So this is effectively a test of whether the
+# client knows how to execute JavaScript.
 class BotBlock extends Plugin {
 	function __construct() {
 		global $PAGE;
 		
-		$this->plugin_version = "0.2.0";
+		$this->plugin_version = "0.2.1";
 		$this->plugin_desc = _("Attempts to block spambots from posting comments.");
 		
 		$this->addOption('block_links', 

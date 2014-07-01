@@ -19,14 +19,19 @@
 */
 
 # Plugin: RSS2FeedGenerator
-# Generates RSS 2.0 feeds for a blog.  This creates RSS feeds for blog entries 
-# and for comments on each entry.  There is an option, enabled by default,
-# to generate entry feeds for each topic.  There are also options for the feed 
-# file names and an option for a stylesheet to link to the RSS feeds, which 
-# will make the feed file somewhat nicer looking if it is viewed in a web 
+# This plugin generates RSS 2.0 feeds for a blog.  It creates RSS feeds for blog entries 
+# and comment feeds on each entry. There is also an option, enabled by default,
+# to generate entry feeds for each tag.
+#
+# Note that this plugin does *not* dynamically generate the feeds.  It works by building
+# up the feed and writing it to a static file on disk.
+#
+# There are options for controlling the names of the feed 
+# files and for linking XSL or CSS stylesheet to link to the RSS feeds.  Those are
+# optional, but they can make the feed file somewhat nicer looking if it is viewed in a web 
 # browser.
 
-require_once("lib/utils.php");
+require_once "lib/utils.php";
 
 class RSS2Entry {
 	
@@ -170,11 +175,11 @@ class RSS2 {
 
 class RSS2FeedGenerator extends Plugin {
 
-	var $guid_is_permalink;
+	public $guid_is_permalink;
 
-	function __construct() {
+	public function __construct() {
 		$this->plugin_desc = _("Create RSS 2.0 feeds for comments and blog entries.");
-		$this->plugin_version = "0.3.1";
+		$this->plugin_version = "0.3.2";
 		$this->guid_is_permalink = true;
 		#$this->addOption("guid_is_permalink", 
 		#                 _("Use entry permalink as globally unique identifier"),

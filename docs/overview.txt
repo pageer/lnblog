@@ -2,22 +2,21 @@ Document: Overview and Setup
 
 Section: Overview
 
-LnBlog is a web-based weblog program that is written in PHP 4 and stores data in text
-files.  It aims to be full-featured, flexible, and configurabe, but still remain easy to
-use and keep software requirements low.  It is designed to work well on inexpensive shared
-web hosts.
+LnBlog is a web-based blogging system and "mini-CMS".  It is written in PHP and requires no
+database or other server software - data is stored in text and XML
+files.  
 
-In terms of functionality, LnBlog includes support for all the basic blogging features,
-such as user comments, TrackBacks, RSS feeds, and file uploads.  LnBlog also allows you to
-create multiple independent weblogs with multiple user accounts.  This feature is ideal
-for managing multiple sub-sites on the same web site.
+In terms of functionality, LnBlog includes support for all the basic features you would expect
+from a blogging system: comments, TrackBacks, Pingbacks, RSS feeds, file uploads, etc.
+A single LnBlog installation allows you to create multiple independent weblogs with multiple user accounts.
+This feature is ideal for managing multiple sub-sites on the same web site.
 
-One of LnBlog's main design goals in flexibility.  To this end, it includes a theme system
+One the main design goals of LnBlog is flexibility.  To this end, it includes a theme system
 and a plugin system to allow user extensions.  The theme system is powerful, allowing you
-to change virtually every element on a page, yet flexible enough that you can simply
+to change virtually every element on a page, yet flexible enough that you can 
 override one file for one blog without having to change or copy anything else.  Various
 page elements, such as the sidebar, are provided by plugins and can be removed or
-rearranged simply by moving or renaming plugin files.
+re-arranged from the plugin management page.
 
 Section: Requirements
 
@@ -27,12 +26,12 @@ connection to the local host.  However, it is preferable to simply use a server 
 that allows access to the filesystem.
 
 You can use any web server or operating system.  LnBlog is tested on Windows with IIS
-and Linux with Apache.  No database is required.  It currently works with both PHP4 and PHP5 
-and should be able to run under pretty much any PHP configuration.  The only required PHP
-extensions are PCRE and XML_Parser, both of which are enabled by default in PHP 4.2 and greater.
+and Linux with Apache, but it should run on anything that rung PHP 5.3 or greater.
+No database or special extensions are required.
+
 If you want to use LnBlog in a language other than English, then the PHP gettext and iconv 
 extensions are highly recommended, but not strictly required.  The CURL extension is also 
-recommended for Pingback and TrackBacks, but this is not required either.
+recommended for Pingback and TrackBacks, but this is not strictly required either.
 
 
 Section: Installation
@@ -44,12 +43,8 @@ The setup process for LnBlog is entirely web-based and mostly painless.
 2) - Upload the LnBlog directory to your web server.
 3) - Point your web browser to the LnBlog directory on your web server.  This will start the setup 
      process.
-4) - Pick the type of file writing you want.  If you have PHP *safe_mode* enabled on your
-     web server, then you *must* use FTP.  If you use "native" file writing, make sure
-     that the LnBlog "userdata" folder and all the files in it are writable for all users.
-     You will also have to  make the folder where you will be creating blogs writable. 
-     See the <fsconfig.php> documentation for details.  If you are using a shared hosting
-     account or if you don't have root/administrator access to the server, FTP is recommended.
+4) - Pick the type of file writing you want. See the <fsconfig.php> documentation for details.
+     These days, "native" will probably be the right choice for most people.
 5) - Create a user account.  This initial user will be a system administrator.
 6) - Log in with the account you just created.
 7) - Start creating new users and weblogs.

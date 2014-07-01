@@ -1,27 +1,24 @@
 Document: Feature List
 
-Here is a list of the features currently supported by LnBlog.  These features 
+The following sections detail the features currently supported by LnBlog.  These features 
 are spread out between the core of LnBlog and the standard plugins.  Plugins can
 be disabled, so if you don't want a feature that is implemented in a plugin, you
 can just turn it off.  Also, all elements of the sidebar (as well as the 
 menubar/sitemap and page banner) are implemented as plugins, and so can be 
 configured and turned off just like other plugins.
 
-Section: Features
+Section: Core Features
 
-- Blog entries with comments.
+- Publish content as either a "blog entry" or a "static article" (like an entry, but not included in the "blog" stream).
+- Comments on both articles and entries.
 - Add tags (topics) to entries.
-- Blacklist comment and trackback spammers by IP address or subnet.
-- RSS feeds for entries and for comments on each entry.
-- Static articles.
-- Draft entries.
-- Send and receive trackbacks.
+- Draft entries with scheduled publication.
+- Supports TrackBack and Pingback notifications.
 - Multiple user accounts.
-- Multiple weblogs.
-- Put blogs on multiple subdomains.
+- Multiple weblogs per instance, with support for multiple subdomains.
 - Upload files to blogs, entries, and articles.
 - Can work with PHP's *safe_mode* turned on.
-- Use a dialect of BBCode to post entries.
+- Post in multiple formats (plain text, HTML, or a dialect of BBCode).
 - Support for Blogger 1.0 and MetaWeblog APIs.
 - Support for internationalization.
 - Support for themes.
@@ -29,30 +26,28 @@ Section: Features
 
 Section: Standard Plugins
 
-The following are a list of the standard plugins that come with LnBlog.  
+Many of LnBlog's features are implemented as plugins.  Below is a quick sampling of some
+of the standard plugins and the features they provide.  For full documentation on the
+available plugins, refer to the "Standard Plugins" section of this documentation.
 
-- E-mail notification on user comments.
-- E-mail notification for trackback pings.
-- Auto-generated RSS feeds (RSS1 headlines and/or RSS2 full text) for blog entries.
-- Auto-generated RSS feeds (RSS1 headlines and/or RSS2 full text) for user comments on each entry.
-- Auto-generate Apache .htaccess files when creating and upgrading blogs (disabled by default).
-- Add metadata (keywords, description, author) and RSS links to the HTML page head.
-- Add trackback auto-discovery RDF code to entries.
-- Turn off comments and trackbacks for an entire blog, or allow comments from only logged-in users.
-- Ban IP addresses and subnets from posting comments or trackback pings.
-- Page header plugin to control display of the blog description.
-- Site map with global or per-blog customization.
-- Sidebar RSS feed links with customizable section header.
-- Sidebar static article list with customizable section header and optional list of custom links.
-- Sidebar calendar with customizable section header.
-- Sidebar form to search your blog with Google (assuming Google has spidered it, disabled by default).
-- Sidebar form to search your blog for a set of words or a regular expression.  Unlike the Google search plugins, this one runs entirely on your server.
-- Sidebar list of tags used in the blog and links to show entries by tag.
+- Author Bio - Put a box in the sidebar with the author's biographical info.
+- Blogroll - Show links to your favorite blogs from an OPML file.
+- Bot Block - Counter measures to stop comment spam bots.
+- Content Ban - Block comment/trackback/pingback spam based on regular expressions.
+- Disable Comment - Turn off comments/trackbacks/pingbacks for the entire blog.
+- Ipban - Block comments/trackbacks/pingbacks based on all or part of the IP address.
+- Linksleeve - Detect comment/trackback/pingback spam using <Linksleeve at http://www.linksleeve.org>.
+- Menubar Breadcrumbs - Put a "breadcrmb trail" in the page header.
+- Menubar Sitemap - Customizable site map or blog list for the page header.
+- Private Blog - Make your blog private, so only specified users can access it.
+- Reply Notifier - Send e-mail notifications for comments/trackbacks/pingbacks
+- Rss2 Generator - Automatically create RSS feeds for entries and comments.
+- Sidebar Archives - Show sidebar links to past months or years with entries.
+- Sidebar Articles - Show links to static articles.
+- Sidebar Calendar - Show a calendar with links to the entries for each day.
+- Sidebar News - Display links to your RSS feeds in the sidebar.
+- Sidebar Recent - Show links to recent entries in the sidebar.
+- Sidebar Search - Add the built-in search box (uses no external services).
+- Sidebar Tags - Show a list of tags for entries in this blog.
+- Tinymce - Use the TinyMCE rich text editor for writing your posts.
 
-Section: Other Plugins
-
-The following features are available via officially supported plugins which are
-not shipped in the default installation.
-
-- Post editing with a JavaScript rich text editor (currently both TinyMCE and
-FCKEditor plugins are available).

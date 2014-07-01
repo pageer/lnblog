@@ -13,7 +13,7 @@ Section: Tag Chart
 Most LBCode constructs map directly so some HTML code.  The following table summarizes the available
 LBCode statements.  As with the auto-markup mode, line breaks are converted to HTML BR tags and 
 double line breaks are converted to new paragraphs.
-(start code)
+(start table)
 [b]bold[/b]                       =>  <strong>bold</strong>
 
 [i]italic[/i]                     =>  <em>italic</em>
@@ -43,13 +43,16 @@ double line breaks are converted to new paragraphs.
                    <a href="http://www.google.com">Google</a>
 
 [img=http://www.google.com/images/logo.gif]Google logo[/img]   =>
-                   <img src="http://www.google.com/images/logo.gif" alt="Google logo" title="Google logo" />
+                   <img src="http://www.google.com/images/logo.gif"
+                        alt="Google logo" title="Google logo" />
 
 [img-right=http://www.google.com/images/logo.gif]Google logo[/img-right]   =>
-                   <img alt="Google logo" title="Google logo" style="float: right; clear: none;" src="http://www.google.com/images/logo.gif" />
+                   <img alt="Google logo" title="Google logo"
+                        style="float: right; clear: none;" src="http://www.google.com/images/logo.gif" />
 
 [img-left=http://www.google.com/images/logo.gif]Google logo[/img-left]  =>
-                   <img alt="Google logo" title="Google logo" style="float: left; clear: none;" src="http://www.google.com/images/logo.gif" />
+                   <img alt="Google logo" title="Google logo"
+                        style="float: left; clear: none;" src="http://www.google.com/images/logo.gif" />
 
 [numlist]                       <ol>
 [*]First item         =>        <li>First item</li>
@@ -60,7 +63,7 @@ double line breaks are converted to new paragraphs.
 [*]First item         =>        <li>First item</li>
 [*]Second item                  <li>Second item</li>
 [/list]                         </ul> 
-(end code)
+(end table)
 
 Section: A Note on URLs
 

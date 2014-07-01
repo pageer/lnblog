@@ -1,11 +1,13 @@
 <?php 
+# Plugin: LoginLink
+# This provides a link to the login page.  It has settings to use a login form
+# rather than a link.  There's also an option to add a link to the LnBLog admin pages.
 
 class LoginLink extends Plugin {
 
 	function __construct($do_output=0) {
-		global $SYSTEM;
 		$this->plugin_desc = _("Adds login panel to the sidebar.");
-		$this->plugin_version = "0.3.0";
+		$this->plugin_version = "0.3.1";
 		$this->use_form = false;
 		$this->admin_link = false;
 		$this->addOption("use_form",
@@ -16,13 +18,13 @@ class LoginLink extends Plugin {
 			false, "checkbox");
 		$this->addOption('no_event',
 			_('No event handlers - do output when plugin is created'),
-			$SYSTEM->sys_ini->value("plugins","EventDefaultOff", 0), 
+			System::instance()->sys_ini->value("plugins","EventDefaultOff", 0), 
 			'checkbox');
 
 		parent::__construct();
 
 		if ( $this->no_event || 
-		     $SYSTEM->sys_ini->value("plugins","EventForceOff", 0) ) {
+		     System::instance()->sys_ini->value("plugins","EventForceOff", 0) ) {
 			# If either of these is true, then don't set the event handler
 			# and rely on explicit invocation for output.
 		} else {
@@ -72,8 +74,7 @@ class LoginLink extends Plugin {
 	
 }
 
-global $PLUGIN_MANAGER;
-if (! $PLUGIN_MANAGER->plugin_config->value('loginlink', 'creator_output', 0)) {
+if (! PluginManager::instance()->plugin_config->value('loginlink', 'creator_output', 0)) {
 	$plug = new LoginLink();
 }
 ?>

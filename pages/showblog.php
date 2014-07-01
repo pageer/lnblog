@@ -68,7 +68,6 @@ $action_map = array(
 	'login'      => 'bloglogin.php',
 	'logout'     => 'bloglogout.php',
 	'upload'     => 'pages/fileupload.php',
-	'sitemape'   => 'sitemap.php',
 	'useredit'   => 'pages/editlogin.php',
 	'plugins'    => 'plugin_setup.php',
 	'tags'       => 'pages/tagsearch.php',

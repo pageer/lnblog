@@ -3,7 +3,7 @@ Stores data storage configuration.
 
 Section: File Writing Overview
 
-Currently, LnBlog only stores data by writing it to text file on the web
+Currently, LnBlog only stores data by writing it to text files on the web
 server.  However, it supports two methods for doing this.  One is to use 
 standard file-writing functions and the other is to use FTP.  These are 
 refferred to, respectively, as NativeFS and FTPFS.  Deciding 
@@ -14,15 +14,21 @@ which should not be present in an initial installation.
 The reason for having two types of filesystem writing is that many web hosts
 use PHP's *safe_mode* feature to provide added security.  One of the 
 restrictions this imposes is that scripts can only read files from the disk
-if the owner of the file is the same as the owner of the script.  In a shared
-hosting environment, data files created by PHP scripts are normally owned by
-the system account which PHP runs as, whereas the scripts would be owned by
-the user account of the site owner, so scripts would not be able to read any 
+if the owner of the file is the same as the owner of the script.  In some shared
+hosting environments (such as those using Mod_PHP), PHP runs and writes files as
+a system accout, whereas the scripts themselves would be owned by
+the user account of the site operator, so scripts would not be able to read any 
 of the files they created.  This restriction can be bypassed by performing 
 file writing via FTP, as this allows scripts to connect to the FTP server as
-the site owner, not a system user.  This also has the beneficial side-effect that 
+the site owner, not a system user.  This also has the beneficial effect that 
 the files created by the scripts will be owned by the user account, so that
 they can be more easily managed via an FTP client.
+
+If you have the option, it is recommended that you use NativeFS.  It is by far
+the faster, more reliable, and easier to configure.  FTPFS only exists to work
+around security restrictions created by certain configurations.  Furthermore, note
+that *safe_mode* was deprecated in PHP 5.3 and removed from PHP 5.4, so unless you're
+stuck on a very old version of PHP, it is unlikely that you will need FTPFS.
 
 Section: Technical Details
 

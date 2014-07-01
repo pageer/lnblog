@@ -1,17 +1,15 @@
 <?php 
 
 # Plugin: PageHeader
-# Adds header text to the page banner.
-#
-# This plugin shows the blog name as a heading link in the banner.
-# There is also an option to show the blog description as a lesser heading.
+# This plugin adds header text to the page banner.  It can show the blog
+# name as a heading link in the banner and optionally show the blog description as a lesser heading.
 
 class PageHeader extends Plugin {
 
 	public function __construct($do_output=0) {
 
 		$this->plugin_desc = _("Output a banner for the page.");
-		$this->plugin_version = "0.2.3";
+		$this->plugin_version = "0.2.4";
 		$this->show_desc = false;
 		$this->addOption("show_desc", _("Show description"), false,"checkbox");
 

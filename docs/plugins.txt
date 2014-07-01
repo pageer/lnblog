@@ -7,15 +7,18 @@ be loaded.
 
 Section: How plugins work
 
-The plugin mechanism is really quite simple.  LnBlog maintains two lists of plugins: disabled plugins 
+The plugin mechanism is really quite simple.  LnBlog LnBlog maintains two lists of plugins: disabled plugins 
 (i.e. those that should not loaded) and plugins to should be loaded first.  These lists can 
 be set for the entire installation and can also be overridden for individual blogs.  You can edit these
 lists through the "configure plugin loading" link.  
 
-When a page is loaded, LnBlog looks at the plugins directory to get a list of all the plugins that are 
-present and sorts them in alphabetical order by file name.  It removes the plugins in the disabled 
-list and moves the ones in the "load first" list to the front.  It then loads the plugins in the resulting
-list in order.
+When a page is loaded, LnBlog will do the following.
+- Looks at the plugins directory (subdirectories are ignored)
+  to get a list of all the PHP files that are present.
+- Sort the plugins based on the order set in the "configure plugin loading" page
+  (the default order is alphabetical).
+- Removes any that are marked as disabled.
+- Initialize each plugin that's left, in order, by including its file.
 
 For plugins that write user-visible data, e.g. sidebar panels, the order in which they are loaded 
 *is important*.  For example, the sidebar panels are displayed in the order in which they are loaded.

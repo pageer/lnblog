@@ -1,11 +1,25 @@
 <?php
+# Plugin: TinyMCEEditor
+# This plugin provides a WYSIWYG (What You See Is What You Get) editor widget for typing your posts.
+# It uses <TinyMCE at http://www.tinymce.com/> as the editor control.
+#
+# The plugin currently provides two "theme" options for TinyMCE.  The default is "Advanced", which provides
+# a fairly full-featured editor experience, with most of the options and controls you're likely to need.  The
+# "Basic" theme is a much simpler, more stripped-down version for those who don't like a lot of clutter in
+# their editor's tool bar.
+#
+# The other option for this plugin is the URL to the TinyMCE instance to use.  Unless you want to host your own
+# copy of TinyMCE, you can ignore this.  The default value is the CDN version of TinyMCE 4.0 hosted by CacheFly.
+# This is free for public use and is probably much faster than your server anyway, so it will be the right
+# choice for most people.
+
 class TinyMCEEditor extends Plugin {
 	
 	protected $file_extensions = array('htm', 'html');
 
 	public function __construct() {
 		$this->plugin_desc = _("Use TinyMCE for the post editor and file editor.");
-		$this->plugin_version = "0.2.0";
+		$this->plugin_version = "0.2.1";
 		$this->addOption("theme", _("TinyMCE theme to use"),"advanced","select",
 			array("basic"=>_("Basic"),"advanced"=>_("Advanced"))
 			);

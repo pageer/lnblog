@@ -1,28 +1,28 @@
 <?php
-
 # Plugin: DisableComments
-# Close comments or trackbacks on selected entries.
-#
-# This plugin allows you to disable comments or trackbacks on all the entries
-# in a blog.  You have several options for this.  For comments, you can
-# disable all comments, allow comments only by logged-in users, or use the
-# per-entry setting (which is the default).  For trackbacks, you can just
-# turn them all off.
+# This plugin allows you to disable comments, trackbacks, or pingbacks on all the entries
+# in a blog.  For comments, you have a few options for how to do this.  You can
+# - Disable all comments, period.
+# - Allow comments only by logged-in users.
+# - Use the per-entry "allow comments" setting, which is the default.
+# For trackbacks and pingbacks, things are much simpler: you can either disable
+# them completely or not.  
 #
 # There is also a time-delay option.  You can just enter a number of days 
-# and both comments and trackbacks will be disabled on all entries more than
+# and all replies (comments, trackbacks, and pingbacks) will be disabled on all entries more than
 # that number of days old.  
 #
-# Note that this plugin does dynamic disabling, so the actual entry files 
-# will not be modified.  Thus, if you edit an old entry, or you will still
-# the the checkbox to allow comments as enabled.  This plugin automatically
-# overrides all such settings.
+# Note that this plugin does dynamic disabling, so the actual entry data
+# will not be modified.  Thus, if you edit an old entry that allowed comments, you may still
+# see the checkbox to allow comments as enabled.  This plugin automatically
+# overrides that setting when enabled.  Note that this also means that if you later turn
+# off this plugin, comments will be re-enabled on those entries.
 
 class DisableComments extends Plugin {
 
 	function __construct() {
 		$this->plugin_desc = _("Allows you to globally disable comments, trackbacks, or pingbacks for an entire blog.");
-		$this->plugin_version = "0.2.0";
+		$this->plugin_version = "0.2.1";
 		$this->no_comment = "default";
 		$this->no_trackback = false;
 		$this->close_old = "";
