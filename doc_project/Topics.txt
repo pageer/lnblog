@@ -88,3 +88,12 @@ Topic Type: Plugin
 
    Keywords:
       plugin, plugins
+
+
+Topic Type: Option
+
+   Plural: Options
+   Page Title If First: No
+
+   Keywords:
+      option, options

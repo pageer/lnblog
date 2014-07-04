@@ -146,8 +146,9 @@ Group: Standard Plugins  {
    File: Plugin Template For Developers  (plugins\disabled\template.php)
    File: Archives  (plugins\sidebar_archives.php)
    File: Articles  (plugins\sidebar_articles.php)
+   File: AuthorBio  (plugins\author_bio.php)
    File: Blogroll  (plugins\blogroll.php)
-   File: Bot Block  (plugins\bot_block.php)
+   File: BotBlock  (plugins\bot_block.php)
    File: Breadcrumbs  (plugins\menubar_breadcrumbs.php)
    File: ContentBan  (plugins\content_ban.php)
    File: DisableComments  (plugins\disable_comment.php)
@@ -196,5 +197,6 @@ Group: Index  {
    Function Index: Functions
    Property Index: Properties
    Plugin Index: Plugins
+   Option Index: Options
    }  # Group: Index
 

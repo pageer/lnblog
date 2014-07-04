@@ -1,5 +1,4 @@
 <?php 
-
 # Plugin: ContentBan
 # Ban posts or trackbacks based on whether or not they match one or more
 # of a list of PCREs (Perl-Compatible Regular Expressions).
@@ -23,12 +22,24 @@ class ContentBan extends Plugin {
 	function __construct() {
 		$this->plugin_desc = _("Allows you to ban comments or trackbacks that match certain regular expressions.");
 		$this->plugin_version = "0.1.0";
+		
+		# Option: Ban list file
+		# This is the name of the file used to store the list of banned expressions.
+		# The format is Perl-compatible regular epxressions, one per line.
 		$this->addOption("ban_list", _("File to store list of banned regular expressions (one RE per line)."),
 			"re_ban.txt", "text");
+		
+		# Option: Do not ban logged-in
+		# WHen this is enabled, users who have an account and are logged in will
+		# not be subject to having comments with banned content blocked.
 		$this->addOption("user_exempt",
 		                 _("Do not apply ban to logged-in users."),
 		                 false, "checkbox");
 		parent::__construct();
+		
+		$this->registerEventHandler("blogcomment", "OnInsert", "clearData");
+		$this->registerEventHandler("trackback", "POSTRetreived", "clearTBData");
+		$this->registerEventHandler("loginops", "PluginOutput", "sidebarLink");
 	}
 
 	# Write the ban list to disk.
@@ -39,7 +50,9 @@ class ContentBan extends Plugin {
 		$local_list = array();
 		$global_list = array();
 
-		if ($this->user_exempt && $usr->checkLogin()) return false;
+		if ($this->user_exempt && $usr->checkLogin()) {
+			return false;
+		}
 		
 		if ( $blog->isBlog() && 
 		     file_exists($blog->home_path.PATH_DELIM.$this->ban_list)) {
@@ -88,7 +101,6 @@ class ContentBan extends Plugin {
 	}
 
 	function sidebarLink($param) {
-		global $PLUGIN_MANAGER;
 		$blg = NewBlog();
 		$usr = NewUser();
 		$banfile = $this->ban_list;
@@ -105,6 +117,3 @@ class ContentBan extends Plugin {
 }
 
 $ban = new ContentBan();
-$ban->registerEventHandler("blogcomment", "OnInsert", "clearData");
-$ban->registerEventHandler("trackback", "POSTRetreived", "clearTBData");
-$ban->registerEventHandler("loginops", "PluginOutput", "sidebarLink");

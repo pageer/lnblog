@@ -1,8 +1,10 @@
 <?php 
 
 # Plugin: PageHeader
-# This plugin adds header text to the page banner.  It can show the blog
-# name as a heading link in the banner and optionally show the blog description as a lesser heading.
+# This plugin adds header text to the page banner.
+#
+# It can show the blog name as a heading link in the banner and optionally
+# show the blog description as a lesser heading.
 
 class PageHeader extends Plugin {
 
@@ -10,9 +12,15 @@ class PageHeader extends Plugin {
 
 		$this->plugin_desc = _("Output a banner for the page.");
 		$this->plugin_version = "0.2.4";
-		$this->show_desc = false;
-		$this->addOption("show_desc", _("Show description"), false,"checkbox");
+		
+		# Option: Show description
+		# If enabled, the blog description will be displayed beneath the title.
+		$this->addOption("show_desc", _("Show description"), false, "checkbox");
 
+		# Option: No event handlers
+		# Enable this to suppress the event handlers used for output.  This means that
+		# you will need to edit your templates and instantiate the plugin where you want
+		# its output to appear.
 		$this->addOption('no_event',
 			_('No event handlers - do output when plugin is created'),
 			System::instance()->sys_ini->value("plugins","EventDefaultOff", 0), 

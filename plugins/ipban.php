@@ -25,12 +25,23 @@
 
 class IPBan extends Plugin {
 	
-	function __construct() {
+	public function __construct() {
 		$this->plugin_desc = _("Allows you to ban IP addresses from adding comments or trackbacks.");
 		$this->plugin_version = "0.2.4";
-		$this->addOption("ban_list", _("File to store list of banned IPs."),
-			"ip_ban.txt", "text");
+		
+		# Option: Ban list file
+		# This is the name of the file used to store the IP ban list.  It will be
+		# relative to the root directory of your blog for the per-blog version
+		# or to the user data directory for the global version.
+		$this->addOption("ban_list", _("File to store list of banned IPs."), "ip_ban.txt", "text");
+		
+		# Option: Show per-blog ban link
+		# Check this to show both the "global ban" and "per-blog ban" links to administrators.
 		$this->addOption("admin_local", _("Show per-blog ban link when administrator"), false, "checkbox");
+		
+		# Option: Ban and delete
+		# When you check this, instead of just banning the IP, the ban link will
+		# also delete the reply.
 		$this->addOption("ban_del", _("Ban link both bans IP and deletes"), true, "checkbox");
 		parent::__construct();
 		
@@ -38,15 +49,21 @@ class IPBan extends Plugin {
 		# e.g. when you do a JavaScript confirmation on a "delete and ban", which 
 		# redirects instead of outputing the page.	
 		$this->banIP($this);
+		
+		$this->registerEventHandler("blogcomment", "OnOutput", "addBanLink");
+		$this->registerEventHandler("blogcomment", "OnInsert", "clearData");
+		$this->registerEventHandler("trackback", "OnOutput", "addBanLink");
+		$this->registerEventHandler("trackback", "POSTRetreived", "clearTBData");
+		$this->registerEventHandler("loginops", "PluginOutput", "sidebarLink");
+		$this->registerEventHandler("page", "OnOutput", "banIP");
 	}
 
 	# Write the ban list to disk.
 
 	function updateList($add_list, $do_global=false) {
-		global $SYSTEM;
 		$blog = NewBlog();
 		$usr = NewUser();
-		if ( $blog->isBlog() && $SYSTEM->canModify($blog, $usr) && !$do_global) {
+		if ( $blog->isBlog() && System::instance()->canModify($blog, $usr) && !$do_global) {
 			$file = $blog->home_path.PATH_DELIM.$this->ban_list;
 		} elseif ( $usr->checkLogin() && $usr->isAdministrator() ) {
 			$file = USER_DATA_PATH.PATH_DELIM.$this->ban_list;
@@ -67,10 +84,9 @@ class IPBan extends Plugin {
 	}
 
 	function addBanLink(&$cmt) {
-		global $SYSTEM;
 		$blog = NewBlog();
 		$usr = NewUser();
-		if ($SYSTEM->canModify($blog, $usr) && $usr->checkLogin()) {
+		if (System::instance()->canModify($blog, $usr) && $usr->checkLogin()) {
 			$cb_link = 
 				spf_("IP: %s", $cmt->ip);
 			if ($this->ban_del) {
@@ -116,11 +132,10 @@ class IPBan extends Plugin {
 	# Ban an IP based on a query string.
 
 	function banIP(&$param) {
-		global $SYSTEM;
 		if (isset($_GET["banip"])) {
 			$blog = NewBlog();
 			$usr = NewUser();
-			if ($SYSTEM->canModify($blog, $usr) && $usr->checkLogin()) {
+			if (System::instance()->canModify($blog, $usr) && $usr->checkLogin()) {
 				$ip = trim($_GET["banip"]);
 				$global = isset($_GET["global"]);
 				$this->updateList(array($ip), $global);
@@ -173,10 +188,9 @@ class IPBan extends Plugin {
 	}
 
 	function sidebarLink($param) {
-		global $PLUGIN_MANAGER;
 		$blg = NewBlog();
 		$usr = NewUser();
-		$banfile = $PLUGIN_MANAGER->plugin_config->value("ipban", 
+		$banfile = PluginManager::instance()->plugin_config->value("ipban", 
 		                                 "ban_list", "ip_ban.txt");
 		echo '<li><a href="'.$blg->uri('editfile', "file=$banfile").'">'.
 			_("Blog IP blacklist").'</a></li>';
@@ -191,9 +205,4 @@ class IPBan extends Plugin {
 }
 
 $ban = new IPBan();
-$ban->registerEventHandler("blogcomment", "OnOutput", "addBanLink");
-$ban->registerEventHandler("blogcomment", "OnInsert", "clearData");
-$ban->registerEventHandler("trackback", "OnOutput", "addBanLink");
-$ban->registerEventHandler("trackback", "POSTRetreived", "clearTBData");
-$ban->registerEventHandler("loginops", "PluginOutput", "sidebarLink");
-$ban->registerEventHandler("page", "OnOutput", "banIP");
+

@@ -1,12 +1,8 @@
 <?php
-# Plugin Author Bio
+# Plugin: AuthorBio
 # This plugin lets you display biographical information about the author in the sidebar.
 # It includes a configurable title and HTML text input as well as an option to display
 # a picture.
-#
-# Note that the picture URL is managed separately and can be any full URL.  You can
-# upload the picture using the "upload file" feature for the blog and select the URL
-# for that file.
 
 require_once 'lib/xml.php';
 class AuthorBio extends Plugin {
@@ -18,13 +14,36 @@ class AuthorBio extends Plugin {
 	public function __construct($do_output=false) {
 		$this->plugin_version = '0.1.1';
 		$this->plugin_desc = _('Display information about the author in the sidebar.');
+		
+		# Option: Sidebar box title
+		# The title for the sidebar panel that contains the widget.
 		$this->addOption('title', _('Sidebar box title'), _('About Me'));
+		
+		# Option: URL of your profile photo
+		# This is the full URL of the profile picture you want to use.
+		# Leave this as an empty string to not have a profile picture.
+		# Note that this plugin does not handle uploading the picture,
+		# so you'll have to do that separately.  For instance, you can upload the
+		# picture using the "upload file" feature for the blog and
+		# select the URL for that file.
 		$this->addOption('picture_url', _('URL of your profile photo'), '');
+		
+		# Option: Bio to display
+		# The bio text that will be shown in the widget.  The text format is
+		# controlled by the <Markup format> option.
 		$this->addOption('bio', _('Bio to display'), '', 'textarea');
 		
 		$options = TextProcessor::getFilterList();
+		# Option: Markup format
+		# This is the format of the text that is used for the bio.  It can be any
+		# of the supported text filters, the defaults being <LBCode Markup>, auto-markup, and HTML.
+		# The default is plain-old HTML.
 		$this->addOption('markup_type', 'Markup format', MARKUP_HTML, 'select', $options);
 		
+		# Option: No event handlers
+		# Enable this to suppress the event handlers used for output.  This means that
+		# you will need to edit your templates and instantiate the plugin where you want
+		# its output to appear.
 		$this->addOption('no_event',
 			_('No event handlers - do output when plugin is created'),
 			System::instance()->sys_ini->value("plugins","EventDefaultOff", 0), 

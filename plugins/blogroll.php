@@ -11,27 +11,45 @@
 # "upload file" feature at the blog-level to upload the file and then point the
 # plugin to that path.
 
-if (! class_exists("Blogroll")) {  # Start massive if statement to prevent multiple definition
+if (! class_exists("Blogroll")):  # Start massive if statement to prevent multiple definition
 
-require_once('lib/xml.php');
+require_once 'lib/xml.php';
 class Blogroll extends Plugin {
 
 	function __construct($do_output=false) {
-		global $SYSTEM;
-	
 		$this->plugin_version = "0.1.1";
 		$this->plugin_desc = _("Creates a blogroll from an OPML file.");
+		
+		# Option: Blog roll file
+		# This is the OPML-formatted file to use to create your blogroll.
+		# For this setting, you must specify a local file path, not a URL.
+		# The file path must be relative to the root of your blog (hence the
+		# recommendation to use the upload feature).  So if you upload it to
+		# the root directory of your blog, you can just specify the file name.
+		# You will need to upload this file separately from this plugin.
+		# It is recommended that you use the blog upload feature for this.
 		$this->addOption("file", _("Blog roll file (in OPML format)"), '');
+		
+		# Option: Caption
+		# This is the caption for the sidebar panel that will hold the blogroll.
 		$this->addOption("caption",
 		                 _("Caption for blogroll sidebar panel"),
 		                 _("Blogroll"));
+		
+		# Option: Heading when viewing page
+		# This is the heading that is displayed at the top of the page when the
+		# blog roll is viewed as a full page, rather than just a sidebar panel.
 		$this->addOption("page_title",
 		                 _("Heading when viewing the full page"),
 		                 _("Other blogs of interest"));
 		
+		# Option: No event handlers
+		# Enable this to suppress the event handlers used for output.  This means that
+		# you will need to edit your templates and instantiate the plugin where you want
+		# its output to appear.
 		$this->addOption('no_event',
 			_('No event handlers - do output when plugin is created'),
-			$SYSTEM->sys_ini->value("plugins","EventDefaultOff", 0), 
+			System::instance()->sys_ini->value("plugins","EventDefaultOff", 0), 
 			'checkbox');
 
 		$this->link_only = true;
@@ -39,7 +57,7 @@ class Blogroll extends Plugin {
 		parent::__construct();
 
 		if ( $this->no_event || 
-		     $SYSTEM->sys_ini->value("plugins","EventForceOff", 0) ) {
+		     System::instance()->sys_ini->value("plugins","EventForceOff", 0) ) {
 			# If either of these is true, then don't set the event handler
 			# and rely on explicit invocation for output.
 		} else {
@@ -137,9 +155,8 @@ class Blogroll extends Plugin {
 	}
 
 	function output_page() {
-		global $PAGE;
 		$blog = NewBlog();
-		$PAGE->setDisplayObject($blog);
+		Page::instance()->setDisplayObject($blog);
 
 		ob_start();
 		echo "<h3>".$this->page_title."</h3>\n";
@@ -148,12 +165,11 @@ class Blogroll extends Plugin {
 		$body = ob_get_contents();
 		ob_end_clean();
 
-		$PAGE->title = spf_("Blogroll - ", $blog->name);
-		$PAGE->display($body, $blog);
+		Page::instance()->title = spf_("Blogroll - ", $blog->name);
+		Page::instance()->display($body, $blog);
 	}
 	
 	function add_stylesheet() {
-		global $PAGE;
 		ob_start();
 ?>
 .description {
@@ -171,19 +187,18 @@ class Blogroll extends Plugin {
 <?php
 		$data = ob_get_contents();
 		ob_end_clean();
-		$PAGE->addInlineStylesheet($data);
+		Page::instance()->addInlineStylesheet($data);
 	}
 
 }
 
-} /* End massive if statement */
+endif; /* End massive if statement */
 
 if (defined("PLUGIN_DO_OUTPUT")) {
 	$plug = new Blogroll();
 	$plug->output_page();
 } else {
-	global $PLUGIN_MANAGER;
-	if (! $PLUGIN_MANAGER->plugin_config->value('blogroll', 'creator_output', 0)) {
+	if (! PluginManager::instance()->plugin_config->value('blogroll', 'creator_output', 0)) {
 		$plug = new Blogroll();
 	}
 }
