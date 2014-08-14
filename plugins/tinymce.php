@@ -86,6 +86,22 @@ class TinyMCEEditor extends Plugin {
 			
 			if (unconditional_display) {
 				tinymce.init($init);
+				
+				var \$toggle_button = $('<button>"._('Toggle HTML Editor')."</button>');
+				\$toggle_button.off('click').on('click', function (e) {
+					e.preventDefault();
+					if (tinymce.editors.length == 0) {
+						tinymce.init($init);
+					} else {
+						tinymce.remove();
+					}
+					return false;
+				});
+				
+				$('textarea').closest('form')
+							  .find('button, input[type=submit], input[type=reset]')
+							  .filter(':last')
+							  .after(\$toggle_button);
 			} else {
 				if (\$input_mode.val() == ".MARKUP_HTML.") {
 					tinymce.init($init);
