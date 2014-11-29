@@ -117,9 +117,9 @@
 	<?php $title = _("Set the markup type for this entry.  Auto-markup is plain text with clickable URLs, LBcode is a dialect of the BBcode markup popular on web forums, and HTML is raw HTML code.");?>
 	<label for="input_mode" title="<?php echo $title?>"><?php p_("Markup type")?></label>
 	<select id="input_mode" name="input_mode" title="<?php echo $title?>">
-	<option value="<?php echo MARKUP_NONE?>"   <?php echo ($HAS_HTML == MARKUP_NONE)  ?' selected="selected"' : ''?>><?php p_("Auto-markup")?></option>
-	<option value="<?php echo MARKUP_BBCODE?>" <?php echo ($HAS_HTML == MARKUP_BBCODE)?' selected="selected"' : ''?>><?php p_("LBcode")?></option>
-	<option value="<?php echo MARKUP_HTML?>"   <?php echo ($HAS_HTML == MARKUP_HTML)  ?' selected="selected"' : ''?>><?php p_("HTML")?></option>
+	<?php foreach (TextProcessor::getAvailableFilters() as $filter): ?>
+	<option value="<?php echo $filter->filter_id?>" <?php echo ($HAS_HTML == $filter->filter_id)  ?' selected="selected"' : ''?>><?php p_($filter->filter_name)?></option>
+	<?php endforeach; ?>
 	</select>
 	</div>
 	

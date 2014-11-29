@@ -8,12 +8,17 @@ class HTMLTextProcessor extends TextProcessor {
 		return $args[1] . '="' . $uri . '"';
 	}
 	
+	protected function fixAllUrls($text) {
+		$ret = preg_replace_callback("/(src)=['\"]([^\:]+)['\"]/U",
+												 array($this, 'fixURI'), $text);
+		$ret = preg_replace_callback("/(href)=['\"]([^\:@]+)['\"]/U", 
+												 array($this, 'fixURI'), $ret);
+		return $ret;
+	}
+	
 	public function toHTML() {
 		if ($this->entry) {
-			$this->formatted = preg_replace_callback("/(src)=['\"]([^\:]+)['\"]/U",
-													 array($this, 'fixURI'), $this->formatted);
-			$this->formatted = preg_replace_callback("/(href)=['\"]([^\:@]+)['\"]/U", 
-													 array($this, 'fixURI'), $this->formatted);
+			$this->formatted = $this->fixAllUrls($this->entry);
 		}
 	}
 }

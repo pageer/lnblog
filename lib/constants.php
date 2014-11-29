@@ -61,6 +61,9 @@ define("MARKUP_BBCODE", 1);
 # Constant: MARKUP_HTML
 # Treat the markup as raw HTML, leaving it untouched.
 define("MARKUP_HTML", 2);
+# Constant: MARKUP_MARKDOWN
+# Treat the markup as Markdown markup.
+define("MARKUP_MARKDOWN", 3);
 
 # Section: BlogEntry Error Codes
 # Update status constants for blog entry modifying.

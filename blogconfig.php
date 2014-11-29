@@ -39,6 +39,8 @@ function class_autoload($className) {
 spl_autoload_register('lib_autoload');
 spl_autoload_register('class_autoload');
 
+require_once implode(DIRECTORY_SEPARATOR, array(__DIR__, 'vendor', 'autoload.php'));
+
 ##########################################
 # Section: Essentials
 
