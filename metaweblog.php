@@ -19,7 +19,7 @@ MetaWeblog API specification at <http://www.xmlrpc.com/metaWeblogApi>.
 
 metaWeblog.newPost        - Creates a new post.
 metaWeblog.editPost       - Edits an existing post.
-metaWeblog.gePost         - Returns a representation of an existing post.
+metaWeblog.getPost         - Returns a representation of an existing post.
 metaWeblog.newMediaObject - Creates a new image, video file, etc. for the blog.
 metaWeblog.getCategories  - Returns the categories known to the blog.
 metaWeblog.getRecentPosts - Returns a list of the most recently made posts.
@@ -54,10 +54,6 @@ makes sense for blog systems which can segregate files on a per-entry basis,
 like LnBlog.  Systems that do not have such a concept should ignore this field.
 
 */
-# Include the libraries for XMLRPC.
-require_once("xmlrpc/xmlrpc.inc");
-require_once("xmlrpc/xmlrpcs.inc");
-
 require_once("blogconfig.php");
 require_once("lib/creators.php");
 	

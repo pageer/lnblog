@@ -4,10 +4,6 @@
 # both the Pingback implementation and the Blogger and MetaWeblog API 
 # implementations.
 
-# Include the libraries for XMLRPC.
-require_once("xmlrpc/xmlrpc.inc");
-require_once("xmlrpc/xmlrpcs.inc");
-
 require_once("blogconfig.php");
 require_once("lib/creators.php");
 require_once("lib/utils.php");
@@ -19,7 +15,7 @@ $function_map = array(
 	"blogger.getUserInfo"   => array("function"=>"blogger_getUserInfo"),
 	"blogger.getTemplate"   => array("function"=>"blogger_getTemplate"),
 	"blogger.setTemplate"   => array("function"=>"blogger_setTemplate"),
-	"blogger.deletePost"    => array("fucntion"=>"blogger_deletePost"),
+	"blogger.deletePost"    => array("function"=>"blogger_deletePost"),
 	"metaWeblog.newPost"        => array("function"=>"metaWeblog_newPost"),
 	"metaWeblog.editPost"       => array("function"=>"metaWeblog_editPost"),
 	"metaWeblog.getPost"        => array("function"=>"metaWeblog_getPost"),
@@ -388,7 +384,7 @@ function blogger_editPost($params) {
 # publish(boolean) - Whether or not to immediately publish the change.
 #                    The parameter is not currently used by LnBlog.
 
-function blogger_deletPost($params) {
+function blogger_deletePost($params) {
 	global $xmlrpcerruser;
 	global $SYSTEM;
 	

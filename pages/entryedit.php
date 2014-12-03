@@ -60,7 +60,6 @@
 session_start();
 require_once("config.php");
 require_once("lib/creators.php");
-require_once("xmlrpc/xmlrpc.inc");
 require_once("pages/pagelib.php");
 
 # Function: handle_pingback_pings

@@ -10,15 +10,15 @@ class HTMLTextProcessor extends TextProcessor {
 	
 	protected function fixAllUrls($text) {
 		$ret = preg_replace_callback("/(src)=['\"]([^\:]+)['\"]/U",
-												 array($this, 'fixURI'), $text);
+									 array($this, 'fixURI'), $text);
 		$ret = preg_replace_callback("/(href)=['\"]([^\:@]+)['\"]/U", 
-												 array($this, 'fixURI'), $ret);
+									 array($this, 'fixURI'), $ret);
 		return $ret;
 	}
 	
 	public function toHTML() {
 		if ($this->entry) {
-			$this->formatted = $this->fixAllUrls($this->entry);
+			$this->formatted = $this->fixAllUrls($this->text);
 		}
 	}
 }

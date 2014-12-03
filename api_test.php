@@ -15,6 +15,8 @@
 # Add the path to your LnBlog folder here.  Include the leading slash, but not 
 # the host name.  By default, 
 $LNBLOG_PATH = dirname($_SERVER['SCRIPT_NAME']);
+
+require implode(DIRECTORY_SEPARATOR, array(__DIR__, 'vendor', 'autoload.php'));
 ?>
 <html>
 <head><title>MetaWeblog API Test</title></head>
@@ -81,8 +83,6 @@ function uploadstruct() {
 }
 
 if ( isset($_POST['btn'])) {
-
-	include("xmlrpc/xmlrpc.inc");
 
 	$method = $_POST['btn'];
 	$params = array();

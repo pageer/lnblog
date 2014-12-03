@@ -19,8 +19,6 @@
 # http://www.linksleeve.org/xml-rpc.php
 # It as been modified to fit LnBlog.
 
-require_once("xmlrpc/xmlrpc.inc");
-
 class Linksleeve extends Plugin {
 
 	function __construct() {

@@ -1,5 +1,6 @@
 {
 	"require": {
-		"erusev/parsedown": "dev-master"
+		"erusev/parsedown": "dev-master",
+		"phpxmlrpc/phpxmlrpc": "3.0.0"
 	}
 }

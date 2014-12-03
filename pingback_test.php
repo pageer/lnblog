@@ -10,6 +10,8 @@
 # Add the path to your LnBlog folder here.  Include the leading slash, but not 
 # the host name.
 $LNBLOG_PATH = '/LnBlog';
+
+require implode(DIRECTORY_SEPARATOR, array(__DIR__, 'vendor', 'autoload.php'));
 ?>
 <html>
 <head><title>Pingback Server Test</title></head>
@@ -26,7 +28,6 @@ echo isset($_POST['target'])?$_POST['target']:'';?>" /></div>
 <?php
 
 if (! empty($_POST)) {
-	include("xmlrpc/xmlrpc.inc");
 
 		$msg = 'pingback.ping';
 		$arr = array(new xmlrpcval($_POST['source'], 'string'),
@@ -34,7 +35,7 @@ if (! empty($_POST)) {
 		
 		$f = new xmlrpcmsg($msg, $arr);
 			 
-		$c = new xmlrpc_client($LNBLOG_PATH."/pingback.php", "localhost", 80);
+		$c = new xmlrpc_client($LNBLOG_PATH."/xmlrpc.php", "localhost", 80);
 		$c->setDebug(1);
 		$r = $c->send($f);
 		$v = $r->value();
