@@ -1,6 +1,9 @@
 {
 	"require": {
-		"erusev/parsedown": "dev-master",
+		"erusev/parsedown": "1.1.4",
 		"phpxmlrpc/phpxmlrpc": "3.0.0"
-	}
+	},
+    "require-dev": {
+        "phing/phing": "2.*"
+    }
 }
