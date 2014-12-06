@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="FooBar" default="dist">
+<project name="LnBlog" default="dist">
 
-    <!-- ============================================  -->
-    <!-- Target: prepare                               -->
-    <!-- ============================================  -->
     <target name="prepare">
         <echo msg="Making directory ./build" />
         <mkdir dir="./build" />
-        <mkdir dir="./build/LnBlog-${version}" />
     </target>
 
-    <!-- ============================================  -->
-    <!-- Target: build                                 -->
-    <!-- ============================================  -->
+	<target name="docs" depends="prepare">
+		
+		<echo msg="Creating documentation folder." />
+		<mkdir dir="./build/documentation" />
+		
+		<echo msg="Building NaturalDocs documentation..." />
+		<exec command="naturaldocs -i . -o HTML build/documentation -p doc_project -ro
+		               -xi vendor -xi build -xi themes -i themes/default" dir="." />
+	</target>
+	
     <target name="build" depends="prepare">
         <echo msg="Copying files to build directory..." />
 		<exec command="hg archive ./build/LnBlog-${version}" dir="." />
@@ -22,9 +25,6 @@
 		<exec command="composer install --no-dev --no-interaction" dir="./build/LnBlog-${version}" />
     </target>
 
-	<!-- ============================================  -->
-    <!-- Target: distclean                             -->
-    <!-- ============================================  -->
     <target name="distclean" depends="build">
 		<echo msg="Cleaning up unneeded project files..." />
 		<delete>
@@ -43,9 +43,6 @@
 		<delete dir="./build/LnBlog-${version}/vendor/phpxmlrpc/phpxmlrpc/extras" />
     </target>
 	
-    <!-- ============================================  -->
-    <!-- (DEFAULT)  Target: dist                       -->
-    <!-- ============================================  -->
     <target name="dist" depends="distclean">
         <echo msg="Creating archive..." />
 

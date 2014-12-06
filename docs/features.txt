@@ -18,7 +18,7 @@ Section: Core Features
 - Multiple weblogs per instance, with support for multiple subdomains.
 - Upload files to blogs, entries, and articles.
 - Can work with PHP's *safe_mode* turned on.
-- Post in multiple formats (plain text, HTML, or a dialect of BBCode).
+- Post in multiple formats (plain text, HTML, Markdown, or a dialect of BBCode).
 - Support for Blogger 1.0 and MetaWeblog APIs.
 - Support for internationalization.
 - Support for themes.

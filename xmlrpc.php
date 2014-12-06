@@ -589,6 +589,49 @@ function blogger_setTemplate($params) {
 	                      "Method blogger.setTemplate not implemented.");
 }
 
+/*
+Section: MetaWeblog API Support
+
+The MetaWeblog API is a blogging interface that includes support for various 
+types of blog metadata.  This is in contrast to the Blogger 1 API, which included
+basic support for adding and editing entry text, but had no notion of subjects, 
+categories, and the like.  It was also heavily biased in favor of Blogger's 
+implementation.  The MetaWeblog API is intended as a more general API to remedy
+this situation.
+
+Like the Blogger API, MetaWeblog functions by making XML-RPC calls.  Most of the
+data used by the API calls takes the form of XML-RPC structs.  The API 
+contains the base methods given below.  For full details, please consult the
+MetaWeblog API specification at <http://www.xmlrpc.com/metaWeblogApi>.
+
+metaWeblog.newPost        - Creates a new post.
+metaWeblog.editPost       - Edits an existing post.
+metaWeblog.getPost         - Returns a representation of an existing post.
+metaWeblog.newMediaObject - Creates a new image, video file, etc. for the blog.
+metaWeblog.getCategories  - Returns the categories known to the blog.
+metaWeblog.getRecentPosts - Returns a list of the most recently made posts.
+
+Topic: Configuration
+
+The configuration for the MetaWeblog API is exactly the same as for the Blogger API.
+You should use the same format for entry IDs and blog IDs as well as the same end-point
+URL.  The only difference is in the commands sent to the server.
+
+Topic: API Extensions
+
+LnBlog's implementation conservatively extends the MetaWeblog API.  In other 
+words, the implementation remains compatible with the standard, but adds a few
+features that clients may, at their option, choose to use.
+
+The newMediaObject method has been extended with an optional struct field called
+'entryid'.  This field takes the same entry ID used by the getPost and editPost
+methods.  If this field is specified, then the media object will be added to that
+particular entry rather than to the base weblog.  Note that this extension only
+makes sense for blog systems which can segregate files on a per-entry basis,
+like LnBlog.  Systems that do not have such a concept should ignore this field.
+
+*/
+
 # Method: metaWeblog.newPost
 # Creates a new post.
 #
@@ -1211,25 +1254,6 @@ function entry_to_struct(&$ent) {
 	$arr['mt_allow_comments'] = new xmlrpcval($ent->allow_comment ? 1 : 0, 'int');
 	$arr['mt_allow_pings'] = new xmlrpcval($ent->allow_tb ? 1 : 0, 'int');
 	$arr['mt_convert_breaks'] = new xmlrpcval($ent->has_html != MARKUP_HTML ? 1 : 0, 'int');
-	
-	/*
-	# On second thought, we don't really want to do this, because that's not 
-	# what enclosures are supposed to be used for.
-	$files = $ent->getUploadedFiles();
-	foreach ($files as $f) {
-		$encs = array();
-		$path = mkpath($ent->localpath(), $f);
-		$encs['url'] = $ent->uri('base').$f;
-		$encs['length'] = filesize($path);
-		if (extension_loaded("fileinfo")) {
-			$mh = finfo_open(FILEINFO_MIME|FILEINFO_PRESERVE_ATIME);
-			$encs['type'] = finfo_file($mh, $path);
-		} else {
-			$encs['type'] = mime_content_type($path);
-		}
-		$arr['enclosure'] = new xmlrpcval($encs, 'struct');
-	}
-	*/
 	
 	return new xmlrpcval($arr, 'struct');
 }

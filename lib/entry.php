@@ -21,39 +21,38 @@
 require_once("utils.php");
 require_once("xml.php");
 
-/**
- * An abstract class representing entries of all types in the blog database.
- */
+# Class: Entry
+# An abstract class representing entries of all types in the blog database.
 abstract class Entry extends LnBlogObject{
 
-	/** @var string An ID for the object that is unique across the class (not used). */
+	/* An ID for the object that is unique across the class (not used). */
 	public $id = '';
 	
-	/** @var string The user ID of this object's owner. */
+	/* The user ID of this object's owner. */
 	public $uid = '';
 	
-	/** @var string The IP address logged for this object at last modification. */
+	/* The IP address logged for this object at last modification. */
 	public $ip = '';
 	
-	/** @var string The human-readable date when the object was last modified. */
+	/* The human-readable date when the object was last modified. */
 	public $date = '';
 	
-	/** @var int The UNIX timestamp when the object was last modified. */
+	/* The UNIX timestamp when the object was last modified. */
 	public $timestamp = 0;
 	
-	/** @var int UNIX timestamp when the object was created. */
+	/* UNIX timestamp when the object was created. */
 	public $post_ts = 0;
 	
-	/** @var string The subject text associated with this object. */
+	/* The subject text associated with this object. */
 	public $subject = '';
 	
-	/** @var string An abstract of the text of this object (not used). */
+	/* An abstract of the text of this object (not used). */
 	public $abstract = '';
 	
-	/** @var string A comma-delimited list of tags applied to this entry. */
+	/* A comma-delimited list of tags applied to this entry. */
 	public $tags = "";
 	
-	/** @var string The main text data of this object.  May be one of several different kinds of markup. */
+	/* The main text data of this object.  May be one of several different kinds of markup. */
 	public $data = '';
 	
 	# Property: file

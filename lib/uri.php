@@ -18,6 +18,9 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+# File: URI
+# A library for handling URI generation and resolution.
+
 # Function: create_uri_object
 # Gets the appropriate URI generator class for a given object and type.  
 # Basically, this the lazy dynamic programmer's version of a factory pattern.

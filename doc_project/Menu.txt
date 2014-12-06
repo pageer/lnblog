@@ -48,145 +48,150 @@ Don't Index: Variables
 # time it is run.  When working with groups, just deal with the braces and
 # forget about the indentation and comments.
 # 
+# You can use this file on other computers even if they use different
+# directories.  As long as the command line points to the same source files,
+# Natural Docs will be able to correct the locations automatically.
+# 
 # --------------------------------------------------------------------------
 
 
 Group: User Documentation  {
 
-   File: Overview and Setup  (docs\overview.txt)
-   File: Feature List  (docs\features.txt)
-   File: Translations  (docs\translations.txt)
-   File: Using Plugins  (docs\plugins.txt)
-   File: User Profiles  (docs\userprofiles.txt)
-   File: LBCode Markup  (docs\lbcode.txt)
+   File: Overview and Setup  (C:\Users\pageer\Documents\Projects\lnblog\docs\overview.txt)
+   File: Feature List  (C:\Users\pageer\Documents\Projects\lnblog\docs\features.txt)
+   File: Translations  (C:\Users\pageer\Documents\Projects\lnblog\docs\translations.txt)
+   File: Using Plugins  (C:\Users\pageer\Documents\Projects\lnblog\docs\plugins.txt)
+   File: User Profiles  (C:\Users\pageer\Documents\Projects\lnblog\docs\userprofiles.txt)
+   File: LBCode Markup  (C:\Users\pageer\Documents\Projects\lnblog\docs\lbcode.txt)
    }  # Group: User Documentation
 
 Group: Configuration  {
 
-   File: blogconfig.php  (no auto-title, blogconfig.php)
-   File: constants.php  (lib\constants.php)
-   File: fsconfig.php  (docs\fsconfig.txt)
-   File: pathconfig.php  (docs\pathconfig.txt)
-   File: userconfig.cfg  (docs\userconfig.txt)
-   File: userconfig.php  (docs\userconfigphp.txt)
-   File: system.ini  (docs\systemini.txt)
+   File: blogconfig.php  (no auto-title, C:\Users\pageer\Documents\Projects\lnblog\blogconfig.php)
+   File: constants.php  (C:\Users\pageer\Documents\Projects\lnblog\lib\constants.php)
+   File: fsconfig.php  (C:\Users\pageer\Documents\Projects\lnblog\docs\fsconfig.txt)
+   File: pathconfig.php  (C:\Users\pageer\Documents\Projects\lnblog\docs\pathconfig.txt)
+   File: userconfig.cfg  (C:\Users\pageer\Documents\Projects\lnblog\docs\userconfig.txt)
+   File: userconfig.php  (C:\Users\pageer\Documents\Projects\lnblog\docs\userconfigphp.txt)
+   File: system.ini  (C:\Users\pageer\Documents\Projects\lnblog\docs\systemini.txt)
    }  # Group: Configuration
 
 Group: Administration Pages  {
 
-   File: api_test.php  (api_test.php)
-   File: basic_layout_tpl.php  (themes\clean\templates\basic_layout_tpl.php)
-   File: bloglogin.php  (bloglogin.php)
-   File: bloglogout.php  (bloglogout.php)
-   File: docroot_test.php  (docroot_test.php)
-   File: fs_setup.php  (fs_setup.php)
-   File: ftproot_test.php  (ftproot_test.php)
-   File: index.php  (index.php)
-   File: mantras-narutux-senin.png  (themes\tuxice\images\tux\CREDITS.txt)
-   File: newblog.php  (newblog.php)
-   File: newlogin.php  (newlogin.php)
-   File: plugin_loading.php  (plugin_loading.php)
-   File: plugin_setup.php  (plugin_setup.php)
-   File: userinfo.php  (userinfo.php)
-   File: xmlrpc.php  (xmlrpc.php)
+   File: bloglogin.php  (C:\Users\pageer\Documents\Projects\lnblog\bloglogin.php)
+   File: bloglogout.php  (C:\Users\pageer\Documents\Projects\lnblog\bloglogout.php)
+   File: fs_setup.php  (C:\Users\pageer\Documents\Projects\lnblog\fs_setup.php)
+   File: index.php  (C:\Users\pageer\Documents\Projects\lnblog\index.php)
+   File: newblog.php  (C:\Users\pageer\Documents\Projects\lnblog\newblog.php)
+   File: newlogin.php  (C:\Users\pageer\Documents\Projects\lnblog\newlogin.php)
+   File: plugin_loading.php  (C:\Users\pageer\Documents\Projects\lnblog\plugin_loading.php)
+   File: plugin_setup.php  (C:\Users\pageer\Documents\Projects\lnblog\plugin_setup.php)
    }  # Group: Administration Pages
 
 Group: Other Pages  {
 
-   File: about.php  (pages\about.php)
-   File: blogpaths.php  (pages\blogpaths.php)
-   File: delcomment.php  (pages\delcomment.php)
-   File: delentry.php  (pages\delentry.php)
-   File: editfile.php  (pages\editfile.php)
-   File: editlogin.php  (pages\editlogin.php)
-   File: entryedit.php  (pages\entryedit.php)
-   File: fileupload.php  (pages\fileupload.php)
-   File: manage_replies.php  (pages\manage_replies.php)
-   File: pagelib.php  (pages\pagelib.php)
-   File: showall.php  (pages\showall.php)
-   File: showarticles.php  (pages\showarticles.php)
-   File: showblog.php  (pages\showblog.php)
-   File: showitem.php  (pages\showitem.php)
-   File: updateblog.php  (pages\updateblog.php)
+   File: about.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\about.php)
+   File: blogpaths.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\blogpaths.php)
+   File: delcomment.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\delcomment.php)
+   File: delentry.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\delentry.php)
+   File: editfile.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\editfile.php)
+   File: editlogin.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\editlogin.php)
+   File: entryedit.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\entryedit.php)
+   File: fileupload.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\fileupload.php)
+   File: manage_replies.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\manage_replies.php)
+   File: pagelib.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\pagelib.php)
+   File: pages\showitem.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\showitem.php)
+   File: showall.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\showall.php)
+   File: showarticles.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\showarticles.php)
+   File: showblog.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\showblog.php)
+   File: updateblog.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\updateblog.php)
+   File: userinfo.php  (C:\Users\pageer\Documents\Projects\lnblog\userinfo.php)
    }  # Group: Other Pages
+
+Group: API Endpoints  {
+
+   File: XML-RPC  (no auto-title, C:\Users\pageer\Documents\Projects\lnblog\xmlrpc.php)
+   }  # Group: API Endpoints
 
 Group: Libraries  {
 
-   File: Article  (lib\article.php)
-   File: Blog  (lib\blog.php)
-   File: BlogComment  (lib\blogcomment.php)
-   File: BlogEntry  (lib\blogentry.php)
-   File: create_uri_object  (lib\urifactory.php)
-   File: Creator Functions  (no auto-title, lib\creators.php)
-   File: Draft  (lib\draft.php)
-   File: entry.php  (lib\entry.php)
-   File: EventRegister  (lib\eventregister.php)
-   File: FileUpload  (lib\FileUpload.class.php)
-   File: FS  (lib\fs.php)
-   File: IniParser  (lib\iniparser.php)
-   File: Internationalization  (no auto-title, lib\i18n.php)
-   File: LnBlogObject  (lib\lnblogobject.php)
-   File: LnBlogXMLConfig  (lib\xmlini.php)
-   File: MIME Types  (no auto-title, lib\stupid_mime.php)
-   File: Page  (lib\page.php)
-   File: PHPTemplate  (lib\template.php)
-   File: Pingback  (lib\Pingback.class.php)
-   File: Plugin  (lib\plugin.php)
-   File: PluginManager  (lib\pluginmanager.php)
-   File: SimpleXMLWriter  (lib\xml.php)
-   File: System  (lib\system.php)
-   File: Trackback  (lib\Trackback.class.php)
-   File: uri.php  (lib\uri.php)
-   File: User  (lib\user.php)
-   File: Utilities  (lib\utils.php)
+   File: Article  (C:\Users\pageer\Documents\Projects\lnblog\lib\article.php)
+   File: Blog  (C:\Users\pageer\Documents\Projects\lnblog\lib\blog.php)
+   File: BlogComment  (C:\Users\pageer\Documents\Projects\lnblog\lib\blogcomment.php)
+   File: BlogEntry  (C:\Users\pageer\Documents\Projects\lnblog\lib\blogentry.php)
+   File: Creator Functions  (no auto-title, C:\Users\pageer\Documents\Projects\lnblog\lib\creators.php)
+   File: Draft  (C:\Users\pageer\Documents\Projects\lnblog\lib\draft.php)
+   File: Entry  (C:\Users\pageer\Documents\Projects\lnblog\lib\entry.php)
+   File: EventRegister  (C:\Users\pageer\Documents\Projects\lnblog\lib\eventregister.php)
+   File: FileUpload  (C:\Users\pageer\Documents\Projects\lnblog\lib\FileUpload.class.php)
+   File: FS  (C:\Users\pageer\Documents\Projects\lnblog\lib\fs.php)
+   File: IniParser  (C:\Users\pageer\Documents\Projects\lnblog\lib\iniparser.php)
+   File: Internationalization  (no auto-title, C:\Users\pageer\Documents\Projects\lnblog\lib\i18n.php)
+   File: LnBlogObject  (C:\Users\pageer\Documents\Projects\lnblog\lib\lnblogobject.php)
+   File: LnBlogXMLConfig  (C:\Users\pageer\Documents\Projects\lnblog\lib\xmlini.php)
+   File: MIME Types  (no auto-title, C:\Users\pageer\Documents\Projects\lnblog\lib\stupid_mime.php)
+   File: Page  (C:\Users\pageer\Documents\Projects\lnblog\lib\page.php)
+   File: PHPTemplate  (C:\Users\pageer\Documents\Projects\lnblog\lib\template.php)
+   File: Pingback  (C:\Users\pageer\Documents\Projects\lnblog\lib\Pingback.class.php)
+   File: Plugin  (C:\Users\pageer\Documents\Projects\lnblog\lib\plugin.php)
+   File: PluginManager  (C:\Users\pageer\Documents\Projects\lnblog\lib\pluginmanager.php)
+   File: SimpleXMLWriter  (C:\Users\pageer\Documents\Projects\lnblog\lib\xml.php)
+   File: System  (C:\Users\pageer\Documents\Projects\lnblog\lib\system.php)
+   File: Trackback  (C:\Users\pageer\Documents\Projects\lnblog\lib\Trackback.class.php)
+   File: URI  (C:\Users\pageer\Documents\Projects\lnblog\lib\uri.php)
+   File: URI Factory  (C:\Users\pageer\Documents\Projects\lnblog\lib\urifactory.php)
+   File: User  (C:\Users\pageer\Documents\Projects\lnblog\lib\user.php)
+   File: Utilities  (C:\Users\pageer\Documents\Projects\lnblog\lib\utils.php)
    }  # Group: Libraries
 
 Group: Standard Plugins  {
 
-   File: Plugin Template For Developers  (plugins\disabled\template.php)
-   File: Archives  (plugins\sidebar_archives.php)
-   File: Articles  (plugins\sidebar_articles.php)
-   File: AuthorBio  (plugins\author_bio.php)
-   File: Blogroll  (plugins\blogroll.php)
-   File: BotBlock  (plugins\bot_block.php)
-   File: Breadcrumbs  (plugins\menubar_breadcrumbs.php)
-   File: ContentBan  (plugins\content_ban.php)
-   File: DisableComments  (plugins\disable_comment.php)
-   File: HTAccessGenerator  (plugins\htaccess_generator.php)
-   File: IPBan  (plugins\ipban.php)
-   File: Linksleeve  (plugins\linksleeve.php)
-   File: LnBlogAd  (plugins\sidebar_poweredby.php)
-   File: LoginLink  (plugins\sidebar_loginlink.php)
-   File: LoginOps  (plugins\sidebar_loginops.php)
-   File: MetaData  (plugins\page_metatags.php)
-   File: News  (plugins\sidebar_news.php)
-   File: PageHeader  (plugins\banner_pageheader.php)
-   File: PrivateBlog  (plugins\private_blog.php)
-   File: Recent  (plugins\sidebar_recent.php)
-   File: ReplyNotifier  (plugins\reply_notifier.php)
-   File: RSS1FeedGenerator  (plugins\rss1_generator.php)
-   File: RSS2FeedGenerator  (plugins\rss2_generator.php)
-   File: SidebarCalendar  (plugins\sidebar_calendar.php)
-   File: SidebarSearch  (plugins\sidebar_search.php)
-   File: SiteMap  (plugins\menubar_sitemap.php)
-   File: TagList  (plugins\sidebar_tags.php)
-   File: TinyMCEEditor  (plugins\tinymce.php)
-   File: TrackbackRDF  (plugins\trackbackrdf.php)
-   File: TrackbackValidator  (plugins\trackback_validator.php)
+   File: Plugin Template For Developers  (C:\Users\pageer\Documents\Projects\lnblog\plugins\disabled\template.php)
+   File: Archives  (C:\Users\pageer\Documents\Projects\lnblog\plugins\sidebar_archives.php)
+   File: Articles  (C:\Users\pageer\Documents\Projects\lnblog\plugins\sidebar_articles.php)
+   File: AuthorBio  (C:\Users\pageer\Documents\Projects\lnblog\plugins\author_bio.php)
+   File: Blogroll  (C:\Users\pageer\Documents\Projects\lnblog\plugins\blogroll.php)
+   File: BotBlock  (C:\Users\pageer\Documents\Projects\lnblog\plugins\bot_block.php)
+   File: Breadcrumbs  (C:\Users\pageer\Documents\Projects\lnblog\plugins\menubar_breadcrumbs.php)
+   File: ContentBan  (C:\Users\pageer\Documents\Projects\lnblog\plugins\content_ban.php)
+   File: DisableComments  (C:\Users\pageer\Documents\Projects\lnblog\plugins\disable_comment.php)
+   File: HTAccessGenerator  (C:\Users\pageer\Documents\Projects\lnblog\plugins\htaccess_generator.php)
+   File: IPBan  (C:\Users\pageer\Documents\Projects\lnblog\plugins\ipban.php)
+   File: Linksleeve  (C:\Users\pageer\Documents\Projects\lnblog\plugins\linksleeve.php)
+   File: LnBlogAd  (C:\Users\pageer\Documents\Projects\lnblog\plugins\sidebar_poweredby.php)
+   File: LoginLink  (C:\Users\pageer\Documents\Projects\lnblog\plugins\sidebar_loginlink.php)
+   File: LoginOps  (C:\Users\pageer\Documents\Projects\lnblog\plugins\sidebar_loginops.php)
+   File: MetaData  (C:\Users\pageer\Documents\Projects\lnblog\plugins\page_metatags.php)
+   File: News  (C:\Users\pageer\Documents\Projects\lnblog\plugins\sidebar_news.php)
+   File: PageHeader  (C:\Users\pageer\Documents\Projects\lnblog\plugins\banner_pageheader.php)
+   File: PrivateBlog  (C:\Users\pageer\Documents\Projects\lnblog\plugins\private_blog.php)
+   File: Recent  (C:\Users\pageer\Documents\Projects\lnblog\plugins\sidebar_recent.php)
+   File: ReplyNotifier  (C:\Users\pageer\Documents\Projects\lnblog\plugins\reply_notifier.php)
+   File: RSS1FeedGenerator  (C:\Users\pageer\Documents\Projects\lnblog\plugins\rss1_generator.php)
+   File: RSS2FeedGenerator  (C:\Users\pageer\Documents\Projects\lnblog\plugins\rss2_generator.php)
+   File: SidebarCalendar  (C:\Users\pageer\Documents\Projects\lnblog\plugins\sidebar_calendar.php)
+   File: SidebarSearch  (C:\Users\pageer\Documents\Projects\lnblog\plugins\sidebar_search.php)
+   File: SiteMap  (C:\Users\pageer\Documents\Projects\lnblog\plugins\menubar_sitemap.php)
+   File: TagList  (C:\Users\pageer\Documents\Projects\lnblog\plugins\sidebar_tags.php)
+   File: TinyMCEEditor  (C:\Users\pageer\Documents\Projects\lnblog\plugins\tinymce.php)
+   File: TrackbackRDF  (C:\Users\pageer\Documents\Projects\lnblog\plugins\trackbackrdf.php)
+   File: TrackbackValidator  (C:\Users\pageer\Documents\Projects\lnblog\plugins\trackback_validator.php)
    }  # Group: Standard Plugins
-
-Group: Blogging Services  {
-
-   File: metaweblog.php  (metaweblog.php)
-   File: pingback_test.php  (pingback_test.php)
-   }  # Group: Blogging Services
 
 Group: Themes  {
 
-   File: archive_layout_tpl.php  (themes\default\templates\archive_layout_tpl.php)
-   File: basic_layout_tpl.php  (themes\default\templates\basic_layout_tpl.php)
-   File: page_head_tpl.php  (themes\default\templates\page_head_tpl.php)
+   File: archive_layout_tpl.php  (C:\Users\pageer\Documents\Projects\lnblog\themes\default\templates\archive_layout_tpl.php)
+   File: basic_layout_tpl.php  (C:\Users\pageer\Documents\Projects\lnblog\themes\default\templates\basic_layout_tpl.php)
+   File: page_head_tpl.php  (C:\Users\pageer\Documents\Projects\lnblog\themes\default\templates\page_head_tpl.php)
    }  # Group: Themes
+
+Group: Test Scripts  {
+
+   File: api_test.php  (C:\Users\pageer\Documents\Projects\lnblog\api_test.php)
+   File: pingback_test.php  (C:\Users\pageer\Documents\Projects\lnblog\pingback_test.php)
+   File: docroot_test.php  (C:\Users\pageer\Documents\Projects\lnblog\docroot_test.php)
+   File: ftproot_test.php  (C:\Users\pageer\Documents\Projects\lnblog\ftproot_test.php)
+   }  # Group: Test Scripts
 
 Group: Index  {
 
@@ -200,3 +205,8 @@ Group: Index  {
    Option Index: Options
    }  # Group: Index
 
+
+
+##### Do not change or remove these lines. #####
+Data: 1(D3330wba6GH6bIp`GGHbBu9NEG\t6bgHulG9t6bo\You`)
+Data: 1(h3330wba6GH6bIp`GGHbBu9NEG\t6bgHulG9t6bo\You`btRGEG6bfGcpNot)
