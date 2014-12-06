@@ -61,8 +61,8 @@ class Blog extends LnBlogObject {
 	public $home_path = '';
 	public $image = '';
 	public $theme = 'default';
-	public $max_entries = BLOG_MAX_ENTRIES;
-	public $max_rss = BLOG_MAX_ENTRIES;
+	public $max_entries = 10;
+	public $max_rss = 10;
 	public $allow_enclosure = 1;
 	public $default_markup = MARKUP_BBCODE;
 	public $owner = ADMIN_USER;

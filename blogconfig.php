@@ -513,16 +513,6 @@ define("FILE_UPLOAD_TARGET_DIRECTORIES", "files");
 # *Default* is "feeds".
 @define("BLOG_FEED_PATH", "feeds");
 
-# Constant: BLOG_MAX_ENTRIES
-# Default number of entries to display on the front page.
-#
-# This constant is used as a default setting for creating new blogs 
-# and can be over-ridden on a per-blog basis.  In other words, not
-# every blog will use this value.
-#
-# *Default* is 10.
-@define("BLOG_MAX_ENTRIES", 10);
-
 ###############################################
 # Section: Blog entry and Article configuration
 
