@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="FooBar" default="dist">
+
+    <!-- ============================================  -->
+    <!-- Target: prepare                               -->
+    <!-- ============================================  -->
+    <target name="prepare">
+        <echo msg="Making directory ./build" />
+        <mkdir dir="./build" />
+        <mkdir dir="./build/LnBlog-${version}" />
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: build                                 -->
+    <!-- ============================================  -->
+    <target name="build" depends="prepare">
+        <echo msg="Copying files to build directory..." />
+		<exec command="hg archive ./build/LnBlog-${version}" dir="." />
+		
+		<echo msg="Installing dependencies with Composer..." />
+		<exec command="composer install --no-dev --no-interaction" dir="./build/LnBlog-${version}" />
+    </target>
+
+	<!-- ============================================  -->
+    <!-- Target: distclean                             -->
+    <!-- ============================================  -->
+    <target name="distclean" depends="build">
+		<echo msg="Cleaning up unneeded project files..." />
+		<delete>
+			<fileset dir="./build/LnBlog-${version}">
+				<include name=".hg*" />
+			</fileset>
+		</delete>
+		<delete file="./build/LnBlog-${version}/LnBlog.komodoproject" />
+		<delete dir="./build/LnBlog-${version}/tests" />
+		<delete dir="./build/LnBlog-${version}/docs" />
+		<delete dir="./build/LnBlog-${version}/doc_project" />
+		<delete dir="./build/LnBlog-${version}/vendor/erusev/parsedown/test" />
+		<delete dir="./build/LnBlog-${version}/vendor/phpxmlrpc/phpxmlrpc/test" />
+		<delete dir="./build/LnBlog-${version}/vendor/phpxmlrpc/phpxmlrpc/doc" />
+		<delete dir="./build/LnBlog-${version}/vendor/phpxmlrpc/phpxmlrpc/demo" />
+		<delete dir="./build/LnBlog-${version}/vendor/phpxmlrpc/phpxmlrpc/extras" />
+    </target>
+	
+    <!-- ============================================  -->
+    <!-- (DEFAULT)  Target: dist                       -->
+    <!-- ============================================  -->
+    <target name="dist" depends="distclean">
+        <echo msg="Creating archive..." />
+
+        <zip destfile="./build/LnBlog-${version}.zip">
+            <fileset dir="./build/LnBlog-${version}">
+                <include name="*" />
+            </fileset>
+        </zip>
+		
+		<echo msg="Generating checksums..." />
+		<exec command="md5sum LnBlog-${version}.zip" dir="./build" output="./build/LnBlog-${version}.md5"/>
+		<exec command="sha1sum LnBlog-${version}.zip" dir="./build" output="./build/LnBlog-${version}.sha1" />
+		
+		<echo msg="Generating GPG signature..." />
+		<exec command="gpg --output LnBlog-${version}.sig --detatch-sig LnBlog-${version}.zip" dir="./build" />
+
+        <echo msg="Dist build complete!" />
+    </target>
+</project>
