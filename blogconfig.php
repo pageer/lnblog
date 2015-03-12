@@ -12,9 +12,9 @@ ini_set("magic_quotes_runtime", "off");
 
 function lib_autoload($className) {
 	$files = array(
-		implode(DIRECTORY_SEPARATOR, array(dirname(__FILE__), 'lib', strtolower($className).'.php')),
-		implode(DIRECTORY_SEPARATOR, array(dirname(__FILE__), 'lib', strtolower($className).'class.php')),
-		implode(DIRECTORY_SEPARATOR, array(dirname(__FILE__), 'lib', $className.'class.php')),
+		implode(DIRECTORY_SEPARATOR, array(__DIR__, 'lib', strtolower($className).'.php')),
+		implode(DIRECTORY_SEPARATOR, array(__DIR__, 'lib', strtolower($className).'class.php')),
+		implode(DIRECTORY_SEPARATOR, array(__DIR__, 'lib', $className.'class.php')),
 	);
 	foreach ($files as $file) {
 		if (file_exists($file)) {
@@ -27,7 +27,7 @@ function lib_autoload($className) {
 function class_autoload($className) {
 	$folders = array('lib', 'lib'.DIRECTORY_SEPARATOR.'textprocessors', 'persistence', 'controllers');
 	foreach ($folders as $fld) {
-		$fileName = array(dirname(__FILE__), $fld, $className.'.class.php');
+		$fileName = array(__DIR__, $fld, $className.'.class.php');
 		$file = implode(DIRECTORY_SEPARATOR, $fileName);
 		if (file_exists($file)) {
 			require $file;
@@ -36,10 +36,12 @@ function class_autoload($className) {
 	}
 }
 
-spl_autoload_register('lib_autoload');
-spl_autoload_register('class_autoload');
-
+// Load Composer's autoloader first.
 require_once implode(DIRECTORY_SEPARATOR, array(__DIR__, 'vendor', 'autoload.php'));
+
+// Prepend our own autoloaders to the queue.
+spl_autoload_register('class_autoload', false, true);
+spl_autoload_register('lib_autoload', false, true);
 
 ##########################################
 # Section: Essentials
