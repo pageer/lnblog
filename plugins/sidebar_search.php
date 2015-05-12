@@ -21,42 +21,16 @@
 # show in the search results.
 #
 # The built-in search, on the other hand, is guaranteed to always have access to all
-# your posts, because it is built right into the plugin and access the data files
+# your posts, because it is built right into the plugin and can access the data files
 # on your server directly.  The down side is that the search is pretty dumb (it does
 # naive sting matching) and not particularly fast.  For the typical blog,
 # if you don't get many search requests then the search performance will probably
 # be "good enough".  However, if you start getting lots of traffic, you'll probably
 # want to switch to Google or Bing.
 
-# Determine if blogconfig.php has already been loaded.  
-# If not, we will need to compensate for this.
-$files = get_included_files();
-foreach ($files as $f) {
-	if (strstr($f, "blogconfig.php")) {
-		$files = true;
-		break;
-	}
-}
-
-# If we haven't loaded blogconfig.php, i.e. if this page has been called directly,
-# then we have to take care of that.  We set the INSTALL_ROOT (since we can be sure
-# that it is the parent of the current directory), adjust the include_path, and 
-# then include blogconfig.php to do the rest.
-$do_output = false;
-if ($files !== true) {
-	session_start();
-	$instdir = dirname(getcwd());
-	#define("INSTALL_ROOT", $instdir);
-	if (! defined("PATH_SEPARATOR") ) 
-		define("PATH_SEPARATOR", strtoupper(substr(PHP_OS,0,3)=='WIN')?';':':');
-	ini_set("include_path", ini_get("include_path").PATH_SEPARATOR.$instdir);
-	require_once("blogconfig.php");
-	if (isset($_GET["show"]) && $_GET["show"] == "sb_search_results") {
-		$do_output = true;
-	}
-}
+$do_output = (isset($_GET["show"]) && $_GET["show"] == "sb_search_results");
 	
-require_once "lib/utils.php";
+require_once INSTALL_ROOT.PATH_DELIM."lib/utils.php";
 
 # Add this really massive if statements to that we don't end up declaring the 
 # same class twice, i.e. if the page is called directly, this class will be defined 
@@ -143,11 +117,16 @@ class SidebarSearch extends Plugin {
 				break;
 			case 'native':
 			default:
-				$form_url = INSTALL_ROOT_URL."plugins/sidebar_search.php?blog=".$blg->blogid."&amp;show=sb_search_results";
-				$method = "post";
+				#$form_url = INSTALL_ROOT_URL."plugins/sidebar_search.php?blog=".$blg->blogid."&amp;show=sb_search_results";
+				$form_url = $blg->getURL().'?plugin=sidebar_search&amp;show=sb_search_results';
+				$method = "get";
 				$search_boxes = array(
 					'visible' => 'sb_search_terms',
-					'hidden' => array(),
+					'hidden' => array(
+						#'blog' => $blg->blogid,
+						'plugin' => 'sidebar_search',
+						'show' => 'sb_search_results',
+					),
 				);
 				break;
 		}
@@ -178,10 +157,12 @@ class SidebarSearch extends Plugin {
 		# Alternatively, if the search term is enclosed in slashes, then the 
 		# search term is treated as a raw regular expression.
 		$blg = NewBlog();
-		if (! isset($_POST["sb_search_terms"])) return false;
-		$search_data = trim(POST("sb_search_terms"));
+		if (! isset($_GET["sb_search_terms"])) {
+			return false;
+		}
+		$search_data = trim(GET("sb_search_terms"));
 		if (preg_match("/\/.+\//", $search_data)) {
-			$terms = array(trim($_POST["sb_search_terms"])."i");
+			$terms = array(trim($_GET["sb_search_terms"])."i");
 		} else {
 			$temp_terms = explode(" ", $search_data);
 			$terms = array();
@@ -222,9 +203,9 @@ class SidebarSearch extends Plugin {
 		if (! $LINK_LIST) {
 			$tpl->set("LIST_TITLE", _("No search results found."));
 			$tpl->set("ITEM_LIST", array(_("No posts matched")));
-		} elseif (trim(POST("sb_search_terms"))) {
+		} elseif (trim(GET("sb_search_terms"))) {
 			$tpl->set("LIST_TITLE", 
-			          spf_('Search results for "%s"', POST("sb_search_terms")));
+			          spf_('Search results for "%s"', GET("sb_search_terms")));
 			$tpl->set("LINK_LIST", $LINK_LIST);
 		} else {
 			$tpl->set("LIST_TITLE", 
