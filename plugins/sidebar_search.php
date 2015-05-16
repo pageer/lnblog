@@ -193,9 +193,8 @@ class SidebarSearch extends Plugin {
 	}
 
 	function show_page($param=false) {
-		global $PAGE;
 		$blog = NewBlog();
-		$PAGE->setDisplayObject($blog);
+		Page::instance()->setDisplayObject($blog);
 		$LINK_LIST = $this->find_entries();
 		if (! count($LINK_LIST)) $LINK_LIST = false;
 
@@ -215,8 +214,8 @@ class SidebarSearch extends Plugin {
 
 		$body = $tpl->process();
 
-		$PAGE->title = spf_("Search results - ", $blog->name);
-		$PAGE->display($body, $blog);
+		Page::instance()->title = spf_("Search results - ", $blog->name);
+		Page::instance()->display($body, $blog);
 	}
 
 }

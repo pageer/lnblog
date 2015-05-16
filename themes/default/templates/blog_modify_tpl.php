@@ -53,8 +53,7 @@
 <label for="theme" title="<?php echo $msg;?>"><?php p_("Theme"); ?></label>
 <select id="theme" name="theme" title="<?php echo $msg;?>">
 <?php 
-global $SYSTEM;
-$dir = $SYSTEM->getThemeList();
+$dir = System::instance()->getThemeList();
 foreach ($dir as $theme) { ?>
 <option value="<?php echo $theme; ?>"<?php if (isset($BLOG_THEME) && $theme == $BLOG_THEME) { ?> selected="selected"<?php } ?>>
 <?php echo $theme; ?></option>

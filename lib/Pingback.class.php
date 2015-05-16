@@ -194,7 +194,6 @@ class Pingback extends Trackback {
 	# The data to be sent to the client.
 
 	function get() {
-		global $SYSTEM;
 		$blog = NewBlog();
 		$u = NewUser();
 		$tpl = NewTemplate('pingback_tpl.php');
@@ -206,7 +205,7 @@ class Pingback extends Trackback {
 			'<a href="'.$del_link.'" class="deletelink">'._("Delete").'</a>';
 			
 		$this->raiseEvent("OnOutput");
-		$tpl->set("SHOW_EDIT_CONTROLS", $SYSTEM->canModify($this->getParent(), $u) && $u->checkLogin() );
+		$tpl->set("SHOW_EDIT_CONTROLS", System::instance()->canModify($this->getParent(), $u) && $u->checkLogin() );
 		$tpl->set("PB_SOURCE", $this->source);
 		$tpl->set("PB_TARGET", $this->target);
 		$tpl->set("CONTROL_BAR", $this->control_bar);

@@ -23,10 +23,8 @@
 # The markup to be inserted into the page for the comment form.
 
 function handle_comment(&$ent, $use_comm_link=false) {
-	global $PAGE;
-	global $SYSTEM;
 		
-	$PAGE->addStylesheet("form.css");
+	Page::instance()->addStylesheet("form.css");
 	$comm_tpl = NewTemplate(COMMENT_FORM_TEMPLATE);
 	# Set form information saved in cookies.
 	if (COOKIE('comment_url')) 
@@ -80,8 +78,8 @@ function handle_comment(&$ent, $use_comm_link=false) {
 					setcookie("comment_showemail", POST("showemail"), $exp, $path);
 			}
 			# Redirect to prevent double-posts.
-			if ($use_comm_link) $PAGE->redirect($ent->uri('comment'));
-			else $PAGE->redirect($ent->permalink());
+			if ($use_comm_link) Page::instance()->redirect($ent->uri('comment'));
+			else Page::instance()->redirect($ent->permalink());
 		} else {
 			# Set the data back in the form, along with error messages.
 			$comm_tpl->set("COMMENT_DATA", POST('data'));
@@ -246,7 +244,6 @@ function reply_boxes($idx, &$obj) {
 # replies - An array of reply objects.
 
 function show_replies(&$ent, &$usr, &$replies, $title) {
-	global $SYSTEM;
 
 	$ret = "";
 	$count = 1;
@@ -256,7 +253,7 @@ function show_replies(&$ent, &$usr, &$replies, $title) {
 		foreach ($replies as $reply) {
 			if (! isset($reply_type)) $reply_type = get_class($reply);
 			$tmp = $reply->get();
-			if ($SYSTEM->canModify($reply, $usr)) {
+			if (System::instance()->canModify($reply, $usr)) {
 				$count += 1;
 				$tmp = reply_boxes($count, $reply).$tmp;
 			}
@@ -269,7 +266,7 @@ function show_replies(&$ent, &$usr, &$replies, $title) {
 
 		$tpl = NewTemplate(LIST_TEMPLATE);
 		
-		if ($SYSTEM->canModify($reply, $usr)) {
+		if (System::instance()->canModify($reply, $usr)) {
 			
 			$typename = '';
 			
@@ -304,7 +301,6 @@ function show_replies(&$ent, &$usr, &$replies, $title) {
 }
 
 function show_all_replies(&$ent, &$usr) {
-		global $SYSTEM;
 
 	# Get an array of each kind of reply.
 	$pingbacks = $ent->getReplyArray(
@@ -329,7 +325,7 @@ function show_all_replies(&$ent, &$usr) {
 
 		foreach ($replies as $reply) {
 			$tmp = $reply->get();
-			if ($SYSTEM->canModify($reply, $usr)) {
+			if (System::instance()->canModify($reply, $usr)) {
 				$count += 1;
 				$tmp = reply_boxes($count, $reply).$tmp;
 			}
@@ -342,7 +338,7 @@ function show_all_replies(&$ent, &$usr) {
 
 		$tpl = NewTemplate(LIST_TEMPLATE);
 		
-		if ($SYSTEM->canModify($reply, $usr)) {
+		if (System::instance()->canModify($reply, $usr)) {
 			$tpl->set("FORM_HEADER", 
 			          spf_("<p>Delete marked replies %s</p>", 
 			          '<input type="submit" value="'._("Delete").'" />'.
@@ -417,7 +413,6 @@ function do_delete(&$obj_arr) {
 # Convert anchor names to objects and check the delete permissions on them.
 # Returns false if the conversion or security check fails.
 function get_response_object($anchor, &$usr) {
-	global $SYSTEM;
 
 	if ( preg_match('/^comment/', $anchor) ) {
 		$ret = NewBlogComment($anchor);
@@ -434,7 +429,7 @@ function get_response_object($anchor, &$usr) {
 
 	# If ret is a valid object, but usr doesn't have delete permission, then
 	# return false.
-	if ( $ret && ! $SYSTEM->canDelete($ret, $usr) ) $ret = false;
+	if ( $ret && ! System::instance()->canDelete($ret, $usr) ) $ret = false;
 
 	return $ret;
 }

@@ -29,7 +29,6 @@ class SiteMap extends Plugin {
 	var $link_file;
 
 	function __construct($do_output=0) {
-		global $SYSTEM;
 
 		$this->plugin_desc = _("Show a sitemap in the menubar");
 		$this->plugin_version = "0.3.1";
@@ -47,13 +46,13 @@ class SiteMap extends Plugin {
 
 		$this->addOption('no_event',
 			_('No event handlers - do output when plugin is created'),
-			$SYSTEM->sys_ini->value("plugins","EventDefaultOff", 0), 
+			System::instance()->sys_ini->value("plugins","EventDefaultOff", 0), 
 			'checkbox');
 
 		parent::__construct();
 
 		if ( $this->no_event || 
-		     $SYSTEM->sys_ini->value("plugins","EventForceOff", 0) ) {
+		     System::instance()->sys_ini->value("plugins","EventForceOff", 0) ) {
 			# If either of these is true, then don't set the event handler
 			# and rely on explicit invocation for output.
 		} else {
@@ -77,14 +76,13 @@ class SiteMap extends Plugin {
 	}
 
 	function output($parm=false) {
-		global $SYSTEM;
 		
 		$blog = NewBlog();
 		$map_file = $this->get_map_file();
 		
 		$markup = '';
 		if ($this->auto_map) {
-			$blogs = $SYSTEM->getBlogList();
+			$blogs = System::instance()->getBlogList();
 			foreach ($blogs as $b) {
 				$markup .= '<li><a href="'.$b->getURL().'" title="'.
 				           $b->description.'">'.$b->name."</a></li>\n";

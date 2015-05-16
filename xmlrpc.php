@@ -236,7 +236,6 @@ then your post ID will be exactly the same as above.
 function blogger_newPost($params) {
 
 	global $xmlrpcerruser;
-	global $SYSTEM;
 	
 	$appkey = $params->getParam(0);  # We ignore the appkey.
 	$blogid = $params->getParam(1);
@@ -254,7 +253,7 @@ function blogger_newPost($params) {
 	$ret = false;
 	
 	if ( $usr->checkPassword($pwd) &&
-	     $SYSTEM->canAddTo($blog, $usr) ) {
+	     System::instance()->canAddTo($blog, $usr) ) {
 		$ent = NewBlogEntry();
 		
 		$ent->has_html = MARKUP_HTML;
@@ -308,7 +307,6 @@ function blogger_newPost($params) {
 
 function blogger_editPost($params) {
 	global $xmlrpcerruser;
-	global $SYSTEM;
 	
 	$appkey = $params->getParam(0);  # We ignore the appkey.
 	$postid = $params->getParam(1);
@@ -329,7 +327,7 @@ function blogger_editPost($params) {
 	
 	$ret = false;
 	
-	if ( $usr->checkPassword($pwd) && $SYSTEM->canModify($ent, $usr) ) {
+	if ( $usr->checkPassword($pwd) && System::instance()->canModify($ent, $usr) ) {
 
 
 		# Test for initial lines to set the subject and/or tags.
@@ -386,7 +384,6 @@ function blogger_editPost($params) {
 
 function blogger_deletePost($params) {
 	global $xmlrpcerruser;
-	global $SYSTEM;
 	
 	$appkey = $params->getParam(0);  # We ignore the appkey.
 	$postid = $params->getParam(1);
@@ -403,7 +400,7 @@ function blogger_deletePost($params) {
 	
 	$ret = false;
 	
-	if ( $usr->checkPassword($pwd) && $SYSTEM->canDelete($ent, $usr) ) {
+	if ( $usr->checkPassword($pwd) && System::instance()->canDelete($ent, $usr) ) {
 
 		$res = $ent->delete();
 		if ($res) {
@@ -432,7 +429,6 @@ function blogger_deletePost($params) {
 
 function blogger_getUsersBlogs($params) {
 	global $xmlrpcerruser;
-	global $SYSTEM;
 /*
 ob_start();
 var_dump($params);
@@ -451,7 +447,7 @@ fclose($h);
 	$usr = NewUser($uid);
 	
 	if ( $usr->checkPassword($pwd) ) {
-		$blogs = $SYSTEM->getUserBlogs($usr);
+		$blogs = System::instance()->getUserBlogs($usr);
 		if (! empty($blogs)) {
 			$resp_arr = array();
 			foreach ($blogs as $blg) {
@@ -487,7 +483,6 @@ fclose($h);
 
 function blogger_getUserInfo($params) {
 	global $xmlrpcerruser;
-	global $SYSTEM;
 	
 	$appkey = $params->getParam(0);  # We ignore the appkey.
 	$username = $params->getParam(1);
@@ -650,7 +645,6 @@ like LnBlog.  Systems that do not have such a concept should ignore this field.
 function metaWeblog_newPost($params) {
 
 	global $xmlrpcerruser;
-	global $SYSTEM;
 	
 	$blogid = $params->getParam(0);
 	$username = $params->getParam(1);
@@ -667,7 +661,7 @@ function metaWeblog_newPost($params) {
 	$ret = false;
 	
 	if ( $usr->checkPassword($pwd) &&
-	     $SYSTEM->canAddTo($blog, $usr) ) {
+	     System::instance()->canAddTo($blog, $usr) ) {
 		
 		$ent = NewBlogEntry();
 		$ent->has_html = MARKUP_HTML;
@@ -732,7 +726,6 @@ function metaWeblog_newPost($params) {
 function metaWeblog_editPost($params) {
 
 	global $xmlrpcerruser;
-	global $SYSTEM;
 	
 	$postid = $params->getParam(0);
 	$username = $params->getParam(1);
@@ -754,7 +747,7 @@ function metaWeblog_editPost($params) {
 	$blog = $ent->getParent();
 	
 	if ( $usr->checkPassword($pwd) &&
-	     $SYSTEM->canModify($ent, $usr) ) {
+	     System::instance()->canModify($ent, $usr) ) {
 			 
 		while ($list = $content->structeach()) {
 			
@@ -812,7 +805,6 @@ function metaWeblog_editPost($params) {
 
 function metaWeblog_getPost($params) {
 	global $xmlrpcerruser;
-	global $SYSTEM;
 	
 	$postid = $params->getParam(0);
 	$username = $params->getParam(1);
@@ -869,7 +861,6 @@ function metaWeblog_getPost($params) {
 
 function metaWeblog_newMediaObject($params) {
 	global $xmlrpcerruser;
-	global $SYSTEM;
 	
 	$blogid = $params->getParam(0);
 	$username = $params->getParam(1);
@@ -881,7 +872,7 @@ function metaWeblog_newMediaObject($params) {
 	$usr = NewUser($uid);
 	$blog = NewBlog($blogid->scalarval());
 	
-	if ( $usr->checkPassword($pwd) && $SYSTEM->canModify($blog, $usr) ) {
+	if ( $usr->checkPassword($pwd) && System::instance()->canModify($blog, $usr) ) {
 		
 		$name = $data->structmem('name');
 		$type = $data->structmem('type');
@@ -894,7 +885,7 @@ function metaWeblog_newMediaObject($params) {
 				$postpath = str_replace("/", PATH_DELIM, $postpath);
 			$postpath = calculate_document_root().PATH_DELIM.$postpath;
 			$entry = NewEntry($postpath);
-			if ($entry->isEntry() && $SYSTEM->canModify($entry,$usr)) {
+			if ($entry->isEntry() && System::instance()->canModify($entry,$usr)) {
 				$path = mkpath($entry->localpath(), $name->scalarval());
 			} else {
 				return new xmlrpcresp(0, $xmlrpcerruser+3, "Invalid login - cannot add files to this entry");
@@ -929,9 +920,7 @@ function metaWeblog_newMediaObject($params) {
 # contain description, htmlUrl, and rssUrl elements.  Note that LnBlog supplies
 # RSS as an optional plugin, so the RSS URL may be empty.
 function metaWeblog_getCategories($params) {
-	global $PLUGIN_MANAGER;
 	global $xmlrpcerruser;
-	global $SYSTEM;
 	
 	$blogid = $params->getParam(0);
 	$username = $params->getParam(1);
@@ -959,8 +948,8 @@ function metaWeblog_getCategories($params) {
 				$cat['htmlUrl'] = new xmlrpcval($blog->uri('tags').'?tag='.urlencode($tag), 'string');
 				
 				$topic = preg_replace('/\W/', '', $tag);
-				$rdf_file = $topic.'_'.$PLUGIN_MANAGER->plugin_config->value("RSS1FeedGenerator", "feed_file", "news.rdf");
-				$xml_file = $topic.'_'.$PLUGIN_MANAGER->plugin_config->value("RSS2FeedGenerator", "feed_file", "news.xml");
+				$rdf_file = $topic.'_'.PluginManager::instance()->plugin_config->value("RSS1FeedGenerator", "feed_file", "news.rdf");
+				$xml_file = $topic.'_'.PluginManager::instance()->plugin_config->value("RSS2FeedGenerator", "feed_file", "news.xml");
 				if (file_exists($base_feed_path.PATH_DELIM.$xml_file)) {
 					$rss_url = $base_feed_uri.$xml_file;
 				} elseif (file_exists($base_feed_path.PATH_DELIM.$rdf_file)) {
@@ -997,7 +986,6 @@ function metaWeblog_getCategories($params) {
 
 function metaWeblog_getRecentPosts($params) {
 	global $xmlrpcerruser;
-	global $SYSTEM;
 	
 	$blogid = $params->getParam(0);
 	$username = $params->getParam(1);
@@ -1060,7 +1048,6 @@ function metaWeblog_getRecentPosts($params) {
 
 function mt_getRecentPostTitles($params) {
 	global $xmlrpcerruser;
-	global $SYSTEM;
 	
 	$blogid = $params->getParam(0);
 	$username = $params->getParam(1);
@@ -1102,9 +1089,7 @@ function mt_getRecentPostTitles($params) {
 # Gets a list of the category IDs and names for this blog.
 
 function mt_getCategoryList($params) {
-	global $PLUGIN_MANAGER;
 	global $xmlrpcerruser;
-	global $SYSTEM;
 	
 	$blogid = $params->getParam(0);
 	$username = $params->getParam(1);
@@ -1142,9 +1127,7 @@ function mt_getCategoryList($params) {
 # Gets a list of the category IDs and names for this blog.
 
 function mt_getPostCategories($params) {
-	global $PLUGIN_MANAGER;
 	global $xmlrpcerruser;
-	global $SYSTEM;
 	
 	$postid = $params->getParam(0);
 	$username = $params->getParam(1);
@@ -1183,9 +1166,7 @@ function mt_getPostCategories($params) {
 # Gets a list of the category IDs and names for this blog.
 
 function mt_setPostCategories($params) {
-	global $PLUGIN_MANAGER;
 	global $xmlrpcerruser;
-	global $SYSTEM;
 	
 	$postid = $params->getParam(0);
 	$username = $params->getParam(1);

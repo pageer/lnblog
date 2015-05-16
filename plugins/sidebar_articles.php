@@ -10,7 +10,6 @@
 class Articles extends Plugin {
 
 	function __construct($do_output=0) {
-		global $SYSTEM;
 		$this->plugin_desc = _("List the articles for a blog.");
 		$this->plugin_version = "0.2.5";
 		$this->header = _("Articles");
@@ -30,13 +29,13 @@ class Articles extends Plugin {
 			
 		$this->addOption('no_event',
 			_('No event handlers - do output when plugin is created'),
-			$SYSTEM->sys_ini->value("plugins","EventDefaultOff", 0), 
+			System::instance()->sys_ini->value("plugins","EventDefaultOff", 0), 
 			'checkbox');
 			
 		parent::__construct();
 		
 		if ( $this->no_event || 
-		     $SYSTEM->sys_ini->value("plugins","EventForceOff", 0) ) {
+		     System::instance()->sys_ini->value("plugins","EventForceOff", 0) ) {
 			# If either of these is true, then don't set the event handler
 			# and rely on explicit invocation for output.
 		} else {
@@ -48,7 +47,6 @@ class Articles extends Plugin {
 	}
 	
 	function buildOutput($parm=false) {
-		global $SYSTEM;
 		
 		$blg = NewBlog();
 		$u = NewUser();
@@ -79,7 +77,7 @@ class Articles extends Plugin {
 				                 'style'=>'margin-top: 0.5em');
 			} 
 		
-			if ($SYSTEM->canModify($blg, $u)) {
+			if (System::instance()->canModify($blg, $u)) {
 				$items[] = array('description'=>ahref($blg->uri('editfile', $this->custom_links),
 				                                      _("Add custom links")),
 				                 'style'=>'margin-top: 0.5em');

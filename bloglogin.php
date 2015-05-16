@@ -23,13 +23,12 @@
 # from.  In the "standard" setup, this page is included by the login.php
 # wrapper script in each blog.
 
-require_once("blogconfig.php");
-require_once("lib/creators.php");
-
 session_start();
 
-global $PAGE;
-$PAGE->setDisplayObject($blog);
+require_once "blogconfig.php";
+require_once "lib/creators.php";
+
+Page::instance()->setDisplayObject($blog);
 $blog = NewBlog();
 
 if ($blog->isBlog()) {
@@ -80,14 +79,17 @@ if ( POST($user_name) && POST($password) ) {
 	if ( $admin_login && ! $usr->isAdministrator() ) {
 		$tpl->set("FORM_MESSAGE", _("Only the administrator account can log into the administrative pages."));
 	} else {
-		if ($ret) $PAGE->redirect($redir_url);
-		else $tpl->set("FORM_MESSAGE", _("Error logging in.  Please check your username and password."));
+		if ($ret) {
+			Page::instance()->redirect($redir_url);
+		} else {
+			$tpl->set("FORM_MESSAGE", _("Error logging in.  Please check your username and password."));
+		}
 	}
 }
 
 $body = $tpl->process();
-$PAGE->title = $page_name;
-$PAGE->addStylesheet("form.css");
-$PAGE->display($body, $blog);
+Page::instance()->title = $page_name;
+Page::instance()->addStylesheet("form.css");
+Page::instance()->display($body, $blog);
 
 ?>

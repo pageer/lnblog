@@ -40,14 +40,12 @@ function populate_fields(&$tpl) {
 	$tpl->set("HOMEPAGE_VALUE", trim(POST($homepage)));
 }
 
-global $PAGE;
-global $SYSTEM;
 $redir_page = "index.php";
 $tpl = NewTemplate(CREATE_LOGIN_TEMPLATE);
 
 # Check if there is at least one administrator.  
 # If not, then we need to create one.
-if ($SYSTEM->hasAdministrator()) {
+if (System::instance()->hasAdministrator()) {
 	$page_name = _("Create New Login");
 	$form_title = _("Create New Login");
 	$first_user = false;
@@ -61,9 +59,9 @@ if ($SYSTEM->hasAdministrator()) {
 
 # If there is an administrator, then we want to restrict creating new accounts.
 $u = NewUser();
-if ($SYSTEM->hasAdministrator() && 
+if (System::instance()->hasAdministrator() && 
     (! $u->checkLogin() || ! $u->isAdministrator()) ) {
-	$PAGE->redirect("index.php");
+	Page::instance()->redirect("index.php");
 	exit;
 }
 
@@ -126,7 +124,7 @@ if ($post_complete) {
 		}
 		
 		if ($ret) {
-			$PAGE->redirect("index.php");
+			Page::instance()->redirect("index.php");
 			exit;
 		}
 	}
@@ -148,7 +146,7 @@ if ($post_complete) {
 }
 
 $body = $tpl->process();
-$PAGE->title = $page_name;
-$PAGE->addStylesheet("form.css");
-$PAGE->display($body);
+Page::instance()->title = $page_name;
+Page::instance()->addStylesheet("form.css");
+Page::instance()->display($body);
 ?>

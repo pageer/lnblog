@@ -18,6 +18,10 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 session_start();
+$page = new WebPages();
+$page->showarchive();
+exit;
+
 
 require_once("config.php");
 require_once("lib/creators.php");

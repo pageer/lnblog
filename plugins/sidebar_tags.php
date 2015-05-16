@@ -131,21 +131,20 @@ class TagList extends Plugin {
 	
 	function output_page() {
 	
-		global $PAGE;
 		$blog = NewBlog();
-		$PAGE->setDisplayObject($blog);
+		Page::instance()->setDisplayObject($blog);
 
 		$list = $this->buildList();
 		
-		$PAGE->addInlineStylesheet(".taglist img { border: 0 }");
+		Page::instance()->addInlineStylesheet(".taglist img { border: 0 }");
 		
 		$tpl = NewTemplate("list_tpl.php");
 		$tpl->set("LIST_TITLE", $this->page_title);
 		$tpl->set("LIST_CLASS", "taglist");
 		$tpl->set("ITEM_LIST", $list);
 
-		$PAGE->title = spf_("Blogroll - ", $blog->name);
-		$PAGE->display($tpl->process(), $blog);
+		Page::instance()->title = spf_("Blogroll - ", $blog->name);
+		Page::instance()->display($tpl->process(), $blog);
 	
 	}
 

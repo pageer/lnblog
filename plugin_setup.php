@@ -31,17 +31,16 @@ require_once("blogconfig.php");
 require_once("lib/creators.php");
 require_once("lib/plugin.php");
 
-global $PAGE;
 $usr = NewUser();
 $blg = NewBlog();
 
 if ($blg->isBlog()) {
-	if (! $SYSTEM->canModify($blg, $usr) || !$usr->checkLogin()) {
-		$PAGE->redirect($blg->uri('login'));
+	if (! System::instance()->canModify($blg, $usr) || !$usr->checkLogin()) {
+		Page::instance()->redirect($blg->uri('login'));
 		exit;
 	}
 } elseif (! $usr->isAdministrator() || !$usr->checkLogin()) {
-	$PAGE->redirect("bloglogin.php");
+	Page::instance()->redirect("bloglogin.php");
 	exit;
 }
 
@@ -51,9 +50,9 @@ if (has_post()) {
 	$ret = $plug->updateConfig();
 
 	if ($blg->isBlog()) {
-		$PAGE->redirect($blg->uri('pluginconfig'));
+		Page::instance()->redirect($blg->uri('pluginconfig'));
 	} else {
-		$PAGE->redirect(INSTALL_ROOT_URL."plugin_setup.php");
+		Page::instance()->redirect(INSTALL_ROOT_URL."plugin_setup.php");
 	}
 
 	exit;
@@ -67,7 +66,7 @@ if (has_post()) {
 	$body .= '<li>'._('Version').': '.$plug->plugin_version.'</li>';
 	$body .= '<li>'._('Description').': '.$plug->plugin_desc.'</li></ul>';
 	ob_start();
-	$ret = $plug->showConfig($PAGE);
+	$ret = $plug->showConfig(Page::instance());
 	$buff = ob_get_contents();
 	ob_end_clean();
 	$body .= is_string($ret) ? $ret : $buff;
@@ -76,8 +75,7 @@ if (has_post()) {
 	
 	$body .= '<p><a href="'.$url.'">'._("Back to plugin list").'</a></p>';
 } else {
-	global $PLUGIN_MANAGER;
-	$plug_list = $PLUGIN_MANAGER->getPluginList();
+	$plug_list = PluginManager::instance()->getPluginList();
 	sort($plug_list);
 	$body = "<h4>"._('Plugin Configuration')."</h4><ul>";
 	$body .= '<table><tr><th>Plugin</th><th>Version</th><th>Description</th></tr>';
@@ -89,6 +87,6 @@ if (has_post()) {
 	}
 	$body .= '</table>';
 }
-$PAGE->title = spf_("%s Plugin Configuration", PACKAGE_NAME);
-$PAGE->display($body);
+Page::instance()->title = spf_("%s Plugin Configuration", PACKAGE_NAME);
+Page::instance()->display($body);
 ?>

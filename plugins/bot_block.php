@@ -13,7 +13,6 @@
 # However, there is also an accessibility option
 class BotBlock extends Plugin {
 	function __construct() {
-		global $PAGE;
 		
 		$this->plugin_version = "0.2.1";
 		$this->plugin_desc = _("Attempts to block spambots from posting comments.");
@@ -77,7 +76,6 @@ class BotBlock extends Plugin {
 	}
 	
 	function outputScript() {
-		global $PAGE;
 		ob_start();
 ?>
 function addIt() {
@@ -91,7 +89,7 @@ window.addEventListener('load', addIt, false);
 <?php
 		$script_data = ob_get_contents();
 		ob_end_clean();
-		$PAGE->addInlineScript($script_data);
+		Page::instance()->addInlineScript($script_data);
 	}
 	
 	function checkICToken(&$cmt) {

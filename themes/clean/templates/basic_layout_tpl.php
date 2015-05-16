@@ -38,20 +38,18 @@
 #
 # It probably goes without saying that the same comments here apply to the
 # menubar and sidebar sections below.
-global $EVENT_REGISTER;
-$EVENT_REGISTER->activateEventFull($tmp=false, "banner", "OnOutput");
+EventRegister::instance()->activateEventFull($tmp=false, "banner", "OnOutput");
 # Stuff to go between the "beginning" and "ending" plugins goes here.  Note
 # that the default plugins all use the OnOutput event, so in practice, putting
 # things here won't have any effect.
-$EVENT_REGISTER->activateEventFull($tmp=false, "banner", "OutputComplete");
+EventRegister::instance()->activateEventFull($tmp=false, "banner", "OutputComplete");
 ?>
     <!-- A menu/navigation bar -->
     <div id="menubar">
     <?php 
     # Activate the menubar plugins.
-    global $EVENT_REGISTER;
-    $EVENT_REGISTER->activateEventFull($tmp=false, "menubar", "OnOutput");
-    $EVENT_REGISTER->activateEventFull($tmp=false, "menubar", "OutputComplete");
+    EventRegister::instance()->activateEventFull($tmp=false, "menubar", "OnOutput");
+    EventRegister::instance()->activateEventFull($tmp=false, "menubar", "OutputComplete");
     ?>
     </div>
 </div>
@@ -64,9 +62,8 @@ $EVENT_REGISTER->activateEventFull($tmp=false, "banner", "OutputComplete");
     <div id="sidebar">
     <?php 
     # Activate the sidebar plugins.
-    global $EVENT_REGISTER;
-    $EVENT_REGISTER->activateEventFull($tmp=false, "sidebar", "OnOutput");
-    $EVENT_REGISTER->activateEventFull($tmp=false, "sidebar", "OutputComplete");
+    EventRegister::instance()->activateEventFull($tmp=false, "sidebar", "OnOutput");
+    EventRegister::instance()->activateEventFull($tmp=false, "sidebar", "OutputComplete");
     ?>
     </div>
 </div>

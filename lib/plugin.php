@@ -233,8 +233,7 @@ abstract class Plugin extends LnBlogObject{
 	# in class variables.  
 	
 	function getConfig() {
-		global $PLUGIN_MANAGER;
-		$parser =& $PLUGIN_MANAGER->plugin_config;
+		$parser =& PluginManager::instance()->plugin_config;
 		foreach ($this->member_list as $mem=>$config) {
 			$this->$mem = (isset($config["default"]) ? $config["default"] : "");
 			$val = $parser->value(get_class($this), $mem, $this->$mem);

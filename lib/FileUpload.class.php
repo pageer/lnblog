@@ -120,7 +120,6 @@ class FileUpload extends LnBlogObject {
 		else $tmp_path = mkpath(ini_get("upload_tmp_dir"), $this->tempname);
 		if ( ! $this->tempname || (! is_uploaded_file($tmp_path) && ! is_file($this->tempname)) ) {
 			$ret = FILEUPLOAD_NO_FILE;
-			#var_dump($tmp_path, $this->tempname, is_uploaded_file($tmp_path), file_exists($this->tempname));
 		}
 		
 		return $ret;

@@ -134,18 +134,7 @@ function NewTemplate($tpl="") {
 # usr - The *optional* username of the user represented by this object.
 # pwd - The *optional* associated password.
 function NewUser($usr=false, $pwd=false) {
-	$s_usr = SESSION(CURRENT_USER);
-	$c_usr = COOKIE(CURRENT_USER);
-	if (!$usr && $c_usr) {
-		if ($s_usr == $c_usr || (! AUTH_USE_SESSION && $s_usr == '') ) {
-			$usr = $c_usr;
-		}
-	}
-	if ($usr && isset($_SESSION["user-".$usr])) {
-		return unserialize($_SESSION["user-".$usr]);
-	} else {
-		return new User($usr, $pwd);
-	}
+	return User::get($usr, $pwd);
 }
 
 # Function: NewFileUpload

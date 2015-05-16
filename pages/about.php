@@ -24,7 +24,6 @@
 # This just shows the basic "about" information, like current version and license information.
 session_start();
 require_once("config.php");
-require_once Path::mk(INSTALL_ROOT, "lib", "creators.php");
 
 $tpl = NewTemplate("about_tpl.php");
 

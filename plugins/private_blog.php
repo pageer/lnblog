@@ -11,11 +11,10 @@ class PrivateBlog extends Plugin {
 	}
 
 	function check_allow($param) {
-		global $SYSTEM;
 		$blog = NewBlog();
 		$usr = NewUser();
 		if (! $blog->isBlog() || 
-		    $SYSTEM->canModify($blog, $usr) ||
+		    System::instance()->canModify($blog, $usr) ||
 			! $this->userlist ||
 			current_file() == "login.php") return false;
 		if (! $usr->checkLogin()) $param->redirect($blog->uri('login'));

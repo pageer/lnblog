@@ -18,10 +18,6 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-require_once("blogconfig.php");
-require_once("lib/utils.php");
-require_once("lib/creators.php");
-
 /*
 Class: BlogComment
 Represents a comment on a blog entry or article.
@@ -355,8 +351,6 @@ class BlogComment extends Entry {
 	*/
 	function get($show_edit_controls=false) {
 
-		global $SYSTEM;
-		
 		# An array of the form label=>URL which holds the list of 
 		# administrative items, such as the delete link.
 		$this->control_bar = array();
@@ -378,7 +372,7 @@ class BlogComment extends Entry {
 
 		$blog = NewBlog();
 		$usr = NewUser();
-		$show_edit_controls = $SYSTEM->canModify($this->getParent());
+		$show_edit_controls = System::instance()->canModify($this->getParent());
 
 		if (! $this->name) $this->name = ANON_POST_NAME;
 		if (! $this->subject) $this->subject = NO_SUBJECT;

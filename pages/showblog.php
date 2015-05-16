@@ -18,6 +18,14 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+
+session_start();
+$pages = new WebPages();
+$pages->showblog();
+exit;
+
+
+
 # File: showblog.php
 # Shows the standard front page of weblog with the most recent entries.
 #
@@ -94,12 +102,11 @@ if ( isset($_GET['action']) && isset($action_map[$_GET['action']]) ) {
 } elseif ( isset($_GET['plugin']) ) {
 	
 	require_once("config.php");
-	#ini_set("include_path", 
-    #    ini_get('include_path').PATH_SEPARATOR.USER_DATA_PATH);
 	define("PLUGIN_DO_OUTPUT", true);
+	$plugin = preg_replace('[^A-Za-z0-9_\-]', '', $_GET['plugin']);
 	$paths = array(@BLOG_ROOT, USER_DATA_PATH, INSTALL_ROOT);
 	foreach ($paths as $path) {
-		$plugin = Path::mk($path, 'plugins', $_GET['plugin'].".php");
+		$plugin = Path::mk($path, 'plugins', "$plugin.php");
 		if (file_exists($plugin)) {
 			require $plugin;
 			exit;

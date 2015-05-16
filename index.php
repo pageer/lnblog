@@ -68,16 +68,14 @@ if (isset($_GET['r'])) {
 	exit;
 }
 
-global $PAGE;
-
 if ( ! file_exists(USER_DATA_PATH.PATH_DELIM.FS_PLUGIN_CONFIG) ) {
-	$PAGE->redirect("fs_setup.php");
+	Page::instance()->redirect("fs_setup.php");
 	exit;
 }
 
 $update =  "update";
 $upgrade = "upgrade";
-$PAGE->title = sprintf(_("%s Administration"), PACKAGE_NAME);
+Page::instance()->title = sprintf(_("%s Administration"), PACKAGE_NAME);
 
 $tpl = NewTemplate('blog_admin_tpl.php');
 $tpl->set("SHOW_NEW");
@@ -87,11 +85,12 @@ $tpl->set("FORM_ACTION", current_file());
 # If not, then we need to create one.
 
 $usr = NewUser();
-if (! $SYSTEM->hasAdministrator()) {
-	$PAGE->redirect("newlogin.php");
+
+if (! System::instance()->hasAdministrator()) {
+	Page::instance()->redirect("newlogin.php");
 	exit;
 } elseif (! $usr->checkLogin() || ! $usr->isAdministrator()) {
-	$PAGE->redirect("bloglogin.php");
+	Page::instance()->redirect("bloglogin.php");
 	exit;
 }
 
@@ -115,7 +114,7 @@ if ( POST('upgrade') && POST('upgrade_btn') ) {
 	if (! $blog->isBlog()) {
 		$status = spf_("The path '%s' is not an LnBlog weblog.", POST('register'));
 	} else {
-		$ret = $SYSTEM->registerBlog($blog->blogid);
+		$ret = System::instance()->registerBlog($blog->blogid);
 		if ($ret) $status = spf_("Blog %s successfully registered.", $blog->blogid);
 		else $status = spf_("Registration error: exited with code %s", $ret);
 	}
@@ -135,21 +134,21 @@ if ( POST('upgrade') && POST('upgrade_btn') ) {
 
 	$usr = NewUser();
 	if ($usr->exists(POST("username"))) {
-		$PAGE->redirect("pages/editlogin.php?user=".POST('username'));
+		Page::instance()->redirect("pages/editlogin.php?user=".POST('username'));
 	} else {
 		$status = spf_("User %s does not exist.", POST('username'));
 	}
 
 }
 
-$blogs = $SYSTEM->getBlogList();
+$blogs = System::instance()->getBlogList();
 $blog_names = array();
 foreach ($blogs as $blg) {
 	$blog_names[] = $blg->blogid;
 }
 $tpl->set("BLOG_ID_LIST", $blog_names);
 
-$users = $SYSTEM->getUserList();
+$users = System::instance()->getUserList();
 $user_ids = array();
 foreach ($users as $u) {
 	$user_ids[] = $u->username();
@@ -157,5 +156,5 @@ foreach ($users as $u) {
 $tpl->set("USER_ID_LIST", $user_ids);
 
 $body = $tpl->process();
-$PAGE->display($body);
+Page::instance()->display($body);
 ?>

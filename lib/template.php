@@ -40,10 +40,13 @@ class PHPTemplate extends LnBlogObject {
 
 	protected $file;   # The name of the template file to use.
 	protected $vars;   # An array of variables to register in the template.
+	protected $search_paths = array();  # The paths on which to search for templates.
 	
 	/** Whether HTML helpers should output their data in addition to returning it. */
 	public $helper_output = true;
-
+	
+	public static $template_paths = array();
+	
 	public function __construct($file="") {
 		$this->file = $file;
 		$this->vars = array();
@@ -121,6 +124,51 @@ class PHPTemplate extends LnBlogObject {
 		$this->vars = array();
 	}
 
+	# Mehtod: setSearchPath
+	# Set the list of paths on which to search for template files.
+	public function setSearchPath($paths) {
+		$this->search_paths = $paths;
+	}
+	
+	public function getSearchPath() {
+		if ($this->search_paths) {
+			return $this->search_paths;
+		} else {
+			$ret = array();
+			if (defined('THEME_NAME') && THEME_NAME != 'default') {
+				if (defined('BLOG_ROOT')) {
+					$ret[] = Path::mk(BLOG_ROOT, 'themes', THEME_NAME, 'templates');
+					$ret[] = Path::mk(BLOG_ROOT, 'templates');
+				}
+				$ret[] = Path::mk(INSTALL_ROOT, 'themes', THEME_NAME, 'templates');
+				if (defined('USER_DATA_PATH')) {
+					$ret[] = Path::mk(USER_DATA_PATH, 'themes', THEME_NAME, 'templates');
+				}
+			} elseif (defined('BLOG_ROOT')) {
+				$ret[] = Path::mk(BLOG_ROOT, 'templates');
+				
+			}
+			$ret[] = Path::mk(INSTALL_ROOT, 'themes', 'default', 'templates');
+			return $ret;
+		}
+	}
+	
+	public function getTemplatePath() {
+		foreach ($this->getSearchPath() as $path) {
+			if (isset(self::$template_paths[$this->file])) {
+				return self::$template_paths[$this->file];
+			} elseif ($this->templateExists($path)) {
+				self::$template_paths[$this->file] = Path::mk($path, $this->file);
+				return self::$template_paths[$this->file];
+			}
+		}
+		return '';
+	}
+	
+	protected function templateExists($path) {
+		return file_exists(Path::mk($path, $this->file));
+	}
+	
 	/**
 	 * Process the template and get the output.
 	 *
@@ -132,12 +180,14 @@ class PHPTemplate extends LnBlogObject {
 	public function process($return_results=true) {
 		ob_start();
 		extract($this->vars, EXTR_OVERWRITE);
-		include $this->file;
+		include $this->getTemplatePath();
 		if ($return_results) {
 			$ret = ob_get_contents();
 			ob_end_clean();
 			return $ret;
-		} else return ob_end_flush();
+		} else {
+			return ob_end_flush();
+		}
 	}
 	
 	public function escape($data, $method, $options = array()) {

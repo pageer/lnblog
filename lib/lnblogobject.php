@@ -40,8 +40,7 @@ class LnBlogObject {
 	 */
 
 	function createEvent($name) {
-		global $EVENT_REGISTER;
-		return $EVENT_REGISTER->addEvent(get_class($this), $name);
+		return EventRegister::instance()->addEvent(get_class($this), $name);
 	}
 
 	/* Method: hasEvent
@@ -55,8 +54,7 @@ class LnBlogObject {
 	 */
 
 	function hasEvent($name) {
-		global $EVENT_REGISTER;
-		return $EVENT_REGISTER->isEvent(get_class($this), $name);
+		return EventRegister::instance()->isEvent(get_class($this), $name);
 	}
 
 	/* Method: hasHandlers
@@ -70,8 +68,7 @@ class LnBlogObject {
 	 */
 
 	function hasHandlers($name) {
-		global $EVENT_REGISTER;
-		return $EVENT_REGISTER->hasHandlers(get_class($this), $name);
+		return EventRegister::instance()->hasHandlers(get_class($this), $name);
 	}
 
 	/* Method: raiseEvent
@@ -86,10 +83,9 @@ class LnBlogObject {
 	 */
 	 
 	function raiseEvent($name) {
-		global $EVENT_REGISTER;
 		$params = func_get_args();
 		array_splice($params, 0, 1);
-		return $EVENT_REGISTER->activateEvent($this, $name, $params); 
+		return EventRegister::instance()->activateEvent($this, $name, $params); 
 	}
 
 	/* Method: registerEventHandler
@@ -105,8 +101,7 @@ class LnBlogObject {
 	 */
 	 
 	function registerEventHandler($type, $name, $func) {
-		global $EVENT_REGISTER;
-		return $EVENT_REGISTER->addHandler($type, $name, 
+		return EventRegister::instance()->addHandler($type, $name, 
 		                                   $this, $func);
 	}
 	
@@ -128,8 +123,7 @@ class LnBlogObject {
 	 */
 
 	function registerStaticEventHandler($type, $name, $func) {
-		global $EVENT_REGISTER;
-		return $EVENT_REGISTER->addHandler($type, $name, 
+		return EventRegister::instance()->addHandler($type, $name, 
 		                                   get_class($this), $func, true);
 	}
 

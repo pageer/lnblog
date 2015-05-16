@@ -75,7 +75,8 @@ function get_blog_path() {
 		if (PATH_DELIM != "/") {
 			$path = str_replace("/", PATH_DELIM, $path);
 		}
-		$path = preg_replace("/[^\w|"."\\".PATH_DELIM."]/", "", $path);
+		//$path = preg_replace("/[^\w|"."\\".PATH_DELIM."]/", "", $path);
+		
 		
 		if ( defined("SUBDOMAIN_ROOT") && 
 		     is_dir(mkpath(SUBDOMAIN_ROOT, $path)) ) {
@@ -253,7 +254,7 @@ define("PACKAGE_URL", "http://lnblog.skepticats.com/");
 
 # Add I18N support here, as this is currently the earliest we can do it.
 # Refer to the lib/i18n.php file for details.
-require_once("lib/i18n.php");
+require_once INSTALL_ROOT."/lib/i18n.php";
 # Constant: PACKAGE_DESCRIPTION
 # The offical text-blurb description of the software.
 define("PACKAGE_DESCRIPTION", spf_("%s: a simple and (hopefully) elegant weblog", PACKAGE_NAME));
@@ -289,7 +290,7 @@ define("PACKAGE_COPYRIGHT", _("Copyright &copy; 2005 &ndash; 2014, Peter A. Geer
 # The name of the local copy of jQUery UI.  If not specified, uses the jQuery CDN.
 @define('LOCAL_JQUERYUI_NAME', '');
 
-#Constant: LOCAL_JQUERYUI_NAME
+#Constant: LOCAL_JQUERYUI_THEME_NAME
 # The name of the local copy of jQUery UI theme CSS.  If not specified, uses the jQuery CDN.
 @define('LOCAL_JQUERYUI_THEME_NAME', '');
 
@@ -705,7 +706,7 @@ if ( defined("BLOG_ROOT") ) {
 	$cfg_file = BLOG_ROOT.PATH_DELIM.BLOG_CONFIG_PATH;
 } elseif (isset($_GET['blog'])) {
 	$cfg_file = DOCUMENT_ROOT.PATH_DELIM.
-		preg_replace("/\W/", "", $_GET['blog']).PATH_DELIM.BLOG_CONFIG_PATH;
+		preg_replace("/[^A-Za-z0-9\-_\/]/", "", $_GET['blog']).PATH_DELIM.BLOG_CONFIG_PATH;
 }
 
 if (isset($cfg_file) && ! is_file($cfg_file)) {
@@ -724,61 +725,32 @@ if (isset($cfg_file) && is_file($cfg_file)) {
 	}
 }
 
+require_once INSTALL_ROOT."/lib/utils.php";
+	
 # Set constants to make themes work.  Most of these are defaults for when 
 # there is no current blog set up.
 @define("THEME_NAME", "default");
+
 if (! defined("INSTALL_ROOT_URL")) {
-	require_once("lib/utils.php");
 	define("INSTALL_ROOT_URL", localpath_to_uri(INSTALL_ROOT, false));
 }
 
-$theme_templates = PATH_DELIM.mkpath("themes",THEME_NAME,"templates");
-
 # Include constants for classes.
-require_once("lib/constants.php");
-
-$inc_path = ini_get('include_path');
-# Add the INSTALL_ROOT to the include path, if it's not already there.
-if (strpos($inc_path, INSTALL_ROOT) === false) {
-	$inc_path .= PATH_SEPARATOR.INSTALL_ROOT;
-}
-# Add the theme and other templates from the blog directory.  These will 
-# override the defaults if they exist.
-if (defined("BLOG_ROOT")) {
-	if (is_dir(BLOG_ROOT.PATH_DELIM.$theme_templates)) {
-		$inc_path .= PATH_SEPARATOR.BLOG_ROOT.$theme_templates;
-	}
-	if (is_dir(BLOG_ROOT.PATH_DELIM."templates")) {
-		$inc_path .= PATH_SEPARATOR.BLOG_ROOT.PATH_DELIM."templates";
-	}
-}
-
-# Add the installation-wide theme and default theme to the include path.  
-# This will be the fall-back if the user theme does not exist.
-if (THEME_NAME != "default") {
-	$inc_path .= PATH_SEPARATOR.INSTALL_ROOT.$theme_templates;
-}
-if (is_dir(USER_DATA_PATH.PATH_DELIM.$theme_templates)) {
-	$inc_path .= PATH_SEPARATOR.USER_DATA_PATH.$theme_templates;
-}
-# Add the default theme template to the include path.  This is for fall-back 
-# when a template doesn't exist in a theme.
-$inc_path .= PATH_SEPARATOR.mkpath(INSTALL_ROOT,"themes","default","templates");
-
-# Finally, we actually set the include_path.
-ini_set('include_path', $inc_path);
+require_once INSTALL_ROOT."/lib/constants.php";
 
 # Include the library of wrapper functions, which will be used to actually 
 # create objects by including the right file at the right time.
 # This is for parsimony of includes.
-require_once("lib/creators.php");
+require_once INSTALL_ROOT."/lib/creators.php";
 
 # Now that everything is initialized, we can create the global event register
 # and plugin manager and create a top-level page for handling output..
-require_once("lib/eventregister.php");
-require_once("lib/page.php");
-require_once('lib/system.php');
-require_once("lib/pluginmanager.php");
+# TODO: Need to get rid of all the globals and switch to singleton instance calls.
+# Then we can get rid of this.
+require_once INSTALL_ROOT."/lib/eventregister.php";
+require_once INSTALL_ROOT."/lib/page.php";
+require_once INSTALL_ROOT.'/lib/system.php';
+require_once INSTALL_ROOT."/lib/pluginmanager.php";
 
 # Initialize the plugins
 PluginManager::instance()->loadPlugins();

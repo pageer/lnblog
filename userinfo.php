@@ -33,8 +33,6 @@ require_once("blogconfig.php");
 #require_once("lib/creators.php");
 require_once("lib/utils.php");
 
-global $PAGE;
-
 $uid = GET("user");
 $uid = $uid ? $uid : POST("user");
 $uid = $uid ? $uid : basename(getcwd());
@@ -42,7 +40,7 @@ $uid = preg_replace("/\W/", "", $uid);
 
 $usr = NewUser($uid);
 $tpl = NewTemplate("user_info_tpl.php");
-$PAGE->setDisplayObject($usr);
+Page::instance()->setDisplayObject($usr);
 $usr->exportVars($tpl);
 
 $priv_path = mkpath(USER_DATA_PATH,$usr->username(),"profile.ini");
@@ -60,6 +58,6 @@ if (file_exists($user_file)) {
 	$ret .= implode("\n", file($user_file));
 }
 
-$PAGE->title = _("User Information");
-$PAGE->display($ret);
+Page::instance()->title = _("User Information");
+Page::instance()->display($ret);
 ?>

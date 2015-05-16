@@ -242,12 +242,11 @@ class System {
 	# at least one existing user in the administrators group, false otherwise.
 
 	public function hasAdministrator() {
-		global $SYSTEM;
 		$has_admin = file_exists(mkpath(USER_DATA_PATH,ADMIN_USER,"passwd.php"));
 		if (! $has_admin) {
-			$users = $SYSTEM->getUserList();
+			$users = $this->getUserList();
 			foreach ($users as $u) {
-				if ($SYSTEM->inGroup($u->username(), 'administrators')) {
+				if ($this->inGroup($u->username(), 'administrators')) {
 					$has_admin = true;
 					break;
 				}

@@ -18,6 +18,13 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+
+session_start();
+$page = new WebPages();
+$page->showitem();
+exit;
+
+
 # Function: show_comment_page
 # Show the page of comments on the entry.
 function show_comment_page(&$blg, &$ent, &$usr) {
@@ -240,8 +247,7 @@ if ( isset($_GET['action']) && strtolower($_GET['action']) == 'upload' ) {
 
 session_start();
 require_once("config.php");
-require_once("lib/creators.php");
-require_once("pages/pagelib.php");
+require_once INSTALL_ROOT."/pages/pagelib.php";
 
 $ent = NewEntry();
 $blg = NewBlog();

@@ -6,26 +6,23 @@
 <!-- Site banner -->
 <div id="banner">
 <?php
-global $EVENT_REGISTER;
-$EVENT_REGISTER->activateEventFull($tmp=false, "banner", "OnOutput");
-$EVENT_REGISTER->activateEventFull($tmp=false, "banner", "OutputComplete");
+EventRegister::instance()->activateEventFull($tmp=false, "banner", "OnOutput");
+EventRegister::instance()->activateEventFull($tmp=false, "banner", "OutputComplete");
 ?>
 </div>
 <!-- A menu/navigation bar -->
 <div id="menubar">
 <?php
-global $EVENT_REGISTER;
-$EVENT_REGISTER->activateEventFull($tmp=false, "menubar", "OnOutput");
-$EVENT_REGISTER->activateEventFull($tmp=false, "menubar", "OutputComplete");
+EventRegister::instance()->activateEventFull($tmp=false, "menubar", "OnOutput");
+EventRegister::instance()->activateEventFull($tmp=false, "menubar", "OutputComplete");
 ?>
 </div>
 <div id="maincontainer">
 <!-- A sidebar -->
 <div id="sidebar">
 <?php
-global $EVENT_REGISTER;
-$EVENT_REGISTER->activateEventFull($tmp=false, "sidebar", "OnOutput");
-$EVENT_REGISTER->activateEventFull($tmp=false, "sidebar", "OutputComplete");
+EventRegister::instance()->activateEventFull($tmp=false, "sidebar", "OnOutput");
+EventRegister::instance()->activateEventFull($tmp=false, "sidebar", "OutputComplete");
 ?>
 </div>
 <!-- Main page content -->

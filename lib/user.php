@@ -28,7 +28,7 @@
 
 define("USER_PROFILE_FILE", "user.xml");
 
-require_once("lib/utils.php");
+require_once INSTALL_ROOT.DIRECTORY_SEPARATOR."lib/utils.php";
 
 class User extends LnBlogObject {
 
@@ -50,6 +50,7 @@ class User extends LnBlogObject {
 				$usr = $c_usr;
 			}
 		}
+		
 		if ($usr && isset($_SESSION["user-".$usr])) {
 			return unserialize($_SESSION["user-".$usr]);
 		} else {
@@ -62,8 +63,7 @@ class User extends LnBlogObject {
 		return $user->checkLogin();
 	}
 
-	function User($uname=false, $pw=false) {
-		global $SYSTEM;
+	public function __construct($uname=false, $pw=false) {
 
 		$this->username = $uname ? $uname : '';
 		
@@ -90,7 +90,7 @@ class User extends LnBlogObject {
 				$this->homepage = $ini->value("userdata", "homepage", "");
 				$this->default_group = 
 					$ini->value('userdata','default_group',
-					            $SYSTEM->sys_ini->value('security',
+					            System::instance()->sys_ini->value('security',
 					                                    'NewUserDefaultGroup',
 					                                    ''));
 				$this->custom = $ini->getSection("customdata");
@@ -323,9 +323,7 @@ class User extends LnBlogObject {
 	# An array of group names to which the user belongs.
 	
 	function groups() {
-		global $SYSTEM;
-		#return $_GLOBALS['SYSTEM']->getGroups($this->username);
-		return $SYSTEM->getGroups($this->username);
+		return System::instance()->getGroups($this->username);
 	}
 
 	# Method: defaultGroup
@@ -353,8 +351,7 @@ class User extends LnBlogObject {
 	# True on success, false on failure.
 	
 	function addToGroup($groupname) {
-		global $SYSTEM;
-		return $SYSTEM->addToGroup($this, $groupname);
+		return System::instance()->addToGroup($this, $groupname);
 	}
 	
 	# Method: login
@@ -371,7 +368,9 @@ class User extends LnBlogObject {
 	function login($pwd) {
 		
 		# Reject empty usernames or passwords.
-		if ( trim($this->username) == "" || trim($pwd) == "" ) return false;
+		if ( trim($this->username) == "" || trim($pwd) == "" ) {
+			return false;
+		}
 		
 		# User does not exist.
 		#if ( ! isset($this->user_list[$this->username]) ) return false;
@@ -379,18 +378,18 @@ class User extends LnBlogObject {
 		$ts = gmdate("M d Y H:i:s", time());
 		if ($this->checkPassword($pwd)) {
 			if (AUTH_USE_SESSION) {
-					# Create a login token.
-					$token = md5(get_ip().$ts);
-					$_SESSION[CURRENT_USER] = $this->username; 
-					$_SESSION[LOGIN_TOKEN] = $token;
-					$_SESSION[LAST_LOGIN_TIME] = $ts;
-					set_domain_cookie(LAST_LOGIN_TIME, "$ts", 
-						(LOGIN_EXPIRE_TIME ? time()+LOGIN_EXPIRE_TIME:false));
-					set_domain_cookie(CURRENT_USER, $this->username, 
-						(LOGIN_EXPIRE_TIME ? time()+LOGIN_EXPIRE_TIME:false));
-					set_domain_cookie(LOGIN_TOKEN, $token, 
-						(LOGIN_EXPIRE_TIME ? time()+LOGIN_EXPIRE_TIME:false));
-					$ret = true;
+				# Create a login token.
+				$token = md5(get_ip().$ts);
+				$_SESSION[CURRENT_USER] = $this->username; 
+				$_SESSION[LOGIN_TOKEN] = $token;
+				$_SESSION[LAST_LOGIN_TIME] = $ts;
+				set_domain_cookie(LAST_LOGIN_TIME, "$ts", 
+					(LOGIN_EXPIRE_TIME ? time()+LOGIN_EXPIRE_TIME:false));
+				set_domain_cookie(CURRENT_USER, $this->username, 
+					(LOGIN_EXPIRE_TIME ? time()+LOGIN_EXPIRE_TIME:false));
+				set_domain_cookie(LOGIN_TOKEN, $token, 
+					(LOGIN_EXPIRE_TIME ? time()+LOGIN_EXPIRE_TIME:false));
+				$ret = true;
 			} else {
 				set_domain_cookie(CURRENT_USER, $this->username, 
 					(LOGIN_EXPIRE_TIME ? time() + LOGIN_EXPIRE_TIME:false));
@@ -430,7 +429,12 @@ class User extends LnBlogObject {
 	function checkLogin($uname=false) {
 		# If the constructor doesn't detect a user name, then we're obviously
 		# not logged in.
-		if (!$this->username) return false;
+		if (!$this->username) {
+			return false;
+		}
+		
+		$auth_ok = false;
+		
 		if (AUTH_USE_SESSION) {
 			# Check the stored login token and time against the one for the
 			# current session.  Return false on failure, or if the current
@@ -439,7 +443,9 @@ class User extends LnBlogObject {
 			$auth_token = md5(get_ip().$cookie_ts);
 			$auth_ok = ($auth_token == SESSION(LOGIN_TOKEN) );
 			$auth_ok = $auth_ok && ($cookie_ts == SESSION(LAST_LOGIN_TIME) );
-			if ($uname) $auth_ok &= ($this->username == $uname);
+			if ($uname) {
+				$auth_ok = $auth_ok && ($this->username == $uname);
+			}
 		} else {
 			# Check the cookies for the user and password hash and compare to 
 			# the password hash for this user on the server.
@@ -449,8 +455,8 @@ class User extends LnBlogObject {
 			$auth_ok = ($this->username == $usr && 
 			            md5($this->passwd.get_ip()) == $pwhash);
 		}
-		if ($auth_ok) return true;
-		else return false;
+		
+		return $auth_ok;
 	}
 
 	# Method: isAdministrator
@@ -461,9 +467,8 @@ class User extends LnBlogObject {
 	# false otherwise.  Note that the system administrator's username
 	# is controlled by the <ADMIN_USER> configuration constant.
 	function isAdministrator() {
-		global $SYSTEM;
 		return ($this->username == ADMIN_USER || 
-		        $SYSTEM->inGroup($this->username, 'administrators'));
+		        System::instance()->inGroup($this->username, 'administrators'));
 	}
 
 }

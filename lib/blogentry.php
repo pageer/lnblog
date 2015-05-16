@@ -18,9 +18,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-require_once("blogconfig.php");
-require_once("lib/utils.php");
-require_once("lib/creators.php");
+require_once INSTALL_ROOT.DIRECTORY_SEPARATOR."lib/urifactory.php";
 
 /*
 Class: BlogEntry
@@ -870,7 +868,6 @@ class BlogEntry extends Entry {
 	tmp - The template we wish to populate.
 	*/
 	public function exportVars(&$tmp, $show_edit_controls=false) {
-		global $PLUGIN_MANAGER;
 	
 		$blog = $this->getParent();
 		
@@ -912,7 +909,7 @@ class BlogEntry extends Entry {
 		$tmp->set("USE_ABSTRACT", $blog->front_page_abstract);
 		
 		# Added so the template can know whether or not to advertise RSS feeds.
-		if ($PLUGIN_MANAGER->pluginLoaded("RSS2FeedGenerator")) {
+		if (PluginManager::instance()->pluginLoaded("RSS2FeedGenerator")) {
 			$gen = new RSS2FeedGenerator();
 			if ($gen->comment_file) {
 				$feed_uri = localpath_to_uri(mkpath($this->localpath(),$gen->comment_file));

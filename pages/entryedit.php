@@ -58,9 +58,8 @@
 # remote servers, set this value to 0.
 
 session_start();
-require_once("config.php");
-require_once("lib/creators.php");
-require_once("pages/pagelib.php");
+require_once INSTALL_ROOT.PATH_DELIM."lib/creators.php";
+require_once INSTALL_ROOT.PATH_DELIM."pages/pagelib.php";
 
 # Function: handle_pingback_pings
 # Handles pingbacks for an entry.  Sends pingbacks to the appropriate links
@@ -112,7 +111,10 @@ function handle_uploads(&$ent) {
 	$err = array();
 	$num_uploads = System::instance()->sys_ini->value("entryconfig",	"AllowInitUpload", 1);
 	
-	$uploads = FileUpload::initUploads($_FILES['upload'], $ent->localpath());
+	$uploads = array();
+	if (isset($_FILES['uploaded'])) {
+		$uploads = FileUpload::initUploads($_FILES['upload'], $ent->localpath());
+	}
 
 	foreach ($uploads as $upld) {
 		if ( $upld->completed() ) {
@@ -138,7 +140,9 @@ function handle_uploads(&$ent) {
 		# In particular, this intended to regenerate the RSS2 feed after uploading
 		# a file from the edit form, so that the enclosure information will be 
 		# set correctly.
-		if (! $ent->isDraft()) $ent->raiseEvent("UpdateComplete");
+		if (! $ent->isDraft()) {
+			$ent->raiseEvent("UpdateComplete");
+		}
 		return true;
 	}
 }
@@ -256,6 +260,7 @@ function handle_post($blg, &$ent, $u, $do_new, $is_art) {
 	}
 	
 	$ret = handle_save($ent, $blg, $result['warnings'], POST('draft'), $is_art);
+	
 	if (! $ret) {
 		$result['errors'] = _("Error: unable to update entry.");
 	} else {

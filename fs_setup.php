@@ -29,20 +29,20 @@ Native FS - Uses PHP's native filesystem functions.
 FTP FS    - Write files through an FTP connection (usually to localhost).
 
 Note that there is a trade-off here.  Native FS has no special requirements
-or configuration in the software, but will probably require manually changing
+or configuration in the software, but, if your host is pporly configured, may require manually changing
 file permissions due to the fact that it runs as a system account.  FTP FS,
 on the other hand, requires the user to enter an FTP username, password, 
 host name, and the root of that user's FTP access (assuming the user cannot
 access the entire filesystem).  However, with FTP FS, LnBlog can create 
 files as the configured user account, rather than a system account like 
-"apache" or "IUSR_whatever".  FTP FS is recommended for hosted sites where 
-you don't have root access to the machine, as it makes administration through
-an FTP connection much easier.
+"apache" or "IUSR_whatever".  FTP FS is recommended when you are forced to
+run under PHP's "safe mode".  However, since this is now deprecated, it is
+probably best to use Native FS.
 */
 
-require_once("blogconfig.php");
-require_once("lib/creators.php");
-require_once("lib/utils.php");
+require_once "blogconfig.php";
+require_once "lib/creators.php";
+require_once "lib/utils.php";
 
 session_start();
 
@@ -206,14 +206,12 @@ function serialize_constants() {
 	return $ret;
 }
 
-global $PAGE;
-
 if ( file_exists(USER_DATA_PATH.PATH_DELIM.FS_PLUGIN_CONFIG) ) {
 	header("Location: index.php");
 	exit;
 }
 
-$PAGE->title = sprintf(_("%s File Writing"), PACKAGE_NAME);
+Page::instance()->title = sprintf(_("%s File Writing"), PACKAGE_NAME);
 $form_title = _("Configure File Writing Support");
 $redir_page = "index.php";
 
@@ -346,8 +344,7 @@ if ( has_post() ) {
 }
 
 $body = $tpl->process();
-$PAGE->addStylesheet("form.css");
-#$PAGE->addScript("lnblog_lib.js");
-$PAGE->addScript("fs_setup.js");
-$PAGE->display($body);
+Page::instance()->addStylesheet("form.css");
+Page::instance()->addScript("fs_setup.js");
+Page::instance()->display($body);
 ?>

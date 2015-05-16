@@ -19,11 +19,10 @@ if (isset($COMMENT_FORM_MESSAGE)) {
 }?>
 </p>
 <?php
-global $EVENT_REGISTER;
-$EVENT_REGISTER->activateEventFull($tmp=false, "commentform", "BeforeForm");?>
+EventRegister::instance()->activateEventFull($tmp=false, "commentform", "BeforeForm");?>
 <fieldset>
 <form id="commentform" method="post" action="<?php echo $FORM_TARGET;?>" accept-charset="<?php echo DEFAULT_CHARSET;?>">
-<?php $EVENT_REGISTER->activateEventFull($tmp=false, "commentform", "FormBegin");?>
+<?php EventRegister::instance()->activateEventFull($tmp=false, "commentform", "FormBegin");?>
 <div>
 <label class="basic_form_label" for="subject"><?php p_("Subject"); ?></label>
 <input style="width: 70%" title="<?php p_("Subject");?>" id="subject" name="subject" accesskey="s" <?php
@@ -62,8 +61,8 @@ if (isset($COMMENT_SHOWEMAIL)) echo "checked=\"checked\""; ?> />
 <input class="comment_submit" name="submit" id="submit" type="submit" value="<?php p_("Post comment"); ?>" />
 <!--<input name="clear" id="clear" type="reset" value="<?php p_("Clear"); ?>" />-->
 </div>
-<?php $EVENT_REGISTER->activateEventFull($tmp=false, "commentform", "FormEnd");?>
+<?php EventRegister::instance()->activateEventFull($tmp=false, "commentform", "FormEnd");?>
 </form>
 </fieldset>
-<?php $EVENT_REGISTER->activateEventFull($tmp=false, "commentform", "AfterForm");?>
+<?php EventRegister::instance()->activateEventFull($tmp=false, "commentform", "AfterForm");?>
 </div>

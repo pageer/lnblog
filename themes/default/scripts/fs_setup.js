@@ -9,12 +9,12 @@ function ftp_test() {
 }
 
 function toggle_ftp(state) {
-	var div = document.getElementById("ftpoptions");
+	var div = $("#ftpoptions");
 	
 	if (state) {
-		div.style.display = "block";
+		div.show();
 	} else {
-		div.style.display = "none";
+		div.hide();
 	}
 }
 
@@ -27,41 +27,41 @@ function hide_ftp() {
 }
 
 function toggle_presets() {
-	if (document.getElementById('mod_nosmroot').checked) {
-		document.getElementById('permdir').selectedIndex = 0;
-		document.getElementById('permscript').selectedIndex = 0;
-		document.getElementById('permfile').selectedIndex = 0;
-		document.getElementById('native').checked = true;
+	if ($('#mod_nosmroot').is(':checked')) {
+		$('#permdir')[0].selectedIndex = 0;
+		$('#permscript')[0].selectedIndex = 0;
+		$('#permfile')[0].selectedIndex = 0;
+		$('#native').prop('checked', true);
 		toggle_ftp(false);
-	} else if (document.getElementById('mod_nosm').checked) {
-		document.getElementById('permdir').selectedIndex = 3;
-		document.getElementById('permscript').selectedIndex = 3;
-		document.getElementById('permfile').selectedIndex = 3;
-		document.getElementById('ftpfs').checked = true;
+	} else if ($('#mod_nosm').is(':checked')) {
+		$('#permdir')[0].selectedIndex = 3;
+		$('#permscript')[0].selectedIndex = 3;
+		$('#permfile')[0].selectedIndex = 3;
+		$('#ftpfs').prop('checked', true);
 		toggle_ftp(true);
-	} else if (document.getElementById('mod_sm').checked) {
-		document.getElementById('permdir').selectedIndex = 3;
-		document.getElementById('permscript').selectedIndex = 3;
-		document.getElementById('permfile').selectedIndex = 3;
-		document.getElementById('ftpfs').checked = true;
+	} else if ($('#mod_sm').is(':checked')) {
+		$('#permdir')[0].selectedIndex = 3;
+		$('#permscript')[0].selectedIndex = 3;
+		$('#permfile')[0].selectedIndex = 3;
+		$('#ftpfs').prop('checked', true);
 		toggle_ftp(true);
-	} else if (document.getElementById('suexec').checked) {
-		document.getElementById('permdir').selectedIndex = 3;
-		document.getElementById('permscript').selectedIndex = 3;
-		document.getElementById('permfile').selectedIndex = 3;
-		document.getElementById('native').checked = true;
+	} else if ($('#suexec').is(':checked')) {
+		$('#permdir')[0].selectedIndex = 3;
+		$('#permscript')[0].selectedIndex = 3;
+		$('#permfile')[0].selectedIndex = 3;
+		$('#native').prop('checked', true);
 		toggle_ftp(false);
 	}
 }
 
 function init_event_handlers() {
-	lnblog.addEvent(document.getElementById('mod_nosmroot'), 'click', toggle_presets);
-	lnblog.addEvent(document.getElementById('mod_nosm'), 'click', toggle_presets);
-	lnblog.addEvent(document.getElementById('mod_sm'), 'click', toggle_presets);
-	lnblog.addEvent(document.getElementById('suexec'), 'click', toggle_presets);
-	lnblog.addEvent(document.getElementById('native'), 'focus', hide_ftp);
-	lnblog.addEvent(document.getElementById('ftpfs'), 'focus', show_ftp);
+	$('#mod_nosmroot').on('click', toggle_presets);
+	$('#mod_nosm').on('click', toggle_presets);
+	$('#mod_sm').on('click', toggle_presets);
+	$('#suexec').on('click', toggle_presets);
+	$('#native').on('focus', hide_ftp);
+	$('#ftpfs').on('focus', show_ftp);
 	toggle_presets();
 }
 
-lnblog.addEvent(document, 'load', init_event_handlers);
+$(document).ready(init_event_handlers);

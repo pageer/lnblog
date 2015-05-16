@@ -25,8 +25,6 @@ session_start();
 require_once("blogconfig.php");
 require_once("lib/creators.php");
 
-global $PAGE;
-
 function plug_sort($a, $b) {
 	if (is_numeric($a["order"]) && ! is_numeric($b["order"])) {
 		return -1;
@@ -54,12 +52,12 @@ $user = NewUser();
 
 if (defined("BLOG_ROOT")) {
 	$blg = NewBlog();
-	if (! $SYSTEM->canModify($blg, $user) || ! $user->checkLogin()) {
-		$PAGE->redirect("login.php");
+	if (! System::instance()->canModify($blg, $user) || ! $user->checkLogin()) {
+		Page::instance()->redirect("login.php");
 		exit;
 	}
 } elseif (! $user->isAdministrator() || ! $user->checkLogin()) {
-	$PAGE->redirect("bloglogin.php");
+	Page::instance()->redirect("bloglogin.php");
 	exit;
 }
 
@@ -94,7 +92,7 @@ if (has_post()) {
 		$tpl->set("UPDATE_MESSAGE", spf_("Error updating file %s", $file));
 	} else {
 		# We redirect so that the user sees the changes right away.
-		$PAGE->redirect(current_uri());
+		Page::instance()->redirect(current_uri());
 	}
 }
 
@@ -118,6 +116,6 @@ uasort($disp_list, "plug_sort");
 
 $tpl->set("PLUGIN_LIST", $disp_list);
 
-$PAGE->title = spf_("%s Plugin Loading Configuration", PACKAGE_NAME);
-$PAGE->display($tpl->process());
+Page::instance()->title = spf_("%s Plugin Loading Configuration", PACKAGE_NAME);
+Page::instance()->display($tpl->process());
 ?>

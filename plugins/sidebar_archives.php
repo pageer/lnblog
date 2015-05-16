@@ -10,7 +10,6 @@
 class Archives extends Plugin {
 
 	function __construct($do_output=0) {
-		global $SYSTEM;
 		$this->plugin_name = _("List the months of archives for a blog.");
 		$this->plugin_version = "0.2.1";
 		$this->addOption("max_months", _("Number of months to show"), 6, "text");
@@ -18,13 +17,13 @@ class Archives extends Plugin {
 		                 _("Archives"), "text");
 		$this->addOption('no_event',
 			_('No event handlers - do output when plugin is created'),
-			$SYSTEM->sys_ini->value("plugins","EventDefaultOff", 0), 
+			System::instance()->sys_ini->value("plugins","EventDefaultOff", 0), 
 			'checkbox');
 		
 		parent::__construct();
 		
 		if ( $this->no_event || 
-		     $SYSTEM->sys_ini->value("plugins","EventForceOff", 0) ) {
+		     System::instance()->sys_ini->value("plugins","EventForceOff", 0) ) {
 			# If either of these is true, then don't set the event handler
 			# and rely on explicit invocation for output.
 		} else {
@@ -60,8 +59,7 @@ class Archives extends Plugin {
 	}  # End of function
 }
 
-global $PLUGIN_MANAGER;
-if (! $PLUGIN_MANAGER->plugin_config->value('archives', 'creator_output', 0)) {
+if (! PluginManager::instance()->plugin_config->value('archives', 'creator_output', 0)) {
 	$rec =& new Archives();
 }
 

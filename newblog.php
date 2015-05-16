@@ -33,15 +33,13 @@ require_once("lib/creators.php");
 require_once("pages/pagelib.php");
 require_once("lib/path.php");
 
-global $PAGE;
-
 if (POST("blogpath")) $path = POST("blogpath");
 else $path = false;
 
 $blog = NewBlog($path);
 $usr = NewUser();
 if (! $usr->isAdministrator() && $usr->checkLogin()) {
-	$PAGE->redirect("bloglogin.php");
+	Page::instance()->redirect("bloglogin.php");
 	exit;
 }
 $tpl = NewTemplate("blog_modify_tpl.php");
@@ -79,9 +77,9 @@ if ( has_post() ) {
 	} else {
 		$ret = $blog->insert();
 		if ($ret) {
-			$ret = $SYSTEM->registerBlog($blog->blogid);
+			$ret = System::instance()->registerBlog($blog->blogid);
 			if ($ret) {
-				$PAGE->redirect($blog->getURL());
+				Page::instance()->redirect($blog->getURL());
 				exit;
 			} else {
 				$tpl->set("UPDATE_MESSAGE", _("Blog create but not registered.  This means the system will not list it on the admin pages.  Please try registering this blog by hand from the administration page."));
@@ -93,7 +91,7 @@ if ( has_post() ) {
 }
 
 $body = $tpl->process();
-$PAGE->title = _("Create new blog");
-$PAGE->addStylesheet("form.css");
-$PAGE->display($body);
+Page::instance()->title = _("Create new blog");
+Page::instance()->addStylesheet("form.css");
+Page::instance()->display($body);
 ?>

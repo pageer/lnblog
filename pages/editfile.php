@@ -31,8 +31,6 @@
 session_start();
 
 require_once("config.php");
-require_once("lib/creators.php");
-require_once("lib/utils.php");
 
 global $PAGE;
 
