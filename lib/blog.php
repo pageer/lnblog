@@ -105,8 +105,10 @@ class Blog extends LnBlogObject {
 	}
 	
 	function getPathFromEnvironment() {
-		if (isset($_GET['blog']) ) $path = trim(sanitize($_GET["blog"]));
-		else $path = '';
+		$path = '';
+		if (isset($_GET['blog']) ) {
+			$path = trim(preg_replace("/[^A-Za-z0-9\-_\/\\]/", '', $_GET["blog"]));
+		}
 		
 		if ($path) {
 			$this->getPathFromPassedValue($path);
@@ -136,7 +138,9 @@ class Blog extends LnBlogObject {
 	function setBlogID() {
 		$root = calculate_server_root($this->home_path);
 		$this->blogid = trim(substr($this->home_path, strlen($root)),  DIRECTORY_SEPARATOR);
-		if (! $this->blogid) $this->blogid = ROOT_ID;
+		if (! $this->blogid) {
+			$this->blogid = ROOT_ID;
+		}
 	}
 	
 	#######################################################

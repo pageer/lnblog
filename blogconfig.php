@@ -71,10 +71,10 @@ function get_blog_path() {
 	if ( defined("BLOG_ROOT") ) {
 		return BLOG_ROOT;
 	} elseif (isset($_GET['blog'])) {
-		$path = $_GET['blog'];
-		if (PATH_DELIM != "/") {
-			$path = str_replace("/", PATH_DELIM, $path);
-		}
+		$path = str_replace('/', DIRECTORY_SEPARATOR, $_GET['blog']);
+		//if (PATH_DELIM != "/") {
+		//	$path = str_replace("/", PATH_DELIM, $path);
+		//}
 		//$path = preg_replace("/[^\w|"."\\".PATH_DELIM."]/", "", $path);
 		
 		
@@ -695,8 +695,12 @@ define("FILE_UPLOAD_TARGET_DIRECTORIES", "files");
 # Set the time zone for date functions.
 date_default_timezone_set(DEFAULT_TIME_ZONE);
 
-if (! defined("BLOG_ROOT") && get_blog_path() ) {
-	define("BLOG_ROOT", get_blog_path());
+
+if (! defined("BLOG_ROOT")) {
+	$blog_path = get_blog_path();
+	if ($blog_path) {
+		define("BLOG_ROOT", $blog_path);
+	}
 }
 
 # Get the theme for the blog.  I'd like to do this in the Blog class, but 
