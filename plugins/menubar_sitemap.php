@@ -119,7 +119,7 @@ class SiteMap extends Plugin {
 	
 	function showLink($param) {
 		$blog = NewBlog();
-		$url = $blog->uri('editfile', 'map=yes', 'file='.$this->link_file, 'list=yes');
+		$url = $blog->uri('editfile', array('map' => 'yes', 'file' => $this->link_file, 'list' => 'yes', 'richedit' => 'false'));
 		echo '<li><a href="'.$url.'">'.
 			_("Edit custom sitemap").'</a></li>';
 	}

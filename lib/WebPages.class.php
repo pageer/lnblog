@@ -1483,6 +1483,7 @@ class WebPages {
 		$action_map = array(
 			'about'      => 'about',
 			'newentry'   => 'entryedit',
+			'editentry'   => 'entryedit',
 			'delentry'   => 'delentry',
 			'edit'       => 'updateblog',
 			'login'      => 'bloglogin.php',

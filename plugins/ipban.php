@@ -192,12 +192,12 @@ class IPBan extends Plugin {
 		$usr = NewUser();
 		$banfile = PluginManager::instance()->plugin_config->value("ipban", 
 		                                 "ban_list", "ip_ban.txt");
-		echo '<li><a href="'.$blg->uri('editfile', "file=$banfile").'">'.
+		echo '<li><a href="'.$blg->uri('editfile', array("file" => $banfile)).'">'.
 			_("Blog IP blacklist").'</a></li>';
 		if ($usr->isAdministrator()) {
 			echo '<li><a href="'.
-				make_uri(INSTALL_ROOT_URL.'pages/editfile.php',
-				         array('file'=>'userdata/'.$banfile)).
+				make_uri(INSTALL_ROOT_URL.'pages/showblog.php',
+				         array('action' => 'editfile', 'file'=>'userdata/'.$banfile)).
 				'">'._("Global IP blacklist").'</a></li>';
 		}
 	}

@@ -116,7 +116,6 @@ class TinyMCEEditor extends Plugin {
 				});
 			}
 		});";
-		//$scr .= $this->getInitString($this->theme);
 		Page::instance()->addInlineScript($scr);
 	}
 	
@@ -126,7 +125,8 @@ class TinyMCEEditor extends Plugin {
 	
 	public function file_editor() {
 		$file_ext = pathinfo(GET('file'), PATHINFO_EXTENSION);
-		if (in_array($file_ext, $this->file_extensions)) {
+		$editor = GET('richedit');
+		if (in_array($file_ext, $this->file_extensions) && $editor != 'false') {
 			$this->show_editor('textarea#output');
 		}
 	}

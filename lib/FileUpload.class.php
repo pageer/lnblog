@@ -18,8 +18,6 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-require_once("lib/utils.php");
-
 # Class: FileUpload
 # Handles file uploads via HTTP POSTs.
 # Handling the upload is a three-step process.  First, you need to create an 

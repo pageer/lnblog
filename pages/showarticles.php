@@ -24,6 +24,17 @@
 # This is included in the index.php wrapper script in the top-level articles
 # directory of blogs.
 
+
+session_start();
+$pages = new WebPages();
+$pages->showarticles();
+exit;
+
+
+
+
+
+
 session_start();
 
 require_once("config.php");

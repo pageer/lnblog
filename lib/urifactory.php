@@ -136,7 +136,9 @@ class BlogURIWrapper extends LnBlogObject {
 	}
 	function login() { return $this->wrapper("login"); }
 	function logout() { return $this->wrapper("logout"); }
-	function editfile() { return $this->wrapper("editfile"); }
+	function editfile($args=null) {
+		return $this->wrapper("editfile", $args);
+	}
 	function edituser() { return $this->wrapper("useredit"); }
 	function pluginconfig() { return $this->wrapper("plugins"); }
 	function pluginload() { return $this->wrapper("pluginload"); }
@@ -186,13 +188,10 @@ class BlogURIHybrid extends BlogURIWrapper {
 	}
 	
 	function addentry() { 
-		return make_uri($this->install_uri."pages/entryedit.php", 
-	                    array("blog"=>$this->object->blogid));
+		return make_uri($this->base_uri."pages/entryedit.php", array("action"=>"newentry"));
 	}
 	function addarticle() {
-		return make_uri($this->install_uri."pages/entryedit.php", 
-	                    array("blog"=>$this->object->blogid,
-		                      "type"=>"article"));
+		return make_uri($this->base_uri, array("action"=>"newentry", "type"=>"article"));
 	}
 
 }
@@ -268,9 +267,9 @@ class BlogEntryURIWrapper extends LnBlogObject {
 		} else {
 			$entry_type = is_a($ent, 'Article') ? 'article' : 'entry';
 		}
-		$qs_arr['blog'] = $ent->parentID();
+		$qs_arr['action'] = 'delentry';
 		$qs_arr[$entry_type] = $ent->entryID();
-		return make_uri(INSTALL_ROOT_URL."pages/delentry.php", $qs_arr);
+		return make_uri($this->object->getParent()->uri('base'), $qs_arr);
 	}
 	
 	function manage_reply() {

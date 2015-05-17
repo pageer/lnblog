@@ -18,6 +18,14 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+
+session_start();
+$pages = new WebPages();
+$pages->showdrafts();
+exit;
+
+
+
 if (isset($_GET['action']) && $_GET['action'] == 'edit') {
 	include('entryedit.php');
 	exit;

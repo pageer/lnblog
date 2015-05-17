@@ -31,7 +31,9 @@ class Breadcrumbs extends Plugin {
 			$this->registerEventHandler("menubar", "OnOutput", "output");
 		}
 		
-		if ($do_output) $this->output();
+		if ($do_output) {
+			$this->output();
+		}
 	}
 
 	public function list_wrap($uri, $text) {
@@ -42,15 +44,20 @@ class Breadcrumbs extends Plugin {
 		
 		$blog = NewBlog();
 		$ent = NewEntry();
-		if (! $blog->isBlog() ) return false;
+		if (! $blog->isBlog() ) {
+			return false;
+		}
 
 		$ret = '';
 
 		$path = trim($_SERVER['PHP_SELF'], '/');
+		$path = str_replace('/', DIRECTORY_SEPARATOR, $path);
 		$pos = strpos($path, $blog->blogid);
-		if ($pos !== false) $path = substr($path, $pos+strlen($blog->blogid));
+		if ($pos !== false) {
+			$path = substr($path, $pos+strlen($blog->blogid));
+		}
 		
-		$tok = strtok($path, '/');
+		$tok = strtok($path, DIRECTORY_SEPARATOR);
 	
 		while ($tok !== false) {
 			if ($tok == BLOG_ENTRY_PATH) {
@@ -79,7 +86,7 @@ class Breadcrumbs extends Plugin {
 				$ret .= '<li>'._('Search results').'</li>';
 			}
 
-			$tok = strtok('/');
+			$tok = strtok(DIRECTORY_SEPARATOR);
 		}
 	
 		if (GET('action') == 'tags') {
@@ -92,7 +99,9 @@ class Breadcrumbs extends Plugin {
 		if ($ret) {
 		
 			$ret = "<ul class=\"location\">\n".$this->list_wrap($blog->uri('blog'), $blog->name).$ret."</ul>\n";
-			if ($this->list_header) $ret = '<h2>'.$this->list_header."</h2>\n".$ret;
+			if ($this->list_header) {
+				$ret = '<h2>'.$this->list_header."</h2>\n".$ret;
+			}
 	
 			echo $ret;
 		}

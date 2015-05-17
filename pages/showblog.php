@@ -19,6 +19,8 @@
 */
 
 
+require_once __DIR__.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."blogconfig.php";
+
 session_start();
 $pages = new WebPages();
 $pages->showblog();
