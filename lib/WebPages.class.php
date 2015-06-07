@@ -12,6 +12,36 @@ class WebPages {
 		Page::instance()->setDisplayObject($this->blog);
 	}
 	
+	protected function redirectOr403($url = '', $message = '') {
+		if ($redirect) {
+			Page::instance()->redirect($redirect);
+		} else {
+			Page::instance()->error(403, $message);
+		}
+	}
+	
+	protected function verifyUserCanModifyBlog($redirect = '', $message = '') {
+		if (! $this->user->checkLogin() || ! System::instance()->canModify($this->blog, $this->user)) {
+			$this->redirectOr403($redirect, $message);
+		}
+	}
+	
+	protected function verifyUserIsLoggedIn($redirect = '', $message = '') {
+		if (! $this->user->checkLogin()) {
+			$this->redirectOr403($redirect, $message);
+		}
+	}
+	
+	protected function reqVar($key) {
+		if (isset($_POST[$key])) {
+			return $_GPOST[$key];
+		} elseif (isset($_GET[$key])) {
+			return $_GET[$key];
+		} else {
+			return null;
+		}
+	}
+	
 	public function about() {
 		$tpl = NewTemplate("about_tpl.php");
 
@@ -27,13 +57,8 @@ class WebPages {
 	}
 	
 	public function blogpaths() {
-		if (POST("blogpath")) {
-			$blog_path = POST("blogpath");
-		} elseif (GET("blogpath")) {
-			$blog_path = GET("blogpath");
-		} else {
-			$blog_path = false;
-		}
+		
+		$blog_path = $this->reqVar("blogpath");
 		
 		$blog = NewBlog($blog_path);
 		$tpl = NewTemplate("blog_path_tpl.php");
@@ -41,20 +66,13 @@ class WebPages {
 		
 		$inst_root = INSTALL_ROOT;
 		$inst_url = INSTALL_ROOT_URL;
-		$blog_url = $blog->getURL(); #BLOG_ROOT_URL;
+		$blog_url = $blog->getURL();
 		
-		if (! (System::instance()->canModify($blog, $this->user) && $this->user->checkLogin())  ) {
-			Page::instance()->redirect($blog->uri('login'));
-			exit;
-		}
-		
-		# NOTE - we should sanitize this input to avoid XSS attacks.  Then again, 
-		# since this page is not publicly accessible, is that needed?
+		$this->verifyUserCanModifyBlog($blog->uri('login'));
 		
 		if (has_post()) {
 			$inst_root = POST("installroot");
 			$inst_url = POST("installrooturl");
-			#$blog_url = POST("blogrooturl");
 			$ret = write_file(mkpath(BLOG_ROOT,"pathconfig.php"), 
 							  pathconfig_php_string($inst_root, $inst_url, $blog_url));
 			if (!$ret) {
@@ -65,7 +83,6 @@ class WebPages {
 			}
 		}
 		
-		#$tpl->set("BLOG_URL", $blog_url);
 		$tpl->set("INST_URL", $inst_url);
 		$tpl->set("INST_ROOT", $inst_root);
 		$tpl->set("POST_PAGE", current_file());
@@ -80,56 +97,10 @@ class WebPages {
 	public function delcomment() {
 		$entry = NewEntry();
 		
-		if (! $this->user->checkLogin()) {
-			Page::instance()->redirect($entry->permalink());
-			exit;
-		}
+		$this->verifyUserIsLoggedIn();
 		
 		# which determines if the resposne is to be deleted.
-		
-		$response_array = array();
-		$denied_array = array();
-		$index = 1;
-		
-		# Get the list of items to be deleted.
-		# There are two possible cases.  First is the case where we've already confirmed
-		# via this page.  The second is where we're either about to confirm or have
-		# confirmed via a query string parameter.
-		
-		if (POST('responselist')) {
-		
-			$anchors = explode(',', $_POST['responselist']);
-			foreach ($anchors as $a) {
-				$obj = get_response_object($a, $u);
-				if ($obj) $response_array[] = $obj;
-				else $denied_array[] = $a;
-			}
-		
-		} else {
-		
-			# For multiple deletes, there are two lists of fields.  The responseid# is the
-			# anchor for that response, wile the response# is the corresponding checkbox 
-		
-			while ( isset($_POST['responseid'.$index]) ) {
-				if ( POST('response'.$index) ) {
-					$obj = get_response_object($_POST['responseid'.$index], $u);
-					if ($obj) $response_array[] = $obj;
-					else $denied_array[] = $_POST['responseid'.$index];
-				}
-				$index++;
-			}
-		
-			# Here we extract any response that may have been passed in the query string.
-			$getvars = array('comment', 'delete', 'response');
-			foreach ($getvars as $var) {
-				if (GET($var)) {
-					$obj = get_response_object(GET($var), $u);
-					if ($obj) $response_array[] = $obj;
-					else $denied_array[] = GET($var);
-				}
-			}
-		
-		}
+		extract($this->get_posted_responses());
 		
 		$tpl = NewTemplate('confirm_tpl.php');
 		$tpl->set("CONFIRM_PAGE", current_file() );
@@ -278,38 +249,33 @@ class WebPages {
 	public function editfile() {
 		
 		$file = GET("file");
-		if (PATH_DELIM  != '/') $file = str_replace('/', PATH_DELIM, $file);
+		if (PATH_DELIM  != '/') {
+			$file = str_replace('/', PATH_DELIM, $file);
+		}
 		$file = str_replace("..".PATH_DELIM, '', $file);
 		
 		$ent = NewBlogEntry();
 		
-		$edit_ok = false;
 		$relpath = INSTALL_ROOT;
 		
+		$message_403 = _("You do not have permission to edit this file.");
+		
+		$this->verifyUserIsLoggedIn(SERVER("referer"), $message_403);
+		
 		if ( GET("profile") == $this->user->username() ) {
-			$edit_ok = true;
 			$relpath = Path::get(USER_DATA_PATH, $this->user->username());
 		} elseif ($ent->isEntry() ) {
 			Page::instance()->setDisplayObject($ent);
 			$relpath = $ent->localpath();
-			if (System::instance()->canModify($ent, $this->user) ) $edit_ok = true;
+			if (System::instance()->canModify($ent, $this->user) ) {
+				$this->redirectOr403(SERVER("referer"), $message_403);
+			}
 		} elseif ($this->blog->isBlog() ) {
 			Page::instance()->setDisplayObject($this->blog);
 			$relpath = $this->blog->home_path;
-			if (System::instance()->canModify($this->blog, $this->user) ) $edit_ok = true;
+			$this->verifyUserCanModifyBlog(SERVER("referer"), $message_403);
 		} elseif ($this->user->isAdministrator() ) {
-			$edit_ok = true;
-		}
-		
-		if (! $this->user->checkLogin()) $edit_ok = false;
-		
-		if (! $edit_ok) {
-			if (SERVER("referer")) Page::instance()->redirect(SERVER("referer"));
-			else {
-				header("HTTP/1.0 403 Forbidden");
-				p_("You do not have permission to edit this file.");
-			}
-			exit;
+			$this->redirectOr403(SERVER("referer"), $message_403);
 		}
 		
 		$tpl = NewTemplate("file_edit_tpl.php");
@@ -321,8 +287,11 @@ class WebPages {
 		}
 		
 		$tpl->set("FORM_ACTION", make_uri(false,false,false));
-		if (isset($_GET["list"])) $tpl->set("PAGE_TITLE", _("Edit Link List"));
-		else $tpl->set("PAGE_TITLE", _("Edit Text File"));
+		if (isset($_GET["list"])) {
+			$tpl->set("PAGE_TITLE", _("Edit Link List"));
+		} else {
+			$tpl->set("PAGE_TITLE", _("Edit Text File"));
+		}
 		
 		if (substr($file, 0, 9) == 'userdata/') {
 			$file = Path::mk(USER_DATA_PATH, substr($file, 9));
@@ -356,24 +325,22 @@ class WebPages {
 		}
 		
 		$tpl->set("FILE_TEXT", htmlentities($data));
-		$tpl->set("FILE_PATH", $file);
-		$tpl->set("FILE_SIZE", file_exists($file)?filesize($file):0);
-		$tpl->set("FILE_URL", localpath_to_uri($file));	
-		$tpl->set("FILE", $file);
 		
 		if (GET('map')) {
 			$tpl->set("SITEMAP_MODE");
 			$tpl->set("FORM_MESSAGE", spf_('This page will help you create a site map to display in the navigation bar at the top of your blog.  This file is stored under the name %s in the root directory of your weblog for a personal sitemap or in the %s installation directory for the system default.  This file in simply a series of <abbr title="Hypertext Markup Language">HTML</abbr> links, each on it\'s own line, which the template will process into a list.  If you require a more complicated menu bar, you will have to create a custom template.',
-		basename(SITEMAP_FILE), PACKAGE_NAME));
+										   basename(SITEMAP_FILE), PACKAGE_NAME));
 			$tpl->set("PAGE_TITLE", _("Create site map"));
-			$tpl->unsetVar("FILE_SIZE");
-			$tpl->unsetVar("FILE_URL");
-			$tpl->unsetVar("FILE_PATH");
-			$tpl->unsetVar("FILE");
-			$tpl->unsetVar("FILE_URL");
+		} else {
+			$tpl->set("FILE_PATH", $file);
+			$tpl->set("FILE_SIZE", file_exists($file)?filesize($file):0);
+			$tpl->set("FILE_URL", localpath_to_uri($file));	
+			$tpl->set("FILE", $file);
 		}
 		
-		if (! defined("BLOG_ROOT")) $this->blog = false;
+		if (! defined("BLOG_ROOT")) {
+			$this->blog = false;
+		}
 		
 		Page::instance()->raiseEvent('FileEditorReady');
 		
@@ -384,12 +351,9 @@ class WebPages {
 	
 	public function editlogin() {
 		$edit_user = NewUser();
-			
-		if (! $edit_user->checkLogin() ) {
-			if ($this->blog->isBlog()) Page::instance()->redirect($this->blog->uri('blog'));
-			else Page::instance()->redirect(INSTALL_ROOT_URL);
-			exit;
-		}
+		
+		$redir_url = $this->blog->isBlog() ? $this->blog->uri('blog') : INSTALL_ROOT_URL;
+		$this->verifyUserIsLoggedIn($redir_url);
 		
 		if ($edit_user->isAdministrator() && isset($_GET['user'])) {
 			$usr = NewUser($_GET['user']);
@@ -467,13 +431,19 @@ class WebPages {
 			}
 			
 			$usr->save();
-			if ($pwd_change) $usr->login(POST('passwd'));
+			
+			if ($pwd_change) {
+				$usr->login(POST('passwd'));
+			}
+			
 			Page::instance()->redirect($redir_page);
 			
 		}
 		
 		$body = $tpl->process();
-		if (! defined("BLOG_ROOT")) $this->blog = false;;
+		if (! defined("BLOG_ROOT")) {
+			$this->blog = false;
+		}
 		Page::instance()->addStylesheet("form.css");
 		Page::instance()->title = $page_name;
 		Page::instance()->display($body, $this->blog);
@@ -570,7 +540,9 @@ class WebPages {
 		# Process the template into the page body, but only if we have not already set
 		# it.  We may set it above to display a message that does not constitute a 
 		# fatal error, such as a failed pingback.
-		if (empty($page_body)) $page_body = $tpl->process();
+		if (empty($page_body)) {
+			$page_body = $tpl->process();
+		}
 		
 		$title = $is_art ? _("New Article") : _("New Entry");
 		Page::instance()->title = sprintf("%s - %s", $this->blog->name, $title);
@@ -923,16 +895,21 @@ class WebPages {
 		}
 	}
 	
-	protected function get_posted_responses(&$response_array, &$denied_array) {
+	protected function get_posted_responses() {
 		$index = 1;
+		$response_array = array();
+		$denied_array = array();
 		
 		if (POST('responselist')) {
 		
 			$anchors = explode(',', $_POST['responselist']);
 			foreach ($anchors as $a) {
 				$obj = get_response_object($a, $this->user);
-				if ($obj) $response_array[] = $obj;
-				else $denied_array[] = $a;
+				if ($obj) {
+					$response_array[] = $obj;
+				} else {
+					$denied_array[] = $a;
+				}
 			}
 		
 		} else {
@@ -945,8 +922,11 @@ class WebPages {
 			while ( isset($_POST['responseid'.$index]) ) {
 				if ( POST('response'.$index) ) {
 					$obj = get_response_object($_POST['responseid'.$index], $this->user);
-					if ($obj) $response_array[] = $obj;
-					else $denied_array[] = $_POST['responseid'.$index];
+					if ($obj) {
+						$response_array[] = $obj;
+					} else {
+						$denied_array[] = $_POST['responseid'.$index];
+					}
 				}
 				$index++;
 			}
@@ -956,11 +936,16 @@ class WebPages {
 			foreach ($getvars as $var) {
 				if (GET($var)) {
 					$obj = get_response_object(GET($var), $this->user);
-					if ($obj) $response_array[] = $obj;
-					else $denied_array[] = GET($var);
+					if ($obj) {
+						$response_array[] = $obj;
+					} else {
+						$denied_array[] = GET($var);
+					}
 				}
 			}
 		}
+		
+		return compact('response_array', 'denied_array');
 	}
 	
 	protected function get_reply_list(&$blog, &$ent) {
@@ -1098,9 +1083,7 @@ class WebPages {
 	
 	protected function handle_deletes() {
 	
-		$response_array = array();
-		$denied_array = array();
-		$this->get_posted_responses($response_array, $denied_array);
+		extract($this->get_posted_responses());
 	
 		$tpl = NewTemplate('confirm_tpl.php');
 		$tpl->set("CONFIRM_PAGE", make_uri(false, false, false) );

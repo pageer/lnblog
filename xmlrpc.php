@@ -4,9 +4,9 @@
 # both the Pingback implementation and the Blogger and MetaWeblog API 
 # implementations.
 
-require_once("blogconfig.php");
-require_once("lib/creators.php");
-require_once("lib/utils.php");
+require_once __DIR__."/blogconfig.php";
+require_once __DIR__."/lib/creators.php";
+require_once __DIR__."/lib/utils.php";
 
 $function_map = array(
 	"blogger.newPost"       => array("function"=>"blogger_newPost"),

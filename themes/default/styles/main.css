@@ -80,6 +80,9 @@ html, body { height: 100%; }  /* Use the whole page. */
 	content: "\00BB \0020";
 }
 
+#menubar > .location > li:first-child:before {
+	content: "";
+}
 /***** Sidebar styles *****/
 
 #sidebar h1, 

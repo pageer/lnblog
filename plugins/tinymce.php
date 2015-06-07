@@ -65,6 +65,11 @@ class TinyMCEEditor extends Plugin {
 			var \$input_mode = $('#input_mode'),
 			    unconditional_display = ".($selector ? 'true' : 'false').";
 			
+			// Suppress the plugin on the list-link page.
+			if (window.location.href.match('[?&]list=yes')) {
+				return;
+			}
+			
 			// Style buttons plugin from http://blog.ionelmc.ro/2013/10/17/tinymce-formatting-toolbar-buttons/
 			tinyMCE.PluginManager.add('stylebuttons', function(editor, url) {
 				['pre', 'p', 'code', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'].forEach(function(name){
@@ -135,5 +140,4 @@ class TinyMCEEditor extends Plugin {
 $plug = new TinyMCEEditor();
 $plug->registerEventHandler("posteditor", "ShowControls", "show_editor");
 $plug->registerEventHandler("blog", "InitComplete", "set_markup");
-$plug->registerEventHandler('page', 'FileEditorReady', 'file_editor')
-?>
+$plug->registerEventHandler('page', 'FileEditorReady', 'file_editor');

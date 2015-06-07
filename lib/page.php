@@ -338,7 +338,7 @@ class Page extends LnBlogObject {
 		
 	}
 	
-	public function error($code) {
+	public function error($code, $extra_message = '') {
 		switch ($code) {
 			case 403:
 				$message = 'Forbidden';
@@ -350,6 +350,9 @@ class Page extends LnBlogObject {
 				$message = '';
 		}
 		header("HTTP/1.0 $code $message");
+		if ($extra_message) {
+			echo $extra_message;
+		}
 		exit;
 	}
 	
