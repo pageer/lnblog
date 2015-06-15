@@ -62,6 +62,22 @@ require_once("blogconfig.php");
 require_once("lib/creators.php");
 require_once("lib/utils.php");
 
+function show_confirm_page($title, $message, $page, $yes_id, $yes_label, $no_id, $no_label, $data_id, $data) {
+	$tpl = NewTemplate('confirm_tpl.php');
+	$tpl->set('CONFIRM_TITLE', $title);
+	$tpl->set('CONFIRM_MESSAGE', $message);
+	$tpl->set('CONFIRM_PAGE', $page);
+	$tpl->set('OK_ID', $yes_id);
+	$tpl->set('OK_LABEL', $yes_label);
+	$tpl->set('CANCEL_ID', $no_label);
+	$tpl->set('CANCEL_LABEL', $no_label);
+	$tpl->set('PASS_DATA_ID', $data_id);
+	$tpl->set('PASS_DATA', $data);
+	$form = $tpl->process();
+	Page::instance()->display($form);
+	exit;
+}
+
 if (isset($_GET['r'])) {
 	$router = new RequestRouter($_GET['r']);
 	$router->route();
@@ -70,12 +86,12 @@ if (isset($_GET['r'])) {
 
 if ( ! file_exists(USER_DATA_PATH.PATH_DELIM.FS_PLUGIN_CONFIG) ) {
 	Page::instance()->redirect("fs_setup.php");
-	exit;
 }
 
 $update =  "update";
 $upgrade = "upgrade";
 Page::instance()->title = sprintf(_("%s Administration"), PACKAGE_NAME);
+Page::instance()->addScript();
 
 $tpl = NewTemplate('blog_admin_tpl.php');
 $tpl->set("SHOW_NEW");
@@ -88,10 +104,8 @@ $usr = NewUser();
 
 if (! System::instance()->hasAdministrator()) {
 	Page::instance()->redirect("newlogin.php");
-	exit;
 } elseif (! $usr->checkLogin() || ! $usr->isAdministrator()) {
 	Page::instance()->redirect("bloglogin.php");
-	exit;
 }
 
 if ( POST('upgrade') && POST('upgrade_btn') ) {
@@ -99,8 +113,7 @@ if ( POST('upgrade') && POST('upgrade_btn') ) {
 	$b = NewBlog(POST('upgrade'));
 	$file_list = $b->upgradeWrappers();
 	if (empty($file_list)) {
-		$status = spf_("Upgrade of %s completed successfully.",
-		               $b->blogid);
+		$status = spf_("Upgrade of %s completed successfully.", $b->blogid);
 	} elseif ($file_list === false) {
 		$status = spf_("Error: %s does not seem to exist.", $b->blogid);
 	} else {
@@ -115,19 +128,51 @@ if ( POST('upgrade') && POST('upgrade_btn') ) {
 		$status = spf_("The path '%s' is not an LnBlog weblog.", POST('register'));
 	} else {
 		$ret = System::instance()->registerBlog($blog->blogid);
-		if ($ret) $status = spf_("Blog %s successfully registered.", $blog->blogid);
-		else $status = spf_("Registration error: exited with code %s", $ret);
+		if ($ret) {
+			$status = spf_("Blog %s successfully registered.", $blog->blogid);
+		} else {
+			$status = spf_("Registration error: exited with code %s", $ret);
+		}
 	}
 	$tpl->set("REGISTER_STATUS", $status);
+
+} elseif ( POST('delete') && POST('delete_btn') ) {
 	
+	if (POST('confirm_form') || GET('confirm')) {
+		
+		$blog = NewBlog(POST('delete'));
+		if (! $blog->isBlog()) {
+			$status = spf_("The path '%s' is not an LnBlog weblog.", POST('delete'));
+		} else {
+			$ret = System::instance()->unregisterBlog($blog->blogid);
+			$ret = $ret && $blog->delete();
+			if ($ret) {
+				$status = spf_("Blog %s successfully deleted.", $blog->blogid);
+			} else {
+				$status = spf_("Delete error: exited with code %s", $ret);
+			}
+		}
+		$tpl->set("DELETE_STATUS", $status);
+		
+	} else {
+		show_confirm_page(_("Confirm blog deletion"), spf_("Really delete blog '%s'?", POST('delete')), current_file(),
+						  'delete_btn', _('Yes'), 'cancel_btn', _('No'), 'delete', POST('delete'));
+	}
+
 } elseif ( POST('fixperm') && POST('fixperm_btn') ) {
 	$p = NewPath();
-	if ($p->isAbsolute(POST('fixperm'))) $fixperm_path = trim(POST('fixperm'));
-	else $fixperm_path = calculate_document_root().PATH_DELIM.trim(POST('fixperm'));
+	if ($p->isAbsolute(POST('fixperm'))) {
+		$fixperm_path = trim(POST('fixperm'));
+	} else {
+		$fixperm_path = calculate_document_root().PATH_DELIM.trim(POST('fixperm'));
+	}
 	$b = NewBlog(POST($fixperm_path));
 	$upgrade_status = $b->fixDirectoryPermissions();
-	if ($upgrade_status) $status = _("Permission update completed successfully.");
-	else $status = spf_("Error: Update exited with status %s.", $upgrade_status);
+	if ($upgrade_status) {
+		$status = _("Permission update completed successfully.");
+	} else {
+		$status = spf_("Error: Update exited with status %s.", $upgrade_status);
+	}
 	$tpl->set("FIXPERM_STATUS", $status);
 
 } elseif (POST("username") && POST("edituser")) {

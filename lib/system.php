@@ -43,8 +43,11 @@ class System {
 	
 	public function registerBlog($blogid) {
 		$list = trim($this->sys_ini->value("register", "BlogList"));
-		if (! $list) $list = array();
-		else $list = explode(",", $list);
+		if (! $list) {
+			$list = array();
+		} else {
+			$list = explode(",", $list);
+		}
 		$blogid = trim($blogid);
 		if (in_array($blogid, $list)) {
 			return true;
@@ -54,6 +57,30 @@ class System {
 			$this->sys_ini->setValue("register", "BlogList", $list);
 			return $this->sys_ini->writeFile();
 		}
+	}
+	
+	# Method: unregisterBlog
+	# Unregisters a blog with the system.  This reverses registerBlog().
+	#
+	# Parameters:
+	# blogid - THe path to the blog, as with registerBlog.
+	#
+	# Returns:
+	# True on success, false on failure or if the blog was not registered.
+	public function unregisterBlog($blogid) {
+		$blogid = trim($blogid);
+		$list = trim($this->sys_ini->value("register", "BlogList"));
+		if ($list) {
+			$list = explode(",", $list);
+			$pos = array_search($blogid, $list);
+			if ($pos !== false) {
+				unset($list[$pos]);
+				$list = implode(",", $list);
+				$this->sys_ini->setValue("register", "BlogList", $list);
+				return $this->sys_ini->writeFile();
+			}
+		}
+		return false;
 	}
 	
 	# Method: getBlogList

@@ -1244,16 +1244,23 @@ class Blog extends LnBlogObject {
 	}
 	
 	# Method: delete
-	# Removes an existing weblog.  This only deletes the blog data file, making this a 
-	# non-blog directory.  It does not totally destroy the data.
+	# Removes an existing weblog.  
+	#
+	# Parameters:
+	# keep_history - If set to true, only delete the blog data file, making this a 
+	#                non-blog directory, rather than totally destroy the data.  If not
+	#                set, defaults to KEEP_EDIT_HISTORY constant.
 	# 
 	# Returns:
 	# True on success, false on failure.
 	
-	function delete () {
+	function delete ($keep_history = null) {
+		if ($keep_history === null) {
+			$keep_history = KEEP_EDIT_HISTORY;
+		}
 		$this->raiseEvent("OnDelete");
 		$fs = NewFS();
-		if (KEEP_EDIT_HISTORY) {
+		if ($keep_history) {
 			$p = Path::get($this->home_path, BLOG_DELETED_PATH);
 			if (! is_dir($p)) {
 				$fs->mkdir_rec($p->get());

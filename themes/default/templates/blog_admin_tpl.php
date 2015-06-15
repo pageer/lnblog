@@ -14,29 +14,29 @@
 <li><a href="newlogin.php"><?php p_("Add new user"); ?></a></li>
 <li>Edit existing user
 <select id="username" name="username">
-<?php foreach ($USER_ID_LIST as $uid) { ?>
+<?php foreach ($USER_ID_LIST as $uid): ?>
 <option><?php echo $uid;?></option>
-<?php } ?>
+<?php endforeach; ?>
 </select>
 <input type="submit" name="edituser" id="edituser" value="<?php p_("Edit");?>" />
 </li>
-<?php if (isset($SHOW_NEW)) { ?>
+<?php if (isset($SHOW_NEW)): ?>
 <li><a href="newblog.php"><?php p_("Add new blog"); ?></a></li>
-<?php } ?>
+<?php endif; ?>
 </ul>
 <h3><?php p_('Upgrade Functions'); ?></h3>
 <ul>
 <li>
 <label for="upgrade"><?php p_("Upgrade blog to current version"); ?></label>
 <select id="upgrade" name="upgrade">
-<?php foreach ($BLOG_ID_LIST as $blog) { ?>
+<?php foreach ($BLOG_ID_LIST as $blog): ?>
 <option><?php echo $blog;?></option>
-<?php } ?>
+<?php endforeach; ?>
 </select>
 <input type="submit" id="upgrade_btn" name="upgrade_btn" value="<?php p_("Upgrade"); ?>" />
-<?php if (isset($UPGRADE_STATUS)) { ?>
+<?php if (isset($UPGRADE_STATUS)): ?>
 <p><?php pf_("Upgrade Status: %s", "<strong>".$UPGRADE_STATUS."</strong>"); ?></p>
-<?php } ?>
+<?php endif; ?>
 </li>
 <li>
 <label for="register"><?php p_("Register a blog with the system"); ?></label>
@@ -46,28 +46,32 @@
 <p><?php pf_("Registration Status: %s", "<strong>".$REGISTER_STATUS."</strong>"); ?></p>
 <?php } ?>
 </li>
-<?php if (0) { /* Start commented-out code */ ?>
-<li>
-<label for="update"><?php p_("Update blog data"); ?></label>
-<input type="text" id="update" name="update" />
-<input type="submit" id="update_btn" name="update_btn" value="<?php p_("Update"); ?>" />
-<?php if (isset($UPDATE_STATUS)) { ?>
-<p><?php pf_("Upgrade Status: %s", "<strong>".$UPDATE_STATUS."</strong>"); ?></p>
-<?php } ?>
-</li>
-<?php } /* End commented-out code */ ?>
 <li>
 <label for="fixperm"><?php p_("Fix directory permissions on blog"); ?></label>
 <select id="fixperm" name="fixperm">
-<?php foreach ($BLOG_ID_LIST as $blog) { ?>
+<?php foreach ($BLOG_ID_LIST as $blog): ?>
 <option><?php echo $blog;?></option>
-<?php } ?>
+<?php endforeach; ?>
 </select>
 <input type="submit" id="fixperm_btn" name="fixperm_btn" value="<?php p_("Fix Perms"); ?>" />
-<?php if (isset($FIXPERM_STATUS)) { ?>
+<?php if (isset($FIXPERM_STATUS)): ?>
 <p><?php pf_("Upgrade Status: %s", "<strong>".$FIXPERM_STATUS."</strong>"); ?></p>
-<?php } ?>
+<?php endif; ?>
 </li>
+
+<li>
+<label for="delete"><?php p_("Delete blog"); ?></label>
+<select id="delete" name="delete">
+<?php foreach ($BLOG_ID_LIST as $blog): ?>
+<option><?php echo $blog;?></option>
+<?php endforeach; ?>
+</select>
+<input type="submit" id="delete_btn" name="delete_btn" value="<?php p_("Delete"); ?>" />
+<?php if (isset($DELETE_STATUS)): ?>
+<p><?php pf_("Delete Status: %s", "<strong>".$DELETE_STATUS."</strong>"); ?></p>
+<?php endif; ?>
+</li>
+
 </ul>
 <ul>
 <li><a href="bloglogout.php"><?php p_("Log out"); ?></a></li>
