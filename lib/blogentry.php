@@ -840,7 +840,9 @@ class BlogEntry extends Entry {
 					 <MARKUP_BBCODE>, and <MARKUP_HTML>.
 	*/
 	public function getPostData() {
-		if (! has_post()) return false;
+		if (! has_post()) {
+			return false;
+		}
 		$this->subject = POST("subject");
 		$this->abstract = POST("abstract");
 		$this->tags = POST("tags");
@@ -849,7 +851,7 @@ class BlogEntry extends Entry {
 		$this->allow_tb = POST("trackbacks") ? 1 : 0;
 		$this->allow_pingback = POST("pingbacks") ? 1 : 0;
 		$this->has_html = POST("input_mode");
-		$this->enclosure = POST("enclosure");
+		$this->enclosure = POST('hasenclosure') ? POST("enclosure") : '';
 		foreach ($this->custom_fields as $fld=>$desc) {
 			$this->$fld = POST($fld);
 		}

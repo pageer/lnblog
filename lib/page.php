@@ -76,7 +76,7 @@ class Page extends LnBlogObject {
 		if (LOCAL_JQUERY_NAME) {
 			$this->addScript(LOCAL_JQUERY_NAME);
 		} else {
-			$this->addExternalScript('//code.jquery.com/jquery-1.11.0.min.js');
+			$this->addExternalScript('//code.jquery.com/jquery-1.11.3.min.js');
 		}
 		$this->addScript("lnblog_lib.js");
 		$this->addStylesheet("main.css");
@@ -93,13 +93,13 @@ class Page extends LnBlogObject {
 		if (LOCAL_JQUERYUI_NAME) {
 			$this->addScript(LOCAL_JQUERYUI_NAME);
 		} else {
-			$this->addExternalScript('//code.jquery.com/ui/1.10.4/jquery-ui.min.js');
+			$this->addExternalScript('//code.jquery.com/ui/1.11.4/jquery-ui.min.js');
 		}
 		if (LOCAL_JQUERYUI_THEME_NAME) {
 			$this->addStylesheet(LOCAL_JQUERYUI_THEME_NAME);
 		} else {
 			$theme = defined('JQUERYUI_THEME') ? JQUERYUI_THEME : DEFAULT_JQUERYUI_THEME;
-			$this->addExternalScript("//code.jquery.com/ui/1.10.4/themes/$theme/jquery-ui.css");
+			$this->addExternalStylesheet("//code.jquery.com/ui/1.11.4/themes/$theme/jquery-ui.css");
 		}
 	}
 	

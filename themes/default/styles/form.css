@@ -28,6 +28,19 @@ form div, fieldset div {
 	margin-top: 0.5em;
 }
 
+form .settings .left-col,
+form .settings .right-col {
+	width: 48%;
+	margin: 1%;
+	clear:none;
+}
+form .settings .left-col {
+	float: left;
+}
+form .settings .right-col {
+	float: right;
+}
+
 textarea {
 	width: 100%;
 }
@@ -105,20 +118,6 @@ form div.threebutton input {
 	min-width: 6em;
 }
 
-form label {
-	width: 50%;
-	text-align: right;
-	margin-right: 1%;
-	float: left;
-}
-
-.formbox label {
-	width: 50%;
-	text-align: right;
-	margin-right: 1%;
-	float: left;
-}
-
 form#tbconfirm label {
 	width: 30%;
 }
@@ -147,12 +146,16 @@ h4 {
 }
 
 /* Entry edit form styles */
-div.entry_subject label { width: 20%; }
-div.entry_subject input { width: 70%; }
+div.entry_subject input {
+	width: 95%;
+}
 
-div.entry_tags label  { width: 20%; }
-div.entry_tags input  { width: 55%; }
-div.entry_tags select { width: 20%; }
+div.entry_tags input  {
+	width: 75%;
+}
+div.entry_tags select {
+	width: 20%;
+}
 
 /* Overlay for entry preview on edit page*/
 .entry_preview {

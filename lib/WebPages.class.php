@@ -546,8 +546,9 @@ class WebPages {
 		
 		$title = $is_art ? _("New Article") : _("New Entry");
 		Page::instance()->title = sprintf("%s - %s", $this->blog->name, $title);
-		Page::instance()->addStylesheet("form.css", "entry.css");
+		Page::instance()->addStylesheet("form.css", "entry.css", "jquery.datetimepicker.css");
 		Page::instance()->addScript("jquery.form.js");
+		Page::instance()->addScript("jquery.datetimepicker.js");
 		Page::instance()->addScript("editor.js");
 		Page::instance()->addScript("upload.js");
 		Page::instance()->addScript(lang_js());
@@ -647,7 +648,7 @@ class WebPages {
 	protected function handle_save(&$ent, &$blg, &$errors, $is_draft, $is_art = false) {
 		if ($is_draft) {
 			$ret = $ent->saveDraft($blg);
-			$ent->setAutoPublishDate(POST('autopublishdate'));
+			$ent->setAutoPublishDate(POST('autopublish') ? POST('autopublishdate') : 0);
 		} else {
 			if (! $ent->isEntry()) {
 				if (is_a($ent, 'Article')) $ent->setPath(POST('short_path'));
