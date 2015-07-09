@@ -532,8 +532,7 @@ class WebPages {
 			}
 		
 		} elseif ( empty($_POST) && ! $this->user->checkLogin() ) {
-			header("HTTP/1.0 403 Forbidden");
-			p_("Access to this page is restricted to logged-in users.");
+			$this->redirectOr403(null, _("Access to this page is restricted to logged-in users."));
 			exit;
 		}
 		
