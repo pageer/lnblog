@@ -153,20 +153,22 @@ class PHPTemplate extends LnBlogObject {
 		}
 	}
 	
-	public function getTemplatePath() {
+	public function getTemplatePath($file_name = null) {
+		$file = $file_name ?: $this->file;
 		foreach ($this->getSearchPath() as $path) {
-			if (isset(self::$template_paths[$this->file])) {
-				return self::$template_paths[$this->file];
-			} elseif ($this->templateExists($path)) {
-				self::$template_paths[$this->file] = Path::mk($path, $this->file);
-				return self::$template_paths[$this->file];
+			if (isset(self::$template_paths[$file])) {
+				return self::$template_paths[$file];
+			} elseif ($this->templateExists($path, $file)) {
+				self::$template_paths[$file] = Path::mk($path, $file);
+				return self::$template_paths[$file];
 			}
 		}
 		return '';
 	}
 	
-	protected function templateExists($path) {
-		return file_exists(Path::mk($path, $this->file));
+	protected function templateExists($path, $file_name = null) {
+		$file = $file_name ?: $this->file;
+		return file_exists(Path::mk($path, $file));
 	}
 	
 	/**

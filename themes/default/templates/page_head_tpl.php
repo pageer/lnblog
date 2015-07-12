@@ -66,5 +66,5 @@ foreach ($SCRIPTS as $js) {
 } 
 ?>
 </head>
-<?php include(BASIC_LAYOUT_TEMPLATE); ?>
+<?php include $this->getTemplatePath(BASIC_LAYOUT_TEMPLATE); ?>
 </html>

@@ -48,7 +48,7 @@
 	<?php 
 	EventRegister::instance()->activateEventFull($tmp=false, "posteditor", "ShowControls");
 	if (! System::instance()->sys_ini->value('entryconfig', 'EditorOnBottom', 0)) {
-		include("js_editor.php");
+		include $this->getTemplatePath("js_editor.php");
 	}
 	?>
 	<div>
@@ -56,7 +56,7 @@
 	</div>
 	<?php
 	if (System::instance()->sys_ini->value('entryconfig', 'EditorOnBottom', 0)) {
-		include("js_editor.php");
+		include $this->getTemplatePath("js_editor.php");
 	}
 	?>
 	<fieldset id="entry_settings">
