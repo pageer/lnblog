@@ -84,7 +84,7 @@ function LBCodeEditor() {
 				meta_str = this.get_acr(desc_str);
 			}
 	
-			if (meta_str == '') {
+			if (! meta_str) {
 				meta_str = window.prompt(meta_text, meta_default);
 				if (! meta_str) {
 					return false;
@@ -271,15 +271,16 @@ function LBCodeEditor() {
 	function topic_add_tag(e) {
 		var tags = document.getElementById('tags');
 		var tagsel = document.getElementById('tag_list');
-		if (tags.value == '') {
+		if (! tags.value) {
 			tags.value = tagsel.value;
-		} else if (tagsel.value != '') {
+		} else {
 			tags.value = tags.value+','+tagsel.value;
 		}
 	}
 	
 	this.upload_add_link = function (e) {
 		/*globals strings */
+		/*jshint regexp: false */
 		var ext = this.value.replace(/^(.*)(\..+)$/, "$2");
 		var img_exts = new Array('.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff', '.tif');
 		var is_img = false;
@@ -429,7 +430,7 @@ $(document).ready(function () {
 			
 			var has_files = false;
 			$("#postform input[type='file']").each(function () {
-				if ($(this).val() != '') {
+				if ($(this).val()) {
 					has_files = true;
 				}
 			});
