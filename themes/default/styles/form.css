@@ -194,3 +194,14 @@ div.entry_tags select {
 	background-color: #fff;
 	box-shadow: 1px 1px 6px;
 }
+
+form.centered label {
+	width: 49%;
+	margin-right: 2%;
+	text-align: right;
+	display: inline-block;
+}
+
+form.centered input {
+	display: inline-block;
+}
