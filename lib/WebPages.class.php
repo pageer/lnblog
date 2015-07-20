@@ -480,7 +480,7 @@ class WebPages {
 			
 			if ($res['errors']) {
 				$tpl->set("HAS_UPDATE_ERROR");
-				$tpl->set("UPDATE_ERROR_MESSAGE", $res['errors']);
+				$tpl->set("UPDATE_ERROR_MESSAGE", $res['errors'] . isset($res['warnings']) ? $res['warnings'] : '');
 				entry_set_template($tpl, $ent);
 			} elseif ($res['warnings']) {
 				$refresh_delay = 10;
@@ -650,7 +650,9 @@ class WebPages {
 			$ent->setAutoPublishDate(POST('autopublish') ? POST('autopublishdate') : 0);
 		} else {
 			if (! $ent->isEntry()) {
-				if (is_a($ent, 'Article')) $ent->setPath(POST('short_path'));
+				if (is_a($ent, 'Article')) {
+					$ent->setPath(POST('short_path'));
+				}
 				$ret = $ent->insert($blg);
 				if ($ret && is_a($ent, 'Article')) {
 					$ent->setSticky(POST('sticky'));
@@ -668,7 +670,9 @@ class WebPages {
 				}
 			}
 			
-			if ($ret) $blg->updateTagList($ent->tags());
+			if ($ret) {
+				$blg->updateTagList($ent->tags());
+			}
 		}
 		
 		if ($ret) {
@@ -700,7 +704,7 @@ class WebPages {
 		$num_uploads = System::instance()->sys_ini->value("entryconfig",	"AllowInitUpload", 1);
 		
 		$uploads = array();
-		if (isset($_FILES['uploaded'])) {
+		if (isset($_FILES['upload'])) {
 			$uploads = FileUpload::initUploads($_FILES['upload'], $ent->localpath());
 		}
 	

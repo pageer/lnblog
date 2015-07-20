@@ -61,22 +61,24 @@ class FileUpload extends LnBlogObject {
 		$this->field = $file;
 		
 		if (! empty($file)) {
+			$this->error = FILEUPLOAD_NO_ERROR;
 			if ($index !== false && is_array($file['tmp_name']) ) {
 				$this->destname = $file['name'][$index];
 				$this->tempname = $file['tmp_name'][$index];
 				$this->size = $file['size'][$index];
 				$this->mimetype = $file['type'][$index];
-				if (isset($file['error'])) 
+				if (isset($file['error'])) {
 					$this->error = $file['error'][$index];
+				}
 			} else {
 				$this->destname = $file['name'];
 				$this->tempname = $file['tmp_name'];
 				$this->size = $file['size'];
 				$this->mimetype = $file['type'];
-				if (isset($file['error'])) 
+				if (isset($file['error'])) {
 					$this->error = $file['error'];
+				}
 			}
-			$this->error = FILEUPLOAD_NO_ERROR;
 		}
 		$this->raiseEvent("InitComplete");
 	}
@@ -89,35 +91,42 @@ class FileUpload extends LnBlogObject {
 
 	function status() {
 
-		if ($this->error == FILEUPLOAD_NOT_INITIALIZED) return $this->error;
-
-		if (defined("UPLOAD_ERR_OK")) {
-			switch ($this->error) {
-				case UPLOAD_ERR_OK:
-					$ret = FILEUPLOAD_NO_ERROR;
-					break;
-				case UPLOAD_ERR_INI_SIZE:
-					$ret = FILEUPLOAD_SERVER_TOO_BIG;
-					break;
-				case UPLOAD_ERR_FORM_SIZE:
-					$ret = FILEUPLOAD_FORM_TOO_BIG;
-					break;
-				case UPLOAD_ERR_PARTIAL:
-					$ret = FILEUPLOAD_PARTIAL_FILE;
-					break;
-				case UPLOAD_ERR_NO_FILE:
-					$ret = FILEUPLOAD_NO_FILE;
-					break;
-			}
+		if ($this->error == FILEUPLOAD_NOT_INITIALIZED) {
+			return $this->error;
 		}
 
-		if ($ret == FILEUPLOAD_NO_ERROR && $this->size <= 0) 
+		switch ($this->error) {
+			case UPLOAD_ERR_OK:
+				$ret = FILEUPLOAD_NO_ERROR;
+				break;
+			case UPLOAD_ERR_INI_SIZE:
+				$ret = FILEUPLOAD_SERVER_TOO_BIG;
+				break;
+			case UPLOAD_ERR_FORM_SIZE:
+				$ret = FILEUPLOAD_FORM_TOO_BIG;
+				break;
+			case UPLOAD_ERR_PARTIAL:
+				$ret = FILEUPLOAD_PARTIAL_FILE;
+				break;
+			case UPLOAD_ERR_NO_FILE:
+				$ret = FILEUPLOAD_NO_FILE;
+				break;
+		}
+
+		if ($ret == FILEUPLOAD_NO_ERROR && $this->size <= 0) {
 			$ret = FILEUPLOAD_FILE_EMPTY;
+		}
 		
-		if (is_file($this->tempname)) $tmp_path = $this->tempname;
-		else $tmp_path = mkpath(ini_get("upload_tmp_dir"), $this->tempname);
-		if ( ! $this->tempname || (! is_uploaded_file($tmp_path) && ! is_file($this->tempname)) ) {
-			$ret = FILEUPLOAD_NO_FILE;
+		if (is_file($this->tempname)) {
+			$tmp_path = $this->tempname;
+		} else {
+			$tmp_path = mkpath(ini_get("upload_tmp_dir"), $this->tempname);
+		}
+		
+		if ($ret === FILEUPLOAD_NO_ERROR) {
+			if ( ! $this->tempname || (! is_uploaded_file($tmp_path) && ! is_file($this->tempname)) ) {
+				$ret = FILEUPLOAD_NO_FILE;
+			}
 		}
 		
 		return $ret;
@@ -129,8 +138,8 @@ class FileUpload extends LnBlogObject {
 	# Returns:
 	# True if the file uploaded without error, false otherwise.
 
-	function completed() { 
-		return ($this->status() == FILEUPLOAD_NO_ERROR); 
+	function completed() {
+		return $this->status() == FILEUPLOAD_NO_ERROR; 
 	}
 
 	# Method: moveFile
@@ -143,10 +152,16 @@ class FileUpload extends LnBlogObject {
 		$this->raiseEvent("OnMove");
 		$tmp_dir = ini_get("upload_tmp_dir");
 		$fs = NewFS();
-		if (is_file($this->tempname)) $tmp_path = $this->tempname;
-		else $tmp_path = $tmp_dir.PATH_DELIM.$this->tempname;
+		if (is_file($this->tempname)) {
+			$tmp_path = $this->tempname;
+		} else {
+			$tmp_path = $tmp_dir.PATH_DELIM.$this->tempname;
+		}
+		
 		$ret = $fs->copy($tmp_path, $this->destdir.PATH_DELIM.$this->destname);
-		if ($ret) $this->raiseEvent("MoveComplete");
+		if ($ret) {
+			$this->raiseEvent("MoveComplete");
+		}
 		return $ret;
 	}
 
@@ -161,7 +176,9 @@ class FileUpload extends LnBlogObject {
 	# A string containing the appropriate message.
 
 	function errorMessage($err=false) {
-		if (!$err) $err = $this->error;
+		if (!$err) {
+			$err = $this->status();
+		}
 		switch ($err) {
 			case FILEUPLOAD_NO_ERROR:
 				$ret = spf_("File '<a href=\"%s\">%s</a>' successfully uploaded.", 
