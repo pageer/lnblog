@@ -36,7 +36,8 @@ recommended for Pingback and TrackBacks, but this is not strictly required eithe
 
 Section: Installation
 
-The setup process for LnBlog is entirely web-based and mostly painless.
+The setup process for LnBlog is entirely web-based and mostly painless.  Just download the
+distribution ZIP file and follow these steps.
 
 1) - Unzip the LnBlog archive into a directory on your hard drive.  You should remove the version
      number from the directory name to make upgrades easier in the future.
@@ -48,6 +49,17 @@ The setup process for LnBlog is entirely web-based and mostly painless.
 5) - Create a user account.  This initial user will be a system administrator.
 6) - Log in with the account you just created.
 7) - Start creating new users and weblogs.
+
+For users who wish to install LnBlog from source, the procedure is similar, except that instead of
+using the distribution ZIP archive, you would do the following.
+
+1) - Clone the LnBlog Mercurial repository using
+     "hg clone https://hg.skepticats.com/lnblog /path/to/www/LnBLog", where "/path/to/www" is the
+     path to a web-accessible portion of your web server.
+2) - Change to the LnBlog clone directory and run "composer install --no-dev".  If you want to
+     build the documentation or distribution archives, you will need to run simply "composer install"
+     to get the development dpeendencies.
+3) - Continue with the instructions above starting at step 3.
 
 Section: Upgrading
 

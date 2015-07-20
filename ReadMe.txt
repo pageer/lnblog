@@ -18,22 +18,29 @@ http://www.skepticats.com/lnblog/content/download/lnblog_docs.zip
 
 Requirements
 ------------
-LnBlog needs a web server with PHP 5 or greater installed and the ability to
+LnBlog needs a web server with PHP 5.3 or greater installed and the ability to
 write to the file system.  Both Apache and IIS are supported and no database
-is required.  File writing through FTP is supported for hosts with safe mode
-enabled. PCRE (Perl-Compatible Regular Expression) support, which is standard
-with most PHP installations, must be enabled. Support for the CURL, gettext, 
-and either mime-magic or fileinfo extensions is helpful, but not required.  
+is required.  File writing through FTP is also supported, but is no longer a
+recommended configuration.  Support for the CURL, gettext, and either
+mime-magic or fileinfo extensions is helpful, but not required.  
 
 Installation
 ------------
-To install LnBlog on your web server, simply extract the ZIP archive and upload 
+There are two ways to install: from the distribution ZIP file downloaded from
+the LnBlog webpage (recommended) or from source, i.e. the cloned Mercurial repository.
+
+To install the distribution ZIP file, simply extract the ZIP archive and upload 
 the resulting folder to the publicly accessible portion of your web server.
 After that, open a web browser go to the URL corresponding to that location.
 This will start the graphical configuration process.  You will be prompted to 
 configure file writing and create an initial user account, after which you will 
 be taken to the administration page where you can create more users, create blog,
 and set other options.
+
+To install directly from a copy of the source repository, you will need to have
+Composer installed (http://getcomposer.org/).  Just move the the source directory
+to the web-accessible portion of your web server and run "composer install" from
+that directory.  You can then run webup process as described above.
 
 Upgrade
 -------
@@ -43,6 +50,10 @@ directory to, e.g., LnBlog-old, and rename the new one in its place (i.e., give
 it the same name the old version had).  Lastly, copy or move the userdata 
 subdirectory from your old  LnBlog directory to the new one, overwriting existing
 files.
+
+If you installed from source, you can simply pull updates from the Mercurial
+repository by running "hg pull -u".  You may also need to run "composer update"
+if new third-party dependencies have been added.
 
 Plugins
 -------
