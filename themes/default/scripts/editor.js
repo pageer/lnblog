@@ -254,20 +254,6 @@ function LBCodeEditor() {
 		return true;
 	}
 	
-	function toggle_post_settings(ev) {
-		var $settings = $('#entry_settings'),
-			$legend_link = $settings.find('legend > a');
-		
-		$settings.find('.settings').toggle();
-		if ($legend_link.text() == '(+)') {
-			$legend_link.text('(-)');
-		} else {
-			$legend_link.text('(+)');
-		}
-		
-		return false;
-	}
-	
 	function topic_add_tag(e) {
 		var tags = document.getElementById('tags');
 		var tagsel = document.getElementById('tag_list');
@@ -277,74 +263,6 @@ function LBCodeEditor() {
 			tags.value = tags.value+','+tagsel.value;
 		}
 	}
-	
-	this.upload_add_link = function (e) {
-		/*globals strings */
-		/*jshint regexp: false */
-		var ext = this.value.replace(/^(.*)(\..+)$/, "$2");
-		var img_exts = new Array('.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff', '.tif');
-		var is_img = false;
-	
-		var check_add = document.getElementById("adduploadlink");
-		if (check_add && ! check_add.checked) {
-			return false;
-		}
-		
-		// Cheap, cheap hack since we're no longer doing auto-add.
-		if (e !== true) {
-			return false;
-		}
-	
-		for (var i=0; i< img_exts.length; i++) {
-			if (img_exts[i] == ext) {
-				is_img = true;
-				break;
-			}
-		}
-	
-		var components = [];
-		var splitchar = '';
-		if (this.value.indexOf("\\") > 0 && this.value.indexOf("/") < 0) {
-			splitchar = "\\";
-		} else {
-			splitchar = "/";
-		}
-		components = this.value.split(splitchar);
-		var fname = components[components.length - 1];
-	
-		// Prompt user for descriptive text. The alternative is just using the filename.
-		var res, prompt_text = false;
-	
-		if (prompt_text) {
-	
-			if (is_img) {
-				res = window.prompt(strings.get('editor_addImageDesc', this.value));
-			} else {
-				res = window.prompt(strings.get('editor_addLinkDesc', this.value));
-			}
-	
-		} else {
-			res = fname;
-		}
-		
-		if (res) {
-			var body = document.getElementById('body');
-			if (is_img) {
-				if (document.getElementById('input_mode').value == 1) {
-					lnblog.insertAtCursor(body, '[img='+fname+']'+res+'[/img]');
-				} else {
-					lnblog.insertAtCursor(body, "<img src=\""+fname+"\" alt=\""+res+"\" title=\""+res+"\" />");
-				}
-			} else {
-				if (document.getElementById('input_mode').value == 1) {
-					lnblog.insertAtCursor(body, '[url='+fname+']'+res+'[/url]');
-				} else {
-					lnblog.insertAtCursor(body, "<a href=\""+fname+"\">"+res+"</a>");
-				}
-			}
-		}
-		return false;
-	};
 	
 	function articleSet(e) {
 		var path = document.getElementById('short_path');
@@ -358,12 +276,6 @@ function LBCodeEditor() {
 		var inputmode = document.getElementById('input_mode');
 		lnblog.addEvent(inputmode, 'change', toggle_lbcode_editor);
 		toggle_lbcode_editor();
-		
-		// Toggle the extended settings fields on or off.
-		var setfld = document.getElementById('entry_settings');
-		var setleg = setfld.getElementsByTagName('legend');
-		lnblog.addEvent(setleg[0], 'click', toggle_post_settings);
-		toggle_post_settings();
 		
 		var tagsel = document.getElementById('tag_list');
 		lnblog.addEvent(tagsel, 'change', topic_add_tag);

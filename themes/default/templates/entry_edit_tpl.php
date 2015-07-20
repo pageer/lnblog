@@ -30,7 +30,7 @@
 		<input placeholder="<?php p_("Tags for this entry (comma-separated list)")?>" id="tags" name="tags"
 		       accesskey="t" title="<?php echo $title?>" type="text" size="40" <?php echo $tags_val?> />
 		<select id="tag_list" title="<?php p_("Add tag")?>">
-			<option value="" selected="selected"><?php p_("Add topic:")?></option>
+			<option value="" selected="selected"><?php p_("Add tag:")?></option>
 			<?php foreach ($BLOG_TAGS as $tag): ?>
 				<option value="<?php echo $tag?>"><?php echo $tag?></option>
 			<?php endforeach; ?>
@@ -59,8 +59,20 @@
 		include $this->getTemplatePath("js_editor.php");
 	}
 	?>
+	
+	<div class="threebutton">
+		<?php if ($PUBLISHED): ?>
+		<input name="post" id="post" type="submit" value="<?php p_("Save")?>" />
+		<?php else: ?>
+		<input name="post" id="post" type="submit" value="<?php p_("Publish")?>" />
+		<input name="draft" id="draft" type="submit" value="<?php p_("Save Draft")?>" />
+		<?php endif; ?>
+		<input name="preview" id="preview" type="submit" value="<?php p_("Preview")?>" />
+	</div>
+
+	
 	<fieldset id="entry_settings">
-		<legend><?php p_("Entry settings");?><a href="#dummy">(-)</a></legend>
+		<legend><?php p_("Entry settings");?></legend>
 		<div class="settings">
 			
 			<div class="left-col">
@@ -153,16 +165,6 @@
 			</div>
 		</div>
 	</fieldset>
-
-<div class="threebutton">
-<?php if ($PUBLISHED): ?>
-<input name="post" id="post" type="submit" value="<?php p_("Save")?>" />
-<?php else: ?>
-<input name="post" id="post" type="submit" value="<?php p_("Publish")?>" />
-<input name="draft" id="draft" type="submit" value="<?php p_("Save Draft")?>" />
-<?php endif; ?>
-<input name="preview" id="preview" type="submit" value="<?php p_("Preview")?>" />
-</div>
 
 </form>
 

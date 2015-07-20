@@ -32,13 +32,18 @@ form .settings .left-col,
 form .settings .right-col {
 	width: 48%;
 	margin: 1%;
-	clear:none;
+	clear: none;
 }
 form .settings .left-col {
 	float: left;
 }
 form .settings .right-col {
 	float: right;
+}
+
+form .settings .bottom-row {
+	width: 98%;
+	margin: 1%;
 }
 
 textarea {
