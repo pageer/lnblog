@@ -91,6 +91,7 @@ class TinyMCEEditor extends Plugin {
 			
 			if (unconditional_display) {
 				tinymce.init($init);
+				$('#postform').addClass('rich-text');
 				
 				var \$toggle_button = $('<button>"._('Toggle HTML Editor')."</button>');
 				\$toggle_button.off('click').on('click', function (e) {
@@ -110,9 +111,11 @@ class TinyMCEEditor extends Plugin {
 			} else {
 				if (\$input_mode.val() == ".MARKUP_HTML.") {
 					tinymce.init($init);
+					$('#postform').addClass('rich-text');
 				}
 				\$input_mode.on('change.editor', function(e) {
 					var mode = $(this).val();
+					$('#postform').toggleClass('rich-text', mode == ".MARKUP_HTML.");
 					if (mode == ".MARKUP_HTML.") { // HTML mode
 						tinymce.init($init);
 					} else {

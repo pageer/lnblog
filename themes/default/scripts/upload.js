@@ -5,7 +5,6 @@ $(document).ready( function () {
 	function initUploadFieldset(field, editor) {
 		
 		var addLink = function ($input) {
-			alert("Calling addLink");
 			var ext = $input.val().replace(/^(.*)(\..+)$/, "$2"),
                 img_exts = new Array('.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff', '.tif'),
                 is_img = false,
@@ -104,7 +103,6 @@ $(document).ready( function () {
 			elems = $(markup);
 			
 			if (editor) {
-				alert(elems.find('.insert-link').length + markup);
 				elems.find(".insert-link").click(function () {
 					addLink($(this).prev());
 					return false;

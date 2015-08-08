@@ -244,6 +244,7 @@ function LBCodeEditor() {
 	function toggle_lbcode_editor(ev) {
 		var lbcode = document.getElementById('lbcode_editor');
 		var dropdown = document.getElementById('input_mode');
+		var val = dropdown.value ? parseInt(dropdown.value, 10) : null;
 		if (lbcode) {
 			if (dropdown.value == 1) {  // Magic number: LBCode constant
 				lbcode.style.display = 'block';
@@ -251,6 +252,13 @@ function LBCodeEditor() {
 				lbcode.style.display = 'none';
 			}
 		}
+		
+		// NOTE: This is totally not scalable....
+		$('#postform').toggleClass('auto-markup', val === 0);
+		$('#postform').toggleClass('lbcode-markup', val === 1);
+		$('#postform').toggleClass('html-markup', val === 2);
+		$('#postform').toggleClass('markdown-markup', val === 3);
+		
 		return true;
 	}
 	

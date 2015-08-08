@@ -210,3 +210,9 @@ form.centered label {
 form.centered input {
 	display: inline-block;
 }
+
+#postform.html-markup.rich-text .insert-link,
+#postform.auto-markup .insert-link,
+#postform.markdown-markup .insert-link {
+	display: none;
+}
