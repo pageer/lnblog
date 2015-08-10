@@ -274,7 +274,7 @@ class WebPages {
 			Page::instance()->setDisplayObject($this->blog);
 			$relpath = $this->blog->home_path;
 			$this->verifyUserCanModifyBlog(SERVER("referer"), $message_403);
-		} elseif ($this->user->isAdministrator() ) {
+		} elseif (! $this->user->isAdministrator() ) {
 			$this->redirectOr403(SERVER("referer"), $message_403);
 		}
 		
