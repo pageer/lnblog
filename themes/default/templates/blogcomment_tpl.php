@@ -48,13 +48,13 @@ if (isset($USER_ID)) {
 <li><?php pf_("Posted by %s %s at %s", $show_name, $show_url, $DATE); ?></li>
 <?php
 	# Show the administrative links.
-	if ($SHOW_CONTROLS) { ?>
+	if ($SHOW_CONTROLS): ?>
 	<li>
 		<ul class="controlbar">
-		<?php foreach ($CONTROL_BAR as $item) {	?>
+		<?php foreach ($CONTROL_BAR as $item): ?>
 		<li><?php echo $item; ?></li>
-		<?php } /* End foreach */ ?>
+		<?php endforeach; ?>
 		</ul>
 	</li>
-	<?php } /* End admin links */ ?>
+	<?php endif; ?>
 </ul>

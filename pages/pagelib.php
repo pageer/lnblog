@@ -54,7 +54,7 @@ function handle_comment(&$ent, $use_comm_link=false) {
 			if ( strpos(POST('subject'), "\n") !== false ||
 				 strpos(POST('username'), "\n") !== false ||
 				 strpos(POST('email'), "\n") !== false ||
-				 strpos(POST('url'), "\n") !== false ) {
+				 strpos(POST('homepage'), "\n") !== false ) {
 				$err = _("Error: line breaks are only allowed in the comment body.  What are you, a spam bot?");
 			} else {
 				$ret = $cmt->insert($ent);
@@ -72,8 +72,8 @@ function handle_comment(&$ent, $use_comm_link=false) {
 					setcookie("comment_name", POST("username"), $exp, $path);
 				if (POST("email"))
 					setcookie("comment_email", POST("email"), $exp, $path);
-				if (POST("url"))
-					setcookie("comment_url", POST("url"), $exp, $path);
+				if (POST("homepage"))
+					setcookie("comment_url", POST("homepage"), $exp, $path);
 				if (POST("showemail"))
 					setcookie("comment_showemail", POST("showemail"), $exp, $path);
 			}
@@ -84,7 +84,7 @@ function handle_comment(&$ent, $use_comm_link=false) {
 			# Set the data back in the form, along with error messages.
 			$comm_tpl->set("COMMENT_DATA", POST('data'));
 			$comm_tpl->set("COMMENT_SUBJECT", POST('subject'));
-			$comm_tpl->set("COMMENT_URL", POST('url'));
+			$comm_tpl->set("COMMENT_URL", POST('homepage'));
 			$comm_tpl->set("COMMENT_NAME", POST('username'));
 			$comm_tpl->set("COMMENT_EMAIL", POST('email'));
 			$comm_tpl->set("COMMENT_SHOWEMAIL", POST('showemail'));

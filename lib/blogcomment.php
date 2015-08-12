@@ -229,8 +229,9 @@ class BlogComment extends Entry {
 		# when we add in the links and other markup.
 		$this->name = $processor->getHTML($this->name);
 		$this->email = $processor->getHTML($this->email);
-		$this->url = $processor->getHTML($this->url);
 		$this->subject = $processor->getHTML($this->subject);
+		# Don't escape the URL, because we want the actual value.
+		$this->url = $this->url;
 		
 		if (! $this->uid) {
 			$u = NewUser();
@@ -374,16 +375,19 @@ class BlogComment extends Entry {
 		$usr = NewUser();
 		$show_edit_controls = System::instance()->canModify($this->getParent());
 
-		if (! $this->name) $this->name = ANON_POST_NAME;
-		if (! $this->subject) $this->subject = NO_SUBJECT;
+		if (! $this->name) {
+			$this->name = ANON_POST_NAME;
+		}
+		if (! $this->subject) {
+			$this->subject = NO_SUBJECT;
+		}
 		if ($this->uid) {
 			$u = NewUser($this->uid);
 			$u->exportVars($t);
 		}
 		
 		$t->set("SUBJECT", $this->subject);
-		if ( strtolower(substr(trim($this->url), 0, 7)) != "http://" &&
-		     $this->url != "" ) {
+		if ( strtolower(substr(trim($this->url), 0, 4)) != "http" && $this->url != "" ) {
 			$this->url = "http://".$this->url;
 		}
 		$this->url = filter_var($this->url, FILTER_VALIDATE_URL);
