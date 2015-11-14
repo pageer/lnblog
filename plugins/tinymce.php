@@ -40,6 +40,8 @@ class TinyMCEEditor extends Plugin {
 						 "link image searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking",
 						 "hr charmap table contextmenu directionality emoticons template paste textcolor preview stylebuttons"
 				   ],
+				   browser_spellcheck: true,
+				   gecko_spellcheck: true,
 				   content_css: "css/content.css",
 				   toolbar: "bold italic underline | style-code | forecolor backcolor | link image media fullpage emoticons | bullist numlist | preview",
 				   removed_menuitems: "newdocument"
