@@ -1472,6 +1472,7 @@ class WebPages {
 			'newentry'   => 'entryedit',
 			'editentry'   => 'entryedit',
 			'delentry'   => 'delentry',
+			'delcomment' => 'delcomment',
 			'edit'       => 'updateblog',
 			'login'      => 'bloglogin.php',
 			'logout'     => 'bloglogout.php',

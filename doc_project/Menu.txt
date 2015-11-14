@@ -100,7 +100,7 @@ Group: Other Pages  {
    File: fileupload.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\fileupload.php)
    File: manage_replies.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\manage_replies.php)
    File: pagelib.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\pagelib.php)
-   File: pages\showitem.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\showitem.php)
+   File: pages\showitem.php  (no auto-title, C:\Users\pageer\Documents\Projects\lnblog\pages\showitem.php)
    File: showall.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\showall.php)
    File: showarticles.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\showarticles.php)
    File: showblog.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\showblog.php)
@@ -115,13 +115,14 @@ Group: API Endpoints  {
 
 Group: Libraries  {
 
+   File: AdminPages.class.php  (C:\Users\pageer\Documents\Projects\lnblog\lib\AdminPages.class.php)
    File: Article  (C:\Users\pageer\Documents\Projects\lnblog\lib\article.php)
    File: Blog  (C:\Users\pageer\Documents\Projects\lnblog\lib\blog.php)
    File: BlogComment  (C:\Users\pageer\Documents\Projects\lnblog\lib\blogcomment.php)
    File: BlogEntry  (C:\Users\pageer\Documents\Projects\lnblog\lib\blogentry.php)
    File: Creator Functions  (no auto-title, C:\Users\pageer\Documents\Projects\lnblog\lib\creators.php)
    File: Draft  (C:\Users\pageer\Documents\Projects\lnblog\lib\draft.php)
-   File: Entry  (C:\Users\pageer\Documents\Projects\lnblog\lib\entry.php)
+   File: Entry  (no auto-title, C:\Users\pageer\Documents\Projects\lnblog\lib\entry.php)
    File: EventRegister  (C:\Users\pageer\Documents\Projects\lnblog\lib\eventregister.php)
    File: FileUpload  (C:\Users\pageer\Documents\Projects\lnblog\lib\FileUpload.class.php)
    File: FS  (C:\Users\pageer\Documents\Projects\lnblog\lib\fs.php)
@@ -138,10 +139,11 @@ Group: Libraries  {
    File: SimpleXMLWriter  (C:\Users\pageer\Documents\Projects\lnblog\lib\xml.php)
    File: System  (C:\Users\pageer\Documents\Projects\lnblog\lib\system.php)
    File: Trackback  (C:\Users\pageer\Documents\Projects\lnblog\lib\Trackback.class.php)
-   File: URI  (C:\Users\pageer\Documents\Projects\lnblog\lib\uri.php)
-   File: URI Factory  (C:\Users\pageer\Documents\Projects\lnblog\lib\urifactory.php)
+   File: URI  (no auto-title, C:\Users\pageer\Documents\Projects\lnblog\lib\uri.php)
+   File: URI Factory  (no auto-title, C:\Users\pageer\Documents\Projects\lnblog\lib\urifactory.php)
    File: User  (C:\Users\pageer\Documents\Projects\lnblog\lib\user.php)
    File: Utilities  (C:\Users\pageer\Documents\Projects\lnblog\lib\utils.php)
+   File: WebPages.class.php  (C:\Users\pageer\Documents\Projects\lnblog\lib\WebPages.class.php)
    }  # Group: Libraries
 
 Group: Standard Plugins  {

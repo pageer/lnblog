@@ -282,7 +282,7 @@ function show_replies(&$ent, &$usr, &$replies, $title) {
 			$qs = array('blog'=>$blog->blogid);
 			if ($ent->isEntry()) $qs['entry'] = $ent->entryID();
 			else $qs['article'] = $ent->entryID();
-			$url = make_uri(INSTALL_ROOT_URL."pages/delcomment.php", $qs);
+			$url = make_uri(false, array('action' => 'delcomment'));
 			$tpl->set("FORM_ACTION", $url);
 		}
 		
@@ -350,7 +350,7 @@ function show_all_replies(&$ent, &$usr) {
 			$qs = array('blog'=>$blog->blogid);
 			if ($ent->isEntry()) $qs['entry'] = $ent->entryID();
 			else $qs['article'] = $ent->entryID();
-			$url = make_uri(INSTALL_ROOT_URL."pages/delcomment.php", $qs);
+			$url = make_uri(false, array('action' => 'delcomment'));
 			$tpl->set("FORM_ACTION", $url);
 		}
 		
