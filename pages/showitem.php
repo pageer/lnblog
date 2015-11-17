@@ -21,7 +21,11 @@
 
 session_start();
 $page = new WebPages();
-$page->showitem();
+if (isset($_GET['action'])) {
+	$page->showblog();
+} else {
+	$page->showitem();
+}
 exit;
 
 

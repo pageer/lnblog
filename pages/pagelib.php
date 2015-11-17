@@ -229,7 +229,6 @@ function reply_boxes($idx, &$obj) {
 	return '<span>'.
 	       '<input type="hidden" '.
 	       'name="responseid'.$idx.'" id="'.get_class($obj).'id'.$idx.'" '.
-	       #'value="'.$obj->getAnchor().'" />'.
 		   'value="'.$obj->globalID().'" />'.
 	       '<input type="checkbox" name="response'.$idx.'" '.
 	       'id="'.get_class($obj).$idx.'" class="markbox" /></span>';
@@ -246,7 +245,7 @@ function reply_boxes($idx, &$obj) {
 function show_replies(&$ent, &$usr, &$replies, $title) {
 
 	$ret = "";
-	$count = 1;
+	$count = 0;
 	if ($replies) {
 		$reply_text = array();
 		$count = 0;
@@ -254,8 +253,8 @@ function show_replies(&$ent, &$usr, &$replies, $title) {
 			if (! isset($reply_type)) $reply_type = get_class($reply);
 			$tmp = $reply->get();
 			if (System::instance()->canModify($reply, $usr)) {
-				$count += 1;
 				$tmp = reply_boxes($count, $reply).$tmp;
+				$count += 1;
 			}
 			$reply_text[] = $tmp;
 		}
@@ -318,7 +317,7 @@ function show_all_replies(&$ent, &$usr) {
 	usort($replies, 'reply_compare');
 			  
 	$ret = "";
-	$count = 1;
+	$count = 0;
 	if ($replies) {
 		$reply_text = array();
 		$count = 0;
@@ -326,8 +325,8 @@ function show_all_replies(&$ent, &$usr) {
 		foreach ($replies as $reply) {
 			$tmp = $reply->get();
 			if (System::instance()->canModify($reply, $usr)) {
-				$count += 1;
 				$tmp = reply_boxes($count, $reply).$tmp;
+				$count += 1;
 			}
 			$reply_text[] = $tmp;
 		}

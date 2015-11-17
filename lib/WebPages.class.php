@@ -1077,7 +1077,8 @@ class WebPages {
 		
 		$idx = 0;
 		foreach ($repl_array as $ent) {
-			$ITEM_LIST[] = $this->get_display_markup($ent, $idx++);
+			$ITEM_LIST[] = $this->get_display_markup($ent, $idx);
+			$idx++;
 		}
 		
 		$tpl->set("ITEM_LIST", $ITEM_LIST);
@@ -1483,7 +1484,7 @@ class WebPages {
 			'pluginload' => 'plugin_loading.php',
 			'profile'    => 'userinfo.php',
 			'managereply'=> 'managereplies',
-			'editfile'   => 'editfile'
+			'editfile'   => 'editfile',
 		);
 		
 		if ( isset($_GET['action']) && isset($action_map[$_GET['action']]) ) {
