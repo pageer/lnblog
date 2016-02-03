@@ -107,7 +107,7 @@ class Blog extends LnBlogObject {
 	function getPathFromEnvironment() {
 		$path = '';
 		if (isset($_GET['blog']) ) {
-			$path = trim(preg_replace("/[^A-Za-z0-9\-_\/\\]/", '', $_GET["blog"]));
+			$path = trim(preg_replace("/[^A-Za-z0-9\-_\/\\\]/", '', $_GET["blog"]));
 		}
 		
 		if ($path) {
