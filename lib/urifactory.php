@@ -253,7 +253,7 @@ class BlogEntryURIWrapper extends LnBlogObject {
 	function pingback() { return $this->base_uri.ENTRY_PINGBACK_DIR."/"; }
 	function upload() {return $this->base_uri."/?action=upload"; }
 	
-	function edit() { return $this->base_uri."?action=edit"; }
+	function edit() { return $this->base_uri."?action=editentry"; }
 	function editDraft() {
 		$b = NewBlog();
 		return make_uri($b->uri('drafts'), 
