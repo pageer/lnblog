@@ -51,7 +51,13 @@ class TinyMCEEditor extends Plugin {
 				$ret = '';
 		}
 		
-		$obj = '{selector: "'.$selector.'"';
+		$obj = '{
+			selector: "'.$selector.'",
+			setup: function(ed) {
+				ed.on("change", function(e) {
+					current_text_content = ed.getContent();
+				});
+			}';
 		if ($ret) {
 			$obj .= ", $ret";
 		}
@@ -90,6 +96,10 @@ class TinyMCEEditor extends Plugin {
 					})
 				});
 			});
+			
+			setInterval(function tinymceUpdate() {
+				current_text_content = tinyMCE.activeEditor.getContent();
+			}, 5000);
 			
 			if (unconditional_display) {
 				tinymce.init($init);

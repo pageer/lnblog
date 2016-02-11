@@ -1,3 +1,4 @@
+/*global strings */
 function LBCodeEditor() {
 
 	this.short_forms = [];
@@ -307,8 +308,23 @@ function LBCodeEditor() {
 }
 
 var lbcode_editor = new LBCodeEditor();
+var original_text_content = '';
+var current_text_content = '';
+
+$(window).on('beforeunload', function unloadHandler() {
+	if (current_text_content !== original_text_content) {
+        return strings.editor_leavePrompt;
+    }
+});
 
 $(document).ready(function () {
+	
+	original_text_content = $('#body').val();
+	current_text_content = original_text_content;
+	
+	$('#body').on('change', function bodyChange() {
+		current_text_content = $(this).val();
+	});
 	
 	// Auto-publish widgets
 	$('#autopublishdate').datetimepicker({
@@ -389,6 +405,8 @@ $(document).ready(function () {
 			$('#postform').hide().ajaxSubmit(options);
 			return false;
 		}
+		// Make the submission not prompt to leave the page.
+		current_text_content = original_text_content;
 		return true;
 	});
 });

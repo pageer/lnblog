@@ -1,4 +1,6 @@
+/*global strings, lnblog */
 function comm_del() {
+	/*jshint regexp:false */
 	var item = this.href.replace(/^.*delete=(.+)$/, "$1");
 	var res = window.confirm(strings.get('entry_deleteConfirm', item));
 	if (res) {
@@ -13,8 +15,8 @@ function comm_del() {
 
 function mark_all() {
 	var boxes = document.getElementsByTagName('input');
-	for (i = 0; i < boxes.length; i++) {
-		if (boxes[i].class == 'markbox') {
+	for (var i = 0; i < boxes.length; i++) {
+		if (boxes[i]['class'] == 'markbox') {
 			boxes[i].checked = !boxes[i].checked;
 		}
 	}
@@ -24,9 +26,8 @@ function mark_type(itemtype) {
 	var boxes = document.getElementsByTagName('input');
 	var str = '^'+itemtype;
 	var re = new RegExp(str);
-	for (i = 0; i < boxes.length; i++) {
-		if (boxes[i].class = 'markbox' && 
-		    re.test(boxes[i].id) ) {
+	for (var i = 0; i < boxes.length; i++) {
+		if (boxes[i]['class'] == 'markbox' && re.test(boxes[i].id) ) {
 			boxes[i].checked = !boxes[i].checked;
 		}
 	}
@@ -56,3 +57,24 @@ function attachDeleteHandlers() {
 }
 
 lnblog.addEvent(window, 'load', attachDeleteHandlers);
+
+// Global to track "dirty" status of form.
+var current_text_content = '';
+var original_text_content = '';
+
+// Window unload hanlder for comment box.
+$(window).on('beforeunload', function windowUnload() {
+	if (current_text_content !== original_text_content) {
+        return strings.editor_leavePrompt;
+    }
+});
+
+$(document).ready(function documentReady() {
+	$('#commentform #data').on('change', function commentChange() {
+		current_text_content = $(this).val();
+	});
+	
+	$('#commentform').on('submit', function commentSubmit() {
+		current_text_content = original_text_content;
+	});
+});
