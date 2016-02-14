@@ -5,7 +5,7 @@
 class LnBlogAd extends Plugin {
 
 	function __construct($do_output=0) {
-		$this->plugin_desc = _("Shameless link whoring.  Put a link to LBlog on the page.");
+		$this->plugin_desc = _("Shameless link whoring.  Put a link to LnBlog on the page.");
 		$this->plugin_version = "0.2.1";
 		$this->use_footer = false;
 		$this->addOption("use_footer",
