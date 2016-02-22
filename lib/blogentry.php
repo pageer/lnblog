@@ -18,8 +18,6 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-require_once INSTALL_ROOT.DIRECTORY_SEPARATOR."lib/urifactory.php";
-
 /*
 Class: BlogEntry
 Represents an entry in the weblog.

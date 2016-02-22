@@ -42,6 +42,62 @@ define("LINK_IMAGE", "images");
 define("LINK_STYLESHEET", "styles");
 define("LINK_SCRIPT", "scripts");
 
+# Function: create_uri_object
+# Gets the appropriate URI generator class for a given object and type.  
+# Basically, this the lazy dynamic programmer's version of a factory pattern.
+#
+# Parameters:
+# object - The object for which to get a URI generator.  The class of the object
+#          determines the class returned.  Note that this function supports 
+#          one level of inheritance, i.e. if the class doesn't have a URI class
+#          of its own, the parent class's is used.
+# type   - Optional boolean that determines what kind of URI we're using, e.g.
+#          querystring, htaccess, or wrapper scripts.  If not specified, then
+#          the value of the URI_TYPE configuration constant is used.
+#
+# Returns:
+# A URI generator object.  The exact object type is determined by the parameters
+# to this function call.
+function create_uri_object(&$object, $type=false) {
+	$objtype = get_class($object);
+	$partype = get_parent_class($object);
+	if (!$type) {
+		$type = URI_TYPE;
+	}
+	
+	switch ($type) {
+		case "hybrid":
+			$type_ext = "URIHybrid";
+			break;
+		case "querystring":
+			$type_ext = "URIQueryString";
+			break;
+		case "htaccess":
+			$type_ext = "URIhtaccess";
+			break;
+		default:
+			$type_ext = "URIWrapper";
+	}
+	
+	# If the object class and URI type is not available, try the parent class.
+	$creator = $objtype.$type_ext;
+	if (! class_exists($creator)) {
+		$creator = $partype.$type_ext;
+	}
+	
+	# Neither the object nor parent class have the selected URI type, try
+	# dropping back to the default URI type.
+	$default_ext = "URIWrapper";
+	if (! class_exists($creator)) {
+		$creator = $objtype.$default_ext;
+	}
+	if (! class_exists($creator)) {
+		$creator = $partype.$default_ext;
+	}
+	
+	return new $creator($object);
+}
+
 # Function: write_file
 # Write contents to a file.  Basically a wrapper around fopen and fwrite.
 # This function was rewritten to use the FS abstract interface.  For 

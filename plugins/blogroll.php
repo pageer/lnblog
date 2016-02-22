@@ -13,7 +13,6 @@
 
 if (! class_exists("Blogroll")):  # Start massive if statement to prevent multiple definition
 
-require_once 'lib/xml.php';
 class Blogroll extends Plugin {
 
 	function __construct($do_output=false) {

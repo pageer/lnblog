@@ -14,7 +14,7 @@ function lib_autoload($className) {
 	$files = array(
 		implode(DIRECTORY_SEPARATOR, array(__DIR__, 'lib', strtolower($className).'.php')),
 		implode(DIRECTORY_SEPARATOR, array(__DIR__, 'lib', strtolower($className).'class.php')),
-		implode(DIRECTORY_SEPARATOR, array(__DIR__, 'lib', $className.'class.php')),
+		implode(DIRECTORY_SEPARATOR, array(__DIR__, 'lib', $className.'.class.php')),
 	);
 	foreach ($files as $file) {
 		if (file_exists($file)) {
@@ -25,7 +25,12 @@ function lib_autoload($className) {
 }
 
 function class_autoload($className) {
-	$folders = array('lib', 'lib'.DIRECTORY_SEPARATOR.'textprocessors', 'persistence', 'controllers');
+	$folders = array(
+		'lib'.DIRECTORY_SEPARATOR.'textprocessors',
+		'lib'.DIRECTORY_SEPARATOR.'uri',
+		'persistence',
+		'controllers',
+	);
 	foreach ($folders as $fld) {
 		$fileName = array(__DIR__, $fld, $className.'.class.php');
 		$file = implode(DIRECTORY_SEPARATOR, $fileName);

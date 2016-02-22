@@ -4,7 +4,6 @@
 # It includes a configurable title and HTML text input as well as an option to display
 # a picture.
 
-require_once 'lib/xml.php';
 class AuthorBio extends Plugin {
 	
 	public $title;

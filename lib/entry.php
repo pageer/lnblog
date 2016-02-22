@@ -19,7 +19,6 @@
 */
 
 require_once("utils.php");
-require_once("xml.php");
 
 # Class: Entry
 # An abstract class representing entries of all types in the blog database.

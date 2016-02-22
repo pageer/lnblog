@@ -1471,7 +1471,7 @@ class WebPages {
 		$action_map = array(
 			'about'      => 'about',
 			'newentry'   => 'entryedit',
-			'editentry'   => 'entryedit',
+			'editentry'  => 'entryedit',
 			'delentry'   => 'delentry',
 			'delcomment' => 'delcomment',
 			'edit'       => 'updateblog',
@@ -1563,6 +1563,7 @@ class WebPages {
 		foreach ($drafts as $d) {
 			$linklist[] = $this->draft_item_markup($d);
 		}
+		$linklist = array_reverse($linklist);
 		
 		$tpl->set("ITEM_LIST", $linklist);
 		$body = $tpl->process();

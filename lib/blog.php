@@ -18,8 +18,6 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-require_once __DIR__.DIRECTORY_SEPARATOR.'urifactory.php';
-
 /* Class: Blog
  * The "master" class which represents a weblog.  Nearly all functions are 
  * performed through this object. This is the object that handles user security.
