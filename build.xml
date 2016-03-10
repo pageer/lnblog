@@ -61,4 +61,9 @@
 
         <echo msg="Dist build complete!" />
     </target>
+	
+	<target name="devserver">
+		<echo msg="Starting PHP server on port 4080" />
+		<exec command="php -S localhost:4080" dir=".." />
+	</target>
 </project>

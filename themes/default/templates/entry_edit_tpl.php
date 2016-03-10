@@ -140,13 +140,13 @@
 				
 				<div>
 				<?php $title = _("Allow this entry to receive Pingback pings from other blogs");?>
-				<input id="pingbacks" name="pingbacks" title="<?php echo $title?>" type="checkbox" <?php echo (! isset($PINGBACKS) || $PINGBACKS) ? 'checked="checked"' : ''?> />
+				<input id="pingbacks" name="pingbacks" title="<?php echo $title?>" type="checkbox" <?php echo !empty($PINGBACKS) ? 'checked="checked"' : ''?> />
 				<label for="pingbacks" title="<?php echo $title;?>"><?php p_("Allow Pingbacks")?></label>
 				</div>
 				
 				<div>
 				<?php $title = spf_("If this box is checked, then after the entry is published, %s will attempt to send Pingback pings to any URLs in the body of the post.", PACKAGE_NAME);?>
-				<input id="send_pingbacks" name="send_pingbacks" title="<?php echo $title?>" type="checkbox" <?php echo empty($SEND_PINGBACKS) ? 'checked="checked"' : ''?> />
+				<input id="send_pingbacks" name="send_pingbacks" title="<?php echo $title?>" type="checkbox" <?php echo !empty($SEND_PINGBACKS) ? 'checked="checked"' : ''?> />
 				<label for="send_pingbacks" title="<?php echo $title?>"><?php p_("Send Pingbacks after posting")?></label>
 				</div>
 			</div>
