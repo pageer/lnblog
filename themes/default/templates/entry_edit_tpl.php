@@ -85,7 +85,15 @@
 					<input id="short_path" name="short_path" title="<?php p_("The last part of the URL path for this article");?>"
 						   placeholder="<?php p_("Article path")?>" type="text" size="30" <?php echo $url_val?> />
 				</div>
+				<?php endif; ?>
 				
+				<div class="sticky-toggle">
+					<?php $title = _("Show a link to this in the articles panel of the sidebar");?>
+					<input id="sticky" name="sticky" title="<?php echo $title?>" type="checkbox" <?php echo $STICKY ? 'checked="checked"' : ''?> />
+					<label for="sticky" title="<?php echo $title?>"><?php p_("Show in sidebar")?></label>
+				</div>
+				
+				<?php if (!$PUBLISHED): ?>
 				<div>
 					<?php
 					$title = _("Auto-publish this entry at this date");
@@ -103,14 +111,6 @@
 					<input type="checkbox" class="checktoggle" id="hasenclosure" name="hasenclosure" data-for="enclosure" value="1" <?php echo empty($ENCLOSURE) ? '' : "checked"?> />
 					<label for="hasenclosure" title="<?php echo $title?>"><?php p_("Enclosure/Podcast")?></label>
 					<input type="text" name="enclosure" size="30" placeholder="<?php p_('File URL')?>" id="enclosure" title="<?php echo $title?>" value="<?php echo isset($ENCLOSURE) ? $ENCLOSURE : ''?>" />
-				</div>
-				<?php endif; ?>
-				
-				<?php if (isset($STICKY)): /* Checkbox to make articles "sticky". */ ?>
-				<div>
-				<?php $title = _("Show a link to this in the articles panel of the sidebar");?>
-				<label for="sticky" title="<?php echo $title?>"><?php p_("Show in sidebar")?></label>
-				<input id="sticky" name="sticky" title="<?php echo $title?>" type="checkbox" <?php echo $STICKY ? 'checked="checked"' : ''?> />
 				</div>
 				<?php endif; ?>
 				

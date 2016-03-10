@@ -274,9 +274,14 @@ function LBCodeEditor() {
 	}
 	
 	function articleSet(e) {
-		var path = document.getElementById('short_path');
 		var isart = document.getElementById('publisharticle');
-		path.style.display = isart.checked ? 'inline' : 'none';
+		if (isart.checked) {
+			$('.sticky-toggle').show();
+			$('#short_path').show();
+        } else {
+			$('.sticky-toggle').hide();
+			$('#short_path').hide();
+		}
 	}
 	
 	function document_add_all_events (e) {

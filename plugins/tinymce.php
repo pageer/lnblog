@@ -23,7 +23,7 @@ class TinyMCEEditor extends Plugin {
 		$this->addOption("theme", _("TinyMCE theme to use"),"advanced","select",
 			array("basic"=>_("Basic"),"advanced"=>_("Advanced"))
 			);
-		$this->addOption("url", _('URL to TinyMCE'), '//tinymce.cachefly.net/4.0/tinymce.min.js');
+		$this->addOption("url", _('URL to TinyMCE'), '//cdn.tinymce.com/4/tinymce.min.js');
 		parent::__construct();
 	}
 	
