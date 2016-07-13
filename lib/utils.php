@@ -817,6 +817,10 @@ function getlink($name, $type=false) {
 		$ret = $blog->uri('script', $name);
 	}
 	
+	// HACK: There is a not insignificant chance that this will break something.
+	// I lament ever having written this function.
+	$ret = preg_replace('/^https?:/', '', $ret);
+	
 	return $ret;
 }
 
