@@ -34,7 +34,7 @@ class WebPages {
 	
 	protected function reqVar($key) {
 		if (isset($_POST[$key])) {
-			return $_GPOST[$key];
+			return $_POST[$key];
 		} elseif (isset($_GET[$key])) {
 			return $_GET[$key];
 		} else {
@@ -1231,7 +1231,7 @@ class WebPages {
 							#make_uri(false, array('action'=>'manage_reply'), false).
 							_("Manage replies").'</a>';
 		
-		$tpl->set('LIST_TITLE', get_list_title($blog));
+		$tpl->set('LIST_TITLE', $this->get_list_title($blog));
 		if (empty($list)) {
 			$tpl->set("LIST_HEADER", _("There are no entries for this blog."));
 		} else {
@@ -1277,7 +1277,7 @@ class WebPages {
 						'<a href="'.$blog->uri('archives').'/">'.
 						_("Back to main archives").'</a>';
 		
-		$tpl->set('LIST_TITLE', get_list_title($blog, $year));
+		$tpl->set('LIST_TITLE', $this->get_list_title($blog, $year));
 		if (empty($links)) {
 			$tpl->set("LIST_HEADER", _("There are no entries for this year."));
 		} else {
