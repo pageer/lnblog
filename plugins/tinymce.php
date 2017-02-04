@@ -19,59 +19,56 @@ class TinyMCEEditor extends Plugin {
 
 	public function __construct() {
 		$this->plugin_desc = _("Use TinyMCE for the post editor and file editor.");
-		$this->plugin_version = "0.2.1";
-		$this->addOption("theme", _("TinyMCE theme to use"),"advanced","select",
-			array("basic"=>_("Basic"),"advanced"=>_("Advanced"))
-			);
+		$this->plugin_version = "0.2.2";
+		$this->addOption("theme", _("TinyMCE theme to use"), "advanced", "select",
+			array("basic" => _("Basic"), "advanced" => _("Advanced"))
+		);
 		$this->addOption("url", _('URL to TinyMCE'), '//cdn.tinymce.com/4/tinymce.min.js');
 		parent::__construct();
 	}
 	
-	protected function getInitString($selector) {
-		$selector = $selector ?: 'textarea#body';
-		switch ($this->theme) {
-			case "basic":
-				$ret = '';
-				break;
-			case "advanced":
-				$ret = '
-					theme: "modern",
-					plugins: [
-						 "link image searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking",
-						 "hr charmap table contextmenu directionality emoticons template paste textcolor preview stylebuttons"
-				   ],
-				   browser_spellcheck: true,
-				   gecko_spellcheck: true,
-				   content_css: "css/content.css",
-				   toolbar: "bold italic underline | style-code | forecolor backcolor | link image media fullpage emoticons | bullist numlist | preview",
-				   removed_menuitems: "newdocument"
-				';
-				break;
-			default:
-				$ret = '';
-		}
-		
-		$obj = '{
-			selector: "'.$selector.'",
+	public function show_editor($selector = '') {
+		Page::instance()->addExternalScript($this->url);
+		ob_start();
+		?>
+		// <script> 
+		/*global tinymce, tinyMCE, current_text_content:true */
+		var MARKUP_HTML = <?php echo MARKUP_HTML?>;
+		var selector = "<?php echo $selector?>";
+		<?php if ($this->theme == 'advanced'): ?>
+		var init = {
+			selector: selector || 'textarea#body',
 			setup: function(ed) {
 				ed.on("change", function(e) {
 					current_text_content = ed.getContent();
 				});
-			}';
-		if ($ret) {
-			$obj .= ", $ret";
-		}
-		$obj .= "}";
+			},
+			theme: "modern",
+			plugins: [
+				"link lists image searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime",
+				"media nonbreaking hr charmap table contextmenu directionality emoticons template paste textcolor ",
+				"preview stylebuttons"
+			],
+			browser_spellcheck: true,
+			gecko_spellcheck: true,
+			content_css: "css/content.css",
+			toolbar: "bold italic underline | style-code | bullist numlist | forecolor backcolor | link image media emoticons | preview",
+			removed_menuitems: "newdocument"
+		};
+		<?php else: ?>
+		var init = {
+			selector: selector || 'textarea#body',
+			setup: function(ed) {
+				ed.on("change", function(e) {
+					current_text_content = ed.getContent();
+				});
+			}
+		};
+		<?php endif; ?>
 		
-		return $obj;
-	}
-	
-	public function show_editor($selector = '') {
-		Page::instance()->addExternalScript($this->url);
-		$init = $this->getInitString($selector);
-		$scr  = "jQuery(document).ready(function() {
-			var \$input_mode = $('#input_mode'),
-			    unconditional_display = ".($selector ? 'true' : 'false').";
+		jQuery(document).ready(function() {
+			var $input_mode = $('#input_mode');
+			var unconditional_display = selector ? true : false;
 			
 			// Suppress the plugin on the list-link page.
 			if (window.location.href.match('[?&]list=yes')) {
@@ -86,14 +83,19 @@ class TinyMCEEditor extends Plugin {
 						text: name.toUpperCase(),
 						onClick: function() { editor.execCommand('mceToggleFormat', false, name); },
 						onPostRender: function() {
-							var self = this, setup = function() {
+							var self = this;
+							var setup = function() {
 								editor.formatter.formatChanged(name, function(state) {
 									self.active(state);
 								});
 							};
-							editor.formatter ? setup() : editor.on('init', setup);
+							if (editor.formatter) {
+								setup();
+							} else {
+								editor.on('init', setup);
+							}
 						}
-					})
+					});
 				});
 			});
 			
@@ -102,14 +104,14 @@ class TinyMCEEditor extends Plugin {
 			}, 5000);
 			
 			if (unconditional_display) {
-				tinymce.init($init);
+				tinymce.init(init);
 				$('#postform').addClass('rich-text');
 				
-				var \$toggle_button = $('<button>"._('Toggle HTML Editor')."</button>');
-				\$toggle_button.off('click').on('click', function (e) {
+				var $toggle_button = $('<button><?php p_('Toggle HTML Editor')?></button>');
+				$toggle_button.off('click').on('click', function (e) {
 					e.preventDefault();
-					if (tinymce.editors.length == 0) {
-						tinymce.init($init);
+					if (tinymce.editors.length === 0) {
+						tinymce.init(init);
 					} else {
 						tinymce.remove();
 					}
@@ -119,28 +121,27 @@ class TinyMCEEditor extends Plugin {
 				$('textarea').closest('form')
 							  .find('button, input[type=submit], input[type=reset]')
 							  .filter(':last')
-							  .after(\$toggle_button);
+							  .after($toggle_button);
 			} else {
-				if (\$input_mode.val() == ".MARKUP_HTML.") {
-					tinymce.init($init);
+				if ($input_mode.val() == MARKUP_HTML) {
+					tinymce.init(init);
 					$('#postform').addClass('rich-text');
 				}
-				\$input_mode.on('change.editor', function(e) {
+				$input_mode.on('change.editor', function(e) {
 					var mode = $(this).val();
-					$('#postform').toggleClass('rich-text', mode == ".MARKUP_HTML.");
-					if (mode == ".MARKUP_HTML.") { // HTML mode
-						tinymce.init($init);
+					$('#postform').toggleClass('rich-text', mode == MARKUP_HTML);
+					if (mode == MARKUP_HTML) { // HTML mode
+						tinymce.init(init);
 					} else {
 						tinymce.remove();
 					}
 				});
 			}
-		});";
+		});
+		// </script>
+		<?php
+		$scr = ob_get_clean();
 		Page::instance()->addInlineScript($scr);
-	}
-	
-	public function set_markup(&$blog) {
-		$blog->default_markup = MARKUP_HTML;
 	}
 	
 	public function file_editor() {
@@ -154,5 +155,4 @@ class TinyMCEEditor extends Plugin {
 
 $plug = new TinyMCEEditor();
 $plug->registerEventHandler("posteditor", "ShowControls", "show_editor");
-$plug->registerEventHandler("blog", "InitComplete", "set_markup");
 $plug->registerEventHandler('page', 'FileEditorReady', 'file_editor');

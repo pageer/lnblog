@@ -101,7 +101,7 @@
 					?>
 					<input type="checkbox" class="checktoggle" id="autopublish" name="autopublish" data-for="autopublishdate" value="1" <?php echo $AUTO_PUBLISH_DATE ? "checked" : ''?> />
 					<label for="autopublish" title="<?php echo $title?>"><?php p_("Auto-publish")?></label>
-					<input type="datetime-local" id="autopublishdate" name="autopublishdate" value="<?php echo $date_string?>" />
+					<input type="text" id="autopublishdate" name="autopublishdate" value="<?php echo $date_string?>" />
 				</div>
 				<?php endif; ?>
 				
