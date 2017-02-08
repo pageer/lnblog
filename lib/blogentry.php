@@ -708,7 +708,7 @@ class BlogEntry extends Entry {
 			$dirname = $this->getPath($ts, true);
 			$path = mkpath($draft_path, $dirname);
 			$fs = NewFS();
-			$ret &= $fs->mkdir_rec($path);
+			$ret = $ret &&  $fs->mkdir_rec($path);
 			$this->file = mkpath($path, ENTRY_DEFAULT_FILE);
 		}
 		

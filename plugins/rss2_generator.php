@@ -332,8 +332,8 @@ class RSS2FeedGenerator extends Plugin {
 			}
 		
 			$ret = $feed->writeFile($path);	
-			if (! $ret) $ret &=  UPDATE_RSS1_ERROR;
-			else $ret &= UPDATE_SUCCESS;
+			if (! $ret) $ret = $ret && UPDATE_RSS1_ERROR;
+			else $ret = $ret && UPDATE_SUCCESS;
 		}
 		return $ret;
 	}

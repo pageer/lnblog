@@ -195,8 +195,8 @@ class RSS1FeedGenerator extends Plugin {
 				$feed->entrylist[] = new RSS1Entry($ent->permalink(), $ent->subject, $ent->subject);
 		
 			$ret = $feed->writeFile($path);
-			if (! $ret) $ret &= UPDATE_RSS1_ERROR;
-			else $ret &= UPDATE_SUCCESS;
+			if (! $ret) $ret = $ret && UPDATE_RSS1_ERROR;
+			else $ret = $ret && UPDATE_SUCCESS;
 		}
 		return $ret;	
 	}

@@ -1089,8 +1089,8 @@ class Blog extends LnBlogObject {
 		foreach ($dir_list as $dir) {
 			#$ext = substr($dir, strlen($dir) - 4);
 			$path = $start_dir.PATH_DELIM.$dir;
-			$ret &= $fs->chmod($path, $fs->directoryMode() );
-			$ret &= $this->fixDirectoryPermissions($path);
+			$ret = $ret && $fs->chmod($path, $fs->directoryMode() );
+			$ret = $ret && $this->fixDirectoryPermissions($path);
 		}
 		return $ret;
 	}
@@ -1127,7 +1127,7 @@ class Blog extends LnBlogObject {
 			$this->raiseEvent("InsertComplete");
 		}
 		
-		return $ret;
+		return (bool)$ret;
 	}
 	
 	function createBlogDirectories(&$fs, $inst_path) {
@@ -1136,17 +1136,17 @@ class Blog extends LnBlogObject {
 		if ($ret) {
 			$result = create_directory_wrappers($this->home_path, BLOG_BASE, $inst_path);
 			# Returns an array of errors, so convert empty array to true.
-			$ret &= (empty($result) ? true : false);
+			$ret = $ret && empty($result);
 		}
 
 		$p = Path::get($this->home_path, BLOG_ENTRY_PATH);
-		$ret &= $this->createNonExistentDirectory($fs, $p);
+		$ret = $ret && $this->createNonExistentDirectory($fs, $p);
 
 		if ($ret) {
 			$result = create_directory_wrappers($p, BLOG_ENTRIES);
-			$ret &= (empty($result) ? true : false);
+			$ret = $ret && empty($result);
 		}
-		$ret &= $this->createNonExistentDirectory($fs, 
+		$ret = $ret && $this->createNonExistentDirectory($fs, 
 			Path::get($this->home_path, BLOG_FEED_PATH));
 
 		return $ret;
