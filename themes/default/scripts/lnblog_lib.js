@@ -59,10 +59,6 @@ var lnblog = {
 		return ret;
 	},
 	
-	deserializeJSON : function (data) {
-		return eval("("+data+")");
-	}
-
 };
 
 lnblog.addEvent(window, 'load', function() {

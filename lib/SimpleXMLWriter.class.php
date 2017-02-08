@@ -12,7 +12,7 @@ class SimpleXMLWriter {
 	public $exclude_list = array();
 	public $cdata_list = array();
 
-	public function __construct(&$object) {
+	public function __construct($object) {
 		$this->object = $object;
 	}
 
@@ -43,7 +43,7 @@ class SimpleXMLWriter {
 		$this->cdata_list = array_merge($this->cdata_list, $list);
 	}
 
-	public function serializeArray(&$arr, $tag) {
+	public function serializeArray($arr, $tag) {
 		
 		$ret = "<$tag type=\"array\">\n";
 		
@@ -65,7 +65,7 @@ class SimpleXMLWriter {
 		return $ret;
 	}
 
-	public function serializeObject(&$obj) {
+	public function serializeObject($obj) {
 		$ret = '<'.get_class($obj).">\n";
 		foreach ($obj as $field=>$value) {
 			if (! in_array($field, $this->exclude_list) &&

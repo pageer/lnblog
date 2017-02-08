@@ -160,41 +160,4 @@ class LnBlogObject {
 		$xml->populateObject($this);
 	}
 	
-	/* Method: serializeJSON
-	 * Works like <serializeXML>, except returns the string in 
-	 * JavaScriptObject Notation instead of XML.
-	 *
-	 * Returns:
-	 * The JSON representation of the object.
-	 */
-	function serializeJSON() {
-		if (isset($this->exclude_fields) && is_array($this->exclude_fields)) {
-			$this->exclude_fields[] = "exclude_fields";
-		} else {
-			$this->exclude_fields = array("exclude_fields");
-		}
-
-		$items = array();
-
-		foreach ($this as $fld=>$val) {
-			if (! in_array($fld, $this->exclude_fields)) {
-				$ret = "$fld: ";
-				if (is_array($val)) {
-					$ret .= "[";
-					foreach ($val as $v) {
-					
-					}
-					$ret .= "]";
-				} elseif (is_string($val)) {
-					$ret .= "'$val'";
-				} else {
-					$ret .= $val;
-				}
-				$items[] = $ret;
-			}
-		}
-
-		$ret = "{".implode(",", $items)."}";
-		return $ret;
-	 }
 }

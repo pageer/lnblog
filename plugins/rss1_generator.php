@@ -93,6 +93,10 @@ class RSS1 {
 	function writeFile($path) {
 		$fs = NewFS();
 		$content = $this->get();
+		$dir = dirname($path);
+		if (! $fs->is_dir($dir)) {
+			$fs->mkdir($dir);
+		}
 		$ret = $fs->write_file($path, $content);
 		return $ret;
 	}

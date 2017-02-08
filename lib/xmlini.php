@@ -25,7 +25,8 @@ class XMLINI {
 	# member for each tag, with the children as the array elements.
 	# Basically, it mirrors the section/key/value structure of an INI file.
 	function readFile() {
-		$file = new SimpleXMLReader($this->filename);
+		$fs = NewFS();
+		$file = new SimpleXMLReader($fs->read_file($this->filename));
 		$file->setOption('assoc_arrays');
 		$file->parse();
 		$this->data = $file->makeObject('LnBlogXMLConfig');

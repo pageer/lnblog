@@ -19,16 +19,9 @@
 */
 
 /*
- This is a class for doing file operations using the FTP interface.  The 
- purpose for this is to keep sane file permissions on the software-generated
- content.  The FTP interface can create files and directories owned by the 
- user, while the normal local file creation functions will create files 
- owned by the web server process.
- This class uses local file operations for reading files and uses FTP
- operations for writing.  This implies three complications:
-  1) The user must have have FTP access to the web root.
-  2) The PHP FTP extension must be available.
-  3) We must somehow correlate the local path to the FTP path.
+Class NativeFS
+This is a wrapper around the native filesystem access functions, with some
+syntactic sugar thrown in.
 */
 
 class NativeFS extends FS {
@@ -92,11 +85,11 @@ class NativeFS extends FS {
 			if ($ent == "." || $ent == "..") {
 				continue;
 			} else {
-				$ret &= $this->rmdir_rec($dir.PATH_DELIM.$ent);
+				$ret = $ret && $this->rmdir_rec($dir.PATH_DELIM.$ent);
 			}
 		}
 		closedir($dirhand);
-		if ($ret) $ret &= $this->rmdir($dir);
+		if ($ret) $ret = $ret && $this->rmdir($dir);
 		return $ret;	
 	}
 

@@ -19,16 +19,17 @@
 */
 
 /*
- This is a class for doing file operations using the FTP interface.  The 
- purpose for this is to keep sane file permissions on the software-generated
- content.  The FTP interface can create files and directories owned by the 
- user, while the normal local file creation functions will create files 
- owned by the web server process.
- This class uses local file operations for reading files and uses FTP
- operations for writing.  This implies three complications:
-  1) The user must have have FTP access to the web root.
-  2) The PHP FTP extension must be available.
-  3) We must somehow correlate the local path to the FTP path.
+Class: FTPFS
+This is a class for doing file operations using the FTP interface.  The 
+purpose for this is to keep sane file permissions on the software-generated
+content.  The FTP interface can create files and directories owned by the 
+user, while the normal local file creation functions will create files 
+owned by the web server process.
+This class uses local file operations for reading files and uses FTP
+operations for writing.  This implies three complications:
+ 1) The user must have have FTP access to the web root.
+ 2) The PHP FTP extension must be available.
+ 3) We must somehow correlate the local path to the FTP path.
 */
 
 require_once("blogconfig.php");

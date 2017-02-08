@@ -265,26 +265,6 @@ class Blog extends LnBlogObject {
 	}
 
 	/*
-	Method: getDateRange
-	Get all blog entries posted between a given range of dates.
-	Note that the range is inclusive.
-
-	Parameters:
-	end_date   - A string containing end date of the range in "yyyy-mm-dd" 
-	             format.  This can also use "yyyy-mm" or "yyyy" format.
-	start_date - The *optional* start date of the range.  If this is omitted, 
-	             the the end date will be taken as the entirity of the range,
-	             whether it is a day, month, or year.
-
-	Returns:
-	An array of BlogEntry objects.
-	*/
-	function getDateRange($end_date, $start_date = '') {
-		$end = split('-', $end_date);
-		
-	}
-
-	/*
 	Method: getDay
 	Get all the blog entries for a particular day.
 
@@ -353,24 +333,17 @@ class Blog extends LnBlogObject {
 	and/or URL.
 
 	Parameters:
-	year  - *Optional* year you want.
-	month - *Optional* month you want.
+	year  - The year you want.
+	month - The month you want.
 
 	Returns:
 	An array of BlogEntry objects posted in the given month,
 	sorted in reverse chronological order by post date.
 	*/
-	function getMonth($year=false, $month=false) {
+	function getMonth($year, $month) {
 		$ent = NewBlogEntry();
-		$curr_dir = getcwd();
-		if ($year && $month) {
-			$curr_dir = mkpath($this->home_path,BLOG_ENTRY_PATH,$year,$month);
-		} elseif (sanitize(GET("month"), "/\D/") && 
-		          sanitize(GET("year"), "/\D/")) {
-			$curr_dir = $this->home_path.PATH_DELIM.BLOG_ENTRY_PATH.
-			            PATH_DELIM.sanitize(GET("year"), "/\D/").PATH_DELIM.
-							sanitize(GET("month"), "/\D/");
-		}
+		$curr_dir = mkpath($this->home_path,BLOG_ENTRY_PATH,$year,$month);
+		
 		$ent_list = array();
 		$dir_list = scan_directory($curr_dir, true);
 		
@@ -387,40 +360,6 @@ class Blog extends LnBlogObject {
 		foreach ($ent_list as $ent) 
 			$this->entrylist[] = NewBlogEntry(mkpath($curr_dir, $ent));
 		return $this->entrylist;
-	}
-
-	/*
-	Method: getMonthCount
-	Get the number of entries in the given month.  If no month and year are
-	given, try to get them from the current directory/URL.
-
-	Parameters:
-	year  - *Optional* year you want.
-	month - *Optional* month you want.
-
-	Returns:
-	A non-negative integer representing the number of posts in that month.
-	*/
-	function getMonthCount($year=false, $month=false) {
-		$ent = NewBlogEntry();
-		$curr_dir = getcwd();
-		if ($year && $month) {
-			$curr_dir = $this->home_path.PATH_DELIM.BLOG_ENTRY_PATH.
-			            PATH_DELIM.$year.PATH_DELIM.$month;
-		} elseif (sanitize(GET("year"), "/\D/") && 
-		          sanitize(GET("month"), "/\D/")) {
-			$curr_dir = $this->home_path.PATH_DELIM.BLOG_ENTRY_PATH.
-			            PATH_DELIM.sanitize(GET("year"), "/\D/").PATH_DELIM.
-							sanitize(GET("month"), "/\D/");
-		}
-		$dir_list = scan_directory($curr_dir, true);
-		$ent_count = 0;
-		foreach ($dir_list as $file) {
-			if ( $ent->isEntry($curr_dir.PATH_DELIM.$file) ) {
-				$ent_count++;
-			}
-		}
-		return $ent_count;
 	}
 
 	/*

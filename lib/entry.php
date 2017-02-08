@@ -77,6 +77,10 @@ abstract class Entry extends LnBlogObject{
 		"ip"=>"IP", "subject"=>"Subject", "has_html"=>"HasHTML",
 		"tags"=>"Tags", "custom"=>"Custom");
 
+	protected function __construct($filesystem) {
+		$this->fs = $filesystem;
+	}
+	
 	/*
 	Method: localpath
 	Get the path to this entry's directory on the local filesystem.  Note 
@@ -280,10 +284,9 @@ abstract class Entry extends LnBlogObject{
 		if (substr($this->file, strlen($this->file)-4) != ".xml") {
 			$this->readOldFile();
 		} else {
-			$this->deserializeXML($this->file);
+			$this->deserializeXML($this->fs->read_file($this->file));
 		}
 
-		#if (! $this->abstract) $this->abstract = $this->getAbstract();
 		if (is_subclass_of($this, 'BlogEntry')) {
 			$this->id = str_replace(PATH_DELIM, '/', 
 			                        substr(dirname($this->file), 

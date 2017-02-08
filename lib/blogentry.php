@@ -45,21 +45,23 @@ class BlogEntry extends Entry {
 	
 	public $allow_comment = true;
 	public $allow_tb = true;
-	public $has_html;
+	public $has_html = MARKUP_BBCODE;
+	public $enclosure = '';
 	public $abstract;
 
-	public function __construct($path="", $revision=ENTRY_DEFAULT_FILE) {
+	public function __construct($path = "", $filesystem = null) {
+		parent::__construct($filesystem ?: NewFS());
 		
 		$this->initVars();
 		$this->raiseEvent("OnInit");
 		
-		$this->getFile($path, $revision, 
+		$this->getFile($path, ENTRY_DEFAULT_FILE, 
 		               array('entry', 'draft'), 
 		               array(BLOG_ENTRY_PATH, BLOG_DRAFT_PATH),
 		               array('/^\d{4}\/\d{2}\/\d{2}_\d{4}\d?\d?$/',
 		                     '/^\d{2}_\d{4}\d?\d?$/'));
 		
-		if ( file_exists($this->file) ) {
+		if ( $this->fs->file_exists($this->file) ) {
 			$this->readFileData();
 		}
 		
@@ -78,7 +80,7 @@ class BlogEntry extends Entry {
 		$this->template_file = "blogentry_summary_tpl.php";
 		$this->custom_fields = array();
 		$this->exclude_fields = array("exclude_fields", "metadata_fields",
-		                              "template_file", "file");
+		                              "template_file", "file", "fs");
 		$this->metadata_fields = array("id"=>"postid", "uid"=>"userid", 
 			"date"=>"date", "timestamp"=>"timestamp", "post_ts"=>"posttimestamp",
 			"ip"=>"ip", "subject"=>"subject",

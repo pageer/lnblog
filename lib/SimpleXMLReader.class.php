@@ -66,7 +66,7 @@ class SimpleXMLReader {
 		xml_parser_free($this->parser);
 	}
 
-	public function make_array(&$arr) {
+	public function make_array($arr) {
 		$ret = array();
 		foreach ($arr as $a) {
 			if ( isset($a['children']) ) {
@@ -89,7 +89,7 @@ class SimpleXMLReader {
 		return $obj;
 	}
 	
-	public function getVal(&$childnode) {
+	public function getVal($childnode) {
 		if ( isset($childnode['attributes']['TYPE']) ) {
 			$type = $childnode['attributes']['TYPE'];
 			switch($type) {
@@ -106,7 +106,7 @@ class SimpleXMLReader {
 		}
 	}
 	
-	public function setVal(&$obj, $node) {
+	public function setVal($obj, $node) {
 		$tag = $node['tag'];
 		if (isset($obj->$tag) && is_bool($obj->$tag)) {
 			if (in_array(strtolower($node['text']), array('true', 'false'))) {
@@ -123,7 +123,7 @@ class SimpleXMLReader {
 		}
 	}
 
-	public function populateObject(&$obj) {
+	public function populateObject($obj) {
 		if (! isset($this->domtree['children'])) return;
 		foreach ($this->domtree['children'] as $child) {
 			if ( isset($child['children']) ) {

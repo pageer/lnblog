@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Komodo Project File - DO NOT EDIT -->
 <project id="cf5ac35d-c366-4f5d-997b-4ffd815562b0" kpf_version="5" name="LnBlog.komodoproject">
+<file id="65e915bd-5682-4638-aadc-c592334c1533" idref="cf5ac35d-c366-4f5d-997b-4ffd815562b0" name="phpunit.xml" url="phpunit.xml">
+</file>
 <preference-set idref="cf5ac35d-c366-4f5d-997b-4ffd815562b0" id="project" preftype="project">
+  <string relative="path" id="import_dirname"></string>
+  <string id="import_exclude_matches">Data;*.*~;*.bak;*.tmp;CVS;.#*;*.pyo;*.pyc;.svn;_svn;.git;.hg;.bzr;*%25*;tmp*.html;.DS_Store;*.swp;*.kpf;*.komodoproject;.komodotools;__pycache__</string>
+  <string id="last_local_directory">None</string>
+  <string id="last_remote_directory">None</string>
   <long id="prefs_version">1</long>
 </preference-set>
 </project>

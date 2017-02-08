@@ -75,12 +75,13 @@ class Blogroll extends Plugin {
 	
 	function output_opml() {
 	
+		$fs = NewFS();
 		$b = NewBlog();
 		$file = $this->get_file_path($b);
 		
 		if (! file_exists($file)) return false;
 		
-		$parser = new SimpleXMLReader($file);
+		$parser = new SimpleXMLReader($fs->read_file($file));
 		$parser->parse();
 
 		foreach ($parser->domtree['children'] as $child) {

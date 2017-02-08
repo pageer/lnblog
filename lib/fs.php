@@ -212,4 +212,27 @@ abstract class FS {
 	# False on failure, an unspecified non-false value on success.
 	public abstract function write_file($path, $contents);
 
+	# Method: read_file
+	# Read a file from disk.
+	#
+	# Parameters:
+	# path - The path to the file to read.
+	#
+	# Returns:
+	# The file contents as a string, or calse on failure.
+	public function read_file($path) {
+		return file_get_contents($path);
+	}
+	
+	# Method: is_dir
+	# Wrapper around native is_dir() function.
+	public function is_dir($path) {
+		return is_dir($path);
+	}
+	
+	# Method: file_exists
+	# Wrapper around native file_exists() function.
+	public function file_exists($path) {
+		return file_exists($path);
+	}
 }
