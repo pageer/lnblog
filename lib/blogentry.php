@@ -657,7 +657,7 @@ class BlogEntry extends Entry {
 		}
 		$this->raiseEvent("InsertComplete");
 
-		return $ret;
+		return (bool)$ret;
 		
 	}
 	
