@@ -1,6 +1,13 @@
 <?php
 
 class BlogIntTest extends PHPUnit_Framework_TestCase {
+	
+	public function tearDown() {
+		$fs = new NativeFS();
+		if ($fs->is_dir("temp")) {
+			$fs->rmdir_rec("temp");
+		}
+	}
     
    	function testInsertDelete() {
 	

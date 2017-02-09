@@ -7,9 +7,11 @@ class Path {
 	
 	public static $sep = DIRECTORY_SEPARATOR;
 	public $path = array();
+	public $dirsep = DIRECTORY_SEPARATOR;
 	
 	public function __construct() {
 		$this->path = func_get_args();
+		$this->dirsep = self::$sep;
 	}
 	
 	public static function mk($arr=null) {
@@ -29,7 +31,7 @@ class Path {
 	}
 	
 	public function isAbsolute($path) {
-		switch(self::$sep) {
+		switch($this->dirsep) {
 			case self::WINDOWS_SEP: 
 				$c1 = ord(strtoupper(substr($path,0,1)));
 				$c2 = substr($path,1,1);
@@ -45,7 +47,7 @@ class Path {
 	}
 	
 	public function getPath() {
-		return self::implodePath(self::$sep, $this->path);
+		return self::implodePath($this->dirsep, $this->path);
 	}
 	
 	public static function get() {
@@ -55,7 +57,7 @@ class Path {
 	
 	public function getCanonical() {
 		$str = $this->getPath();
-		$components = explode(self::$sep, $str);
+		$components = explode($this->dirsep, $str);
 		$ret = '';
 		
 		for ($i = count($components) - 1; $i > 0; $i--) {
@@ -63,7 +65,7 @@ class Path {
 				case ''   : break;
 				case '.'  : break;
 				case '..' : $i--; break;
-				default   : $ret = self::$sep.$components[$i].$ret;
+				default   : $ret = $this->dirsep.$components[$i].$ret;
 			}
 		}
 		
@@ -82,9 +84,9 @@ class Path {
 			$path = substr($path, strlen($striproot));
 		}
 			
-		if (self::$sep != '/') {
+		if ($this->dirsep != '/') {
 			if ($this->isAbsolute($path)) $path = substr($path, 2);
-			$path = str_replace(self::$sep, '/', $path);
+			$path = str_replace($this->dirsep, '/', $path);
 		}
 		return $path;
 	}
@@ -102,14 +104,6 @@ class Path {
 	public function append($dir) {
 		$args = func_get_args();
 		$this->path = array_merge($this->path, $args);
-	}
-	
-	public function appendSlash($path) {
-		if (substr($path, -1) != self::$sep) {
-			return $path.self::$sep;
-		} else {
-			return $path;
-		}
 	}
 	
 	public function toURL() {

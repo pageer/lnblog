@@ -2,6 +2,9 @@
 class NativeFsIntTest extends PHPUnit_Framework_TestCase {
     function setUp() {
 		$this->init_dir = getcwd();
+        if (! is_dir("temp")) {
+            mkdir("temp");
+        }
     }
     
     function tearDown() {
@@ -11,6 +14,7 @@ class NativeFsIntTest extends PHPUnit_Framework_TestCase {
 		@rmdir("temp/foo/baz");
 		@rmdir("temp/foo/bar");
 		@rmdir("temp/foo");
+        @rmdir("temp");
 	}
     
 	function getOctalPermString($path) {
