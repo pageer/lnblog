@@ -32,8 +32,6 @@ operations for writing.  This implies three complications:
  3) We must somehow correlate the local path to the FTP path.
 */
 
-require_once("blogconfig.php");
-
 class FTPFS extends FS {
 	
 	public $host = '';

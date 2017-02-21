@@ -28,8 +28,6 @@
 
 define("USER_PROFILE_FILE", "user.xml");
 
-require_once INSTALL_ROOT.DIRECTORY_SEPARATOR."lib/utils.php";
-
 class User extends LnBlogObject {
 
 	public $username = '';

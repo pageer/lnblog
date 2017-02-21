@@ -13,10 +13,10 @@
 # FTP_ROOT is correct.
 
 $EXCLUDE_FS = true;
-require_once("blogconfig.php");
-require_once("lib/creators.php");
-require_once("lib/utils.php");
-require_once("lib/ftpfs.php");
+require_once __DIR__."/blogconfig.php";
+require_once __DIR__."/lib/creators.php";
+require_once __DIR__."/lib/utils.php";
+require_once __DIR__."/lib/ftpfs.php";
 
 # Takes an FTPFS instance and tests if a given file can be reached with it.
 

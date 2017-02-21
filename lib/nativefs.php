@@ -71,10 +71,11 @@ class NativeFS extends FS {
 
 	public function rmdir($dir) {
 		# We can't delete the current directory because we're still using it.
-		if ( realpath($dir) == $this->getcwd() ) {
+		$dir_path = realpath($dir);
+		if ( $dir_path == $this->getcwd() ) {
 			chdir("..");
 		}
-		return rmdir($dir);
+		return rmdir($dir_path);
 	}
 
 	public function rmdir_rec($dir) {

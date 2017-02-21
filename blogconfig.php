@@ -42,7 +42,7 @@ function class_autoload($className) {
 }
 
 // Load Composer's autoloader first.
-require_once implode(DIRECTORY_SEPARATOR, array(__DIR__, 'vendor', 'autoload.php'));
+require_once __DIR__.'/vendor/autoload.php';
 
 // Prepend our own autoloaders to the queue.
 spl_autoload_register('class_autoload', false, true);

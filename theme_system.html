@@ -131,7 +131,7 @@ want to change the appearance of blog entries from the default theme,
 you would simply not create templates or style sheets for the blog entries in your theme.</p>
 
 
-<p>Because templates are actually PHP files, LnBlog uses PHP's standard <code>include_path</code> configuration variable
+<p>Templates are actually PHP files. LnBlog uses a custom search path
 to determine which file to use.&nbsp; However, for other types of
 files, this will not work.&nbsp; Therefore, LnBlog includes a PHP
 function called <code>getlink()</code>, which returns a URL to the selected file, suitable for

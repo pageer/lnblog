@@ -43,7 +43,7 @@ class BotBlock extends Plugin {
 		$this->rand1 = rand(1, 100);
 		$this->rand2 = rand(1, 100);
 		$this->operator = rand(1, 3);
-		$this->salt = phpversion().$_SERVER['REMOTE_ADDR'];
+		$this->salt = phpversion().(isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'localhost');
 		$tmp = $this->rand1;
 		switch ($this->operator) {
 			case 1: $tmp += $this->rand2; break;

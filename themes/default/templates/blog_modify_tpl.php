@@ -121,7 +121,7 @@ if ($BLOG_ALLOW_ENC) { ?> checked="checked"<?php } ?> />
 <?php if ( defined("INSTALL_ROOT_URL") && defined("BLOG_ROOT") && 
            is_dir(BLOG_ROOT) && BLOG_ROOT != INSTALL_ROOT) { 
 	$blog = NewBlog(); ?>
-<a href="<?php echo INSTALL_ROOT_URL;?>pages/blogpaths.php?blog=<?php echo $blog->blogid;?>">Edit paths for blog</a>
+<a href="<?php echo $blog->getURL();?>?action=blogpaths">Edit paths for blog</a>
 <?php } ?>
 </div>
 <div>

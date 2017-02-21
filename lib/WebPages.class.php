@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__.'/../pages/pagelib.php';
 
-class WebPages {
+class WebPages extends BasePages {
 	
 	protected $blog;
 	protected $user;
@@ -10,6 +10,32 @@ class WebPages {
 		$this->user = NewUser();
 		$this->blog = NewBlog();
 		Page::instance()->setDisplayObject($this->blog);
+	}
+	
+	protected function getActionMap() {
+		return array(
+			'about'      => 'about',
+			'newentry'   => 'entryedit',
+			'editentry'  => 'entryedit',
+			'delentry'   => 'delentry',
+			'delcomment' => 'delcomment',
+			'edit'       => 'updateblog',
+			'login'      => 'AdminPages::bloglogin',
+			'logout'     => 'AdminPages::bloglogout',
+			'upload'     => 'fileupload',
+			'useredit'   => 'editlogin',
+			'plugins'    => 'AdminPages::pluginsetup',
+			'tags'       => 'tagsearch',
+			'pluginload' => 'AdminPages::pluginloading',
+			'profile'    => 'AdminPager::userinfo',
+			'managereply'=> 'managereplies',
+			'editfile'   => 'editfile',
+			'blogpaths'  => 'blogpaths',
+		);
+	}
+	
+	protected function defaultAction() {
+		return $this->showblog();
 	}
 	
 	protected function redirectOr403($url = '', $message = '') {
@@ -371,7 +397,6 @@ class WebPages {
 			$form_title = spf_("New Login for %s", $this->blog->name);
 			$redir_page = $this->blog->uri('blog');
 		} else {
-			# Add the template directory to the include_path.
 			$page_name = _("Change Administrator Login");
 			$form_title = _("System Aministration Login");
 			$redir_page = INSTALL_ROOT_URL;
@@ -391,7 +416,7 @@ class WebPages {
 		
 		$this->blog_qs = ($this->blog->isBlog() ? "blog=".$this->blog->blogid."&amp;" : "");
 		$tpl->set("UPLOAD_LINK", 
-				  INSTALL_ROOT_URL."pages/fileupload.php?".
+				  INSTALL_ROOT_URL."pages/index.php?action=upload&".
 				  $this->blog_qs."profile=".$usr->username() );
 		$tpl->set("PROFILE_EDIT_LINK", $this->blog->uri("editfile", array("file"=>"profile.htm", 
 												  'profile'=>$usr->username()) ) );
@@ -1468,58 +1493,6 @@ class WebPages {
 	}
 
 	public function showblog() {
-		$action_map = array(
-			'about'      => 'about',
-			'newentry'   => 'entryedit',
-			'editentry'  => 'entryedit',
-			'delentry'   => 'delentry',
-			'delcomment' => 'delcomment',
-			'edit'       => 'updateblog',
-			'login'      => 'bloglogin.php',
-			'logout'     => 'bloglogout.php',
-			'upload'     => 'fileupload',
-			'useredit'   => 'editlogin',
-			'plugins'    => 'plugin_setup.php',
-			'tags'       => 'tagsearch',
-			'pluginload' => 'plugin_loading.php',
-			'profile'    => 'userinfo.php',
-			'managereply'=> 'managereplies',
-			'editfile'   => 'editfile',
-		);
-		
-		if ( isset($_GET['action']) && isset($action_map[$_GET['action']]) ) {
-			
-			$action = str_replace('/', DIRECTORY_SEPARATOR, $action_map[$_GET['action']]);
-			$filepath = Path::mk(INSTALL_ROOT, $action);
-			if (file_exists($filepath)) {
-				include $filepath;
-			} else {
-				$this->$action();
-			}
-			exit;
-			
-		} elseif ( isset($_GET['script']) ) {
-			
-			$file = $this->script_path($_GET['script']);
-			if (file_exists($file)) readfile($file);
-			else echo "// Failed to find $file";
-			exit;
-			
-		} elseif ( isset($_GET['plugin']) ) {
-			
-			define("PLUGIN_DO_OUTPUT", true);
-			$plugin = preg_replace('[^A-Za-z0-9_\-]', '', $_GET['plugin']);
-			$paths = array(@BLOG_ROOT, USER_DATA_PATH, INSTALL_ROOT);
-			foreach ($paths as $path) {
-				$plugin = Path::mk($path, 'plugins', "$plugin.php");
-				if (file_exists($plugin)) {
-					require $plugin;
-					exit;
-				}
-			}
-			exit;
-		}
-		
 		$this->blog->autoPublishDrafts();
 		Page::instance()->setDisplayObject($this->blog);
 		

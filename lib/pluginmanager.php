@@ -211,18 +211,21 @@ class PluginManager {
 	 */
 
 	function loadPlugins() {
-		$path = USER_DATA_PATH.PATH_SEPARATOR.INSTALL_ROOT;
-		if (get_blog_path()) {
-			$path = get_blog_path().PATH_SEPARATOR.$path;
+		$paths = array(USER_DATA_PATH, INSTALL_ROOT);
+		$blog_path = get_blog_path();
+		if ($blog_path) {
+			array_unshift($paths, $blog_path);
 		}
-		$old_path = ini_get('include_path');
-		ini_set('include_path', $path);
 		foreach ($this->load_list as $f=>$v) {
 			if ($v) {
-				include("plugins/".$f);
+				foreach ($paths as $path) {
+					$file = Path::mk($path, 'plugins', $f);
+					if (file_exists($file)) {
+						include $file;
+					}
+				}
 			}
 		}
-		ini_set('include_path', $old_path);
 	}
 	
 	/* Method: testFile

@@ -48,14 +48,15 @@ class BlogComment extends Entry {
 	var $url;
 	var $show_email;
 		
-	function BlogComment ($path="", $revision="") {
+	function __construct ($path = "", $filesystem = null) {
+		parent::__construct($filesystem ?: NewFS());
 		$this->raiseEvent("OnInit");
 		$this->ip = get_ip();
 		$this->date = "";
 		$this->timestamp = 0;
 		$this->subject = "";
 		$this->data = "";
-		$this->file = $path . ($revision ? "_".$revision : "");
+		$this->file = $path ;
 		$this->url = "";
 		$this->email = "";
 		$this->name = ANON_POST_NAME;

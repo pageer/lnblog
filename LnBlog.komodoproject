@@ -5,9 +5,21 @@
 </file>
 <preference-set idref="cf5ac35d-c366-4f5d-997b-4ffd815562b0" id="project" preftype="project">
   <string relative="path" id="import_dirname"></string>
-  <string id="import_exclude_matches">Data;*.*~;*.bak;*.tmp;CVS;.#*;*.pyo;*.pyc;.svn;_svn;.git;.hg;.bzr;*%25*;tmp*.html;.DS_Store;*.swp;*.kpf;*.komodoproject;.komodotools;__pycache__</string>
+  <string id="import_exclude_matches">vendor;Data;design;*.*~;*.bak;*.tmp;CVS;.#*;*.pyo;*.pyc;.svn;_svn;.git;.hg;.bzr;*%25*;tmp*.html;.DS_Store;*.swp;*.kpf;*.komodoproject;.komodotools;__pycache__</string>
   <string id="last_local_directory">None</string>
   <string id="last_remote_directory">None</string>
   <long id="prefs_version">1</long>
+<preference-set id="testPlans">
+<preference-set id="New test plan #1">
+  <string id="command_line"></string>
+  <string relative="url" id="directory">pages</string>
+  <string id="language">Perl - TAP (*.t)</string>
+</preference-set>
+<preference-set id="Test Suite">
+  <string id="command_line"></string>
+  <string relative="url" id="directory"></string>
+  <string id="language">PHP - PHPUnit</string>
+</preference-set>
+</preference-set>
 </preference-set>
 </project>

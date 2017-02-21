@@ -40,7 +40,7 @@ function NewFS() {
 	} else {
 		if (!defined("FS_PLUGIN")) define("FS_PLUGIN", "nativefs");
 	}
-	require_once(FS_PLUGIN.".php");
+	require_once __DIR__.'/'.FS_PLUGIN.".php";
 	switch (FS_PLUGIN) {
 		case "nativefs":
 			return new NativeFS;
@@ -123,7 +123,6 @@ function NewBlogComment($param=false) {
 # Function: NewTemplate
 # Creates a new template object.
 function NewTemplate($tpl="") {
-	require_once("template.php");
 	return new PHPTemplate($tpl);
 }
 

@@ -1,5 +1,4 @@
 <?php
-require_once("lib/utils.php");
 # Plugin: RSS1FeedGenerator
 # Generates RSS 1.0 (RDF Site Summary) feeds for a blog.  This generates both 
 # feeds for new entries and comment feeds for each individual entry.  There is 

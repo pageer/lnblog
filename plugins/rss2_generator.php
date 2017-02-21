@@ -31,8 +31,6 @@
 # optional, but they can make the feed file somewhat nicer looking if it is viewed in a web 
 # browser.
 
-require_once "lib/utils.php";
-
 class RSS2Entry {
 	
 	var $link;

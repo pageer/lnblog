@@ -108,7 +108,7 @@ class ContentBan extends Plugin {
 			_("Blog RegEx blacklist").'</a></li>';
 		if ($usr->isAdministrator()) {
 			echo '<li><a href="'.
-				make_uri(INSTALL_ROOT_URL.'pages/showblog.php',
+				make_uri(INSTALL_ROOT_URL.'index.php',
 				         array('action' => 'editfile', 'file'=>'userdata/'.$banfile)).'">'.
 				_("Global RegEx blacklist").'</a></li>';
 		}

@@ -14,9 +14,9 @@ class BlogCommentURIWrapper extends LnBlogObject {
 		$qs_arr = array();
 		$parent = $this->object->getParent();
 		$entry_type = is_a($this->object, 'Article') ? 'article' : 'entry';
-		$qs_arr['blog'] = $parent->parentID();
+		$qs_arr['action'] = 'delcomment';
 		$qs_arr[$entry_type] = $parent->entryID();
 		$qs_arr['delete'] = $this->object->getAnchor();
-		return make_uri(INSTALL_ROOT_URL."pages/delcomment.php", $qs_arr);
+		return make_uri($parent->getParent()->getURL(), $qs_arr);
 	}
 }

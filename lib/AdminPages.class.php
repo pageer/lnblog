@@ -17,8 +17,28 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+require_once __DIR__.'/../pages/pagelib.php';
 
-class AdminPages {
+class AdminPages extends BasePages {
+	
+	protected function getActionMap() {
+		return array(
+			'index' => 'index',
+			'login' => 'bloglogin',
+			'logout' => 'bloglogout',
+			'newblog' => 'newblog',
+			'newlogin' => 'newlogin',
+			'pluginload' => 'pluginloading',
+			'plugins' => 'pluginsetup',
+			'profile' => 'userinfo',
+			'fssetup' => 'fssetup',
+			'editfile' => 'WebPages::editfile',
+		);
+	}
+	
+	protected function defaultAction() {
+		return $this->index();
+	}
 	
 	protected function redirect($action, $params = array()) {
 		$params['action'] = $action;
@@ -34,6 +54,22 @@ class AdminPages {
 		}
 		
 		Page::instance()->redirect($url);
+	}
+	
+	private function show_confirm_page($title, $message, $page, $yes_id, $yes_label, $no_id, $no_label, $data_id, $data) {
+		$tpl = NewTemplate('confirm_tpl.php');
+		$tpl->set('CONFIRM_TITLE', $title);
+		$tpl->set('CONFIRM_MESSAGE', $message);
+		$tpl->set('CONFIRM_PAGE', $page);
+		$tpl->set('OK_ID', $yes_id);
+		$tpl->set('OK_LABEL', $yes_label);
+		$tpl->set('CANCEL_ID', $no_label);
+		$tpl->set('CANCEL_LABEL', $no_label);
+		$tpl->set('PASS_DATA_ID', $data_id);
+		$tpl->set('PASS_DATA', $data);
+		$form = $tpl->process();
+		Page::instance()->display($form);
+		exit;
 	}
 	
 	# Method: index
@@ -74,11 +110,6 @@ class AdminPages {
 	# are raised when this upgrade feature is run, so that plugins may perform
 	# any needed updates at that time.
 	public function index() {
-		if (isset($_GET['r'])) {
-			$router = new RequestRouter($_GET['r']);
-			$router->route();
-			exit;
-		}
 		
 		if ( ! file_exists(USER_DATA_PATH.PATH_DELIM.FS_PLUGIN_CONFIG) ) {
 			$this->redirect("fssetup");
@@ -102,7 +133,7 @@ class AdminPages {
 			$this->redirect("newlogin");
 			exit;
 		} elseif (! $usr->checkLogin() || ! $usr->isAdministrator()) {
-			$this->redirect("bloglogin");
+			$this->redirect("login");
 			exit;
 		}
 		
@@ -132,8 +163,30 @@ class AdminPages {
 			}
 			$tpl->set("REGISTER_STATUS", $status);
 			
+		} elseif ( POST('delete') && POST('delete_btn') ) {
+	
+			if (POST('confirm_form') || GET('confirm')) {
+				
+				$blog = NewBlog(POST('delete'));
+				if (! $blog->isBlog()) {
+					$status = spf_("The path '%s' is not an LnBlog weblog.", POST('delete'));
+				} else {
+					$ret = System::instance()->unregisterBlog($blog->blogid);
+					$ret = $ret && $blog->delete();
+					if ($ret) {
+						$status = spf_("Blog %s successfully deleted.", $blog->blogid);
+					} else {
+						$status = spf_("Delete error: exited with code %s", $ret);
+					}
+				}
+				$tpl->set("DELETE_STATUS", $status);
+				
+			} else {
+				$this->show_confirm_page(_("Confirm blog deletion"), spf_("Really delete blog '%s'?", POST('delete')), current_file(),
+								  'delete_btn', _('Yes'), 'cancel_btn', _('No'), 'delete', POST('delete'));
+			}
 		} elseif ( POST('fixperm') && POST('fixperm_btn') ) {
-			$p = NewPath();
+			$p = new Path();
 			if ($p->isAbsolute(POST('fixperm'))) $fixperm_path = trim(POST('fixperm'));
 			else $fixperm_path = calculate_document_root().PATH_DELIM.trim(POST('fixperm'));
 			$b = NewBlog(POST($fixperm_path));
@@ -146,7 +199,7 @@ class AdminPages {
 		
 			$usr = NewUser();
 			if ($usr->exists(POST("username"))) {
-				Page::instance()->redirect("pages/showblog.php?action=useredit&user=".POST('username'));
+				Page::instance()->redirect("index.php?action=useredit&user=".POST('username'));
 			} else {
 				$status = spf_("User %s does not exist.", POST('username'));
 			}
@@ -185,7 +238,6 @@ class AdminPages {
 			$redir_url = $blog->getURL();
 			$admin_login = false;
 		} else {
-		#	ini_set("include_path", ini_get("include_path").PATH_SEPARATOR."templates");
 			$page_name = _("System Administration");
 			$form_name = _("System Administration Login");
 			$redir_url = "?action=index";
@@ -252,8 +304,7 @@ class AdminPages {
 		$cancel_id = "cancel";
 		$ok_id = "ok";
 		
-		if ($blog->isBlog()) $redir_url = $blog->getURL();
-		else                 $redir_url = "?action=index";
+		$redir_url = $blog->isBlog() ? $blog->getURL() : "?action=index";
 		
 		$tpl = NewTemplate(CONFIRM_TEMPLATE);
 		$tpl->set("CONFIRM_TITLE", _("Logout"));
@@ -601,7 +652,7 @@ class AdminPages {
 			if ($blg->isBlog()) {
 				Page::instance()->redirect($blg->uri('pluginconfig'));
 			} else {
-				$this->redirect("pluginsetup");
+				$this->redirect("plugins");
 			}
 		
 			exit;
@@ -707,7 +758,7 @@ class AdminPages {
 	
 	# Test to autodetect the FTP root directory for the given account.
 	protected function ftproot_test() {
-		require("lib/ftpfs.php");
+		require "/lib/ftpfs.php";
 		@$ftp = new FTPFS(trim(POST("ftp_host")), 
 						  trim(POST("ftp_user")), trim(POST("ftp_pwd")) );
 		if ($ftp->status !== false) {
@@ -837,11 +888,10 @@ class AdminPages {
 		
 		Page::instance()->title = sprintf(_("%s File Writing"), PACKAGE_NAME);
 		$form_title = _("Configure File Writing Support");
-		$redir_page = "index.php";
 		
 		$tpl = NewTemplate(FS_CONFIG_TEMPLATE);
 		
-		$tpl->set("FORM_ACTION", basename(SERVER("PHP_SELF")) );
+		$tpl->set("FORM_ACTION", '');
 		
 		if ( has_post() ) {
 		
@@ -937,7 +987,9 @@ class AdminPages {
 					$ret = $fs->write_file(USER_DATA_PATH.PATH_DELIM.FS_PLUGIN_CONFIG, $content);
 				}
 				
-				if (! $ret) {
+				if ( $ret) {
+					$this->redirect("index");
+				} else {
 					if (FS_PLUGIN == "ftpfs") {
 						$tpl->set("FORM_MESSAGE", sprintf(
 							_("Error: Could not create fsconfig.php file.  Make sure that the directory %s exists on the server and is writable to %s."),
@@ -946,9 +998,6 @@ class AdminPages {
 						$tpl->set("FORM_MESSAGE", sprintf(
 							_("Error: Could not create fsconfig.php file.  Make sure that the directory %s exists on the server and is writable to the web server user."), USER_DATA_PATH));
 					}
-				} else {
-					header("Location: index.php");
-					exit;
 				}
 				
 			} else {

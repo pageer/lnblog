@@ -346,7 +346,7 @@ class BlogEntry extends Entry {
 				# No fileinfo, no mime_magic, so revert to file extension matching.
 				# This is a dirty and incomplete method, but I suppose it's better
 				# than nothing.  Though only marginally.
-				require_once('lib/stupid_mime.php');	
+				require_once __DIR__.'/stupid_mime.php';	
 				$ret['type'] = stupid_mime_get_type($path);
 			}
 

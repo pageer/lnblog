@@ -18,8 +18,6 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-require_once("utils.php");
-
 # Class: Entry
 # An abstract class representing entries of all types in the blog database.
 abstract class Entry extends LnBlogObject{

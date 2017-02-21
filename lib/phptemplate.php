@@ -25,11 +25,6 @@
 # templating is not significantly less complicated than regular PHP
 # syntax, we might as well save ourselves some trouble and just use PHP.
 #
-# Please note that this class will depend on an appropriately set 
-# include_path.  This will allow us to transparently have different templates
-# for different sections of the site and fall back to the default if we
-# don't want to bother.
-#
 # Ihnerits:
 # <LnBlogObject>
 
@@ -130,6 +125,17 @@ class PHPTemplate extends LnBlogObject {
 		$this->search_paths = $paths;
 	}
 	
+	# Method: getSearchPath
+	# Gets the search path for templates.  If a custom path list is set, it will return that.
+	# Otherwise, it will return the following paths, if applicable:
+	# - BLOG_ROOT/themes/THEME_NAME/templates
+	# - BLOG_ROOT/templates
+	# - USER_DATA_PATH/themes/THEME_NAME/templates
+	# - INSTALL_ROOT/themes/THEME_NAME/templates
+	# - INSTALL_ROOT/themes/default/templates
+	#
+	# Returns:
+	# An array of path strings
 	public function getSearchPath() {
 		if ($this->search_paths) {
 			return $this->search_paths;
@@ -140,13 +146,12 @@ class PHPTemplate extends LnBlogObject {
 					$ret[] = Path::mk(BLOG_ROOT, 'themes', THEME_NAME, 'templates');
 					$ret[] = Path::mk(BLOG_ROOT, 'templates');
 				}
-				$ret[] = Path::mk(INSTALL_ROOT, 'themes', THEME_NAME, 'templates');
 				if (defined('USER_DATA_PATH')) {
 					$ret[] = Path::mk(USER_DATA_PATH, 'themes', THEME_NAME, 'templates');
 				}
+				$ret[] = Path::mk(INSTALL_ROOT, 'themes', THEME_NAME, 'templates');
 			} elseif (defined('BLOG_ROOT')) {
 				$ret[] = Path::mk(BLOG_ROOT, 'templates');
-				
 			}
 			$ret[] = Path::mk(INSTALL_ROOT, 'themes', 'default', 'templates');
 			return $ret;

@@ -4,6 +4,7 @@
 		"phpxmlrpc/phpxmlrpc": "3.0.0"
 	},
     "require-dev": {
-        "phing/phing": "2.*"
+        "phing/phing": "2.*",
+		"phpspec/prophecy": "~1.0"
     }
 }

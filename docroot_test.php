@@ -11,10 +11,10 @@
 # DOCUMENT_ROOT is correct.
 
 $EXCLUDE_FS = true;
-require_once("blogconfig.php");
-require_once("lib/constants.php");
-require_once("lib/creators.php");
-require_once("lib/utils.php");
+require_once __DIR__."/blogconfig.php";
+require_once __DIR__."/lib/constants.php";
+require_once __DIR__."/lib/creators.php";
+require_once __DIR__."/lib/utils.php";
 $tpl = NewTemplate(DOCROOT_TEST_TEMPLATE);
 $curr_dir = getcwd();
 $tpl->set("CURR_DIR", $curr_dir);

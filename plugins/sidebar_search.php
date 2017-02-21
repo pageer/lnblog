@@ -30,8 +30,6 @@
 
 $do_output = (isset($_GET["show"]) && $_GET["show"] == "sb_search_results");
 	
-require_once INSTALL_ROOT.PATH_DELIM."lib/utils.php";
-
 # Add this really massive if statements to that we don't end up declaring the 
 # same class twice, i.e. if the page is called directly, this class will be defined 
 # when it first loads and then again when the plugins are loaded.
@@ -183,7 +181,8 @@ class SidebarSearch extends Plugin {
 					}
 				}
 				if ($res == count($terms)) {
-					$ret[] = array("link"=>$ent->permalink(), "title"=>$ent->subject);
+					$subject = $ent->subject ?: $ent->prettyDate($this->post_ts);
+					$ret[] = array("link"=>$ent->permalink(), "title"=>$subject);
 				}
 			}
 		} else {

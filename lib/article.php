@@ -38,7 +38,9 @@ class Article extends BlogEntry {
 	
 	protected $article_path = '';
 
-	public function __construct($path="", $revision=ENTRY_DEFAULT_FILE) {
+	public function __construct($path = "", $filesystem = null) {
+		$this->fs = $filesystem ?: NewFS();
+		
 		$this->raiseEvent("OnInit");
 		
 		$this->initVars();

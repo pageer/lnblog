@@ -16,7 +16,7 @@
 # the host name.  By default, 
 $LNBLOG_PATH = dirname($_SERVER['SCRIPT_NAME']);
 
-require implode(DIRECTORY_SEPARATOR, array(__DIR__, 'vendor', 'autoload.php'));
+require __DIR__.'/vendor/autoload.php';
 ?>
 <html>
 <head><title>MetaWeblog API Test</title></head>

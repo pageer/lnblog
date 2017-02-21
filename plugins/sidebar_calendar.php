@@ -3,38 +3,10 @@
 # This plugin adds a calendar to the sidebar with links to the days that have entries.
 # It allows the user to navigate between months, updating the calendar via AJAX calls.
 
-# Determine if blogconfig.php has already been loaded.  
-# If not, we will need to compensate for this.
-$files = get_included_files();
-$has_config = false;
-foreach ($files as $f) {
-	if (strstr($f, "blogconfig.php")) {
-		$has_config = true;
-		break;
-	}
-}
-
-# If we haven't loaded blogconfig.php, i.e. if this page has been called directly,
-# then we have to take care of that.  We set the INSTALL_ROOT (since we can be sure
-# that it is the parent of the current directory), adjust the include_path, and 
-# then include blogconfig.php to do the rest.
 $do_output = false;
-if ($has_config !== true) {
-	session_start();
-	$instdir = dirname(getcwd());
-	#define("INSTALL_ROOT", $instdir);
-	if (! defined("PATH_SEPARATOR") ) 
-		define("PATH_SEPARATOR", strtoupper(substr(PHP_OS,0,3)=='WIN')?';':':');
-	ini_set("include_path", ini_get("include_path").PATH_SEPARATOR.$instdir);
-	require_once("blogconfig.php");
-	if (isset($_GET["month"])) {
-		$do_output = true;
-	}
-} elseif (isset($_GET['month']) && isset($_GET['plugin']) && defined('PLUGIN_DO_OUTPUT')) {
+if (isset($_GET['month']) && isset($_GET['plugin']) && defined('PLUGIN_DO_OUTPUT')) {
 	$do_output = true;
 }
-
-require_once("lib/utils.php");
 
 # Add this really massive if statements to that we don't end up declaring the 
 # same class twice, i.e. if the page is called directly, this class will be defined 
@@ -96,6 +68,12 @@ class SidebarCalendar extends Plugin {
 	}
 
 	function self_uri($arr=false) {
+		if (! $arr) {
+			$arr = array();
+		}
+		$arr['plugin'] = 'sidebar_calendar';
+		return make_uri('index.php', $arr);
+		
 		$ret = localpath_to_uri(__FILE__);
 		$urlinfo = parse_url($ret);
 		if ( isset($urlinfo['host']) && 

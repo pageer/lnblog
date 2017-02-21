@@ -1,6 +1,13 @@
 <?php
 
 abstract class TextProcessor {
+	private static $available_filters = array(
+		'AutoMarkupTextProcessor',
+		'HTMLTextProcessor',
+		'LBCodeTextProcessor',
+		'MarkdownTextProcessor',
+	);
+
 	/**
 	 * @var string The original, unformatted text.
 	 */
@@ -77,28 +84,12 @@ abstract class TextProcessor {
 			return $filters;
 		}
 		
-		self::loadAllFilters();
 		$classes = get_declared_classes();
 		$ret = array();
-		foreach ($classes as $class) {
-			if (is_subclass_of($class, 'TextProcessor')) {
-				$filters[] = new $class();
-			}
+		foreach (self::$available_filters as $class) {
+			$filters[] = new $class();
 		}
 		return $filters;
-	}
-	
-	/**
-	 * Load all text processor classes found.
-	 */
-	static public function loadAllFilters() {
-		$filter_dir = mkpath(INSTALL_ROOT, 'lib', 'textprocessors');
-		$files = scandir($filter_dir);
-		foreach ($files as $file) {
-			if (strpos($file, '.class.php')) {
-				require_once $file;
-			}
-		}
 	}
 	
 	public function __construct(Entry $entry = null, $text = '') {

@@ -600,7 +600,6 @@ function pathconfig_php_string($inst_root, $inst_url, $blog_url) {
 	$config_data .= '@define("INSTALL_ROOT", \''.$inst_root."');\n";
 	$config_data .= '@define("INSTALL_ROOT_URL", \''.$inst_url."');\n";
 	$config_data .= '@define("BLOG_ROOT_URL", \''.$blog_url."');\n";
-	#$config_data .= 'ini_set(\'include_path\', ini_get(\'include_path\').PATH_SEPARATOR.INSTALL_ROOT);';
 	return $config_data;
 }
 

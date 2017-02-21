@@ -24,38 +24,6 @@
 # in each blog.
 
 session_start();
-require_once("blogconfig.php");
-require_once("lib/creators.php");
-
-$blog = NewBlog();
-Page::instance()->setDisplayObject($blog);
-
-$cancel_id = "cancel";
-$ok_id = "ok";
-
-if ($blog->isBlog()) $redir_url = $blog->getURL();
-else                 $redir_url = "index.php";
-
-$tpl = NewTemplate(CONFIRM_TEMPLATE);
-$tpl->set("CONFIRM_TITLE", _("Logout"));
-$tpl->set("CONFIRM_MESSAGE", _("Do you really want to log out?"));
-$tpl->set("CONFIRM_PAGE", current_file());
-$tpl->set("OK_ID", $ok_id);
-$tpl->set("OK_LABEL", _("Yes"));
-$tpl->set("CANCEL_ID", $cancel_id);
-$tpl->set("CANCEL_LABEL", _("No"));
-
-if (POST($ok_id)) {
-	$usr = NewUser();
-	$usr->logout();
-	Page::instance()->redirect($redir_url);
-} else if (POST($cancel_id)) {
-	Page::instance()->redirect($redir_url);
-}
-
-$body = $tpl->process();
-if ($blog->isBlog()) Page::instance()->title = sprintf(_("%s - Logout"), $blog->name);
-else                 Page::instance()->title = _("Administration - Logout");
-Page::instance()->display($body, $blog);
-
-?>
+require_once __DIR__."/blogconfig.php";
+$admin = new AdminPages();
+$admin->bloglogout();

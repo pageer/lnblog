@@ -8,9 +8,9 @@
 <ul>
 <li><a href="plugin_setup.php"><?php p_("Configure site-wide plugins"); ?></a></li>
 <li><a href="plugin_loading.php"><?php p_("Configure enabled plugins and load order"); ?></a></li>
-<li><a href="pages/editfile.php?file=userdata/system.ini"><?php p_("Edit system.ini file"); ?></a></li>
-<li><a href="pages/editfile.php?file=userdata/groups.ini"><?php p_("Edit groups.ini file"); ?></a></li>
-<li><a href="pages/editfile.php?map=yes&amp;file=userdata/sitemap.htm&amp;list=yes"><?php p_("Modify site-wide menubar"); ?></a></li>
+<li><a href="?action=editfile&file=userdata/system.ini"><?php p_("Edit system.ini file"); ?></a></li>
+<li><a href="?action=editfile&file=userdata/groups.ini"><?php p_("Edit groups.ini file"); ?></a></li>
+<li><a href="?action=editfile&map=yes&amp;file=userdata/sitemap.htm&amp;list=yes"><?php p_("Modify site-wide menubar"); ?></a></li>
 <li><a href="newlogin.php"><?php p_("Add new user"); ?></a></li>
 <li>Edit existing user
 <select id="username" name="username">

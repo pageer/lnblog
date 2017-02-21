@@ -224,6 +224,18 @@ abstract class FS {
 		return file_get_contents($path);
 	}
 	
+	# Method: readfile
+	# Wrapper around native readfile() function.
+	public function readfile($path) {
+		return readfile($path);
+	}
+	
+	# Method: echo_to_string
+	# Wrapper around the native echo statement.
+	public function echo_to_output($string) {
+		echo $string;
+	}
+	
 	# Method: is_dir
 	# Wrapper around native is_dir() function.
 	public function is_dir($path) {
