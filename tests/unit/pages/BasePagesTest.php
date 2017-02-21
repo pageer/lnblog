@@ -72,6 +72,10 @@ class BasePagesTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals('defaultAction', $this->page->method_called);
     }
     
+    public function testRouteRequest_WhenActionIsScript_ReadsFileToOutput() {
+        
+    }
+    
     protected function setUp() {
         $this->prophet = new \Prophecy\Prophet();
         $this->fs = $this->prophet->prophesize('FS');

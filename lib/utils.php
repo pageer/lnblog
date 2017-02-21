@@ -695,11 +695,6 @@ function create_directory_wrappers($path, $type, $instpath="") {
 			$config_level = 1;
 			break;
 	}
-	# Write the config.php file, with the appropriate level of distance
-	# from the blog root.
-	#$ret = $fs->write_file($current."config.php", 
-	#                       config_php_string($config_level));
-	#if (! $ret) $ret_list[] = $current."config.php";
 
 	foreach ($filelist as $file=>$content) {
 		$curr_file = $current.$file.".php";

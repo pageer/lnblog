@@ -7,6 +7,7 @@ class WebPages extends BasePages {
 	protected $user;
 	
 	public function __construct() {
+		parent::__construct();
 		$this->user = NewUser();
 		$this->blog = NewBlog();
 		Page::instance()->setDisplayObject($this->blog);

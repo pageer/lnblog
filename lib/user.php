@@ -132,11 +132,11 @@ class User extends LnBlogObject {
 			$qs = $blog->isBlog() ? array('blog'=>$blog->blogid) : false;
 			$ret = make_uri(localpath_to_uri(USER_DATA_PATH."/".$this->username."/"), $qs);
 		} else {
-			$qs = array("user"=>$this->username);
+			$qs = array("action" => "profile", "user"=>$this->username);
 			if ($blog->isBlog()) {
 				$qs['blog'] = $blog->blogid;
 			}
-			$ret = make_uri(INSTALL_ROOT_URL."userinfo.php", $qs);
+			$ret = make_uri(INSTALL_ROOT_URL."index.php", $qs);
 		}
 		return $ret;
 	}

@@ -10,11 +10,6 @@
   <string id="last_remote_directory">None</string>
   <long id="prefs_version">1</long>
 <preference-set id="testPlans">
-<preference-set id="New test plan #1">
-  <string id="command_line"></string>
-  <string relative="url" id="directory">pages</string>
-  <string id="language">Perl - TAP (*.t)</string>
-</preference-set>
 <preference-set id="Test Suite">
   <string id="command_line"></string>
   <string relative="url" id="directory"></string>

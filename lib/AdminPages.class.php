@@ -33,6 +33,9 @@ class AdminPages extends BasePages {
 			'profile' => 'userinfo',
 			'fssetup' => 'fssetup',
 			'editfile' => 'WebPages::editfile',
+			'docroot' => 'docroot_test',
+			'ftproot' => 'ftproot_test',
+			'useredit' => 'WebPages::editlogin',
 		);
 	}
 	
@@ -263,14 +266,11 @@ class AdminPages extends BasePages {
 			$usr = NewUser(trim(POST($user_name)));
 			$ret = $usr->login(POST($password));
 			if (POST("referer")) {
-				#if ( basename(POST("referer")) != current_file() && 
-				#     basename(POST("referer")) != "newlogin.php") {
 				if ( strstr(POST('referer'), 'login.php') !== false ||
 					 strstr(POST('referer'), 'logout.php') !== false ) {
 					$tpl->set("REF", 'index.php' );
 					$redir_url = 'index.php';
 				} else {
-					 #strpos(POST("referer"), localpath_to_uri(INSTALL_ROOT)) !== false 
 					$tpl->set("REF", POST("referer") );
 					$redir_url = POST("referer");
 				}
@@ -721,6 +721,132 @@ class AdminPages extends BasePages {
 		Page::instance()->display($ret);
 	}
 	
+	private function ftp_file_exists($file, $ftp_obj) {
+
+		$dir_list = ftp_nlist($ftp_obj->connection, $ftp_obj->localpathToFSPath(dirname($file)));
+		if (! is_array($dir_list)) $dir_list = array();
+		
+		foreach ($dir_list as $ent) {
+			if (basename($file) == basename($ent)) {
+				#echo basename($file)." == $ent<br />";
+				return true;
+			} #else echo basename($file)." != $ent<br />";
+		}
+		return false;
+	}
+	
+	# Takes a file or directory on the local host and an FTP connection.
+	# Connects to the FTP server, changes to the root directory, and
+	# checks the directory listing.  It then goes down the local directory 
+	# tree until it finds a directory that contains one of the entries in the
+	# listing.  This directory is the FTP root.
+	
+	private function find_dir($dir, $conn) {
+		# Change to the root directory.
+		ftp_chdir($conn, "/");
+		$ftp_list = ftp_nlist($conn, ".");
+	
+		# Save the drive letter (if it exists).
+		$drive = substr($dir, 0, 2);
+	
+		# Get the current path into an array.
+		if (PATH_DELIM != "/") {
+			if (substr($dir, 1, 1) == ":") $dir = substr($dir, 3);
+			$dir = str_replace(PATH_DELIM, "/", $dir);
+		}
+	
+		if (substr($dir, 0, 1) == "/") $dir = substr($dir, 1);
+		$dir_list = explode("/", $dir);
+	
+		# For each local directory element, loop through contents of the FTP
+		# root directory.  If the current element is in FTP root, then the 
+		# parent of the current element is the root.
+		# $ftp_root starts at root and has the current directory appended at the
+		# end of each outer loop iteration.  Thus, $ftp_root always holds the 
+		# parent of the currently processing directory.
+		# Note that we must account for Windows drive letters, grubmle, grumble.
+		if (PATH_DELIM == "/") {
+			$ftp_root = "/";
+		} else {
+			$ftp_root = $drive.PATH_DELIM;
+		}
+		foreach ($dir_list as $dir) {
+			foreach ($ftp_list as $ftpdir) {
+				if ($dir == $ftpdir && $ftpdir != ".." && $ftpdir != ".") {
+					return $ftp_root;
+				}
+			}
+			$ftp_root .= $dir.PATH_DELIM;
+		}
+		
+	}
+
+	public function ftproot_test() {	
+		$tpl = NewTemplate(FTPROOT_TEST_TEMPLATE);
+		
+		$user = trim(POST("uid"));
+		$tpl->set("USER", $user);
+		$pass = trim(POST("pwd"));
+		$tpl->set("PASS", $pass);
+		$hostname = trim(POST("host"));
+		$tpl->set("HOSTNAME", $hostname);
+		$test_file = getcwd().PATH_DELIM."ReadMe.txt";
+		$tpl->set("TEST_FILE", $test_file);
+		$tpl->set("TARGETPAGE", current_file());
+		$ftp_root = "";
+		$test_status = false;
+		$ftp_path = "";
+		$error_message = "";
+		$curr_dir = getcwd();
+		$tpl->set("CURR_DIR", $curr_dir);
+		
+		if ($user && $pass && $hostname) {
+		
+			$ftp = new FTPFS($hostname, $user, $pass);
+			if ($ftp->status !== false)	{
+		
+				if (! POST("ftproot")) {
+					$ftp_root = $this->find_dir($test_file, $ftp->connection);
+				} else {
+					$ftp_root = POST("ftproot");
+				}
+				$ftp->ftp_root = $ftp_root;
+				
+				$test_status = $this->ftp_file_exists($test_file, $ftp);
+				$ftp_path = $ftp->localpathToFSPath($test_file);
+		
+			} else $error_message = _("Unable to connect to FTP server.");
+		}
+		
+		$tpl->set("FTP_ROOT", $ftp_root);
+		$tpl->set("FTP_PATH", $ftp_path);
+		$tpl->set("ERROR_MESSAGE", $error_message);
+		$tpl->set("TEST_STATUS", $test_status);
+		
+		echo $tpl->process();
+	}
+	
+	public function docroot_test() {
+		$tpl = NewTemplate(DOCROOT_TEST_TEMPLATE);
+		$curr_dir = getcwd();
+		$tpl->set("CURR_DIR", $curr_dir);
+		$tpl->set("TARGETFILE", current_file());
+		if (POST("docroot")) {
+			$doc_root = POST("docroot");
+		} else {
+			$doc_root = calculate_document_root();
+			define("DOCUMENT_ROOT", $doc_root);
+		}
+		$tpl->set("DOC_ROOT", $doc_root);
+		$target_url = localpath_to_uri($curr_dir.PATH_DELIM."ReadMe.txt");
+		$tpl->set("TARGET_URL", $target_url);
+		$documentation_path = $doc_root.PATH_DELIM.basename($curr_dir).PATH_DELIM."ReadMe.txt";
+		$tpl->set("DOCUMENTATION_PATH", $documentation_path);
+		$documentation_exists = file_exists($documentation_path);
+		$tpl->set("DOCUMENTATION_EXISTS", $documentation_exists);
+		echo $tpl->process();
+	}
+	
 	# Test how and if native file writing works.
 	protected function nativefs_test() {
 		
@@ -757,7 +883,7 @@ class AdminPages extends BasePages {
 	}
 	
 	# Test to autodetect the FTP root directory for the given account.
-	protected function ftproot_test() {
+	protected function test_ftproot() {
 		require "/lib/ftpfs.php";
 		@$ftp = new FTPFS(trim(POST("ftp_host")), 
 						  trim(POST("ftp_user")), trim(POST("ftp_pwd")) );
@@ -767,7 +893,7 @@ class AdminPages extends BasePages {
 			ftp_chdir($ftp->connection, "/");
 			$ftp_list = ftp_nlist($ftp->connection, ".");
 			
-			$file = getcwd().PATH_DELIM."fs_setup.php";
+			$file = getcwd().PATH_DELIM."blogconfig.php";
 			$drive = substr($file, 0, 2);
 	
 			# Get the current path into an array.
@@ -807,7 +933,7 @@ class AdminPages extends BasePages {
 			if (! is_array($dir_list)) $dir_list = array();
 	
 			foreach ($dir_list as $ent) {
-				if ("fs_setup.php" == basename($ent)) {
+				if ("blogconfig.php" == basename($ent)) {
 					return $ftp_root;
 				} 
 			}
@@ -935,7 +1061,7 @@ class AdminPages extends BasePages {
 				if ( trim(POST("ftp_user")) && trim(POST("ftp_pwd")) && trim(POST("ftp_conf")) 
 					 && trim(POST("ftp_host")) && trim(POST("ftp_pwd")) == trim(POST("ftp_conf"))
 					  && ! trim(POST("ftp_root")) ) {
-					$ftp_root_test_result = $this->ftproot_test();
+					$ftp_root_test_result = $this->test_ftproot();
 				}
 		
 				if ($has_all_data) {
