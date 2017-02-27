@@ -365,7 +365,6 @@ abstract class Entry extends LnBlogObject{
 		if (! $this->fs->is_dir(dirname($this->file)) ) 
 			$this->fs->mkdir_rec(dirname($this->file)); 
 		$ret = $this->fs->write_file($this->file, $file_data);
-		var_dump("result:",$this->file,$file_data, $ret);
 		return $ret;
 	}
 }
