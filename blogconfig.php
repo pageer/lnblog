@@ -763,5 +763,3 @@ require_once INSTALL_ROOT."/lib/pluginmanager.php";
 
 # Initialize the plugins
 PluginManager::instance()->loadPlugins();
-
-?>

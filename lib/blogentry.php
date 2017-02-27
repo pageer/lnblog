@@ -36,13 +36,14 @@ OnUpdate       - Fired before changes are saved to persistent storage.
 UpdateComplete - Fired after changes to object are saved.
 OnOutput       - Fired before output is generated.
 OutputComplete - Fired after output has finished being generated.
-POSTRetrieved  - Fired after data has been retreived from an HTTP POST.
+POSTRetrieved  - Fired after data has been retrieved from an HTTP POST.
 */
 
 class BlogEntry extends Entry {
 	
 	const AUTO_PUBLISH_FILE = 'puslish.txt';
 	
+	public $send_pingback = true;
 	public $allow_comment = true;
 	public $allow_tb = true;
 	public $has_html = MARKUP_BBCODE;
@@ -77,17 +78,32 @@ class BlogEntry extends Entry {
 		$this->allow_comment = true;
 		$this->allow_tb = true;
 		$this->allow_pingback = true;
+		$this->send_pingback = true;
 		$this->template_file = "blogentry_summary_tpl.php";
 		$this->custom_fields = array();
-		$this->exclude_fields = array("exclude_fields", "metadata_fields",
-		                              "template_file", "file", "fs");
-		$this->metadata_fields = array("id"=>"postid", "uid"=>"userid", 
-			"date"=>"date", "timestamp"=>"timestamp", "post_ts"=>"posttimestamp",
-			"ip"=>"ip", "subject"=>"subject",
-			"abstract"=>"abstract", "allow_comment"=>"allowcomment",
-			"has_html"=>"hashtml", "tags"=>"tags", 
+		$this->exclude_fields = array(
+			"exclude_fields",
+			"metadata_fields",
+		    "template_file",
+			"file",
+			"fs",
+		);
+		$this->metadata_fields = array(
+			"id"=>"postid",
+			"uid"=>"userid", 
+			"date"=>"date",
+			"timestamp"=>"timestamp",
+			"post_ts"=>"posttimestamp",
+			"ip"=>"ip",
+			"subject"=>"subject",
+			"abstract"=>"abstract",
+			"allow_comment"=>"allowcomment",
+			"has_html"=>"hashtml",
+			"tags"=>"tags", 
 			"allow_tb"=>"allowtrackback", 
-			"allow_pingback"=>"allowpingback", "enclosure"=>"enclosure");
+			"allow_pingback"=>"allowpingback",
+			"enclosure"=>"enclosure",
+		);
 	}
 	
 	# Gets the directory and data file for this entry.
@@ -113,11 +129,11 @@ class BlogEntry extends Entry {
 
 		# Auto-detect the current entry.  If no path is given, 
 		# then assume the current directory.
-		if (is_dir($path)) {
+		if ($this->fs->is_dir($path)) {
 		
 			$this->file = $path.PATH_DELIM.$revision;
 			# Support old blog entry format.
-			if (! file_exists($this->file) ) $this->tryOldFileName();
+			if (! $this->fs->file_exists($this->file) ) $this->tryOldFileName();
 
 		} elseif ($first_get || $path) {
 			# If $path is an identifier, then convert it to a real path.
@@ -144,14 +160,13 @@ class BlogEntry extends Entry {
 				if (is_array($subdir)) {
 					foreach ($subdir as $s) {
 						$f = mkpath($blog->home_path,$s,$entrypath,$revision);
-						if (file_exists($f)) $this->file =$f;
+						if ($this->fs->file_exists($f)) $this->file = $f;
 					}
 					if (! $this->file) {
 						$this->file = mkpath($blog->home_path,$subdir[0],$entrypath,$revision);
 					}
 				} else $this->file = mkpath($blog->home_path,$subdir,$entrypath,$revision);
 				
-				#$this->file = mkpath($blog->home_path,$subdir,$entrypath,$revision);
 
 			} else {
 				# If we don't have a short entry ID, assume it's a global ID.
@@ -159,17 +174,17 @@ class BlogEntry extends Entry {
 				$this->file = mkpath($entrypath,$revision);
 			}
 
-			if (! file_exists($this->file)) $this->tryOldFileName();			
+			if (! $this->fs->file_exists($this->file)) $this->tryOldFileName();			
 
 		} else {
 		
-			$this->file = getcwd().PATH_DELIM.$revision;
-			if (! file_exists($this->file) ) $this->tryOldFileName();
+			$this->file = $this->fs->getcwdLocal().PATH_DELIM.$revision;
+			if (! $this->fs->file_exists($this->file) ) $this->tryOldFileName();
 			
 			# We might be in a comment or trackback directory, 
 			if (! $this->isEntry() ) {
-				$tmpfile = dirname(getcwd()).PATH_DELIM.$revision;
-				if (! file_exists($tmpfile) ) $this->tryOldFileName();
+				$tmpfile = dirname($this->fs->getcwdLocal()).PATH_DELIM.$revision;
+				if (! $this->fs->file_exists($tmpfile) ) $this->tryOldFileName();
 			}
 		}
 	
@@ -182,7 +197,7 @@ class BlogEntry extends Entry {
 	public function tryOldFileName() {
 		$tmpfile = dirname($this->file);
 		$tmpfile = mkpath($tmpfile,"current.htm");
-		if (file_exists($tmpfile)) {
+		if ($this->fs->file_exists($tmpfile)) {
 			$this->file = $tmpfile;
 		}
 	}
@@ -196,7 +211,7 @@ class BlogEntry extends Entry {
 	A Blog object.
 	*/
 	public function getParent() {
-		if (file_exists($this->file)) {
+		if ($this->fs->file_exists($this->file)) {
 			$dir = $this->file;
 			# If this is an article, the blog is 3 levels up.
 			for ($i=0; $i<3; $i++) $dir = dirname($dir);
@@ -243,12 +258,6 @@ class BlogEntry extends Entry {
 		$ret = dirname($this->file);
 		$ret = substr($ret, strlen($root));
 		$ret = str_replace(PATH_DELIM, '/', $ret);
-		#$parent = $this->getParent();
-		#$ret = $parent->blogid;
-		#$ret = dirname($this->file);
-		#$ret = str_replace(PATH_DELIM, '/', 
-		#                   substr(dirname($this->file), 
-		#                          strlen(DOCUMENT_ROOT)));
 		return trim($ret, '/');
 	}
 
@@ -261,10 +270,6 @@ class BlogEntry extends Entry {
 	public function parentID() {
 		$parent = $this->getParent();
 		return $parent->blogid;
-		#$path = dirname($this->file);
-		#$num_levels = is_a($this, 'Article') ? 2 : 4;
-		#for ($i = 0; $i < $num_levels; $i++) $path = dirname($path);
-		#return substr($path, strlen(DOCUMENT_ROOT));
 	}
 	
 	# Method: getUploadedFiles
@@ -277,14 +282,21 @@ class BlogEntry extends Entry {
 	
 	public function getUploadedFiles() {
 		$base_path = $this->localpath();
-		$std_files = array('index.php','config.php','edit.php','delete.php',
-		                   'trackback.php','uploadfile.php',ENTRY_DEFAULT_FILE);
+		$std_files = array(
+			'index.php',
+			'config.php',
+			'edit.php',
+			'delete.php',
+			'trackback.php',
+			'uploadfile.php',
+			ENTRY_DEFAULT_FILE
+		);
 		$files = scan_directory($base_path);
 		
 		$ret = array();
 		
 		foreach ($files as $f) {
-			if (!in_array($f, $std_files) && !is_dir(mkpath($base_path, $f))) {
+			if (!in_array($f, $std_files) && !$this->fs->is_dir(mkpath($base_path, $f))) {
 				$ret[] = $f;
 			}
 		}
@@ -302,7 +314,6 @@ class BlogEntry extends Entry {
 	# checks if the enclosure matches the expected content or an enclosure tag in
 	# an RSS feed.  If so, extracts the data into an array.  
 	# Otherwise Otherwise, returns false.
-
 	public function getEnclosure() {
 		# Remove stray whitespace.
 		$enc = trim($this->enclosure);
@@ -333,10 +344,10 @@ class BlogEntry extends Entry {
 			$path = uri_to_localpath($enc);
 		}
 
-		if (file_exists($path)) {
+		if ($this->fs->file_exists($path)) {
 			$ret = array();
 			$ret['url'] = localpath_to_uri($path);
-			$ret['length'] = filesize($path);
+			$ret['length'] = $this->fs->filesize($path);
 			if (extension_loaded("fileinfo")) {
 				$mh = finfo_open(FILEINFO_MIME|FILEINFO_PRESERVE_ATIME);
 				$ret['type'] = finfo_file($mh, $path);
@@ -378,7 +389,6 @@ class BlogEntry extends Entry {
 	Returns:
 	A string with the path to use for this entry.
 	*/
-
 	public function getPath($curr_ts, $just_name=false, $long_format=false) {
 		$year = date("Y", $curr_ts);
 		$month = date("m", $curr_ts);
@@ -400,8 +410,8 @@ class BlogEntry extends Entry {
 	*/
 	public function isEntry ($path=false) {
 		if (! $path) $path = dirname($this->file);
-		return file_exists($path.PATH_DELIM.ENTRY_DEFAULT_FILE) || 
-		       file_exists($path.PATH_DELIM."current.htm");
+		return $this->fs->file_exists($path.PATH_DELIM.ENTRY_DEFAULT_FILE) || 
+		       $this->fs->file_exists($path.PATH_DELIM."current.htm");
 	}
 	
 	/*
@@ -414,7 +424,7 @@ class BlogEntry extends Entry {
 	*/
 	public function isDraft($path=false) {
 		if (! $path) $path = dirname($this->file);
-		if (file_exists($path)) $path = realpath($path);
+		if ($this->fs->file_exists($path)) $path = realpath($path);
 		return ( $this->isEntry($path) &&
 		         basename(dirname($path)) == BLOG_DRAFT_PATH );
 	}
@@ -494,7 +504,7 @@ class BlogEntry extends Entry {
 	
 	public function getByPath ($path, $revision=ENTRY_DEFAULT_FILE) {
 		$file_path = $path.PATH_DELIM.$revision;
-		if (! file_exists($file_path)) $file_path = $path.PATH_DELIM."current.htm";
+		if (! $this->fs->file_exists($file_path)) $file_path = $path.PATH_DELIM."current.htm";
 		return $this->readFileData($file_path); 
 	}
 	
@@ -518,10 +528,9 @@ class BlogEntry extends Entry {
 		$target = $dir_path.PATH_DELIM.
 			$this->getPath($curr_ts, true, true).ENTRY_PATH_SUFFIX;
 		$source = $dir_path.PATH_DELIM.ENTRY_DEFAULT_FILE;
-		if (! file_exists($source)) $source = $dir_path.PATH_DELIM."current.htm";
+		if (! $this->fs->file_exists($source)) $source = $dir_path.PATH_DELIM."current.htm";
 
-		$fs = NewFS();
-		$ret = $fs->rename($source, $target);
+		$ret = $this->fs->rename($source, $target);
 		
 		if (basename($this->file) == "current.htm")
 			$this->file = $dir_path.PATH_DELIM.ENTRY_DEFAULT_FILE;
@@ -531,27 +540,27 @@ class BlogEntry extends Entry {
 		# This is done here for the article subclass, as it did not previously 
 		# create these wrappers.
 		if ($this->allow_comment && 
-		    ! is_dir($dir_path.PATH_DELIM.ENTRY_COMMENT_DIR) ) {
+		    ! $this->fs->is_dir($dir_path.PATH_DELIM.ENTRY_COMMENT_DIR) ) {
 			create_directory_wrappers($dir_path.PATH_DELIM.ENTRY_COMMENT_DIR, ENTRY_COMMENTS, get_class($this));
 		}
 		if ($this->allow_tb &&
-		    ! is_dir($dir_path.PATH_DELIM.ENTRY_TRACKBACK_DIR) ) {
+		    ! $this->fs->is_dir($dir_path.PATH_DELIM.ENTRY_TRACKBACK_DIR) ) {
 			create_directory_wrappers($dir_path.PATH_DELIM.ENTRY_TRACKBACK_DIR, ENTRY_TRACKBACKS, get_class($this));
 		}
 
 		if (! $ret) {
 			
-			$ret = $fs->rename($target, $source);
+			$ret = $this->fs->rename($target, $source);
 			return false;
 			
 		} else {
 		
-			if (! KEEP_EDIT_HISTORY) $fs->delete($target);
+			if (! KEEP_EDIT_HISTORY) $this->fs->delete($target);
 			
 			$subfile = $this->calcPrettyPermalink();
 			if ($subfile) {
 				$subfile = dirname(dirname($this->file)).PATH_DELIM.$subfile;
-				if (! file_exists($subfile)) $this->makePrettyPermalink();
+				if (! $this->fs->file_exists($subfile)) $this->makePrettyPermalink();
 			}
 		}
 
@@ -677,11 +686,11 @@ class BlogEntry extends Entry {
 	Publishes a draft entry as an actual blog entry.
 	This is an alias for BlogEntry::insert($blog, true).
 	*/
-	public function publishDraft(&$blog) {
+	public function publishDraft($blog) {
 		return $this->insert($blog, true);
 	}
 	
-	public function publishDraftAsArticle(&$blog, $path=false) {
+	public function publishDraftAsArticle($blog, $path=false) {
 		$art = NewArticle();
 		foreach ($this as $key=>$val) {
 			$art->$key = $val;
@@ -694,21 +703,20 @@ class BlogEntry extends Entry {
 	Saves the object as a draft, which can be recalled, edited, 
 	and published latter.
 	*/
-	public function saveDraft(&$blog) {
+	public function saveDraft($blog) {
 		$ret = true;
 		
 		$ts = time();
 		$draft_path = mkpath($blog->home_path, BLOG_DRAFT_PATH);
-		if (! is_dir($draft_path)) {
+		if (! $this->fs->is_dir($draft_path)) {
 			$r = create_directory_wrappers($draft_path, BLOG_DRAFTS);
 			if (! empty($r)) $ret = false;
 		}
 		
-		if (! file_exists($this->file)) {
+		if (! $this->fs->file_exists($this->file)) {
 			$dirname = $this->getPath($ts, true);
 			$path = mkpath($draft_path, $dirname);
-			$fs = NewFS();
-			$ret = $ret &&  $fs->mkdir_rec($path);
+			$ret = $ret &&  $this->fs->mkdir_rec($path);
 			$this->file = mkpath($path, ENTRY_DEFAULT_FILE);
 		}
 		
@@ -850,6 +858,7 @@ class BlogEntry extends Entry {
 		$this->allow_comment = POST("comments") ? 1 : 0;
 		$this->allow_tb = POST("trackbacks") ? 1 : 0;
 		$this->allow_pingback = POST("pingbacks") ? 1 : 0;
+		$this->send_pingback = POST("send_pingbacks") ? 1 : 0;
 		$this->has_html = POST("input_mode");
 		$this->enclosure = POST('hasenclosure') ? POST("enclosure") : '';
 		foreach ($this->custom_fields as $fld=>$desc) {

@@ -26,8 +26,6 @@
  
 class LnBlogObject {
 	
-	function LnBlogObject() {}
-
 	/* Method: createEvent
 	 * Creates an event for the current class.
 	 *

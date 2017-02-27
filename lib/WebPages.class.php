@@ -480,7 +480,7 @@ class WebPages extends BasePages {
 		$ent = NewEntry();
 		
 		// HACK: Don't suck out if the entry is published as an article.
-		if ( @$_POST['publisharticle'] && $ent->isDraft()) {
+		if ( POST('publisharticle') && $ent->isDraft() && !POST('draft')) {
 			$ent = NewArticle();
 		}
 		
@@ -506,7 +506,7 @@ class WebPages extends BasePages {
 			
 			if ($res['errors']) {
 				$tpl->set("HAS_UPDATE_ERROR");
-				$tpl->set("UPDATE_ERROR_MESSAGE", $res['errors'] . isset($res['warnings']) ? $res['warnings'] : '');
+				$tpl->set("UPDATE_ERROR_MESSAGE", $res['errors'] . (isset($res['warnings']) ? $res['warnings'] : ''));
 				entry_set_template($tpl, $ent);
 			} elseif ($res['warnings']) {
 				$refresh_delay = 10;
@@ -584,9 +584,9 @@ class WebPages extends BasePages {
 
 		$result = array('errors'=> false, 'warnings'=> '');
 		
-		if ($do_new) {
-			$ent = $is_art ? NewArticle() : NewBlogEntry();
-		}
+		#if ($do_new) {
+		#	$ent = $is_art ? NewArticle() : NewBlogEntry();
+		#}
 		$ent->getPostData();
 		
 		// Bail on security error

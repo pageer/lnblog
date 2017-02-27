@@ -39,7 +39,7 @@ class Article extends BlogEntry {
 	protected $article_path = '';
 
 	public function __construct($path = "", $filesystem = null) {
-		$this->fs = $filesystem ?: NewFS();
+		parent::__construct($filesystem ?: NewFS());
 		
 		$this->raiseEvent("OnInit");
 		
@@ -48,9 +48,9 @@ class Article extends BlogEntry {
 		$this->allow_tb = false;
 		$this->allow_pingback = false;
 		$this->template_file = ARTICLE_TEMPLATE;
-		$this->getFile($path, $revision, 'article', BLOG_ARTICLE_PATH, '/.*/');
+		$this->getFile($path, ENTRY_DEFAULT_FILE, 'article', BLOG_ARTICLE_PATH, '/.*/');
 
-		if ( file_exists($this->file) ) {
+		if ( $this->fs->file_exists($this->file) ) {
 			$this->readFileData();
 		}
 		$this->raiseEvent("InitComplete");
@@ -69,7 +69,6 @@ class Article extends BlogEntry {
 	Returns:
 	True if object is a valid article, false otherwise.
 	*/
-
 	public function isArticle($path=false) {
 		if (!$path) $path = dirname($this->file);
 		return $this->isEntry($path) && strpos($path, BLOG_ARTICLE_PATH) !== false;
@@ -88,14 +87,11 @@ class Article extends BlogEntry {
 	Returns:
 	True on success, false on failure.
 	*/
-
 	public function setSticky($show=true) {
-		$f = NewFS();
-		
 		if ($show) 
-			$ret = $f->write_file(dirname($this->file).PATH_DELIM.STICKY_PATH, $this->subject);
-		elseif (file_exists(dirname($this->file).PATH_DELIM.STICKY_PATH))
-			$ret = $f->delete(dirname($this->file).PATH_DELIM.STICKY_PATH);
+			$ret = $this->fs->write_file(dirname($this->file).PATH_DELIM.STICKY_PATH, $this->subject);
+		elseif ($this->fs->file_exists(dirname($this->file).PATH_DELIM.STICKY_PATH))
+			$ret = $this->fs->delete(dirname($this->file).PATH_DELIM.STICKY_PATH);
 		else $ret = true;
 		return $ret;
 	}
@@ -110,11 +106,9 @@ class Article extends BlogEntry {
 	Returns:
 	True if the article is sticky, false otherwise.
 	*/
-	
-
 	public function isSticky($path=false) {
 		return ($this->isArticle($path) && 
-		        file_exists($path ? $path : 
+		        $this->fs->file_exists($path ? $path : 
 		                    (dirname($this->file).PATH_DELIM.STICKY_PATH) ) );
 	}
 
@@ -133,12 +127,12 @@ class Article extends BlogEntry {
 	public function readSticky($path) {
 	
 		$old_path = $this->file;
-		if (is_dir($path)) $this->file = $path.PATH_DELIM.ENTRY_DEFAULT_FILE;
+		if ($this->fs->is_dir($path)) $this->file = $path.PATH_DELIM.ENTRY_DEFAULT_FILE;
 		else $this->file = $path;
 		$sticky_file = dirname($this->file).PATH_DELIM.STICKY_PATH;
 		
-		if ( file_exists($sticky_file) ) {
-			$data = file($sticky_file);
+		if ( $this->fs->file_exists($sticky_file) ) {
+			$data = $this->fs->file($sticky_file);
 			$desc = "";
 			foreach ($data as $line) { 
 				$desc .= $line; 
@@ -175,7 +169,6 @@ class Article extends BlogEntry {
 	Returns:
 	A string to use for the path to the article.
 	*/
-
 	public function getPath($curr_ts=false, $just_name=false, $long_format=false) {
 		if (! $curr_ts) {
 			$path = strtolower($this->subject);
@@ -208,7 +201,6 @@ class Article extends BlogEntry {
 	Returns:
 	True on success, false on failure.
 	*/
-
 	public function insert ($blog, $from_draft=false) {
 
 		$this->raiseEvent("OnInsert");
@@ -221,12 +213,11 @@ class Article extends BlogEntry {
 		$basepath = $blog->home_path.PATH_DELIM.BLOG_ARTICLE_PATH;
 		$dir_path = $this->article_path;
 		
-		if (! is_dir($basepath)) create_directory_wrappers($basepath, BLOG_ARTICLES);
+		if (! $this->fs->is_dir($basepath)) create_directory_wrappers($basepath, BLOG_ARTICLES);
 		if (! $dir_path) $dir_path = $this->getPath();
 		$dir_path = $basepath.PATH_DELIM.$dir_path;
 		if ($from_draft) {
-			$fs = NewFS();
-			$fs->rename(dirname($this->file), $dir_path);
+			$this->fs->rename(dirname($this->file), $dir_path);
 		}
 		$ret = create_directory_wrappers($dir_path, ARTICLE_BASE);
 
@@ -261,7 +252,7 @@ class Article extends BlogEntry {
 
 	public function permalink($html_escape=true) {
 		if (! USE_WRAPPER_SCRIPTS && 
-		    ! file_exists(BLOG_ROOT.PATH_DELIM.".htaccess") ) {
+		    ! $this->fs->file_exists(BLOG_ROOT.PATH_DELIM.".htaccess") ) {
 			$path = localpath_to_uri(INSTALL_ROOT);
 			$path .= "pages/showarticle.php?";
 			$path .= "blog=".basename(dirname(dirname($this->file)));

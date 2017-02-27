@@ -69,6 +69,7 @@ class TinyMCEEditor extends Plugin {
 		jQuery(document).ready(function() {
 			var $input_mode = $('#input_mode');
 			var unconditional_display = selector ? true : false;
+			var content_fetch_timer = null;
 			
 			// Suppress the plugin on the list-link page.
 			if (window.location.href.match('[?&]list=yes')) {
@@ -99,9 +100,14 @@ class TinyMCEEditor extends Plugin {
 				});
 			});
 			
-			setInterval(function tinymceUpdate() {
-				current_text_content = tinyMCE.activeEditor.getContent();
-			}, 5000);
+			var setContentFetchInterval = function() {
+				content_fetch_timer = setInterval(function tinymceUpdate() {
+					current_text_content = tinyMCE.activeEditor.getContent();
+				}, 5000);
+			};
+			var clearContentFetchInterval = function() {
+				clearInterval(content_fetch_timer);
+			};
 			
 			if (unconditional_display) {
 				tinymce.init(init);
@@ -112,7 +118,9 @@ class TinyMCEEditor extends Plugin {
 					e.preventDefault();
 					if (tinymce.editors.length === 0) {
 						tinymce.init(init);
+						setContentFetchInterval();
 					} else {
+						clearContentFetchInterval();
 						tinymce.remove();
 					}
 					return false;
@@ -132,7 +140,9 @@ class TinyMCEEditor extends Plugin {
 					$('#postform').toggleClass('rich-text', mode == MARKUP_HTML);
 					if (mode == MARKUP_HTML) { // HTML mode
 						tinymce.init(init);
+						setContentFetchInterval();
 					} else {
+						clearContentFetchInterval();
 						tinymce.remove();
 					}
 				});

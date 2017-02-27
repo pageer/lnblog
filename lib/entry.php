@@ -56,26 +56,40 @@ abstract class Entry extends LnBlogObject{
 	# The path to the file that holds data for this entry.  Note that this is
 	# specific to filesystem storage and is for internal use only.
 	public $file = '';
+	
 	# Property: has_html
 	# Holds the type of markup used in the data property.  This can be one
 	# of several defined constants, includine <MARKUP_NONE>, <MARKUP_BBCODE>, 
 	# and <MARKUP_HTML>.
 	public $has_html = MARKUP_NONE;
+	
 	# Property: custom_fields
 	# An array of custom fields for the entry, with keys being the field name
 	# for use in the data structure and configuration files and the value
 	# being a short description to display to the user.
 	public $custom_fields = array();
+	
 	# Property: metadata_fields
 	# An array of property->var pairs.  These are the object member 
 	# variable names and the data file variable names respectively.
 	# They are used to retreive data from persistent storage.
-	public $metadata_fields = array("id"=>"PostID", "uid"=>"UserID",
-		"date"=>"Date", "timestamp"=>"Timestamp", "post_ts"=>"PostTimeStemp", 
-		"ip"=>"IP", "subject"=>"Subject", "has_html"=>"HasHTML",
-		"tags"=>"Tags", "custom"=>"Custom");
+	public $metadata_fields = array(
+		"id"=>"PostID",
+		"uid"=>"UserID",
+		"date"=>"Date",
+		"timestamp"=>"Timestamp",
+		"post_ts"=>"PostTimeStemp", 
+		"ip"=>"IP",
+		"subject"=>"Subject",
+		"has_html"=>"HasHTML",
+		"tags"=>"Tags",
+		"custom"=>"Custom"
+	);
 
-	protected function __construct($filesystem) {
+	/** @var FS */
+	protected $fs;
+	
+	protected function __construct(FS $filesystem) {
 		$this->fs = $filesystem;
 	}
 	
@@ -114,7 +128,9 @@ abstract class Entry extends LnBlogObject{
 	Returns:
 	A string containing HTML code for the item's text.
 	*/
-	public function description() { return $this->markup(); }
+	public function description() {
+		return $this->markup();
+	}
 		
 	/*
 	Method: data
@@ -150,7 +166,9 @@ abstract class Entry extends LnBlogObject{
 	Abstract function that returns the object's permalink.  
 	Child classes *must* over-ride this.
 	*/
-	public function permalink() { return ""; }
+	public function permalink() {
+		return "";
+	}
 
 	/*
 	Method: getParent
@@ -159,7 +177,9 @@ abstract class Entry extends LnBlogObject{
 	BlogEntry or Article for BlogComment or TrackBack objects.
 	Child classes *must* over-ride this method.
 	*/
-	public function getParent() { return false; }
+	public function getParent() {
+		return false;
+	}
 	
 	/*
 	Method: baselink
@@ -169,7 +189,9 @@ abstract class Entry extends LnBlogObject{
 	Returns:
 	An absolute URI.
 	*/
-	public function baselink() { return $this->uri(); }
+	public function baselink() {
+		return $this->uri();
+	}
 	
 	/*
 	Method: queryStringToID
@@ -177,7 +199,9 @@ abstract class Entry extends LnBlogObject{
 	for an object.  
 	Child classes *must* over-ride this function.
 	*/
-	public function queryStringToID() { return false; }
+	public function queryStringToID() {
+		return false;
+	}
 
 	# Method: markup
 	# Apply appropriate markup to the entry data.
@@ -295,17 +319,17 @@ abstract class Entry extends LnBlogObject{
 		}
 		
 		if (! $this->post_ts) {
-			$this->post_ts = filemtime($this->file);
+			$this->post_ts = $this->fs->filemtime($this->file);
 		}
 		if (! $this->timestamp) {
-			$this->timestamp = filemtime($this->file);
+			$this->timestamp = $this->fs->filemtime($this->file);
 		}
 		
 		return $this->data;
 	}
 
 	public function readOldFile() {
-		$data = file($this->file);
+		$data = $this->fs->file($this->file);
 		$file_data = "";
 		if (! $data) $file_data = false;
 		else 
@@ -337,31 +361,11 @@ abstract class Entry extends LnBlogObject{
 	# True if the file write is successful, false otherwise.
 	
 	public function writeFileData() {
-		$fs = NewFS();
-
-		if (defined("USE_OLD_ENTRY_FORMAT")) {
-			$file_data = $this->writeOldFile();
-		} else {
-			$file_data = $this->serializeXML();
-		}
-
-		if (! is_dir(dirname($this->file)) ) 
-			$fs->mkdir_rec(dirname($this->file)); 
-		$ret = $fs->write_file($this->file, $file_data);
+		$file_data = $this->serializeXML();
+		if (! $this->fs->is_dir(dirname($this->file)) ) 
+			$this->fs->mkdir_rec(dirname($this->file)); 
+		$ret = $this->fs->write_file($this->file, $file_data);
+		var_dump("result:",$this->file,$file_data, $ret);
 		return $ret;
 	}
-	
-	public function writeOldFile() {
-		$header = '';
-		foreach ($this->custom_fields as $fld=>$desc) {
-			$this->metadata_fields[$fld] = $fld;
-		}
-		foreach ($this->metadata_fields as $mem=>$fvar) {
-			$header .= "<!--META ".$fvar.": ".
-				(isset($this->$mem) ? $this->$mem : "")." META-->\n";
-		}
-		$file_data = $header.$this->data;
-		return $file_data;
-	}
-
 }

@@ -41,6 +41,13 @@ abstract class FS {
 	# A string with the working directory reported by the filesystem functions.
 	public abstract function getcwd();
 	
+	# Method: getcwdLocal
+	# Wrapper around native getcwd() function.  This is always the local current directory, regardless
+	# of the filesystem driver.
+	public function getcwdLocal() {
+		return getcwd();
+	}
+	
 	# Method: chdir
 	# Change working directory
 	#
@@ -246,5 +253,23 @@ abstract class FS {
 	# Wrapper around native file_exists() function.
 	public function file_exists($path) {
 		return file_exists($path);
+	}
+	
+	# Method: filesize
+	# Wrapper around native filesize() function.
+	public function filesize($path) {
+		return filesize($path);
+	}
+	
+    # Method: filemtime 
+	# Wrapper around native filemtime function.
+	public function filemtime($path) {
+		return filemtime($path);
+	}
+	
+	# Method: file
+	# Wrapper around native file function.
+	public function file($path) {
+		return file($path);
 	}
 }

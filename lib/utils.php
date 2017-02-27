@@ -626,7 +626,6 @@ function create_directory_wrappers($path, $type, $instpath="") {
 
 	switch ($type) {
 		case BLOG_BASE:
-			#var_dump(is_dir(realpath($instpath)), is_dir('C:\\inetpub\\wwwroot\\lnblog'), $instpath);
 			if (!is_dir($instpath)) return false;
 			$filelist = array("index"=>"pages/showblog");
 			$removelist = array("new", "newart", "edit", "login", "logout", 
@@ -636,7 +635,6 @@ function create_directory_wrappers($path, $type, $instpath="") {
 			if (! file_exists($current."pathconfig.php")) {
 				$inst_root = realpath($instpath);
 				$blog_root = realpath($path);
-				#var_dump($inst_root, $blog_root);
 				$inst_url = localpath_to_uri($inst_root);
 				$blog_url = localpath_to_uri($blog_root);
 				$config_data = pathconfig_php_string($inst_root, $inst_url, $blog_url);

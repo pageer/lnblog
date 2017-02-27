@@ -104,7 +104,7 @@ function handle_comment(&$ent, $use_comm_link=false) {
 # tpl - The template to populate.
 # ent - the BlogEntry or Article with which to populate the template.
 
-function entry_set_template(&$tpl, &$ent) {
+function entry_set_template($tpl, $ent) {
 	$tpl->set("URL", POST("short_path"));
 	$tpl->set("SUBJECT", htmlspecialchars($ent->subject));
 	$tpl->set("TAGS", htmlspecialchars($ent->tags));
