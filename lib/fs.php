@@ -271,5 +271,11 @@ abstract class FS {
 	# Wrapper around native file function.
 	public function file($path) {
 		return file($path);
-	}
+    }
+
+    # Method: realpath
+    # Wrapper around native realpath function
+    public function realpath($path) {
+        return realpath($path);
+    }
 }

@@ -181,7 +181,7 @@ class Article extends BlogEntry {
 			$fmt = $long_format ? ENTRY_PATH_FORMAT_LONG : ENTRY_PATH_FORMAT;
 			$base = date($fmt, $curr_ts);
 			if ($just_name) return $base;
-			else return $year.PATH_DELIM.$month.PATH_DELIM.$base;
+            else return Path::mk($year, $month, $base);
 		}
 	}
 	

@@ -28,6 +28,7 @@ function class_autoload($className) {
 	$folders = array(
 		'lib'.DIRECTORY_SEPARATOR.'textprocessors',
 		'lib'.DIRECTORY_SEPARATOR.'uri',
+        'lib'.DIRECTORY_SEPARATOR.'exceptions',
 		'persistence',
 		'controllers',
 	);

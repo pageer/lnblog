@@ -251,7 +251,11 @@ class EventRegister {
 		if (!$params) $params = array();
 		return $this->activateEventFull($raiser, 
 		             strtolower(get_class($raiser)), $event, $params);
-	}
+    }
+
+    public function clearAll() {
+        $this->event_list = array();
+    }
 }
 
 $EVENT_REGISTER = EventRegister::instance();

@@ -56,15 +56,17 @@ class BlogEntry extends Entry {
 		$this->initVars();
 		$this->raiseEvent("OnInit");
 		
-		$this->getFile($path, ENTRY_DEFAULT_FILE, 
-		               array('entry', 'draft'), 
-		               array(BLOG_ENTRY_PATH, BLOG_DRAFT_PATH),
-		               array('/^\d{4}\/\d{2}\/\d{2}_\d{4}\d?\d?$/',
-		                     '/^\d{2}_\d{4}\d?\d?$/'));
-		
-		if ( $this->fs->file_exists($this->file) ) {
-			$this->readFileData();
-		}
+        if ($path !== null) {
+            $this->getFile($path, ENTRY_DEFAULT_FILE, 
+                           array('entry', 'draft'), 
+                           array(BLOG_ENTRY_PATH, BLOG_DRAFT_PATH),
+                           array('/^\d{4}\/\d{2}\/\d{2}_\d{4}\d?\d?$/',
+                                 '/^\d{2}_\d{4}\d?\d?$/'));
+            
+            if ( $this->fs->file_exists($this->file) ) {
+                $this->readFileData();
+            }
+        }
 		
 		$this->raiseEvent("InitComplete");
 	}
@@ -131,7 +133,7 @@ class BlogEntry extends Entry {
 		# then assume the current directory.
 		if ($this->fs->is_dir($path)) {
 		
-			$this->file = $path.PATH_DELIM.$revision;
+			$this->file = Path::mk($path, $revision);
 			# Support old blog entry format.
 			if (! $this->fs->file_exists($this->file) ) $this->tryOldFileName();
 
@@ -174,17 +176,21 @@ class BlogEntry extends Entry {
 				$this->file = mkpath($entrypath,$revision);
 			}
 
-			if (! $this->fs->file_exists($this->file)) $this->tryOldFileName();			
+            if (! $this->fs->file_exists($this->file)) {
+                $this->tryOldFileName();			
+            }
 
 		} else {
 		
-			$this->file = $this->fs->getcwdLocal().PATH_DELIM.$revision;
+			$this->file = Path::mk($this->fs->getcwdLocal(), $revision);
 			if (! $this->fs->file_exists($this->file) ) $this->tryOldFileName();
 			
 			# We might be in a comment or trackback directory, 
 			if (! $this->isEntry() ) {
-				$tmpfile = dirname($this->fs->getcwdLocal()).PATH_DELIM.$revision;
-				if (! $this->fs->file_exists($tmpfile) ) $this->tryOldFileName();
+				$tmpfile = Path::mk(dirname($this->fs->getcwdLocal()), $revision);
+                if (! $this->fs->file_exists($tmpfile) ) {
+                    $this->tryOldFileName();
+                }
 			}
 		}
 	
@@ -395,7 +401,7 @@ class BlogEntry extends Entry {
 		$fmt = $long_format ? ENTRY_PATH_FORMAT_LONG : ENTRY_PATH_FORMAT;
 		$base = date($fmt, $curr_ts);
 		if ($just_name) return $base;
-		else return $year.PATH_DELIM.$month.PATH_DELIM.$base;
+		else return Path::mk($year, $month, $base);
 	}
 
 	/*
@@ -409,9 +415,14 @@ class BlogEntry extends Entry {
 	True if the object is an existing entry, false otherwise.
 	*/
 	public function isEntry ($path=false) {
-		if (! $path) $path = dirname($this->file);
-		return $this->fs->file_exists($path.PATH_DELIM.ENTRY_DEFAULT_FILE) || 
-		       $this->fs->file_exists($path.PATH_DELIM."current.htm");
+        if (! $path) {
+            $path = dirname($this->file);
+        }
+        if (! $path) {
+            return false;
+        }
+		return $this->fs->file_exists(Path::mk($path, ENTRY_DEFAULT_FILE)) ||
+		       $this->fs->file_exists(Path::mk($path, "current.htm"));
 	}
 	
 	/*
@@ -423,8 +434,11 @@ class BlogEntry extends Entry {
 	True if the entry is a draft, false otherwise.
 	*/
 	public function isDraft($path=false) {
-		if (! $path) $path = dirname($this->file);
-		if ($this->fs->file_exists($path)) $path = realpath($path);
+        if (! $path) {
+            $path = dirname($this->file);
+        } elseif ($this->fs->file_exists($path)) {
+           $path = realpath($path);
+        }
 		return ( $this->isEntry($path) &&
 		         basename(dirname($path)) == BLOG_DRAFT_PATH );
 	}
@@ -437,6 +451,13 @@ class BlogEntry extends Entry {
 	public function isPublished($path=false) {
 		return $this->isEntry($path) && ! $this->isDraft();
 	}
+
+    /**
+    * Determines if the entry is published as an article.  */
+    public function isArticle() {
+        $article_dir = basename(dirname(dirname($this->file)));
+        return $this->fs->file_exists($this->file) && $article_dir == BLOG_ARTICLE_PATH;
+    }
 	
 	/*
 	Method: localpath
@@ -670,7 +691,7 @@ class BlogEntry extends Entry {
 		
 	}
 	
-	protected function setDates($curr_ts = null) {
+	public function setDates($curr_ts = null) {
 		# Set the timestamp and date, plus the ones for the original post, if
 		# this is a new entry.
 		$curr_ts = $curr_ts ? $curr_ts : time();
@@ -795,7 +816,9 @@ class BlogEntry extends Entry {
 		} else {
 			$ret = preg_replace("/\W/", "_", $ret);
 		}
-		if ($ret) $ret .= ".php";
+        if ($ret) {
+            $ret .= ".php";
+        }
 		return $ret;
 	}
 	
@@ -813,20 +836,20 @@ class BlogEntry extends Entry {
 			# Put the wrapper in the parent of the entry directory.
 			$path = dirname(dirname($this->file));
 			$dir_path = basename(dirname($this->file));
-			$path .= PATH_DELIM.$subfile;
+			$path = Path::mk($path, $subfile);
 			# Check that there isn't already a file by this name.
-			if (file_exists($path)) {
+			if ($this->fs->file_exists($path)) {
 				$i = 2;
 				# Get rid of the .php extension
 				$base = substr($path, 0, strlen($path) - 5);
-				while (file_exists($path)) {
+				while ($this->fs->file_exists($path)) {
 					$path = $base.$i.".php";
 					$i++;
 				}
 			}
 			$content =  "<?php \$entrypath = dirname(__FILE__).DIRECTORY_SEPARATOR.'".$dir_path."'.DIRECTORY_SEPARATOR; " .
 				"chdir(\$entrypath); include \$entrypath.'index.php';";
-			$ret = write_file($path, $content);
+			$ret = $this->fs->write_file($path, $content);
 		} else $ret = false;
 		return $ret;
 	}

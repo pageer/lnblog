@@ -1,9 +1,5 @@
 <?php
 
-define("FS_DEFAULT_MODE", 0666);
-define("FS_SCRIPT_MODE", 0777);
-define("FS_DIRECTORY_MODE", 0777);
-
 class NativeFsTest extends PHPUnit_Framework_TestCase {
     
     function testCreator() {
