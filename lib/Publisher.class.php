@@ -6,11 +6,13 @@ class Publisher {
 
     private $fs;
     private $blog;
+    private $user;
     private $wrappers;
     private $keepHistory;
 
-    public function __construct(Blog $blog, FS $fs, WrapperGenerator $wrappers) {
+    public function __construct(Blog $blog, User $user, FS $fs, WrapperGenerator $wrappers) {
         $this->blog = $blog;
+        $this->user = $user;
         $this->fs = $fs;
         $this->wrappers = $wrappers;
     }
@@ -48,41 +50,31 @@ class Publisher {
         }
 
         if ( $this->fs->is_dir($dir_path) ) {
-            return false;
+            throw new TargetPathExists();
         }
 		
-		$entry->raiseEvent("OnInsert");
+        $this->raiseEvent($entry, 'BlogEntry', 'OnInsert');
 
-		# First, check that the year and month directories exist and have
-		# the appropriate wrapper scripts in them.
-		$month_path = dirname($dir_path);
-		$year_path = dirname($month_path);
-        if (! $this->fs->is_dir($year_path)) {
-            $this->wrappers->createDirectoryWrappers($year_path, YEAR_ENTRIES);
-        }
-        if (! $this->fs->is_dir($month_path)) {
-            $this->wrappers->createDirectoryWrappers($month_path, MONTH_ENTRIES);
-        }
-		$this->fs->rename(dirname($entry->file), $dir_path);	
+        $this->createMonthDirectory($dir_path);
 
-		$this->wrappers->createDirectoryWrappers($dir_path, ENTRY_BASE);
-		$this->wrappers->createDirectoryWrappers(Path::mk($dir_path, ENTRY_COMMENT_DIR), ENTRY_COMMENTS);
-		$this->wrappers->createDirectoryWrappers(Path::mk($dir_path, ENTRY_TRACKBACK_DIR), ENTRY_TRACKBACKS);
-		$this->wrappers->createDirectoryWrappers(Path::mk($dir_path, ENTRY_PINGBACK_DIR), ENTRY_PINGBACKS);
+		$ret = $this->fs->rename(dirname($entry->file), $dir_path);	
+
+        if (! $ret) {
+            throw new EntryRenameFailed();
+        }
+
+        $this->createEntryWrappers($dir_path);
 				
 		$entry->file = Path::mk($dir_path, ENTRY_DEFAULT_FILE);
-		$entry->post_ts = $curr_ts;
+        $entry->uid = $this->user->username();
 		$entry->setDates($curr_ts);
 		$entry->ip = get_ip();
 
-		//$ret = $entry->writeFileData();
-		# Add a wrapper file to make the link prettier.
-		//if ($ret) {
-			$entry->id = $entry->globalID();
-			$entry->makePrettyPermalink();
-		//}
-		$entry->raiseEvent("InsertComplete");
+        $entry->makePrettyPermalink();
+
+        $this->raiseEvent($entry, 'BlogEntry', 'UpdateComplete');
     }
+
 
     /**
      * Publish the entry as an article.
@@ -92,8 +84,50 @@ class Publisher {
      * @param   BlogEntry   $entry
      * @throw   Exception
      */
-    public function publishArticle(BlogEntry $entry) {
+    public function publishArticle(BlogEntry $entry, DateTime $time = null) {
 
+        $time = $time ?: new DateTime();
+		$curr_ts = $time->getTimestamp();
+		$basepath = Path::mk($this->blog->home_path, BLOG_ARTICLE_PATH);
+
+        if (! $entry->isEntry()) {
+            $this->createDraft($entry, $time);
+        }
+
+		$dir_path = $entry->article_path;
+        if (! $dir_path) {
+           $dir_path = $this->getPath();
+        }
+		$dir_path = Path::mk($basepath, $dir_path);
+
+        if ($this->fs->is_dir($dir_path)) {
+            throw new EntryAlreadyExists();
+        } elseif (! $this->fs->is_dir($basepath)) {
+            $this->wrappers->createDirectoryWrappers($basepath, BLOG_ARTICLES);
+        }
+
+		$this->raiseEvent($entry, "Article", "OnInsert");
+		$ret = $this->fs->rename(dirname($entry->file), $dir_path);
+
+        if (! $ret) {
+            throw new EntryRenameFailed();
+        }
+
+		$ret = $this->wrappers->createDirectoryWrappers($dir_path, ARTICLE_BASE);
+        $this->wrappers->createDirectoryWrappers(Path::mk($dir_path, ENTRY_COMMENT_DIR), ENTRY_COMMENTS);
+        $this->wrappers->createDirectoryWrappers(Path::mk($dir_path, ENTRY_TRACKBACK_DIR), ENTRY_TRACKBACKS);
+        $this->wrappers->createDirectoryWrappers(Path::mk($dir_path, ENTRY_PINGBACK_DIR), ENTRY_PINGBACKS);
+
+		$entry->file = Path::mk($dir_path, ENTRY_DEFAULT_FILE);
+        $entry->uid = $this->user->username();
+		$entry->date = fmtdate(ENTRY_DATE_FORMAT, $curr_ts);
+		$entry->timestamp = $curr_ts;
+        if (! $entry->post_ts) {
+            $entry->post_ts = $curr_ts;
+        }
+		$entry->ip = get_ip();
+
+		$this->raiseEvent($entry, "Article", "InsertComplete");
     }
 
     /**
@@ -105,7 +139,26 @@ class Publisher {
      * @throw   Exception
      */
     public function unpublish(BlogEntry $entry) {
+        if (! $entry->isEntry()) {
+            throw new EntryDoesNotExist();
+        }
+        if (! $entry->isPublished()) {
+            throw new EntryIsNotPublished();
+        }
 
+        $this->raiseEvent($entry, 'BlogEntry', 'OnDelete');
+
+        $path = date('d_His', $entry->post_ts);
+        $draft_path = Path::mk($this->blog->home_path, BLOG_DRAFT_PATH, $path);
+        $ret = $this->fs->rename($entry->localpath(), $draft_path);
+
+        if (! $ret) {
+            throw new EntryRenameFailed();
+        }
+
+        $this->wrappers->removeForEntry($entry);
+
+        $this->raiseEvent($entry, 'BlogEntry', 'DeleteComplete');
     }
 
     /**
@@ -114,7 +167,7 @@ class Publisher {
      * Saves a new entry in the drafts folder.  Throws on failure or
      * if the entry already exists.
      * @param   BlogEntry       $entry
-     * @param   DateTime|null   $time   (Optional) creation time
+     * @param   DateTime|null   $time   (Optionl) creation time
      * @throw   Exception
      */
     public function createDraft(BlogEntry $entry, DateTime $time = null) {
@@ -122,7 +175,7 @@ class Publisher {
             $time = new DateTime();
         }
 		$ts = $time->getTimestamp();
-        $draft_path = mkpath($this->blog->home_path, BLOG_DRAFT_PATH);
+        $draft_path = Path::mk($this->blog->home_path, BLOG_DRAFT_PATH);
 		if (! $this->fs->is_dir($draft_path)) {
 			$r = $this->wrappers->createDirectoryWrappers($draft_path, BLOG_DRAFTS);
             if (! empty($r)) {
@@ -135,13 +188,14 @@ class Publisher {
         }
         
 		$dirname = $entry->getPath($ts, true);
-		$path = mkpath($draft_path, $dirname);
+		$path = Path::mk($draft_path, $dirname);
         $ret = $this->fs->mkdir_rec($path);
         if (! $ret) {
             throw new Exception("Could not create directory for new draft.");
         }
 
-        $entry->file = mkpath($path, ENTRY_DEFAULT_FILE);
+        $entry->file = Path::mk($path, ENTRY_DEFAULT_FILE);
+        $entry->uid = $this->user->username();
         $entry->date = '';
         $entry->timestamp = '';
 		$entry->setDates($ts);
@@ -173,7 +227,7 @@ class Publisher {
         $event_class = $entry->isArticle() ? 'Article' : 'BlogEntry';
 
         if ($entry->isPublished()) {
-            EventRegister::instance()->activateEventFull($entry, $event_class, 'OnUpdate');
+            $this->raiseEvent($entry, $event_class, 'OnUpdate');
         }
 		
 		$dir_path = dirname($entry->file);
@@ -193,8 +247,82 @@ class Publisher {
         }
 
         if ($entry->isPublished()){
-            EventRegister::instance()->activateEventFull($entry, $event_class, 'UpdateComplete');
+            $this->raiseEvent($entry, $event_class, 'UpdateComplete');
         }
+    }
+
+    /**
+     * Completely delete an entry.
+     *
+     * Applies to both published and draft entries.  Throws on failure of if 
+     * the entry has not been saved.
+     * @param   BlogEntry   $entry
+     * @param   DateTime    $time
+     * @throw   Exception
+     */
+    public function delete(BlogEntry $entry, DateTime $time = null) {
+        if (!$entry->isEntry()) {
+            throw new EntryDoesNotExist();
+        }
+		
+        $event_class = $entry->isArticle() ? 'Article' : 'BlogEntry';
+
+        if ($entry->isPublished()) {
+            $this->raiseEvent($entry, $event_class, 'OnDelete');
+        }
+
+		$subfile = $entry->calcPrettyPermalink();
+        $subfile = Path::mk(dirname($entry->localpath()), $subfile);
+		if ($this->fs->file_exists($subfile)) {
+			$this->fs->delete($subfile);
+		}
+		
+        if ($this->keepEditHistory()) {
+            $time = $time ?: new DateTime();
+			$target_file = Path::mk($entry->localpath(), $entry->getPath($time->getTimestamp(), true, true).ENTRY_PATH_SUFFIX);
+			$ret = $this->fs->rename($entry->file, $target_file);
+		} else {
+            $ret = $this->fs->rmdir_rec($entry->localpath());
+		}
+
+        if (! $ret) {
+            throw new EntryDeleteFailed();
+        }
+		
+        if ($entry->isPublished()){
+            $this->raiseEvent($entry, $event_class, 'DeleteComplete');
+        }
+    }
+
+    /**
+     * Add or update file attachments for the entry.
+     *
+     * Adds files attachments to the entry.  Any filenames that already exist
+     * will be overwritten.  Throws if one or more fails or entry is not saved.
+     * @param   BlogEntry   $entry
+     * @param   array       $files_data The PHP $_FILES array of attachments.
+     * @throw   Exception
+     */
+    public function addAttachments(BlogEntry $entry, array $files) {
+
+    }
+
+    private function createMonthDirectory($dir_path) {
+		$month_path = dirname($dir_path);
+		$year_path = dirname($month_path);
+        if (! $this->fs->is_dir($year_path)) {
+            $this->wrappers->createDirectoryWrappers($year_path, YEAR_ENTRIES);
+        }
+        if (! $this->fs->is_dir($month_path)) {
+            $this->wrappers->createDirectoryWrappers($month_path, MONTH_ENTRIES);
+        }
+    }
+
+    private function createEntryWrappers($dir_path) {
+		$this->wrappers->createDirectoryWrappers($dir_path, ENTRY_BASE);
+		$this->wrappers->createDirectoryWrappers(Path::mk($dir_path, ENTRY_COMMENT_DIR), ENTRY_COMMENTS);
+		$this->wrappers->createDirectoryWrappers(Path::mk($dir_path, ENTRY_TRACKBACK_DIR), ENTRY_TRACKBACKS);
+		$this->wrappers->createDirectoryWrappers(Path::mk($dir_path, ENTRY_PINGBACK_DIR), ENTRY_PINGBACKS);
     }
 
     private function updateWithHistory(BlogEntry $entry, DateTime $time) {
@@ -231,60 +359,8 @@ class Publisher {
         }
     }
 
-    /**
-     * Completely delete an entry.
-     *
-     * Applies to both published and draft entries.  Throws on failure of if 
-     * the entry has not been saved.
-     * @param   BlogEntry   $entry
-     * @param   DateTime    $time
-     * @throw   Exception
-     */
-    public function delete(BlogEntry $entry, DateTime $time = null) {
-        if (!$entry->isEntry()) {
-            throw new EntryDoesNotExist();
-        }
-		
-        $event_class = $entry->isArticle() ? 'Article' : 'BlogEntry';
-
-        if ($entry->isPublished()) {
-            EventRegister::instance()->activateEventFull($entry, $event_class, 'OnDelete');
-        }
-
-		$subfile = $entry->calcPrettyPermalink();
-        $subfile = Path::mk(dirname($entry->localpath()), $subfile);
-		if ($this->fs->file_exists($subfile)) {
-			$this->fs->delete($subfile);
-		}
-		
-        if ($this->keepEditHistory()) {
-            $time = $time ?: new DateTime();
-			$target_file = Path::mk($entry->localpath(), $entry->getPath($time->getTimestamp(), true, true).ENTRY_PATH_SUFFIX);
-			$ret = $this->fs->rename($entry->file, $target_file);
-		} else {
-            $ret = $this->fs->rmdir_rec($entry->localpath());
-		}
-
-        if (! $ret) {
-            throw new EntryDeleteFailed();
-        }
-		
-        if ($entry->isPublished()){
-            EventRegister::instance()->activateEventFull($entry, $event_class, 'DeleteComplete');
-        }
-    }
-
-    /**
-     * Add or update file attachments for the entry.
-     *
-     * Adds files attachments to the entry.  Any filenames that already exist
-     * will be overwritten.  Throws if one or more fails or entry is not saved.
-     * @param   BlogEntry   $entry
-     * @param   array       $files_data The PHP $_FILES array of attachments.
-     * @throw   Exception
-     */
-    public function addAttachments(BlogEntry $entry, array $files) {
-
+    private function raiseEvent($object, $class, $event) {
+        EventRegister::instance()->activateEventFull($object, $class, $event);
     }
     
 }

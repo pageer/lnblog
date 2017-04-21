@@ -128,5 +128,14 @@ class WrapperGenerator {
     	return $ret_list;
     }
 
+    public function removeForEntry(BlogEntry $entry) {
+    	$removelist = array("index", "edit", "delete", "trackback", "uploadfile");
+        foreach ($removeList as $item) {
+            $path = Path::mk($entry->localpath(), "$item.php");
+            if ($this->fs->file_exists($path)) {
+                $this->fs->delete($path);
+            }
+        }
+    }
 
 }
