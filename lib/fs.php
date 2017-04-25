@@ -248,12 +248,24 @@ abstract class FS {
 	public function is_dir($path) {
 		return is_dir($path);
 	}
+
+    # Method: is_file
+    # Wrapper around native is_file() method
+    public function is_file($path) {
+        return is_file($path);
+    }
 	
 	# Method: file_exists
 	# Wrapper around native file_exists() function.
 	public function file_exists($path) {
 		return file_exists($path);
 	}
+
+    # Method: scandir
+    # Wraper around native scandir() function.    
+    public function scandir($directory, $sorting_order = SCANDIR_SORT_ASCENDING) {
+        return scandir($directory, $sorting_order);
+    }
 	
 	# Method: filesize
 	# Wrapper around native filesize() function.

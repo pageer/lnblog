@@ -3,9 +3,6 @@ use Prophecy\Argument;
 
 abstract class PublisherTestBase extends PHPUnit_Framework_TestCase {
 
-     
-    /******** Test Fixtures ********/
-
     protected function setUp() {
         Path::$sep = '/';
         $this->prophet = new \Prophecy\Prophet();

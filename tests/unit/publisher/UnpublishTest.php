@@ -64,6 +64,22 @@ class UnpublishTest extends PublisherTestBase {
         $this->publisher->unpublish($entry);
     }
 
+    public function testUnpublish_WhenRenameSucceeds_RemovesPrettyPermalink() {
+        $entry = new BlogEntry(null, $this->fs->reveal());
+        $entry->subject = 'Test Entry';
+        $entry->file = './entries/2017/01/02_1234/entry.xml';
+        $entry->post_ts = strtotime('2017-01-02 12:34:00');
+        $this->fs->scandir(Argument::any())->willReturn(array());
+        $this->fs->file_exists('./entries/2017/01/02_1234/entry.xml')->willReturn(true);
+        $this->fs->file_exists('./entries/2017/01/Test_Entry.php')->willReturn(true);
+        $this->fs->is_dir('./drafts/02_123400')->willReturn(false);
+        $this->fs->rename('./entries/2017/01/02_1234', './drafts/02_123400')->willReturn(true);
+
+        $this->fs->delete('./entries/2017/01/Test_Entry.php')->willReturn(true)->shouldBeCalled();
+
+        $this->publisher->unpublish($entry);
+    }
+
     public function testUnpublish_WhenRenameSucceeds_RaisesOnDeleteEvent() {
         $entry = $this->setUpTestEntryForSuccessfulUnpublish();
         $event_stub = new PublisherEventTestingStub();

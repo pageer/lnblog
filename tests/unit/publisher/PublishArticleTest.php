@@ -122,6 +122,31 @@ class PublishArticleTest extends PublisherTestBase {
         $this->publisher->publishArticle($entry, $this->getTestTime());
     }
 
+    public function testPublishArticle_WhenArticlesDirDoesNotExist_CreatesArticlesDirWrappers() {
+        $entry = $this->setUpTestArticleForSuccessfulPublish();
+        $this->fs->is_dir('./content/some_stuff')->willReturn(false);
+        $this->fs->is_dir('./content')->willReturn(false);
+        $this->wrappers->createDirectoryWrappers('./content/some_stuff', ARTICLE_BASE)->willReturn(true);
+        $this->wrappers->createDirectoryWrappers('./content/some_stuff/comments', ENTRY_COMMENTS)->willReturn(true);
+        $this->wrappers->createDirectoryWrappers('./content/some_stuff/trackback', ENTRY_TRACKBACKS)->willReturn(true);
+        $this->wrappers->createDirectoryWrappers('./content/some_stuff/pingback', ENTRY_PINGBACKS)->willReturn(true);
+
+        $this->wrappers->createDirectoryWrappers('./content', BLOG_ARTICLES)->willReturn(true)->shouldBeCalled();
+
+        $this->publisher->publishArticle($entry, $this->getTestTime());
+    }
+
+    public function testPublishArticle_WhenArticlePathIsNotSet_PublishesWithPathGeneratedFromSubject() {
+        $entry = $this->setUpTestArticleForSuccessfulPublish();
+        $entry->subject = "Whatever THing";
+        $entry->article_path = '';
+        $this->fs->is_dir('./content/whatever_thing')->willReturn(false);
+
+        $this->fs->rename('./drafts/02_1234', './content/whatever_thing')->willReturn(true)->shouldBeCalled();
+
+        $this->publisher->publishArticle($entry, $this->getTestTime());
+    }
+
     private function getTestDraftEntry() {
         $entry = new BlogEntry(null, $this->fs->reveal());
         $entry->file = './drafts/02_1234/entry.xml';

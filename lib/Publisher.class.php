@@ -67,6 +67,7 @@ class Publisher {
 				
 		$entry->file = Path::mk($dir_path, ENTRY_DEFAULT_FILE);
         $entry->uid = $this->user->username();
+        $entry->post_ts = $curr_ts;
 		$entry->setDates($curr_ts);
 		$entry->ip = get_ip();
 
@@ -94,9 +95,11 @@ class Publisher {
             $this->createDraft($entry, $time);
         }
 
-		$dir_path = $entry->article_path;
+        $dir_path = $entry->article_path;
         if (! $dir_path) {
-           $dir_path = $this->getPath();
+            $dir_path = strtolower($entry->subject);
+            $dir_path = preg_replace("/\s+/", "_", $dir_path);
+            $dir_path = preg_replace("/\W+/", "", $dir_path);
         }
 		$dir_path = Path::mk($basepath, $dir_path);
 
@@ -157,6 +160,7 @@ class Publisher {
         }
 
         $this->wrappers->removeForEntry($entry);
+        $this->deletePermalinkFile($entry);
 
         $this->raiseEvent($entry, 'BlogEntry', 'DeleteComplete');
     }
@@ -171,27 +175,25 @@ class Publisher {
      * @throw   Exception
      */
     public function createDraft(BlogEntry $entry, DateTime $time = null) {
-        if (! $time) {
-            $time = new DateTime();
-        }
+        $time = $time ?: new DateTime();
 		$ts = $time->getTimestamp();
         $draft_path = Path::mk($this->blog->home_path, BLOG_DRAFT_PATH);
 		if (! $this->fs->is_dir($draft_path)) {
 			$r = $this->wrappers->createDirectoryWrappers($draft_path, BLOG_DRAFTS);
             if (! empty($r)) {
-                throw new Exception('Could not create drafts directory');
+                throw new CouldNotCreateDirectory('Could not create drafts directory');
             }
 		}
 		
         if ($entry->isEntry()) {
-            throw new Exception("This draft aleady exists.");
+            throw new EntryAlreadyExists("This draft aleady exists.");
         }
         
 		$dirname = $entry->getPath($ts, true);
 		$path = Path::mk($draft_path, $dirname);
         $ret = $this->fs->mkdir_rec($path);
         if (! $ret) {
-            throw new Exception("Could not create directory for new draft.");
+            throw new EntryWriteFailed("Could not create directory for new draft.");
         }
 
         $entry->file = Path::mk($path, ENTRY_DEFAULT_FILE);
@@ -204,7 +206,7 @@ class Publisher {
         $ret = $this->fs->write_file($entry->file, $file_data);
 
         if (! $ret) {
-            throw new Exception("Failed to write draft entry data.");
+            throw new EntryWriteFailed("Failed to write draft entry data.");
         }
     }
 
@@ -242,9 +244,7 @@ class Publisher {
             $this->updateWithoutHistory($entry);
         }
 
-        if ($entry->isPublished() && ! $entry->isArticle()) {    
-            $this->updatePermalinkFile($entry);
-        }
+        $this->updatePermalinkFile($entry);
 
         if ($entry->isPublished()){
             $this->raiseEvent($entry, $event_class, 'UpdateComplete');
@@ -258,7 +258,7 @@ class Publisher {
      * the entry has not been saved.
      * @param   BlogEntry   $entry
      * @param   DateTime    $time
-     * @throw   Exception
+     * @throw   EntryDoesNotExist|EntryDeleteFailed
      */
     public function delete(BlogEntry $entry, DateTime $time = null) {
         if (!$entry->isEntry()) {
@@ -271,11 +271,7 @@ class Publisher {
             $this->raiseEvent($entry, $event_class, 'OnDelete');
         }
 
-		$subfile = $entry->calcPrettyPermalink();
-        $subfile = Path::mk(dirname($entry->localpath()), $subfile);
-		if ($this->fs->file_exists($subfile)) {
-			$this->fs->delete($subfile);
-		}
+        $this->deletePermalinkFile($entry);
 		
         if ($this->keepEditHistory()) {
             $time = $time ?: new DateTime();
@@ -350,11 +346,39 @@ class Publisher {
     }
 
     private function updatePermalinkFile(BlogEntry $entry) {
-        $subfile = $entry->calcPrettyPermalink();
-        if ($subfile) {
+        if ($entry->isPublished() && ! $entry->isArticle()) {    
+            $subfile = $entry->calcPrettyPermalink();
+            if ($subfile) {
+                $subfile = Path::mk(dirname(dirname($entry->file)), $subfile);
+                if (! $this->fs->file_exists($subfile)) {
+                    $entry->makePrettyPermalink();
+                }
+            }
+        }
+    }
+
+    private function deletePermalinkFile(BlogEntry $entry) {
+        if (! $entry->isArticle()) {
+            $subfile = $entry->calcPrettyPermalink();
             $subfile = Path::mk(dirname(dirname($entry->file)), $subfile);
-            if (! $this->fs->file_exists($subfile)) {
-                $entry->makePrettyPermalink();
+            if ($this->fs->file_exists($subfile)) {
+                $this->fs->delete($subfile);
+            }
+            $this->deleteStalePermalinkFiles($entry);
+        }
+    }
+
+    private function deleteStalePermalinkFiles(BlogEntry $entry) {
+        $path = dirname(dirname($entry->file));
+        $base_dir = basename(dirname($entry->file));
+        $listing = $this->fs->scandir($path);
+        foreach ($listing as $file) {
+            $full_path = Path::mk($path, $file);
+            if (substr($file, -4) == ".php" && $this->fs->is_file($full_path)) {
+                $content = $this->fs->read_file($full_path);
+                if (strpos($content, "'$base_dir'") > 0 || strpos($content, '"'.$base_dir.'"') > 0) {
+                    $this->fs->delete($full_path);
+                }
             }
         }
     }

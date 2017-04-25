@@ -18,7 +18,7 @@ class WrapperGenerator {
     	$sys_templ_dir = "INSTALL_ROOT.'".PATH_DELIM.BLOG_TEMPLATE_DIR."'";
     
         if (! is_dir($path)) {
-            $this->fs->$ret = $this->fs->mkdir_rec($path);
+            $ret = $this->fs->mkdir_rec($path);
         }
     
     	$current = $path.PATH_DELIM;
@@ -129,7 +129,7 @@ class WrapperGenerator {
     }
 
     public function removeForEntry(BlogEntry $entry) {
-    	$removelist = array("index", "edit", "delete", "trackback", "uploadfile");
+    	$removeList = array("index", "edit", "delete", "trackback", "uploadfile");
         foreach ($removeList as $item) {
             $path = Path::mk($entry->localpath(), "$item.php");
             if ($this->fs->file_exists($path)) {

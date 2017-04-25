@@ -45,7 +45,7 @@ class NativeFS extends FS {
 	public function getcwd() {
 		return getcwd();
 	}
-	
+
 	public function mkdir($dir, $mode=false) { 
 		if (! $mode) $mode = $this->directory_mode;
 		if ($mode) {
@@ -62,10 +62,17 @@ class NativeFS extends FS {
 
 	public function mkdir_rec($dir, $mode=false) {
 		$parent = dirname($dir);
-		if ( $parent == $dir ) return false;
-		if (! is_dir($parent) )	$ret = $this->mkdir_rec($parent, $mode);
-		else $ret = true;
-		if ($ret) $ret = $this->mkdir($dir, $mode);
+        if ( $parent == $dir ) {
+            return false;
+        }
+        if (! is_dir($parent) ) {
+            $ret = $this->mkdir_rec($parent, $mode);
+        } else {
+            $ret = true;
+        }
+        if ($ret) {
+            $ret = $this->mkdir($dir, $mode);
+        }
 		return $ret;
 	}
 
@@ -79,7 +86,9 @@ class NativeFS extends FS {
 	}
 
 	public function rmdir_rec($dir) {
-		if (! is_dir($dir)) return $this->delete($dir);
+        if (! is_dir($dir)) {
+            return $this->delete($dir);
+        }
 		$dirhand = opendir($dir);
 		$ret = true;
 		while ( ( false !== ( $ent = readdir($dirhand) ) ) && $ret ) {
@@ -90,7 +99,9 @@ class NativeFS extends FS {
 			}
 		}
 		closedir($dirhand);
-		if ($ret) $ret = $ret && $this->rmdir($dir);
+        if ($ret) {
+            $ret = $ret && $this->rmdir($dir);
+        }
 		return $ret;	
 	}
 

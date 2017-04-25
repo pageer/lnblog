@@ -49,6 +49,7 @@ class BlogEntry extends Entry {
 	public $has_html = MARKUP_BBCODE;
 	public $enclosure = '';
 	public $abstract;
+    public $article_path = '';
 
 	public function __construct($path = "", $filesystem = null) {
 		parent::__construct($filesystem ?: NewFS());
@@ -99,6 +100,7 @@ class BlogEntry extends Entry {
 			"ip"=>"ip",
 			"subject"=>"subject",
 			"abstract"=>"abstract",
+            "article_path" => "article_path",
 			"allow_comment"=>"allowcomment",
 			"has_html"=>"hashtml",
 			"tags"=>"tags", 
@@ -437,7 +439,7 @@ class BlogEntry extends Entry {
         if (! $path) {
             $path = dirname($this->file);
         } elseif ($this->fs->file_exists($path)) {
-           $path = realpath($path);
+           $path = $this->fs->realpath($path);
         }
 		return ( $this->isEntry($path) &&
 		         basename(dirname($path)) == BLOG_DRAFT_PATH );

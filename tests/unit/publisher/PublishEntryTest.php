@@ -3,10 +3,7 @@ use Prophecy\Argument;
 
 class PublishEntryTest extends PublisherTestBase {
 
-    /******** Publish Entry ********/
-
     public function testPublishEntry_WhenEntryDoesNotExists_SaveAsDraftAndMovesDirectory() {
-        $time = new DateTime('2017-01-02 12:34:00');
         $fs = $this->fs;
         $entry = new BlogEntry(null, $fs->reveal());
         $fs->file_exists('./drafts/02_1234/entry.xml')->willReturn(false);
@@ -19,11 +16,10 @@ class PublishEntryTest extends PublisherTestBase {
         });
         $fs->rename('./drafts/02_1234', './entries/2017/01/02_1234')->willReturn(true)->shouldBeCalled();
 
-        $this->publisher->publishEntry($entry, $time);
+        $this->publisher->publishEntry($entry, $this->getTestTime());
     }
 
     public function testPublishEntry_WhenPublishTargetDirAlreadyExists_AddsSecondsToTargetPath() {
-        $time = new DateTime('2017-01-02 12:34:00');
         $fs = $this->fs;
         $entry = new BlogEntry(null, $fs->reveal());
         $entry->file = './drafts/02_1234/entry.xml';
@@ -33,21 +29,20 @@ class PublishEntryTest extends PublisherTestBase {
 
         $fs->rename('./drafts/02_1234', './entries/2017/01/02_123400')->willReturn(true)->shouldBeCalled();
 
-        $this->publisher->publishEntry($entry, $time);
+        $this->publisher->publishEntry($entry, $this->getTestTime());
     }
 
     /**
      * @expectedException   TargetPathExists
      */
     public function testPublishEntry_WhenBothPublishTargetDirsAlreadyExists_Throws() {
-        $time = new DateTime('2017-01-02 12:34:00');
         $fs = $this->fs;
         $entry = new BlogEntry(null, $fs->reveal());
         $entry->file = './drafts/02_1234/entry.xml';
         $fs->file_exists(Argument::any())->willReturn(true);
         $fs->is_dir(Argument::any())->willReturn(true);
 
-        $this->publisher->publishEntry($entry, $time);
+        $this->publisher->publishEntry($entry, $this->getTestTime());
     }
  
     public function testPublishEntry_WhenPublishSucceeds_CreatePrettyPermalink() {
@@ -64,7 +59,6 @@ class PublishEntryTest extends PublisherTestBase {
      * @expectedException   EntryRenameFailed
      */
     public function testPublishEntry_WhenRenameFails_Throws() {
-        $time = new DateTime('2017-01-02 12:34:00');
         $fs = $this->fs;
         $entry = new BlogEntry(null, $fs->reveal());
         $entry->file = './drafts/02_1234/entry.xml';
@@ -74,7 +68,7 @@ class PublishEntryTest extends PublisherTestBase {
         $fs->is_dir('./entries/2017/01/02_1234')->willReturn(false);
         $fs->rename('./drafts/02_1234', './entries/2017/01/02_1234')->willReturn(false);
 
-        $this->publisher->publishEntry($entry, $time);
+        $this->publisher->publishEntry($entry, $this->getTestTime());
     }
 
     public function testPublishEntry_WhenPublishDirectoryAvailable_RaisesOnInsertEvent() {
@@ -109,6 +103,17 @@ class PublishEntryTest extends PublisherTestBase {
         $this->assertEquals($expected_time, $entry->timestamp);
         $this->assertContains('2017-01-02 12:34', $entry->date);
         $this->assertEquals('1.2.3.4', $entry->ip);
+    }
+
+    public function testPublishEntry_WhenPostDateIsAlreadySet_UpdatesPostDateToPublicationDate() {
+        $entry = $this->setUpDraftEntryForSuccessfulPublish();
+        $this->user->username()->willReturn('billybob');
+        $entry->post_ts = 123456789;
+
+        $this->publisher->publishEntry($entry, $this->getTestTime());
+
+        $expected_time = $this->getTestTime()->getTimestamp();
+        $this->assertEquals($expected_time, $entry->post_ts);
     }
 
     public function testPublishEntry_WhenYearDirDoesNotExist_CreatesWithWrappers() {
