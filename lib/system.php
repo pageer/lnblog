@@ -11,6 +11,8 @@
 # being.
 
 class System {
+
+    static public $static_instance;
 	
 	public function __construct() {
 		$this->userdata = defined("USER_DATA_PATH")?USER_DATA_PATH:"";
@@ -21,11 +23,10 @@ class System {
 	}
 	
 	public static function instance() {
-		static $static_instance;
-		if (! isset($static_instance)) {
-			$static_instance = new System();
+		if (! isset(self::$static_instance)) {
+            self::$static_instance = new System();
 		}
-		return $static_instance;
+		return self::$static_instance;
 	}
 	
 	# Method: registerBlog
@@ -310,7 +311,9 @@ class System {
 	# True if the 
 	public function canAddTo($parm, $usr=false) {
 		$ret = false;
-		if (!$usr) $usr = NewUser();
+        if (!$usr) {
+            $usr = NewUser();
+        }
 		
 		if ( $this->inGroup($usr->username(), 'administrators') ||
 		     $this->isOwner($usr->username(), $parm) ||

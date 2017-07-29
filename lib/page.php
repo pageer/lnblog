@@ -117,7 +117,7 @@ class Page extends LnBlogObject {
 	# Parameters:
 	# ref - A reference to the object to set.
 	
-	public function setDisplayObject(&$ref) {
+	public function setDisplayObject($ref) {
 		$this->display_object = $ref;
 	}
 

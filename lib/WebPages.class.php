@@ -5,12 +5,19 @@ class WebPages extends BasePages {
 
 	protected $blog;
 	protected $user;
+    protected $publisher;
 
-	public function __construct() {
+    private $last_pingback_results = array();
+    private $last_upload_error = array();
+
+	public function __construct(Blog $blog = null, User $user = null) {
 		parent::__construct();
-		$this->user = NewUser();
-		$this->blog = NewBlog();
-		Page::instance()->setDisplayObject($this->blog);
+		$this->user = $user ?: NewUser();
+		$this->blog = $blog ?: NewBlog();
+		$this->getPage()->setDisplayObject($this->blog);
+
+        EventRegister::instance()->addHandler('BlogEntry', 'PingbackComplete', $this, 'handlePingbackComplete');
+        EventRegister::instance()->addHandler('BlogEntry', 'UploadError', $this, 'handleUploadError');
 	}
 
 	protected function getActionMap() {
@@ -39,11 +46,11 @@ class WebPages extends BasePages {
 		return $this->showblog();
 	}
 
-	protected function redirectOr403($url = '', $message = '') {
+	protected function redirectOr403($redirect = '', $message = '') {
 		if ($redirect) {
-			Page::instance()->redirect($redirect);
+			$this->getPage()->redirect($redirect);
 		} else {
-			Page::instance()->error(403, $message);
+			$this->getPage()->error(403, $message);
 		}
 	}
 
@@ -80,7 +87,7 @@ class WebPages extends BasePages {
 		$tpl->set("COPYRIGHT", PACKAGE_COPYRIGHT);
 
 		$content = $tpl->process();
-		Page::instance()->display($content, $this->blog);
+		$this->getPage()->display($content, $this->blog);
 	}
 
 	public function blogpaths() {
@@ -89,7 +96,7 @@ class WebPages extends BasePages {
 
 		$blog = NewBlog($blog_path);
 		$tpl = NewTemplate("blog_path_tpl.php");
-		Page::instance()->setDisplayObject($blog);
+		$this->getPage()->setDisplayObject($blog);
 
 		$inst_root = INSTALL_ROOT;
 		$inst_url = INSTALL_ROOT_URL;
@@ -105,7 +112,7 @@ class WebPages extends BasePages {
 			if (!$ret) {
 				$tpl->set("UPDATE_MESSAGE", _("Error updating blog paths."));
 			} else {
-				Page::instance()->redirect($blog_url);
+				$this->getPage()->redirect($blog_url);
 				exit;
 			}
 		}
@@ -116,9 +123,9 @@ class WebPages extends BasePages {
 		$tpl->set("UPDATE_TITLE", sprintf(_("Update paths for %s"), $blog->name));
 
 		$body = $tpl->process();
-		Page::instance()->title = sprintf(_("Update blog paths - %s"), htmlspecialchars($blog->name));
-		Page::instance()->addStylesheet("form.css");
-		Page::instance()->display($body, $blog);
+		$this->getPage()->title = sprintf(_("Update blog paths - %s"), htmlspecialchars($blog->name));
+		$this->getPage()->addStylesheet("form.css");
+		$this->getPage()->display($body, $blog);
     }
 
 	public function delcomment() {
@@ -187,7 +194,7 @@ class WebPages extends BasePages {
 				$message = _("Unable to delete the following responses.  Do you want to try again?");
 				$message .= $list;
 			} else {
-				Page::instance()->redirect($entry->permalink());
+				$this->getPage()->redirect($entry->permalink());
 				exit;
 			}
 
@@ -213,17 +220,17 @@ class WebPages extends BasePages {
 		$tpl->set("PASS_DATA", $anchors);
 
 		$body = $tpl->process();
-		Page::instance()->title = sprintf("%s - %s", $this->blog->name, $title);
+		$this->getPage()->title = sprintf("%s - %s", $this->blog->name, $title);
 
-		Page::instance()->display($body, $this->blog);
+		$this->getPage()->display($body, $this->blog);
 	}
 
 	public function delentry() {
 		$ent = NewEntry();
-		Page::instance()->setDisplayObject($ent);
+		$this->getPage()->setDisplayObject($ent);
 
 		$is_draft = $ent->isDraft();
-		$is_art = is_a($ent, 'Article') ? true : false;
+		$is_art = $ent->isArticle() ? true : false;
 
 		$conf_id = _("OK");
 		$cancel_id = _("Cancel");
@@ -236,16 +243,16 @@ class WebPages extends BasePages {
 				if (!$ret) {
 					$message = spf_("Error: Unable to delete '%s'.  Try again?", $ent->subject);
 				} elseif ($is_draft) {
-					Page::instance()->redirect($this->blog->uri('listdrafts'));
+					$this->getPage()->redirect($this->blog->uri('listdrafts'));
 				} else {
-					Page::instance()->redirect($this->blog->getURL());
+					$this->getPage()->redirect($this->blog->getURL());
 				}
 			} else {
 				$message = _("Error: user ".$this->user->username()." does not have permission to delete this entry.");
 			}
 		} elseif (POST($cancel_id)) {
 
-			Page::instance()->redirect($ent->permalink());
+			$this->getPage()->redirect($ent->permalink());
 
 		} elseif ( empty($_POST) && ! $this->user->checkLogin() ) {
 			# Prevent user agents from just navigating to this page.
@@ -268,9 +275,9 @@ class WebPages extends BasePages {
 
 		$body = $tpl->process();
 
-		Page::instance()->title = $is_art ? spf_("%s - Delete entry", $this->blog->name) :
+		$this->getPage()->title = $is_art ? spf_("%s - Delete entry", $this->blog->name) :
 								 spf_("%s - Delete article", $this->blog->name);;
-		Page::instance()->display($body, $this->blog);
+		$this->getPage()->display($body, $this->blog);
 	}
 
 	public function editfile() {
@@ -292,13 +299,13 @@ class WebPages extends BasePages {
 		if ( GET("profile") == $this->user->username() ) {
 			$relpath = Path::get(USER_DATA_PATH, $this->user->username());
 		} elseif ($ent->isEntry() ) {
-			Page::instance()->setDisplayObject($ent);
+			$this->getPage()->setDisplayObject($ent);
 			$relpath = $ent->localpath();
 			if (System::instance()->canModify($ent, $this->user) ) {
 				$this->redirectOr403(SERVER("referer"), $message_403);
 			}
 		} elseif ($this->blog->isBlog() ) {
-			Page::instance()->setDisplayObject($this->blog);
+			$this->getPage()->setDisplayObject($this->blog);
 			$relpath = $this->blog->home_path;
 			$this->verifyUserCanModifyBlog(SERVER("referer"), $message_403);
 		} elseif (! $this->user->isAdministrator() ) {
@@ -310,7 +317,7 @@ class WebPages extends BasePages {
 		# Prepare template for link list display.
 		if (GET("list")) {
 			$tpl->set("SHOW_LINK_EDITOR");
-			Page::instance()->addScript("sitemap.js");
+			$this->getPage()->addScript("sitemap.js");
 		}
 
 		$tpl->set("FORM_ACTION", make_uri(false,false,false));
@@ -369,11 +376,11 @@ class WebPages extends BasePages {
 			$this->blog = false;
 		}
 
-		Page::instance()->raiseEvent('FileEditorReady');
+		$this->getPage()->raiseEvent('FileEditorReady');
 
-		Page::instance()->title = _("Edit file");
-		Page::instance()->addStylesheet("form.css");
-		Page::instance()->display($tpl->process(), $this->blog);
+		$this->getPage()->title = _("Edit file");
+		$this->getPage()->addStylesheet("form.css");
+		$this->getPage()->display($tpl->process(), $this->blog);
 	}
 
 	public function editlogin() {
@@ -390,7 +397,7 @@ class WebPages extends BasePages {
 		} else {
 			$usr = NewUser();
 		}
-		Page::instance()->setDisplayObject($usr);
+		$this->getPage()->setDisplayObject($usr);
 
 		# Allow us to use this to create the admin login.
 		if ($this->blog->isBlog()) {
@@ -462,7 +469,7 @@ class WebPages extends BasePages {
 				$usr->login(POST('passwd'));
 			}
 
-			Page::instance()->redirect($redir_page);
+			$this->getPage()->redirect($redir_page);
 
 		}
 
@@ -470,162 +477,124 @@ class WebPages extends BasePages {
 		if (! defined("BLOG_ROOT")) {
 			$this->blog = false;
 		}
-		Page::instance()->addStylesheet("form.css");
-		Page::instance()->title = $page_name;
-		Page::instance()->display($body, $this->blog);
+		$this->getPage()->addStylesheet("form.css");
+		$this->getPage()->title = $page_name;
+		$this->getPage()->display($body, $this->blog);
 	}
+
+    private function updatePageFromEntrySaveResult($res, $tpl, $ent) {
+        if ($res['errors']) {
+            $tpl->set("HAS_UPDATE_ERROR");
+            $tpl->set("UPDATE_ERROR_MESSAGE", $res['errors'] . (isset($res['warnings']) ? $res['warnings'] : ''));
+            entry_set_template($tpl, $ent);
+        } elseif ($res['warnings']) {
+            $refresh_delay = 10;
+            $error = $res['warnings'] . "<p>" .
+                spf_(
+                    'You will be redirected to <a href="%s">the new entry</a> in %d seconds.',
+                    $ent->permalink(), 
+                    $refresh_delay
+                ) . "</p>";
+            $tpl->set("HAS_UPDATE_ERROR");
+            $tpl->set("UPDATE_ERROR_MESSAGE", $error);
+            $this->getPage()->refresh($ent->permalink(), $refresh_delay);
+        } elseif ( POST('draft') ) {
+            $this->getPage()->redirect($this->blog->uri('listdrafts'));
+            return false;
+        } elseif (POST('preview') || GET('preview')) {
+            if (GET('save') == 'draft' && !GET('ajax')) {
+                $uri = create_uri_object($ent);
+                $uri->separator = '&';
+                $this->getPage()->redirect($uri->editDraft(true));
+                return false;
+            }
+
+            $is_art = !empty($_POST['publisharticle']) || GET('type') == 'article';
+            $this->user->exportVars($tpl);
+            $this->blog->raiseEvent($is_art? "OnArticlePreview" : "OnEntryPreview");
+            entry_set_template($tpl, $ent);
+
+            if (GET('ajax')) {
+                $response = array(
+                    'id' => $ent->entryID(),
+                    'content' => rawurlencode($ent->get())
+                );
+                echo json_encode($response);
+                return false;
+            } else {
+                $tpl->set("PREVIEW_DATA", $ent->get() );
+            }
+        } else {
+            $this->getPage()->redirect($ent->permalink());
+            return false;
+        }
+        return true;
+    }
+
+    private function getEntryPreSaveError($ent) {
+		if (! $ent->data) {
+			return _("error: entry contains no data.");
+		}
+
+		if (! $this->check_perms($this->blog, $ent, $this->user)) {
+			return spf_("permission denied: user %s cannot update this entry.", $this->user->username());
+		}
+
+		return '';
+    }
 
 	public function entryedit() {
 
-		$ent = NewEntry();
-
-		// HACK: Don't suck out if the entry is published as an article.
-		if ( POST('publisharticle') && $ent->isDraft() && !POST('draft')) {
-			$ent = NewArticle();
-		}
-
-		if (! $ent->isEntry()) {
-			$do_new = true;
-			Page::instance()->setDisplayObject($this->blog);
-		} else {
-			$do_new = false;
-			Page::instance()->setDisplayObject($ent);
-		}
-
-		$is_art = !empty($_POST) ?
-				  !empty($_POST['publisharticle']) :
-				  ( GET('type')=='article' || is_a($ent, 'Article') );
+		$ent = $this->getEntry();
+		$this->getPage()->setDisplayObject($ent->isEntry() ? $ent : $this->blog);
+		$is_art = !empty($_POST['publisharticle']) || GET('type') == 'article';
 
 		$ent->raiseEvent('OnUpdateUiInit');
 
 		$tpl = $this->init_template($this->blog, $ent, $is_art);
 
-		if ( POST('post') || POST('draft') ) {
+		if ( empty($_POST) && ! $this->user->checkLogin() ) {
+			return $this->redirectOr403(null, _("Access to this page is restricted to logged-in users."));
+        }
 
-			$res = $this->handle_post($this->blog, $ent, $this->user, $do_new, $is_art);
+        $ent->getPostData();
 
-			if ($res['errors']) {
-				$tpl->set("HAS_UPDATE_ERROR");
-				$tpl->set("UPDATE_ERROR_MESSAGE", $res['errors'] . (isset($res['warnings']) ? $res['warnings'] : ''));
-				entry_set_template($tpl, $ent);
-			} elseif ($res['warnings']) {
-				$refresh_delay = 10;
-				$page_body = $res['warnings']."<p>".
-							 spf_('You will be redirected to <a href="%s">the new entry</a> in %d seconds.',
-							 $ent->permalink(), $refresh_delay)."</p>";
-				Page::instance()->refresh($ent->permalink(), $refresh_delay);
-			} elseif ( POST('draft') ) {
-				Page::instance()->redirect($this->blog->uri('listdrafts'));
-			} else {
-				Page::instance()->redirect($ent->permalink());
-			}
+        if (!empty($_POST)) {
+            $res = array('errors' => '', 'warnings' => '');
+            $res['errors'] = $this->getEntryPreSaveError($ent);
+            
+            if (!$res['errors']) {
+                $res = $this->persistEntry($ent, $is_art);
+            }
 
-		} elseif (POST('preview') || GET('preview')) {
+            $continue = $this->updatePageFromEntrySaveResult($res, $tpl, $ent);
+            
+            if (!$continue) {
+                return;
+            }
+        }
 
-			$last_var = $is_art ? 'last_article' : 'last_blogentry';
-			if ($do_new) {
-				$this->blog->$last_var = $is_art ? NewArticle() : NewBlogEntry();
-			} else {
-				$this->blog->$last_var = $ent;
-			}
-
-			$this->blog->$last_var->getPostData();
-
-			if (GET('save') == 'draft') {
-				$errs = '';
-				$ret = $this->handle_save($this->blog->$last_var, $this->blog, $errs, true);
-				if (! GET('ajax')) {
-					$uri = create_uri_object($this->blog->$last_var);
-					$uri->separator = '&';
-					Page::instance()->redirect($uri->editDraft(true));
-					exit;
-				}
-			}
-
-			$this->user->exportVars($tpl);
-			$this->blog->raiseEvent($is_art?"OnArticlePreview":"OnEntryPreview");
-			entry_set_template($tpl, $this->blog->$last_var);
-
-			if (GET('ajax')) {
-				$response = array(
-					'id' => $this->blog->$last_var->entryID(),
-					'content' => rawurlencode($this->blog->$last_var->get())
-				);
-				echo json_encode($response);
-				exit;
-			} else {
-				$tpl->set("PREVIEW_DATA", $this->blog->$last_var->get() );
-			}
-
-		} elseif ( empty($_POST) && ! $this->user->checkLogin() ) {
-			$this->redirectOr403(null, _("Access to this page is restricted to logged-in users."));
-			exit;
-		}
-
-		# Process the template into the page body, but only if we have not already set
-		# it.  We may set it above to display a message that does not constitute a
-		# fatal error, such as a failed pingback.
-		if (empty($page_body)) {
-			$page_body = $tpl->process();
-		}
+		$page_body = $tpl->process();
 
 		$title = $is_art ? _("New Article") : _("New Entry");
-		Page::instance()->title = sprintf("%s - %s", $this->blog->name, $title);
-		Page::instance()->addStylesheet("form.css", "entry.css", "jquery.datetimepicker.css");
-		Page::instance()->addScript("jquery.form.js");
-		Page::instance()->addScript("jquery.datetimepicker.js");
-		Page::instance()->addScript("editor.js");
-		Page::instance()->addScript("upload.js");
-		Page::instance()->addScript(lang_js());
-		Page::instance()->display($page_body, $this->blog);
-	}
-
-	protected function handle_post($blg, &$ent, $u, $do_new, $is_art) {
-
-		$result = array('errors'=> false, 'warnings'=> '');
-
-		#if ($do_new) {
-		#	$ent = $is_art ? NewArticle() : NewBlogEntry();
-		#}
-		$ent->getPostData();
-
-		// Bail on security error
-		if (! $this->check_perms($blg, $ent, $u)) {
-			$result['errors'] = spf_("Permission denied: user %s cannot update this entry.", $u->username());
-			return $result;
-		}
-
-		$ret = false;
-		// Bail on empty post
-		if (! $ent->data) {
-			$result['errors'] = _("Error: entry contains no data.");
-			return $result;
-		}
-
-		$ret = $this->handle_save($ent, $blg, $result['warnings'], POST('draft'), $is_art);
-
-		if (! $ret) {
-			$result['errors'] = _("Error: unable to update entry.");
-		} else {
-			# Check for pingback-enabled links and send them pings.
-			if ( POST("send_pingbacks") && ! POST('draft') ) {
-				$result['warnings'] .= $this->handle_pingback_pings($ent);
-			}
-		}
-
-		if ($result['warnings']) {
-			$result['warnings'] = "<h4>"._("Entry created, but with errors")."</h4>".$result['warnings'];
-		}
-
-		return $result;
+		$this->getPage()->title = sprintf("%s - %s", $this->blog->name, $title);
+		$this->getPage()->addStylesheet("form.css");
+		$this->getPage()->addStylesheet("entry.css");
+		$this->getPage()->addStylesheet("jquery.datetimepicker.css");
+		$this->getPage()->addScript("jquery.form.js");
+		$this->getPage()->addScript("jquery.datetimepicker.js");
+		$this->getPage()->addScript("editor.js");
+		$this->getPage()->addScript("upload.js");
+        $this->getPage()->addScript(lang_js());
+		$this->getPage()->display($page_body, $this->blog);
 	}
 
 	protected function check_perms($blog, $entry, $user) {
 		$sys = System::instance();
 		return $user->checkLogin() && (
-				 ($entry != false && $sys->canAddTo($blog, $user)) ||
-				 ($entry == false && $sys->canModify($entry, $user))
-			   );
+            (!$entry->isEntry() && $sys->canAddTo($blog, $user)) ||
+            ($entry->isEntry() && $sys->canModify($entry, $user))
+        );
 	}
 
 	protected function init_template($blog, $entry, $is_article = false) {
@@ -635,16 +604,16 @@ class WebPages extends BasePages {
 		if ($entry->isEntry()) {
 			entry_set_template($tpl, $entry);
 			$tpl->set('PUBLISHED', $entry->isPublished());
-			$tpl->set("SEND_PINGBACKS", $blog->auto_pingback == 'all');
+		    $tpl->set('ARTICLE', $entry->isArticle());
 		} else if ($is_article) {
+		    $tpl->set('ARTICLE', true);
 			$tpl->set("GET_SHORT_PATH");
-			$tpl->set("STICKY", true);
 			$tpl->set("COMMENTS", false);
 			$tpl->set("TRACKBACKS", false);
 			$tpl->set("PINGBACKS", false);
 			$tpl->set("HAS_HTML", $blog->default_markup);
 		} else {
-			$tpl->set("SEND_PINGBACKS", $blog->auto_pingback != 'none');
+		    $tpl->set('ARTICLE', true);
 			$tpl->set("HAS_HTML", $blog->default_markup);
 		}
 
@@ -661,59 +630,6 @@ class WebPages extends BasePages {
 		return $tpl;
 	}
 
-	# Function: handle_save
-	# Takes care of saving an entry and handling the uploads, if applicable.
-	#
-	# Parameters:
-	# ent - The current entry object.
-	# blg - The current blog object, i.e. the parent of ent.
-	# errors - Reference string parameter to return error messages generated by uploads.
-	#
-	# Returns:A boolean or numeric false on failure, non-false on success.
-	protected function handle_save(&$ent, &$blg, &$errors, $is_draft, $is_art = false) {
-		if ($is_draft) {
-			$ret = $ent->saveDraft($blg);
-			$ent->setAutoPublishDate(POST('autopublish') ? POST('autopublishdate') : 0);
-		} else {
-			if (! $ent->isEntry()) {
-				if (is_a($ent, 'Article')) {
-					$ent->setPath(POST('short_path'));
-				}
-				$ret = $ent->insert($blg);
-				if ($ret && is_a($ent, 'Article')) {
-					$ent->setSticky(POST('sticky'));
-				}
-			} elseif ($ent->isDraft()) {
-				if ($is_art) {
-					$ret = $ent->publishDraftAsArticle($blg, POST('short_path'));
-				} else {
-					$ret = $ent->publishDraft($blg);
-				}
-			} else {
-				$ret = $ent->update();
-				if ($ret && is_a($ent, 'Article')) {
-					$ent->setSticky(POST('sticky'));
-				}
-			}
-
-			if ($ret) {
-				$blg->updateTagList($ent->tags());
-			}
-		}
-
-		if ($ret) {
-			$messages = $this->handle_uploads($ent);
-			if (is_array($messages)) {
-				$ret = false;
-				$err = _("File upload errors:")."<br />".
-						implode("\n<br />", $messages);
-				$errors = "<p>".$err."</p>";
-			}
-		}
-
-		return $ret;
-	}
-
 	# Function: handle_uploads
 	# Handles uploads that are sent when an entry is edited.  It checks the file
 	# uploads and moves them to the entry directory.
@@ -727,7 +643,6 @@ class WebPages extends BasePages {
 
 	protected function handle_uploads(&$ent) {
 		$err = array();
-		$num_uploads = System::instance()->sys_ini->value("entryconfig",	"AllowInitUpload", 1);
 
 		$uploads = array();
 		if (isset($_FILES['upload'])) {
@@ -765,26 +680,11 @@ class WebPages extends BasePages {
 		}
 	}
 
-	# Function: handle_pingback_pings
-	# Handles pingbacks for an entry.  Sends pingbacks to the appropriate links
-	# in the entry body, and returns an error string, if applicable.
-	#
-	# Parameters:
-	# ent - The entry in question.
-	#
-	# Returns:
-	# An error string.  If there were no errors sending any pingbacks, then the
-	# null string is returned.
-
-	function handle_pingback_pings(&$ent) {
-		if (! $ent->allow_pingback) return '';
-
-		$local = System::instance()->sys_ini->value("entryconfig", "AllowLocalPingback", 1);
-		$results = $ent->sendPings($local);
+	private function handlePingbackPings($ent) {
 		$errors = array();
 		$err = '';
 
-		foreach ($results as $res) {
+		foreach ($this->last_pingback_results as $res) {
 			if ($res['response']->faultCode()) {
 				$errors[] = spf_('URI: %s', $res['uri']).'<br />'.
 							spf_("Error %d: %s<br />",
@@ -799,6 +699,16 @@ class WebPages extends BasePages {
 		}
 		return $err;
 	}
+
+    private function handleUploads() {
+        $err = '';
+        if ($this->last_upload_error) {
+            $err = _("File upload errors:")."<br />".
+                    implode("\n<br />", $this->last_upload_error);
+            $err = "<p>$err</p>";
+        }
+        return $err;
+    }
 
 	public function fileupload() {
 		$num_fields = 1;
@@ -870,10 +780,10 @@ class WebPages extends BasePages {
 			$body .= "</h3>";
 		}
 
-		Page::instance()->addStylesheet("form.css");
-		Page::instance()->title = _("Upload file");
-		Page::instance()->addScript('upload.js');
-		Page::instance()->display($body, $this->blog);
+		$this->getPage()->addStylesheet("form.css");
+		$this->getPage()->title = _("Upload file");
+		$this->getPage()->addScript('upload.js');
+		$this->getPage()->display($body, $this->blog);
 	}
 
 	public function managereplies() {
@@ -886,12 +796,12 @@ class WebPages extends BasePages {
 			$main_obj = $this->blog;
 		}
 
-		Page::instance()->setDisplayObject($main_obj);
+		$this->getPage()->setDisplayObject($main_obj);
 
 		if ($this->has_posted_responses()) {
 			$body = $this->handle_deletes();
 			if ($body === true) {
-				#Page::instance()->redirect(make_uri(false, false, false, '&'));
+				#$this->getPage()->redirect(make_uri(false, false, false, '&'));
 				# It seems that the POST data is passed on when you redirect to the same
 				# page.  You learn something new every day.
 				$body = $this->show_reply_list($main_obj);
@@ -900,8 +810,8 @@ class WebPages extends BasePages {
 			$body = $this->show_reply_list($main_obj);
 		}
 
-		Page::instance()->title = $this->blog->title()." - "._('Manage replies');
-		Page::instance()->display($body, $this->blog);
+		$this->getPage()->title = $this->blog->title()." - "._('Manage replies');
+		$this->getPage()->display($body, $this->blog);
 	}
 
 	protected function get_display_markup(&$item, $count) {
@@ -1207,7 +1117,7 @@ class WebPages extends BasePages {
 
 	public function showall() {
 		$this->blog = NewBlog();
-		Page::instance()->setDisplayObject($this->blog);
+		$this->getPage()->setDisplayObject($this->blog);
 
 		$title = spf_("All entries for %s.", $this->blog->name);
 		$this->blog->getRecent(-1);
@@ -1224,8 +1134,8 @@ class WebPages extends BasePages {
 		$tpl->set("LINK_LIST", $LINK_LIST);
 		$body = $tpl->process();
 
-		Page::instance()->title = $this->blog->name." - ".$title;
-		Page::instance()->display($body, $this->blog);
+		$this->getPage()->title = $this->blog->name." - ".$title;
+		$this->getPage()->display($body, $this->blog);
 	}
 
 	function show_base_archives(&$blog) {
@@ -1318,7 +1228,7 @@ class WebPages extends BasePages {
 		$list = $blog->getMonth($year, $month);
 
 		if ( strtolower(GET('show')) == 'all' ) {
-			Page::instance()->addStylesheet("entry.css");
+			$this->getPage()->addStylesheet("entry.css");
 			return $blog->getWeblog();
 		} else {
 
@@ -1359,7 +1269,7 @@ class WebPages extends BasePages {
 		} elseif (count($ret) == 0) {
 			$body = spf_("No entry found for %d-%d-%d", $year, $month, $day);
 		} else {
-			Page::instance()->addStyleSheet("entry.css");
+			$this->getPage()->addStyleSheet("entry.css");
 			$body = $blog->getWeblog();
 		}
 		return $body;
@@ -1377,7 +1287,7 @@ class WebPages extends BasePages {
 	}
 
 	public function showarchive() {
-		Page::instance()->setDisplayObject($this->blog);
+		$this->getPage()->setDisplayObject($this->blog);
 
 		$monthdir = basename(getcwd());
 		$yeardir = basename(dirname(getcwd()));
@@ -1412,7 +1322,7 @@ class WebPages extends BasePages {
 
 			$body = $this->show_day_archives($this->blog, $year, $month, $day);
 			if (is_array($body)) {
-				Page::instance()->redirect( $body[1] );
+				$this->getPage()->redirect( $body[1] );
 				exit;
 			}
 
@@ -1433,12 +1343,12 @@ class WebPages extends BasePages {
 		if (GET('ajax')) {
 			echo $body;
 		} else {
-			Page::instance()->display($body, $this->blog);
+			$this->getPage()->display($body, $this->blog);
 		}
 	}
 
 	public function showarticles() {
-		Page::instance()->setDisplayObject($this->blog);
+		$this->getPage()->setDisplayObject($this->blog);
 
 		$year_dir = basename(getcwd());
 		$title = $this->blog->name." - ".$year_dir;
@@ -1453,16 +1363,16 @@ class WebPages extends BasePages {
 		$tpl->set("LINK_LIST", $LINK_LIST);
 		$body = $tpl->process();
 
-		Page::instance()->title = $title;
-		Page::instance()->display($body, $this->blog);
+		$this->getPage()->title = $title;
+		$this->getPage()->display($body, $this->blog);
 	}
 
 	# Function: show_blog_page
 	# Shows the main blog page.  This is typically the front page of the blog.
 	protected function show_blog_page(&$blog) {
 		$ret = $blog->getWeblog();
-		Page::instance()->title = $blog->title();
-		Page::instance()->addStylesheet("entry.css");
+		$this->getPage()->title = $blog->title();
+		$this->getPage()->addStylesheet("entry.css");
 		return $ret;
 	}
 
@@ -1495,10 +1405,10 @@ class WebPages extends BasePages {
 
 	public function showblog() {
 		$this->blog->autoPublishDrafts();
-		Page::instance()->setDisplayObject($this->blog);
+		$this->getPage()->setDisplayObject($this->blog);
 
 		$content = $this->show_blog_page($this->blog);
-		Page::instance()->display($content, $this->blog);
+		$this->getPage()->display($content, $this->blog);
 	}
 
 	protected function draft_item_markup(&$ent) {
@@ -1521,10 +1431,10 @@ class WebPages extends BasePages {
 		$list_months = false;
 
 		$usr = User::get();
-		Page::instance()->setDisplayObject($this->blog);
+		$this->getPage()->setDisplayObject($this->blog);
 
 		if (! $usr->checkLogin() || ! System::instance()->canModify($this->blog, $usr)) {
-			Page::instance()->error(403);
+			$this->getPage()->error(403);
 		}
 
 		$title = spf_("%s - Drafts", $this->blog->name);
@@ -1542,15 +1452,15 @@ class WebPages extends BasePages {
 		$tpl->set("ITEM_LIST", $linklist);
 		$body = $tpl->process();
 
-		Page::instance()->title = $title;
-		Page::instance()->display($body, $this->blog);
+		$this->getPage()->title = $title;
+		$this->getPage()->display($body, $this->blog);
 	}
 
 	# Function: show_comment_page
 	# Show the page of comments on the entry.
 	protected function show_comment_page(&$blg, &$ent, &$usr) {
 
-		Page::instance()->title = $ent->title() . " - " . $blg->title();
+		$this->getPage()->title = $ent->title() . " - " . $blg->title();
 
 		# This code will detect if a comment has been submitted and, if so,
 		# will add it.  We do this before printing the comments so that a
@@ -1569,14 +1479,14 @@ class WebPages extends BasePages {
 			$content = show_comments($ent, $usr);
 			# Extra styles to add.  Build the list as we go to keep from including more
 			# style sheets than we need to.
-			Page::instance()->addStylesheet("reply.css");
+			$this->getPage()->addStylesheet("reply.css");
 		} elseif (! $ent->allow_comment) {
 			$content = '<p>'._('Comments are closed on this entry.').'</p>';
 		}
 		$content .= $comm_output;
 
-		Page::instance()->addScript(lang_js());
-		Page::instance()->addScript("entry.js");
+		$this->getPage()->addScript(lang_js());
+		$this->getPage()->addScript("entry.js");
 
 		return $content;
 
@@ -1586,10 +1496,10 @@ class WebPages extends BasePages {
 	# Show the page of Pingbacks for the entry.
 	protected function show_pingback_page(&$blg, &$ent, &$usr) {
 
-		Page::instance()->title = $ent->title() . " - " . $blg->title();
-		Page::instance()->addScript(lang_js());
-		Page::instance()->addStylesheet("reply.css");
-		Page::instance()->addScript("entry.js");
+		$this->getPage()->title = $ent->title() . " - " . $blg->title();
+		$this->getPage()->addScript(lang_js());
+		$this->getPage()->addStylesheet("reply.css");
+		$this->getPage()->addScript("entry.js");
 		$body = show_pingbacks($ent, $usr);
 		if (! $body) $body = '<p>'.
 			spf_('There are no pingbacks for %s',
@@ -1602,10 +1512,10 @@ class WebPages extends BasePages {
 	# Shows the page of TrackBacks for the entry.
 	protected function show_trackback_page(&$blg, &$ent, &$usr) {
 
-		Page::instance()->title = $ent->title() . " - " . $blg->title();
-		Page::instance()->addScript(lang_js());
-		Page::instance()->addStylesheet("reply.css");
-		Page::instance()->addScript("entry.js");
+		$this->getPage()->title = $ent->title() . " - " . $blg->title();
+		$this->getPage()->addScript(lang_js());
+		$this->getPage()->addStylesheet("reply.css");
+		$this->getPage()->addScript("entry.js");
 		$body = show_trackbacks($ent, $usr);
 		if (! $body) {
 			$body = '<p>'.spf_('There are no trackbacks for %s',
@@ -1646,7 +1556,7 @@ class WebPages extends BasePages {
 						$refresh_time = 5;
 						$tpl->set("ERROR_MESSAGE",
 								  spf_("Trackback ping succeded.  You will be returned to the entry in %d seconds.", $refresh_time));
-						Page::instance()->refresh($ent->permalink(), $refresh_time);
+						$this->getPage()->refresh($ent->permalink(), $refresh_time);
 					} else {
 						$tpl->set("ERROR_MESSAGE",
 								  spf_('Error %s: %s', $ret['error'], $ret['message']).
@@ -1669,8 +1579,8 @@ class WebPages extends BasePages {
 		}
 
 
-		Page::instance()->title = _("Send Trackback Ping");
-		Page::instance()->addStyleSheet("form.css");
+		$this->getPage()->title = _("Send Trackback Ping");
+		$this->getPage()->addStyleSheet("form.css");
 
 		return $tpl->process();
 	}
@@ -1687,7 +1597,7 @@ class WebPages extends BasePages {
 		}
 
 		# Get the entry AFTER posting the comment so that the comment count is right.
-		Page::instance()->title = $ent->title() . " - " . $blg->title();
+		$this->getPage()->title = $ent->title() . " - " . $blg->title();
 		$show_ctl = System::instance()->canModify($ent, $usr) && $usr->checkLogin();
 		$content =  $ent->getFull($show_ctl);
 
@@ -1704,19 +1614,19 @@ class WebPages extends BasePages {
 				$enc_arr = array("rel"=>'enclosure',
 								 "href"=>$enc['url'],
 								 "type"=>$enc['type']);
-				Page::instance()->addLink($enc_arr);
+				$this->getPage()->addLink($enc_arr);
 			}
 		}
 
 		if ($ent->allow_pingback) {
-			Page::instance()->addHeader("X-Pingback", INSTALL_ROOT_URL."xmlrpc.php");
-			Page::instance()->addLink(array('rel'=>'pingback',
+			$this->getPage()->addHeader("X-Pingback", INSTALL_ROOT_URL."xmlrpc.php");
+			$this->getPage()->addLink(array('rel'=>'pingback',
 								 'href'=>INSTALL_ROOT_URL."xmlrpc.php"));
 		}
-		Page::instance()->addScript(lang_js());
-		Page::instance()->addScript("entry.js");
-		Page::instance()->addStylesheet("reply.css");
-		Page::instance()->addStylesheet("entry.css");
+		$this->getPage()->addScript(lang_js());
+		$this->getPage()->addScript("entry.js");
+		$this->getPage()->addStylesheet("reply.css");
+		$this->getPage()->addStylesheet("entry.css");
 
 		return $content;
 	}
@@ -1736,7 +1646,7 @@ class WebPages extends BasePages {
 		}
 
 		$ent = NewEntry();
-		Page::instance()->setDisplayObject($ent);
+		$this->getPage()->setDisplayObject($ent);
 
 		$page_type = strtolower(GET('show'));
 		if (! $page_type) {
@@ -1781,11 +1691,11 @@ class WebPages extends BasePages {
 
 		}
 
-		Page::instance()->display($content);
+		$this->getPage()->display($content);
 	}
 
 	public function tagsearch() {
-		Page::instance()->setDisplayObject($this->blog);
+		$this->getPage()->setDisplayObject($this->blog);
 
 		$tags = htmlspecialchars(GET("tag"));
 		$show_posts = GET("show") ? true : false;
@@ -1814,7 +1724,7 @@ class WebPages extends BasePages {
 			$ret = $this->blog->getEntriesByTag($tag_list, $limit, true);
 			if ($show_posts) {
 				$body = $this->blog->getWeblog();
-				Page::instance()->addStylesheet("entry.css");
+				$this->getPage()->addStylesheet("entry.css");
 			} else {
 				$links = array();
 				foreach ($ret as $ent) {
@@ -1827,10 +1737,10 @@ class WebPages extends BasePages {
 				$tpl->set("LINK_LIST", $links);
 				$body = $tpl->process();
 			}
-			Page::instance()->title = $this->blog->name.' - '._("Topic Search");
+			$this->getPage()->title = $this->blog->name.' - '._("Topic Search");
 		}
 
-		Page::instance()->display($body);
+		$this->getPage()->display($body);
 	}
 
 	public function updateblog() {
@@ -1841,10 +1751,10 @@ class WebPages extends BasePages {
 		$blog = NewBlog($blog_path);
 		$usr = User::get();
 		$tpl = NewTemplate("blog_modify_tpl.php");
-		Page::instance()->setDisplayObject($blog);
+		$this->getPage()->setDisplayObject($blog);
 
 		if (! $usr->checkLogin() || ! System::instance()->canModify($blog, $usr)) {
-			Page::instance()->error(403);
+			$this->getPage()->error(403);
 		}
 
 		# NOTE - we should sanitize this input to avoid XSS attacks.  Then again,
@@ -1860,7 +1770,7 @@ class WebPages extends BasePages {
 			$ret = $blog->update();
 			System::instance()->registerBlog($blog->blogid);
 			if (!$ret) $tpl->set("UPDATE_MESSAGE", _("Error: unable to update blog."));
-			else Page::instance()->redirect($blog->getURL());
+			else $this->getPage()->redirect($blog->getURL());
 		}
 
 		if ($usr->username() == ADMIN_USER) {
@@ -1871,8 +1781,90 @@ class WebPages extends BasePages {
 		$tpl->set("UPDATE_TITLE", sprintf(_("Update %s"), $blog->name));
 
 		$body = $tpl->process();
-		Page::instance()->title = spf_("Update blog - %s", $blog->name);
-		Page::instance()->addStylesheet("form.css");
-		Page::instance()->display($body, $blog);
+		$this->getPage()->title = spf_("Update blog - %s", $blog->name);
+		$this->getPage()->addStylesheet("form.css");
+		$this->getPage()->display($body, $blog);
 	}
+
+    private function persistEntry($ent, $is_art) {
+        $res = array('errors' => '', 'warnings' => '');
+
+        $send_pingbacks = false;
+        $do_preview = $this->editIsPreview();
+        $create_draft = $this->editIsDraft($ent);
+        $save_entry = $this->editIsSave($ent);
+
+        try {
+            if ($is_art && $this->editIsPost($ent)) {
+                $this->getPublisher()->publishArticle($ent);
+            } elseif ($this->editIsPost($ent)) {
+                $this->getPublisher()->publishEntry($ent);
+                $send_pingbacks = true;
+            } elseif ($create_draft) {
+                $this->getPublisher()->createDraft($ent);
+            } elseif ($save_entry) {
+                $this->getPublisher()->update($ent);
+                $send_pingbacks = $ent->isPublished() && !$do_preview;
+            }
+        } catch (Exception $e) {
+            $res['errors'] = $e->getMessage();
+        }
+
+        $res['errors'] .= $this->handleUploads();
+        $res['warnings'] = $this->handlePingbackPings($ent);
+
+        return $res;
+    }
+
+    private function editIsPost($ent) {
+        return POST('post') && !$ent->isPublished();
+    }
+
+    private function editIsPreview() {
+        return POST('preview') || GET('preview');
+    }
+
+    private function editIsDraft($ent) {
+        return (POST('draft') && !$ent->isEntry()) || (
+                (POST('preview') || GET('preview')) && 
+                GET('save') == 'draft' && !$ent->isEntry()
+            );
+    }
+
+    private function editIsSave($ent) {
+        return $ent->isEntry() && (
+            (POST('draft') && !$ent->isPublished()) || 
+            (POST('post') && $ent->isPublished()) ||
+            ($this->editIsPreview() && GET('save') == 'draft')
+        );
+    }
+
+    public function handlePingbackComplete($param, $data) {
+        $this->last_pingback_results = $data;
+    }
+
+    public function handleUploadError($params, $data) {
+        $this->last_upload_error = $data;
+    }
+
+    protected function getPage() {
+        return Page::instance();
+    }
+
+    protected function getFs() {
+        return NewFS();
+    }
+
+    protected function getEntry($path = false) {
+        return NewEntry($path, $this->getFs());
+    }
+
+    protected function getPublisher() {
+        if (!$this->publisher) {
+            $fs = NewFS();
+            $wrappers = new WrapperGenerator($fs);
+            $this->publisher = new Publisher($this->blog, $this->user, $fs, $wrappers);
+        }
+        return $this->publisher;
+    }
 }

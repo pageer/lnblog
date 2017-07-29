@@ -23,17 +23,20 @@
 
 class INIParser {
 	
-	var $filename;
-	var $current_section;
-	var $case_insensitive;
-	var $data;
+	public $filename;
+	public $current_section;
+	public $case_insensitive;
+	public $data;
+
+    private $fs;
 	
-	function INIParser ($file=false) {
+	public function __construct($file=false, $fs = null) {
+        $this->fs = $fs ?: NewFS();
 		$this->current_section = false;
 		$this->case_insensitive = true;
 		$this->data = array();
 		if ( $file ) $this->filename = $file;
-		if ( file_exists($this->filename) ) {
+		if ( $this->fs->file_exists($this->filename) ) {
 			$this->readFile();
 		}
 	}
@@ -54,7 +57,7 @@ class INIParser {
 			return;
 		}
 
-		$file_content = file($this->filename);
+		$file_content = $this->fs->file($this->filename);
 		$this->data = array();
 		$cur_sec = false;
 		foreach ($file_content as $line) {
@@ -119,7 +122,7 @@ class INIParser {
 	function writeFile($file=false) {
 		if ($file) $this->filename = $file;
 		if (! $this->filename) return false;
-		return write_file($this->filename, $this->getFile());
+		return $this->fs->write_file($this->filename, $this->getFile());
 	}
 
 	# Method: value

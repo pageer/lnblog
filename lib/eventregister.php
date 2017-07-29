@@ -166,7 +166,7 @@ class EventRegister {
 	 * Raises an arbitrary event for the given class. 
 	 * 
 	 * Parameters:
-	 * param    - An arbitrary object that is passe by reference to the event
+	 * param    - An arbitrary object that is passed by reference to the event
 	 *            handlers.
 	 * raisecls - The name of the class the event belongs to.
 	 * event    - The name of the event.

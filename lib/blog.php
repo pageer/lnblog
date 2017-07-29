@@ -703,8 +703,17 @@ class Blog extends LnBlogObject {
 			$pub_path = mkpath($art_path, $dir, BlogEntry::AUTO_PUBLISH_FILE);
 			if (file_exists($pub_path) && $art->isEntry($ent_path = mkpath($art_path, $dir))) {
 				$ent = NewEntry($ent_path);
-				if ($ent->shouldAutoPublish()) {
-					$ent->publishDraft($this);
+                if ($ent->shouldAutoPublish()) {
+                    $fs = NewFS();
+                    $generator = new WrapperGenerator($fs);
+                    $user = NewUser();
+                    $publisher = new Publisher($this, $user, $fs, $generator);
+
+                    if ($ent->is_article) {
+                        $publisher->publishArticle($ent);
+                    } else {
+                        $publisher->publishEntry($ent);
+                    }
 				}
 			}
 		}
@@ -748,13 +757,13 @@ class Blog extends LnBlogObject {
 	An array of Article objects.
 	*/
 	function getArticles() {
-		$art = NewArticle();
+		$art = NewEntry();
 		$art_path = Path::get($this->home_path, BLOG_ARTICLE_PATH);
 		$art_list = scan_directory($art_path);
 		$ret = array();
 		foreach ($art_list as $dir) {
-			if ($art->isArticle($art_path.$dir) ) {
-				$ret[] = NewArticle($art_path.$dir);
+			if ($art->checkArticlePath($art_path.$dir) ) {
+				$ret[] = NewEntry($art_path.$dir);
 			}
 		}
 		return $ret;
@@ -775,20 +784,19 @@ class Blog extends LnBlogObject {
 	of the article and the permalink to it respectively.
 	*/
 	function getArticleList($number=false, $sticky_only=true) {
-		$art = NewArticle();
+		$art = NewEntry();
 		$art_path = $this->home_path.PATH_DELIM.BLOG_ARTICLE_PATH.PATH_DELIM;
 		$art_list = scan_directory($art_path);
 		if (!$art_list) $art_list = array();
 		$ret = array();
 		$count = 0;
 		foreach ($art_list as $dir) {
-			if ( ! $sticky_only && $art->isArticle($art_path.$dir) ) {
+			if ( ! $sticky_only && $art->checkArticlePath($art_path.$dir) ) {
 				$sticky_test = $art->readSticky($art_path.$dir);
 				if ($sticky_test) {
 					$ret[] = $sticky_test;
 				} else {
-					
-					$a = NewArticle($art_path.$dir);
+					$a = NewEntry($art_path.$dir);
 					$ret[] = array("title"=>$a->subject, "link"=>$a->permalink());
 				}
 				$count++;
@@ -800,7 +808,6 @@ class Blog extends LnBlogObject {
 			if ($number && $count >= $number) break;
 		}
 		return $ret;
-
 	}
 
 	# This method is for internal use only.

@@ -15,7 +15,7 @@ class TrackbackURIWrapper extends LnBlogObject {
 	function delete() {
 		$qs_arr = array();
 		$parent = $this->object->getParent();
-		$entry_type = is_a($this->object, 'Article') ? 'article' : 'entry';
+		$entry_type = (is_a($this->object, 'BlogEntry') && $this->object->isArticle()) ? 'article' : 'entry';
 		$qs_arr['action'] = 'delcomment';
 		$qs_arr[$entry_type] = $parent->entryID();
 		$qs_arr['delete'] = $this->object->getAnchor();

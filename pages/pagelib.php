@@ -105,7 +105,8 @@ function handle_comment(&$ent, $use_comm_link=false) {
 # ent - the BlogEntry or Article with which to populate the template.
 
 function entry_set_template($tpl, $ent) {
-	$tpl->set("URL", POST("short_path"));
+	$tpl->set("URL", $ent->article_path);
+    $tpl->set("PUBLISHARTICLE", $ent->is_article);
 	$tpl->set("SUBJECT", htmlspecialchars($ent->subject));
 	$tpl->set("TAGS", htmlspecialchars($ent->tags));
 	$tpl->set("DATA", htmlspecialchars($ent->data));
@@ -114,12 +115,10 @@ function entry_set_template($tpl, $ent) {
 	$tpl->set("COMMENTS", $ent->allow_comment);
 	$tpl->set("TRACKBACKS", $ent->allow_tb);
 	$tpl->set("PINGBACKS", $ent->allow_pingback);
-	if (is_a($ent, 'Article')) {
-		if ($ent->isEntry()) {
-			$tpl->set("STICKY", $ent->isSticky());
-		} else {
-			$tpl->set("STICKY", (POST('sticky') ? true : false));
-		}
+	if ($ent->isArticle()) {
+        $tpl->set("STICKY", $ent->isSticky());
+    } else {
+        $tpl->set("STICKY", $ent->is_sticky ? true : false);
 	}
 }
 

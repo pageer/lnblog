@@ -255,6 +255,12 @@ abstract class FS {
         return is_file($path);
     }
 	
+    # Method: is_uploaded_file
+    # Wrapper around native is_uploaded_file() function.
+    public function is_uploaded_file($path) {
+        return is_uploaded_file($path);
+    }
+
 	# Method: file_exists
 	# Wrapper around native file_exists() function.
 	public function file_exists($path) {

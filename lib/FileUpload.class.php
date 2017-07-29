@@ -41,23 +41,26 @@ class FileUpload extends LnBlogObject {
 	public $size = 0;
 	public $mimetype = '';
 	public $error = FILEUPLOAD_NOT_INITIALIZED;
+
+    private $fs;
 	
-	public static function initUploads($file, $dir) {
+	public static function initUploads($file, $dir, $fs = null) {
 		$ret = array();
 		if (is_array($file['tmp_name'])) {
 			$i = 0;
 			while (isset($file['tmp_name'][$i])) {
-				$ret[] = new FileUpload($file, $dir, $i++);
+				$ret[] = new FileUpload($file, $dir, $i++, $fs);
 			}
 		} else {
-			$ret[] = new FileUpload($file, $dir);
+			$ret[] = new FileUpload($file, $dir, false, $fs);
 		}
 		return $ret;
 	}
 
-	public function __construct($file, $dir=false, $index=false) {
+	public function __construct($file, $dir = false, $index = false, $fs = null) {
+        $this->fs = $fs ?: NewFS();
 		$this->raiseEvent("OnInit");
-		$this->destdir = $dir ? $dir : getcwd();
+		$this->destdir = $dir ? $dir : $this->fs->getcwd();
 		$this->field = $file;
 		
 		if (! empty($file)) {
@@ -117,14 +120,14 @@ class FileUpload extends LnBlogObject {
 			$ret = FILEUPLOAD_FILE_EMPTY;
 		}
 		
-		if (is_file($this->tempname)) {
+		if ($this->fs->is_file($this->tempname)) {
 			$tmp_path = $this->tempname;
 		} else {
-			$tmp_path = mkpath(ini_get("upload_tmp_dir"), $this->tempname);
+			$tmp_path = Path::mk(ini_get("upload_tmp_dir"), $this->tempname);
 		}
 		
 		if ($ret === FILEUPLOAD_NO_ERROR) {
-			if ( ! $this->tempname || (! is_uploaded_file($tmp_path) && ! is_file($this->tempname)) ) {
+			if ( ! $this->tempname || (! $this->fs->is_uploaded_file($tmp_path) && ! $this->fs->is_file($this->tempname)) ) {
 				$ret = FILEUPLOAD_NO_FILE;
 			}
 		}
@@ -151,14 +154,13 @@ class FileUpload extends LnBlogObject {
 	function moveFile() {
 		$this->raiseEvent("OnMove");
 		$tmp_dir = ini_get("upload_tmp_dir");
-		$fs = NewFS();
-		if (is_file($this->tempname)) {
+		if ($this->fs->is_file($this->tempname)) {
 			$tmp_path = $this->tempname;
 		} else {
-			$tmp_path = $tmp_dir.PATH_DELIM.$this->tempname;
+			$tmp_path = Path::mk($tmp_dir, $this->tempname);
 		}
 		
-		$ret = $fs->copy($tmp_path, $this->destdir.PATH_DELIM.$this->destname);
+		$ret = $this->fs->copy($tmp_path, Path::mk($this->destdir, $this->destname));
 		if ($ret) {
 			$this->raiseEvent("MoveComplete");
 		}
@@ -182,7 +184,7 @@ class FileUpload extends LnBlogObject {
 		switch ($err) {
 			case FILEUPLOAD_NO_ERROR:
 				$ret = spf_("File '<a href=\"%s\">%s</a>' successfully uploaded.", 
-				            localpath_to_uri(mkpath($this->destdir, $this->destname)),
+				            localpath_to_uri(Path::mk($this->destdir, $this->destname)),
 				            $this->destname);
 				break;
 			case FILEUPLOAD_NO_FILE:

@@ -44,15 +44,21 @@ class Pingback extends Trackback {
 	public $ping_date = '';
 	public $timestamp = '';
 	public $file = '';
+
+    private $fs;
+    private $http_client;
 	
-	public function __construct($path=false) {
+	public function __construct($path=false, $fs = null, $http_client = null) {
 		$this->raiseEvent("OnInit");
 		
+        $this->fs = $fs ?: NewFS();
+        $this->http_client = $http_client ?: new HttpClient();
+
 		$this->file = $path;
 		if ($this->file) {
-			if (! is_file($this->file)) 
+			if (! $this->fs->is_file($this->file)) 
 				$this->file = $this->getFilename($this->file);
-			if (is_file($this->file)) 
+			if ($this->fs->is_file($this->file)) 
 				$this->readFileData($this->file);
 		}
 		
@@ -89,7 +95,7 @@ class Pingback extends Trackback {
 
 		if (! $this->source) return false;
 
-		if (! is_dir($dir)) {
+		if (! $this->fs->is_dir($dir)) {
 			$ret = create_directory_wrappers($dir, ENTRY_PINGBACKS, get_class($ent));
 		}
 		$ret = $this->writeFileData($this->file);
@@ -109,7 +115,7 @@ class Pingback extends Trackback {
 	# false otherwise
 	function isPingback($path=false) {
 		if (!$path) $path = $this->file;
-		if ( file_exists($path) && 
+		if ( $this->fs->file_exists($path) && 
 		     basename(dirname($path)) == ENTRY_PINGBACK_DIR ) {
 			return true;
 		} else {
@@ -144,12 +150,12 @@ class Pingback extends Trackback {
 		$ret = substr($anchor, 8);
 		$ret .= PINGBACK_PATH_SUFFIX;
 		$ret = mkpath($ent->localpath(),ENTRY_PINGBACK_DIR,$ret);
-		$ret = realpath($ret);
+		$ret = $this->fs->realpath($ret);
 		return $ret;
 	}
 	
 	function readOldFile($path) {
-		$file_data = file($path);
+		$file_data = $this->fs->file($path);
 		foreach ($file_data as $line) {
 			$line = trim($line);
 			$pos = strpos($line, ":");
@@ -235,14 +241,6 @@ class Pingback extends Trackback {
 		return $source_info['host'] == $target_info['host'];
 	}
 	
-	# The following Trackback methods are private and are not to be inherited by
-	# subclasses.  However, PHP4 does not have a way to express this.  Therefore
-	# I'll just put them here and give them an empty implementation.
-	#function incomingPing() { return false; }
-	#function send() { return false; }
-	#function receive() { return false; }
-	#function getPostData() { return false; }
-	
 	# Method: fetchPage
 	# Requests a URL from a remote host and returns the resulting data.
 	#
@@ -255,47 +253,8 @@ class Pingback extends Trackback {
 	# A string containing the HTTP headers and body of the requested URL.
 	
 	function fetchPage($url, $headers=false) {
-		if (extension_loaded('curl')) {
-
-			$hnd = curl_init();
-			curl_setopt($hnd, CURLOPT_URL, $url);
-			curl_setopt($hnd, CURLOPT_FOLLOWLOCATION, 1);
-			curl_setopt($hnd, CURLOPT_RETURNTRANSFER, 1);
-			curl_setopt($hnd, CURLOPT_HEADER, 1);
-			if ($headers) curl_setopt($hnd, CURLOPT_NOBODY, 1);
-			$response = curl_exec($hnd);
-			
-		} else {
-
-			$url_bits = parse_url($url);
-			$host = $url_bits['host'];
-			$path = isset($url_bits['path']) ? $url_bits['path'] : "/";
-			$port = isset($url_bits['port']) ? $url_bits['port'] : 80;
-			$query = isset($url_bits['query']) ? $url_bits['query'] : '';
-			
-			# Open a socket.
-			$fp = @fsockopen($host, $port);
-			if (!$fp) return false;
-	
-			# Create the HTTP request to be sent to the remote host.
-			if ($query) $path .= '?'.$query;
-			if ($headers) $method = 'HEAD';
-			else $method = 'GET';
-			$data = $method." ".$path."\r\n".
-					"Host: ".$host."\r\n".
-					"Connection: close\r\n\r\n";
-			
-			# Send the data and then get back any response.
-			fwrite($fp, $data);
-			$response = '';
-
-			while (! feof($fp)) {
-				$s = fgets($fp);
-				$response .= $s;
-			}
-			fclose($fp);
-		}
-		return $response;
+        $client = new HttpClient();
+        return $client->fetchUrl($url, $headers);
 	}
 	
 	# Method: checkPingbackEnabled
@@ -310,7 +269,7 @@ class Pingback extends Trackback {
 	
 	function checkPingbackEnabled($url) {
 		# First check the page headers.
-		$pageheaders = Pingback::fetchPage($url, true);
+		$pageheaders = $this->http_client->fetchUrl($url, true);
 		$pingback_server = '';
 		$text_data = false;
 		
@@ -339,7 +298,7 @@ class Pingback extends Trackback {
 		}
 		
 		if (! $pingback_server && $text_data) {
-			$pagedata = Pingback::fetchPage($url);
+			$pagedata = $this->http_client->fetchUrl($url);
 			$ret = preg_match('|<link rel="pingback" href="([^"]+)" ?/?>|',
 				              $pagedata, $matches);
 			if ($ret) {

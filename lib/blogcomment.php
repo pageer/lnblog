@@ -330,7 +330,7 @@ class BlogComment extends Entry {
 	this is a comment on.
 	
 	Returns:
-	A BlogEntry or Article object, depending on the context.
+	A BlogEntry.
 	*/
 	function getParent() {
 		if (file_exists($this->file)) {

@@ -41,15 +41,20 @@ POSTRetrieved  - Fired after data has been retrieved from an HTTP POST.
 
 class BlogEntry extends Entry {
 	
-	const AUTO_PUBLISH_FILE = 'puslish.txt';
+	const AUTO_PUBLISH_FILE = 'publish.txt';
 	
 	public $send_pingback = true;
+    public $allow_pingback = true;
 	public $allow_comment = true;
 	public $allow_tb = true;
 	public $has_html = MARKUP_BBCODE;
 	public $enclosure = '';
 	public $abstract;
+    public $is_article = false;
     public $article_path = '';
+    public $is_sticky = false;
+    public $autopublish = false;
+    public $autopublish_date = '';
 
 	public function __construct($path = "", $filesystem = null) {
 		parent::__construct($filesystem ?: NewFS());
@@ -100,13 +105,17 @@ class BlogEntry extends Entry {
 			"ip"=>"ip",
 			"subject"=>"subject",
 			"abstract"=>"abstract",
+            "is_article" => "is_article",
             "article_path" => "article_path",
+            "autopublish" => "autopublish",
+            "autopublish_date" => "autopublish_date",
 			"allow_comment"=>"allowcomment",
 			"has_html"=>"hashtml",
 			"tags"=>"tags", 
 			"allow_tb"=>"allowtrackback", 
 			"allow_pingback"=>"allowpingback",
 			"enclosure"=>"enclosure",
+            "is_sticky"=>"is_sticky",
 		);
 	}
 	
@@ -407,6 +416,80 @@ class BlogEntry extends Entry {
 	}
 
 	/*
+	Method: setSticky
+	Set whether or not an article should be considered "featured".
+	Articles not set sticky should be considered archival and not
+	shown on things like front-page article lists.
+
+	Parameters:
+	show - *Optional* boolean parameter to turn stickiness on or off.
+	       Default is true (stickiness on).
+
+	Returns:
+	True on success, false on failure.
+	*/
+    public function setSticky($show=true) {
+        $ret = true;
+        $sticky_path = Path::mk(dirname($this->file), STICKY_PATH);
+		if ($show) {
+			$ret = $this->fs->write_file($sticky_path, $this->subject);
+        } elseif ($this->fs->file_exists($sticky_path)) {
+			$ret = $this->fs->delete(Path::mk($sticky_path));
+        }
+		return $ret;
+	}
+
+	/*
+	Method: isSticky
+	Determines if the article is set as sticky.
+
+	Parameters: 
+	path - *Optional* unique ID for the article.
+
+	Returns:
+	True if the article is sticky, false otherwise.
+	*/
+	public function isSticky($path=false) {
+        $path = $path ?: dirname($this->file);
+        return $this->checkArticlePath($path) && 
+		    $this->fs->file_exists(Path::mk($path, STICKY_PATH));
+	}
+
+	/*
+	Method: readSticky
+	Get the title and permalink without retreiving the entire article.
+	
+	Parameters:
+	path - The unique ID for the article.
+	
+	Returns:
+	A two-element array, with "link" and "title" for the permalink and
+	subject of the article.
+	*/
+
+	public function readSticky($path) {
+		$old_path = $this->file;
+        if ($this->fs->is_dir($path)) {
+            $this->file = Path::mk($path, ENTRY_DEFAULT_FILE);
+        } else {
+           $this->file = $path;
+        }
+		$sticky_file = Path::mk(dirname($this->file), STICKY_PATH);
+		
+		if ( $this->fs->file_exists($sticky_file) ) {
+			$data = $this->fs->file($sticky_file);
+			$desc = "";
+			foreach ($data as $line) { 
+				$desc .= $line; 
+			}
+			$ret = array("title"=>$desc, "link"=>$this->permalink() ); 
+		} else $ret = false;
+		
+		$this->file = $old_path;
+		return $ret;
+	}
+    
+	/*
 	Method: isEntry
 	Determine if the object is a blog entry or not.
 
@@ -437,10 +520,12 @@ class BlogEntry extends Entry {
 	*/
 	public function isDraft($path=false) {
         if (! $path) {
-            $path = dirname($this->file);
-        } elseif ($this->fs->file_exists($path)) {
+            $path = $this->file;
+        }
+        if ($this->fs->file_exists($path)) {
            $path = $this->fs->realpath($path);
         }
+        $path = dirname($path);
 		return ( $this->isEntry($path) &&
 		         basename(dirname($path)) == BLOG_DRAFT_PATH );
 	}
@@ -455,10 +540,16 @@ class BlogEntry extends Entry {
 	}
 
     /**
-    * Determines if the entry is published as an article.  */
+     * Determines if the entry is published as an article.
+     */
     public function isArticle() {
         $article_dir = basename(dirname(dirname($this->file)));
         return $this->fs->file_exists($this->file) && $article_dir == BLOG_ARTICLE_PATH;
+    }
+
+    public function checkArticlePath($dir_path) {
+        $article_dir = basename(dirname($dir_path));
+        return $this->fs->is_dir($dir_path) && $article_dir == BLOG_ARTICLE_PATH;
     }
 	
 	/*
@@ -761,13 +852,12 @@ class BlogEntry extends Entry {
 	 * @param 	string $date	The date to publish or null.
 	 */
 	public function setAutoPublishDate($date) {
-		$date_ts = strtotime($date);
-		$fs = NewFS();
-		$path = mkpath($this->localpath(), self::AUTO_PUBLISH_FILE);
-		if ($date_ts > time()) {
-			$fs->write_file($path, date('Y-m-d H:i:s', $date_ts));
-		} elseif (file_exists($path)) {
-			$fs->delete($path);
+		$date_ts = new DateTime($date);
+		$path = Path::mk($this->localpath(), self::AUTO_PUBLISH_FILE);
+		if ($date && $date_ts > new DateTime()) {
+			$this->fs->write_file($path, $date_ts->format('Y-m-d H:i:s'));
+		} elseif ($this->fs->file_exists($path)) {
+			$this->fs->delete($path);
 		}
 	}
 	
@@ -779,10 +869,10 @@ class BlogEntry extends Entry {
 	public function getAutoPublishDate() {
 		$path = mkpath($this->localpath(), self::AUTO_PUBLISH_FILE);
 		$ts = 0;
-		if (file_exists($path)) {
-			$ts = strtotime(trim(file_get_contents($path)));
+		if ($this->fs->file_exists($path)) {
+			$ts = new DateTime(trim($this->fs->read_file($path)));
 		}
-		return $ts ? date('Y-m-d H:i:s', $ts) : '';
+		return $ts ? $ts->format('Y-m-d H:i:s') : '';
 	}
 	
 	/**
@@ -792,9 +882,10 @@ class BlogEntry extends Entry {
 	 */
 	public function shouldAutoPublish() {
 		$path = mkpath($this->localpath(), self::AUTO_PUBLISH_FILE);
-		if (file_exists($path)) {
-			$ts = strtotime(trim(file_get_contents($path)));
-			return time() >= $ts;
+		if ($this->fs->file_exists($path)) {
+			$ts = new DateTime(trim($this->fs->read_file($path)));
+            $now = new DateTime();
+			return $now >= $ts;
 		}
 		return false;
 	}
@@ -886,6 +977,11 @@ class BlogEntry extends Entry {
 		$this->send_pingback = POST("send_pingbacks") ? 1 : 0;
 		$this->has_html = POST("input_mode");
 		$this->enclosure = POST('hasenclosure') ? POST("enclosure") : '';
+        $this->is_article = POST('publisharticle') ? 1 : 0;
+        $this->article_path = POST('short_path');
+        $this->is_sticky = POST('sticky') ? 1 : 0;
+        $this->autopublish = POST('autopublish') ? 1 : 0;
+        $this->autopublish_date = POST('autopublishdate');
 		foreach ($this->custom_fields as $fld=>$desc) {
 			$this->$fld = POST($fld);
 		}
@@ -943,6 +1039,10 @@ class BlogEntry extends Entry {
 		$tmp->set("PINGBACK_LINK", $this->uri('pingback'));
 		$tmp->set("SHOW_CONTROLS", $show_edit_controls);
 		$tmp->set("USE_ABSTRACT", $blog->front_page_abstract);
+        $send_pingbacks = $this->isEntry() ?
+            $this->send_pingback :
+            $blog->auto_pingback != 'none';
+		$tmp->set("SEND_PINGBACKS", $send_pingbacks);
 		
 		# Added so the template can know whether or not to advertise RSS feeds.
 		if (PluginManager::instance()->pluginLoaded("RSS2FeedGenerator")) {
@@ -1283,25 +1383,28 @@ class BlogEntry extends Entry {
 	# pingback-enabled, and sends a pingback ping to those links.
 	#
 	# Parameters:
+    # $client - The HttpClient to use for the request.
 	# local - *Optional* boolean that determines whether or not to send pings
 	#         to posts on the same webserver.  *Defaults* to false.
 	# Returns:
 	# An array of associative arrays.  Each array has 'uri' and a 'response' 
 	# key, which contain the target URI and the XML-RPC response object.
 	
-	public function sendPings($local=false) {
-		
-		$urls = $this->extractLinks($local);
+	public function sendPings($client, $local=false) {
 
+        if (!$this->send_pingback) {
+            return array();
+        }
+
+		$urls = $this->extractLinks($local);
 		$ret = array();
 
 		foreach ($urls as $uri) {
-			$p = NewPingback();
+			$p = new Pingback(false, $this->fs, $client);
 			$pb_server = $p->checkPingbackEnabled($uri);
 
 			if ($pb_server) {
-
-				$result = $this->sendPingback($pb_server, $uri);
+				$result = $this->sendPingback($client, $pb_server, $uri);
 				$ret[] = array('uri'=>$uri, 'response'=>$result);
 			}
 			
@@ -1309,7 +1412,7 @@ class BlogEntry extends Entry {
 		return $ret;
 	}
 	
-	public function sendPingback($uri, $target) {
+	private function sendPingback($client, $uri, $target) {
 		
 		$linkdata = parse_url($uri);
 
@@ -1321,9 +1424,7 @@ class BlogEntry extends Entry {
 		               new xmlrpcval($target, 'string'));
 		$msg = new xmlrpcmsg('pingback.ping', $parms);
 		
-		$client = new xmlrpc_client($path, $host, $port);
-		if (defined("XMLRPC_SEND_PING_DEBUG")) $client->setDebug(1);
-		$result = $client->send($msg);
+		$result = $client->sendXmlRpcMessage($host, $path, $port, $msg);
 		
 		return $result;
 	}
@@ -1381,5 +1482,4 @@ class BlogEntry extends Entry {
 
 		return $ret;
 	}
-
 }

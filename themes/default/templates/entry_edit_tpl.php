@@ -79,7 +79,7 @@
 				<?php if (!$PUBLISHED): ?>
 				<div>
 					<?php $title = _("Publish this as an article instead of a regular blog entry");?>
-					<input type="checkbox" class="checktoggle" id="publisharticle" name="publisharticle" data-for="short-path" value="1" <?php echo isset($GET_SHORT_PATH) ? 'checked="checked"' : ''?> />
+					<input type="checkbox" class="checktoggle" id="publisharticle" name="publisharticle" data-for="short-path" value="1" <?php echo !empty($PUBLISHARTICLE) ? 'checked="checked"' : ''?> />
 					<label for="publisharticle" title="<?php echo $title;?>"><?php p_("Publish as article")?></label>
 					<?php $url_val = isset($URL) ? ('value="' . $URL . '"') : ''; ?>
 					<input id="short_path" name="short_path" title="<?php p_("The last part of the URL path for this article");?>"
@@ -87,11 +87,13 @@
 				</div>
 				<?php endif; ?>
 				
+				<?php if (!$PUBLISHED || $ARTICLE): ?>
 				<div class="sticky-toggle">
 					<?php $title = _("Show a link to this in the articles panel of the sidebar");?>
-					<input id="sticky" name="sticky" title="<?php echo $title?>" type="checkbox" <?php echo $STICKY ? 'checked="checked"' : ''?> />
+					<input id="sticky" name="sticky" title="<?php echo $title?>" type="checkbox" <?php echo !empty($STICKY) ? 'checked="checked"' : ''?> />
 					<label for="sticky" title="<?php echo $title?>"><?php p_("Show in sidebar")?></label>
 				</div>
+                <?php endif; ?>
 				
 				<?php if (!$PUBLISHED): ?>
 				<div>

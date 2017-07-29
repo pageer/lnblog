@@ -62,12 +62,11 @@ function NewBlog($param=false) {
 	return new Blog($param);
 }
 
-function NewEntry($param=false) {
-	$artid = false;
+function NewEntry($param = false, $fs = null) {
 	$entid = false;
 	
 	if (isset($_GET['article'])) {
-		$artid = $_GET['article'];
+		$entid = $_GET['article'];
 	} elseif (isset($_GET['entry'])) {
 		$entid = $_GET['entry'];
 	} elseif (isset($_GET['draft'])) {
@@ -75,9 +74,9 @@ function NewEntry($param=false) {
 	} else {
 		if (! $param) $param = getcwd();
 		if (strpos($param, BLOG_ARTICLE_PATH) !== false) {
-			$artid = $param;
-			if (basename($artid) == ENTRY_COMMENT_DIR) 
-				$artid = dirname($artid);
+			$entid = $param;
+			if (basename($entid) == ENTRY_COMMENT_DIR) 
+				$entid = dirname($entid);
 		}
 		elseif (strpos($param, BLOG_ENTRY_PATH) !== false ||
 		        strpos($param, BLOG_DRAFT_PATH) !== false) {
@@ -91,27 +90,14 @@ function NewEntry($param=false) {
 			}
 		}
 	}
-	
-	if ($entid) {
-		return new BlogEntry($entid);
-	} elseif ($artid) {
-		return new Article($artid);
-	} else {
-		return new BlogEntry();
-	}
-	return false;
+
+	return new BlogEntry($entid, $fs);
 }
 
 # Function: NewBlogEntry
 # Creates a new blog entry object.
 function NewBlogEntry($param=false) {
 	return new BlogEntry($param);
-}
-
-# Function: NewArticle
-# Creates a new article object
-function NewArticle($param=false) {
-	return new Article($param);
 }
 
 # Function: NewBlogComment

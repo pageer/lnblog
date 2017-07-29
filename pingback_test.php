@@ -11,7 +11,7 @@
 # the host name.
 $LNBLOG_PATH = '/LnBlog';
 
-require __DIR__'/vendor/autoload.php';
+require __DIR__.'/vendor/autoload.php';
 ?>
 <html>
 <head><title>Pingback Server Test</title></head>

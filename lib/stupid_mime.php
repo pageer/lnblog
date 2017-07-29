@@ -227,6 +227,5 @@ function stupid_mime_get_extensions($filename) {
 		$filename = substr($filename, strpos($filename,".") + 1);
 		$ret[] = $filename;
 	}
-	if (!count($ret)) $ret = false;
 	return $ret;
 }

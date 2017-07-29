@@ -68,7 +68,7 @@ class BlogEntryURIWrapper extends LnBlogObject {
 		if ($ent->isDraft()) {
 			$entry_type = 'draft';
 		} else {
-			$entry_type = is_a($ent, 'Article') ? 'article' : 'entry';
+			$entry_type = $ent->isArticle() ? 'article' : 'entry';
 		}
 		$qs_arr['action'] = 'delentry';
 		$qs_arr[$entry_type] = $ent->entryID();

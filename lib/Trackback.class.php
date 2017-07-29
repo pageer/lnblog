@@ -51,8 +51,14 @@ class Trackback extends LnBlogObject {
 	var $ip;
 	var $file;
 
-	function Trackback($path=false) {
+    private $fs;
+    private $http_client;
+
+	public function __construct($path=false, $fs = null, $http_client = null) {
 		$this->raiseEvent("OnInit");
+
+        $this->fs = $fs ?: NewFS();
+        $this->http_client = $http_client ?: new HttpClient();
 		
 		$this->title = '';
 		$this->blog = '';
@@ -63,8 +69,8 @@ class Trackback extends LnBlogObject {
 		$this->file = $path;
 		
 		if ($this->file) {
-			if (! is_file($this->file)) $this->file = $this->getFilename($this->file);
-			if (is_file($this->file)) $this->readFileData($this->file);
+			if (! $this->fs->is_file($this->file)) $this->file = $this->getFilename($this->file);
+			if ($this->fs->is_file($this->file)) $this->readFileData($this->file);
 		}
 		
 		$this->raiseEvent("InitComplete");
@@ -93,7 +99,7 @@ class Trackback extends LnBlogObject {
 	# A BlogEntry or Article object, depending on the context.
 	
 	function getParent() {
-		if (file_exists($this->file)) {
+		if ($this->fs->file_exists($this->file)) {
 			return NewEntry(dirname(dirname($this->file)));
 		} else {
 			return NewEntry();
@@ -113,7 +119,7 @@ class Trackback extends LnBlogObject {
 
 	function isTrackback($path=false) {
 		if (!$path) $path = $this->file;
-		if ( file_exists($path) && 
+		if ( $this->fs->file_exists($path) && 
 		     basename(dirname($path)) == ENTRY_TRACKBACK_DIR ) {
 			return true;
 		} else {
@@ -173,49 +179,7 @@ class Trackback extends LnBlogObject {
 		if ($this->blog) $query_string .= "&blog_name=".urlencode($this->blog);
 		if ($this->data) $query_string .= "&excerpt=".urlencode($this->data);
 
-		if (extension_loaded("curl")) {
-
-			# Initialize CURL and POST to the target URL.
-			$hnd = curl_init();
-			curl_setopt($hnd, CURLOPT_URL, $url);
-			curl_setopt($hnd, CURLOPT_POST, 1);
-			curl_setopt($hnd, CURLOPT_FOLLOWLOCATION, 1);
-			curl_setopt($hnd, CURLOPT_RETURNTRANSFER, 1);
-			curl_setopt($hnd, CURLOPT_POSTFIELDS, $query_string);
-			$response = curl_exec($hnd);
-
-		} else {
-			
-			$url_bits = parse_url($url);
-			$host = $url_bits['host'];
-			$path = $url_bits['path'];
-			$port = isset($url_bits['port']) ? $url_bits['port'] : 80;
-
-			# Open a socket.
-			$fp = pfsockopen($host, $port);
-			if (!$fp) {
-				return false;
-			}
-			
-			# Create the HTTP request to be sent to the remote host.
-			$data = "POST ".$path."\r\n".
-			        "Host: ".$host."\r\n".
-			        "Content-Type: application/x-www-form-urlencoded; ".
-		   	        "charset=utf-8\r\n".
-					"Content-Length: ".strlen($query_string)."\r\n".
-					"Connection: close\r\n\r\n".
-		      	  $query_string;
-
-			# Send the data and then get back any response.
-			fwrite($fp, $data);
-			$response = '';
-	
-			while (! feof($fp)) {
-				$response .= fgets($fp);
-			}
-			fclose($fp);
-
-		}
+        $response = $this->http_client->sendPost($url, $query_string);
 
 		# Get the error code
 		$start_tag_pos = strpos($response, "<error>");
@@ -360,13 +324,12 @@ class Trackback extends LnBlogObject {
 
 	function writeFileData($path) {
 		
-		$fs = NewFS();
-		if (! is_dir( dirname($path) ) ) {
-			$fs->mkdir_rec(dirname($path));
+		if (! $this->fs->is_dir( dirname($path) ) ) {
+			$this->fs->mkdir_rec(dirname($path));
 		}
 		$this->file = $path;
 		$data = $this->serializeXML();
-		$ret = $fs->write_file($path, $data);
+		$ret = $this->fs->write_file($path, $data);
 		return $ret;
 	}
 
@@ -415,9 +378,8 @@ class Trackback extends LnBlogObject {
 	
 	function delete() {
 		$this->raiseEvent("OnDelete");
-		if (file_exists($this->file)) {
-			$fs = NewFS();
-			$ret = $fs->delete($this->file);
+		if ($this->fs->file_exists($this->file)) {
+			$ret = $this->fs->delete($this->file);
 		} else $ret = false;
 		$this->raiseEvent("DeleteComplete");
 		return $ret;
