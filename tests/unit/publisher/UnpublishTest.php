@@ -9,6 +9,7 @@ class UnpublishTest extends PublisherTestBase {
         $entry->file = './content/some_stuff/entry.xml';
         $entry->post_ts = strtotime('2017-01-02 12:34:00');
         $this->fs->file_exists('./content/some_stuff/entry.xml')->willReturn(true);
+        $this->fs->realpath($entry->file)->willReturn($entry->file);
         $this->fs->is_dir('./drafts/02_123400')->willReturn(false);
 
         $this->fs->rename('./content/some_stuff', './drafts/02_123400')->willReturn(true)->shouldBeCalled();
@@ -33,6 +34,7 @@ class UnpublishTest extends PublisherTestBase {
         $entry = new BlogEntry(null, $this->fs->reveal());
         $entry->file = "./drafts/02_1234/entry.xml";
         $this->fs->file_exists('./drafts/02_1234/entry.xml')->willReturn(true);
+        $this->fs->realpath($entry->file)->willReturn($entry->file);
 
         $this->publisher->unpublish($entry);
     }
@@ -44,7 +46,8 @@ class UnpublishTest extends PublisherTestBase {
         $entry = new BlogEntry(null, $this->fs->reveal());
         $entry->file = './content/some_stuff/entry.xml';
         $entry->post_ts = strtotime('2017-01-02 12:34:00');
-        $this->fs->file_exists('./content/some_stuff/entry.xml')->willReturn(true);
+        $this->fs->file_exists($entry->file)->willReturn($entry->file);
+        $this->fs->realpath($entry->file)->willReturn($entry->file);
         $this->fs->is_dir('./drafts/02_123400')->willReturn(false);
         $this->fs->rename('./content/some_stuff', './drafts/02_123400')->willReturn(false);
 
@@ -56,6 +59,7 @@ class UnpublishTest extends PublisherTestBase {
         $entry->file = './content/some_stuff/entry.xml';
         $entry->post_ts = strtotime('2017-01-02 12:34:00');
         $this->fs->file_exists('./content/some_stuff/entry.xml')->willReturn(true);
+        $this->fs->realpath($entry->file)->willReturn($entry->file);
         $this->fs->is_dir('./drafts/02_123400')->willReturn(false);
         $this->fs->rename('./content/some_stuff', './drafts/02_123400')->willReturn(true);
 
@@ -71,6 +75,7 @@ class UnpublishTest extends PublisherTestBase {
         $entry->post_ts = strtotime('2017-01-02 12:34:00');
         $this->fs->scandir(Argument::any())->willReturn(array());
         $this->fs->file_exists('./entries/2017/01/02_1234/entry.xml')->willReturn(true);
+        $this->fs->realpath($entry->file)->willReturn($entry->file);
         $this->fs->file_exists('./entries/2017/01/Test_Entry.php')->willReturn(true);
         $this->fs->is_dir('./drafts/02_123400')->willReturn(false);
         $this->fs->rename('./entries/2017/01/02_1234', './drafts/02_123400')->willReturn(true);
@@ -131,6 +136,7 @@ class UnpublishTest extends PublisherTestBase {
         $entry->file = './content/some_stuff/entry.xml';
         $entry->post_ts = strtotime('2017-01-02 12:34:00');
         $this->fs->file_exists('./content/some_stuff/entry.xml')->willReturn(true);
+        $this->fs->realpath($entry->file)->willReturn($entry->file);
         $this->fs->is_dir('./drafts/02_123400')->willReturn(false);
         $this->fs->rename('./content/some_stuff', './drafts/02_123400')->willReturn(true);
         return $entry;
@@ -149,6 +155,7 @@ class UnpublishTest extends PublisherTestBase {
         $entry->file = './content/some_stuff/entry.xml';
         $entry->post_ts = strtotime('2017-01-02 12:34:00');
         $this->fs->file_exists('./content/some_stuff/entry.xml')->willReturn($file_exists);
+        $this->fs->realpath($entry->file)->willReturn($entry->file);
         $this->fs->rename('./content/some_stuff', './drafts/02_123400')->willReturn($rename_success);
         return $entry;
     }

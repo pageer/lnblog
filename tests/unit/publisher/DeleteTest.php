@@ -21,6 +21,7 @@ class DeleteTest extends PublisherTestBase {
         $this->fs->rmdir_rec(Argument::any())->willReturn(true);
         $this->fs->scandir(Argument::any())->willReturn(array());
         $this->fs->file_exists($path)->willReturn(true);
+        $this->fs->realpath($path)->willReturn($path);
         $this->fs->file_exists($link_path)->willReturn(true);
 
         $this->fs->delete($link_path)->shouldBeCalled();
@@ -39,6 +40,7 @@ class DeleteTest extends PublisherTestBase {
         $entry->file = $path;
         $this->fs->rmdir_rec(Argument::any())->willReturn(true);
         $this->fs->file_exists($path)->willReturn(true);
+        $this->fs->realpath($path)->willReturn($path);
         $this->fs->file_exists($link_path)->willReturn(true);
         $this->fs->file_exists($old_link_path1)->willReturn(true);
         $this->fs->file_exists($old_link_path2)->willReturn(true);
@@ -72,6 +74,7 @@ class DeleteTest extends PublisherTestBase {
         $entry->file = $path;
         $this->fs->scandir(Argument::any())->willReturn(array());
         $this->fs->file_exists($path)->willReturn(true);
+        $this->fs->realpath($path)->willReturn($path);
         $this->fs->file_exists(Argument::any())->willReturn(false);
 
         $this->fs->rmdir_rec('./entries/2017/03/02_1234')->willReturn(true)->shouldBeCalled();
@@ -87,6 +90,7 @@ class DeleteTest extends PublisherTestBase {
         $entry->file = $path;
         $this->fs->scandir(Argument::any())->willReturn(array());
         $this->fs->file_exists($path)->willReturn(true);
+        $this->fs->realpath($path)->willReturn($path);
         $this->fs->file_exists(Argument::any())->willReturn(false);
 
         $this->fs->rename($path, './entries/2017/03/02_1234/02_123400.xml')->willReturn(true)->shouldBeCalled();
@@ -104,6 +108,7 @@ class DeleteTest extends PublisherTestBase {
         $entry->file = $path;
         $this->fs->scandir(Argument::any())->willReturn(array());
         $this->fs->file_exists($path)->willReturn(true);
+        $this->fs->realpath($path)->willReturn($path);
         $this->fs->file_exists(Argument::any())->willReturn(false);
         $this->fs->rmdir_rec('./entries/2017/03/02_1234')->willReturn(false);
 
@@ -121,6 +126,7 @@ class DeleteTest extends PublisherTestBase {
         $entry->file = $path;
         $this->fs->scandir(Argument::any())->willReturn(array());
         $this->fs->file_exists($path)->willReturn(true);
+        $this->fs->realpath($path)->willReturn($path);
         $this->fs->file_exists(Argument::any())->willReturn(false);
         $this->fs->rename($path, $new_path)->willReturn(false);
 
