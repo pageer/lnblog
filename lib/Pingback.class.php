@@ -44,6 +44,7 @@ class Pingback extends Trackback {
 	public $ping_date = '';
 	public $timestamp = '';
 	public $file = '';
+    public $exclude_fields = array('fs');
 
     private $fs;
     private $http_client;

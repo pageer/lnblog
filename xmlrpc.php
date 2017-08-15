@@ -249,45 +249,44 @@ function blogger_newPost($params) {
 	$uid = trim($username->scalarval());
 	$pwd = trim($password->scalarval());
 	$usr = NewUser($uid);
+    $fs = NewFS();
+    $publisher = new Publisher($blog, $usr, $fs, new WrapperGenerator($fs));
 	
-	$ret = false;
-	
-	if ( $usr->checkPassword($pwd) &&
-	     System::instance()->canAddTo($blog, $usr) ) {
-		$ent = NewBlogEntry();
-		
-		$ent->has_html = MARKUP_HTML;
-		
-		$ent->subject = strftime("%d %B %Y");  # Set initial subject
-		
-		# Test for initial lines to set the subject and/or tags.
-		$data = explode("\n", $content->scalarval());
-		if (isset($data[0]) && preg_match("/^Subject:.+/i", trim($data[0]))) {
-			$ent->subject = trim(preg_replace("/^Subject:(.+)/i", "$1", trim($data[0])));
-			$data[0] = '';
-		}
-		if (isset($data[1]) && preg_match("/^Tags:.+/i", trim($data[1]))) {
-			$ent->tags = trim(preg_replace("/^Tags:(.+)/i", "$1", trim($data[1])));
-			$data[1] = '';
-		}
-		$data = implode("\n", $data);
+	if ( !$usr->checkPassword($pwd) ||
+	     !System::instance()->canAddTo($blog, $usr) ) {
+		return new xmlrpcresp(0, $xmlrpcerruser+3, "Invalid password - cannot create new post");
+    }
 
-		$ent->uid = $usr->username();
-		$ent->data = $data;
+    $ent = NewBlogEntry();
+    $ent->has_html = MARKUP_HTML;
+    $ent->subject = strftime("%d %B %Y");  # Set initial subject
+    
+    # Test for initial lines to set the subject and/or tags.
+    $data = explode("\n", $content->scalarval());
+    if (isset($data[0]) && preg_match("/^Subject:.+/i", trim($data[0]))) {
+        $ent->subject = trim(preg_replace("/^Subject:(.+)/i", "$1", trim($data[0])));
+        $data[0] = '';
+    }
+    if (isset($data[1]) && preg_match("/^Tags:.+/i", trim($data[1]))) {
+        $ent->tags = trim(preg_replace("/^Tags:(.+)/i", "$1", trim($data[1])));
+        $data[1] = '';
+    }
+    $data = implode("\n", $data);
 
-		if ($publish) {
-			$ret = $ent->insert($blog);
-			$blog->updateTagList($ent->tags());
-		} else {
-			$ret = $ent->saveDraft($blog);
-		}
+    $ent->uid = $usr->username();
+    $ent->data = $data;
 
-		if ($ret) $ret = new xmlrpcresp( new xmlrpcval($ent->globalID()) );
-		else $ret = new xmlrpcresp(0, $xmlrpcerruser+2, "Entry add failed");
-	} else {
-		$ret = new xmlrpcresp(0, $xmlrpcerruser+3, "Invalid password - cannot create new post");
-	 }
-	return $ret;
+    try {
+        if ($publish) {
+            $publisher->publishEntry($ent);
+        } else {
+            $publisher->createDraft($ent);
+        }
+        return new xmlrpcresp( new xmlrpcval($ent->globalID()) );
+    } catch (Exception $e) {
+        return new xmlrpcresp(0, $xmlrpcerruser+2, "Entry add failed");
+    }
+
 }
 
 # Method: blogger.editPost
@@ -324,51 +323,44 @@ function blogger_editPost($params) {
 	$uid = trim($username->scalarval());
 	$pwd = trim($password->scalarval());
 	$usr = NewUser($uid);
-	
-	$ret = false;
-	
-	if ( $usr->checkPassword($pwd) && System::instance()->canModify($ent, $usr) ) {
+    $fs = NewFS();
+    $publisher = new Publisher($blog, $usr, $fs, new WrapperGenerator($fs));
 
+	if (!$usr->checkPassword($pwd) || !System::instance()->canModify($ent, $usr) ) {
+		return new xmlrpcresp(0, $xmlrpcerruser+3, "Invalid password - cannot edit post");
+    }
 
-		# Test for initial lines to set the subject and/or tags.
-		$data = explode("\n", $content->scalarval());
+    # Test for initial lines to set the subject and/or tags.
+    $data = explode("\n", $content->scalarval());
 
-		if (isset($data[0]) && preg_match("/^Subject:.+/i", trim($data[0]))) {
-			$ent->subject = trim(preg_replace("/^Subject:(.+)/i", "$1", trim($data[0])));
-			$data[0] = '';
-		}
-		if (isset($data[1]) && preg_match("/^Tags:.+/i", trim($data[1]))) {
-			$ent->tags = trim(preg_replace("/^Tags:(.+)/i", "$1", trim($data[1])));
-			$data[1] = '';
-		}
+    if (isset($data[0]) && preg_match("/^Subject:.+/i", trim($data[0]))) {
+        $ent->subject = trim(preg_replace("/^Subject:(.+)/i", "$1", trim($data[0])));
+        $data[0] = '';
+    }
+    if (isset($data[1]) && preg_match("/^Tags:.+/i", trim($data[1]))) {
+        $ent->tags = trim(preg_replace("/^Tags:(.+)/i", "$1", trim($data[1])));
+        $data[1] = '';
+    }
 
-		$data = implode("\n", $data);
+    $data = implode("\n", $data);
 
-		if ($data) {
-		
-			$ent->data = $data;
-			
-			if (! $ent->isDraft()) { 
-				$ret = $ent->update();
-				$blog->updateTagList($ent->tags());
-			} elseif ($ent->isDraft() && $publish) {
-				$ret = $ent->publishDraft($blog);
-				$blog->updateTagList($ent->tags());
-			} else {
-				$ret = $ent->saveDraft($blog);
-			}
-			
-			if ($ret) $ret = new xmlrpcresp( new xmlrpcval(true, 'boolean') );
-			else $ret = new xmlrpcresp(0, $xmlrpcerruser+2, "Entry update failed");
-			
-		} else {
-			$ret = new xmlrpcresp(0, $xmlrpcerruser+4, "No data in message - cannot edit post");
-		}
-
-	} else {
-		$ret = new xmlrpcresp(0, $xmlrpcerruser+3, "Invalid password - cannot edit post");
-	 }
-	return $ret;
+    if (!$data) {
+        return new xmlrpcresp(0, $xmlrpcerruser+4, "No data in message - cannot edit post");
+    }
+    
+    $ent->data = $data;
+    
+    try {
+        if ($ent->isDraft() && $publish) {
+            $publisher->publishEntry($ent);
+        } else {
+            $publisher->update($ent);
+        }
+        return new xmlrpcresp( new xmlrpcval(true, 'boolean') );
+    } catch (Exception $e) {
+        return new xmlrpcresp(0, $xmlrpcerruser+2, "Entry update failed");
+    }
+    
 }
 
 # Method: blogger.deletePost
@@ -397,23 +389,22 @@ function blogger_deletePost($params) {
 	$uid = trim($username->scalarval());
 	$pwd = trim($password->scalarval());
 	$usr = NewUser($uid);
+    $fs = NewFS();
+    $publisher = new Publisher($blog, $usr, $fs, new WrapperGenerator($fs));
 	
-	$ret = false;
-	
-	if ( $usr->checkPassword($pwd) && System::instance()->canDelete($ent, $usr) ) {
+    $can_delete = $usr->checkPassword($pwd) &&
+        System::instance()->canDelete($ent, $usr);
 
-		$res = $ent->delete();
-		if ($res) {
-			 $ret = new xmlrpcresp( new xmlrpcval(true, 'boolean') );
-		} else {
-			$ret = new xmlrpcresp(0, $xmlrpcerruser+2, "Entry update failed");
-		}
-			
-	} else {
-		$ret = new xmlrpcresp(0, $xmlrpcerruser+3, "Invalid password - cannot edit post");
-	 }
-	return $ret;
+    if (!$can_delete) {
+		return new xmlrpcresp(0, $xmlrpcerruser+3, "Invalid password - cannot edit post");
+    }
 
+    try {
+        $publisher->delete($ent);
+        return new xmlrpcresp( new xmlrpcval(true, 'boolean') );
+    } catch (Exception $e) {
+        return new xmlrpcresp(0, $xmlrpcerruser+2, "Entry update failed");
+    }
 }
 
 # Method: blogger.getUsersBlogs
@@ -657,55 +648,51 @@ function metaWeblog_newPost($params) {
 	$uid = trim($username->scalarval());
 	$pwd = trim($password->scalarval());
 	$usr = NewUser($uid);
+    $fs = NewFS();
+    $publisher = new Publisher($blog, $usr, $fs, new WrapperGenerator($fs));
 	
-	$ret = false;
-	
-	if ( $usr->checkPassword($pwd) &&
-	     System::instance()->canAddTo($blog, $usr) ) {
+	if ( !$usr->checkPassword($pwd) ||
+	     !System::instance()->canAddTo($blog, $usr) ) {
+		return new xmlrpcresp(0, $xmlrpcerruser+3, "Invalid login - cannot create new post");
+    }
 		
-		$ent = NewBlogEntry();
-		$ent->has_html = MARKUP_HTML;
-		$ent->subject = strftime("%d %B %Y");  # Set initial subject
-			 
-		while ($list = $content->structeach()) {
-			
-			# We only handle a few of the possible RSS2 item elements because
-			# most of them only apply to already published entries.
-			switch($list['key']) {
-				case 'title':
-					$ent->subject = $list['value']->scalarval();
-					break;
-				case 'description':
-					$ent->data = $list['value']->scalarval();
-					break;
-				case 'categories':
-					$tag_arr = array();
-					$size = $list['value']->arraysize();
-					for ($i=0; $i < $size; $i++) {
-						$elem = $list['value']->arraymem($i);
-						$tag_arr[] = $elem->scalarval();
-					}
-					$ent->tags = implode(',', $tag_arr);
-					break;
-			}
-			
-		}
+    $ent = NewBlogEntry();
+    $ent->has_html = MARKUP_HTML;
+    $ent->subject = strftime("%d %B %Y");  # Set initial subject
+         
+    while ($list = $content->structeach()) {
+        
+        # We only handle a few of the possible RSS2 item elements because
+        # most of them only apply to already published entries.
+        switch($list['key']) {
+            case 'title':
+                $ent->subject = $list['value']->scalarval();
+                break;
+            case 'description':
+                $ent->data = $list['value']->scalarval();
+                break;
+            case 'categories':
+                $tag_arr = array();
+                $size = $list['value']->arraysize();
+                for ($i=0; $i < $size; $i++) {
+                    $elem = $list['value']->arraymem($i);
+                    $tag_arr[] = $elem->scalarval();
+                }
+                $ent->tags = implode(',', $tag_arr);
+                break;
+        }
+    }
 
-		$ent->uid = $usr->username();
-		
-		if ($publish) {
-			$ret = $ent->insert($blog);
-			$blog->updateTagList($ent->tags());
-		} else {
-			$ret = $ent->saveDraft($blog);
-		}
-		
-		if ($ret) $ret = new xmlrpcresp( new xmlrpcval($ent->globalID()) );
-		else $ret = new xmlrpcresp(0, $xmlrpcerruser+2, "Entry add failed");
-	} else {
-		$ret = new xmlrpcresp(0, $xmlrpcerruser+3, "Invalid login - cannot create new post");
-	 }
-	return $ret;
+    try {
+        if ($publish) {
+            $publisher->publishEntry($ent);
+        } else {
+            $publisher->createDraft($ent);
+        }
+        return new xmlrpcresp( new xmlrpcval($ent->globalID()) );
+    } catch (Exception $e) {
+        return new xmlrpcresp(0, $xmlrpcerruser+2, "Entry add failed");
+    }
 }
 
 # Method: metaWeblog.editPost
@@ -736,59 +723,57 @@ function metaWeblog_editPost($params) {
 	$uid = $username->scalarval();
 	$pwd = $password->scalarval();
 	$usr = NewUser($uid);
+    $fs = NewFS();
 	
 	$postpath = $postid->scalarval();
 	if (PATH_DELIM != '/') $postpath = str_replace("/", PATH_DELIM, $postpath);
 	$postpath = calculate_document_root().PATH_DELIM.$postpath;
 	
-	$ret = false;
-	
 	$ent = NewBlogEntry($postpath);
 	$blog = $ent->getParent();
+
+    $publisher = new Publisher($blog, $usr, $fs, new WrapperGenerator($fs));
 	
-	if ( $usr->checkPassword($pwd) &&
-	     System::instance()->canModify($ent, $usr) ) {
+	if (!$usr->checkPassword($pwd) ||
+	    !System::instance()->canModify($ent, $usr) ) {
+		return new xmlrpcresp(0, $xmlrpcerruser+3, "Invalid login - cannot edit this post");
+    }
 			 
-		while ($list = $content->structeach()) {
-			
-			# We only handle a few of the possible RSS2 item elements because
-			# most of them only apply to already published entries.
-			switch($list['key']) {
-				case 'title':
-					$ent->subject = $list['value']->scalarval();
-					break;
-					case 'description':
-					$ent->data = $list['value']->scalarval();
-					break;
-				case 'categories':
-					$tag_arr = array();
-					$size = $list['value']->arraysize();
-					for ($i=0; $i < $size; $i++) {
-						$elem = $list['value']->arraymem($i);
-						$tag_arr[] = $elem->scalarval();
-					}
-					$ent->tags = implode(',', $tag_arr);
-					break;
-			}
-			
-		}
+    while ($list = $content->structeach()) {
+        
+        # We only handle a few of the possible RSS2 item elements because
+        # most of them only apply to already published entries.
+        switch($list['key']) {
+            case 'title':
+                $ent->subject = $list['value']->scalarval();
+                break;
+                case 'description':
+                $ent->data = $list['value']->scalarval();
+                break;
+            case 'categories':
+                $tag_arr = array();
+                $size = $list['value']->arraysize();
+                for ($i=0; $i < $size; $i++) {
+                    $elem = $list['value']->arraymem($i);
+                    $tag_arr[] = $elem->scalarval();
+                }
+                $ent->tags = implode(',', $tag_arr);
+                break;
+        }
+        
+    }
 
-		if (! $ent->isDraft()) { 
-			$ret = $ent->update();
-			$blog->updateTagList($ent->tags());
-		} elseif ($ent->isDraft() && $publish) {
-			$ret = $ent->publishDraft($blog);
-			$blog->updateTagList($ent->tags());
-		} else {
-			$ret = $ent->saveDraft($blog);
-		}
+    try {
+        if ($ent->isDraft() && $publish) {
+            $publisher->publishEntry($ent);
+        } else {
+            $publisher->update($ent);
+        }
 
-		if ($ret) $ret = new xmlrpcresp( new xmlrpcval(true,'boolean') );
-		else $ret = new xmlrpcresp(0, $xmlrpcerruser+2, "Entry edit failed");
-	} else {
-		$ret = new xmlrpcresp(0, $xmlrpcerruser+3, "Invalid login - cannot edit this post");
-	 }
-	return $ret;
+        return new xmlrpcresp( new xmlrpcval(true,'boolean') );
+    } catch (Exception $e) {
+        return new xmlrpcresp(0, $xmlrpcerruser+2, "Entry edit failed");
+    }
 }
 
 # Method: metaWeblog.getPost

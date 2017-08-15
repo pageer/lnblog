@@ -253,7 +253,13 @@ class BlogEntry extends Entry {
 	public function entryID() {
 		$temp = dirname($this->file);
 		$ret = basename($temp);  # Add day component.
-		if (! $this->isDraft()) {
+        if ($this->isDraft()) {
+		    return $ret;
+        } elseif ($this->isArticle()) {
+			$temp = dirname($temp);
+			$ret = basename($temp)."/".$ret;
+            return $ret;
+        } else {
 			$temp = dirname($temp);
 			$ret = basename($temp)."/".$ret;  # Add month component.
 			$temp = dirname($temp);
@@ -622,168 +628,6 @@ class BlogEntry extends Entry {
 		return $this->readFileData($file_path); 
 	}
 	
-	/*
-	Method: update
-	Commit changes to the object.
-
-	Returns:
-	True on success, false on failure.
-	*/
-	public function update () {
-		
-		$this->raiseEvent("OnUpdate");
-		
-		$dir_path = dirname($this->file);
-		$this->ip = get_ip();
-		$curr_ts = time();
-		$this->date = fmtdate(ENTRY_DATE_FORMAT, $curr_ts);
-		$this->timestamp = $curr_ts;
-
-		$target = $dir_path.PATH_DELIM.
-			$this->getPath($curr_ts, true, true).ENTRY_PATH_SUFFIX;
-		$source = $dir_path.PATH_DELIM.ENTRY_DEFAULT_FILE;
-		if (! $this->fs->file_exists($source)) $source = $dir_path.PATH_DELIM."current.htm";
-
-		$ret = $this->fs->rename($source, $target);
-		
-		if (basename($this->file) == "current.htm")
-			$this->file = $dir_path.PATH_DELIM.ENTRY_DEFAULT_FILE;
-		if ($ret) $ret = $this->writeFileData();
-
-		# Create wrappers for comments and trackbacks if they do not exist.
-		# This is done here for the article subclass, as it did not previously 
-		# create these wrappers.
-		if ($this->allow_comment && 
-		    ! $this->fs->is_dir($dir_path.PATH_DELIM.ENTRY_COMMENT_DIR) ) {
-			create_directory_wrappers($dir_path.PATH_DELIM.ENTRY_COMMENT_DIR, ENTRY_COMMENTS, get_class($this));
-		}
-		if ($this->allow_tb &&
-		    ! $this->fs->is_dir($dir_path.PATH_DELIM.ENTRY_TRACKBACK_DIR) ) {
-			create_directory_wrappers($dir_path.PATH_DELIM.ENTRY_TRACKBACK_DIR, ENTRY_TRACKBACKS, get_class($this));
-		}
-
-		if (! $ret) {
-			
-			$ret = $this->fs->rename($target, $source);
-			return false;
-			
-		} else {
-		
-			if (! KEEP_EDIT_HISTORY) $this->fs->delete($target);
-			
-			$subfile = $this->calcPrettyPermalink();
-			if ($subfile) {
-				$subfile = dirname(dirname($this->file)).PATH_DELIM.$subfile;
-				if (! $this->fs->file_exists($subfile)) $this->makePrettyPermalink();
-			}
-		}
-
-		$this->raiseEvent("UpdateComplete");
-		return $ret;
-	}
-
-	/* 
-	Method: delete
-	Delete the current object.
-
-	Returns:
-	True on success, false on failure.
-	*/
-	public function delete () {
-		
-		$fs = NewFS();
-		$curr_ts = time();
-		$dir_path = dirname($this->file);
-		if (! $this->isEntry($dir_path) ) return false;
-		
-		$this->raiseEvent("OnDelete");
-
-		$subfile = $this->calcPrettyPermalink();
-		if (file_exists($subfile)) {
-			$fs->delete($subfile);
-		} else {
-			$subfile = $this->calcPrettyPermalink(true);
-			if (file_exists($subfile)) $fs->delete($subfile);
-		}
-		
-		if (KEEP_EDIT_HISTORY) {
-			$source_file = $dir_path.PATH_DELIM.ENTRY_DEFAULT_FILE;
-			$target_file = $dir_path.PATH_DELIM.
-				$this->getPath($curr_ts, true, true).ENTRY_PATH_SUFFIX;
-			$ret = $fs->rename($source_file, $target_file);
-		} else {
-			$ret = $fs->rmdir_rec($this->localpath());
-		}
-		
-		$this->raiseEvent("DeleteComplete");
-		
-		return $ret;
-	}
-
-	/*
-	Method: insert
-	Save the object to persistent storage.
-	
-	Parameters:
-	blog       - The blog into which the entry will be inserted.
-	from_draft - Indicates that the entry will be inserted from a 
-	             draft entry, not created directly from user input.
-	Returns:
-	True on success, false on failure.
-	*/
-	public function insert ($blog, $from_draft=false) {
-	
-		if (! $this->uid) {
-			$usr = NewUser();
-			$this->uid = $usr->username();
-		}
-	
-		$curr_ts = time();
-		
-		$basepath = $blog->home_path.PATH_DELIM.BLOG_ENTRY_PATH;
-		$dir_path = $basepath.PATH_DELIM.$this->getPath($curr_ts);
-		
-		# If the entry directory already exists, something is wrong. 
-		if ( is_dir($dir_path) ) 
-			$dir_path = $basepath.PATH_DELIM.$this->getPath($curr_ts, false, true);
-		if ( is_dir($dir_path) ) return false;
-		
-		$this->raiseEvent("OnInsert");
-
-		# First, check that the year and month directories exist and have
-		# the appropriate wrapper scripts in them.
-		$month_path = dirname($dir_path);
-		$year_path = dirname($month_path);
-		if (! is_dir($year_path)) $ret = create_directory_wrappers($year_path, YEAR_ENTRIES);
-		if (! is_dir($month_path)) $ret = create_directory_wrappers($month_path, MONTH_ENTRIES);
-		if ($from_draft) {
-			$fs = NewFS();
-			$fs->rename(dirname($this->file), $dir_path);	
-		}
-		$ret = create_directory_wrappers($dir_path, ENTRY_BASE);
-
-		# Create the comments directory.
-		create_directory_wrappers($dir_path.PATH_DELIM.ENTRY_COMMENT_DIR, ENTRY_COMMENTS);
-		create_directory_wrappers($dir_path.PATH_DELIM.ENTRY_TRACKBACK_DIR, ENTRY_TRACKBACKS);
-		create_directory_wrappers($dir_path.PATH_DELIM.ENTRY_PINGBACK_DIR, ENTRY_PINGBACKS);
-				
-		$this->file = $dir_path.PATH_DELIM.ENTRY_DEFAULT_FILE;
-		$this->post_ts = $curr_ts;
-		$this->setDates($curr_ts);
-		$this->ip = get_ip();
-
-		$ret = $this->writeFileData();
-		# Add a wrapper file to make the link prettier.
-		if ($ret) {
-			$this->id = $this->globalID();
-			$this->makePrettyPermalink();
-		}
-		$this->raiseEvent("InsertComplete");
-
-		return (bool)$ret;
-		
-	}
-	
 	public function setDates($curr_ts = null) {
 		# Set the timestamp and date, plus the ones for the original post, if
 		# this is a new entry.
@@ -793,57 +637,6 @@ class BlogEntry extends Entry {
 		if (! $this->post_ts) {
 			$this->post_ts = $curr_ts;
 		}
-	}
-	
-	/* 
-	Method: publishDraft
-	Publishes a draft entry as an actual blog entry.
-	This is an alias for BlogEntry::insert($blog, true).
-	*/
-	public function publishDraft($blog) {
-		return $this->insert($blog, true);
-	}
-	
-	public function publishDraftAsArticle($blog, $path=false) {
-		$art = NewArticle();
-		foreach ($this as $key=>$val) {
-			$art->$key = $val;
-		}
-		return $art->insert($blog, $path, true);
-	}
-	
-	/*
-	Method: saveDraft
-	Saves the object as a draft, which can be recalled, edited, 
-	and published latter.
-	*/
-	public function saveDraft($blog) {
-		$ret = true;
-		
-		$ts = time();
-		$draft_path = mkpath($blog->home_path, BLOG_DRAFT_PATH);
-		if (! $this->fs->is_dir($draft_path)) {
-			$r = create_directory_wrappers($draft_path, BLOG_DRAFTS);
-			if (! empty($r)) $ret = false;
-		}
-		
-		if (! $this->fs->file_exists($this->file)) {
-			$dirname = $this->getPath($ts, true);
-			$path = mkpath($draft_path, $dirname);
-			$ret = $ret &&  $this->fs->mkdir_rec($path);
-			$this->file = mkpath($path, ENTRY_DEFAULT_FILE);
-		}
-		
-		$this->setDates($ts);
-		
-		if (! $this->uid) {
-			$usr = NewUser();
-			$this->uid = $usr->username();
-		}
-		
-		$ret = $this->writeFileData();
-		
-		return $ret;
 	}
 	
 	/**

@@ -232,8 +232,8 @@ class AdminPages extends BasePages {
 	# from.  In the "standard" setup, this page is included by the login.php
 	# wrapper script in each blog.
 	public function bloglogin() {
-		Page::instance()->setDisplayObject($blog);
 		$blog = NewBlog();
+		Page::instance()->setDisplayObject($blog);
 		
 		if ($blog->isBlog()) {
 			$page_name = spf_("%s - Login", $blog->name);

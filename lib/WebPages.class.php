@@ -227,6 +227,7 @@ class WebPages extends BasePages {
 
 	public function delentry() {
 		$ent = NewEntry();
+
 		$this->getPage()->setDisplayObject($ent);
 
 		$is_draft = $ent->isDraft();
@@ -239,14 +240,13 @@ class WebPages extends BasePages {
 		if (POST($conf_id)) {
 			$err = false;
 			if (System::instance()->canDelete($ent, $this->user) && $this->user->checkLogin()) {
-				$ret = $ent->delete();
-				if (!$ret) {
+                try {
+                    $this->getPublisher()->delete($ent);
+                } catch (EntryDeleteFailed $error) {
 					$message = spf_("Error: Unable to delete '%s'.  Try again?", $ent->subject);
-				} elseif ($is_draft) {
-					$this->getPage()->redirect($this->blog->uri('listdrafts'));
-				} else {
-					$this->getPage()->redirect($this->blog->getURL());
-				}
+                }
+                $url = $is_draft ?$this->blog->uri('listdrafts') : $this->blog->getURL();
+				$this->getPage()->redirect($url);
 			} else {
 				$message = _("Error: user ".$this->user->username()." does not have permission to delete this entry.");
 			}

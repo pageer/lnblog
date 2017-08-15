@@ -51,6 +51,8 @@ class Trackback extends LnBlogObject {
 	var $ip;
 	var $file;
 
+    public $exclude_fields = array('fs');
+
     private $fs;
     private $http_client;
 

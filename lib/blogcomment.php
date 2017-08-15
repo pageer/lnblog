@@ -63,7 +63,7 @@ class BlogComment extends Entry {
 		$this->has_html = MARKUP_NONE;
 		$this->show_email = COMMENT_EMAIL_VIEW_PUBLIC;
 		$this->exclude_fields = array('exclude_fields', 'metadata_fields',
-		                              'file');
+		                              'file', 'fs');
 		$this->metadata_fields = array("id"=>"postid", "uid"=>"userid",
 			"name"=>"name", "email"=>"e-mail", "url"=>"url",
 			"show_email"=>"show_email", "date"=>"date", 

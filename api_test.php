@@ -15,13 +15,16 @@
 # Add the path to your LnBlog folder here.  Include the leading slash, but not 
 # the host name.  By default, 
 $LNBLOG_PATH = dirname($_SERVER['SCRIPT_NAME']);
+$HOSTNAME = isset($_GET['host']) ? $_GET['host'] : 'localhost';
+$PORT = isset($_GET['port']) ? $_GET['port'] : 80;
 
 require __DIR__.'/vendor/autoload.php';
 ?>
 <html>
 <head><title>MetaWeblog API Test</title></head>
 <body>
-<form method="post" enctype="multipart/form-data">
+<form method="post" enctype="multipart/form-data"
+    action="?port=<?php echo $PORT?>&$host=<?php echo $HOSTNAME?>">
 <div>Username:<input type="text" name="username" value="<?php
 echo isset($_POST['username'])?$_POST['username']:'';?>" /></div>
 <div>Password:<input type="password" name="password" value="<?php
@@ -97,6 +100,7 @@ echo "Doing method $method\n";
 			                new xmlrpcval(true, 'boolean'));
 			break;
 		case "blogger.deletePost":
+		case "metaWeblog.deletePost":
 			$params = array(new xmlrpcval("1234567", "string"), 
 			                new xmlrpcval($_POST['entid'], "string"),
 			                new xmlrpcval($_POST['username'], 'string'),
@@ -118,9 +122,7 @@ echo "Doing method $method\n";
 			                new xmlrpcval($_POST['password'], 'string'));
 			break;
 		case "blogger.setTemplate":
-
 		case "blogger.getTemplate":
-
 		case "metaWeblog.newPost":
 			$params = array(new xmlrpcval($_POST['entid'], "string"),
 			                new xmlrpcval($_POST['username'], 'string'),
@@ -128,8 +130,6 @@ echo "Doing method $method\n";
 			                entrystruct($_POST['data']),
 			                new xmlrpcval(true, 'boolean'));
 			break;
-		case "metaWeblog.deletePost":
-
 		case "metaWeblog.editPost":
 			$params = array(new xmlrpcval($_POST['entid'], "string"),
 			                new xmlrpcval($_POST['username'], 'string'),
@@ -178,23 +178,20 @@ echo "Doing method $method\n";
 			                new xmlrpcval($catarr, 'array'));
 			break;
 		case "mt.supportedMethods":
-
 		case "mt.supportedTextFilters":
-
 		case "mt.getTrackbackPings":
 			$params = array(new xmlrpcval($_POST['entid'], "string"));
 			break;
 		case "mt.publishPost":
-
 		case "slv":
 			$params = array(new xmlrpcval($_POST['data'], 'string'));
 	}
 
 		$f = new xmlrpcmsg($method, $params);
 		if ($method == 'slv') {
-			$c = new xmlrpc_client("/slv.php", "www.linksleeve.org", 80);
+			$c = new xmlrpc_client("/slv.php", "www.linksleeve.org", $PORT);
 		} else {
-			$c = new xmlrpc_client($LNBLOG_PATH."/xmlrpc.php", "localhost", 80);
+			$c = new xmlrpc_client($LNBLOG_PATH."/xmlrpc.php", "localhost", $PORT);
 		}
 		$c->setDebug(1);
 		$r = $c->send($f);
