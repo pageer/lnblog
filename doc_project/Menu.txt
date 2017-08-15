@@ -76,38 +76,6 @@ Group: Configuration  {
    File: system.ini  (C:\Users\pageer\Documents\Projects\lnblog\docs\systemini.txt)
    }  # Group: Configuration
 
-Group: Administration Pages  {
-
-   File: bloglogin.php  (C:\Users\pageer\Documents\Projects\lnblog\bloglogin.php)
-   File: bloglogout.php  (C:\Users\pageer\Documents\Projects\lnblog\bloglogout.php)
-   File: fs_setup.php  (C:\Users\pageer\Documents\Projects\lnblog\fs_setup.php)
-   File: index.php  (C:\Users\pageer\Documents\Projects\lnblog\index.php)
-   File: newblog.php  (C:\Users\pageer\Documents\Projects\lnblog\newblog.php)
-   File: newlogin.php  (C:\Users\pageer\Documents\Projects\lnblog\newlogin.php)
-   File: plugin_loading.php  (C:\Users\pageer\Documents\Projects\lnblog\plugin_loading.php)
-   File: plugin_setup.php  (C:\Users\pageer\Documents\Projects\lnblog\plugin_setup.php)
-   }  # Group: Administration Pages
-
-Group: Other Pages  {
-
-   File: about.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\about.php)
-   File: blogpaths.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\blogpaths.php)
-   File: delcomment.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\delcomment.php)
-   File: delentry.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\delentry.php)
-   File: editfile.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\editfile.php)
-   File: editlogin.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\editlogin.php)
-   File: entryedit.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\entryedit.php)
-   File: fileupload.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\fileupload.php)
-   File: manage_replies.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\manage_replies.php)
-   File: pagelib.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\pagelib.php)
-   File: pages\showitem.php  (no auto-title, C:\Users\pageer\Documents\Projects\lnblog\pages\showitem.php)
-   File: showall.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\showall.php)
-   File: showarticles.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\showarticles.php)
-   File: showblog.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\showblog.php)
-   File: updateblog.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\updateblog.php)
-   File: userinfo.php  (C:\Users\pageer\Documents\Projects\lnblog\userinfo.php)
-   }  # Group: Other Pages
-
 Group: API Endpoints  {
 
    File: XML-RPC  (no auto-title, C:\Users\pageer\Documents\Projects\lnblog\xmlrpc.php)
@@ -116,31 +84,30 @@ Group: API Endpoints  {
 Group: Libraries  {
 
    File: AdminPages.class.php  (C:\Users\pageer\Documents\Projects\lnblog\lib\AdminPages.class.php)
-   File: Article  (C:\Users\pageer\Documents\Projects\lnblog\lib\article.php)
    File: Blog  (C:\Users\pageer\Documents\Projects\lnblog\lib\blog.php)
    File: BlogComment  (C:\Users\pageer\Documents\Projects\lnblog\lib\blogcomment.php)
    File: BlogEntry  (C:\Users\pageer\Documents\Projects\lnblog\lib\blogentry.php)
    File: Creator Functions  (no auto-title, C:\Users\pageer\Documents\Projects\lnblog\lib\creators.php)
-   File: Draft  (C:\Users\pageer\Documents\Projects\lnblog\lib\draft.php)
    File: Entry  (no auto-title, C:\Users\pageer\Documents\Projects\lnblog\lib\entry.php)
    File: EventRegister  (C:\Users\pageer\Documents\Projects\lnblog\lib\eventregister.php)
    File: FileUpload  (C:\Users\pageer\Documents\Projects\lnblog\lib\FileUpload.class.php)
    File: FS  (C:\Users\pageer\Documents\Projects\lnblog\lib\fs.php)
+   File: FTPFS  (C:\Users\pageer\Documents\Projects\lnblog\lib\ftpfs.php)
    File: IniParser  (C:\Users\pageer\Documents\Projects\lnblog\lib\iniparser.php)
    File: Internationalization  (no auto-title, C:\Users\pageer\Documents\Projects\lnblog\lib\i18n.php)
    File: LnBlogObject  (C:\Users\pageer\Documents\Projects\lnblog\lib\lnblogobject.php)
    File: LnBlogXMLConfig  (C:\Users\pageer\Documents\Projects\lnblog\lib\xmlini.php)
    File: MIME Types  (no auto-title, C:\Users\pageer\Documents\Projects\lnblog\lib\stupid_mime.php)
    File: Page  (C:\Users\pageer\Documents\Projects\lnblog\lib\page.php)
-   File: PHPTemplate  (C:\Users\pageer\Documents\Projects\lnblog\lib\template.php)
+   File: PHPTemplate  (C:\Users\pageer\Documents\Projects\lnblog\lib\phptemplate.php)
    File: Pingback  (C:\Users\pageer\Documents\Projects\lnblog\lib\Pingback.class.php)
    File: Plugin  (C:\Users\pageer\Documents\Projects\lnblog\lib\plugin.php)
    File: PluginManager  (C:\Users\pageer\Documents\Projects\lnblog\lib\pluginmanager.php)
-   File: SimpleXMLWriter  (C:\Users\pageer\Documents\Projects\lnblog\lib\xml.php)
+   File: SimpleXMLReader  (C:\Users\pageer\Documents\Projects\lnblog\lib\SimpleXMLReader.class.php)
+   File: SimpleXMLWriter  (C:\Users\pageer\Documents\Projects\lnblog\lib\SimpleXMLWriter.class.php)
    File: System  (C:\Users\pageer\Documents\Projects\lnblog\lib\system.php)
    File: Trackback  (C:\Users\pageer\Documents\Projects\lnblog\lib\Trackback.class.php)
-   File: URI  (no auto-title, C:\Users\pageer\Documents\Projects\lnblog\lib\uri.php)
-   File: URI Factory  (no auto-title, C:\Users\pageer\Documents\Projects\lnblog\lib\urifactory.php)
+   File: URI  (C:\Users\pageer\Documents\Projects\lnblog\lib\uri\URI.class.php)
    File: User  (C:\Users\pageer\Documents\Projects\lnblog\lib\user.php)
    File: Utilities  (C:\Users\pageer\Documents\Projects\lnblog\lib\utils.php)
    File: WebPages.class.php  (C:\Users\pageer\Documents\Projects\lnblog\lib\WebPages.class.php)
@@ -191,9 +158,9 @@ Group: Test Scripts  {
 
    File: api_test.php  (C:\Users\pageer\Documents\Projects\lnblog\api_test.php)
    File: pingback_test.php  (C:\Users\pageer\Documents\Projects\lnblog\pingback_test.php)
-   File: docroot_test.php  (C:\Users\pageer\Documents\Projects\lnblog\docroot_test.php)
-   File: ftproot_test.php  (C:\Users\pageer\Documents\Projects\lnblog\ftproot_test.php)
    }  # Group: Test Scripts
+
+File: pagelib.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\pagelib.php)
 
 Group: Index  {
 
