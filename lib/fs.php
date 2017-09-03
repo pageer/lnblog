@@ -273,6 +273,31 @@ abstract class FS {
         return scandir($directory, $sorting_order);
     }
 	
+    # Function: scan_directory
+    # Does essentially the same thing as scandir on PHP 5.  Gets all the entries
+    # in the given directory.
+    #
+    # Parameters:
+    # path      - The directory path to scan.
+    # dirs_only - *Optional* parameter to list only the directories in the path.  
+    #             The *default* is false.
+    #
+    # Returns: 
+    # An array of directory entry names, removing "." and ".." entries.
+    public function scan_directory($path, $dirs_only=false) {
+        if (! is_dir($path)) return array();
+        $dirhand = opendir($path);
+        $dir_list = array();
+        while ( false !== ($ent = readdir($dirhand)) ) {
+            if ($ent != "." && $ent != "..") {
+                if (! $dirs_only) $dir_list[] = $ent;
+                else if (is_dir($path.PATH_DELIM.$ent)) $dir_list[] = $ent;
+            }
+        }
+        closedir($dirhand);
+        return $dir_list;
+    }
+
 	# Method: filesize
 	# Wrapper around native filesize() function.
 	public function filesize($path) {

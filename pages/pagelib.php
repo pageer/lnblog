@@ -97,31 +97,6 @@ function handle_comment(&$ent, $use_comm_link=false) {
 
 }
 
-# Function: entry_set_template
-# Sets variables in an entry template for display.
-#
-# Parameters:
-# tpl - The template to populate.
-# ent - the BlogEntry or Article with which to populate the template.
-
-function entry_set_template($tpl, $ent) {
-	$tpl->set("URL", $ent->article_path);
-    $tpl->set("PUBLISHARTICLE", $ent->is_article);
-	$tpl->set("SUBJECT", htmlspecialchars($ent->subject));
-	$tpl->set("TAGS", htmlspecialchars($ent->tags));
-	$tpl->set("DATA", htmlspecialchars($ent->data));
-	$tpl->set("ENCLOSURE", $ent->enclosure);
-	$tpl->set("HAS_HTML", $ent->has_html);
-	$tpl->set("COMMENTS", $ent->allow_comment);
-	$tpl->set("TRACKBACKS", $ent->allow_tb);
-	$tpl->set("PINGBACKS", $ent->allow_pingback);
-	if ($ent->isArticle()) {
-        $tpl->set("STICKY", $ent->isSticky());
-    } else {
-        $tpl->set("STICKY", $ent->is_sticky ? true : false);
-	}
-}
-
 # Function: blog_set_template
 # Sets template variables for display of a blog.
 #
@@ -139,7 +114,7 @@ function blog_set_template(&$tpl, &$blog) {
 	$tpl->set("BLOG_RSS_MAX", $blog->max_rss);
 	$tpl->set("BLOG_ALLOW_ENC", $blog->allow_enclosure);
 	$tpl->set("BLOG_DEFAULT_MARKUP", $blog->default_markup);
-	$tpl->set("BLOG_AUTO_PINGBACK", $blog->auto_pingback);
+	$tpl->set("BLOG_AUTO_PINGBACK", $blog->autoPingbackEnabled());
 	$tpl->set("BLOG_GATHER_REPLIES", $blog->gather_replies);
 	$tpl->set("BLOG_FRONT_PAGE_ABSTRACT", $blog->front_page_abstract);
 	$tpl->set("BLOG_MAIN_ENTRY", $blog->front_page_entry);
@@ -161,7 +136,7 @@ function blog_get_post_data(&$blog) {
 	$blog->max_rss = POST("maxrss");
 	$blog->allow_enclosure = POST("allow_enc")?1:0;
 	$blog->default_markup = POST("blogmarkup");
-	$blog->auto_pingback = POST('pingback');
+	$blog->auto_pingback = POST('pingback')?1:0;
 	$blog->gather_replies = POST('replies')?1:0;
 	$blog->front_page_abstract = POST('use_abstract')?1:0;
 	$blog->front_page_entry = POST('main_entry');

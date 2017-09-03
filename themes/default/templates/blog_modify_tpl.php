@@ -81,19 +81,10 @@ foreach ($dir as $theme) { ?>
 <fieldset>
 <legend style="font-weight: bold"><?php p_("Default settings for blog entries");?></legend>
 <div>
-<?php $msg = _("Determines when Pingbacks should be sent: whenever an entry is modified, only when it is first posted, or never.  You can manually override this on the entry edit screen.");?>
-<label for="pingback" title="<?php echo $msg;?>"><?php p_("Send Pingbacks when posting entries"); ?></label>
-<select id="pingback" name="pingback" title="<?php echo $msg;?>">
-<option value="all"<?php 
-if ($BLOG_AUTO_PINGBACK == 'all') { echo ' selected="selected"'; } 
-?>>Always</option>
-<option value="new"<?php 
-if ($BLOG_AUTO_PINGBACK == 'new') { echo ' selected="selected"'; } 
-?>>New entries only</option>
-<option value="none"<?php
-if ($BLOG_AUTO_PINGBACK == 'none') { echo ' selected="selected"'; } 
-?>>Never</option>
-</select>
+<?php $msg = _("Determines when Pingbacks should be sent by default for new posts.  You can manually override this on the entry edit screen.");?>
+<?php $pingback_checked = $BLOG_AUTO_PINGBACK ? 'checked="checked"' : ''; ?>
+<label for="pingback" title="<?php echo $msg;?>"><?php p_("Send Pingbacks by default when posting entries"); ?></label>
+<input type="checkbox" id="pingback" name="pingback" title="<?php echo $msg?>" <?php echo $pingback_checked?> />
 </div>
 <?php if (0) { /* Not yet implemented.*/ ?>
 <div>

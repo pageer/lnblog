@@ -130,13 +130,13 @@
 			<div class="right-col">
 				<div>
 				<?php $title = _("Allow readers to post comments on this entry");?>
-				<input id="comments" name="comments" title="<?php echo $title?>" type="checkbox" <?php echo (! isset($COMMENTS) || $COMMENTS) ? 'checked="checked"' : ''?> />
+				<input id="comments" name="comments" title="<?php echo $title?>" type="checkbox" <?php echo !empty($COMMENTS) ? 'checked="checked"' : ''?> />
 				<label for="comments" title="<?php echo $title?>"><?php p_("Allow comments")?></label>
 				</div>
 				
 				<div>
-				<?php $title = _("Allow this entry to receive TrackBack pings from other blogs");?>
-				<input id="trackbacks" name="trackbacks" title="<?php echo $title?>" type="checkbox" <?php echo (! isset($TRACKBACKS) || $TRACKBACKS) ? 'checked="checked"' : ''?> />
+                <?php $title = _("Allow this entry to receive TrackBack pings from other blogs");?>
+				<input id="trackbacks" name="trackbacks" title="<?php echo $title?>" type="checkbox" <?php echo !empty($TRACKBACKS) ? 'checked="checked"' : ''?> />
 				<label for="trackbacks" title="<?php echo $title?>"><?php p_("Allow TrackBacks")?></label>
 				</div>
 				

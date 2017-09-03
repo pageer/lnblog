@@ -834,7 +834,7 @@ class BlogEntry extends Entry {
 		$tmp->set("USE_ABSTRACT", $blog->front_page_abstract);
         $send_pingbacks = $this->isEntry() ?
             $this->send_pingback :
-            $blog->auto_pingback != 'none';
+            $blog->autoPingbackEnabled();
 		$tmp->set("SEND_PINGBACKS", $send_pingbacks);
 		
 		# Added so the template can know whether or not to advertise RSS feeds.

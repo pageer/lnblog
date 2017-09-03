@@ -82,7 +82,10 @@ class Blog extends LnBlogObject {
     # HACK: because the menubar is messed up and I'm too lazy to fix it properly.
     public $skip_root = false;
 
-	function __construct($path="") {
+    private $fs;
+
+	public function __construct($path = "", $fs = null) {
+        $this->fs = $fs ?: NewFS();
 
 		if ($path) {
 			$this->getPathFromPassedValue($path);
@@ -91,8 +94,8 @@ class Blog extends LnBlogObject {
 		}
 		
 		# Canonicalize the home path.
-		if (is_dir($this->home_path)) {
-			$this->home_path = realpath($this->home_path);
+		if ($this->fs->is_dir($this->home_path)) {
+			$this->home_path = $this->fs->realpath($this->home_path);
 		}
 
 		$this->raiseEvent("OnInit");
@@ -111,10 +114,10 @@ class Blog extends LnBlogObject {
 		if ($path) {
 			$this->getPathFromPassedValue($path);
 		} elseif (defined("BLOG_ROOT")) { 
-			$this->home_path = realpath(BLOG_ROOT);
+			$this->home_path = $this->fs->realpath(BLOG_ROOT);
 			$this->setBlogID();
 		} else {
-			$this->home_path = getcwd();
+			$this->home_path = $this->fs->getcwd();
 			$this->setBlogID();
 		}
 	}
@@ -123,9 +126,9 @@ class Blog extends LnBlogObject {
 		if ($path == ROOT_ID) {
 			$this->home_path = calculate_document_root();
 			$this->blogid = ROOT_ID;
-		} elseif (is_dir($path)) {
-			$path = realpath($path);
-			$this->home_path = realpath($path);
+		} elseif ($this->fs->is_dir($path)) {
+			$path = $this->fs->realpath($path);
+			$this->home_path = $this->fs->realpath($path);
 			$this->setBlogID();
 		} else {
 			$this->home_path = $this->get_blog_path($path);
@@ -157,9 +160,9 @@ class Blog extends LnBlogObject {
 	function get_blog_path($id) {
 		$system = System::instance();
 		$path = test_server_root($id);
-		if ( ! is_dir($path) ) {
+		if ( ! $this->fs->is_dir($path) ) {
 			$path = $system->sys_ini->value("bloglist", $id);
-			if (! is_dir($path)) {
+			if (! $this->fs->is_dir($path)) {
 				echo spf_("Unable to locate blogID %s.  Make sure the ID is correct or add an entry to the [bloglist] section of system.ini.", $id);
 				return false;
 			}
@@ -176,8 +179,8 @@ class Blog extends LnBlogObject {
 	*/
 	function isBlog($blog=false) {
 	
-		return file_exists(Path::mk($this->home_path, BLOG_CONFIG_PATH)) ||
-		       file_exists(Path::mk($this->home_path.PATH_DELIM.'blogdata.txt'));
+		return $this->fs->file_exists(Path::mk($this->home_path, BLOG_CONFIG_PATH)) ||
+		       $this->fs->file_exists(Path::mk($this->home_path, 'blogdata.txt'));
 	}
 
 	function getParent() { return false; }
@@ -210,27 +213,24 @@ class Blog extends LnBlogObject {
 	keys are ignored.  This is for internal use only.
 	*/
 	function readBlogData() {
-		$path = $this->home_path.PATH_DELIM.BLOG_CONFIG_PATH;
-		if (is_file($path)) {
-			$ini = NewINIParser($path);
-			$data = $ini->getSection("blog");
-			foreach ($data as $key=>$val) {
-				if (is_array($this->$key)) {
-					$this->$key = explode(",", $val);
-					if (! $this->$key) $this->$key = array();
-				} else {
-					$this->$key = $val;
-				}
-			}
-			
-			$this->sw_version = $ini->value('system','SoftwareVersion','0.7pre');
-			$this->last_upgrade = $ini->value('system','LastUpgrade','');
-			$this->url_method = $ini->value('system','URLMethod','wrapper');
-			
-		} elseif (is_file($this->home_path.PATH_DELIM.'blogdata.txt')) {
-			$path = $this->home_path.PATH_DELIM.'blogdata.txt';
-			$config_data = file($path);
-		}
+		$path = Path::mk($this->home_path, BLOG_CONFIG_PATH);
+		if (!$this->fs->is_file($path)) {
+            return;
+        }
+        $ini = NewINIParser($path);
+        $data = $ini->getSection("blog");
+        foreach ($data as $key=>$val) {
+            if (is_array($this->$key)) {
+                $this->$key = explode(",", $val);
+                if (! $this->$key) $this->$key = array();
+            } else {
+                $this->$key = $val;
+            }
+        }
+        
+        $this->sw_version = $ini->value('system','SoftwareVersion','0.7pre');
+        $this->last_upgrade = $ini->value('system','LastUpgrade','');
+        $this->url_method = $ini->value('system','URLMethod','wrapper');
 	}
 
 	/*
@@ -281,8 +281,7 @@ class Blog extends LnBlogObject {
 		$fmtday = sprintf("%02d", $day);
 		$month_dir = mkpath(BLOG_ROOT,BLOG_ENTRY_PATH,
 		                    $year,sprintf("%02d", $month));
-		#$day_list = glob($month_dir.PATH_DELIM.$fmtday."*");
-		$day_list = scan_directory($month_dir, true);
+		$day_list = $this->fs->scan_directory($month_dir, true);
 		rsort($day_list);
 
 		$match_list = array();
@@ -310,10 +309,10 @@ class Blog extends LnBlogObject {
 	*/
 	function getDayCount($year, $month, $day) {
 		$fmtday = sprintf("%02d", $day);
-		$month_dir = mkpath(BLOG_ROOT,BLOG_ENTRY_PATH,
+		$month_dir = Path::mk(BLOG_ROOT,BLOG_ENTRY_PATH,
 		                    $year,sprintf("%02d", $month));
 		#$day_list = glob($month_dir.PATH_DELIM.$fmtday."*");
-		$day_list = scan_directory($month_dir, true);
+		$day_list = $this->fs->scan_directory($month_dir, true);
 		$ent = NewBlogEntry();
 		$ret = 0;
 		foreach ($day_list as $dy) {
@@ -342,17 +341,17 @@ class Blog extends LnBlogObject {
 	*/
 	function getMonth($year, $month) {
 		$ent = NewBlogEntry();
-		$curr_dir = mkpath($this->home_path,BLOG_ENTRY_PATH,$year,$month);
+		$curr_dir = Path::mk($this->home_path,BLOG_ENTRY_PATH,$year,$month);
 		
 		$ent_list = array();
-		$dir_list = scan_directory($curr_dir, true);
+		$dir_list = $this->fs->scan_directory($curr_dir, true);
 		
 		if (! $dir_list) return array();
 		
 		rsort($dir_list);
 		
 		foreach ($dir_list as $file) {
-			if ( $ent->isEntry($curr_dir.PATH_DELIM.$file) ) {
+			if ( $ent->isEntry(Path::mk($curr_dir, $file)) ) {
 				$ent_list[] = $file;
 			}
 		}
@@ -375,21 +374,21 @@ class Blog extends LnBlogObject {
 	*/
 	function getYear($year=false) {
 		$ent = NewBlogEntry();
-		$curr_dir = getcwd();
+		$curr_dir = $this->fs->getcwd();
 		if ($year) {
-			$curr_dir = mkpath($this->home_path,BLOG_ENTRY_PATH,$year);
+			$curr_dir = Path::mk($this->home_path,BLOG_ENTRY_PATH,$year);
 		} elseif (sanitize(GET("year"), "/\D/")) {
-			$curr_dir = mkpath($this->home_path,BLOG_ENTRY_PATH,
+			$curr_dir = Path::mk($this->home_path,BLOG_ENTRY_PATH,
 			                   sanitize(GET("year"), "/\D/"));
 		}
 		$ent_list = array();
-		$dir_list = scan_directory($curr_dir, true);
+		$dir_list = $this->fs->scan_directory($curr_dir, true);
 		rsort($dir_list);
 		
 		if (! $dir_list) return array();
 		
 		foreach ($dir_list as $dir) {
-			$path = mkpath($curr_dir, $dir);
+			$path = Path::mk($curr_dir, $dir);
 			if (is_dir($path)) {
 				$ent_list = array_merge($ent_list, $this->getMonth($year, $dir));
 			}
@@ -409,7 +408,7 @@ class Blog extends LnBlogObject {
 	4-digit year and a permalink to the archive of that year respectively.
 	*/
 	function getYearList() {
-		$year_list = scan_directory($this->home_path.PATH_DELIM.BLOG_ENTRY_PATH, true);
+		$year_list = $this->fs->scan_directory(Path::mk($this->home_path, BLOG_ENTRY_PATH), true);
 		if ($year_list) rsort($year_list);
 		$ret = array();
 		foreach ($year_list as $yr) {
@@ -440,7 +439,7 @@ class Blog extends LnBlogObject {
 				$year = sanitize(GET("year"), "/\D/");
 			} else $year = basename(getcwd());
 		}
-		$month_list = scan_directory(mkpath($this->home_path, BLOG_ENTRY_PATH, $year), true);
+		$month_list = $this->fs->scan_directory(Path::mk($this->home_path, BLOG_ENTRY_PATH, $year), true);
 		rsort($month_list);
 		$ret = array();
 		foreach ($month_list as $mo) {
@@ -594,22 +593,22 @@ class Blog extends LnBlogObject {
 		$this->entrylist = array();
 		if ($number == 0) return;
 	
-		$ent_dir = $this->home_path.PATH_DELIM.BLOG_ENTRY_PATH;
+		$ent_dir = Path::mk($this->home_path, BLOG_ENTRY_PATH);
 		$num_scanned = 0;
 		$num_found = 0;
 		
-		$year_list = scan_directory($ent_dir, true);
+		$year_list = $this->fs->scan_directory($ent_dir, true);
 		rsort($year_list);
 
 		foreach ($year_list as $year) {
-			$month_list = scan_directory($ent_dir.PATH_DELIM.$year, true);
+			$month_list = $this->fs->scan_directory(Path::mk($ent_dir, $year), true);
 			rsort($month_list);
 			foreach ($month_list as $month) {
-				$path = $ent_dir.PATH_DELIM.$year.PATH_DELIM.$month;
-				$ents = scan_directory($path, true);
+				$path = Path::mk($ent_dir, $year, $month);
+				$ents = $this->fs->scan_directory($path, true);
 				rsort($ents);
 				foreach ($ents as $e) {
-					$ent_path = $path.PATH_DELIM.$e;
+					$ent_path = Path::mk($path, $e);
 					if ( $entry->isEntry($ent_path) ) {
 						if ($num_scanned >= $offset) {
 							$this->entrylist[] = NewBlogEntry($ent_path);
@@ -643,21 +642,21 @@ class Blog extends LnBlogObject {
 		$entry = NewBlogEntry();
 		$this->entrylist = array();
 	
-		$ent_dir = $this->home_path.PATH_DELIM.BLOG_ENTRY_PATH;
+		$ent_dir = Path::mk($this->home_path, BLOG_ENTRY_PATH);
 		$num_found = 0;
 		
-		$year_list = scan_directory($ent_dir, true);
+		$year_list = $this->fs->scan_directory($ent_dir, true);
 		rsort($year_list);
 
 		foreach ($year_list as $year) {
-			$month_list = scan_directory($ent_dir.PATH_DELIM.$year, true);
+			$month_list = $this->fs->scan_directory(Path::mk($ent_dir, $year), true);
 			rsort($month_list);
 			foreach ($month_list as $month) {
-				$path = $ent_dir.PATH_DELIM.$year.PATH_DELIM.$month;
-				$ents = scan_directory($path, true);
+				$path = Path::mk($ent_dir,$year, $month);
+				$ents = $this->fs->scan_directory($path, true);
 				rsort($ents);
 				foreach ($ents as $e) {
-					$ent_path = $path.PATH_DELIM.$e;
+					$ent_path = Path::mk($path, $e);
 					if ( $entry->isEntry($ent_path) ) {
 						$tmp = NewBlogEntry($ent_path);
 						$ent_tags = $tmp->tags();
@@ -695,19 +694,18 @@ class Blog extends LnBlogObject {
 		$auto_publish_checked = true;
 		
 		$art = NewBlogEntry();
-		$art_path = mkpath($this->home_path, BLOG_DRAFT_PATH);
+		$art_path = Path::mk($this->home_path, BLOG_DRAFT_PATH);
 		
-		$art_list = scan_directory($art_path);
+		$art_list = $this->fs->scan_directory($art_path);
 		$ret = array();
 		foreach ($art_list as $dir) {
-			$pub_path = mkpath($art_path, $dir, BlogEntry::AUTO_PUBLISH_FILE);
-			if (file_exists($pub_path) && $art->isEntry($ent_path = mkpath($art_path, $dir))) {
+			$pub_path = Path::mk($art_path, $dir, BlogEntry::AUTO_PUBLISH_FILE);
+			if ($this->fs->file_exists($pub_path) && $art->isEntry($ent_path = Path::mk($art_path, $dir))) {
 				$ent = NewEntry($ent_path);
                 if ($ent->shouldAutoPublish()) {
-                    $fs = NewFS();
-                    $generator = new WrapperGenerator($fs);
+                    $generator = new WrapperGenerator($this->fs);
                     $user = NewUser();
-                    $publisher = new Publisher($this, $user, $fs, $generator);
+                    $publisher = new Publisher($this, $user, $this->fs, $generator);
 
                     if ($ent->is_article) {
                         $publisher->publishArticle($ent);
@@ -728,13 +726,13 @@ class Blog extends LnBlogObject {
 	*/
 	function getDrafts() {
 		$art = NewBlogEntry();
-		$art_path = mkpath($this->home_path, BLOG_DRAFT_PATH);
+		$art_path = Path::mk($this->home_path, BLOG_DRAFT_PATH);
 		
-		$art_list = scan_directory($art_path);
+		$art_list = $this->fs->scan_directory($art_path);
 		$ret = array();
 		foreach ($art_list as $dir) {
-			if ($art->isEntry(mkpath($art_path,$dir)) ) {
-				$ret[] = NewEntry(mkpath($art_path,$dir));
+			if ($art->isEntry(Path::mk($art_path,$dir)) ) {
+				$ret[] = NewEntry(Path::mk($art_path,$dir));
 			}
 		}
 		usort($ret, array($this, '_sort_by_date'));
@@ -785,23 +783,23 @@ class Blog extends LnBlogObject {
 	*/
 	function getArticleList($number=false, $sticky_only=true) {
 		$art = NewEntry();
-		$art_path = $this->home_path.PATH_DELIM.BLOG_ARTICLE_PATH.PATH_DELIM;
+		$art_path = Path::mk($this->home_path, BLOG_ARTICLE_PATH);
 		$art_list = scan_directory($art_path);
 		if (!$art_list) $art_list = array();
 		$ret = array();
 		$count = 0;
 		foreach ($art_list as $dir) {
-			if ( ! $sticky_only && $art->checkArticlePath($art_path.$dir) ) {
-				$sticky_test = $art->readSticky($art_path.$dir);
+			if ( ! $sticky_only && $art->checkArticlePath(Path::mk($art_path, $dir)) ) {
+				$sticky_test = $art->readSticky(Path::mk($art_path, $dir));
 				if ($sticky_test) {
 					$ret[] = $sticky_test;
 				} else {
-					$a = NewEntry($art_path.$dir);
+					$a = NewEntry(Path::mk($art_path, $dir));
 					$ret[] = array("title"=>$a->subject, "link"=>$a->permalink());
 				}
 				$count++;
-			} elseif ($sticky_only && $art->isSticky($art_path.$dir) ) {
-				$ret[] = $art->readSticky($art_path.$dir);
+			} elseif ($sticky_only && $art->isSticky(Path::mk($art_path, $dir)) ) {
+				$ret[] = $art->readSticky(Path::mk($art_path, $dir));
 				$count++;
 			}
 			
@@ -917,6 +915,12 @@ class Blog extends LnBlogObject {
 		$ret = array_merge($ret, $this->getArticlePingbacks());
 		return $ret;
 	}
+
+    # Method: autoPingbackEnabled
+    # Determine if pingbacks are on by default.
+    public function autoPingbackEnabled() {
+        return $this->auto_pingback ? $this->auto_pingback != 'none' : false;
+    }
 	
 	/*
 	Method: exportVars
@@ -936,7 +940,7 @@ class Blog extends LnBlogObject {
 		$tpl->set("BLOG_URL_ROOTREL", $this->getURL(false));
 		$tpl->set("BLOG_ALLOW_ENC", $this->allow_enclosure);
 		$tpl->set("BLOG_GATHER_REPLIES", $this->gather_replies);
-		$tpl->set("BLOG_AUTO_PINGBACK", $this->auto_pingback);
+		$tpl->set("BLOG_AUTO_PINGBACK", $this->autoPingbackEnabled());
 		$tpl->set("BLOG_FRONT_PAGE_ABSTRACT", $this->front_page_abstract);
 	}
 
@@ -984,95 +988,96 @@ class Blog extends LnBlogObject {
 	*/
 	function upgradeWrappers () {
 		$this->raiseEvent("OnUpgrade");
-		$inst_path = getcwd();
+		$inst_path = $this->fs->getcwd();
 		$files = array();
 		# Upgrade the base blog directory first.  All other directories will
 		# get a copy of the config.php created here.
-		$ret = create_directory_wrappers($this->home_path, BLOG_BASE, $inst_path);
+        $wrappers = new WrapperGenerator($this->fs);
+		$ret = $wrappers->createDirectoryWrappers($this->home_path, BLOG_BASE, $inst_path);
 		if (! is_array($ret)) return false;
 		else $fiels = $ret;
 		
 		# Upgrade the articles.
-		$path = $this->home_path.PATH_DELIM.BLOG_ARTICLE_PATH;
-		$ret = create_directory_wrappers($path, BLOG_ARTICLES);
+		$path = Path::mk($this->home_path, BLOG_ARTICLE_PATH);
+		$ret = $wrappers->createDirectoryWrappers($path, BLOG_ARTICLES);
 		$files = array_merge($files, $ret);
 		
-		$dir_list = scan_directory($path, true);
+		$dir_list = $this->fs->scan_directory($path, true);
 		foreach ($dir_list as $art) {
-			$ent_path = mkpath($path, $art);
-			$cmt_path = mkpath($ent_path, ENTRY_COMMENT_DIR);
-			$tb_path = mkpath($ent_path, ENTRY_TRACKBACK_DIR);
-			$pb_path = mkpath($ent_path, ENTRY_PINGBACK_DIR);
-			$ret = create_directory_wrappers($ent_path, ARTICLE_BASE);
+			$ent_path = Path::mk($path, $art);
+			$cmt_path = Path::mk($ent_path, ENTRY_COMMENT_DIR);
+			$tb_path = Path::mk($ent_path, ENTRY_TRACKBACK_DIR);
+			$pb_path = Path::mk($ent_path, ENTRY_PINGBACK_DIR);
+			$ret = $wrappers->createDirectoryWrappers($ent_path, ARTICLE_BASE);
 			$files = array_merge($files, $ret);
-			$ret = create_directory_wrappers($cmt_path, ENTRY_COMMENTS, 'article');
+			$ret = $wrappers->createDirectoryWrappers($cmt_path, ENTRY_COMMENTS, 'article');
 			$files = array_merge($files, $ret);
-			$ret = create_directory_wrappers($tb_path, ENTRY_TRACKBACKS, 'article');
+			$ret = $wrappers->createDirectoryWrappers($tb_path, ENTRY_TRACKBACKS, 'article');
 			$files = array_merge($files, $ret);
-			$ret = create_directory_wrappers($pb_path, ENTRY_PINGBACKS, 'article');
+			$ret = $wrappers->createDirectoryWrappers($pb_path, ENTRY_PINGBACKS, 'article');
 			$files = array_merge($files, $ret);
 		}
 		
 		$path = mkpath($this->home_path, BLOG_ENTRY_PATH);
-		$ret = create_directory_wrappers($path, BLOG_ENTRIES);
+		$ret = $wrappers->createDirectoryWrappers($path, BLOG_ENTRIES);
 		$files = array_merge($files, $ret);
-		$dir_list = scan_directory($path, true);
+		$dir_list = $this->fs->scan_directory($path, true);
 		foreach ($dir_list as $yr) {
-			$year_path = $path.PATH_DELIM.$yr;
-			$ret = create_directory_wrappers($year_path, YEAR_ENTRIES);
+			$year_path = Path::mk($path, $yr);
+			$ret = $wrappers->createDirectoryWrappers($year_path, YEAR_ENTRIES);
 			$files = array_merge($files, $ret);
-			$year_list = scan_directory($year_path, true);
+			$year_list = $this->fs->scan_directory($year_path, true);
 			foreach ($year_list as $mn) {
 				$month_path = $year_path.PATH_DELIM.$mn;
-				$ret = create_directory_wrappers($month_path, MONTH_ENTRIES);
+				$ret = $wrappers->createDirectoryWrappers($month_path, MONTH_ENTRIES);
 				$files = array_merge($files, $ret);
-				$month_list = scan_directory($month_path, true);
+				$month_list = $this->fs->scan_directory($month_path, true);
 				foreach ($month_list as $ent) {
-					$ent_path = mkpath($month_path, $ent);
-					$cmt_path = mkpath($ent_path, ENTRY_COMMENT_DIR);
-					$tb_path = mkpath($ent_path, ENTRY_TRACKBACK_DIR);
-					$pb_path = mkpath($ent_path, ENTRY_PINGBACK_DIR);
-					$ret = create_directory_wrappers($ent_path, ENTRY_BASE);
+					$ent_path = Path::mk($month_path, $ent);
+					$cmt_path = Path::mk($ent_path, ENTRY_COMMENT_DIR);
+					$tb_path = Path::mk($ent_path, ENTRY_TRACKBACK_DIR);
+					$pb_path = Path::mk($ent_path, ENTRY_PINGBACK_DIR);
+					$ret = $wrappers->createDirectoryWrappers($ent_path, ENTRY_BASE);
 					$files = array_merge($files, $ret);
-					$ret = create_directory_wrappers($cmt_path, ENTRY_COMMENTS);
+					$ret = $wrappers->createDirectoryWrappers($cmt_path, ENTRY_COMMENTS);
 					$files = array_merge($files, $ret);
-					$ret = create_directory_wrappers($tb_path, ENTRY_TRACKBACKS);
+					$ret = $wrappers->createDirectoryWrappers($tb_path, ENTRY_TRACKBACKS);
 					$files = array_merge($files, $ret);
-					$ret = create_directory_wrappers($pb_path, ENTRY_PINGBACKS);
+					$ret = $wrappers->createDirectoryWrappers($pb_path, ENTRY_PINGBACKS);
 					$files = array_merge($files, $ret);
 					
 					# Update the "pretty permalink" wrapper scripts
 					$ppl_files = glob(Path::mk($month_path, '*.php'));
 					foreach ($ppl_files as $ppl) {
-						$content = file_get_contents($ppl);
+						$content = $this->fs->read_file($ppl);
 						$matches = array();
 						if (preg_match("/chdir\('([\d_]+)'\)/", $content, $matches)) {
 							$content = '<?php $path = dirname(__FILE__).DIRECTORY_SEPARATOR."'.
 								$matches[1].'".DIRECTORY_SEPARATOR; chdir($path); include "$path/index.php";';
-							write_file($ppl, $content);
+							$this->fs->write_file($ppl, $content);
 						}
 					}
 				}
 			}
 		}
-		$path = $this->home_path.PATH_DELIM.BLOG_ARTICLE_PATH;
-		$ret = create_directory_wrappers($path, BLOG_ARTICLES);
-		$path = $this->home_path.PATH_DELIM.BLOG_DRAFT_PATH;
-		$ret = create_directory_wrappers($path, ENTRY_DRAFTS);
+		$path = Path::mk($this->home_path, BLOG_ARTICLE_PATH);
+		$ret = $wrappers->createDirectoryWrappers($path, BLOG_ARTICLES);
+		$path = Path::mk($this->home_path, BLOG_DRAFT_PATH);
+		$ret = $wrappers->createDirectoryWrappers($path, ENTRY_DRAFTS);
 		$files = array_merge($files, $ret);
-		$dir_list = scan_directory($path, true);
+		$dir_list = $this->fs->scan_directory($path, true);
 		foreach ($dir_list as $ar) {
 			$ar_path = $path.PATH_DELIM.$ar;
 			$cmt_path = $ar_path.PATH_DELIM.ENTRY_COMMENT_DIR;
-			$ret = create_directory_wrappers($ar_path, ARTICLE_BASE);
+			$ret = $wrappers->createDirectoryWrappers($ar_path, ARTICLE_BASE);
 			$files = array_merge($files, $ret);
-			$ret = create_directory_wrappers($cmt_path, ENTRY_COMMENTS);
+			$ret = $wrappers->createDirectoryWrappers($cmt_path, ENTRY_COMMENTS);
 			$files = array_merge($files, $ret);
 		}
 		$this->sw_version = PACKAGE_VERSION;
 		$this->last_upgrade = date('r');
 		$ret = $this->writeBlogData();
-		if (! $ret) $files[] = $this->home_path.PATH_DELIM.BLOG_CONFIG_PATH;
+		if (! $ret) $files[] = Path::mk($this->home_path, BLOG_CONFIG_PATH);
 		$this->raiseEvent("UpgradeComplete");
 		return $files;
 	}
@@ -1087,16 +1092,13 @@ class Blog extends LnBlogObject {
 	#
 	# Returns:
 	# True on success, false otherwise.
-
 	function fixDirectoryPermissions($start_dir=false) {
-		$fs = NewFS();
 		if (! $start_dir) $start_dir = $this->home_path;
-		$dir_list = scan_directory($start_dir, true);
+		$dir_list = $this->fs->scan_directory($start_dir, true);
 		$ret = true;
 		foreach ($dir_list as $dir) {
-			#$ext = substr($dir, strlen($dir) - 4);
-			$path = $start_dir.PATH_DELIM.$dir;
-			$ret = $ret && $fs->chmod($path, $fs->directoryMode() );
+			$path = Path::mk($start_dir, $dir);
+			$ret = $ret && $this->fs->chmod($path, $this->fs->directoryMode() );
 			$ret = $ret && $this->fixDirectoryPermissions($path);
 		}
 		return $ret;
@@ -1110,11 +1112,9 @@ class Blog extends LnBlogObject {
 	# 
 	# Returns:
 	# True on success, false otherwise.
-
 	function insert ($path=false) {
 		
 		$this->raiseEvent("OnInsert");
-		$fs = NewFS();
 
 		$this->name = htmlentities($this->name);
 		$this->description = htmlentities($this->description);
@@ -1122,7 +1122,7 @@ class Blog extends LnBlogObject {
 		$p = new Path($path ? $path : $this->home_path);
 		$this->home_path = $p->getCanonical();
 
-		$ret = $this->createBlogDirectories($fs, INSTALL_ROOT);
+		$ret = $this->createBlogDirectories($this->fs, INSTALL_ROOT);
 		
 		$this->setBlogID();
 		
@@ -1141,7 +1141,8 @@ class Blog extends LnBlogObject {
 
 		$ret = $this->createNonExistentDirectory($fs, $this->home_path);
 		if ($ret) {
-			$result = create_directory_wrappers($this->home_path, BLOG_BASE, $inst_path);
+            $wrappers = new WrapperGenerator($fs);
+			$result = $wrappers->createDirectoryWrappers($this->home_path, BLOG_BASE, $inst_path);
 			# Returns an array of errors, so convert empty array to true.
 			$ret = $ret && empty($result);
 		}
@@ -1150,7 +1151,7 @@ class Blog extends LnBlogObject {
 		$ret = $ret && $this->createNonExistentDirectory($fs, $p);
 
 		if ($ret) {
-			$result = create_directory_wrappers($p, BLOG_ENTRIES);
+			$result = $wrappers->createDirectoryWrappers($p, BLOG_ENTRIES);
 			$ret = $ret && empty($result);
 		}
 		$ret = $ret && $this->createNonExistentDirectory($fs, 
@@ -1203,17 +1204,16 @@ class Blog extends LnBlogObject {
 			$keep_history = KEEP_EDIT_HISTORY;
 		}
 		$this->raiseEvent("OnDelete");
-		$fs = NewFS();
 		if ($keep_history) {
 			$p = Path::get($this->home_path, BLOG_DELETED_PATH);
 			if (! is_dir($p)) {
-				$fs->mkdir_rec($p->get());
+				$this->fs->mkdir_rec($p->get());
 			}
 			$p = Path::get($this->home_path, BLOG_DELETED_PATH,
 			         BLOG_CONFIG_PATH."-".date(ENTRY_PATH_FORMAT_LONG));
-			$ret = $fs->rename(Path::get($this->home_path, BLOG_CONFIG_PATH), $p);
+			$ret = $this->fs->rename(Path::get($this->home_path, BLOG_CONFIG_PATH), $p);
 		} else {
-			$ret = $fs->rmdir_rec($this->home_path);
+			$ret = $this->fs->rmdir_rec($this->home_path);
 		}
 		$this->raiseEvent("DeleteComplete");
 		return $ret;

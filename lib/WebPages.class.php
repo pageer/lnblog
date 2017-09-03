@@ -486,7 +486,7 @@ class WebPages extends BasePages {
         if ($res['errors']) {
             $tpl->set("HAS_UPDATE_ERROR");
             $tpl->set("UPDATE_ERROR_MESSAGE", $res['errors'] . (isset($res['warnings']) ? $res['warnings'] : ''));
-            entry_set_template($tpl, $ent);
+            $this->entry_set_template($tpl, $ent);
         } elseif ($res['warnings']) {
             $refresh_delay = 10;
             $error = $res['warnings'] . "<p>" .
@@ -512,7 +512,7 @@ class WebPages extends BasePages {
             $is_art = !empty($_POST['publisharticle']) || GET('type') == 'article';
             $this->user->exportVars($tpl);
             $this->blog->raiseEvent($is_art? "OnArticlePreview" : "OnEntryPreview");
-            entry_set_template($tpl, $ent);
+            $this->entry_set_template($tpl, $ent);
 
             if (GET('ajax')) {
                 $response = array(
@@ -601,10 +601,12 @@ class WebPages extends BasePages {
 		$tpl = NewTemplate(ENTRY_EDIT_TEMPLATE);
 		$tpl->set('PUBLISHED', false);
 
+		$this->entry_set_template($tpl, $entry);
+
 		if ($entry->isEntry()) {
-			entry_set_template($tpl, $entry);
 			$tpl->set('PUBLISHED', $entry->isPublished());
 		    $tpl->set('ARTICLE', $entry->isArticle());
+            $tpl->set('SEND_PINGBACKS', $entry->send_pingback);
 		} else if ($is_article) {
 		    $tpl->set('ARTICLE', true);
 			$tpl->set("GET_SHORT_PATH");
@@ -612,9 +614,14 @@ class WebPages extends BasePages {
 			$tpl->set("TRACKBACKS", false);
 			$tpl->set("PINGBACKS", false);
 			$tpl->set("HAS_HTML", $blog->default_markup);
+            $send_pingbacks = $this->isEntry() ?
+                $this->send_pingback :
+                $blog->autoPingbackEnabled();
+            $tpl->set('SEND_PINGBACKS', $send_pingback);
 		} else {
 		    $tpl->set('ARTICLE', true);
 			$tpl->set("HAS_HTML", $blog->default_markup);
+            $tpl->set('SEND_PINGBACKS', $blog->autoPingbackEnabled());
 		}
 
 		$auto_publish = POST('autopublishdate') ?: ($entry ? $entry->getAutoPublishDate() : '');
@@ -629,6 +636,30 @@ class WebPages extends BasePages {
 
 		return $tpl;
 	}
+
+    # Function: entry_set_template
+    # Sets variables in an entry template for display.
+    #
+    # Parameters:
+    # tpl - The template to populate.
+    # ent - the BlogEntry or Article with which to populate the template.
+    private function entry_set_template($tpl, $ent) {
+        $tpl->set("URL", $ent->article_path);
+        $tpl->set("PUBLISHARTICLE", $ent->is_article);
+        $tpl->set("SUBJECT", htmlspecialchars($ent->subject));
+        $tpl->set("TAGS", htmlspecialchars($ent->tags));
+        $tpl->set("DATA", htmlspecialchars($ent->data));
+        $tpl->set("ENCLOSURE", $ent->enclosure);
+        $tpl->set("HAS_HTML", $ent->has_html);
+        $tpl->set("COMMENTS", $ent->allow_comment);
+        $tpl->set("TRACKBACKS", $ent->allow_tb);
+        $tpl->set("PINGBACKS", $ent->allow_pingback);
+        if ($ent->isArticle()) {
+            $tpl->set("STICKY", $ent->isSticky());
+        } else {
+            $tpl->set("STICKY", $ent->is_sticky ? true : false);
+        }
+    }
 
 	# Function: handle_uploads
 	# Handles uploads that are sent when an entry is edited.  It checks the file
