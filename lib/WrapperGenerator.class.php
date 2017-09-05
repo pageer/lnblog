@@ -1,7 +1,6 @@
 <?php
-/**
- * Encapsulates the legacy functions for generating directory wrappers.
- */
+# Class: WrapperGenerator
+# Encapsulates the legacy functions for generating directory wrappers.
 class WrapperGenerator {
 
     private $fs;
@@ -10,9 +9,21 @@ class WrapperGenerator {
         $this->fs = $fs;
     }
 
-    /**
-     * Legacy function to create/remove directory wrapper scripts.
-     */
+    # Method: createDirectoryWrappers
+    # Create the required wrapper scripts for a directory.  Note that
+    # the instpath parameter is for the software installation path 
+    # and is only required for the BLOG_BASE type, as it is used 
+    # to create the config.php file.
+    # As of version 0.7.4, this function returns an array of paths for
+    # which the file operation returned an error code.
+    #
+    # Parameters:
+    # path     - The path at which we're creating wrappers.
+    # type     - The type of wrappers to create.
+    # instpath - The LnBlog install path, only required for type of BLOG_BASE
+    #
+    # Returns:
+    # List of paths for which there was an error.
     public function createDirectoryWrappers($path, $type, $instpath = "") {
         $blog_templ_dir = "BLOG_ROOT.'".PATH_DELIM.BLOG_TEMPLATE_DIR."'";
     	$sys_templ_dir = "INSTALL_ROOT.'".PATH_DELIM.BLOG_TEMPLATE_DIR."'";
@@ -128,6 +139,11 @@ class WrapperGenerator {
     	return $ret_list;
     }
 
+    # Method: removeForEntry
+    # Removes directory wrappers for a given entry
+    #
+    # Parameters:
+    # entry - The BlogEntry for which to remove the wrappers.
     public function removeForEntry(BlogEntry $entry) {
     	$removeList = array("index", "edit", "delete", "trackback", "uploadfile");
         foreach ($removeList as $item) {

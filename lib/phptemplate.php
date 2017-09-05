@@ -37,7 +37,8 @@ class PHPTemplate extends LnBlogObject {
 	protected $vars;   # An array of variables to register in the template.
 	protected $search_paths = array();  # The paths on which to search for templates.
 	
-	/** Whether HTML helpers should output their data in addition to returning it. */
+    # Property: helper_output
+    # Whether HTML helpers should output their data in addition to returning it. */
 	public $helper_output = true;
 	
 	public static $template_paths = array();
@@ -47,12 +48,15 @@ class PHPTemplate extends LnBlogObject {
 		$this->vars = array();
 	}
 
-	/**
-	 * Get a template var as a string.
-	 *
-	 * @param string $var The variable name
-	 * @param mixed $escape Whether/how to escape the data.
-	 * @return mixed The var value, or empty string if it is not set.
+	/* Method: get
+	   Get a template var as a string.
+	  
+       Parameter:
+	   var - (string) The variable name
+	   escape - (boolean) Whether/how to escape the data.
+
+       Returns
+	   The var value, or empty string if it is not set.
 	 */
 	public function get($var, $escape = false) {
 		$ret = '';
@@ -65,54 +69,59 @@ class PHPTemplate extends LnBlogObject {
 		return $ret;
 	}
 	
-	/**
-	 * Same as get(), but echoes rather than return.
-	 */
+	# Method: raw
+	# Same as get(), but echoes rather than return.
 	public function raw($var, $escape = false) {
 		echo $this->get($var, $escape);
 	}
 	
-	/**
-	 * Same as get(), but echos rather than return and escapes HTML by default.
-	 */
+    # Method: put
+	# Same as get(), but echos rather than return and escapes HTML by default.
 	public function put($var, $escape = self::ESC_HTML) {
 		echo $this->get($var, $escape);
 	}
 	
-	/**
-	 * Sets a template variable.
-	 *
-	 * @param string $var  The name of the variable.
-	 * @param mixed $val Optional value for the variable.  Defaults to true.
-	 * @return mixed The value passed or true.
+	/* Method: set
+	   Sets a template variable.
+	  
+       Parameters:
+	   var - (string) The name of the variable.
+	   val - (mixed) Optional value for the variable.  Defaults to true.
+
+       Returns:
+	   The value passed or true.
 	 */
 	public function set($var, $val=true) {
 		return $this->vars[$var] = $val;
 	}
 	
-	/**
-	 * Unsets a previously set template variable.
-	 * 
-	 * @param string $var  The name of the variable to unset.
+	/* Method: unsetVar
+	   Unsets a previously set template variable.
+	   
+	   var - (string) The name of the variable to unset.
 	 */
 	public function unsetVar($var) {
 		unset($this->vars[$var]);
 	}
 
-	/**
-	 * Determine if a template variable has been set.
-	 * 
-	 * @param string $var  The name of a template variable.
-	 * @return boolean True if var has been set, false otherwise.
+	/* Method: varSet
+	   Determine if a template variable has been set.
+	   
+       Parameter:
+	   var - (string) The name of a template variable.
+       
+       Returns:
+	   True if var has been set, false otherwise.
 	 */
 	public function varSet($var) {
 		return isset($this->vars[$var]);
 	}
 
-	/**
-	 * Resets a template back to its empty state, clearing all variables and the file.
-	 *
-	 * @param string $file  An optional file name for the reset template.
+	/* Method: reset
+	   Resets a template back to its empty state, clearing all variables and the file.
+	  
+       Parameters:
+	   file - (string) An optional file name for the reset template.
 	 */
 	public function reset($file="") {
 		$this->file = $file;
@@ -176,13 +185,14 @@ class PHPTemplate extends LnBlogObject {
 		return file_exists(Path::mk($path, $file));
 	}
 	
-	/**
-	 * Process the template and get the output.
-	 *
-	 * @param boolean $return_results Determines whether the output should be returned
-	 *                                in a string instead of sent straight to the client.
-	 *                                Default is true.
-	 * @return string The output if return_results is true.  Otherwise, true on success and false on failure.
+	/* Method: process
+	   Process the template and get the output.
+	  
+       Parameters:
+	   return_results - (boolean) Determines whether the output should be returned
+	                    in a string instead of sent straight to the client.  Default is true.
+       Returns:
+	   The output string if return_results is true.  Otherwise, true on success and false on failure.
 	 */
 	public function process($return_results=true) {
 		ob_start();

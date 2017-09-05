@@ -1,7 +1,7 @@
 <?php
-/**
- * Handles publication of blog entries, including updates and deletions.
- */
+
+# Class: Publisher
+# Handles publication of blog entries, including updates and deletions.
 class Publisher {
 
     private $fs;
@@ -18,6 +18,15 @@ class Publisher {
         $this->wrappers = $wrappers;
     }
 
+    /* Method: keepEditHistory
+       Set or get whether publication should retain edit history.
+
+       Parameters:
+       val - Boolean for whether to turn on edit history or null for fetch.
+       
+       Returns:
+       True if edit history is on, false otherwise.
+    */
     public function keepEditHistory($val = null) {
         if ($val !== null) {
             $this->keepHistory = $val;
@@ -25,14 +34,18 @@ class Publisher {
         return $this->keepHistory;
     }
 
-    /**
-     * Publish the entry as a normal blog entry.
-     *
-     * Puts the entry inside the normal list of blog entries.
-     * Throws on failure or if the entry is already published.
-     * @param   BlogEntry   $entry
-     * @param   DateTime    $time
-     * @throw   Exception|EntryRenameFailed
+    /* Method publishEntry
+       Publish the entry as a normal blog entry.
+      
+       Puts the entry inside the normal list of blog entries.
+       Throws on failure or if the entry is already published.
+
+       Paremeters:
+       entry - (BlogEntry) The entry to publish
+       time  - (DateTime) Optional publication time, default is now.
+
+       Throws:
+       Exception or EntryRenameFailed when rename fails.
      */
     public function publishEntry(BlogEntry $entry, DateTime $time = null) {
         $time = $time ?: new DateTime();
@@ -72,13 +85,18 @@ class Publisher {
     }
 
 
-    /**
-     * Publish the entry as an article.
-     *
-     * Same as publishEntry(), but publishes the entry as an article outside 
-     * of the normal blog listing structure.  Throws on failure.
-     * @param   BlogEntry   $entry
-     * @throw   Exception|EntryRenameFailed
+    /* Method: publishArticle
+       Publish the entry as an article.
+      
+       Same as publishEntry(), but publishes the entry as an article outside 
+       of the normal blog listing structure.  Throws on failure.
+
+       Parameters:
+       entry - (BlogEntry) The entry to publish
+       time  - (DateTime) Optional publication time, default is now.
+
+       Throws:
+       Exception or EntryRenameFailed
      */
     public function publishArticle(BlogEntry $entry, DateTime $time = null) {
 
@@ -118,13 +136,17 @@ class Publisher {
 		$this->raiseEvent($entry, "Article", "InsertComplete");
     }
 
-    /**
-     * Unpublish the entry.
-     *
-     * Moves the entry from a published blog entry or article to an unpublished 
-     * draft entry.  Throws on failure or if the entry is not published.
-     * @param   BlogEntry   $entry
-     * @throw   Exception|EntryRenameFailed
+    /* Method: unpublish
+       Unpublish the entry.
+      
+       Moves the entry from a published blog entry or article to an unpublished 
+       draft entry.  Throws on failure or if the entry is not published.
+
+       Parameters:
+       entry - (BlogEntry) The entry to unpublish
+
+       Throws:
+       Exception or EntryRenameFailed
      */
     public function unpublish(BlogEntry $entry) {
         if (! $entry->isEntry()) {
@@ -146,14 +168,18 @@ class Publisher {
         $this->raiseEvent($entry, 'BlogEntry', 'DeleteComplete');
     }
 
-    /**
-     * Save the entry as a new draft.
-     *
-     * Saves a new entry in the drafts folder.  Throws on failure or
-     * if the entry already exists.
-     * @param   BlogEntry       $entry
-     * @param   DateTime|null   $time   (Optionl) creation time
-     * @throw   CouldNotCreateDirectory|EntryAlreadyExists|EntryWriteFailed
+    /* Method: createDraft
+       Save the entry as a new draft.
+      
+       Saves a new entry in the drafts folder.  Throws on failure or
+       if the entry already exists.
+       
+       Parameters:
+       entry - (BlogEntry) The entry to persist as a draft.
+       time  - (DateTime) Optional creation time
+
+       Throws:
+       CouldNotCreateDirectory or EntryAlreadyExists or EntryWriteFailed
      */
     public function createDraft(BlogEntry $entry, DateTime $time = null) {
         $time = $time ?: new DateTime();
@@ -187,14 +213,18 @@ class Publisher {
         }
     }
 
-    /**
-     * Update an existing entry on disk.
-     *
-     * Writes out the state of the entry without changing its publication status.
-     * Throws if the update fails or the entry does not already exist.
-     * @param   BlogEntry   $entry
-     * @param   DateTime    $time
-     * @throws   EntryDoesNotExist|EntryWriteFailed|EntryRenameFailed
+    /* Method: update
+       Update an existing entry on disk.
+      
+       Writes out the state of the entry without changing its publication status.
+       Throws if the update fails or the entry does not already exist.
+
+       Parameters:
+       entry - (BlogEntry) The entry to update.
+       time  - (DateTime) The optional time when the entry is updated.
+       
+       Throws:
+       EntryDoesNotExist or EntryWriteFailed or EntryRenameFailed
      */
     public function update(BlogEntry $entry, DateTime $time = null) {
         $time = $time ?: new DateTime();
@@ -229,14 +259,18 @@ class Publisher {
         }
     }
 
-    /**
-     * Completely delete an entry.
-     *
-     * Applies to both published and draft entries.  Throws on failure of if 
-     * the entry has not been saved.
-     * @param   BlogEntry   $entry
-     * @param   DateTime    $time
-     * @throw   EntryDoesNotExist|EntryDeleteFailed
+    /* Method: delete
+       Completely delete an entry.
+      
+       Applies to both published and draft entries.  Throws on failure of if 
+       the entry has not been saved.
+
+       Parameters:
+       entry - (BlogEntry) The entry to delete.
+       time  - (DateTime) The optional deletion time, used for history.
+
+       Throws:
+       EntryDoesNotExist or EntryDeleteFailed
      */
     public function delete(BlogEntry $entry, DateTime $time = null) {
         if (!$entry->isEntry()) {
@@ -258,14 +292,18 @@ class Publisher {
         }
     }
 
-    /**
-     * Add or update file attachments for the entry.
-     *
-     * Adds files attachments to the entry.  Any filenames that already exist
-     * will be overwritten.  Throws if one or more fails or entry is not saved.
-     * @param   BlogEntry   $entry
-     * @param   array       $files_data The PHP $_FILES array of attachments.
-     * @throw   Exception
+    /* Method: addAttachments
+       Add or update file attachments for the entry.
+      
+       Adds files attachments to the entry.  Any filenames that already exist
+       will be overwritten.  Throws if one or more fails or entry is not saved.
+
+       Parameters:
+       entry      - (BlogEntry) The entry to which to add the attachment.
+       files_data - (array) The PHP $_FILES array of attachments.
+
+       Throws:
+       Exception
      */
     public function addAttachments(BlogEntry $entry, array $files) {
 

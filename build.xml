@@ -12,9 +12,17 @@
 		<echo msg="Creating documentation folder." />
 		<mkdir dir="./build/documentation" />
 		
-		<echo msg="Building NaturalDocs documentation..." />
+		<echo msg="Building NaturalDocs 1.52 documentation..." />
 		<exec command="naturaldocs -i . -o HTML build/documentation -p doc_project -ro
 		               -xi vendor -xi build -xi themes -i themes/default" dir="." />
+	</target>
+	<target name="docs" depends="prepare">
+		
+		<echo msg="Creating documentation folder." />
+		<mkdir dir="./build/documentation" />
+		
+		<echo msg="Building NaturalDocs 2.x documentation..." />
+		<exec command="naturaldocs doc_project" dir="." />
 	</target>
 	
     <target name="build" depends="prepare">
