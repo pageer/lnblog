@@ -3,7 +3,9 @@ syntax: glob
 vendor
 build
 doc_project/Data
+doc_project/Working Data
 doc_project/*_Backup.txt
+userdata/*/
 .komodotools
 design
 tags

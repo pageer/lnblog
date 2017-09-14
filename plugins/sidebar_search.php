@@ -28,9 +28,9 @@
 # be "good enough".  However, if you start getting lots of traffic, you'll probably
 # want to switch to Google or Bing.
 
-$do_output = (isset($_GET["show"]) && $_GET["show"] == "sb_search_results");
+$do_page_output = (isset($_GET["show"]) && $_GET["show"] == "sb_search_results");
 	
-# Add this really massive if statements to that we don't end up declaring the 
+# Add this really massive if statements so that we don't end up declaring the 
 # same class twice, i.e. if the page is called directly, this class will be defined 
 # when it first loads and then again when the plugins are loaded.
 if (! class_exists("SidebarSearch")):  # Start massive if statement
@@ -213,19 +213,21 @@ class SidebarSearch extends Plugin {
 
 		$body = $tpl->process();
 
-		Page::instance()->title = spf_("Search results - ", $blog->name);
+		Page::instance()->title = spf_("Search results -  %s", $blog->name);
 		Page::instance()->display($body, $blog);
 	}
 
 }
 
+else:
+
+    if ($do_page_output) {
+        $sbsearch = new SidebarSearch();
+        $sbsearch->show_page();
+    }
+
 endif; # End massive if statement
 
-$sbsearch = new SidebarSearch();
-if ($do_output) {
-	$sbsearch->show_page();
-} else {
-	if (! PluginManager::instance()->plugin_config->value('sidebarsearch', 'creator_output', 0)) {
-		$sb = new SidebarSearch();
-	}
+if (! PluginManager::instance()->plugin_config->value('sidebarsearch', 'creator_output', 0)) {
+    $sb = new SidebarSearch();
 }

@@ -614,10 +614,10 @@ class WebPages extends BasePages {
 			$tpl->set("TRACKBACKS", false);
 			$tpl->set("PINGBACKS", false);
 			$tpl->set("HAS_HTML", $blog->default_markup);
-            $send_pingbacks = $this->isEntry() ?
+            $send_pingbacks = $entry->isEntry() ?
                 $this->send_pingback :
                 $blog->autoPingbackEnabled();
-            $tpl->set('SEND_PINGBACKS', $send_pingback);
+            $tpl->set('SEND_PINGBACKS', $send_pingbacks);
 		} else {
 		    $tpl->set('ARTICLE', true);
 			$tpl->set("HAS_HTML", $blog->default_markup);

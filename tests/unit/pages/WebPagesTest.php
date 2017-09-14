@@ -6,6 +6,7 @@ class WebPagesTest extends \PHPUnit_Framework_TestCase {
 
     public function testEditEntry_WhenEmptyPostAndNotLoggedIn_Shows403Error() {
         $this->entry->isEntry()->willReturn(false);
+        $this->entry->isArticle()->willReturn(false);
         $this->entry->getAutoPublishDate()->willReturn('');
         $this->entry->raiseEvent(Argument::any())->willReturn(null);
         $this->page->setDisplayObject(Argument::any())->willReturn(null);
