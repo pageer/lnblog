@@ -11,7 +11,7 @@ class HttpClient {
 			curl_setopt($hnd, CURLOPT_HEADER, 1);
 			if ($headers) curl_setopt($hnd, CURLOPT_NOBODY, 1);
 			$response = curl_exec($hnd);
-			
+
 		} else {
 
 			$url_bits = parse_url($url);
@@ -93,10 +93,10 @@ class HttpClient {
     }
 
     public function sendXmlRpcMessage($host, $path, $port, $msg) {
-        $client = new xmlrpc_client($host, $path, $port);
+        $client = new xmlrpc_client($path, $host, $port);
         if (defined("XMLRPC_SEND_PING_DEBUG")) {
             $client->setDebug(1);
         }
-        $client->send($msg);
+        return $client->send($msg);
     }
 }

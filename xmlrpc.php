@@ -420,15 +420,7 @@ function blogger_deletePost($params) {
 
 function blogger_getUsersBlogs($params) {
 	global $xmlrpcerruser;
-/*
-ob_start();
-var_dump($params);
-$data = ob_get_contents();
-ob_end_clean();
-$h = fopen(dirname(__FILE__)."\\getuserblogs.txt", "w+");
-fwrite($h, $data);
-fclose($h);
-*/
+
 	$appkey = $params->getParam(0);  # We ignore the appkey.
 	$username = $params->getParam(1);
 	$password = $params->getParam(2);

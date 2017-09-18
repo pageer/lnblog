@@ -46,14 +46,11 @@ class Pingback extends Trackback {
 	public $file = '';
     public $exclude_fields = array('fs');
 
-    private $fs;
-    private $http_client;
-	
 	public function __construct($path=false, $fs = null, $http_client = null) {
-		$this->raiseEvent("OnInit");
-		
         $this->fs = $fs ?: NewFS();
         $this->http_client = $http_client ?: new HttpClient();
+
+		$this->raiseEvent("OnInit");
 
 		$this->file = $path;
 		if ($this->file) {

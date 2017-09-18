@@ -43,25 +43,25 @@ class Trackback extends LnBlogObject {
 
 	# The only required element is the URL
 
-	var $title;
-	var $blog;
-	var $data;
-	var $url;
-	var $ping_date;
-	var $ip;
-	var $file;
+	public $title;
+	public $blog;
+	public $data;
+	public $url;
+	public $ping_date;
+	public $ip;
+	public $file;
 
     public $exclude_fields = array('fs');
 
-    private $fs;
-    private $http_client;
+    protected $fs;
+    protected $http_client;
 
 	public function __construct($path=false, $fs = null, $http_client = null) {
-		$this->raiseEvent("OnInit");
-
         $this->fs = $fs ?: NewFS();
         $this->http_client = $http_client ?: new HttpClient();
 		
+		$this->raiseEvent("OnInit");
+
 		$this->title = '';
 		$this->blog = '';
 		$this->data = '';
@@ -325,7 +325,6 @@ class Trackback extends LnBlogObject {
 	# True on success, false on failure.
 
 	function writeFileData($path) {
-		
 		if (! $this->fs->is_dir( dirname($path) ) ) {
 			$this->fs->mkdir_rec(dirname($path));
 		}

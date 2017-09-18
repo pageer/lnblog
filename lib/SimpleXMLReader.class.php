@@ -127,10 +127,10 @@ class SimpleXMLReader {
 		if (! isset($this->domtree['children'])) return;
 		foreach ($this->domtree['children'] as $child) {
 			if ( isset($child['children']) ) {
-				$obj->$child['tag'] = $this->make_array($child['children']);
+				@$obj->$child['tag'] = $this->make_array($child['children']);
 			} elseif ( isset($child['attributes']['TYPE']) && 
 			           $child['attributes']['TYPE'] == 'array' ) {
-				$obj->$child['tag'] = array();
+				@$obj->$child['tag'] = array();
 			} else {
 				SimpleXMLReader::setVal($obj, $child);
 			}

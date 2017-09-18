@@ -87,16 +87,20 @@ if ($COMMENT_RSS_ENABLED) {
 <?php } /* End local pingback block */ 
 
 if ( ! empty($TRACKBACKS) ) { ?>
-<h3><?php p_("TrackBacks");?> 
+<h3><?php p_("TrackBacks");?></h3>
+<?php if (isset($SHOW_TRACKBACK_LINK)): ?>
 <a href="<?php echo $SHOW_TRACKBACK_LINK; ?>" title="<?php p_("TrackBack page");?>">#</a></h3>
+<?php endif; ?>
 <ul>
 <?php foreach ($TRACKBACKS as $p) { echo $p->get($SHOW_CONTROLS); } ?>
 </ul>
 <?php } /* End TrackBack block */
 
 if ( ! empty($PINGBACKS) ) { ?>
-<h3><?php p_("Pingbacks");?> 
+<h3><?php p_("Pingbacks");?></h3>
+<?php if (isset($SHOW_PINGBACK_LINK)): ?>
 <a href="<?php echo $SHOW_PINGBACK_LINK; ?>" title="<?php p_("PingBack page");?>">#</a></h3>
+<?php endif; ?>
 <ul>
 <?php foreach ($PINGBACKS as $p) { echo $p->get($SHOW_CONTROLS); } ?>
 </ul>
