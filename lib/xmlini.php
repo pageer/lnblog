@@ -11,9 +11,14 @@ class LnBlogXMLConfig extends LnBlogObject { }
 # data value limit, among other things.
 class XMLINI {
 
-	function XMLINI($file=false) {
-		if ( $file ) $this->filename = $file;
-		if ( file_exists($this->filename) ) {
+    private $fs;
+    private $filename;
+
+	public function __construct($file=false, $fs = null) {
+        $this->fs = $fs ?: NewFS();
+        $this->filename = $file;
+
+		if ($file && $this->fs->file_exists($this->filename)) {
 			$this->readFile();
 		} else {
 			$this->data = new LnBlogXMLConfig();
@@ -25,8 +30,8 @@ class XMLINI {
 	# member for each tag, with the children as the array elements.
 	# Basically, it mirrors the section/key/value structure of an INI file.
 	function readFile() {
-		$fs = NewFS();
-		$file = new SimpleXMLReader($fs->read_file($this->filename));
+		$file_contents = $this->fs->read_file($this->filename);
+		$file = new SimpleXMLReader($file_contents);
 		$file->setOption('assoc_arrays');
 		$file->parse();
 		$this->data = $file->makeObject('LnBlogXMLConfig');
@@ -39,7 +44,7 @@ class XMLINI {
 	# The configuration data as an XML string.
 
 	function getFile() {
-		return $this->data->serializeXML();
+	    return $this->data->serializeXML();
 	}
 	
 	# Method: writeFile
@@ -52,9 +57,13 @@ class XMLINI {
 	# True if the write succeeds, false otherwise.
 
 	function writeFile($file=false) {
-		if ($file) $this->filename = $file;
-		if (! $this->filename) return false;
-		return write_file($this->filename, $this->getFile());
+        if ($file) {
+            $this->filename = $file;
+        }
+        if (! $this->filename) {
+            return false;
+        }
+		return $this->fs->write_file($this->filename, $this->getFile());
 	}
 	
 	# Method: value
@@ -72,14 +81,14 @@ class XMLINI {
 	function value($sec, $var=false, $default=false) {
 		$sec = strtolower($sec);
 		$var = strtolower($var);
-		if ( isset($this->data->$sec) && 
+		if ( isset($this->data->$sec) &&
 		     isset($this->data->{$sec}[$var]) ) {
 			return $ret = $this->data->{$sec}[$var];
 		} else {
 			return $default;
 		}
 	}
-	
+
 	# Method: valueIsSet
 	# Determine if a particular key has been set.
 	#
@@ -89,7 +98,7 @@ class XMLINI {
 	#
 	# Returns:
 	# True if the given key has been set, false otherwise.
-	
+
 	function valueIsSet($sec, $var) {
 		$sec = strtolower($sec);
 		$var = strtolower($var);
@@ -158,8 +167,11 @@ class XMLINI {
 	# file - The XMLINI object to merge with the current object.
 
 	function merge($file) {
-		if ($file->data && ! $this->data) $this->data = $file->data;
-		elseif (! $file->data) return;
+        if ($file->data && ! $this->data) {
+            $this->data = $file->data;
+        } elseif (! $file->data) {
+           return;
+        }
 	
 		foreach ($file->data as $sec=>$keys) {
 			if (isset($this->data->$sec) ) {

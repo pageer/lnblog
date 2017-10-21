@@ -584,10 +584,9 @@ class AdminPages extends BasePages {
 					$first[$plug] = POST($this->namefix($plug)."_ord");
 			}
 			asort($first);
-			$lfirst = array();
-			foreach ($first as $key=>$val) $lfirst[] = $key;
+			$lfirst = array_keys($first);
 			
-			PluginManager::instance()->exclude_list = $disabled; #implode(",", $disabled);
+			PluginManager::instance()->disabled = $disabled; #implode(",", $disabled);
 			PluginManager::instance()->load_first = $lfirst; #implode(",", $first);
 			
 			if (defined("BLOG_ROOT")) $file = BLOG_ROOT.PATH_DELIM."plugins.xml";
@@ -612,7 +611,7 @@ class AdminPages extends BasePages {
 		foreach (PluginManager::instance()->plugin_list as $plug) {
 			$disp_list[$this->namefix($plug)] = 
 				array("order"=>_("Unspecified"), 
-					  "enabled"=> !in_array($plug, PluginManager::instance()->exclude_list),
+					  "enabled"=> !in_array($plug, PluginManager::instance()->disabled),
 					  "file"=>$plug);
 		}
 		

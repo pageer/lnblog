@@ -126,11 +126,12 @@ class SimpleXMLReader {
 	public function populateObject($obj) {
 		if (! isset($this->domtree['children'])) return;
 		foreach ($this->domtree['children'] as $child) {
+            $tag = $child['tag'];
 			if ( isset($child['children']) ) {
-				@$obj->$child['tag'] = $this->make_array($child['children']);
+				@$obj->$tag = $this->make_array($child['children']);
 			} elseif ( isset($child['attributes']['TYPE']) && 
 			           $child['attributes']['TYPE'] == 'array' ) {
-				@$obj->$child['tag'] = array();
+				@$obj->$tag = array();
 			} else {
 				SimpleXMLReader::setVal($obj, $child);
 			}

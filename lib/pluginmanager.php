@@ -27,7 +27,7 @@ class PluginManager {
 	protected static $registry = array();
 
 	var $plugin_list;
-	var $exclude_list;
+	var $disabled;
 	var $load_first;
 	var $load_list;
 	var $plugin_config;
@@ -69,14 +69,16 @@ class PluginManager {
 		$this->plugin_list = $this->getFileList();
 		# Get various settings to determine which plugins should be loaded and 
 		# in what order.
-		$excl = $this->plugin_config->value("Plugin_Manager", "exclude_list",
-											implode(',', $this->default_excluded));
-		$this->exclude_list = explode(",", $excl);
-		if (! is_array($this->exclude_list)) $this->exclude_list = array();
-		
+        $defaults = implode(',', $this->default_excluded);
+		$excl = $this->plugin_config->value("Plugin_Manager", "exclude_list", $defaults);
+        
+		$this->disabled = explode(",", $excl);
+        if (! is_array($this->disabled)) {
+            $this->disabled = array();
+        }
 
-		$lf = $this->plugin_config->value("Plugin_Manager", "load_first",
-										  implode(',', $this->default_load_first));
+        $defaults = implode(',', $this->default_load_first);
+		$lf = $this->plugin_config->value("Plugin_Manager", "load_first", $defaults);
 		$this->load_first = explode(",", $lf);
 		
 		$this->load_list = array();
@@ -104,7 +106,7 @@ class PluginManager {
 			}
 		}
 		
-		foreach ($this->exclude_list as $val) {
+		foreach ($this->disabled as $val) {
 			if (isset($this->load_list[$val])) {
 				$this->load_list[$val] = false;
 			}
@@ -130,8 +132,10 @@ class PluginManager {
 		if ($blog_path) {
 			$blog_config = NewConfigFile($blog_path.PATH_DELIM."plugins.xml");
 			$blog_config->merge($global_config);
-			$this->plugin_config =& $blog_config;
-		} else $this->plugin_config =& $global_config;
+			$this->plugin_config = $blog_config;
+        } else {
+            $this->plugin_config = $global_config;
+        }
 	}
 
 	/* Method: getPluginList
