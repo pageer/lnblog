@@ -60,7 +60,7 @@ class Archives extends Plugin {
 }
 
 if (! PluginManager::instance()->plugin_config->value('archives', 'creator_output', 0)) {
-	$rec =& new Archives();
+	$rec = new Archives();
 }
 
 ?>
