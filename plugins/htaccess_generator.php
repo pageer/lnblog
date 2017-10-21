@@ -42,7 +42,7 @@ class HTAccessGenerator extends Plugin {
 
 }
 
-$gen =& new HTAccessGenerator();
+$gen = new HTAccessGenerator();
 $gen->registerEventHandler("blog", "UpgradeComplete", "create_file");
 $gen->registerEventHandler("blog", "InsertComplete", "create_file");
 
