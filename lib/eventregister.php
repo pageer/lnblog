@@ -149,8 +149,7 @@ class EventRegister {
             $this->event_list[$rclass][$ename][$cclass]['static'] = array();
             $this->event_list[$rclass][$ename][$cclass]['instance'] = array();
             if (is_object($catching_class)) {
-                $this->event_list[$rclass][$ename][$cclass]['object'] =&
-                    $catching_class;
+                $this->event_list[$rclass][$ename][$cclass]['object'] = $catching_class;
             }
         }
         $mtype = $static ? 'static' : 'instance';
@@ -195,7 +194,7 @@ class EventRegister {
 
                 if (isset($this->event_list[$rcls][$ename][$classname]['object'])) {
 
-                    $tmp_class =& $this->event_list[$rcls][$ename][$classname]['object'];
+                    $tmp_class = $this->event_list[$rcls][$ename][$classname]['object'];
 
                     if ( strtolower(get_class($tmp_class)) != $classname) {
                         $tmp_class = new $classname;

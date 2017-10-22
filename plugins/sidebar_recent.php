@@ -128,7 +128,7 @@ class Recent extends Plugin {
     function outputCache($obj=false, $suppress_login = true) {
 
         if (! is_a($obj, 'Blog')) $b = NewBlog();
-        else $b =& $obj;
+        else $b = $obj;
         $f = NewFS();
 
         $is_index = ( current_url() == $b->uri('blog') ||

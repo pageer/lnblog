@@ -233,7 +233,7 @@ abstract class Plugin extends LnBlogObject{
     # in class variables.
 
     function getConfig() {
-        $parser =& PluginManager::instance()->plugin_config;
+        $parser = PluginManager::instance()->plugin_config;
         foreach ($this->member_list as $mem=>$config) {
             $this->$mem = (isset($config["default"]) ? $config["default"] : "");
             $val = $parser->value(get_class($this), $mem, $this->$mem);
@@ -314,7 +314,7 @@ abstract class Plugin extends LnBlogObject{
     function outputCache($obj=false, $suppress_login=true) {
 
         if (! is_a($obj, 'Blog')) $b = NewBlog();
-        else $b =& $obj;
+        else $b = $obj;
         $u = NewUser();
         $f = NewFS();
 

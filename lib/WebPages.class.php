@@ -922,10 +922,10 @@ class WebPages extends BasePages {
     protected function get_reply_list(&$blog, &$ent) {
         if ( $ent && $ent->isEntry() ) {
             $use_ent = true;
-            $obj =& $ent;
+            $obj = $ent;
         } else {
             $use_ent = false;
-            $obj =& $blog;
+            $obj = $blog;
         }
 
         if (GET("type") == 'comment') {

@@ -9,7 +9,7 @@ class BlogEntryURIWrapper extends LnBlogObject {
     function setEscape($val) { $this->separator = $val ? "&amp;" : "&"; }
 
     function permalink() {
-        $ent =& $this->object;
+        $ent = $this->object;
         $pretty_file = $ent->calcPrettyPermalink();
         if ($pretty_file)
             $pretty_file = mkpath(dirname($ent->localpath()),$pretty_file);
@@ -64,7 +64,7 @@ class BlogEntryURIWrapper extends LnBlogObject {
     }
 
     function delete() {
-        $ent =& $this->object;
+        $ent = $this->object;
         if ($ent->isDraft()) {
             $entry_type = 'draft';
         } else {
