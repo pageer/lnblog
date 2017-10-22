@@ -8,7 +8,7 @@ class Publisher {
     private $blog;
     private $user;
     private $wrappers;
-    private $http_client; 
+    private $http_client;
     private $keepHistory;
 
     public function __construct(Blog $blog, User $user, FS $fs, WrapperGenerator $wrappers) {
@@ -23,7 +23,7 @@ class Publisher {
 
        Parameters:
        val - Boolean for whether to turn on edit history or null for fetch.
-       
+
        Returns:
        True if edit history is on, false otherwise.
     */
@@ -36,7 +36,7 @@ class Publisher {
 
     /* Method publishEntry
        Publish the entry as a normal blog entry.
-      
+
        Puts the entry inside the normal list of blog entries.
        Throws on failure or if the entry is already published.
 
@@ -50,29 +50,29 @@ class Publisher {
     public function publishEntry(BlogEntry $entry, DateTime $time = null) {
         $time = $time ?: new DateTime();
         $curr_ts = $time->getTimestamp();
-		
-		$basepath = Path::mk($this->blog->home_path, BLOG_ENTRY_PATH);
-		$dir_path = Path::mk($basepath, $entry->getPath($curr_ts));
+
+        $basepath = Path::mk($this->blog->home_path, BLOG_ENTRY_PATH);
+        $dir_path = Path::mk($basepath, $entry->getPath($curr_ts));
         $draft_created = false;
 
         if (! $entry->isEntry()) {
             $this->createDraft($entry, $time);
             $draft_created = true;
         }
-		
-		# If the entry directory already exists, something is wrong. 
-		if ( $this->fs->is_dir($dir_path) ) {
-			$dir_path = Path::mk($basepath, $entry->getPath($curr_ts, false, true));
+
+        # If the entry directory already exists, something is wrong.
+        if ( $this->fs->is_dir($dir_path) ) {
+            $dir_path = Path::mk($basepath, $entry->getPath($curr_ts, false, true));
         }
 
         if ( $this->fs->is_dir($dir_path) ) {
             throw new TargetPathExists();
         }
-		
+
         $this->raiseEvent($entry, 'BlogEntry', 'OnInsert');
 
         $this->createMonthDirectory($dir_path);
-        $this->renameEntry(dirname($entry->file), $dir_path);	
+        $this->renameEntry(dirname($entry->file), $dir_path);
         $this->createEntryWrappers($dir_path);
 
         $this->updateFileForPublication($entry, $dir_path, $curr_ts, $draft_created);
@@ -87,8 +87,8 @@ class Publisher {
 
     /* Method: publishArticle
        Publish the entry as an article.
-      
-       Same as publishEntry(), but publishes the entry as an article outside 
+
+       Same as publishEntry(), but publishes the entry as an article outside
        of the normal blog listing structure.  Throws on failure.
 
        Parameters:
@@ -101,8 +101,8 @@ class Publisher {
     public function publishArticle(BlogEntry $entry, DateTime $time = null) {
 
         $time = $time ?: new DateTime();
-		$curr_ts = $time->getTimestamp();
-		$basepath = Path::mk($this->blog->home_path, BLOG_ARTICLE_PATH);
+        $curr_ts = $time->getTimestamp();
+        $basepath = Path::mk($this->blog->home_path, BLOG_ARTICLE_PATH);
         $draft_created = false;
 
         if (! $entry->isEntry()) {
@@ -118,28 +118,28 @@ class Publisher {
             $this->wrappers->createDirectoryWrappers($basepath, BLOG_ARTICLES);
         }
 
-		$this->raiseEvent($entry, "Article", "OnInsert");
+        $this->raiseEvent($entry, "Article", "OnInsert");
 
-		$this->renameEntry(dirname($entry->file), $dir_path);
+        $this->renameEntry(dirname($entry->file), $dir_path);
 
-		$ret = $this->wrappers->createDirectoryWrappers($dir_path, ARTICLE_BASE);
+        $ret = $this->wrappers->createDirectoryWrappers($dir_path, ARTICLE_BASE);
         $this->wrappers->createDirectoryWrappers(Path::mk($dir_path, ENTRY_COMMENT_DIR), ENTRY_COMMENTS);
         $this->wrappers->createDirectoryWrappers(Path::mk($dir_path, ENTRY_TRACKBACK_DIR), ENTRY_TRACKBACKS);
         $this->wrappers->createDirectoryWrappers(Path::mk($dir_path, ENTRY_PINGBACK_DIR), ENTRY_PINGBACKS);
 
         $this->updateFileForPublication($entry, $dir_path, $curr_ts, $draft_created);
- 
+
         $entry->setSticky($entry->is_sticky);
         $this->blog->updateTagList($entry->tags());
         $this->sendPingbacks($entry);
 
-		$this->raiseEvent($entry, "Article", "InsertComplete");
+        $this->raiseEvent($entry, "Article", "InsertComplete");
     }
 
     /* Method: unpublish
        Unpublish the entry.
-      
-       Moves the entry from a published blog entry or article to an unpublished 
+
+       Moves the entry from a published blog entry or article to an unpublished
        draft entry.  Throws on failure or if the entry is not published.
 
        Parameters:
@@ -170,10 +170,10 @@ class Publisher {
 
     /* Method: createDraft
        Save the entry as a new draft.
-      
+
        Saves a new entry in the drafts folder.  Throws on failure or
        if the entry already exists.
-       
+
        Parameters:
        entry - (BlogEntry) The entry to persist as a draft.
        time  - (DateTime) Optional creation time
@@ -183,23 +183,23 @@ class Publisher {
      */
     public function createDraft(BlogEntry $entry, DateTime $time = null) {
         $time = $time ?: new DateTime();
-		$ts = $time->getTimestamp();
+        $ts = $time->getTimestamp();
         $draft_path = Path::mk($this->blog->home_path, BLOG_DRAFT_PATH);
 
         $this->createDraftsDirectory($draft_path);
-		
+
         if ($entry->isEntry()) {
             throw new EntryAlreadyExists("This draft aleady exists.");
         }
-        
+
         $path = $this->getEntryDraftPath($entry, $ts, $draft_path);
         $this->createEntryDraftDirectory($path);
 
         $entry->file = Path::mk($path, ENTRY_DEFAULT_FILE);
         $entry->uid = $this->user->username();
-		$entry->setDates($ts);
+        $entry->setDates($ts);
 
-		$file_data = $entry->serializeXML();
+        $file_data = $entry->serializeXML();
         $ret = $this->fs->write_file($entry->file, $file_data);
 
         $this->handleUploads($entry);
@@ -215,14 +215,14 @@ class Publisher {
 
     /* Method: update
        Update an existing entry on disk.
-      
+
        Writes out the state of the entry without changing its publication status.
        Throws if the update fails or the entry does not already exist.
 
        Parameters:
        entry - (BlogEntry) The entry to update.
        time  - (DateTime) The optional time when the entry is updated.
-       
+
        Throws:
        EntryDoesNotExist or EntryWriteFailed or EntryRenameFailed
      */
@@ -238,8 +238,8 @@ class Publisher {
         if ($entry->isPublished()) {
             $this->raiseEvent($entry, $event_class, 'OnUpdate');
         }
-		
-		$entry->ip = get_ip();
+
+        $entry->ip = get_ip();
         $entry->setDates($time->getTimestamp());
 
         $this->updateEntry($entry, $time);
@@ -261,8 +261,8 @@ class Publisher {
 
     /* Method: delete
        Completely delete an entry.
-      
-       Applies to both published and draft entries.  Throws on failure of if 
+
+       Applies to both published and draft entries.  Throws on failure of if
        the entry has not been saved.
 
        Parameters:
@@ -276,7 +276,7 @@ class Publisher {
         if (!$entry->isEntry()) {
             throw new EntryDoesNotExist();
         }
-		
+
         $event_class = $entry->isArticle() ? 'Article' : 'BlogEntry';
 
         if ($entry->isPublished()) {
@@ -284,9 +284,9 @@ class Publisher {
         }
 
         $this->deletePermalinkFile($entry);
-		
+
         $this->deleteEntry($entry , $time);
-		
+
         if ($entry->isPublished()){
             $this->raiseEvent($entry, $event_class, 'DeleteComplete');
         }
@@ -294,7 +294,7 @@ class Publisher {
 
     /* Method: addAttachments
        Add or update file attachments for the entry.
-      
+
        Adds files attachments to the entry.  Any filenames that already exist
        will be overwritten.  Throws if one or more fails or entry is not saved.
 
@@ -316,22 +316,22 @@ class Publisher {
             $dir_path = preg_replace("/\s+/", "_", $dir_path);
             $dir_path = preg_replace("/\W+/", "", $dir_path);
         }
-		$dir_path = Path::mk($basepath, $dir_path);
+        $dir_path = Path::mk($basepath, $dir_path);
         return $dir_path;
     }
 
     private function createDraftsDirectory($draft_path) {
-		if (! $this->fs->is_dir($draft_path)) {
-			$ret = $this->wrappers->createDirectoryWrappers($draft_path, BLOG_DRAFTS);
+        if (! $this->fs->is_dir($draft_path)) {
+            $ret = $this->wrappers->createDirectoryWrappers($draft_path, BLOG_DRAFTS);
             if (! empty($ret)) {
                 throw new CouldNotCreateDirectory('Could not create drafts directory');
             }
-		}
+        }
     }
- 
+
     private function getEntryDraftPath($entry, $ts, $draft_path) {
-		$dirname = $entry->getPath($ts, true);
-		return Path::mk($draft_path, $dirname);
+        $dirname = $entry->getPath($ts, true);
+        return Path::mk($draft_path, $dirname);
     }
 
     private function createEntryDraftDirectory($path) {
@@ -342,8 +342,8 @@ class Publisher {
     }
 
     private function createMonthDirectory($dir_path) {
-		$month_path = dirname($dir_path);
-		$year_path = dirname($month_path);
+        $month_path = dirname($dir_path);
+        $year_path = dirname($month_path);
         if (! $this->fs->is_dir($year_path)) {
             $this->wrappers->createDirectoryWrappers($year_path, YEAR_ENTRIES);
         }
@@ -353,16 +353,16 @@ class Publisher {
     }
 
     private function createEntryWrappers($dir_path) {
-		$this->wrappers->createDirectoryWrappers($dir_path, ENTRY_BASE);
-		$this->wrappers->createDirectoryWrappers(Path::mk($dir_path, ENTRY_COMMENT_DIR), ENTRY_COMMENTS);
-		$this->wrappers->createDirectoryWrappers(Path::mk($dir_path, ENTRY_TRACKBACK_DIR), ENTRY_TRACKBACKS);
-		$this->wrappers->createDirectoryWrappers(Path::mk($dir_path, ENTRY_PINGBACK_DIR), ENTRY_PINGBACKS);
+        $this->wrappers->createDirectoryWrappers($dir_path, ENTRY_BASE);
+        $this->wrappers->createDirectoryWrappers(Path::mk($dir_path, ENTRY_COMMENT_DIR), ENTRY_COMMENTS);
+        $this->wrappers->createDirectoryWrappers(Path::mk($dir_path, ENTRY_TRACKBACK_DIR), ENTRY_TRACKBACKS);
+        $this->wrappers->createDirectoryWrappers(Path::mk($dir_path, ENTRY_PINGBACK_DIR), ENTRY_PINGBACKS);
     }
 
     private function updateWithHistory(BlogEntry $entry, DateTime $time) {
-		$dir_path = dirname($entry->file);
-		$target = Path::mk($dir_path, $entry->getPath($time->getTimestamp(), true, true).ENTRY_PATH_SUFFIX);
-		$source = $entry->file;
+        $dir_path = dirname($entry->file);
+        $target = Path::mk($dir_path, $entry->getPath($time->getTimestamp(), true, true).ENTRY_PATH_SUFFIX);
+        $source = $entry->file;
 
         $this->renameEntry($source, $target);
 
@@ -391,11 +391,11 @@ class Publisher {
     private function deleteEntry(BlogEntry $entry, DateTime $time = null) {
         if ($this->keepEditHistory()) {
             $time = $time ?: new DateTime();
-			$target_file = Path::mk($entry->localpath(), $entry->getPath($time->getTimestamp(), true, true).ENTRY_PATH_SUFFIX);
-			$ret = $this->fs->rename($entry->file, $target_file);
-		} else {
+            $target_file = Path::mk($entry->localpath(), $entry->getPath($time->getTimestamp(), true, true).ENTRY_PATH_SUFFIX);
+            $ret = $this->fs->rename($entry->file, $target_file);
+        } else {
             $ret = $this->fs->rmdir_rec($entry->localpath());
-		}
+        }
 
         if (! $ret) {
             throw new EntryDeleteFailed();
@@ -410,7 +410,7 @@ class Publisher {
     }
 
     private function updatePermalinkFile(BlogEntry $entry) {
-        if ($entry->isPublished() && ! $entry->isArticle()) {    
+        if ($entry->isPublished() && ! $entry->isArticle()) {
             $subfile = $entry->calcPrettyPermalink();
             if ($subfile) {
                 $subfile = Path::mk(dirname(dirname($entry->file)), $subfile);
@@ -448,21 +448,21 @@ class Publisher {
     }
 
     private function renameEntry($source, $dest) {
-		$ret = $this->fs->rename($source, $dest);	
+        $ret = $this->fs->rename($source, $dest);
         if (! $ret) {
             throw new EntryRenameFailed();
         }
     }
 
-	private function handleUploads($ent) {
-		$err = array();
+    private function handleUploads($ent) {
+        $err = array();
 
-		$uploads = array();
-		if (isset($_FILES['upload'])) {
-			$uploads = FileUpload::initUploads($_FILES['upload'], $ent->localpath(), $this->fs);
+        $uploads = array();
+        if (isset($_FILES['upload'])) {
+            $uploads = FileUpload::initUploads($_FILES['upload'], $ent->localpath(), $this->fs);
         }
 
-		foreach ($uploads as $upld) {
+        foreach ($uploads as $upld) {
 
             $upload_error = (
                 $upld->status() != FILEUPLOAD_NO_FILE &&
@@ -472,44 +472,44 @@ class Publisher {
                 ! defined("UPLOAD_IGNORE_UNINITIALIZED")
             );
 
-			if ( $upld->completed() ) {
-				$ret = $upld->moveFile();
-				if (! $ret) {
-					$err[] = _('Error moving uploaded file');
-				}
-			} elseif ($upload_error) {
-				$err[] = $upld->errorMessage();
-			}
-		}
+            if ( $upld->completed() ) {
+                $ret = $upld->moveFile();
+                if (! $ret) {
+                    $err[] = _('Error moving uploaded file');
+                }
+            } elseif ($upload_error) {
+                $err[] = $upld->errorMessage();
+            }
+        }
 
-		if ($err) {
+        if ($err) {
             $this->raiseEvent($ent, 'BlogEntry', 'UploadError', $err);
-		} elseif ($uploads) {
-			# This event is raised here as sort of a hack.  The idea is that some
-			# plugins will need information on uploaded files, but can only get that
-			# when an event is raised by the entry.
-			# In particular, this intended to regenerate the RSS2 feed after uploading
-			# a file from the edit form, so that the enclosure information will be
-			# set correctly.
-			if (! $ent->isDraft()) {
-				$ent->raiseEvent("UpdateComplete");
-			}
+        } elseif ($uploads) {
+            # This event is raised here as sort of a hack.  The idea is that some
+            # plugins will need information on uploaded files, but can only get that
+            # when an event is raised by the entry.
+            # In particular, this intended to regenerate the RSS2 feed after uploading
+            # a file from the edit form, so that the enclosure information will be
+            # set correctly.
+            if (! $ent->isDraft()) {
+                $ent->raiseEvent("UpdateComplete");
+            }
             $ent->raiseEvent('UploadSuccess');
-		}
-	}
+        }
+    }
 
     private function updateFileForPublication($entry, $dir_path, $curr_ts, $draft_created) {
-		$entry->file = Path::mk($dir_path, ENTRY_DEFAULT_FILE);
+        $entry->file = Path::mk($dir_path, ENTRY_DEFAULT_FILE);
         $entry->uid = $this->user->username();
         $entry->post_ts = $curr_ts;
-		$entry->setDates($curr_ts);
-		$entry->ip = get_ip();
+        $entry->setDates($curr_ts);
+        $entry->ip = get_ip();
 
         if (!$draft_created) {
             $ret = $this->handleUploads($entry);
         }
-				
-		$file_data = $entry->serializeXML();
+
+        $file_data = $entry->serializeXML();
         return $this->fs->write_file($entry->file, $file_data);
     }
 
@@ -526,7 +526,7 @@ class Publisher {
             }
         }
     }
-    
+
     protected function getHttpClient() {
         if (!$this->http_client) {
             $this->http_client = new HttpClient();

@@ -5,18 +5,18 @@
 # TrackBack URLs to automatically send TrackBacks to your entries.  Note that the code
 # will only be inserted for entries that have TrackBacks enabled.
 class TrackbackRDF extends Plugin {
-	
-	function __construct() {
-		$this->plugin_desc = _("Add TrackBack auto-discovery RDF to entry pages.");
-		$this->plugin_version = "0.1.2";
-		parent::__construct();
-	}
 
-	function add_rdf(&$ent) {
-		if (! $ent->allow_tb) {
-			return false;
-		}
-	?>
+    function __construct() {
+        $this->plugin_desc = _("Add TrackBack auto-discovery RDF to entry pages.");
+        $this->plugin_version = "0.1.2";
+        parent::__construct();
+    }
+
+    function add_rdf(&$ent) {
+        if (! $ent->allow_tb) {
+            return false;
+        }
+    ?>
 <!--
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
          xmlns:dc="http://purl.org/dc/elements/1.1/"
@@ -28,9 +28,9 @@ class TrackbackRDF extends Plugin {
     trackback:ping="<?php echo $ent->uri('trackback');?>" />
 </rdf:RDF>
 -->
-<?php		
-	}
-	
+<?php
+    }
+
 }
 $plug = new TrackbackRDF();
 $plug->registerEventHandler("blogentry", "OnOutput", "add_rdf");

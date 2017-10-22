@@ -40,9 +40,9 @@ POSTRetrieved  - Fired after data has been retrieved from an HTTP POST.
 */
 
 class BlogEntry extends Entry {
-    
+
     const AUTO_PUBLISH_FILE = 'publish.txt';
-    
+
     public $send_pingback = true;
     public $allow_pingback = true;
     public $allow_comment = true;
@@ -58,27 +58,27 @@ class BlogEntry extends Entry {
 
     public function __construct($path = "", $filesystem = null) {
         parent::__construct($filesystem ?: NewFS());
-        
+
         $this->initVars();
         $this->raiseEvent("OnInit");
-        
+
         if ($path !== null) {
-            $this->getFile($path, ENTRY_DEFAULT_FILE, 
-                           array('entry', 'draft'), 
+            $this->getFile($path, ENTRY_DEFAULT_FILE,
+                           array('entry', 'draft'),
                            array(BLOG_ENTRY_PATH, BLOG_DRAFT_PATH),
                            array('/^\d{4}\/\d{2}\/\d{2}_\d{4}\d?\d?$/',
                                  '/^\d{2}_\d{4}\d?\d?$/'));
-            
+
             if ( $this->fs->file_exists($this->file) ) {
                 $this->readFileData();
             }
         }
-        
+
         $this->raiseEvent("InitComplete");
     }
-    
+
     # Initializes the member variables.
-    # This is for INTERNAL USE ONLY and exists mainly to pass on the 
+    # This is for INTERNAL USE ONLY and exists mainly to pass on the
     # variables to subclasses without having to call the entire constructor.
     public function initVars() {
         $this->enclosure = '';
@@ -98,7 +98,7 @@ class BlogEntry extends Entry {
         );
         $this->metadata_fields = array(
             "id"=>"postid",
-            "uid"=>"userid", 
+            "uid"=>"userid",
             "date"=>"date",
             "timestamp"=>"timestamp",
             "post_ts"=>"posttimestamp",
@@ -111,18 +111,18 @@ class BlogEntry extends Entry {
             "autopublish_date" => "autopublish_date",
             "allow_comment"=>"allowcomment",
             "has_html"=>"hashtml",
-            "tags"=>"tags", 
-            "allow_tb"=>"allowtrackback", 
+            "tags"=>"tags",
+            "allow_tb"=>"allowtrackback",
             "allow_pingback"=>"allowpingback",
             "enclosure"=>"enclosure",
             "is_sticky"=>"is_sticky",
         );
     }
-    
+
     # Gets the directory and data file for this entry.
     # Again, this is for INTERNAL USE ONLY and is inherited, with parameters,
     # by the Article class.
-    public function getFile($path, $revision, $getvar='entry', 
+    public function getFile($path, $revision, $getvar='entry',
                      $subdir=BLOG_ENTRY_PATH,
                      $id_re='/^\d{4}\/\d{2}\/\d{2}_\d{4}\d?\d?$/') {
         $path = trim($path);
@@ -140,10 +140,10 @@ class BlogEntry extends Entry {
             $first_get = GET($getvar);
         }
 
-        # Auto-detect the current entry.  If no path is given, 
+        # Auto-detect the current entry.  If no path is given,
         # then assume the current directory.
         if ($this->fs->is_dir($path)) {
-        
+
             $this->file = Path::mk($path, $revision);
             # Support old blog entry format.
             if (! $this->fs->file_exists($this->file) ) $this->tryOldFileName();
@@ -152,7 +152,7 @@ class BlogEntry extends Entry {
             # If $path is an identifier, then convert it to a real path.
 
             $entrypath = trim($path ? $path : sanitize($first_get));
-        
+
             # If the path is a short entry ID, then try to detect the blog and
             # reconstruct the full path.
             if (is_array($id_re)) {
@@ -162,14 +162,14 @@ class BlogEntry extends Entry {
                     if ($has_match) break;
                 }
             } else $has_match = preg_match($id_re, $entrypath);
-            
+
             if ( $has_match ) {
-                
+
                 # If we can pass a short ID, it's assumed that we can find the
                 # current blog from the environment (query string, config.php, etc.)
                 $blog = NewBlog();
                 $entrypath = str_replace("/", PATH_DELIM, $entrypath );
-                
+
                 if (is_array($subdir)) {
                     foreach ($subdir as $s) {
                         $f = mkpath($blog->home_path,$s,$entrypath,$revision);
@@ -179,7 +179,7 @@ class BlogEntry extends Entry {
                         $this->file = mkpath($blog->home_path,$subdir[0],$entrypath,$revision);
                     }
                 } else $this->file = mkpath($blog->home_path,$subdir,$entrypath,$revision);
-                
+
 
             } else {
                 # If we don't have a short entry ID, assume it's a global ID.
@@ -188,15 +188,15 @@ class BlogEntry extends Entry {
             }
 
             if (! $this->fs->file_exists($this->file)) {
-                $this->tryOldFileName();            
+                $this->tryOldFileName();
             }
 
         } else {
-        
+
             $this->file = Path::mk($this->fs->getcwdLocal(), $revision);
             if (! $this->fs->file_exists($this->file) ) $this->tryOldFileName();
-            
-            # We might be in a comment or trackback directory, 
+
+            # We might be in a comment or trackback directory,
             if (! $this->isEntry() ) {
                 $tmpfile = Path::mk(dirname($this->fs->getcwdLocal()), $revision);
                 if (! $this->fs->file_exists($tmpfile) ) {
@@ -204,12 +204,12 @@ class BlogEntry extends Entry {
                 }
             }
         }
-    
+
         return $this->file;
     }
-    
+
     # For INTERNAL USE ONLY.  If the calculated entry file does
-    # not exist, try the old filename and change the file 
+    # not exist, try the old filename and change the file
     # property if that does exist.
     public function tryOldFileName() {
         $tmpfile = dirname($this->file);
@@ -234,7 +234,7 @@ class BlogEntry extends Entry {
             for ($i=0; $i<3; $i++) $dir = dirname($dir);
             $ret = NewBlog($dir);
             if (!$ret->isBlog()) {
-                # If the entry is a BlogEntry, then the parent will be 2 more 
+                # If the entry is a BlogEntry, then the parent will be 2 more
                 # (i.e. 5) levels up
                 for ($i=0; $i<2; $i++) $dir = dirname($dir);
                 $ret = NewBlog($dir);
@@ -269,10 +269,10 @@ class BlogEntry extends Entry {
     }
 
     # Method: globalID
-    # A unique ID for use with blogging APIs.  Note that this ID embedds the 
+    # A unique ID for use with blogging APIs.  Note that this ID embedds the
     # parent blog's ID, whereas the <entryID> method provides an ID *within*
     # the current blog.
-    # 
+    #
     # Returns:
     # A string with the unique ID.
 
@@ -294,15 +294,15 @@ class BlogEntry extends Entry {
         $parent = $this->getParent();
         return $parent->blogid;
     }
-    
+
     # Method: getUploadedFiles
-    # Gets an array of the names of all files uploaded to this entry.  
+    # Gets an array of the names of all files uploaded to this entry.
     # Currently, this just means all files in the entry directory that were not
     # created by LnBlog.
     #
     # Returns:
     # An array containing the file names without path.
-    
+
     public function getUploadedFiles() {
         $base_path = $this->localpath();
         $std_files = array(
@@ -315,9 +315,9 @@ class BlogEntry extends Entry {
             ENTRY_DEFAULT_FILE
         );
         $files = scan_directory($base_path);
-        
+
         $ret = array();
-        
+
         foreach ($files as $f) {
             if (!in_array($f, $std_files) && !$this->fs->is_dir(mkpath($base_path, $f))) {
                 $ret[] = $f;
@@ -327,15 +327,15 @@ class BlogEntry extends Entry {
 
     # Method: getEnclosure
     # Gets the URL, file size, and media type of the file set as the enclosure
-    # for this entry, it if exists.  The file is checkedy by converting the 
+    # for this entry, it if exists.  The file is checkedy by converting the
     # URL into a local path using the same rules as entry URL absolutizaiton,
     # or simply doing a URL to localpath conversion.
     #
     # Returns:
-    # If the enclosure property is set and the file is found, returns an array 
-    # with elements "url", "length", and "type".  If the file is not found, then 
+    # If the enclosure property is set and the file is found, returns an array
+    # with elements "url", "length", and "type".  If the file is not found, then
     # checks if the enclosure matches the expected content or an enclosure tag in
-    # an RSS feed.  If so, extracts the data into an array.  
+    # an RSS feed.  If so, extracts the data into an array.
     # Otherwise Otherwise, returns false.
     public function getEnclosure() {
         # Remove stray whitespace.
@@ -349,8 +349,8 @@ class BlogEntry extends Entry {
 
         if (! $enc) return false;
 
-        # Calculate the enclosure path, using the same rules as LBCode URI 
-        # absolutizing.  
+        # Calculate the enclosure path, using the same rules as LBCode URI
+        # absolutizing.
         # No slash = relative to entry directory.
         if (strpos($enc, '/') === false) {
             $path = mkpath($this->localpath(), $enc);
@@ -359,7 +359,7 @@ class BlogEntry extends Entry {
         } elseif (! strpos($enc, ':') && substr($enc, 1, 1) != '/') {
             $blog = $this->getParent();
             $path = mkpath($blog->home_path, $enc);
-        
+
         # Slash at start, no colon = root-relatice path
         } elseif (! strpos($enc, ':') && substr($enc, 1, 1) == '/') {
             $path = mkpath(DOCUMENT_ROOT, $enc);
@@ -380,11 +380,11 @@ class BlogEntry extends Entry {
                 # No fileinfo, no mime_magic, so revert to file extension matching.
                 # This is a dirty and incomplete method, but I suppose it's better
                 # than nothing.  Though only marginally.
-                require_once __DIR__.'/stupid_mime.php';    
+                require_once __DIR__.'/stupid_mime.php';
                 $ret['type'] = stupid_mime_get_type($path);
             }
 
-        } elseif (strpos($this->enclosure, 'url')    !== false && 
+        } elseif (strpos($this->enclosure, 'url')    !== false &&
                   strpos($this->enclosure, 'length') !== false &&
                   strpos($this->enclosure, 'type')   !== false) {
             $enc = $this->enclosure;
@@ -399,7 +399,7 @@ class BlogEntry extends Entry {
 
     /*
     Method: getPath
-    Returns a path to use for the entry.  This is only applicable for 
+    Returns a path to use for the entry.  This is only applicable for
     file-based storage and is for *internal use only*.
 
     Parameters:
@@ -449,7 +449,7 @@ class BlogEntry extends Entry {
     Method: isSticky
     Determines if the article is set as sticky.
 
-    Parameters: 
+    Parameters:
     path - *Optional* unique ID for the article.
 
     Returns:
@@ -457,17 +457,17 @@ class BlogEntry extends Entry {
     */
     public function isSticky($path=false) {
         $path = $path ?: dirname($this->file);
-        return $this->checkArticlePath($path) && 
+        return $this->checkArticlePath($path) &&
             $this->fs->file_exists(Path::mk($path, STICKY_PATH));
     }
 
     /*
     Method: readSticky
     Get the title and permalink without retreiving the entire article.
-    
+
     Parameters:
     path - The unique ID for the article.
-    
+
     Returns:
     A two-element array, with "link" and "title" for the permalink and
     subject of the article.
@@ -481,20 +481,20 @@ class BlogEntry extends Entry {
            $this->file = $path;
         }
         $sticky_file = Path::mk(dirname($this->file), STICKY_PATH);
-        
+
         if ( $this->fs->file_exists($sticky_file) ) {
             $data = $this->fs->file($sticky_file);
             $desc = "";
-            foreach ($data as $line) { 
-                $desc .= $line; 
+            foreach ($data as $line) {
+                $desc .= $line;
             }
-            $ret = array("title"=>$desc, "link"=>$this->permalink() ); 
+            $ret = array("title"=>$desc, "link"=>$this->permalink() );
         } else $ret = false;
-        
+
         $this->file = $old_path;
         return $ret;
     }
-    
+
     /*
     Method: isEntry
     Determine if the object is a blog entry or not.
@@ -515,11 +515,11 @@ class BlogEntry extends Entry {
         return $this->fs->file_exists(Path::mk($path, ENTRY_DEFAULT_FILE)) ||
                $this->fs->file_exists(Path::mk($path, "current.htm"));
     }
-    
+
     # Method: isDraft
     # Checks if the given entry is saved as a draft, as opposed to a
     # published blog entry.
-    #  
+    #
     # Returns:
     # True if the entry is a draft, false otherwise.
     public function isDraft($path=false) {
@@ -533,10 +533,10 @@ class BlogEntry extends Entry {
         return ( $this->isEntry($path) &&
                  basename(dirname($path)) == BLOG_DRAFT_PATH );
     }
-    
-    # Method: isPublished 
+
+    # Method: isPublished
     # Determine if the entry has been published.
-    # 
+    #
     # Parameters:
     # path  - The path to the entry.
     #
@@ -560,10 +560,10 @@ class BlogEntry extends Entry {
         $article_dir = basename(dirname($dir_path));
         return $this->fs->is_dir($dir_path) && $article_dir == BLOG_ARTICLE_PATH;
     }
-    
+
     /*
     Method: localpath
-    Get the path to this entry's directory on the local filesystem.  Note 
+    Get the path to this entry's directory on the local filesystem.  Note
     that this is specific to file-based storage and so should only be c
     called internally.
 
@@ -578,7 +578,7 @@ class BlogEntry extends Entry {
     /*
     Method: permalink
     Get the permalink to the object.
-    
+
     Returns:
     A string containing the full URI to this entry.
     */
@@ -594,43 +594,43 @@ class BlogEntry extends Entry {
 
     public function baselink() {
         return $this->uri("base");
-    }   
+    }
 
     # Method: commentlink
     # Get the permalink to the object.
-    
+
     # Returns:
     # A string containing the full URI to this entry.
-    
+
     public function commentlink() {
         return $this->uri("comment");
     }
-    
+
     /*
     Method: uri
     Gets the URI of the a specified page.
-    
+
     Parameters:
     link - The page for which you want the URI.  Valid values are
            "page", "
-    
+
     Returns:
     A string holding the relevant URI.
     */
-    
+
     public function uri($type) {
         $uri = create_uri_object($this);
         $args = func_get_args();
-        
+
         return $uri->$type($args);
     }
-    
+
     public function getByPath ($path, $revision=ENTRY_DEFAULT_FILE) {
         $file_path = $path.PATH_DELIM.$revision;
         if (! $this->fs->file_exists($file_path)) $file_path = $path.PATH_DELIM."current.htm";
-        return $this->readFileData($file_path); 
+        return $this->readFileData($file_path);
     }
-    
+
     public function setDates($curr_ts = null) {
         # Set the timestamp and date, plus the ones for the original post, if
         # this is a new entry.
@@ -641,7 +641,7 @@ class BlogEntry extends Entry {
             $this->post_ts = $curr_ts;
         }
     }
-    
+
     # Method setAutoPublishDate
     # Sets the date at which a draft should auto-publish
     #
@@ -656,10 +656,10 @@ class BlogEntry extends Entry {
             $this->fs->delete($path);
         }
     }
-    
+
     # Method: getAutoPublishDate
     # Get the auto-publish date.
-    # 
+    #
     # Returns:
     # The date string when publication will happen or empty string.
     public function getAutoPublishDate() {
@@ -670,10 +670,10 @@ class BlogEntry extends Entry {
         }
         return $ts ? $ts->format('Y-m-d H:i:s') : '';
     }
-    
+
     # Method shouldAutoPublish
     # Determine if a draft is ready to be auto-published
-    # 
+    #
     # Returns:
     # True if the draft should be publised, false otherwise.
     public function shouldAutoPublish() {
@@ -685,15 +685,15 @@ class BlogEntry extends Entry {
         }
         return false;
     }
-    
+
     /*
     Method: calcPrettyPermalink
     Calculates a file name for a "pretty" permalink wrapper script.
-    
+
     Parameters:
     use_broken_regex - *Optional* parameter to calculate the URI based on the
                        ugly regex used in LnBlog < 0.7.  *Defaults* to false.
-    
+
     Returns:
     The string to be used for the file name.
     */
@@ -710,12 +710,12 @@ class BlogEntry extends Entry {
         }
         return $ret;
     }
-    
+
     /*
     Method: makePrettyPermalink
     Creates a wrapper script that makes a "pretty" permalink to the entry
     directory based on the subject text of the entry.
-    
+
     Returns:
     True on success, false on failure.
     */
@@ -791,14 +791,14 @@ class BlogEntry extends Entry {
     /*
     Method: exportVars
     Sets template variables with the entry data.
-    
+
     Parameters:
     tmp - The template we wish to populate.
     */
     public function exportVars(&$tmp, $show_edit_controls=false) {
-    
+
         $blog = $this->getParent();
-        
+
         $tmp->set("SUBJECT", $this->subject);
         $tmp->set("POSTDATE", $this->prettyDate($this->post_ts) );
         $tmp->set("POST_TIMESTAMP", $this->post_ts);
@@ -806,13 +806,13 @@ class BlogEntry extends Entry {
         $tmp->set("EDIT_TIMESTAMP", $this->timestamp);
         $tmp->set("ABSTRACT", $this->getSummary());
         $tmp->set("TAGS", $this->tags());
-        
+
         $tagurls = array();
         foreach ($this->tags() as $tag) {
             $tagurls[htmlspecialchars($tag)] = $blog->uri("tags", urlencode($tag));
         }
         $tmp->set("TAG_URLS", $tagurls);
-        
+
         $tmp->set("BODY", $this->markup() );
         $tmp->set("ENCLOSURE", $this->enclosure);
         $tmp->set("ENCLOSURE_DATA", $this->getEnclosure());
@@ -839,7 +839,7 @@ class BlogEntry extends Entry {
             $this->send_pingback :
             $blog->autoPingbackEnabled();
         $tmp->set("SEND_PINGBACKS", $send_pingbacks);
-        
+
         # Added so the template can know whether or not to advertise RSS feeds.
         if (PluginManager::instance()->pluginLoaded("RSS2FeedGenerator")) {
             $gen = new RSS2FeedGenerator();
@@ -849,7 +849,7 @@ class BlogEntry extends Entry {
                 $tmp->set("COMMENT_FEED_LINK", $feed_uri);
             }
         }
-        
+
         # RSS compatibility variables
         $tmp->set("TITLE", $this->title());
         $tmp->set("LINK", $this->permalink());
@@ -861,7 +861,7 @@ class BlogEntry extends Entry {
             $tmp->set(strtoupper($fld)."_DESC", $desc);
         }
     }
-    
+
     /*
     Method: get
     Get the HTML to use to display the entry summary.
@@ -878,13 +878,13 @@ class BlogEntry extends Entry {
         $this->raiseEvent("OnOutput");
         $ret = ob_get_contents();
         ob_end_clean();
-    
+
         $tmp = NewTemplate($this->template_file);
         $blog = $this->getParent();
         $usr = NewUser($this->uid);
         $usr->exportVars($tmp);
         $this->exportVars($tmp, $show_edit_controls);
-        
+
         $ret .= $tmp->process();
         ob_start();
         $this->raiseEvent("OutputComplete");
@@ -909,7 +909,7 @@ class BlogEntry extends Entry {
         $this->raiseEvent("OnOutput");
         $ret = ob_get_contents();
         ob_end_clean();
-    
+
         $tmp = NewTemplate('blogentry_tpl.php');
         $blog = $this->getParent();
         $usr = NewUser($this->uid);
@@ -920,7 +920,7 @@ class BlogEntry extends Entry {
         $pings = $this->getPingbacksByType();
         $tmp->set("PINGBACKS", $pings['remote']);
         $tmp->set("LOCAL_PINGBACKS", $pings['local']);
-        
+
         $ret .= $tmp->process();
         ob_start();
         $this->raiseEvent("OutputComplete");
@@ -929,18 +929,18 @@ class BlogEntry extends Entry {
         return $ret;
     }
 
-    # Generic reply-handling functions. 
-    # These functions are generic and can get lists of comments, trackbacks, or 
+    # Generic reply-handling functions.
+    # These functions are generic and can get lists of comments, trackbacks, or
     # pingbacks based on given parameters.  The public methods for getting the
     # different kinds of replies are wrappers around these.
-    
+
     # Method: getReplyCount
     # Get the number of replies of a particular type.
     #
     # Parameters:
     # parms - An associative array of various parameters.  The valid array
     #         keys are "path", which is the directory to scan, "ext", which is
-    #         the file extension of the data files, and "match_re", which is a 
+    #         the file extension of the data files, and "match_re", which is a
     #         regular expression matching the names of the data files minus
     #         the extension (default is /[\w\d]+/)).
     #         Note that "path" and "ext" keys are required.
@@ -948,13 +948,13 @@ class BlogEntry extends Entry {
     # Returns:
     # An integer representing the number of replies of the given type.
     # If the call fails for some reason, then false is returned.
-    
+
     public function getReplyCount($params) {
         $dir_path = dirname($this->file);
         $dir_path = $dir_path.PATH_DELIM.$params['path'];
         $dir_array = scan_directory($dir_path);
         if ($dir_array === false) return false;
-        
+
         $count = 0;
         foreach ($dir_array as $file) {
             $cond = is_file($dir_path.PATH_DELIM.$file);
@@ -968,32 +968,32 @@ class BlogEntry extends Entry {
         }
         return $count;
     }
-    
+
     # Method: getReplyArray
     # Get an array of replies of a particular type.  This is for internal use
     # only.  Call getComments(), getTrackbacks(), getPingbacks, or getReplies()
-    # instead of this.  
+    # instead of this.
     #
     # Parameters:
-    # params - An associative array of settings, as in <getReplyCount>.  In 
-    #          *addition* to the keys allowed by that function, this one also 
+    # params - An associative array of settings, as in <getReplyCount>.  In
+    #          *addition* to the keys allowed by that function, this one also
     #          requires a "creator" key, which is the name of a function that
-    #          will return the correct type of object given the data path to 
+    #          will return the correct type of object given the data path to
     #          its storage file as a parameter.  It also accepts an optional
     #          "sort_asc" key, which will sort the files in order by filename,
-    #          (which equates to date order) rather than in reverse order when 
+    #          (which equates to date order) rather than in reverse order when
     #          set to true.
     #
     # Returns:
-    # An array of BlogComment, Trackback, or Pingback objects, depending on 
+    # An array of BlogComment, Trackback, or Pingback objects, depending on
     # the parameters.  Returns false on failure.
-    
+
     public function getReplyArray($params) {
         $dir_path = dirname($this->file);
         $dir_path = $dir_path.PATH_DELIM.$params['path'];
         if (! is_dir($dir_path)) return array();
         else $reply_dir = scan_directory($dir_path);
-        
+
         $reply_files = array();
         foreach ($reply_dir as $file) {
             $cond = is_file($dir_path.PATH_DELIM.$file);
@@ -1002,7 +1002,7 @@ class BlogEntry extends Entry {
                 if (! $cond && isset($params['altext'])) {
                     $cond = preg_match("/[\w\d]+".$params['altext']."/", $file);
                 }
-            if ($cond) $reply_files[] = $file; 
+            if ($cond) $reply_files[] = $file;
             }
         }
         if (isset($params['sort_asc']) && $params['sort_asc']) {
@@ -1015,7 +1015,7 @@ class BlogEntry extends Entry {
         $creator = $params['creator'];
         foreach ($reply_files as $file)
             $reply_array[] = $creator($dir_path.PATH_DELIM.$file);
-        
+
         return $reply_array;
     }
 
@@ -1033,7 +1033,7 @@ class BlogEntry extends Entry {
         $repls = array_merge($repls, $this->getPingbacks());
         return $repls;
     }
-    
+
     # Comment handling functions.
 
     /*
@@ -1041,7 +1041,7 @@ class BlogEntry extends Entry {
     Determine the number of comments that belong to this object.
 
     Returns:
-    A non-negative integer representing the number of comments or false on 
+    A non-negative integer representing the number of comments or false on
     failure.
     */
     public function getCommentCount() {
@@ -1056,7 +1056,7 @@ class BlogEntry extends Entry {
     Parameters:
     sort_asc - *Optional* boolean (true by default) determining whether the
                comments should be sorted in ascending order by date.
-    
+
     Returns:
     An array of BlogComment object.
     */
@@ -1065,7 +1065,7 @@ class BlogEntry extends Entry {
                         'creator'=>'NewBlogComment', 'sort_asc'=>$sort_asc);
         return $this->getReplyArray($params);
     }
-    
+
     # Method: getCommentArray
     # Compatibility function, alias for getComments
     public function getCommentArray($sort_asc=true) {
@@ -1079,7 +1079,7 @@ class BlogEntry extends Entry {
     Get the number of TrackBacks for this object.
 
     Returns:
-    A non-negative integer representing the number of TrackBacks or false on 
+    A non-negative integer representing the number of TrackBacks or false on
     failure.
     */
     public function getTrackbackCount() {
@@ -1094,31 +1094,31 @@ class BlogEntry extends Entry {
     Parameters:
     sort_asc - *Optional* boolean (true by default) determining whether the
                trackbacks should be sorted in ascending order by date.
-    
+
     Returns:
     An array of Trackback objects.
     */
     public function getTrackbacks($sort_asc=true) {
-        $params = array('path'=>ENTRY_TRACKBACK_DIR, 
+        $params = array('path'=>ENTRY_TRACKBACK_DIR,
                         'ext'=>TRACKBACK_PATH_SUFFIX,
                         'creator'=>'NewTrackback', 'sort_asc'=>$sort_asc);
         return $this->getReplyArray($params);
     }
-    
+
     # Method: getTrackbackArray
     # Compatibility function, alias for getTrackbacks
     public function getTrackbackArray($sort_asc=true) {
         return $this->getTrackbacks($sort_asc);
     }
-    
+
     # Pingback handling functions
-    
+
     /*
     Method: getPingbackCount
     Get the number of Pingbacks for this object.
 
     Returns:
-    A non-negative integer representing the number of Pingbacks or false on 
+    A non-negative integer representing the number of Pingbacks or false on
     failure.
     */
     public function getPingbackCount() {
@@ -1133,32 +1133,32 @@ class BlogEntry extends Entry {
     Parameters:
     sort_asc - *Optional* boolean (true by default) determining whether the
                pingbacks should be sorted in ascending order by date.
-    
+
     Returns:
     An array of Pingback objects.
     */
     public function getPingbacks($sort_asc=true) {
-        $params = array('path'=>ENTRY_PINGBACK_DIR, 
+        $params = array('path'=>ENTRY_PINGBACK_DIR,
                         'ext'=>PINGBACK_PATH_SUFFIX,
                         'creator'=>'NewPingback', 'sort_asc'=>$sort_asc);
         return $this->getReplyArray($params);
     }
-    
+
     # Method: getPingbackArray
     # Compatibility function, alias for getPingbacks
     public function getPingbackArray($sort_asc=true) {
         return $this->getPingbacks($sort_asc);
     }
-    
+
     # Method: getPingbacksByType
     # Gets the local and remote pingbacks for an entry, i.e. pingbacks that come
     # from URLs on the same blog as this entry and others.
     #
-    # Returns: 
+    # Returns:
     # An associative array with two keys, "local" and "remote".  Each element is
     # an array of Pingback objects with the "friendly" pings in the "local"
     # array and others in the "remote" array.
-    
+
     public function getPingbacksByType() {
         $pings = $this->getPingbacks();
         $ret = array('local'=>array(), 'remote'=>array());
@@ -1173,9 +1173,9 @@ class BlogEntry extends Entry {
         }
         return $ret;
     }
-    
+
     # Method: sendPings
-    # Scans the links in the current entry, determines which are 
+    # Scans the links in the current entry, determines which are
     # pingback-enabled, and sends a pingback ping to those links.
     #
     # Parameters:
@@ -1183,9 +1183,9 @@ class BlogEntry extends Entry {
     # local - *Optional* boolean that determines whether or not to send pings
     #         to posts on the same webserver.  *Defaults* to false.
     # Returns:
-    # An array of associative arrays.  Each array has 'uri' and a 'response' 
+    # An array of associative arrays.  Each array has 'uri' and a 'response'
     # key, which contain the target URI and the XML-RPC response object.
-    
+
     public function sendPings($client, $local=false) {
 
         if (!$this->send_pingback) {
@@ -1203,28 +1203,28 @@ class BlogEntry extends Entry {
                 $result = $this->sendPingback($client, $pb_server, $uri);
                 $ret[] = array('uri'=>$uri, 'response'=>$result);
             }
-            
+
         }
         return $ret;
     }
-    
+
     private function sendPingback($client, $uri, $target) {
-        
+
         $linkdata = parse_url($uri);
 
         $host = isset($linkdata['host']) ? $linkdata['host'] : $_SERVER["SERVER_NAME"];
         $path = isset($linkdata['path']) ? $linkdata['path'] : '';
         $port = isset($linkdata['port']) ? $linkdata['port'] : 80;
-    
-        $parms = array(new xmlrpcval($this->permalink(), 'string'), 
+
+        $parms = array(new xmlrpcval($this->permalink(), 'string'),
                        new xmlrpcval($target, 'string'));
         $msg = new xmlrpcmsg('pingback.ping', $parms);
-        
+
         $result = $client->sendXmlRpcMessage($host, $path, $port, $msg);
-        
+
         return $result;
     }
-    
+
     # Method: pingExists
     # Checks if a Pingback ping has already been recorded for the source URL.
     #
@@ -1232,9 +1232,9 @@ class BlogEntry extends Entry {
     # uri - The source URI to check.
     #
     # Returns:
-    # True if there is already a recorded ping with the source URI, false 
+    # True if there is already a recorded ping with the source URI, false
     # otherwise.
-    
+
     public function pingExists ($uri) {
         $pings = $this->getPingbacks();
         if (! $pings) return false;
@@ -1243,7 +1243,7 @@ class BlogEntry extends Entry {
         }
         return false;
     }
-    
+
     # Method: extractLinks
     # Extracts all the hyperlinks from the entry text.
     #
@@ -1252,9 +1252,9 @@ class BlogEntry extends Entry {
     #               should be included.  *Defaults* to false.
     #
     # Returns:
-    # An array of URLs containing each hyperlink in the entry.  If allow_local 
+    # An array of URLs containing each hyperlink in the entry.  If allow_local
     # is false, then links without a protocol and host name are excluded.
-    
+
     public function extractLinks($allow_local=false) {
         $matches = array();
         $data = $this->markup();

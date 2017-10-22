@@ -14,7 +14,7 @@ abstract class PublisherTestBase extends PHPUnit_Framework_TestCase {
         $this->blog->home_path = '.';
 
         $this->user = $this->prophet->prophesize('User');
-        
+
         $this->fs = $this->prophet->prophesize('FS');
 
         $this->system = $this->prophet->prophesize('System');
@@ -38,9 +38,9 @@ abstract class PublisherTestBase extends PHPUnit_Framework_TestCase {
     }
 
     protected function getTestTime() {
-        return new DateTime('2017-01-02 12:34:00'); 
+        return new DateTime('2017-01-02 12:34:00');
     }
-    
+
     protected function setUpTestDraftEntryForSuccessfulSave() {
         return $this->setUpEntryForSuccessfulSave('./drafts/02_1234/entry.xml');
     }

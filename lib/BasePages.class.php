@@ -18,52 +18,52 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 abstract class BasePages {
-    
+
     protected $fs;
-    
+
     abstract protected function getActionMap();
     abstract protected function defaultAction();
 
     public function __construct($fs = null) {
         $this->fs = $fs ? $fs : NewFS();
     }
-    
+
     public function routeRequest($action = null) {
-		$action_map = $this->getActionMap();
+        $action_map = $this->getActionMap();
         $action = $action ?: GET('action');
         $action_method = isset($action_map[$action]) ? $action_map[$action] : null;
-		
-		if ($action_method && strpos($action_method, '::') !== false) {
-        
+
+        if ($action_method && strpos($action_method, '::') !== false) {
+
             list($class, $method) = explode('::', $action_method, 2);
             $object = new $class();
             return $object->$method();
-        
-		} elseif ($action_method) {
-            
-			return $this->$action_method();
-			
-		} elseif ( isset($_GET['script']) ) {
-			
-			$file = $this->script_path($_GET['script']);
-			if ($this->fs->file_exists($file)) $this->fs->readfile($file);
-			else $this->fs->echo_to_output("// Failed to find $file");
+
+        } elseif ($action_method) {
+
+            return $this->$action_method();
+
+        } elseif ( isset($_GET['script']) ) {
+
+            $file = $this->script_path($_GET['script']);
+            if ($this->fs->file_exists($file)) $this->fs->readfile($file);
+            else $this->fs->echo_to_output("// Failed to find $file");
             return true;
-			
-		} elseif ( isset($_GET['plugin']) ) {
-			
-			define("PLUGIN_DO_OUTPUT", true);
-			$plugin_name = preg_replace('[^A-Za-z0-9_\-]', '', $_GET['plugin']);
-			$paths = array(@BLOG_ROOT, USER_DATA_PATH, INSTALL_ROOT);
-			foreach ($paths as $path) {
-				$plugin = Path::mk($path, 'plugins', "$plugin_name.php");
-				if ($this->fs->file_exists($plugin)) {
-					require $plugin;
+
+        } elseif ( isset($_GET['plugin']) ) {
+
+            define("PLUGIN_DO_OUTPUT", true);
+            $plugin_name = preg_replace('[^A-Za-z0-9_\-]', '', $_GET['plugin']);
+            $paths = array(@BLOG_ROOT, USER_DATA_PATH, INSTALL_ROOT);
+            foreach ($paths as $path) {
+                $plugin = Path::mk($path, 'plugins', "$plugin_name.php");
+                if ($this->fs->file_exists($plugin)) {
+                    require $plugin;
                     return true;
-				}
-			}
-		}
-        
+                }
+            }
+        }
+
         $this->defaultAction();
-	}
+    }
 }

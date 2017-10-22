@@ -41,409 +41,409 @@
 
 class Trackback extends LnBlogObject {
 
-	# The only required element is the URL
+    # The only required element is the URL
 
-	public $title;
-	public $blog;
-	public $data;
-	public $url;
-	public $ping_date;
-	public $ip;
-	public $file;
+    public $title;
+    public $blog;
+    public $data;
+    public $url;
+    public $ping_date;
+    public $ip;
+    public $file;
 
     public $exclude_fields = array('fs');
 
     protected $fs;
     protected $http_client;
 
-	public function __construct($path=false, $fs = null, $http_client = null) {
+    public function __construct($path=false, $fs = null, $http_client = null) {
         $this->fs = $fs ?: NewFS();
         $this->http_client = $http_client ?: new HttpClient();
-		
-		$this->raiseEvent("OnInit");
 
-		$this->title = '';
-		$this->blog = '';
-		$this->data = '';
-		$this->url = '';
-		$this->ip = '';
-		$this->ping_date = false;
-		$this->file = $path;
-		
-		if ($this->file) {
-			if (! $this->fs->is_file($this->file)) $this->file = $this->getFilename($this->file);
-			if ($this->fs->is_file($this->file)) $this->readFileData($this->file);
-		}
-		
-		$this->raiseEvent("InitComplete");
-	}
+        $this->raiseEvent("OnInit");
 
-	# Method: title
-	# An RSS compatibility method for getting the title of an entry.
-	#
-	# Parameters:
-	# no_escape - *Optional* boolean that tells the function to not escape
-	#             ampersands and angle braces in the return value.
-	#
-	# Returns:
-	# A string containing the title of this object.
-	function title($no_escape=false) {
-		$ret = $this->title ? $this->title : NO_SUBJECT;
-		return $no_escape ? $ret : htmlspecialchars($ret);
-	}
-	
-	function description() { }
-	
-	# Method: getParent
-	# Gets a copy of the parent object.
-	#
-	# Returns:
-	# A BlogEntry or Article object, depending on the context.
-	
-	function getParent() {
-		if ($this->fs->file_exists($this->file)) {
-			return NewEntry(dirname(dirname($this->file)));
-		} else {
-			return NewEntry();
-		}
-	}
+        $this->title = '';
+        $this->blog = '';
+        $this->data = '';
+        $this->url = '';
+        $this->ip = '';
+        $this->ping_date = false;
+        $this->file = $path;
 
-	# Method: isTrackback
-	# Determines if an object or file is a saved trackback.
-	#
-	# Parameters:
-	# path - The *optional* path to the trackback data file.  If not given, 
-	#        then the object's file property is used.
-	#
-	# Returns:
-	# True if the data file exists and is under an entry trackback directory, 
-	# false otherwise
+        if ($this->file) {
+            if (! $this->fs->is_file($this->file)) $this->file = $this->getFilename($this->file);
+            if ($this->fs->is_file($this->file)) $this->readFileData($this->file);
+        }
 
-	function isTrackback($path=false) {
-		if (!$path) $path = $this->file;
-		if ( $this->fs->file_exists($path) && 
-		     basename(dirname($path)) == ENTRY_TRACKBACK_DIR ) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
-	# Method: uri
-	# Get the URI for various functions
+        $this->raiseEvent("InitComplete");
+    }
 
-	function uri($type) {
-		$uri = create_uri_object($this);
-		return $uri->$type();
-	}
+    # Method: title
+    # An RSS compatibility method for getting the title of an entry.
+    #
+    # Parameters:
+    # no_escape - *Optional* boolean that tells the function to not escape
+    #             ampersands and angle braces in the return value.
+    #
+    # Returns:
+    # A string containing the title of this object.
+    function title($no_escape=false) {
+        $ret = $this->title ? $this->title : NO_SUBJECT;
+        return $no_escape ? $ret : htmlspecialchars($ret);
+    }
 
-	# Method: getPostData
-	# Pulls the trackback data out of the POST and into the object.
-	#
-	# As per the TrackBack specification located at
-	# <http://www.sixapart.com/pronet/docs/trackback_spec>, the interface for 
-	# POSTs is as follows.
-	# title     - The title of the pinging post.
-	# excerpt   - An excerpt from the text of the pinging post.
-	# blog_name - The name of the blog to which the pinging post belongs.
-	# url       - The URL of the pinging post.  This is the only required field.
+    function description() { }
 
-	function getPostData() {
-		$this->title = htmlspecialchars(POST("title"));
-		$this->data = htmlspecialchars(POST("excerpt"));
-		$this->blog = htmlspecialchars(POST("blog_name"));
-		$this->url = POST("url");
-		$this->ip = get_ip();
-		$this->ping_date = date('r');
-		$this->raiseEvent("POSTRetreived");
-	}
-	
-	# Method: send
-	# Send a TrackBack ping without using a form.
-	#
-	# Parameters:
-	# url - The URL to which the trackback ping will be sent.
-	#
-	# Returns: 
-	# An associative array with 'error', 'message', and 'response' elements.
-	# The error element contains the trackback return code from the remote
-	# server.  The message element contains the error message if there was
-	# one.  Note that a return code of 0 indicates success, while other values
-	# indicate an error.  The response element contains the full XML response,
-	# for debugging purposes.
-	
-	function send($url) {
-		$this->raiseEvent("OnSend");
-		
-		# Build the query string, ignoring missing elements.
-		$query_string = "url=".urlencode($this->url);
-		if ($this->title) $query_string .= "&title=".urlencode($this->title);
-		if ($this->blog) $query_string .= "&blog_name=".urlencode($this->blog);
-		if ($this->data) $query_string .= "&excerpt=".urlencode($this->data);
+    # Method: getParent
+    # Gets a copy of the parent object.
+    #
+    # Returns:
+    # A BlogEntry or Article object, depending on the context.
+
+    function getParent() {
+        if ($this->fs->file_exists($this->file)) {
+            return NewEntry(dirname(dirname($this->file)));
+        } else {
+            return NewEntry();
+        }
+    }
+
+    # Method: isTrackback
+    # Determines if an object or file is a saved trackback.
+    #
+    # Parameters:
+    # path - The *optional* path to the trackback data file.  If not given,
+    #        then the object's file property is used.
+    #
+    # Returns:
+    # True if the data file exists and is under an entry trackback directory,
+    # false otherwise
+
+    function isTrackback($path=false) {
+        if (!$path) $path = $this->file;
+        if ( $this->fs->file_exists($path) &&
+             basename(dirname($path)) == ENTRY_TRACKBACK_DIR ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    # Method: uri
+    # Get the URI for various functions
+
+    function uri($type) {
+        $uri = create_uri_object($this);
+        return $uri->$type();
+    }
+
+    # Method: getPostData
+    # Pulls the trackback data out of the POST and into the object.
+    #
+    # As per the TrackBack specification located at
+    # <http://www.sixapart.com/pronet/docs/trackback_spec>, the interface for
+    # POSTs is as follows.
+    # title     - The title of the pinging post.
+    # excerpt   - An excerpt from the text of the pinging post.
+    # blog_name - The name of the blog to which the pinging post belongs.
+    # url       - The URL of the pinging post.  This is the only required field.
+
+    function getPostData() {
+        $this->title = htmlspecialchars(POST("title"));
+        $this->data = htmlspecialchars(POST("excerpt"));
+        $this->blog = htmlspecialchars(POST("blog_name"));
+        $this->url = POST("url");
+        $this->ip = get_ip();
+        $this->ping_date = date('r');
+        $this->raiseEvent("POSTRetreived");
+    }
+
+    # Method: send
+    # Send a TrackBack ping without using a form.
+    #
+    # Parameters:
+    # url - The URL to which the trackback ping will be sent.
+    #
+    # Returns:
+    # An associative array with 'error', 'message', and 'response' elements.
+    # The error element contains the trackback return code from the remote
+    # server.  The message element contains the error message if there was
+    # one.  Note that a return code of 0 indicates success, while other values
+    # indicate an error.  The response element contains the full XML response,
+    # for debugging purposes.
+
+    function send($url) {
+        $this->raiseEvent("OnSend");
+
+        # Build the query string, ignoring missing elements.
+        $query_string = "url=".urlencode($this->url);
+        if ($this->title) $query_string .= "&title=".urlencode($this->title);
+        if ($this->blog) $query_string .= "&blog_name=".urlencode($this->blog);
+        if ($this->data) $query_string .= "&excerpt=".urlencode($this->data);
 
         $response = $this->http_client->sendPost($url, $query_string);
 
-		# Get the error code
-		$start_tag_pos = strpos($response, "<error>");
-		$end_tag_pos = strpos($response, "</error>");
-		if ($start_tag_pos && $end_tag_pos) {
-			$ret_code = substr($response, 
-			                   $start_tag_pos + strlen("<error>"),
-			                   $end_tag_pos - ($start_tag_pos + strlen("<error>")) );
-		} else {
-			$ret_code = 1;
-		}
-						   
-		$start_tag_pos = strpos($response, "<message>");
-		$end_tag_pos = strpos($response, "</message>");
-		if ($start_tag_pos && $end_tag_pos) {
-			$ret_msg = substr($response, 
-			                  $start_tag_pos + strlen("<message>"),
-			                  $end_tag_pos - ($start_tag_pos + strlen("<message>")) );
-		} elseif ($ret_code != 0) {
-			$ret_msg = _('Malformed response');
-		} else {
-			$ret_msg = '';
-		}
-		
-		$this->raiseEvent("SendComplete");
-		return array('error'=>$ret_code, 'message'=>$ret_msg,
-		             'response'=>htmlentities($response));
-	}
+        # Get the error code
+        $start_tag_pos = strpos($response, "<error>");
+        $end_tag_pos = strpos($response, "</error>");
+        if ($start_tag_pos && $end_tag_pos) {
+            $ret_code = substr($response,
+                               $start_tag_pos + strlen("<error>"),
+                               $end_tag_pos - ($start_tag_pos + strlen("<error>")) );
+        } else {
+            $ret_code = 1;
+        }
 
-	# Method: receive
-	# Receive a TrackBack ping and store the data in a file.
-	# This method also outputs a response in XML for the pinger.
-	#
-	# Returns:
-	# Zero on success, 1 on failure.  Note that these are the same return 
-	# codes described in the TrackBack specificaiton.
+        $start_tag_pos = strpos($response, "<message>");
+        $end_tag_pos = strpos($response, "</message>");
+        if ($start_tag_pos && $end_tag_pos) {
+            $ret_msg = substr($response,
+                              $start_tag_pos + strlen("<message>"),
+                              $end_tag_pos - ($start_tag_pos + strlen("<message>")) );
+        } elseif ($ret_code != 0) {
+            $ret_msg = _('Malformed response');
+        } else {
+            $ret_msg = '';
+        }
 
-	function receive() {
-		$this->raiseEvent("OnReceive");
-		$this->getPostData();
-		$parent = $this->getParent();
-		$error = '';
-		if (! $this->url) {
-			$error = _("No URL in ping.");
-		} elseif (! $parent->allow_tb) {
-			$error = _("This entry does not accept trackbacks.");
-		} else {
-			$ts = time();
-			$this->ping_date = date("Y-m-d H:i:s T", $ts);
-			$path = mkpath($parent->localpath(), ENTRY_TRACKBACK_DIR, 
-			               $ts.TRACKBACK_PATH_SUFFIX);
-			$ret = $this->writeFileData($path);
-			if (! $ret) $error = _("Unable to save ping data.");
-		}
-		$err_code = $error == '' ? "0" : "1";
-		$output = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n".
-		          "<response>\n".
-		          "<error>".$err_code."</error>\n";
-		if ($error != '') $output .= "<message>$error</message>\n";
-		$output .= "</response>\n";
-		/*
-		ob_start();
-		print_r($this);
-		$output .= ob_get_contents();
-		ob_end_clean();
-		*/
+        $this->raiseEvent("SendComplete");
+        return array('error'=>$ret_code, 'message'=>$ret_msg,
+                     'response'=>htmlentities($response));
+    }
 
-		$this->raiseEvent("ReceiveComplete");
-		return $output;
-	}
+    # Method: receive
+    # Receive a TrackBack ping and store the data in a file.
+    # This method also outputs a response in XML for the pinger.
+    #
+    # Returns:
+    # Zero on success, 1 on failure.  Note that these are the same return
+    # codes described in the TrackBack specificaiton.
 
-	# Method: incomingPing
-	# Determines if there is a trackback ping in the POST data.
-	#
-	# Returns:
-	# True if there is a ping URL in the POST, false otherwise.
+    function receive() {
+        $this->raiseEvent("OnReceive");
+        $this->getPostData();
+        $parent = $this->getParent();
+        $error = '';
+        if (! $this->url) {
+            $error = _("No URL in ping.");
+        } elseif (! $parent->allow_tb) {
+            $error = _("This entry does not accept trackbacks.");
+        } else {
+            $ts = time();
+            $this->ping_date = date("Y-m-d H:i:s T", $ts);
+            $path = mkpath($parent->localpath(), ENTRY_TRACKBACK_DIR,
+                           $ts.TRACKBACK_PATH_SUFFIX);
+            $ret = $this->writeFileData($path);
+            if (! $ret) $error = _("Unable to save ping data.");
+        }
+        $err_code = $error == '' ? "0" : "1";
+        $output = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n".
+                  "<response>\n".
+                  "<error>".$err_code."</error>\n";
+        if ($error != '') $output .= "<message>$error</message>\n";
+        $output .= "</response>\n";
+        /*
+        ob_start();
+        print_r($this);
+        $output .= ob_get_contents();
+        ob_end_clean();
+        */
 
-	function incomingPing() {
-		if (POST("url")) return true;
-		else return false;
-	}
+        $this->raiseEvent("ReceiveComplete");
+        return $output;
+    }
 
-	# Method: readFileData
-	# Reads trackback ping data from a file.
-	#
-	# Parameters:
-	# path - Optional path for the data file.  *Default* is the current file.
+    # Method: incomingPing
+    # Determines if there is a trackback ping in the POST data.
+    #
+    # Returns:
+    # True if there is a ping URL in the POST, false otherwise.
 
-	function readFileData($path=false) {
-		if (! $path) $path = $this->file;
-		if (substr($this->file, strlen($this->file)-4) != ".xml") {
-			$this->readOldFile($path);
-		} else {
-			$this->deserializeXML($path);
-		}
-	}
+    function incomingPing() {
+        if (POST("url")) return true;
+        else return false;
+    }
 
-	function readOldFile($path) {
-		$file_data = file($path);
-		foreach ($file_data as $line) {
-			$line = trim($line);
-			$pos = strpos($line, ":");
-			$var = '';
-			$dat = '';
-			# Get the variable name and value, which starts 2 places after
-			# the colon is found.
-			if ($pos !== false) {
-				$var = substr($line, 0, $pos);
-				$dat = substr($line, $pos + 2);
-			}
-			# Set the properties.
-			switch ($var) {
-				case 'URL':
-					$this->url = $dat;
-					break;
-				case 'Title':
-					$this->title = $dat;
-					break;
-				case 'IP':
-					$this->ip = $dat;
-					break;
-				case 'Date':
-					$this->ping_date = $dat;
-					break;
-				case 'Blog':
-					$this->blog = $dat;
-					break;
-				default:
-					$this->data .= $line;
-			}
-		}
-	}
+    # Method: readFileData
+    # Reads trackback ping data from a file.
+    #
+    # Parameters:
+    # path - Optional path for the data file.  *Default* is the current file.
 
-	# Method: writeFileData
-	# Write trackback data to a file.
-	#
-	# Parameters:
-	# path - The path to which to write the data
-	#
-	# Returns:
-	# True on success, false on failure.
+    function readFileData($path=false) {
+        if (! $path) $path = $this->file;
+        if (substr($this->file, strlen($this->file)-4) != ".xml") {
+            $this->readOldFile($path);
+        } else {
+            $this->deserializeXML($path);
+        }
+    }
 
-	function writeFileData($path) {
-		if (! $this->fs->is_dir( dirname($path) ) ) {
-			$this->fs->mkdir_rec(dirname($path));
-		}
-		$this->file = $path;
-		$data = $this->serializeXML();
-		$ret = $this->fs->write_file($path, $data);
-		return $ret;
-	}
+    function readOldFile($path) {
+        $file_data = file($path);
+        foreach ($file_data as $line) {
+            $line = trim($line);
+            $pos = strpos($line, ":");
+            $var = '';
+            $dat = '';
+            # Get the variable name and value, which starts 2 places after
+            # the colon is found.
+            if ($pos !== false) {
+                $var = substr($line, 0, $pos);
+                $dat = substr($line, $pos + 2);
+            }
+            # Set the properties.
+            switch ($var) {
+                case 'URL':
+                    $this->url = $dat;
+                    break;
+                case 'Title':
+                    $this->title = $dat;
+                    break;
+                case 'IP':
+                    $this->ip = $dat;
+                    break;
+                case 'Date':
+                    $this->ping_date = $dat;
+                    break;
+                case 'Blog':
+                    $this->blog = $dat;
+                    break;
+                default:
+                    $this->data .= $line;
+            }
+        }
+    }
 
-	# Method: get
-	# Put the saved data into a template for display.
-	#
-	# Returns:
-	# The data to be sent to the client.
+    # Method: writeFileData
+    # Write trackback data to a file.
+    #
+    # Parameters:
+    # path - The path to which to write the data
+    #
+    # Returns:
+    # True on success, false on failure.
 
-	function get() {
-		$blog = NewBlog();
-		$u = NewUser();
-		$tpl = NewTemplate(TRACKBACK_TEMPLATE);
-		$anchor = $this->getAnchor();
-		$del_link = $this->uri("delete");
+    function writeFileData($path) {
+        if (! $this->fs->is_dir( dirname($path) ) ) {
+            $this->fs->mkdir_rec(dirname($path));
+        }
+        $this->file = $path;
+        $data = $this->serializeXML();
+        $ret = $this->fs->write_file($path, $data);
+        return $ret;
+    }
 
-		$this->control_bar = array();
-		$this->control_bar[] = 
-			'<a href="'.$del_link.'" '.
-			'class="deletelink">'.
-			_("Delete").'</a>';
-			#'onclick="return comm_del(this, \''.spf_("Delete %s?", $anchor).'\');">'
-			#'onclick="return window.confirm(\'Delete '.$anchor.'?\');">'
-			
-		$this->raiseEvent("OnOutput");
-		$tpl->set("SHOW_EDIT_CONTROLS", System::instance()->canModify($this->getParent(), $u) && $u->checkLogin() );
-		$tpl->set("TB_URL", $this->url);
-		$tpl->set("CONTROL_BAR", $this->control_bar);
-		$tpl->set("TB_PERMALINK", $this->permalink());
-		$tpl->set("TB_ANCHOR", $this->getAnchor());
-		if ($this->ping_date) $tpl->set("TB_DATE", $this->ping_date);
-		if ($this->ip) $tpl->set("TB_IP", $this->ip);
-		if ($this->title) $tpl->set("TB_TITLE", $this->title);
-		if ($this->blog) $tpl->set("TB_BLOG", $this->blog);
-		if ($this->data) $tpl->set("TB_DATA", $this->data);
-		
-		$this->raiseEvent("OutputComplete");
-		return $tpl->process();
-	}
-	
-	# Method: delete
-	# Permanently delete a trackback.
-	#
-	# Returns:
-	# True on success, false on failure.
-	
-	function delete() {
-		$this->raiseEvent("OnDelete");
-		if ($this->fs->file_exists($this->file)) {
-			$ret = $this->fs->delete($this->file);
-		} else $ret = false;
-		$this->raiseEvent("DeleteComplete");
-		return $ret;
-	}
+    # Method: get
+    # Put the saved data into a template for display.
+    #
+    # Returns:
+    # The data to be sent to the client.
 
-	# Method: permalink
-	# Gives the permalink to the trackback entry.
-	#
-	# Returns:
-	# A permalink to the trackback entry.
-	
-	function permalink() {
-		return $this->uri("permalink");
-	}
+    function get() {
+        $blog = NewBlog();
+        $u = NewUser();
+        $tpl = NewTemplate(TRACKBACK_TEMPLATE);
+        $anchor = $this->getAnchor();
+        $del_link = $this->uri("delete");
 
-	# Method: getAnchor
-	# Gets an anchor to the entry on the page.
-	#
-	# Returns:
-	# The anchor to use for this trackback.
-	
-	function getAnchor() {
-		$ret = basename($this->file);
-		$ret = preg_replace("/.\w\w\w$/", "", $ret);
-		$ret = "trackback".$ret;
-		return $ret;
-	}
+        $this->control_bar = array();
+        $this->control_bar[] =
+            '<a href="'.$del_link.'" '.
+            'class="deletelink">'.
+            _("Delete").'</a>';
+            #'onclick="return comm_del(this, \''.spf_("Delete %s?", $anchor).'\');">'
+            #'onclick="return window.confirm(\'Delete '.$anchor.'?\');">'
 
-	# Method: getFilename
-	# Converts an anchor from <getAnchor> or an ID from globalID into a filename.
-	#
-	# Parameters:
-	# anchor - The anchor or ID to turn into a filename.
-	#
-	# Returns:
-	# The path to the trackback file.
-	
-	function getFilename($anchor) {
-		if (strpos($anchor, "#") !== false) {
-			$pieces = split('#', $anchor);
-			$entid = dirname($pieces[0]);
-			$tbid = $pieces[1];
-		} else {
-			$entid = false;
-			$tbid = $anchor;
-		}
-		$ent = NewEntry($entid);
-		$ret = substr($tbid, 9);
-		$ret .= TRACKBACK_PATH_SUFFIX;
-		$ret = mkpath($ent->localpath(),ENTRY_TRACKBACK_DIR,$ret);
-		$ret = realpath($ret);
-		return $ret;
-	}
+        $this->raiseEvent("OnOutput");
+        $tpl->set("SHOW_EDIT_CONTROLS", System::instance()->canModify($this->getParent(), $u) && $u->checkLogin() );
+        $tpl->set("TB_URL", $this->url);
+        $tpl->set("CONTROL_BAR", $this->control_bar);
+        $tpl->set("TB_PERMALINK", $this->permalink());
+        $tpl->set("TB_ANCHOR", $this->getAnchor());
+        if ($this->ping_date) $tpl->set("TB_DATE", $this->ping_date);
+        if ($this->ip) $tpl->set("TB_IP", $this->ip);
+        if ($this->title) $tpl->set("TB_TITLE", $this->title);
+        if ($this->blog) $tpl->set("TB_BLOG", $this->blog);
+        if ($this->data) $tpl->set("TB_DATA", $this->data);
 
-	# Method: globalID
-	# Get the global identifier for this trackback.
-	function globalID() {
-		$parent = $this->getParent();
-		$id = $parent->globalID();
-		if (defined('ENTRY_TRACKBACK_DIR') && ENTRY_TRACKBACK_DIR) {
-			$id .= '/'.ENTRY_TRACKBACK_DIR;
-		}
-		$id .= '/#'.$this->getAnchor();
-		return $id;
-	}
+        $this->raiseEvent("OutputComplete");
+        return $tpl->process();
+    }
+
+    # Method: delete
+    # Permanently delete a trackback.
+    #
+    # Returns:
+    # True on success, false on failure.
+
+    function delete() {
+        $this->raiseEvent("OnDelete");
+        if ($this->fs->file_exists($this->file)) {
+            $ret = $this->fs->delete($this->file);
+        } else $ret = false;
+        $this->raiseEvent("DeleteComplete");
+        return $ret;
+    }
+
+    # Method: permalink
+    # Gives the permalink to the trackback entry.
+    #
+    # Returns:
+    # A permalink to the trackback entry.
+
+    function permalink() {
+        return $this->uri("permalink");
+    }
+
+    # Method: getAnchor
+    # Gets an anchor to the entry on the page.
+    #
+    # Returns:
+    # The anchor to use for this trackback.
+
+    function getAnchor() {
+        $ret = basename($this->file);
+        $ret = preg_replace("/.\w\w\w$/", "", $ret);
+        $ret = "trackback".$ret;
+        return $ret;
+    }
+
+    # Method: getFilename
+    # Converts an anchor from <getAnchor> or an ID from globalID into a filename.
+    #
+    # Parameters:
+    # anchor - The anchor or ID to turn into a filename.
+    #
+    # Returns:
+    # The path to the trackback file.
+
+    function getFilename($anchor) {
+        if (strpos($anchor, "#") !== false) {
+            $pieces = split('#', $anchor);
+            $entid = dirname($pieces[0]);
+            $tbid = $pieces[1];
+        } else {
+            $entid = false;
+            $tbid = $anchor;
+        }
+        $ent = NewEntry($entid);
+        $ret = substr($tbid, 9);
+        $ret .= TRACKBACK_PATH_SUFFIX;
+        $ret = mkpath($ent->localpath(),ENTRY_TRACKBACK_DIR,$ret);
+        $ret = realpath($ret);
+        return $ret;
+    }
+
+    # Method: globalID
+    # Get the global identifier for this trackback.
+    function globalID() {
+        $parent = $this->getParent();
+        $id = $parent->globalID();
+        if (defined('ENTRY_TRACKBACK_DIR') && ENTRY_TRACKBACK_DIR) {
+            $id .= '/'.ENTRY_TRACKBACK_DIR;
+        }
+        $id .= '/#'.$this->getAnchor();
+        return $id;
+    }
 }

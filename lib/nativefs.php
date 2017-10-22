@@ -26,42 +26,42 @@ syntactic sugar thrown in.
 
 class NativeFS extends FS {
 
-	public function __construct() {
-		$this->default_mode = defined("FS_DEFAULT_MODE") ? FS_DEFAULT_MODE : 0000;
-		$this->script_mode = defined("FS_SCRIPT_MODE") ? FS_SCRIPT_MODE : 0000;
-		$this->directory_mode = defined("FS_DIRECTORY_MODE") ? FS_DIRECTORY_MODE : 0000;;
-	}
-	
-	
-	public function __destruct() {}
+    public function __construct() {
+        $this->default_mode = defined("FS_DEFAULT_MODE") ? FS_DEFAULT_MODE : 0000;
+        $this->script_mode = defined("FS_SCRIPT_MODE") ? FS_SCRIPT_MODE : 0000;
+        $this->directory_mode = defined("FS_DIRECTORY_MODE") ? FS_DIRECTORY_MODE : 0000;;
+    }
 
-	public function localpathToFSPath($path) { return $path; }
-	public function FSPathToLocalpath($path) { return $path; }
 
-	public function chdir($dir) {
-		return chdir($dir);
-	}
-	
-	public function getcwd() {
-		return getcwd();
-	}
+    public function __destruct() {}
 
-	public function mkdir($dir, $mode=false) { 
-		if (! $mode) $mode = $this->directory_mode;
-		if ($mode) {
-			$old_mask = umask(0000);
-			$ret = mkdir($dir, $mode); 
-			umask($old_mask);
-		} else {
-			# The optional mode assumes PHP 4.2.0 or greater.
-			# Is that a problem?
-			$ret = mkdir($dir);
-		}
-		return $ret;
-	}
+    public function localpathToFSPath($path) { return $path; }
+    public function FSPathToLocalpath($path) { return $path; }
 
-	public function mkdir_rec($dir, $mode=false) {
-		$parent = dirname($dir);
+    public function chdir($dir) {
+        return chdir($dir);
+    }
+
+    public function getcwd() {
+        return getcwd();
+    }
+
+    public function mkdir($dir, $mode=false) {
+        if (! $mode) $mode = $this->directory_mode;
+        if ($mode) {
+            $old_mask = umask(0000);
+            $ret = mkdir($dir, $mode);
+            umask($old_mask);
+        } else {
+            # The optional mode assumes PHP 4.2.0 or greater.
+            # Is that a problem?
+            $ret = mkdir($dir);
+        }
+        return $ret;
+    }
+
+    public function mkdir_rec($dir, $mode=false) {
+        $parent = dirname($dir);
         if ( $parent == $dir ) {
             return false;
         }
@@ -73,66 +73,66 @@ class NativeFS extends FS {
         if ($ret) {
             $ret = $this->mkdir($dir, $mode);
         }
-		return $ret;
-	}
+        return $ret;
+    }
 
-	public function rmdir($dir) {
-		# We can't delete the current directory because we're still using it.
-		$dir_path = realpath($dir);
-		if ( $dir_path == $this->getcwd() ) {
-			chdir("..");
-		}
-		return rmdir($dir_path);
-	}
+    public function rmdir($dir) {
+        # We can't delete the current directory because we're still using it.
+        $dir_path = realpath($dir);
+        if ( $dir_path == $this->getcwd() ) {
+            chdir("..");
+        }
+        return rmdir($dir_path);
+    }
 
-	public function rmdir_rec($dir) {
+    public function rmdir_rec($dir) {
         if (! is_dir($dir)) {
             return $this->delete($dir);
         }
-		$dirhand = opendir($dir);
-		$ret = true;
-		while ( ( false !== ( $ent = readdir($dirhand) ) ) && $ret ) {
-			if ($ent == "." || $ent == "..") {
-				continue;
-			} else {
-				$ret = $ret && $this->rmdir_rec($dir.PATH_DELIM.$ent);
-			}
-		}
-		closedir($dirhand);
+        $dirhand = opendir($dir);
+        $ret = true;
+        while ( ( false !== ( $ent = readdir($dirhand) ) ) && $ret ) {
+            if ($ent == "." || $ent == "..") {
+                continue;
+            } else {
+                $ret = $ret && $this->rmdir_rec($dir.PATH_DELIM.$ent);
+            }
+        }
+        closedir($dirhand);
         if ($ret) {
             $ret = $ret && $this->rmdir($dir);
         }
-		return $ret;	
-	}
+        return $ret;
+    }
 
-	public function chmod($path, $mode) {
-		return chmod($path, $mode);
-	}
+    public function chmod($path, $mode) {
+        return chmod($path, $mode);
+    }
 
-	public function copy($src, $dest)   { return copy($src, $dest); }
-	public function rename($src, $dest) { return rename($src, $dest); }
-	public function delete($src)        { return unlink($src); }
+    public function copy($src, $dest)   { return copy($src, $dest); }
+    public function rename($src, $dest) { return rename($src, $dest); }
+    public function delete($src)        { return unlink($src); }
 
-	public function write_file($path, $contents) {
-		$mask = $this->isScript($path) ? $this->script_mode : $this->default_mode;
-		
-		if ($mask) {
-			$old_umask = umask(0000);
-			umask($mask xor 0777);
-		}
-		
-		$fh = fopen($path, "w");
-		if ($fh) {
-			$ret = fwrite($fh, $contents);
-			fclose($fh);
-		} else $ret = false;
+    public function write_file($path, $contents) {
+        $mask = $this->isScript($path) ? $this->script_mode : $this->default_mode;
 
-		if ($mask) {
-			umask($old_umask);
-			$this->chmod($path, $mask);
-		}
-		
-		return $ret;
-	}
+        if ($mask) {
+            $old_umask = umask(0000);
+            umask($mask xor 0777);
+        }
+
+        $fh = fopen($path, "w");
+        if ($fh) {
+            $ret = fwrite($fh, $contents);
+            fclose($fh);
+        } else $ret = false;
+
+        if ($mask) {
+            umask($old_umask);
+            $this->chmod($path, $mask);
+        }
+
+        return $ret;
+    }
 
 }

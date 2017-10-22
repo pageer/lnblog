@@ -14,153 +14,153 @@
 # choice for most people.
 
 class TinyMCEEditor extends Plugin {
-	
-	protected $file_extensions = array('htm', 'html');
 
-	public function __construct() {
-		$this->plugin_desc = _("Use TinyMCE for the post editor and file editor.");
-		$this->plugin_version = "0.2.2";
-		$this->addOption("theme", _("TinyMCE theme to use"), "advanced", "select",
-			array("basic" => _("Basic"), "advanced" => _("Advanced"))
-		);
-		$this->addOption("url", _('URL to TinyMCE'), '//cdn.tinymce.com/4/tinymce.min.js');
-		parent::__construct();
-	}
-	
-	public function show_editor($selector = '') {
-		Page::instance()->addExternalScript($this->url);
-		ob_start();
-		?>
-		// <script> 
-		/*global tinymce, tinyMCE, current_text_content:true */
-		var MARKUP_HTML = <?php echo MARKUP_HTML?>;
-		var selector = "<?php echo $selector?>";
-		<?php if ($this->theme == 'advanced'): ?>
-		var init = {
-			selector: selector || 'textarea#body',
-			setup: function(ed) {
-				ed.on("change", function(e) {
-					current_text_content = ed.getContent();
-				});
-			},
-			theme: "modern",
-			plugins: [
-				"link lists image searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime",
-				"media nonbreaking hr charmap table contextmenu directionality emoticons template paste textcolor ",
-				"preview stylebuttons"
-			],
-			browser_spellcheck: true,
-			gecko_spellcheck: true,
-			content_css: "css/content.css",
-			toolbar: "bold italic underline | style-code | bullist numlist | forecolor backcolor | link image media emoticons | preview",
-			removed_menuitems: "newdocument"
-		};
-		<?php else: ?>
-		var init = {
-			selector: selector || 'textarea#body',
-			setup: function(ed) {
-				ed.on("change", function(e) {
-					current_text_content = ed.getContent();
-				});
-			}
-		};
-		<?php endif; ?>
-		
-		jQuery(document).ready(function() {
-			var $input_mode = $('#input_mode');
-			var unconditional_display = selector ? true : false;
-			var content_fetch_timer = null;
-			
-			// Suppress the plugin on the list-link page.
-			if (window.location.href.match('[?&]list=yes')) {
-				return;
-			}
-			
-			// Style buttons plugin from http://blog.ionelmc.ro/2013/10/17/tinymce-formatting-toolbar-buttons/
-			tinyMCE.PluginManager.add('stylebuttons', function(editor, url) {
-				['pre', 'p', 'code', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'].forEach(function(name){
-					editor.addButton('style-' + name, {
-						tooltip: 'Toggle ' + name,
-						text: name.toUpperCase(),
-						onClick: function() { editor.execCommand('mceToggleFormat', false, name); },
-						onPostRender: function() {
-							var self = this;
-							var setup = function() {
-								editor.formatter.formatChanged(name, function(state) {
-									self.active(state);
-								});
-							};
-							if (editor.formatter) {
-								setup();
-							} else {
-								editor.on('init', setup);
-							}
-						}
-					});
-				});
-			});
-			
-			var setContentFetchInterval = function() {
-				content_fetch_timer = setInterval(function tinymceUpdate() {
-					current_text_content = tinyMCE.activeEditor.getContent();
-				}, 5000);
-			};
-			var clearContentFetchInterval = function() {
-				clearInterval(content_fetch_timer);
-			};
-			
-			if (unconditional_display) {
-				tinymce.init(init);
-				$('#postform').addClass('rich-text');
-				
-				var $toggle_button = $('<button><?php p_('Toggle HTML Editor')?></button>');
-				$toggle_button.off('click').on('click', function (e) {
-					e.preventDefault();
-					if (tinymce.editors.length === 0) {
-						tinymce.init(init);
-						setContentFetchInterval();
-					} else {
-						clearContentFetchInterval();
-						tinymce.remove();
-					}
-					return false;
-				});
-				
-				$('textarea').closest('form')
-							  .find('button, input[type=submit], input[type=reset]')
-							  .filter(':last')
-							  .after($toggle_button);
-			} else {
-				if ($input_mode.val() == MARKUP_HTML) {
-					tinymce.init(init);
-					$('#postform').addClass('rich-text');
-				}
-				$input_mode.on('change.editor', function(e) {
-					var mode = $(this).val();
-					$('#postform').toggleClass('rich-text', mode == MARKUP_HTML);
-					if (mode == MARKUP_HTML) { // HTML mode
-						tinymce.init(init);
-						setContentFetchInterval();
-					} else {
-						clearContentFetchInterval();
-						tinymce.remove();
-					}
-				});
-			}
-		});
-		// </script>
-		<?php
-		$scr = ob_get_clean();
-		Page::instance()->addInlineScript($scr);
-	}
-	
-	public function file_editor() {
-		$file_ext = pathinfo(GET('file'), PATHINFO_EXTENSION);
-		$editor = GET('richedit');
-		if (in_array($file_ext, $this->file_extensions) && $editor != 'false') {
-			$this->show_editor('textarea#output');
-		}
-	}
+    protected $file_extensions = array('htm', 'html');
+
+    public function __construct() {
+        $this->plugin_desc = _("Use TinyMCE for the post editor and file editor.");
+        $this->plugin_version = "0.2.2";
+        $this->addOption("theme", _("TinyMCE theme to use"), "advanced", "select",
+            array("basic" => _("Basic"), "advanced" => _("Advanced"))
+        );
+        $this->addOption("url", _('URL to TinyMCE'), '//cdn.tinymce.com/4/tinymce.min.js');
+        parent::__construct();
+    }
+
+    public function show_editor($selector = '') {
+        Page::instance()->addExternalScript($this->url);
+        ob_start();
+        ?>
+        // <script>
+        /*global tinymce, tinyMCE, current_text_content:true */
+        var MARKUP_HTML = <?php echo MARKUP_HTML?>;
+        var selector = "<?php echo $selector?>";
+        <?php if ($this->theme == 'advanced'): ?>
+        var init = {
+            selector: selector || 'textarea#body',
+            setup: function(ed) {
+                ed.on("change", function(e) {
+                    current_text_content = ed.getContent();
+                });
+            },
+            theme: "modern",
+            plugins: [
+                "link lists image searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime",
+                "media nonbreaking hr charmap table contextmenu directionality emoticons template paste textcolor ",
+                "preview stylebuttons"
+            ],
+            browser_spellcheck: true,
+            gecko_spellcheck: true,
+            content_css: "css/content.css",
+            toolbar: "bold italic underline | style-code | bullist numlist | forecolor backcolor | link image media emoticons | preview",
+            removed_menuitems: "newdocument"
+        };
+        <?php else: ?>
+        var init = {
+            selector: selector || 'textarea#body',
+            setup: function(ed) {
+                ed.on("change", function(e) {
+                    current_text_content = ed.getContent();
+                });
+            }
+        };
+        <?php endif; ?>
+
+        jQuery(document).ready(function() {
+            var $input_mode = $('#input_mode');
+            var unconditional_display = selector ? true : false;
+            var content_fetch_timer = null;
+
+            // Suppress the plugin on the list-link page.
+            if (window.location.href.match('[?&]list=yes')) {
+                return;
+            }
+
+            // Style buttons plugin from http://blog.ionelmc.ro/2013/10/17/tinymce-formatting-toolbar-buttons/
+            tinyMCE.PluginManager.add('stylebuttons', function(editor, url) {
+                ['pre', 'p', 'code', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'].forEach(function(name){
+                    editor.addButton('style-' + name, {
+                        tooltip: 'Toggle ' + name,
+                        text: name.toUpperCase(),
+                        onClick: function() { editor.execCommand('mceToggleFormat', false, name); },
+                        onPostRender: function() {
+                            var self = this;
+                            var setup = function() {
+                                editor.formatter.formatChanged(name, function(state) {
+                                    self.active(state);
+                                });
+                            };
+                            if (editor.formatter) {
+                                setup();
+                            } else {
+                                editor.on('init', setup);
+                            }
+                        }
+                    });
+                });
+            });
+
+            var setContentFetchInterval = function() {
+                content_fetch_timer = setInterval(function tinymceUpdate() {
+                    current_text_content = tinyMCE.activeEditor.getContent();
+                }, 5000);
+            };
+            var clearContentFetchInterval = function() {
+                clearInterval(content_fetch_timer);
+            };
+
+            if (unconditional_display) {
+                tinymce.init(init);
+                $('#postform').addClass('rich-text');
+
+                var $toggle_button = $('<button><?php p_('Toggle HTML Editor')?></button>');
+                $toggle_button.off('click').on('click', function (e) {
+                    e.preventDefault();
+                    if (tinymce.editors.length === 0) {
+                        tinymce.init(init);
+                        setContentFetchInterval();
+                    } else {
+                        clearContentFetchInterval();
+                        tinymce.remove();
+                    }
+                    return false;
+                });
+
+                $('textarea').closest('form')
+                              .find('button, input[type=submit], input[type=reset]')
+                              .filter(':last')
+                              .after($toggle_button);
+            } else {
+                if ($input_mode.val() == MARKUP_HTML) {
+                    tinymce.init(init);
+                    $('#postform').addClass('rich-text');
+                }
+                $input_mode.on('change.editor', function(e) {
+                    var mode = $(this).val();
+                    $('#postform').toggleClass('rich-text', mode == MARKUP_HTML);
+                    if (mode == MARKUP_HTML) { // HTML mode
+                        tinymce.init(init);
+                        setContentFetchInterval();
+                    } else {
+                        clearContentFetchInterval();
+                        tinymce.remove();
+                    }
+                });
+            }
+        });
+        // </script>
+        <?php
+        $scr = ob_get_clean();
+        Page::instance()->addInlineScript($scr);
+    }
+
+    public function file_editor() {
+        $file_ext = pathinfo(GET('file'), PATHINFO_EXTENSION);
+        $editor = GET('richedit');
+        if (in_array($file_ext, $this->file_extensions) && $editor != 'false') {
+            $this->show_editor('textarea#output');
+        }
+    }
 }
 
 $plug = new TinyMCEEditor();

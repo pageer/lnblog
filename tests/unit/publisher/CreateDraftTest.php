@@ -2,7 +2,7 @@
 use Prophecy\Argument;
 
 class CreateDraftTest extends PublisherTestBase {
-    
+
     public function testCreateDraft_WhenEntryDoesNotExist_WritesEntryDataToFile() {
         $entry = $this->getTestEntry();
         $this->fs->is_dir('./drafts')->willReturn(true);
@@ -50,7 +50,7 @@ class CreateDraftTest extends PublisherTestBase {
         $this->fs->file_exists(Argument::any())->willReturn(false);
         $this->fs->mkdir_rec(Argument::any())->willReturn(true);
         $this->fs->write_file(Argument::any(), Argument::any())->willReturn(true);
-        
+
         $this->wrappers->createDirectoryWrappers('./drafts', BLOG_DRAFTS)->shouldBeCalled();
 
         $this->publisher->createDraft($entry, $this->getTestTime());

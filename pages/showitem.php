@@ -2,8 +2,8 @@
 session_start();
 $page = new WebPages();
 if (isset($_GET['action'])) {
-	//$page->showblog();
+    //$page->showblog();
 $page->routeRequest();
 } else {
-	$page->showitem();
+    $page->showitem();
 }

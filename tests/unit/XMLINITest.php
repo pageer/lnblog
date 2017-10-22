@@ -2,7 +2,7 @@
 use Prophecy\Argument;
 
 class XMLINITest extends PHPUnit_Framework_TestCase {
-    
+
     public function testWriteFileWithSimpleSettingWritesSimpleXmlNode() {
         $this->config->setValue('foo', 'bar', 'baz');
 
@@ -69,7 +69,7 @@ class XMLINITest extends PHPUnit_Framework_TestCase {
         $this->assertEquals('baz', $baz);
         $this->assertEquals('fuzz', $fuzz);
     }
-    
+
     public function testMergeWhenFilesDoNotOverlapResultContainsBothDataSets() {
         $xml1 = '<?xml version="1.0" encoding="utf-8"?>' . "\n" .
             "<LnBlogXMLConfig>\n" .
