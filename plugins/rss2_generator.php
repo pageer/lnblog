@@ -143,11 +143,11 @@ class RSS2 {
 
         $ret = '<?xml version="1.0" encoding="utf-8"?>'."\n";
         if ($this->link_stylesheet) {
-            $sheet = getlink($this->link_stylesheet);
+            $sheet = '../index.php?style=' . $this->link_stylesheet;
             $ret .= '<?xml-stylesheet type="text/css" href="'.$sheet.'" ?>'."\n";
         }
         if ($this->link_xslsheet) {
-            $sheet = getlink($this->link_xslsheet);
+            $sheet = '../index.php?style=' . $this->link_xslsheet;
             $ret .= '<?xml-stylesheet type="text/xsl" href="'.$sheet.'" ?>'."\n";
         }
         $ret .= '<rss version="2.0" xmlns:slash="http://purl.org/rss/1.0/modules/slash/" xmlns:wfw="http://wellformedweb.org/CommentAPI/">'."\n";
@@ -183,9 +183,9 @@ class RSS2FeedGenerator extends Plugin {
         #                 _("Use entry permalink as globally unique identifier"),
         #                 true, "checkbox");
         $this->addOption("feed_style", _("CSS style sheet for RSS feeds"),
-                         "rss.css", "text");
+                         "", "text");
         $this->addOption("feed_xsl", _("XSLT style sheet for RSS feeds"),
-                         "rss.xsl", "text");
+                         "", "text");
         $this->addOption("feed_file", _("File name for blog RSS 2 feed"),
                          "news.xml", "text");
         $this->addOption("comment_file", _("File name for comment RSS 2 feeds"),

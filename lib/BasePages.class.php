@@ -45,9 +45,14 @@ abstract class BasePages {
 
         } elseif ( isset($_GET['script']) ) {
 
-            $file = $this->script_path($_GET['script']);
-            if ($this->fs->file_exists($file)) $this->fs->readfile($file);
-            else $this->fs->echo_to_output("// Failed to find $file");
+            $file = $this->scriptPath($_GET['script']);
+            $this->dumpAssetFile($file, "// Failed to find $file");
+            return true;
+
+        } elseif ( isset($_GET['style']) ) {
+
+            $file = $this->stylePath($_GET['style']);
+            $this->dumpAssetFile($file, "/* Failed to find $file */");
             return true;
 
         } elseif ( isset($_GET['plugin']) ) {
@@ -65,5 +70,48 @@ abstract class BasePages {
         }
 
         $this->defaultAction();
+    }
+
+    protected function getThemeAssetPath($type, $name) {
+        if ( defined("BLOG_ROOT") &&
+             file_exists(BLOG_ROOT."/$type/$name") ) {
+
+            return BLOG_ROOT."/$type/$name";
+
+        # Second case: Try the userdata directory
+        } elseif ( defined('THEME_NAME') && defined('USER_DATA_PATH') &&
+                   file_exists(USER_DATA_PATH.'/themes/'.THEME_NAME."/$type/$name") ) {
+            return USER_DATA_PATH."/themes/".THEME_NAME."/$type/$name";
+
+        # Third case: check the current theme directory
+        } elseif ( defined('INSTALL_ROOT') && defined('THEME_NAME') &&
+                   file_exists(INSTALL_ROOT."/themes/".THEME_NAME."/$type/$name") ) {
+            return INSTALL_ROOT."/themes/".THEME_NAME."/$type/$name";
+
+        # Fourth case: try the default theme
+        } elseif ( defined('INSTALL_ROOT') &&
+                   file_exists(INSTALL_ROOT."/themes/default/$type/$name") ) {
+            return INSTALL_ROOT."/themes/default/$type/$name";
+
+        # Last case: nothing found, so return the original string.
+        } else {
+            return $name;
+        }
+    }
+
+    protected function getStylePath($name) {
+        return $this->getThemeAssetPath("styles", $name);
+    }
+
+    protected function scriptPath($name) {
+        return $this->getThemeAssetPath("scripts", $name);
+    }
+
+    private function dumpAssetFile($file, $default) {
+        if ($this->fs->file_exists($file)) {
+           $this->fs->readfile($file);
+        } else {
+            $this->fs->echo_to_output($default);
+        }
     }
 }
