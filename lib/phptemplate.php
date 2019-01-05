@@ -207,12 +207,13 @@ class PHPTemplate extends LnBlogObject {
         }
     }
 
-    public function escape($data, $method, $options = array()) {
+    public function escape($data, $method = '') {
         switch ($method) {
-            case self::ESC_HTML:
-                return htmlspecialchars($data);
             case self::ESC_URL:
                 return urlencode($data);
+            case self::ESC_HTML:
+            default:
+                return htmlspecialchars($data);
         }
         return '';
     }

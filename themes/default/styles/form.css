@@ -216,3 +216,11 @@ form.centered input {
 #postform.markdown-markup .insert-link {
 	display: none;
 }
+
+.attachment-list-toggle {
+    display: block;
+}
+
+.attachment-list {
+    margin-top: 2px;
+}

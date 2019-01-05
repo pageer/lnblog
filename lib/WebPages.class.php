@@ -31,6 +31,7 @@ class WebPages extends BasePages {
             'login'      => 'AdminPages::bloglogin',
             'logout'     => 'AdminPages::bloglogout',
             'upload'     => 'fileupload',
+            'removefile' => 'removefile',
             'useredit'   => 'editlogin',
             'plugins'    => 'AdminPages::pluginsetup',
             'tags'       => 'tagsearch',
@@ -501,7 +502,7 @@ class WebPages extends BasePages {
         } elseif ( POST('draft') ) {
             $this->getPage()->redirect($this->blog->uri('listdrafts'));
             return false;
-        } elseif (POST('preview') || GET('preview')) {
+        } elseif ($this->editIsPreview()) {
             if (GET('save') == 'draft' && !GET('ajax')) {
                 $uri = create_uri_object($ent);
                 $uri->separator = '&';
@@ -659,6 +660,10 @@ class WebPages extends BasePages {
         } else {
             $tpl->set("STICKY", $ent->is_sticky ? true : false);
         }
+
+        $entry_attachments = $ent->isEntry() ? $ent->getAttachments() : [];
+        $tpl->set("ENTRY_ATTACHMENTS", $entry_attachments);
+        $tpl->set("BLOG_ATTACHMENTS", $this->blog->getAttachments());
     }
 
     # Function: handle_uploads
@@ -815,6 +820,23 @@ class WebPages extends BasePages {
         $this->getPage()->title = _("Upload file");
         $this->getPage()->addScript('upload.js');
         $this->getPage()->display($body, $this->blog);
+    }
+
+    public function removefile() {
+        $entry_id = POST("entry");
+        $file_name = POST("file");
+
+        $entry = NewEntry();
+
+        try {
+            if ($entry->isEntry()) {
+                $entry->removeAttachment($file_name);
+            } else {
+                $this->blog->removeAttachment($file_name);
+            }
+        } catch (Exception $e) {
+            $this->getPage()->error(500, "Could not delete file '$file'");
+        }
     }
 
     public function managereplies() {
@@ -1425,8 +1447,8 @@ class WebPages extends BasePages {
         return $ret;
     }
 
-
     public function showdrafts() {
+        var_dump($this->blog->home_path);
         if (isset($_GET['action']) && $_GET['action'] == 'edit') {
             $this->entryedit();
             return;

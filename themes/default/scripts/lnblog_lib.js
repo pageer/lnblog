@@ -63,13 +63,12 @@ var lnblog = {
 
 lnblog.addEvent(window, 'load', function() {
 	if (typeof strings != 'undefined') {
-			strings.get = function (string_id) {
-				ret = this[string_id];
-				for (var i = 1; i < arguments.length; i++) {
-					ret = ret.replace('%'+i+'$s', arguments[i]);
-				}
-				return ret;
-			};
-		}
-	}
-);
+        strings.get = function (string_id) {
+            ret = this[string_id];
+            for (var i = 1; i < arguments.length; i++) {
+                ret = ret.replace('%'+i+'$s', arguments[i]);
+            }
+            return ret;
+        };
+    }
+});

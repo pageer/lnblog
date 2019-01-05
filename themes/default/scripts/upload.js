@@ -1,4 +1,4 @@
-/*globals strings, lnblog, lbcode_editor */
+/*globals strings, lnblog, lbcode_editor, AJAX_URL */
 /*jshint regexp: false */
 $(document).ready( function () {
 	
@@ -6,7 +6,7 @@ $(document).ready( function () {
 		
 		var addLink = function ($input) {
 			var ext = $input.val().replace(/^(.*)(\..+)$/, "$2"),
-                img_exts = new Array('.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff', '.tif'),
+                img_exts = ['.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff', '.tif'],
                 is_img = false,
                 res;
 		
@@ -27,20 +27,7 @@ $(document).ready( function () {
 			components = $input.val().split(splitchar);
 			var fname = components[components.length - 1];
 		
-			var prompt_text = false;  // Prompt user for descriptive text.
-                                      // The alternative is just using the filename.
-		
-			if (prompt_text) {
-		
-				if (is_img) {
-					res = window.prompt(strings.get('editor_addImageDesc', $input.val()));
-				} else {
-					res = window.prompt(strings.get('editor_addLinkDesc', $input.val()));
-				}
-		
-			} else {
-				res = fname;
-			}
+            res = fname;
 			
 			if (res) {
 				var body = document.getElementById('body');
@@ -60,7 +47,7 @@ $(document).ready( function () {
 			}
 			return false;
 		};
-		
+
 		var fieldset = field,
 			num_fields = 0,
 			button_markup = '<a href="#" class="insert-link">Insert Link</a>';
@@ -69,6 +56,8 @@ $(document).ready( function () {
 		var btn_markup = '<div><label for="add_upload">File uploads</label> ' +
 			'<a href="#" id="add_upload" class="add_upload_btn">Add Upload</a></div>';
 		$(fieldset).prepend(btn_markup);
+
+        // Add toggling for attachment list
 		
 		// Get the starting field index
 		var has_fields = $(fieldset).find('input[id^="upload"]').length;
@@ -119,9 +108,55 @@ $(document).ready( function () {
 			return false;
 		});
 	}
+
+    var removeUpload = function() {
+        var $node = $(this).closest('.attachment');
+        var file_name = $node.data('file');
+        var should_remove = confirm("Really delete file '" + file_name + "'?");
+        var url = window.AJAX_URL + '?action=removefile';
+        
+        var query_params = window.location.search.substr(1).split('&');
+        for (var i = 0; i < query_params.length; i++) {
+            var pieces = query_params[i].split('=');
+            if (pieces[0] === 'draft') {
+                url += '&draft=' + pieces[1];
+            }
+        }
+
+        if (should_remove) {
+            $.post(url, {file: file_name})
+                .done(function() {
+                    var $list = $node.closest('.attachment-list');
+                    $node.remove();
+                    if ($list.children().length === 0) {
+                        var link_name = $list.hasClass('entry-attachments') ? 'entry-attachments' : 'blog-attachments';
+                        $list.hide();
+                        $list.parent().find('[name="' + link_name + '"]').hide();
+                    }
+                })
+                .fail(function() {
+                    alert("Error removing file '" + file_name + "'.");
+                });
+        }
+
+        return false;
+    };
 	
+    $('.attachment-list-toggle').on('click', function() {
+        var $this = $(this);
+        var type = $this.attr('name');
+        $this.parent().find('.' + type).toggle();
+        return false;
+    });
+    $('.attachment-list').toggle(false);
+
+    $('.attachment').each(function() {
+        var $link = $('<a href="#">' + strings.editor_removeLink + '</a>');
+        $link.on('click', removeUpload);
+        $(this).append($link);
+    });
+
 	$('.upload_field').each( function (index) {
 		initUploadFieldset(this, typeof(lbcode_editor) != 'undefined' ? lbcode_editor : false);
-	} );
-	
+	});
 } );

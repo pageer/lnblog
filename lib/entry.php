@@ -214,7 +214,9 @@ abstract class Entry extends LnBlogObject{
     # A string with markup applied.
 
     public function markup($data="", $use_nofollow=false) {
-        if (! $data) $data = $this->data;
+        if (! $data) {
+            $data = $this->data;
+        }
         $processor = TextProcessor::get($this->has_html, $this, $data);
         $processor->use_nofollow = $use_nofollow;
         return $processor->getHTML();

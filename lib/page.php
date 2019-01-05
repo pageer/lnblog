@@ -343,6 +343,8 @@ class Page extends LnBlogObject {
             case 404:
                 $message = 'Not Found';
                 break;
+            case 500:
+                $message = 'Internal Server Error';
             default:
                 $message = '';
         }

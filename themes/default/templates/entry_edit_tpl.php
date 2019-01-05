@@ -1,3 +1,7 @@
+<script type="application/javascript">
+    window.AJAX_URL = '<?php echo $BLOG_URL_ROOTREL?>';
+</script>
+
 <?php if (isset($HAS_UPDATE_ERROR)): ?>
 <h3><?php echo $UPDATE_ERROR_MESSAGE?></h3>
 <?php endif; ?>
@@ -10,9 +14,9 @@
 <fieldset>
 <form id="postform" method="post" action="<?php echo $FORM_ACTION?>"
 	  enctype="multipart/form-data" accept-charset="<?php echo DEFAULT_CHARSET?>"
-	
+
 	<?php echo !empty($PREVIEW_DATA) ? 'style="display:none"' : ''?>>
-	
+
 	<div class="entry_subject">
 		<?php
 		$title = _("Title or subject line for this entry");
@@ -45,7 +49,7 @@
 	</div>
 	<?php endif; ?>
 
-	<?php 
+	<?php
 	EventRegister::instance()->activateEventFull($tmp=false, "posteditor", "ShowControls");
 	if (! System::instance()->sys_ini->value('entryconfig', 'EditorOnBottom', 0)) {
 		include $this->getTemplatePath("js_editor.php");
@@ -59,7 +63,7 @@
 		include $this->getTemplatePath("js_editor.php");
 	}
 	?>
-	
+
 	<div class="threebutton">
 		<?php if ($PUBLISHED): ?>
 		<input name="post" id="post" type="submit" value="<?php p_("Save")?>" />
@@ -70,11 +74,11 @@
 		<input name="preview" id="preview" type="submit" value="<?php p_("Preview")?>" />
 	</div>
 
-	
+
 	<fieldset id="entry_settings">
 		<legend><?php p_("Entry settings");?></legend>
 		<div class="settings">
-			
+
 			<div class="left-col">
 				<?php if (!$PUBLISHED): ?>
 				<div>
@@ -86,7 +90,7 @@
 						   placeholder="<?php p_("Article path")?>" type="text" size="30" <?php echo $url_val?> />
 				</div>
 				<?php endif; ?>
-				
+
 				<?php if (!$PUBLISHED || $ARTICLE): ?>
 				<div class="sticky-toggle">
 					<?php $title = _("Show a link to this in the articles panel of the sidebar");?>
@@ -94,7 +98,7 @@
 					<label for="sticky" title="<?php echo $title?>"><?php p_("Show in sidebar")?></label>
 				</div>
                 <?php endif; ?>
-				
+
 				<?php if (!$PUBLISHED): ?>
 				<div>
 					<?php
@@ -106,7 +110,7 @@
 					<input type="text" id="autopublishdate" name="autopublishdate" value="<?php echo $date_string?>" />
 				</div>
 				<?php endif; ?>
-				
+
 				<?php if ($ALLOW_ENCLOSURE || ! empty($ENCLOSURE)): /* Add optional enclosure box.*/?>
 				<div>
 					<?php $title = _('Enter the URL of the MP3 or other media file for this post.  If you are uploading the file to this post, you can enter just the filename.');?>
@@ -115,7 +119,7 @@
 					<input type="text" name="enclosure" size="30" placeholder="<?php p_('File URL')?>" id="enclosure" title="<?php echo $title?>" value="<?php echo isset($ENCLOSURE) ? $ENCLOSURE : ''?>" />
 				</div>
 				<?php endif; ?>
-				
+
 				<div>
 				<?php $title = _("Set the markup type for this entry.  Auto-markup is plain text with clickable URLs, LBcode is a dialect of the BBcode markup popular on web forums, and HTML is raw HTML code.");?>
 				<label for="input_mode" title="<?php echo $title?>"><?php p_("Markup type")?></label>
@@ -126,34 +130,54 @@
 				</select>
 				</div>
 			</div>
-			
+
 			<div class="right-col">
 				<div>
 				<?php $title = _("Allow readers to post comments on this entry");?>
 				<input id="comments" name="comments" title="<?php echo $title?>" type="checkbox" <?php echo !empty($COMMENTS) ? 'checked="checked"' : ''?> />
 				<label for="comments" title="<?php echo $title?>"><?php p_("Allow comments")?></label>
 				</div>
-				
+
 				<div>
                 <?php $title = _("Allow this entry to receive TrackBack pings from other blogs");?>
 				<input id="trackbacks" name="trackbacks" title="<?php echo $title?>" type="checkbox" <?php echo !empty($TRACKBACKS) ? 'checked="checked"' : ''?> />
 				<label for="trackbacks" title="<?php echo $title?>"><?php p_("Allow TrackBacks")?></label>
 				</div>
-				
+
 				<div>
 				<?php $title = _("Allow this entry to receive Pingback pings from other blogs");?>
 				<input id="pingbacks" name="pingbacks" title="<?php echo $title?>" type="checkbox" <?php echo !empty($PINGBACKS) ? 'checked="checked"' : ''?> />
 				<label for="pingbacks" title="<?php echo $title;?>"><?php p_("Allow Pingbacks")?></label>
 				</div>
-				
+
 				<div>
 				<?php $title = spf_("If this box is checked, then after the entry is published, %s will attempt to send Pingback pings to any URLs in the body of the post.", PACKAGE_NAME);?>
 				<input id="send_pingbacks" name="send_pingbacks" title="<?php echo $title?>" type="checkbox" <?php echo !empty($SEND_PINGBACKS) ? 'checked="checked"' : ''?> />
 				<label for="send_pingbacks" title="<?php echo $title?>"><?php p_("Send Pingbacks after posting")?></label>
 				</div>
 			</div>
-			
+
 			<div class="bottom-row">
+                <?php if ($ENTRY_ATTACHMENTS): ?>
+                    <a name="entry-attachments" href="#" class="attachment-list-toggle"><?php p_("Entry attachments") ?></a>
+                    <ul class="entry-attachments attachment-list">
+                        <?php foreach ($ENTRY_ATTACHMENTS as $attachment): ?>
+                            <li class="attachment" data-file="<?php echo $this->escape($attachment->getName())?>">
+                                <?php echo $this->escape($attachment->getName()) ?>
+                            </li>
+                        <?php endforeach ?>
+                    </ul>
+                <?php endif ?>
+                <?php if ($BLOG_ATTACHMENTS): ?>
+                    <a name="blog-attachments" href="#" class="attachment-list-toggle"><?php p_("Blog attachments") ?></a>
+                    <ul class="blog-attachments attachment-list">
+                        <?php foreach ($BLOG_ATTACHMENTS as $attachment): ?>
+                            <li class="attachment" data-file="<?php echo $this->escape($attachment->getName())?>">
+                                <?php echo $this->escape($attachment->getName()) ?>
+                            </li>
+                        <?php endforeach ?>
+                    </ul>
+                <?php endif ?>
 				<?php if ($num_uploads = System::instance()->sys_ini->value("entryconfig", "AllowInitUpload", 1)): ?>
 				<div class="upload_field">
 					<?php for ($i = 1; $i <= $num_uploads; $i++): ?>

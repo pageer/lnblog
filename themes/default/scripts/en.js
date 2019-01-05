@@ -15,6 +15,7 @@ var strings = {
 	
 	editor_submitWithFiles: "Save draft before preview?\nIf you do not, your file uploads will be lost.",
     
-    editor_leavePrompt: "You have unsaved changes.  Do you really want to leave the page?"
+    editor_leavePrompt: "You have unsaved changes.  Do you really want to leave the page?",
+    editor_removeLink: "Remove"
 	
 };

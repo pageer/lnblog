@@ -39,7 +39,7 @@ OutputComplete - Fired after output has finished being generated.
 POSTRetrieved  - Fired after data has been retrieved from an HTTP POST.
 */
 
-class BlogEntry extends Entry {
+class BlogEntry extends Entry implements AttachmentContainer {
 
     const AUTO_PUBLISH_FILE = 'publish.txt';
 
@@ -56,8 +56,13 @@ class BlogEntry extends Entry {
     public $autopublish = false;
     public $autopublish_date = '';
 
-    public function __construct($path = "", $filesystem = null) {
-        parent::__construct($filesystem ?: NewFS());
+    private $filemanager;
+
+    public function __construct($path = "", $filesystem = null, $file_manager = null) {
+        $fs = $filesystem ?: NewFS();
+        parent::__construct($fs);
+
+        $this->filemanager = $file_manager ?: new FileManager($this, $fs);
 
         $this->initVars();
         $this->raiseEvent("OnInit");
@@ -1277,5 +1282,17 @@ class BlogEntry extends Entry {
         }
 
         return $ret;
+    }
+
+    public function getAttachments() {
+        return $this->filemanager->getAll();
+    }
+
+    public function addAttachment($path, $name = '') {
+        $this->filemanager->attach($path, $name);
+    }
+
+    public function removeAttachment($name) {
+        $this->filemanager->remove($name);
     }
 }

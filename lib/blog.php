@@ -49,7 +49,7 @@
 # this constant sets a magic value to use.
 @define("ROOT_ID", ".");
 
-class Blog extends LnBlogObject {
+class Blog extends LnBlogObject implements AttachmentContainer {
 
     public $name = '';
     public $description = '';
@@ -83,9 +83,11 @@ class Blog extends LnBlogObject {
     public $skip_root = false;
 
     private $fs;
+    private $filemanager;
 
-    public function __construct($path = "", $fs = null) {
+    public function __construct($path = "", $fs = null, $file_manager = null) {
         $this->fs = $fs ?: NewFS();
+        $this->filemanager = $file_manager ?: new FileManager($this, $this->fs);
 
         if ($path) {
             $this->getPathFromPassedValue($path);
@@ -920,6 +922,18 @@ class Blog extends LnBlogObject {
     # Determine if pingbacks are on by default.
     public function autoPingbackEnabled() {
         return $this->auto_pingback ? $this->auto_pingback != 'none' : false;
+    }
+
+    public function getAttachments() {
+        return $this->filemanager->getAll();
+    }
+
+    public function addAttachment($path, $name = '') {
+        $this->filemanager->attach($path, $name);
+    }
+
+    public function removeAttachment($name) {
+        $this->filemanager->remove($name);
     }
 
     /*
