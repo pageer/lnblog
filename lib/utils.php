@@ -581,15 +581,15 @@ function get_ip() {
 
 function config_php_string($levels) {
     $ret = 'if (! defined("PATH_SEPARATOR") ) define("PATH_SEPARATOR", strtoupper(substr(PHP_OS,0,3)==\'WIN\')?\';\':\':\');'."\n";
-    $ret .= 'if (! defined("BLOG_ROOT")) define("BLOG_ROOT", dirname(__FILE__)';
+    $ret .= 'if (! defined("BLOG_ROOT")) define("BLOG_ROOT", ';
+    $file_part = 'dirname(__FILE__)';
     if ($levels > 0) {
-        $ret .= ".'";
         for ($i = 1; $i <= $levels; $i++) {
-            $ret .= DIRECTORY_SEPARATOR.'..';
+            #$ret .= DIRECTORY_SEPARATOR.'..';
+            $file_part = 'dirname(' . $file_part . ')';
         }
-        $ret .= "'";
     }
-    $ret .= ");\n";
+    $ret .= "$file_part);\n";
     $ret .= 'require_once(BLOG_ROOT.DIRECTORY_SEPARATOR."pathconfig.php");'."\n";
     $ret .= 'require_once(INSTALL_ROOT.DIRECTORY_SEPARATOR."blogconfig.php");'."\n";
     return $ret;
