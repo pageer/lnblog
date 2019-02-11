@@ -181,7 +181,8 @@ class Trackback extends LnBlogObject {
         if ($this->blog) $query_string .= "&blog_name=".urlencode($this->blog);
         if ($this->data) $query_string .= "&excerpt=".urlencode($this->data);
 
-        $response = $this->http_client->sendPost($url, $query_string);
+        $result = $this->http_client->sendPost($url, $query_string);
+        $response = $result->rawResponse();
 
         # Get the error code
         $start_tag_pos = strpos($response, "<error>");

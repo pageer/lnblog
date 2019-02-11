@@ -1,5 +1,5 @@
 <?php
-class SimpleXmlReaderTest extends PHPUnit_Framework_TestCase {
+class SimpleXmlReaderTest extends PHPUnit\Framework\TestCase {
     function testGetSetOption() {
 		$s = new SimpleXMLReader("test");
 		$s->setOption("foo");

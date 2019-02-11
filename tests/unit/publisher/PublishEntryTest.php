@@ -1,4 +1,5 @@
 <?php
+
 use Prophecy\Argument;
 
 class PublishEntryTest extends PublisherTestBase {
@@ -13,7 +14,7 @@ class PublishEntryTest extends PublisherTestBase {
         $fs->mkdir_rec('./drafts/02_1234')->willReturn(true)->shouldBeCalled();
         $fs->write_file('./drafts/02_1234/entry.xml', Argument::any())->shouldBeCalled()->will(function($args) use ($fs) {
             $fs->file_exists('./drafts/02_1234/entry.xml')->willReturn(true);
-            return true; 
+            return true;
         });
         $fs->rename('./drafts/02_1234', './entries/2017/01/02_1234')->will(function($args) use ($fs) {
             $fs->write_file('./entries/2017/01/02_1234/entry.xml', Argument::any())->willReturn(true)->shouldBeCalled();
@@ -39,7 +40,7 @@ class PublishEntryTest extends PublisherTestBase {
             $new_path = './drafts/02_1234/entry.xml';
             $fs->file_exists($new_path)->willReturn(true);
             $fs->realpath($new_path)->willReturn($new_path);
-            return true; 
+            return true;
         });
         $fs->rename('./drafts/02_1234', './entries/2017/01/02_1234')->will(function($args) use ($fs) {
             $fs->write_file('./entries/2017/01/02_1234/entry.xml', Argument::any())->willReturn(true);
@@ -81,7 +82,7 @@ class PublishEntryTest extends PublisherTestBase {
 
         $this->publisher->publishEntry($entry, $this->getTestTime());
     }
- 
+
     public function testPublishEntry_WhenPublishSucceeds_CreatePrettyPermalink() {
         $entry = $this->setUpDraftEntryForSuccessfulPublish();
         $entry->subject = 'Some Weird Stuff';
@@ -186,63 +187,6 @@ class PublishEntryTest extends PublisherTestBase {
        $this->publisher->publishEntry($entry, $this->getTestTime());
     }
 
-    public function testPublishEntry_WhenTextHasLinksAndSendPingbacks_SendsPingbacks() {
-        $entry = $this->setUpDraftEntryForSuccessfulPublish();
-        $entry->data = 'This is a <a href="http://www.example.com/test">link</a> thing.';
-        $entry->has_html = MARKUP_HTML;
-        $entry->file = './drafts/02_1234/entry.xml';
-        $entry->send_pingback = true;
-        $this->http_client->fetchUrl('http://www.example.com/test', true)->willReturn("X-Pingback: http://www.example.com/ping\r\nContent-Type: text/html");
-        $this->http_client->fetchUrl('http://www.example.com/test')->willReturn("<link rel=\"pingback\" href=\"http://www.example.com/ping\">");
-
-        $this->http_client->sendXmlRpcMessage('www.example.com', '/ping', 80, Argument::any())->shouldBeCalled();
-        
-        $this->publisher->publishEntry($entry, $this->getTestTime());
-    }
-
-    public function testPublishEntry_WhenSendPingbacksOff_DoesNotSendPingbacks() {
-        $entry = $this->setUpDraftEntryForSuccessfulPublish();
-        $entry->data = 'This is a <a href="http://www.example.com/test">link</a> thing.';
-        $entry->has_html = MARKUP_HTML;
-        $entry->file = './drafts/02_1234/entry.xml';
-        $entry->send_pingback = false;
-        $this->http_client->fetchUrl('http://www.example.com/test', true)->willReturn("X-Pingback: http://www.example.com/ping\r\nContent-Type: text/html");
-
-        $this->http_client->sendXmlRpcMessage('www.example.com', '/ping', 80, Argument::any())->shouldNotBeCalled();
-        
-        $this->publisher->publishEntry($entry, $this->getTestTime());
-    }
-
-    public function testPublishEntry_WhenSendingPingbacks_RaisesPingbackCompleteEventWithResponseData() {
-        $ping_results = array(array('uri' => 'http://example.com/test', 'response' => 'test'));
-        $entry = $this->setUpDraftEntryForSuccessfulPublish();
-        $event_stub = new PublisherEventTestingStub();
-        EventRegister::instance()->addHandler('BlogEntry', 'PingbackComplete', $event_stub, 'eventHandler');
-        $entry->data = 'This is a <a href="http://example.com/test">link</a> thing.';
-        $entry->has_html = MARKUP_HTML;
-        $entry->file = './drafts/02_1234/entry.xml';
-        $entry->send_pingback = true;
-        $this->http_client->fetchUrl('http://example.com/test', true)->willReturn("X-Pingback: http://example.com/ping\r\nContent-Type: text/html");
-        $this->http_client->fetchUrl('http://example.com/test')->willReturn("<link rel=\"pingback\" href=\"http://example.com/ping\">");
-        $this->http_client->sendXmlRpcMessage('example.com', '/ping', 80, Argument::any())->willReturn('test');
-
-        $this->publisher->publishEntry($entry, $this->getTestTime());
-
-        $this->assertTrue($event_stub->has_been_called);
-        $this->assertEquals($ping_results, $event_stub->event_data);
-    }
-
-    public function testPublishEntry_WhenNoPingbacksSent_DoesNotRaisePingbackCompleteEvent() {
-        $ping_results = array(array('uri' => 'http://example.com/test', 'response' => 'test'));
-        $entry = $this->setUpDraftEntryForSuccessfulPublish();
-        $event_stub = new PublisherEventTestingStub();
-        EventRegister::instance()->addHandler('BlogEntry', 'PingbackComplete', $event_stub, 'eventHandler');
-        $entry->send_pingback = false;
-
-        $this->publisher->publishEntry($entry, $this->getTestTime());
-
-        $this->assertFalse($event_stub->has_been_called);
-    }
 
     public function testPublishEntry_NoUploadsPresent_DoesNotRaisesUploadSuccessOrErrorEvents() {
         $entry = $this->setUpDraftEntryForSuccessfulPublish();
@@ -311,5 +255,4 @@ class PublishEntryTest extends PublisherTestBase {
         })->shouldBeCalled();
         return $entry;
     }
-
 }

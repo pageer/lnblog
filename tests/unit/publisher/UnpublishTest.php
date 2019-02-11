@@ -143,11 +143,11 @@ class UnpublishTest extends PublisherTestBase {
     }
 
     private function setUpTestEntryForEarlyFailedUnpublish() {
-        $this->setUpTestEntryForFailedUnpublish(false, true);
+        return $this->setUpTestEntryForFailedUnpublish(false, true);
     }
 
     private function setUpTestEntryForLateFailedUnpublish() {
-        $this->setUpTestEntryForFailedUnpublish(true, false);
+        return $this->setUpTestEntryForFailedUnpublish(true, false);
     }
 
     private function setUpTestEntryForFailedUnpublish($file_exists, $rename_success) {

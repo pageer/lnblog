@@ -1,6 +1,6 @@
 <?php
 
-class NativeFsTest extends PHPUnit_Framework_TestCase {
+class NativeFsTest extends PHPUnit\Framework\TestCase {
     
     function testCreator() {
 		$fs = new NativeFS();

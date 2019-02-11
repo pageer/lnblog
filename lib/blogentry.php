@@ -1179,57 +1179,6 @@ class BlogEntry extends Entry implements AttachmentContainer {
         return $ret;
     }
 
-    # Method: sendPings
-    # Scans the links in the current entry, determines which are
-    # pingback-enabled, and sends a pingback ping to those links.
-    #
-    # Parameters:
-    # $client - The HttpClient to use for the request.
-    # local - *Optional* boolean that determines whether or not to send pings
-    #         to posts on the same webserver.  *Defaults* to false.
-    # Returns:
-    # An array of associative arrays.  Each array has 'uri' and a 'response'
-    # key, which contain the target URI and the XML-RPC response object.
-
-    public function sendPings($client, $local=false) {
-
-        if (!$this->send_pingback) {
-            return array();
-        }
-
-        $urls = $this->extractLinks($local);
-        $ret = array();
-
-        foreach ($urls as $uri) {
-            $p = new Pingback(false, $this->fs, $client);
-            $pb_server = $p->checkPingbackEnabled($uri);
-
-            if ($pb_server) {
-                $result = $this->sendPingback($client, $pb_server, $uri);
-                $ret[] = array('uri'=>$uri, 'response'=>$result);
-            }
-
-        }
-        return $ret;
-    }
-
-    private function sendPingback($client, $uri, $target) {
-
-        $linkdata = parse_url($uri);
-
-        $host = isset($linkdata['host']) ? $linkdata['host'] : $_SERVER["SERVER_NAME"];
-        $path = isset($linkdata['path']) ? $linkdata['path'] : '';
-        $port = isset($linkdata['port']) ? $linkdata['port'] : 80;
-
-        $parms = array(new xmlrpcval($this->permalink(), 'string'),
-                       new xmlrpcval($target, 'string'));
-        $msg = new xmlrpcmsg('pingback.ping', $parms);
-
-        $result = $client->sendXmlRpcMessage($host, $path, $port, $msg);
-
-        return $result;
-    }
-
     # Method: pingExists
     # Checks if a Pingback ping has already been recorded for the source URL.
     #
@@ -1249,49 +1198,29 @@ class BlogEntry extends Entry implements AttachmentContainer {
         return false;
     }
 
-    # Method: extractLinks
-    # Extracts all the hyperlinks from the entry text.
+    # Method: getAttachments
+    # Get a list of files attached to this entry
     #
-    # Parameters:
-    # allow_local - *Optional* boolean parameter that determines if local links,
-    #               should be included.  *Defaults* to false.
-    #
-    # Returns:
-    # An array of URLs containing each hyperlink in the entry.  If allow_local
-    # is false, then links without a protocol and host name are excluded.
-
-    public function extractLinks($allow_local=false) {
-        $matches = array();
-        $data = $this->markup();
-
-        $ret = preg_match_all('/href="([^"]+)"/i', $data, $matches);
-
-        $url_matches = $matches[1];  # Grab only the saved subexpression.
-        $ret = array();
-
-        foreach ($url_matches as $m) {
-            if ($allow_local) {
-                $ret[] = $m;
-            } else {
-                # If we're NOT allowing local pings, filter them out.
-                $url = parse_url($m);
-                if (isset($url['host']) && $url['host'] != SERVER("SERVER_NAME")) {
-                    $ret[] = $m;
-                }
-            }
-        }
-
-        return $ret;
-    }
-
+    # Returns: Array of AttachedFile objects
     public function getAttachments() {
         return $this->filemanager->getAll();
     }
 
+    # Method: addAttachment
+    # Add an attached file to the entry.
+    #
+    # Parameters:
+    # path - The local file path to the file to attach.
+    # name - Optional name of the file.  Default is the existing name.
     public function addAttachment($path, $name = '') {
         $this->filemanager->attach($path, $name);
     }
 
+    # Method: removeAttachment
+    # Remove a file that is attached to the entry.
+    #
+    # Parameter:
+    # name - The name of the file to remove.
     public function removeAttachment($name) {
         $this->filemanager->remove($name);
     }

@@ -40,6 +40,7 @@ class WebPages extends BasePages {
             'managereply'=> 'managereplies',
             'editfile'   => 'editfile',
             'blogpaths'  => 'blogpaths',
+            'webmention' => 'webmention',
         );
     }
 
@@ -424,11 +425,10 @@ class WebPages extends BasePages {
         $tpl->set("PROFILEPAGE_VALUE", htmlentities($usr->profileUrl()) );
 
         $this->blog_qs = ($this->blog->isBlog() ? "blog=".$this->blog->blogid."&amp;" : "");
-        $tpl->set("UPLOAD_LINK",
-                  INSTALL_ROOT_URL."pages/index.php?action=upload&".
-                  $this->blog_qs."profile=".$usr->username() );
-        $tpl->set("PROFILE_EDIT_LINK", $this->blog->uri("editfile", array("file"=>"profile.htm",
-                                                  'profile'=>$usr->username()) ) );
+
+        $tpl->set("UPLOAD_LINK", $this->blog->uri("upload", ['profile' => $usr->username()]));
+        $edit_link_data = ["file"=>"profile.htm", 'profile'=>$usr->username()];
+        $tpl->set("PROFILE_EDIT_LINK", $this->blog->uri("editfile", $edit_link_data));
         $tpl->set("PROFILE_EDIT_DESC", _("Edit extra profile data") );
         $tpl->set("UPLOAD_DESC", _("Upload file to profile") );
 
@@ -721,11 +721,12 @@ class WebPages extends BasePages {
         $err = '';
 
         foreach ($this->last_pingback_results as $res) {
-            if ($res['response']->faultCode()) {
+            if ($res['response']['code']) {
                 $errors[] = spf_('URI: %s', $res['uri']).'<br />'.
                             spf_("Error %d: %s<br />",
-                                 $res['response']->faultCode(),
-                                 $res['response']->faultString());
+                                 $res['response']['code'],
+                                 $res['response']['message']
+                             );
             }
         }
 
@@ -754,15 +755,23 @@ class WebPages extends BasePages {
         $tpl = NewTemplate(UPLOAD_TEMPLATE);
         $tpl->set("NUM_UPLOAD_FIELDS", $num_fields);
 
+        $blog_files = [];
+        $entry_files = [];
+
         $target = false;
         if ( isset($_GET["profile"]) &&
              ($_GET["profile"] == $this->user->username() || $this->user->isAdministrator()) ) {
             $target = Path::mk(USER_DATA_PATH, $this->user->username());
         } elseif ($ent->isEntry() && System::instance()->canModify($ent, $this->user)) {
             $target = $ent->localpath();
+            $entry_files = $ent->getAttachments();
+            $blog_files = $this->blog->getAttachments();
         } elseif (System::instance()->canModify($this->blog, $this->user)) {
             $target = $this->blog->home_path;
-            if ($target_under_blog) $target = mkpath($target, $target_under_blog);
+            $blog_files = $this->blog->getAttachments();
+            if ($target_under_blog) {
+                $target = mkpath($target, $target_under_blog);
+            }
         }
 
         # Check that the user is logged in.
@@ -786,6 +795,8 @@ class WebPages extends BasePages {
             $tpl->set("MAX_SIZE", $size);
             $tpl->set("FILE", $file_name);
             $tpl->set("TARGET_URL", localpath_to_uri($target) );
+            $tpl->set("BLOG_ATTACHMENTS", $blog_files);
+            $tpl->set("ENTRY_ATTACHMENTS", $entry_files);
 
             if (! empty($_FILES)) {
                 $files = FileUpload::initUploads($_FILES[$file_name], $target);
@@ -1810,6 +1821,10 @@ class WebPages extends BasePages {
         $this->getPage()->title = spf_("Update blog - %s", $blog->name);
         $this->getPage()->addStylesheet("form.css");
         $this->getPage()->display($body, $blog);
+    }
+
+    public function webmention() {
+
     }
 
     private function persistEntry($ent, $is_art) {

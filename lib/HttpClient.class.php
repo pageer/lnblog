@@ -1,4 +1,5 @@
 <?php
+
 class HttpClient {
 
     public function fetchUrl($url, $headers = false) {
@@ -9,7 +10,9 @@ class HttpClient {
             curl_setopt($hnd, CURLOPT_FOLLOWLOCATION, 1);
             curl_setopt($hnd, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($hnd, CURLOPT_HEADER, 1);
-            if ($headers) curl_setopt($hnd, CURLOPT_NOBODY, 1);
+            if ($headers) {
+                curl_setopt($hnd, CURLOPT_NOBODY, 1);
+            }
             $response = curl_exec($hnd);
 
         } else {
@@ -45,8 +48,8 @@ class HttpClient {
         return $response;
     }
 
-    public function sendPost($url, $data) {
-        if (extension_loaded("curl")) {
+    public function sendPost($url, $data, $include_headers = false) {
+        if (false && extension_loaded("curl")) {
 
             # Initialize CURL and POST to the target URL.
             $hnd = curl_init();
@@ -54,6 +57,9 @@ class HttpClient {
             curl_setopt($hnd, CURLOPT_POST, 1);
             curl_setopt($hnd, CURLOPT_FOLLOWLOCATION, 1);
             curl_setopt($hnd, CURLOPT_RETURNTRANSFER, 1);
+            if ($include_headers) {
+                curl_setopt($hnd, CURLOPT_HEADER, 1);
+            }
             curl_setopt($hnd, CURLOPT_POSTFIELDS, $data);
             $response = curl_exec($hnd);
 
@@ -87,9 +93,16 @@ class HttpClient {
                 $response .= fgets($fp);
             }
             fclose($fp);
+
+            if (!$include_headers) {
+                $header_break = strpos($response, "\r\n\r\n");
+                if ($header_break) {
+                    $response = substr($response, $header_break + 4);
+                }
+            }
         }
 
-        return $response;
+        return new HttpResponse($response);
     }
 
     public function sendXmlRpcMessage($host, $path, $port, $msg) {

@@ -25,7 +25,7 @@ class OtherTestPages extends TestPages {
     }
 }
 
-class BasePagesTest extends PHPUnit_Framework_TestCase {
+class BasePagesTest extends PHPUnit\Framework\TestCase {
     
     private $page;
     private $fs;

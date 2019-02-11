@@ -1,5 +1,5 @@
 <?php
-class ServerTest extends PHPUnit_Framework_TestCase {
+class ServerTest extends PHPUnit\Framework\TestCase {
     function testGetServerSubdomainURI() {
 		$s = new Server();
 		$_SERVER['SERVER_NAME'] = 'myhost';

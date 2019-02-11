@@ -21,5 +21,27 @@
 	<span><input type="submit" name="submit" id="submit" value="<?php p_('Upload');?>" /></span>
 	<span><input type="reset" name="clear" id="clear" value="<?php p_('Clear');?>" /></span>
 	</div>
+    <div style="margin-top: 20px">
+        <?php if ($ENTRY_ATTACHMENTS): ?>
+            <a name="entry-attachments" href="#" class="attachment-list-toggle"><?php p_("Entry attachments") ?></a>
+            <ul class="entry-attachments attachment-list">
+                <?php foreach ($ENTRY_ATTACHMENTS as $attachment): ?>
+                    <li class="attachment" data-file="<?php echo $this->escape($attachment->getName())?>">
+                        <?php echo $this->escape($attachment->getName()) ?>
+                    </li>
+                <?php endforeach ?>
+            </ul>
+        <?php endif ?>
+        <?php if ($BLOG_ATTACHMENTS): ?>
+            <a name="blog-attachments" href="#" class="attachment-list-toggle"><?php p_("Blog attachments") ?></a>
+            <ul class="blog-attachments attachment-list">
+                <?php foreach ($BLOG_ATTACHMENTS as $attachment): ?>
+                    <li class="attachment" data-file="<?php echo $this->escape($attachment->getName())?>">
+                        <?php echo $this->escape($attachment->getName()) ?>
+                    </li>
+                <?php endforeach ?>
+            </ul>
+        <?php endif ?>
+    </div>
 	</form>
 </fieldset>

@@ -1,5 +1,5 @@
 <?php
-class BlogEntryTest extends PHPUnit_Framework_TestCase {
+class BlogEntryTest extends PHPUnit\Framework\TestCase {
     function testCalcPrettyPermalink() {
 		$e = new BlogEntry();
 		

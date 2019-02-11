@@ -1,7 +1,7 @@
 <?php
 use Prophecy\Argument;
 
-abstract class PublisherTestBase extends PHPUnit_Framework_TestCase {
+abstract class PublisherTestBase extends PHPUnit\Framework\TestCase {
 
     protected function setUp() {
         $_FILES = array();

@@ -1,5 +1,5 @@
 <?php
-class SimpleXmlWriterTest extends PHPUnit_Framework_TestCase {
+class SimpleXmlWriterTest extends PHPUnit\Framework\TestCase {
     function testConstructor() {
 		$this->fizz = array();
 		$a = array('foo');

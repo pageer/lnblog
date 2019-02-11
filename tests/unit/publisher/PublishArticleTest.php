@@ -206,13 +206,20 @@ class PublishArticleTest extends PublisherTestBase {
         $this->http_client->fetchUrl('http://www.example.com/test', true)->willReturn("X-Pingback: http://www.example.com/ping\r\nContent-Type: text/html");
         $this->http_client->fetchUrl('http://www.example.com/test')->willReturn("<link rel=\"pingback\" href=\"http://www.example.com/ping\">");
 
-        $this->http_client->sendXmlRpcMessage('www.example.com', '/ping', 80, Argument::any())->shouldBeCalled();
+        $this->http_client->sendXmlRpcMessage('www.example.com', '/ping', 80, Argument::any())
+            ->willReturn(new xmlrpcresp(0, 0, 'success'))
+            ->shouldBeCalled();
         
         $this->publisher->publishArticle($entry, $this->getTestTime());
     }
     
     public function testPublishArticle_WhenSendingPingbacks_RaisesPingbackCompleteEventWithResponseData() {
-        $ping_results = array(array('uri' => 'http://example.com/test', 'response' => 'test'));
+        $ping_results = [
+            [
+                'uri' => 'http://example.com/test',
+                'response' => ['code' => 0, 'message' => '']
+            ]
+        ];
         $entry = $this->setUpTestArticleForSuccessfulPublish();
         $event_stub = new PublisherEventTestingStub();
         EventRegister::instance()->addHandler('BlogEntry', 'PingbackComplete', $event_stub, 'eventHandler');
@@ -222,7 +229,8 @@ class PublishArticleTest extends PublisherTestBase {
         $entry->send_pingback = true;
         $this->http_client->fetchUrl('http://example.com/test', true)->willReturn("X-Pingback: http://example.com/ping\r\nContent-Type: text/html");
         $this->http_client->fetchUrl('http://example.com/test')->willReturn("<link rel=\"pingback\" href=\"http://example.com/ping\">");
-        $this->http_client->sendXmlRpcMessage('example.com', '/ping', 80, Argument::any())->willReturn('test');
+        $this->http_client->sendXmlRpcMessage('example.com', '/ping', 80, Argument::any())
+            ->willReturn(new xmlrpcresp(0, 0, 'success'));
 
         $this->publisher->publishArticle($entry, $this->getTestTime());
 

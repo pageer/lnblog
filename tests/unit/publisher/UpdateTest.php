@@ -280,7 +280,9 @@ class UpdateTest extends PublisherTestBase {
         $this->http_client->fetchUrl('http://www.example.com/test', true)->willReturn("X-Pingback: http://www.example.com/ping\r\nContent-Type: text/html");
         $this->http_client->fetchUrl('http://www.example.com/test')->willReturn("<link rel=\"pingback\" href=\"http://www.example.com/ping\">");
 
-        $this->http_client->sendXmlRpcMessage('www.example.com', '/ping', 80, Argument::any())->shouldBeCalled();
+        $this->http_client->sendXmlRpcMessage('www.example.com', '/ping', 80, Argument::any())
+            ->willReturn(new xmlrpcresp(0, 0, 'success'))
+            ->shouldBeCalled();
         
         $this->publisher->update($entry, $this->getTestTime());
     }
@@ -308,7 +310,9 @@ class UpdateTest extends PublisherTestBase {
         $this->http_client->fetchUrl('http://www.example.com/test', true)->willReturn("X-Pingback: http://www.example.com/ping\r\nContent-Type: text/html");
         $this->http_client->fetchUrl('http://www.example.com/test')->willReturn("<link rel=\"pingback\" href=\"http://www.example.com/ping\">");
 
-        $this->http_client->sendXmlRpcMessage('www.example.com', '/ping', 80, Argument::any())->shouldBeCalled();
+        $this->http_client->sendXmlRpcMessage('www.example.com', '/ping', 80, Argument::any())
+            ->willReturn(new xmlrpcresp(0, 0, 'success'))
+            ->shouldBeCalled();
         
         $this->publisher->update($entry, $this->getTestTime());
     }
@@ -330,7 +334,12 @@ class UpdateTest extends PublisherTestBase {
     }
 
     public function testUpdate_WhenSendingPings_RaisesPingbackCompleteEvent() {
-        $ping_results = array(array('uri' => 'http://example.com/test', 'response' => 'test'));
+        $ping_results = [
+            [
+                'uri' => 'http://example.com/test',
+                'response' => ['code' => 0, 'message' => ''],
+            ]
+        ];
         $entry = $this->setUpTestPublishedEntryForSuccessfulSave();
         $event_stub = new PublisherEventTestingStub();
         EventRegister::instance()->addHandler('BlogEntry', 'PingbackComplete', $event_stub, 'eventHandler');
@@ -340,7 +349,8 @@ class UpdateTest extends PublisherTestBase {
         $entry->send_pingback = true;
         $this->http_client->fetchUrl('http://example.com/test', true)->willReturn("X-Pingback: http://example.com/ping\r\nContent-Type: text/html");
         $this->http_client->fetchUrl('http://example.com/test')->willReturn("<link rel=\"pingback\" href=\"http://example.com/ping\">");
-        $this->http_client->sendXmlRpcMessage('example.com', '/ping', 80, Argument::any())->willReturn('test');
+        $this->http_client->sendXmlRpcMessage('example.com', '/ping', 80, Argument::any())
+            ->willReturn(new xmlrpcresp(0, 0, 'success'));
 
         $this->publisher->update($entry, $this->getTestTime());
 

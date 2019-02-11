@@ -1,5 +1,5 @@
 <?php
-class UriTest extends PHPUnit_Framework_TestCase {
+class UriTest extends PHPUnit\Framework\TestCase {
     	function initUri() {
 		$u = new URI();
 		$u->host = "example.com";

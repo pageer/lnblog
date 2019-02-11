@@ -2,7 +2,7 @@
 
 use Prophecy\Argument;
 
-class WebPagesTest extends \PHPUnit_Framework_TestCase {
+class WebPagesTest extends \PHPUnit\Framework\TestCase {
 
     public function testEditEntry_WhenEmptyPostAndNotLoggedIn_Shows403Error() {
         $this->entry->isEntry()->willReturn(false);
@@ -154,6 +154,7 @@ class WebPagesTest extends \PHPUnit_Framework_TestCase {
         $this->entry->send_pingback = false;
         $this->entry->isEntry()->willReturn(true);
         $this->entry->isPublished()->willReturn(false);
+        $this->entry->getAttachments()->willReturn([]);
         $this->system->canAddTo($this->blog, $this->user)->willReturn(false);
         $this->system->canModify($this->entry, $this->user)->willReturn(true);
 
@@ -171,6 +172,7 @@ class WebPagesTest extends \PHPUnit_Framework_TestCase {
         $this->entry->send_pingback = false;
         $this->entry->isEntry()->willReturn(true);
         $this->entry->isPublished()->willReturn(true);
+        $this->entry->getAttachments()->willReturn([]);
         $this->system->canAddTo($this->blog, $this->user)->willReturn(false);
         $this->system->canModify($this->entry, $this->user)->willReturn(true);
 
@@ -188,6 +190,7 @@ class WebPagesTest extends \PHPUnit_Framework_TestCase {
         $this->entry->getPostData()->willReturn(null);
         $this->entry->raiseEvent(Argument::any())->willReturn(null);
         $this->entry->permalink()->willReturn('');
+        $this->entry->getAttachments()->willReturn([]);
         $this->user->checkLogin()->willReturn(true);
         $this->system->canAddTo($this->blog, $this->user)->willReturn(false);
         $this->system->canModify($this->entry, $this->user)->willReturn(false);
@@ -204,6 +207,7 @@ class WebPagesTest extends \PHPUnit_Framework_TestCase {
         $this->entry->data = 'some data';
         $this->entry->isEntry()->willReturn(true);
         $this->entry->isPublished()->willReturn(false);
+        $this->entry->getAttachments()->willReturn([]);
         $this->system->canAddTo($this->blog, $this->user)->willReturn(false);
         $this->system->canModify($this->entry, $this->user)->willReturn(true);
         $this->publisher->update($this->entry)->willThrow(new Exception("Update Failure!"));
@@ -223,6 +227,7 @@ class WebPagesTest extends \PHPUnit_Framework_TestCase {
         $this->entry->get()->willReturn("This is a test entry");
         $this->entry->isEntry()->willReturn(true);
         $this->entry->isPublished()->willReturn(false);
+        $this->entry->getAttachments()->willReturn([]);
         $this->user->exportVars(Argument::any())->willReturn(null);
         $this->system->canAddTo($this->blog, $this->user)->willReturn(false);
         $this->system->canModify($this->entry, $this->user)->willReturn(true);
@@ -240,6 +245,7 @@ class WebPagesTest extends \PHPUnit_Framework_TestCase {
         $this->entry->data = 'some data';
         $this->entry->isEntry()->willReturn(true);
         $this->entry->isPublished()->willReturn(false);
+        $this->entry->getAttachments()->willReturn([]);
         $this->user->exportVars(Argument::any())->willReturn(null);
         $this->system->canAddTo($this->blog, $this->user)->willReturn(false);
         $this->system->canModify($this->entry, $this->user)->willReturn(true);
@@ -300,7 +306,7 @@ class WebPagesTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertEquals(json_encode(['id'=>'asdf', 'content'=> 'This%20is%20some%20markup']), $output);
     }
-    
+
     public function testEditEntry_WhenPreviewAndSaveButNotAjax_Redirects() {
         $_POST['body'] = "This is a test entry";
         $_POST['preview'] = 'preview';
@@ -336,12 +342,13 @@ class WebPagesTest extends \PHPUnit_Framework_TestCase {
         $ping_data = array(
             array(
                 'uri' => 'http://example.com/test',
-                'response' => new xmlrpcresp('test', 123, 'This is an error'),
+                'response' => ['code' => 123, 'message' => 'This is an error'],
             ),
         );
         $this->entry->data = 'some data';
         $this->entry->isEntry()->willReturn(true);
         $this->entry->isPublished()->willReturn(false);
+        $this->entry->getAttachments()->willReturn([]);
         $this->system->canAddTo($this->blog, $this->user)->willReturn(true);
         $this->system->canModify($this->entry, $this->user)->willReturn(true);
         $this->sys_ini->value("entryconfig", 'AllowLocalPingback', 1)->willReturn(1);
@@ -364,12 +371,13 @@ class WebPagesTest extends \PHPUnit_Framework_TestCase {
         $ping_data = array(
             array(
                 'uri' => 'http://example.com/test',
-                'response' => new xmlrpcresp('test', 0, 'It worked'),
+                'response' => ['code' =>  0, 'message' => 'It worked'],
             ),
         );
         $this->entry->data = 'some data';
         $this->entry->isEntry()->willReturn(true);
         $this->entry->isPublished()->willReturn(false);
+        $this->entry->getAttachments()->willReturn([]);
         $this->system->canAddTo($this->blog, $this->user)->willReturn(true);
         $this->system->canModify($this->entry, $this->user)->willReturn(true);
         $this->sys_ini->value("entryconfig", 'AllowLocalPingback', 1)->willReturn(1);
@@ -384,7 +392,7 @@ class WebPagesTest extends \PHPUnit_Framework_TestCase {
 
         $this->webpage->entryedit();
     }
-    
+
     public function testEditEntry_WhenEntryHasUploadsWithErrors_ShowsWarnings() {
         $_POST['body'] = "This is a test entry";
         $_POST['post'] = 'post';
@@ -392,6 +400,7 @@ class WebPagesTest extends \PHPUnit_Framework_TestCase {
         $this->entry->data = 'some data';
         $this->entry->isEntry()->willReturn(true);
         $this->entry->isPublished()->willReturn(false);
+        $this->entry->getAttachments()->willReturn([]);
         $this->system->canAddTo($this->blog, $this->user)->willReturn(true);
         $this->system->canModify($this->entry, $this->user)->willReturn(true);
         $this->page->refresh(Argument::any(), Argument::any())->willReturn(null);
@@ -411,6 +420,7 @@ class WebPagesTest extends \PHPUnit_Framework_TestCase {
         $this->entry->data = 'some data';
         $this->entry->isEntry()->willReturn(true);
         $this->entry->isPublished()->willReturn(false);
+        $this->entry->getAttachments()->willReturn([]);
         $this->system->canAddTo($this->blog, $this->user)->willReturn(true);
         $this->system->canModify($this->entry, $this->user)->willReturn(true);
         $this->page->refresh(Argument::any(), Argument::any())->willReturn(null);

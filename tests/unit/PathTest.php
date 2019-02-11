@@ -1,5 +1,5 @@
 <?php
-class PathTest extends PHPUnit_Framework_TestCase {
+class PathTest extends PHPUnit\Framework\TestCase {
     function testCreator() {
 		$p = new Path();
 		$this->assertEquals($p->path, array());

@@ -309,6 +309,13 @@ class Publisher {
 
     }
 
+    protected function getHttpClient() {
+        if (!$this->http_client) {
+            $this->http_client = new HttpClient();
+        }
+        return $this->http_client;
+    }
+
     private function getArticleDirectoryPath($entry, $basepath) {
         $dir_path = $entry->article_path;
         if (! $dir_path) {
@@ -518,19 +525,7 @@ class Publisher {
     }
 
     private function sendPingbacks($entry) {
-        if ($entry->send_pingback) {
-            $local = System::instance()->sys_ini->value("entryconfig", "AllowLocalPingback", 1);
-            $ping_results = $entry->sendPings($this->getHttpClient(), $local);
-            if (!empty($ping_results)) {
-                $this->raiseEvent($entry, 'BlogEntry', 'PingbackComplete', $ping_results);
-            }
-        }
-    }
-
-    protected function getHttpClient() {
-        if (!$this->http_client) {
-            $this->http_client = new HttpClient();
-        }
-        return $this->http_client;
+        $client = new SocialWebClient($this->getHttpClient(), $this->fs);
+        $client->sendReplies($entry);
     }
 }

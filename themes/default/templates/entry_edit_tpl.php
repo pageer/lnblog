@@ -1,6 +1,8 @@
+<?php if (isset($BLOG_URL_ROOTREL)): ?>
 <script type="application/javascript">
     window.AJAX_URL = '<?php echo $BLOG_URL_ROOTREL?>';
 </script>
+<?php endif ?>
 
 <?php if (isset($HAS_UPDATE_ERROR)): ?>
 <h3><?php echo $UPDATE_ERROR_MESSAGE?></h3>

@@ -56,7 +56,7 @@ class BlogURIWrapper extends LnBlogObject {
     function delentry($entryid) {
         return $this->wrapper("delentry", array('entry'=>$entryid));
     }
-    function upload() { return $this->wrapper("upload"); }
+    function upload($profile = []) { return $this->wrapper("upload", $profile); }
     function edit() { return $this->wrapper("edit"); }
     function manage_reply() { return $this->wrapper("managereply"); }
     function manage_all() { return $this->wrapper("managereply"); }
