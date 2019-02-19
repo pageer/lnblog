@@ -1656,9 +1656,12 @@ class WebPages extends BasePages {
         }
 
         if ($ent->allow_pingback) {
-            $this->getPage()->addHeader("X-Pingback", INSTALL_ROOT_URL."xmlrpc.php");
-            $this->getPage()->addLink(array('rel'=>'pingback',
-                                 'href'=>INSTALL_ROOT_URL."xmlrpc.php"));
+            $pingback_url = INSTALL_ROOT_URL."xmlrpc.php";
+            $this->getPage()->addHeader("X-Pingback", $pingback_url);
+            $this->getPage()->addLink(['rel'=>'pingback', 'href' => $pingback_url]);
+            $webmention_url = INSTALL_ROOT_URL . "index.php?action=webmention";
+            $this->getPage()->addHeader("Link", "<$webmention_url>; rel=\"webmention\"");
+            $this->getPage()->addLink(['rel'=>'webmention', 'href' => $webmention_url]);
         }
         $this->getPage()->addScript(lang_js());
         $this->getPage()->addScript("entry.js");
@@ -1824,7 +1827,16 @@ class WebPages extends BasePages {
     }
 
     public function webmention() {
-
+        $source = POST('source');
+        $target = POST('target');
+        try {
+            $this->getSocialWebServer()->addWebmention($source, $target);
+        } catch (WebmentionInvalidReceive $invalid) {
+            $extra_content = "\r\n\r\n" . $invalid->getMessage();
+            $this->getPage()->error(400, $extra_content);
+        } catch (Exception $error) {
+            $this->getPage()->error(500);
+        }
     }
 
     private function persistEntry($ent, $is_art) {
@@ -1907,5 +1919,11 @@ class WebPages extends BasePages {
             $this->publisher = new Publisher($this->blog, $this->user, $fs, $wrappers);
         }
         return $this->publisher;
+    }
+
+    protected function getSocialWebServer() {
+        $mapper = new EntryMapper();
+        $client = new HttpClient();
+        return new SocialWebServer($mapper, $client);
     }
 }

@@ -22,6 +22,7 @@ $xml_lang = str_replace("_", "-", LANGUAGE); ?>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $xml_lang; ?>" lang="<?php echo $xml_lang; ?>">
 <head>
 <title><?php echo $PAGE_TITLE; ?></title>
+<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
 <?php foreach ($METADATA as $meta) { ?>
 <meta <?php if ($meta["http-equiv"]) { ?>http-equiv="<?php echo $meta["http-equiv"]; ?>"<?php } 
 ?> <?php if ($meta["name"]) { ?>name="<?php echo $meta["name"]; ?>"<?php } ?> content="<?php echo $meta["content"]; ?>" />

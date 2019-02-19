@@ -354,53 +354,6 @@ class System {
 
     ########## Junk code ###############3
 
-    # Function: uri_to_localpath
-    # The reverse of <localpath_to_uri>, this function takes a URI handled by LnBlog
-    # and converts it into a local path to the file or directory in question.  This
-    # function assumes that the URI is fully qualified, e.g.
-    # |http://somehost.com/somepath/somefile.ext
-    # Note that this may or may not play well with Apache .htaccess files.
-    #
-    # Parameters:
-    # uri - The URI to convert.
-    #
-    # Returns:
-    # A string containing the local path referenced by the URI.  Not that this path
-    # may or may not exist.
-
-    function uri_to_localpath($uri) {
-
-        $url_bits = parse_url($uri);
-        if (! $url_bits) return '';
-
-        #$protocol = isset($url_bits['scheme']) ? $url_bits['scheme'] : '';
-        #$domain = isset($url_bits['host']) ? $url_bits['host'] : '';
-        $path = isset($url_bits['path']) ? $url_bits['path'] : '';
-
-        # Account for user home directories in path.  Please note that this is
-        # an ugly, ugly hack to make this function work when I'm testing on my
-        # local workstation, where I use ~/www for by web root.
-        if ( preg_match(URI_TO_LOCALPATH_MATCH_RE, $path) ) {
-            $path = preg_replace(URI_TO_LOCALPATH_MATCH_RE, URI_TO_LOCALPATH_REPLACE_RE, $path);
-        }
-
-        if (defined("DOMAIN_NAME") && defined("SUBDOMAIN_ROOT") &&
-            isset($url_bits['host']) &&
-            preg_match('/'.str_replace('.','\.',DOMAIN_NAME).'$/', DOMAIN_NAME) &&
-            strpos($url_bits['host'], DOMAIN_NAME) > 1) {
-
-            $pos = strpos($url_bits['host'], DOMAIN_NAME);
-            $tmp_path = substr($url_bits['host'], 0, $pos - 1);
-            $path = mkpath(SUBDOMAIN_ROOT, $tmp_path, $path);
-        } else {
-            $path = mkpath(DOCUMENT_ROOT, $path);
-        }
-
-        $p = new Path($path);
-        return $p->getCanonical();
-
-    }
-
     # Function: calculate_document_root
     # An alternate way to find the document root.  This one works by comparing
     # the current URL on the server to the current directory.  The idea is that

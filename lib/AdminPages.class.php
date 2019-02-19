@@ -36,6 +36,7 @@ class AdminPages extends BasePages {
             'docroot' => 'docroot_test',
             'ftproot' => 'ftproot_test',
             'useredit' => 'WebPages::editlogin',
+            'webmention' => 'WebPages::webmention',
         );
     }
 

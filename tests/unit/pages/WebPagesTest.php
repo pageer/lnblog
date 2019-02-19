@@ -413,6 +413,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
 
         $this->webpage->entryedit();
     }
+
     public function testEditEntry_WhenEntryHasUploadsWithoutErrors_NoWarningDisplayed() {
         $_POST['body'] = "This is a test entry";
         $_POST['post'] = 'post';
@@ -433,6 +434,44 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->webpage->entryedit();
     }
 
+    public function testWebmention_WhenValid_AddsWebmention() {
+        $_POST['source'] = 'http://yoursite.com/test1';
+        $_POST['target'] = 'https://mysite.com/test2';
+
+        $this->webpage->webmention();
+
+        $this->social_server->addWebmention(
+            'http://yoursite.com/test1',
+            'https://mysite.com/test2'
+        )->shouldHaveBeenCalled();
+    }
+
+    public function testWebmention_WhenAddingThrowsInvalidReceive_Returns400() {
+        $_POST['source'] = 'http://yoursite.com/test1';
+        $_POST['target'] = 'https://mysite.com/test2';
+        $this->social_server->addWebmention(
+            'http://yoursite.com/test1',
+            'https://mysite.com/test2'
+        )->willThrow(new WebmentionInvalidReceive('test'));
+
+        $this->webpage->webmention();
+
+        $this->page->error(400, "\r\n\r\ntest")->shouldHaveBeenCalled();
+    }
+
+    public function testWebmention_WhenAddingThrowsUnexpectedError_Returns500() {
+        $_POST['source'] = 'http://yoursite.com/test1';
+        $_POST['target'] = 'https://mysite.com/test2';
+        $this->social_server->addWebmention(
+            'http://yoursite.com/test1',
+            'https://mysite.com/test2'
+        )->willThrow(new Exception());
+
+        $this->webpage->webmention();
+
+        $this->page->error(500)->shouldHaveBeenCalled();
+    }
+
     protected function setUp() {
         EventRegister::instance()->clearAll();
         $_POST = [];
@@ -440,22 +479,25 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
 
         $this->prophet = new \Prophecy\Prophet();
 
-        $this->system = $this->prophet->prophesize('System');
-        $this->sys_ini = $this->prophet->prophesize('INIParser');
+        $this->system = $this->prophet->prophesize(System::class);
+        $this->sys_ini = $this->prophet->prophesize(INIParser::class);
         $this->system->reveal()->sys_ini = $this->sys_ini->reveal();
         System::$static_instance = $this->system->reveal();
 
-        $this->blog = $this->prophet->prophesize('Blog');
-        $this->user = $this->prophet->prophesize('User');
-        $this->entry = $this->prophet->prophesize('BlogEntry');
-        $this->publisher = $this->prophet->prophesize('Publisher');
-        $this->page = $this->prophet->prophesize('Page');
+        $this->blog = $this->prophet->prophesize(Blog::class);
+        $this->user = $this->prophet->prophesize(User::class);
+        $this->entry = $this->prophet->prophesize(BlogEntry::class);
+        $this->publisher = $this->prophet->prophesize(Publisher::class);
+        $this->mapper = $this->prophet->prophesize(EntryMapper::class);
+        $this->social_server = $this->prophet->prophesize(SocialWebServer::class);
+        $this->page = $this->prophet->prophesize(Page::class);
 
         $this->webpage = new TestableWebPages($this->blog->reveal(), $this->user->reveal());
 
         $this->webpage->test_page = $this->page->reveal();
         $this->webpage->test_entry = $this->entry->reveal();
         $this->webpage->test_publisher = $this->publisher->reveal();
+        $this->webpage->test_social_server = $this->social_server->reveal();
     }
 
     protected function tearDown() {
@@ -537,5 +579,9 @@ class TestableWebPages extends WebPages {
 
     protected function getPublisher() {
         return $this->test_publisher ?: parent::getPublisher();
+    }
+
+    protected function getSocialWebServer() {
+        return $this->test_social_server ?: parent::getSocialWebServer();
     }
 }

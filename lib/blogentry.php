@@ -1224,4 +1224,13 @@ class BlogEntry extends Entry implements AttachmentContainer {
     public function removeAttachment($name) {
         $this->filemanager->remove($name);
     }
+
+    # Method: addReply
+    # Inserts a reply (comment, pingback, etc.) to the entry.
+    #
+    # Parameters:
+    # reply - The reply object ot insert
+    public function addReply($reply) {
+        $result = $reply->insert($this);
+    }
 }

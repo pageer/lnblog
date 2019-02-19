@@ -1,7 +1,18 @@
 <?php
 
+# Class: HttpClient
+# A simple class for making HTTP requests.
 class HttpClient {
-
+    # Method: fetchUrl
+    # Fetch the content of  a URL.
+    #
+    # Parameters:
+    # url - String containing the URL to fetch
+    # header - Optional boolean switch for whether to include headers in the
+    #          text.  Off by default.
+    #
+    # Returns:
+    # The page content as a string.
     public function fetchUrl($url, $headers = false) {
         if (extension_loaded('curl')) {
 
@@ -48,8 +59,18 @@ class HttpClient {
         return $response;
     }
 
-    public function sendPost($url, $data, $include_headers = false) {
-        if (false && extension_loaded("curl")) {
+    # Method: sendPost
+    # Send a POST request and get the response.  The request is
+    # sent as x-www-form-urlencoded data.
+    #
+    # Parameters:
+    # url - The URL to which the resquest is sent.
+    # data - The post data to send as a URL-encoded string.
+    #
+    # Returns:
+    # An HttpResponse object containing the response.
+    public function sendPost($url, $data) {
+        if (extension_loaded("curl")) {
 
             # Initialize CURL and POST to the target URL.
             $hnd = curl_init();
@@ -57,9 +78,7 @@ class HttpClient {
             curl_setopt($hnd, CURLOPT_POST, 1);
             curl_setopt($hnd, CURLOPT_FOLLOWLOCATION, 1);
             curl_setopt($hnd, CURLOPT_RETURNTRANSFER, 1);
-            if ($include_headers) {
-                curl_setopt($hnd, CURLOPT_HEADER, 1);
-            }
+            curl_setopt($hnd, CURLOPT_HEADER, 1);
             curl_setopt($hnd, CURLOPT_POSTFIELDS, $data);
             $response = curl_exec($hnd);
 
@@ -93,13 +112,6 @@ class HttpClient {
                 $response .= fgets($fp);
             }
             fclose($fp);
-
-            if (!$include_headers) {
-                $header_break = strpos($response, "\r\n\r\n");
-                if ($header_break) {
-                    $response = substr($response, $header_break + 4);
-                }
-            }
         }
 
         return new HttpResponse($response);

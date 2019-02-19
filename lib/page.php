@@ -336,25 +336,19 @@ class Page extends LnBlogObject {
     # error         - The HTTP status code for the response.
     # extra_message - An additional message to output for the response
     public function error($code, $extra_message = '') {
-        switch ($code) {
-            case 403:
-                $message = 'Forbidden';
-                break;
-            case 404:
-                $message = 'Not Found';
-                break;
-            case 500:
-                $message = 'Internal Server Error';
-            default:
-                $message = '';
-        }
+        $message_table = [
+            400 => 'Bad Request',
+            403 => 'Forbidden',
+            404 => 'Not Found',
+            500 => 'Internal Server Error',
+        ];
+        $message = isset($message_table[$code]) ? $message_table[$code] : '';
         header("HTTP/1.0 $code $message");
         if ($extra_message) {
             echo $extra_message;
         }
         exit;
     }
-    
 }
 
 $PAGE = Page::instance();

@@ -106,7 +106,7 @@ class SocialWebClient {
 
     private function sendWebmention($entry, $uri, $target) {
         $data = "source=" . $entry->permalink() . "&target=" . $target;
-        $result = $this->http_client->sendPost($uri, $data, true);
+        $result = $this->http_client->sendPost($uri, $data);
         $code = $result->responseCode();
         return [
             'code' => $code >= 200 && $code <= 299 ? 0 : $code,
