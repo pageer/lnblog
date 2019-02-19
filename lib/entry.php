@@ -341,7 +341,8 @@ abstract class Entry extends LnBlogObject{
             foreach ($data as $line) {
                 preg_match('/<!--META ([\w|\s|-]*): (.*) META-->/', $line, $matches);
                 if ($matches && isset($lookup[strtolower($matches[1])])) {
-                    $this->$lookup[strtolower($matches[1])] = $matches[2];
+                    $field = $lookup[strtolower($matches[1])];
+                    $this->$field = $matches[2];
                 }
                 $cleanline = preg_replace("/<!--META.*META-->\s\r?\n?\r?/", "", $line);
 
