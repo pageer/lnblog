@@ -113,7 +113,7 @@ $(document).ready( function () {
         var $node = $(this).closest('.attachment');
         var file_name = $node.data('file');
         var should_remove = confirm("Really delete file '" + file_name + "'?");
-        var url = window.AJAX_URL + '?action=removefile';
+        var url = (window.AJAX_URL || '') + '?action=removefile';
         
         var query_params = window.location.search.substr(1).split('&');
         for (var i = 0; i < query_params.length; i++) {
@@ -151,7 +151,7 @@ $(document).ready( function () {
     $('.attachment-list').toggle(false);
 
     $('.attachment').each(function() {
-        var $link = $('<a href="#">' + strings.editor_removeLink + '</a>');
+        var $link = $('<a href="#" title="' + strings.editor_removeLink + '">&times;</a>');
         $link.on('click', removeUpload);
         $(this).append($link);
     });
