@@ -990,8 +990,8 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     Method: upgradeWrappers
     This is an upgrade function that will create new config and wrapper
     scripts to upgrade a directory of blog data to the current version.
-    The data files should always work unmodified, so they do not need to
-    be upgraded.  This should not be required too often, if all goes well.
+    The data files will only be modified if required.  Copies of the old
+    files should be left as a backup.
 
     Precondition:
     It is assumed that this function will only be run from the package
@@ -1022,6 +1022,8 @@ class Blog extends LnBlogObject implements AttachmentContainer {
             $cmt_path = Path::mk($ent_path, ENTRY_COMMENT_DIR);
             $tb_path = Path::mk($ent_path, ENTRY_TRACKBACK_DIR);
             $pb_path = Path::mk($ent_path, ENTRY_PINGBACK_DIR);
+            $ret = $this->writeEntryFileIfNeeded($ent_path);
+            $files = array_merge($files, $ret);
             $ret = $wrappers->createDirectoryWrappers($ent_path, ARTICLE_BASE);
             $files = array_merge($files, $ret);
             $ret = $wrappers->createDirectoryWrappers($cmt_path, ENTRY_COMMENTS, 'article');
@@ -1051,6 +1053,8 @@ class Blog extends LnBlogObject implements AttachmentContainer {
                     $cmt_path = Path::mk($ent_path, ENTRY_COMMENT_DIR);
                     $tb_path = Path::mk($ent_path, ENTRY_TRACKBACK_DIR);
                     $pb_path = Path::mk($ent_path, ENTRY_PINGBACK_DIR);
+                    $ret = $this->writeEntryFileIfNeeded($ent_path);
+                    $files = array_merge($files, $ret);
                     $ret = $wrappers->createDirectoryWrappers($ent_path, ENTRY_BASE);
                     $files = array_merge($files, $ret);
                     $ret = $wrappers->createDirectoryWrappers($cmt_path, ENTRY_COMMENTS);
@@ -1082,6 +1086,8 @@ class Blog extends LnBlogObject implements AttachmentContainer {
         $dir_list = $this->fs->scan_directory($path, true);
         foreach ($dir_list as $ar) {
             $ar_path = $path.PATH_DELIM.$ar;
+            $ret = $this->writeEntryFileIfNeeded($ar_path);
+            $files = array_merge($files, $ret);
             $cmt_path = $ar_path.PATH_DELIM.ENTRY_COMMENT_DIR;
             $ret = $wrappers->createDirectoryWrappers($ar_path, ARTICLE_BASE);
             $files = array_merge($files, $ret);
@@ -1094,6 +1100,25 @@ class Blog extends LnBlogObject implements AttachmentContainer {
         if (! $ret) $files[] = Path::mk($this->home_path, BLOG_CONFIG_PATH);
         $this->raiseEvent("UpgradeComplete");
         return $files;
+    }
+
+    private function shouldWriteEntryDataFile($entry_path) {
+        $path = Path::mk($entry_path, ENTRY_DEFAULT_FILE);
+        return !$this->fs->file_exists($path);
+    }
+
+    private function backupOldFileData($entry_path) {
+        // Nothing to do for now.  May need in the future.
+    }
+
+    private function writeEntryFileIfNeeded($entry_path) {
+        if ($this->shouldWriteEntryDataFile($entry_path)) {
+            $this->backupOldFileData($entry_path);
+            $entry = new BlogEntry($entry_path, $this->fs);
+            $ret = $entry->writeFileData();
+            return $ret ? [] : $entry->file;
+        }
+        return [];
     }
 
     # Method: fixDirectoryPermissions

@@ -1198,6 +1198,17 @@ class BlogEntry extends Entry implements AttachmentContainer {
         return false;
     }
 
+    # Method: writeFileData
+    # Overrides the default implementation to make sure that we always
+    # write to the correct file name.
+    public function writeFileData() {
+        $file_base_name = basename($this->file);
+        if ($file_base_name != ENTRY_DEFAULT_FILE) {
+            $this->file = Path::mk(dirname($this->file), ENTRY_DEFAULT_FILE);
+        }
+        return parent::writeFileData();
+    }
+
     # Method: getAttachments
     # Get a list of files attached to this entry
     #

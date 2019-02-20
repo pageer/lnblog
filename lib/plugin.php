@@ -113,7 +113,7 @@ abstract class Plugin extends LnBlogObject{
     *Optionally* returns the form markup as a string.
     */
 
-    function showConfig(&$page) {
+    function showConfig($page) {
         if (! $this->member_list) return false;
 
         echo "<fieldset>\n";
