@@ -666,56 +666,6 @@ class WebPages extends BasePages {
         $tpl->set("BLOG_ATTACHMENTS", $this->blog->getAttachments());
     }
 
-    # Function: handle_uploads
-    # Handles uploads that are sent when an entry is edited.  It checks the file
-    # uploads and moves them to the entry directory.
-    #
-    # Parameters:
-    # ent - The entry we're editing.
-    #
-    # Returns:
-    # If all uploads are successful, returns true.  Otherwise, returns an array
-    # of error messages, one element for each upload error.
-
-    protected function handle_uploads(&$ent) {
-        $err = array();
-
-        $uploads = array();
-        if (isset($_FILES['upload'])) {
-            $uploads = FileUpload::initUploads($_FILES['upload'], $ent->localpath());
-        }
-
-        foreach ($uploads as $upld) {
-            if ( $upld->completed() ) {
-                $ret = $upld->moveFile();
-                if (! $ret) {
-                    $err[] = _('Error moving uploaded file');
-                }
-            } elseif ( ( $upld->status() != FILEUPLOAD_NO_FILE &&
-                         $upld->status() != FILEUPLOAD_NOT_INITIALIZED ) ||
-                       ( $upld->status() == FILEUPLOAD_NOT_INITIALIZED &&
-                        ! defined("UPLOAD_IGNORE_UNINITIALIZED") ) ) {
-                $ret = false;
-                $err[] = $upld->errorMessage();
-            }
-        }
-
-        if ($err) {
-            return $err;
-        } else {
-            # This event is raised here as sort of a hack.  The idea is that some
-            # plugins will need information on uploaded files, but can only get that
-            # when an event is raised by the entry.
-            # In particular, this intended to regenerate the RSS2 feed after uploading
-            # a file from the edit form, so that the enclosure information will be
-            # set correctly.
-            if (! $ent->isDraft()) {
-                $ent->raiseEvent("UpdateComplete");
-            }
-            return true;
-        }
-    }
-
     private function handlePingbackPings($ent) {
         $errors = array();
         $err = '';
@@ -783,10 +733,26 @@ class WebPages extends BasePages {
 
             $file_name = "upload";
 
+            if (! empty($_FILES)) {
+                $files = FileUpload::initUploads($_FILES[$file_name], $target);
+
+                $messages = $this->moveUploadedFiles($files);
+                $msg = spf_(
+                    "Select files to upload to the above location." . 
+                        "  The file size limit is %s.",
+                    ini_get("upload_max_filesize")
+                );
+                if (!empty($messages)) {
+                    $msg = implode("<br />", $messages);
+                }
+
+                $tpl->set("UPLOAD_MESSAGE", $msg);
+            }
+
             $query_string = isset($_GET["blog"])?"?blog=".$_GET["blog"]:'';
             $query_string .= isset($_GET["profile"]) ?
-                             ($query_string?"&amp;":"?")."profile=".$_GET["profile"] :
-                             "";
+                ($query_string?"&amp;":"?")."profile=".$_GET["profile"] :
+                "";
 
             $tpl->set("TARGET", current_file().$query_string);
             $size = ini_get("upload_max_filesize");
@@ -798,39 +764,39 @@ class WebPages extends BasePages {
             $tpl->set("BLOG_ATTACHMENTS", $blog_files);
             $tpl->set("ENTRY_ATTACHMENTS", $entry_files);
 
-            if (! empty($_FILES)) {
-                $files = FileUpload::initUploads($_FILES[$file_name], $target);
-
-                $msg = '';
-                foreach ($files as $f) {
-                    if ($f->status() != FILEUPLOAD_NOT_INITIALIZED && $f->size > 0) {
-                        $err = $f->errorMessage();
-                        if ($msg) $msg .= "<br />";
-                        $msg .= $err;
-                        if ( $f->completed() ) $f->moveFile();
-                    }
-                }
-                if (! $msg) {
-                    $msg .= spf_("Select files to upload to the above location.  The file size limit is %s.",
-                                 ini_get("upload_max_filesize"));
-                }
-
-                $tpl->set("UPLOAD_MESSAGE", $msg);
-            }
-
             $body = $tpl->process();
 
         } else {
             $body = "<h3>";
-            if ($ent->isEntry()) $body .= _("You do not have permission to upload files to this entry.");
-            else $body .= _("You do not have permission to upload files to this weblog.");
+            if ($ent->isEntry()) {
+                $body .= _("You do not have permission to upload files to this entry.");
+            } else {
+                $body .= _("You do not have permission to upload files to this weblog.");
+            }
             $body .= "</h3>";
         }
 
         $this->getPage()->addStylesheet("form.css");
         $this->getPage()->title = _("Upload file");
+        $this->getPage()->addScript(lang_js());
         $this->getPage()->addScript('upload.js');
         $this->getPage()->display($body, $this->blog);
+    }
+
+    private function moveUploadedFiles($files) {
+        $errors = [];
+        foreach ($files as $f) {
+            $upload_attempted =
+                $f->status() != FILEUPLOAD_NOT_INITIALIZED &&
+                $f->size > 0;
+            if ($upload_attempted) {
+                $errors[] = $f->errorMessage();
+                if ($f->completed()) {
+                    $f->moveFile();
+                }
+            }
+        }
+        return $errors;
     }
 
     public function removefile() {
@@ -1459,7 +1425,6 @@ class WebPages extends BasePages {
     }
 
     public function showdrafts() {
-        var_dump($this->blog->home_path);
         if (isset($_GET['action']) && $_GET['action'] == 'edit') {
             $this->entryedit();
             return;
