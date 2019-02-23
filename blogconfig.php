@@ -10,29 +10,18 @@
 # files to remove the escape characters.
 ini_set("magic_quotes_runtime", "off");
 
-function lib_autoload($className) {
-    $files = array(
-        implode(DIRECTORY_SEPARATOR, array(__DIR__, 'lib', strtolower($className).'.php')),
-        implode(DIRECTORY_SEPARATOR, array(__DIR__, 'tests', 'unit', $className.'.php')),
-    );
-    foreach ($files as $file) {
-        if (file_exists($file)) {
-            require $file;
-            break;
-        }
-    }
-}
-
 function class_autoload($className) {
-    $folders = array(
-        'lib'.DIRECTORY_SEPARATOR.'textprocessors',
-        'lib'.DIRECTORY_SEPARATOR.'uri',
-        'lib'.DIRECTORY_SEPARATOR.'exceptions',
-        'persistence',
-        'controllers',
-    );
+    $folders = [
+        implode(DIRECTORY_SEPARATOR, ['lib']),
+        implode(DIRECTORY_SEPARATOR, ['lib', 'textprocessors']),
+        implode(DIRECTORY_SEPARATOR, ['lib', 'uri']),
+        implode(DIRECTORY_SEPARATOR, ['lib', 'exceptions']),
+        implode(DIRECTORY_SEPARATOR, ['tests', 'unit']),
+        implode(DIRECTORY_SEPARATOR, ['tests', 'unit', 'publisher']),
+        implode(DIRECTORY_SEPARATOR, ['tests', 'unit', 'pages']),
+    ];
     foreach ($folders as $fld) {
-        $fileName = array(__DIR__, $fld, $className.'.php');
+        $fileName = [__DIR__, $fld, $className.'.php'];
         $file = implode(DIRECTORY_SEPARATOR, $fileName);
         if (file_exists($file)) {
             require $file;
@@ -46,7 +35,6 @@ require_once __DIR__.'/vendor/autoload.php';
 
 // Prepend our own autoloaders to the queue.
 spl_autoload_register('class_autoload', false, true);
-spl_autoload_register('lib_autoload', false, true);
 
 ##########################################
 # Section: Essentials
