@@ -56,7 +56,7 @@
 
         <zip destfile="./build/LnBlog-${version}.zip">
             <fileset dir="./build/LnBlog-${version}">
-                <include name="*" />
+                <include name="**" />
             </fileset>
         </zip>
 		
