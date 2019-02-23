@@ -1,6 +1,6 @@
 <?php
 
-class PublisherIntTest extends PHPUnit_Framework_TestCase {
+class PublisherIntTest extends \PHPUnit\Framework\TestCase {
 
     const TESTPATH = "temp/publishertest";
 
@@ -10,7 +10,7 @@ class PublisherIntTest extends PHPUnit_Framework_TestCase {
         $blog->insert(self::TESTPATH);
 
         $user = new User("testuser", "testpass");
-        
+
         $publisher = new Publisher($blog, $user, NewFS(), new WrapperGenerator(NewFS()));
         $this->assertTrue(is_dir(self::TESTPATH));
 
@@ -28,7 +28,7 @@ class PublisherIntTest extends PHPUnit_Framework_TestCase {
         $entry_path = self::TESTPATH . "/drafts/02_0345";
         $publisher->createDraft($entry, new DateTime("2017-01-02 03:45:00"));
         $draft = new BlogEntry($entry_path, NewFS());
-        
+
         $this->assertTrue(file_exists($entry_path."/entry.xml"));
         $this->assertEquals("Some Stuff", $draft->subject);
         $this->assertEquals("This is some stuff, I guess.", $draft->body);
@@ -78,7 +78,7 @@ class PublisherIntTest extends PHPUnit_Framework_TestCase {
 
         return array($publisher, $draft);
     }
-    
+
     /**
      * @depends testUnpublishEntry
      */
@@ -103,7 +103,7 @@ class PublisherIntTest extends PHPUnit_Framework_TestCase {
         $entry_path = self::TESTPATH . "/entries/2017/02/03_0345";
         $publisher->publishEntry($entry, new DateTime("2017-02-03 03:45:00"));
         $published_entry = new BlogEntry($entry_path, NewFS());
-        
+
         $this->assertTrue(file_exists($entry_path."/entry.xml"));
         $this->assertTrue(file_exists(self::TESTPATH."/entries/2017/02/Some_Published_Stuff.php"));
         $this->assertEquals("Some Published Stuff", $published_entry->subject);
@@ -157,7 +157,7 @@ class PublisherIntTest extends PHPUnit_Framework_TestCase {
         $entry_path = self::TESTPATH . "/content/some_published_stuff";
         $publisher->publishArticle($entry, new DateTime("2017-02-03 03:45:00"));
         $published_entry = new BlogEntry($entry_path, NewFS());
-        
+
         $this->assertTrue(file_exists($entry_path."/entry.xml"));
         $this->assertEquals("Some Published Stuff", $published_entry->subject);
         $this->assertEquals("This is some published stuff.", $published_entry->body);
@@ -197,7 +197,7 @@ class PublisherIntTest extends PHPUnit_Framework_TestCase {
         $draft = new BlogEntry(self::TESTPATH."/drafts/03_0346", NewFS());
         $publisher->publishArticle($draft, new DateTime("2017-02-03 04:45:00"));
         $entry = new BlogEntry($article_path, NewFS());
-        
+
         $this->assertTrue(file_exists($article_path."/entry.xml"));
         $this->assertEquals("some_path", $entry->article_path);
 
@@ -223,7 +223,7 @@ class PublisherIntTest extends PHPUnit_Framework_TestCase {
             $fs->rmdir_rec(self::TESTPATH);
         }
     }
-    
+
     public static function tearDownAfterClass() {
         $fs = NewFS();
         if (is_dir(self::TESTPATH)) {
