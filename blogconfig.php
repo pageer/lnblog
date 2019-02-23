@@ -13,8 +13,6 @@ ini_set("magic_quotes_runtime", "off");
 function lib_autoload($className) {
     $files = array(
         implode(DIRECTORY_SEPARATOR, array(__DIR__, 'lib', strtolower($className).'.php')),
-        implode(DIRECTORY_SEPARATOR, array(__DIR__, 'lib', strtolower($className).'class.php')),
-        implode(DIRECTORY_SEPARATOR, array(__DIR__, 'lib', $className.'.class.php')),
         implode(DIRECTORY_SEPARATOR, array(__DIR__, 'tests', 'unit', $className.'.php')),
     );
     foreach ($files as $file) {
@@ -34,7 +32,7 @@ function class_autoload($className) {
         'controllers',
     );
     foreach ($folders as $fld) {
-        $fileName = array(__DIR__, $fld, $className.'.class.php');
+        $fileName = array(__DIR__, $fld, $className.'.php');
         $file = implode(DIRECTORY_SEPARATOR, $fileName);
         if (file_exists($file)) {
             require $file;
@@ -246,7 +244,7 @@ define("PACKAGE_NAME", "LnBlog");
 # Constant: PACKAGE_VERSION
 # The version number of the software.  This is a string in the format
 # "1.2.3".  Note that each number may be more than one digit.
-define("PACKAGE_VERSION", "1.3.0");
+define("PACKAGE_VERSION", "2.0.0");
 
 # Constant: REQUIRED_VERSION
 # The minimum software version required by your blog to properly
