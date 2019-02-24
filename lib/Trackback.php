@@ -421,7 +421,7 @@ class Trackback extends LnBlogObject {
 
     function getFilename($anchor) {
         if (strpos($anchor, "#") !== false) {
-            $pieces = split('#', $anchor);
+            $pieces = explode('#', $anchor);
             $entid = dirname($pieces[0]);
             $tbid = $pieces[1];
         } else {

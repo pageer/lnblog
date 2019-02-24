@@ -289,47 +289,6 @@ class BlogEntry extends Entry implements AttachmentContainer {
         return trim($ret, '/');
     }
 
-    # Method: parentID
-    # Gets an identifier for the entry's parent blog.
-    #
-    # Returns:
-    # For file-based storage, returns the webroot-relative path to the blog.
-
-    public function parentID() {
-        $parent = $this->getParent();
-        return $parent->blogid;
-    }
-
-    # Method: getUploadedFiles
-    # Gets an array of the names of all files uploaded to this entry.
-    # Currently, this just means all files in the entry directory that were not
-    # created by LnBlog.
-    #
-    # Returns:
-    # An array containing the file names without path.
-
-    public function getUploadedFiles() {
-        $base_path = $this->localpath();
-        $std_files = array(
-            'index.php',
-            'config.php',
-            'edit.php',
-            'delete.php',
-            'trackback.php',
-            'uploadfile.php',
-            ENTRY_DEFAULT_FILE
-        );
-        $files = scan_directory($base_path);
-
-        $ret = array();
-
-        foreach ($files as $f) {
-            if (!in_array($f, $std_files) && !$this->fs->is_dir(mkpath($base_path, $f))) {
-                $ret[] = $f;
-            }
-        }
-    }
-
     # Method: getEnclosure
     # Gets the URL, file size, and media type of the file set as the enclosure
     # for this entry, it if exists.  The file is checkedy by converting the
@@ -591,16 +550,6 @@ class BlogEntry extends Entry implements AttachmentContainer {
         return $this->uri("page");
     }
 
-    # Method: baselink
-    # Returns a link to the object's base directory.
-    #
-    # Returns:
-    # A string with the URI.
-
-    public function baselink() {
-        return $this->uri("base");
-    }
-
     # Method: commentlink
     # Get the permalink to the object.
 
@@ -628,12 +577,6 @@ class BlogEntry extends Entry implements AttachmentContainer {
         $args = func_get_args();
 
         return $uri->$type($args);
-    }
-
-    public function getByPath ($path, $revision=ENTRY_DEFAULT_FILE) {
-        $file_path = $path.PATH_DELIM.$revision;
-        if (! $this->fs->file_exists($file_path)) $file_path = $path.PATH_DELIM."current.htm";
-        return $this->readFileData($file_path);
     }
 
     public function setDates($curr_ts = null) {
@@ -1189,11 +1132,15 @@ class BlogEntry extends Entry implements AttachmentContainer {
     # True if there is already a recorded ping with the source URI, false
     # otherwise.
 
-    public function pingExists ($uri) {
+    public function pingExists($uri) {
         $pings = $this->getPingbacks();
-        if (! $pings) return false;
+        if (! $pings) {
+            return false;
+        }
         foreach ($pings as $p) {
-            if ($p->source == $uri) return true;
+            if ($p->source == $uri) {
+                return true;
+            }
         }
         return false;
     }

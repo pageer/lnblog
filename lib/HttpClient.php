@@ -1,7 +1,11 @@
 <?php
 
-# Class: HttpClient
-# A simple class for making HTTP requests.
+/**
+ * Class: HttpClient
+ * A simple class for making HTTP requests.
+ *
+ * @codeCoverageIgore
+ */
 class HttpClient {
     # Method: fetchUrl
     # Fetch the content of  a URL.
@@ -36,12 +40,15 @@ class HttpClient {
 
             # Open a socket.
             $fp = @fsockopen($host, $port);
-            if (!$fp) return false;
+            if (!$fp) {
+                return false;
+            }
 
             # Create the HTTP request to be sent to the remote host.
-            if ($query) $path .= '?'.$query;
-            if ($headers) $method = 'HEAD';
-            else $method = 'GET';
+            if ($query) {
+                $path .= '?'.$query;
+            }
+            $method = $headers ? 'HEAD' : 'GET';
             $data = $method." ".$path."\r\n".
                     "Host: ".$host."\r\n".
                     "Connection: close\r\n\r\n";

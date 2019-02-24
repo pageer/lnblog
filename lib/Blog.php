@@ -107,7 +107,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
         $this->raiseEvent("InitComplete");
     }
 
-    function getPathFromEnvironment() {
+    private function getPathFromEnvironment() {
         $path = '';
         if (isset($_GET['blog']) ) {
             $path = trim(preg_replace("/[^A-Za-z0-9\-_\/\\\]/", '', $_GET["blog"]));
@@ -124,7 +124,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
         }
     }
 
-    function getPathFromPassedValue($path) {
+    private function getPathFromPassedValue($path) {
         if ($path == ROOT_ID) {
             $this->home_path = calculate_document_root();
             $this->blogid = ROOT_ID;
@@ -133,12 +133,12 @@ class Blog extends LnBlogObject implements AttachmentContainer {
             $this->home_path = $this->fs->realpath($path);
             $this->setBlogID();
         } else {
-            $this->home_path = $this->get_blog_path($path);
+            $this->home_path = $this->getBlogPath($path);
             $this->blogid = $path;
         }
     }
 
-    function setBlogID() {
+    private function setBlogID() {
         $root = calculate_server_root($this->home_path);
         $this->blogid = trim(substr($this->home_path, strlen($root)),  DIRECTORY_SEPARATOR);
         if (! $this->blogid) {
@@ -150,16 +150,16 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     # Section: RSS compatibility methods
     #######################################################
 
-    function title($no_escape=false) {
+    public function title($no_escape=false) {
         $ret = $this->name ? $this->name : '';
         return ( $no_escape ? $ret : htmlspecialchars($ret) );
     }
 
-    function description() {
+    public function description() {
         return htmlspecialchars($this->description);
     }
 
-    function get_blog_path($id) {
+    private function getBlogPath($id) {
         $system = System::instance();
         $path = test_server_root($id);
         if ( ! $this->fs->is_dir($path) ) {
@@ -179,13 +179,13 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     Returns:
     True if the blog metadata exists, false otherwise.
     */
-    function isBlog($blog=false) {
+    public function isBlog($blog=false) {
 
         return $this->fs->file_exists(Path::mk($this->home_path, BLOG_CONFIG_PATH)) ||
                $this->fs->file_exists(Path::mk($this->home_path, 'blogdata.txt'));
     }
 
-    function getParent() { return false; }
+    public function getParent() { return false; }
 
     /*
     Method: writers
@@ -198,7 +198,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     An array of user names.
     */
 
-    function writers($list=false) {
+    public function writers($list=false) {
         if ($list === false) {
             return $this->write_list;
         } elseif (is_array($list)) {
@@ -214,7 +214,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     Format is key = data, each record is a single line, unrecognized
     keys are ignored.  This is for internal use only.
     */
-    function readBlogData() {
+    private function readBlogData() {
         $path = Path::mk($this->home_path, BLOG_CONFIG_PATH);
         if (!$this->fs->is_file($path)) {
             return;
@@ -242,7 +242,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     Returns:
     False on failure, something else on success.
     */
-    function writeBlogData() {
+    private function writeBlogData() {
         $path = $this->home_path.PATH_DELIM.BLOG_CONFIG_PATH;
         $ini = NewINIParser($path);
         $props = array("name", "description", "image", "max_entries",
@@ -279,7 +279,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     An array of BlogEntry objects posted on the given date, sorted in
     reverse chronological order by post time.
     */
-    function getDay($year, $month, $day) {
+    public function getDay($year, $month, $day) {
         $fmtday = sprintf("%02d", $day);
         $month_dir = mkpath(BLOG_ROOT,BLOG_ENTRY_PATH,
                             $year,sprintf("%02d", $month));
@@ -309,7 +309,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     Retruns:
     An integer representing how many posts were made that day.
     */
-    function getDayCount($year, $month, $day) {
+    public function getDayCount($year, $month, $day) {
         $fmtday = sprintf("%02d", $day);
         $month_dir = Path::mk(BLOG_ROOT,BLOG_ENTRY_PATH,
                             $year,sprintf("%02d", $month));
@@ -341,7 +341,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     An array of BlogEntry objects posted in the given month,
     sorted in reverse chronological order by post date.
     */
-    function getMonth($year, $month) {
+    public function getMonth($year, $month) {
         $ent = NewBlogEntry();
         $curr_dir = Path::mk($this->home_path,BLOG_ENTRY_PATH,$year,$month);
 
@@ -374,7 +374,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     An array of BlogEntry objects posted in the given year,
     sorted in reverse chronological order by post date.
     */
-    function getYear($year=false) {
+    public function getYear($year=false) {
         $ent = NewBlogEntry();
         $curr_dir = $this->fs->getcwd();
         if ($year) {
@@ -409,7 +409,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     second has two elements, indexed as "year" and "link", which hold the
     4-digit year and a permalink to the archive of that year respectively.
     */
-    function getYearList() {
+    public function getYearList() {
         $year_list = $this->fs->scan_directory(Path::mk($this->home_path, BLOG_ENTRY_PATH), true);
         if ($year_list) rsort($year_list);
         $ret = array();
@@ -435,7 +435,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     respectively, the year you specified, the 2-digit month, and a permalink
     to the archive for that month.
     */
-    function getMonthList($year=false) {
+    public function getMonthList($year=false) {
         if (! $year) {
             if (sanitize(GET("year"), "/\D/")) {
                 $year = sanitize(GET("year"), "/\D/");
@@ -465,7 +465,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     <getMonthList>.  The total length of the first dimension of the array
     should be nummonths long.
     */
-    function getRecentMonthList($nummonths=12) {
+    public function getRecentMonthList($nummonths=12) {
         $count = 0;
         $ret = array();
         $year_list = $this->getYearList();
@@ -490,7 +490,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     Returns:
     A string holding the URI to the blog root directory.
     */
-    function getURL($full_uri=true) {
+    public function getURL($full_uri=true) {
         return $this->uri('blog');
     }
 
@@ -506,7 +506,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
         Returns:
         A string with the permalink.
     */
-    function uri($type) {
+    public function uri($type) {
         $uri = create_uri_object($this);
 
         $args = array();
@@ -541,7 +541,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     Returns:
     An array of BlogEntry objects.
     */
-    function getRecent($num_entries=false) {
+    public function getRecent($num_entries=false) {
 
         $show_max = $num_entries ? $num_entries : $this->max_entries;
         if (! $num_entries) $show_max = $this->max_entries;
@@ -563,7 +563,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     Returns:
     An array of BlogEntry objects.
     */
-    function getNextMax($num_entries=false) {
+    public function getNextMax($num_entries=false) {
 
         $show_max = $num_entries ? $num_entries : $this->max_entries;
         if (! $num_entries) $show_max = $this->max_entries;
@@ -589,7 +589,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     Returns:
     An array of BlogEntry objects.
     */
-    function getEntries($number=-1,$offset=0) {
+    public function getEntries($number=-1,$offset=0) {
 
         $entry = NewBlogEntry();
         $this->entrylist = array();
@@ -639,7 +639,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     # Returns:
     # An array of entry objects, in reverse chronological order by post date.
 
-    function getEntriesByTag($taglist, $limit=0, $match_all=false) {
+    public function getEntriesByTag($taglist, $limit=0, $match_all=false) {
 
         $entry = NewBlogEntry();
         $this->entrylist = array();
@@ -687,6 +687,8 @@ class Blog extends LnBlogObject implements AttachmentContainer {
         return $this->entrylist;
     }
 
+    # Method:autoPublishDrafts
+    # Publish any drafts which are scheduled for publication.
     public function autoPublishDrafts() {
         static $auto_publish_checked;// Don't do this more than once per request;
 
@@ -726,7 +728,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     Returns:
     An array of BlogEntry objects.
     */
-    function getDrafts() {
+    public function getDrafts() {
         $art = NewBlogEntry();
         $art_path = Path::mk($this->home_path, BLOG_DRAFT_PATH);
 
@@ -756,7 +758,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     Returns:
     An array of Article objects.
     */
-    function getArticles() {
+    public function getArticles() {
         $art = NewEntry();
         $art_path = Path::get($this->home_path, BLOG_ARTICLE_PATH);
         $art_list = scan_directory($art_path);
@@ -783,7 +785,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     is two elements indexed as "title" and "link".  These represent the title
     of the article and the permalink to it respectively.
     */
-    function getArticleList($number=false, $sticky_only=true) {
+    public function getArticleList($number=false, $sticky_only=true) {
         $art = NewEntry();
         $art_path = Path::mk($this->home_path, BLOG_ARTICLE_PATH);
         $art_list = scan_directory($art_path);
@@ -811,7 +813,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     }
 
     # This method is for internal use only.
-    function getItemReplies($array_creator, $reply_array_creator) {
+    private function getItemReplies($array_creator, $reply_array_creator) {
         $ent_array = $this->$array_creator();
         $ret = array();
         foreach ($ent_array as $ent) {
@@ -823,7 +825,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     # This method is also for internal use only.  It and getItemReplies are
     # generic helper functions for the publicly visible functions
     # that follow.
-    function getItemRepliesAll($array_creator) {
+    private function getItemRepliesAll($array_creator) {
         $ret = $this->getItemReplies($array_creator, "getCommentArray");
         $ret = array_merge($ret, $this->getItemReplies($array_creator, "getTrackbackArray"));
         $ret = array_merge($ret, $this->getItemReplies($array_creator, "getPingbackArray"));
@@ -838,57 +840,57 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     # An array of objects, including BlogComment, Trackback, and Pingback
     # objects.  The sorting of this list is dependent on the data storage
     # implementation for the blog.
-    function getEntryReplies() {
+    public function getEntryReplies() {
         return $this->getItemRepliesAll("getEntries");
     }
 
     # Method: getEntryComments
     # Like <getEntryReplies>, but only returns BlogComments.
-    function getEntryComments() {
+    public function getEntryComments() {
         return $this->getItemReplies("getEntries", "getCommentArray");
     }
 
     # Method: getEntryTrackbacks
     # Like <getEntryReplies>, but only returns Trackbacks.
-    function getEntryTrackbacks() {
+    public function getEntryTrackbacks() {
         return $this->getItemReplies("getEntries", "getTrackbackArray");
     }
 
     # Method: getEntryPingbacks
     # Like <getEntryReplies>, but only returns Pingbacks.
-    function getEntryPingbacks() {
+    public function getEntryPingbacks() {
         return $this->getItemReplies("getEntries", "getPingbackArray");
     }
 
     # Method: getArticleReplies
     # Like <getEntryReplies>, but returns the replies for all Articles, instead
     # of for all BlogEntries.
-    function getArticleReplies() {
+    public function getArticleReplies() {
         return $this->getItemRepliesAll("getArticles");
     }
 
     # Method: getArticleComments
     # Like <getArticleReplies>, but only returns BlogComments.
-    function getArticleComments() {
+    public function getArticleComments() {
         return $this->getItemReplies("getArticles", "getCommentArray");
     }
 
     # Method: getArticleTrackbacks
     # Like <getArticleReplies>, but only returns Trackbacks.
-    function getArticleTrackbacks() {
+    public function getArticleTrackbacks() {
         return $this->getItemReplies("getArticles", "getTrackbackArray");
     }
 
     # Method: getArticleArticlePingbacks
     # Like <getArticleReplies>, but only returns Pingbacks.
-    function getArticlePingbacks() {
+    public function getArticlePingbacks() {
         return $this->getItemReplies("getArticles", "getPingbackArray");
     }
 
     # Method: getReplies
     # Like <getEntryReplies> and <getArticleReplies>, but combines both,
     # returning an array of *all* replies for this blog.
-    function getReplies() {
+    public function getReplies() {
         $ret = $this->getEntryReplies();
         $ret = array_merge($ret, $this->getArticleReplies());
         return $ret;
@@ -896,23 +898,23 @@ class Blog extends LnBlogObject implements AttachmentContainer {
 
     # Method: getComments
     # Like <getReplies>, but only for comments.
-    function getComments() {
+    public function getComments() {
         $ret = $this->getEntryComments();
         $ret = array_merge($ret, $this->getArticleComments());
         return $ret;
     }
 
     # Method: getTrackbacks
-    # Like <getReplies>, but only for comments.
-    function getTrackbacks() {
+    # Like <getReplies>, but only for trackbacks.
+    public function getTrackbacks() {
         $ret = $this->getEntryTrackbacks();
         $ret = array_merge($ret, $this->getArticleTrackbacks());
         return $ret;
     }
 
     # Method: getPingbacks
-    # Like <getReplies>, but only for comments.
-    function getPingbacks() {
+    # Like <getReplies>, but only for pingbacks.
+    public function getPingbacks() {
         $ret = $this->getEntryPingbacks();
         $ret = array_merge($ret, $this->getArticlePingbacks());
         return $ret;
@@ -944,7 +946,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     Parameters:
     tpl - The PHPTemplate to populate.
     */
-    function exportVars(&$tpl) {
+    public function exportVars(&$tpl) {
         $tpl->set("BLOG_NAME", htmlspecialchars($this->name));
         $tpl->set("BLOG_DESCRIPTION", htmlspecialchars($this->description));
         $tpl->set("BLOG_IMAGE", $this->image);
@@ -965,7 +967,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     Returns:
     A string holding the HTML to display.
     */
-    function getWeblog () {
+    public function getWeblog () {
         $ret = "";
         $u = NewUser();
 
@@ -1000,7 +1002,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     Returns:
     True on success, false on failure.
     */
-    function upgradeWrappers () {
+    public function upgradeWrappers () {
         $this->raiseEvent("OnUpgrade");
         $inst_path = $this->fs->getcwd();
         $files = array();
@@ -1131,7 +1133,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     #
     # Returns:
     # True on success, false otherwise.
-    function fixDirectoryPermissions($start_dir=false) {
+    public function fixDirectoryPermissions($start_dir=false) {
         if (! $start_dir) $start_dir = $this->home_path;
         $dir_list = $this->fs->scan_directory($start_dir, true);
         $ret = true;
@@ -1151,7 +1153,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     #
     # Returns:
     # True on success, false otherwise.
-    function insert ($path=false) {
+    public function insert($path=false) {
 
         $this->raiseEvent("OnInsert");
 
@@ -1176,7 +1178,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
         return (bool)$ret;
     }
 
-    function createBlogDirectories(&$fs, $inst_path) {
+    private function createBlogDirectories(&$fs, $inst_path) {
 
         $ret = $this->createNonExistentDirectory($fs, $this->home_path);
         if ($ret) {
@@ -1199,7 +1201,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
         return $ret;
     }
 
-    function createNonExistentDirectory(&$fs, $dir) {
+    private function createNonExistentDirectory(&$fs, $dir) {
         if (! is_dir($dir) ) {
             $ret = $fs->mkdir_rec($dir);
             return $ret;
@@ -1214,7 +1216,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     # Returns:
     # True on success, false otherwise.
 
-    function update () {
+    public function update() {
         $this->raiseEvent("OnUpdate");
         $this->name = htmlentities($this->name);
         $this->description = htmlentities($this->description);
@@ -1238,7 +1240,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     # Returns:
     # True on success, false on failure.
 
-    function delete ($keep_history = null) {
+    public function delete($keep_history = null) {
         if ($keep_history === null) {
             $keep_history = KEEP_EDIT_HISTORY;
         }
@@ -1268,7 +1270,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     # Returns:
     # True on success, false on failure.
 
-    function updateTagList($tags) {
+    public function updateTagList($tags) {
         $modified = false;
         if (! $tags) return false;
         foreach ($tags as $tag) {

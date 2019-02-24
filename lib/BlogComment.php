@@ -48,7 +48,7 @@ class BlogComment extends Entry {
     var $url;
     var $show_email;
 
-    function __construct ($path = "", $filesystem = null) {
+    public function __construct ($path = "", $filesystem = null) {
         parent::__construct($filesystem ?: NewFS());
         $this->raiseEvent("OnInit");
         $this->ip = get_ip();
@@ -91,7 +91,7 @@ class BlogComment extends Entry {
     # Method: uri
     # Get the URI for various functions.
 
-    function uri($type) {
+    public function uri($type) {
         $uri = create_uri_object($this);
         return $uri->$type();
     }
@@ -107,7 +107,7 @@ class BlogComment extends Entry {
     Returns:
     A string to use for the file name.
     */
-    function getPath($ts) {
+    public function getPath($ts) {
         $base = date(COMMENT_PATH_FORMAT, $ts);
         return $base;
     }
@@ -119,7 +119,7 @@ class BlogComment extends Entry {
     Returns:
     True on success, false on failure.
     */
-    function update () {
+    public function update() {
         $this->raiseEvent("OnUpdate");
         if (KEEP_COMMENT_HISTORY) $ret = $this->delete();
         else $ret = true;
@@ -137,7 +137,7 @@ class BlogComment extends Entry {
     Returns:
     True on success, false on failure.
     */
-    function delete () {
+    public function delete() {
         $this->raiseEvent("OnDelete");
         $fs = NewFS();
         if (KEEP_COMMENT_HISTORY) {
@@ -168,7 +168,7 @@ class BlogComment extends Entry {
     Returns:
     True on success, false on failure.
     */
-    function insert($entry) {
+    public function insert($entry) {
 
         $curr_ts = time();
         $usr = NewUser();
@@ -209,7 +209,7 @@ class BlogComment extends Entry {
     subject   - The subject of the post.
     data      - The post content.  This cannot be empty.
     */
-    function getPostData() {
+    public function getPostData() {
         if (! has_post()) return false;
         $this->name = POST("username");
         $this->email = POST("email");
@@ -249,7 +249,7 @@ class BlogComment extends Entry {
     Returns:
     A string for anchor text based on the file name/storage ID.
     */
-    function getAnchor() {
+    public function getAnchor() {
         $ret = basename($this->file);
         $ret = preg_replace("/.\w\w\w$/", "", $ret);
         $ret = "comment".$ret;
@@ -266,9 +266,9 @@ class BlogComment extends Entry {
     Returns:
     A string with the name of the associated file.
     */
-    function getFilename($anchor) {
+    public function getFilename($anchor) {
         if (strpos($anchor, "#") !== false) {
-            $pieces = split('#', $anchor);
+            $pieces = explode('#', $anchor);
             $entid = dirname($pieces[0]);
             $cmtid = $pieces[1];
         } else {
@@ -285,7 +285,7 @@ class BlogComment extends Entry {
 
     # Method: globalID
     # Get the global identifier for this trackback.
-    function globalID() {
+    public function globalID() {
         $parent = $this->getParent();
         $id = $parent->globalID();
         if (defined('ENTRY_COMMENT_DIR') && ENTRY_COMMENT_DIR) {
@@ -303,7 +303,7 @@ class BlogComment extends Entry {
     Returns:
     The full URI to the object's permalink, including page anchor.
     */
-    function permalink() {
+    public function permalink() {
         return $this->uri("permalink");
     }
 
@@ -319,7 +319,7 @@ class BlogComment extends Entry {
     True if the comment data file exists, false otherwise.
     */
 
-    function isComment($path=false) {
+    public function isComment($path=false) {
         if (!$path) $path = $this->file;
         return file_exists($path);
     }
@@ -332,7 +332,7 @@ class BlogComment extends Entry {
     Returns:
     A BlogEntry.
     */
-    function getParent() {
+    public function getParent() {
         if (file_exists($this->file)) {
             return NewEntry(dirname(dirname($this->file)));
         } else {
@@ -351,7 +351,7 @@ class BlogComment extends Entry {
     Returns:
     A string containing the markup.
     */
-    function get($show_edit_controls=false) {
+    public function get($show_edit_controls=false) {
 
         # An array of the form label=>URL which holds the list of
         # administrative items, such as the delete link.

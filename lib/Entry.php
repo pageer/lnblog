@@ -180,28 +180,6 @@ abstract class Entry extends LnBlogObject{
         return false;
     }
 
-    /*
-    Method: baselink
-    Gets a link to the object's base directory, to use for converting relative
-    to absolute paths.  I some cases, this is just the permalink.
-
-    Returns:
-    An absolute URI.
-    */
-    public function baselink() {
-        return $this->uri();
-    }
-
-    /*
-    Method: queryStringToID
-    Abstract function that converts a query string into a unique identifier
-    for an object.
-    Child classes *must* over-ride this function.
-    */
-    public function queryStringToID() {
-        return false;
-    }
-
     # Method: markup
     # Apply appropriate markup to the entry data.
     #

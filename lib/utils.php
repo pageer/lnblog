@@ -400,7 +400,7 @@ function has_post() {
 # Returns:
 # A string with the URI.
 
-function current_uri ($relative=false, $query_string=false, $no_escape=false) {
+function current_uri($relative=false, $query_string=false, $no_escape=false) {
     $ret = SERVER("SCRIPT_NAME");
     if ($relative) $ret = basename($ret);
     if ($query_string) {
