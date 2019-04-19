@@ -44,22 +44,15 @@ class SiteMap extends Plugin {
             _("Use unmodified file contents as menubar (no auto-generated HTML)"),
             false, "checkbox");
 
-        $this->addOption('no_event',
-            _('No event handlers - do output when plugin is created'),
-            System::instance()->sys_ini->value("plugins","EventDefaultOff", 0),
-            'checkbox');
+        $this->addNoEventOption();
 
         parent::__construct();
 
-        if ( $this->no_event ||
-             System::instance()->sys_ini->value("plugins","EventForceOff", 0) ) {
-            # If either of these is true, then don't set the event handler
-            # and rely on explicit invocation for output.
-        } else {
-            $this->registerEventHandler("menubar", "OnOutput", "output");
-        }
+        $this->registerNoEventOutputHandler("menubar", "output");
 
-        if ($do_output) $this->output();
+        if ($do_output) {
+            $this->output();
+        }
     }
 
     function get_map_file() {

@@ -57,10 +57,7 @@ class SidebarSearch extends Plugin {
                                "menubar"=>_("Menubar"))
                         );
 
-        $this->addOption('no_event',
-            _('No event handlers - do output when plugin is created'),
-            System::instance()->sys_ini->value("plugins","EventDefaultOff", 0),
-            'checkbox');
+        $this->addNoEventOption();
 
         parent::__construct();
 

@@ -90,13 +90,37 @@ abstract class Plugin extends LnBlogObject{
     options     - An array of options for radio and select controls.
     */
 
-    function addOption($name, $description, $default, $control="text", $options=false) {
+    public function addOption($name, $description, $default, $control="text", $options=false) {
         if (! isset($this->member_list)) $this->member_list = array();
         $this->$name = $default;
         $this->member_list[$name] =
             array("description"=>$description,
                   "default"=>$default, "control"=>$control);
         if ($options) $this->member_list[$name]["options"] = $options;
+    }
+
+    # Method: addNoEventOption
+    # Add an option to turn off event output handlers.
+    public function addNoEventOption() {
+        $this->addOption(
+            'no_event',
+            _('No event handlers - do output when plugin is created'),
+            System::instance()->sys_ini->value("plugins","EventDefaultOff", 0),
+            'checkbox'
+        );
+    }
+
+    # Method: registerNoEventOutputHandler
+    # Register a handler to do output in the case that "no event" is turned
+    # off.
+    public function registerNoEventOutputHandler($target, $function_name) {
+        $system_default = System::instance()->sys_ini->value("plugins","EventForceOff", 0);
+        if ( $this->no_event || $system_default) {
+            # If either of these is true, then don't set the event handler
+            # and rely on explicit invocation for output.
+        } else {
+            $this->registerEventHandler($target, "OnOutput", $function_name);
+        }
     }
 
     /*
@@ -113,7 +137,7 @@ abstract class Plugin extends LnBlogObject{
     *Optionally* returns the form markup as a string.
     */
 
-    function showConfig($page) {
+    public function showConfig($page) {
         if (! $this->member_list) return false;
 
         echo "<fieldset>\n";
@@ -189,7 +213,7 @@ abstract class Plugin extends LnBlogObject{
     # Returns:
     # True on success, false on failure.
 
-    function updateConfig() {
+    public function updateConfig() {
         if (! $this->member_list) return false;
         if (defined("BLOG_ROOT")) {
             $parser = NewConfigFile(BLOG_ROOT.PATH_DELIM."plugins.xml");
@@ -232,7 +256,7 @@ abstract class Plugin extends LnBlogObject{
     # Reads the configuration data for the plugin from a file and stores it
     # in class variables.
 
-    function getConfig() {
+    public function getConfig() {
         $parser = PluginManager::instance()->plugin_config;
         foreach ($this->member_list as $mem=>$config) {
             $this->$mem = (isset($config["default"]) ? $config["default"] : "");
@@ -240,10 +264,6 @@ abstract class Plugin extends LnBlogObject{
             if ($val == "1" || $val == "0") $this->$mem = intval($val);
             else $this->$mem = $val;
         }
-    }
-
-    function convertINItoXML() {
-
     }
 
     # Section: Cache management functions
@@ -261,7 +281,7 @@ abstract class Plugin extends LnBlogObject{
     # A string representing the local filesystem path to which cach data will be written.
     # In the default implementation, this has the form BLOGROOT/cache/PLUGINCLASS_output.cache.
 
-    function cachepath($obj) {
+    public function cachepath($obj) {
         if (method_exists($obj, "isBlog") && $obj->isBlog())
             return mkpath($obj->home_path, "cache", get_class($this)."_output.cache");
             else return false;
@@ -275,7 +295,7 @@ abstract class Plugin extends LnBlogObject{
     #       this parameter is passed on to <cachepath> and so can be used for implementing
     #       multi-file caches.
 
-    function invalidateCache($obj=false) {
+    public function invalidateCache($obj=false) {
         if ( ! is_a($obj, 'Blog')) $b = NewBlog();
         else $b = $obj;
         $f = NewFS();
@@ -296,7 +316,9 @@ abstract class Plugin extends LnBlogObject{
     # Returns:
     # A string of data to send to the client.
 
-    function buildOutput($obj) { return ''; }
+    public function buildOutput($obj) {
+        return '';
+    }
 
     # Method: outputCache
     # Dumps the contents of the cache file to the browser.  If the cache file exists, then
@@ -311,10 +333,9 @@ abstract class Plugin extends LnBlogObject{
     #                  in.  This allows for users with different permission
     #                  levels to still see different pages with caching on.
 
-    function outputCache($obj=false, $suppress_login=true) {
+    public function outputCache($obj=false, $suppress_login=true) {
 
-        if (! is_a($obj, 'Blog')) $b = NewBlog();
-        else $b = $obj;
+        $b = is_a($obj, 'Blog') ? $obj : NewBlog();
         $u = NewUser();
         $f = NewFS();
 
@@ -350,7 +371,7 @@ abstract class Plugin extends LnBlogObject{
     # events for the BlogEntry and Article classes, as well as the UpdateComplete event of the
     # blog class.
 
-    function registerStandardInvalidators() {
+    public function registerStandardInvalidators() {
         $this->registerEventHandler("blogentry", "UpdateComplete", "invalidateCache");
         $this->registerEventHandler("blogentry", "InsertComplete", "invalidateCache");
         $this->registerEventHandler("blogentry", "DeleteComplete", "invalidateCache");
@@ -359,18 +380,4 @@ abstract class Plugin extends LnBlogObject{
         $this->registerEventHandler("article", "DeleteComplete", "invalidateCache");
         $this->registerEventHandler("blog", "UpdateComplete", "invalidateCache");
     }
-
-    # Method: getCache
-    # Returns the contents of the cache file as a string.
-    #
-    # Parameters:
-    # obj - Object to which the cache applies.
-    #
-    # Returns:
-    # A string with the contents of the cache file.
-
-    function getCache($obj=false) {
-
-    }
-
 }

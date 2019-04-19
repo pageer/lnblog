@@ -21,20 +21,11 @@ class TagList extends Plugin {
 		                 _("Tags for this blog"));
 		$this->addOption("show_feeds", _("Show RSS feeds"), true, 'checkbox');
 
-		$this->addOption('no_event',
-			_('No event handlers - do output when plugin is created'),
-			System::instance()->sys_ini->value("plugins","EventDefaultOff", 0), 
-			'checkbox');
+        $this->addNoEventOption();
 
 		parent::__construct();
 
-		if ( $this->no_event || 
-		     System::instance()->sys_ini->value("plugins","EventForceOff", 0) ) {
-			# If either of these is true, then don't set the event handler
-			# and rely on explicit invocation for output.
-		} else {
-			$this->registerEventHandler("sidebar", "OnOutput", "outputCache");
-		}
+        $this->registerNoEventOutputHandler("sidebar", "outputCache");
 		$this->registerEventHandler("blogentry", "UpdateComplete", "invalidateCache");
 		$this->registerEventHandler("blogentry", "InsertComplete", "invalidateCache");
 		$this->registerEventHandler("article", "UpdateComplete", "invalidateCache");

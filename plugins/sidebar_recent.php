@@ -30,11 +30,7 @@ class Recent extends Plugin {
         $this->addOption("enable_cache",
             _("Enable plugin output caching"),
               true, "checkbox");
-
-        $this->addOption('no_event',
-            _('No event handlers - do output when plugin is created'),
-            System::instance()->sys_ini->value("plugins","EventDefaultOff", 0),
-            'checkbox');
+        $this->addNoEventOption();
 
         parent::__construct();
 
@@ -45,18 +41,19 @@ class Recent extends Plugin {
             $this->cache_base_path = false;
         }
 
-        if ( ! ($this->no_event ||
-                System::instance()->sys_ini->value("plugins","EventForceOff", 0)) ) {
-            $this->registerEventHandler("sidebar", "OnOutput", "outputCache");
-        }
+        $this->registerNoEventOutputHandler("sidebar", "outputCache");
         $this->registerStandardInvalidators();
 
-        if ($do_output) $this->outputCache();
+        if ($do_output) {
+            $this->outputCache();
+        }
     }
 
     function buildOutput($blg, $is_index=false) {
 
-        if ( !($this->num_entries > 0) ) $this->num_entries = false;
+        if ( !($this->num_entries > 0) ) {
+            $this->num_entries = false;
+        }
 
         # Show some of the more recent entries.  If we're on the "front page"
         # of the blog, then show the next set of entries.  Otherwise, show the
@@ -127,8 +124,7 @@ class Recent extends Plugin {
 
     function outputCache($obj=false, $suppress_login = true) {
 
-        if (! is_a($obj, 'Blog')) $b = NewBlog();
-        else $b = $obj;
+        $b = is_a($obj, 'Blog') ? $obj : NewBlog();
         $f = NewFS();
 
         $is_index = ( current_url() == $b->uri('blog') ||
@@ -145,13 +141,16 @@ class Recent extends Plugin {
                 $cache_path = $this->cachepath($v);
                 if ($cache_path && ! file_exists($cache_path)) {
                     $content = $this->buildOutput($b, $v);
-                    if (! is_dir(dirname($cache_path))) $f->mkdir(dirname($cache_path));
+                    if (! is_dir(dirname($cache_path))) {
+                        $f->mkdir(dirname($cache_path));
+                    }
                     $f->write_file($cache_path, $content);
                 }
             }
 
-            if (file_exists($this->cachepath($is_index)))
+            if (file_exists($this->cachepath($is_index))) {
                 readfile($this->cachepath($is_index));
+            }
         }
     }
 

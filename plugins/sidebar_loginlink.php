@@ -16,22 +16,15 @@ class LoginLink extends Plugin {
         $this->addOption("admin_link",
             _("Show link to administration pages"),
             false, "checkbox");
-        $this->addOption('no_event',
-            _('No event handlers - do output when plugin is created'),
-            System::instance()->sys_ini->value("plugins","EventDefaultOff", 0),
-            'checkbox');
+        $this->addNoEventOption();
 
         parent::__construct();
 
-        if ( $this->no_event ||
-             System::instance()->sys_ini->value("plugins","EventForceOff", 0) ) {
-            # If either of these is true, then don't set the event handler
-            # and rely on explicit invocation for output.
-        } else {
-            $this->registerEventHandler("sidebar", "OnOutput", "output");
-        }
+        $this->registerNoEventOutputHandler("sidebar", "output");
 
-        if ($do_output) $this->output();
+        if ($do_output) {
+            $this->output();
+        }
     }
 
     function output($parm=false) {
