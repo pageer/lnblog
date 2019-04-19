@@ -292,23 +292,6 @@ class Publisher {
         }
     }
 
-    /* Method: addAttachments
-       Add or update file attachments for the entry.
-
-       Adds files attachments to the entry.  Any filenames that already exist
-       will be overwritten.  Throws if one or more fails or entry is not saved.
-
-       Parameters:
-       entry      - (BlogEntry) The entry to which to add the attachment.
-       files_data - (array) The PHP $_FILES array of attachments.
-
-       Throws:
-       Exception
-     */
-    public function addAttachments(BlogEntry $entry, array $files) {
-
-    }
-
     protected function getHttpClient() {
         if (!$this->http_client) {
             $this->http_client = new HttpClient();
