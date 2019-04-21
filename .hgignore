@@ -1,6 +1,7 @@
 syntax: glob
 
 vendor
+bower_components
 build
 doc_project/Data
 doc_project/Working Data
