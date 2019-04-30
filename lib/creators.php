@@ -40,7 +40,6 @@ function NewFS() {
     } else {
         if (!defined("FS_PLUGIN")) define("FS_PLUGIN", "nativefs");
     }
-    require_once __DIR__.'/'.FS_PLUGIN.".php";
     switch (FS_PLUGIN) {
         case "nativefs":
             return new NativeFS;
