@@ -744,10 +744,10 @@ require_once INSTALL_ROOT."/lib/creators.php";
 # and plugin manager and create a top-level page for handling output..
 # TODO: Need to get rid of all the globals and switch to singleton instance calls.
 # Then we can get rid of this.
-require_once INSTALL_ROOT."/lib/eventregister.php";
-require_once INSTALL_ROOT."/lib/page.php";
-require_once INSTALL_ROOT.'/lib/system.php';
-require_once INSTALL_ROOT."/lib/pluginmanager.php";
+require_once INSTALL_ROOT."/lib/EventRegister.php";
+require_once INSTALL_ROOT."/lib/Page.php";
+require_once INSTALL_ROOT.'/lib/System.php';
+require_once INSTALL_ROOT."/lib/PluginManager.php";
 
 # Initialize the plugins
 PluginManager::instance()->loadPlugins();
