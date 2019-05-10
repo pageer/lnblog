@@ -22,8 +22,8 @@ form {
 	padding: 0;
 }
 
-form div, fieldset div {
-	width: 100%;
+form div,
+fieldset div {
 	clear: both;
 	margin-top: 0.5em;
 }

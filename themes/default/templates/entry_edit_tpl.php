@@ -19,6 +19,10 @@
 
 	<?php echo !empty($PREVIEW_DATA) ? 'style="display:none"' : ''?>>
 
+    <?php if (isset($ENTRYID)): ?>
+        <input type="hidden" name="entryid" value="<?php echo $ENTRYID?>" />
+    <?php endif ?>
+
 	<div class="entry_subject">
 		<?php
 		$title = _("Title or subject line for this entry");
@@ -161,15 +165,19 @@
 
 			<div class="bottom-row">
                 <?php if ($ENTRY_ATTACHMENTS): ?>
-                    <a name="entry-attachments" href="#" class="attachment-list-toggle"><?php p_("Entry attachments") ?></a>
-                    <ul class="entry-attachments attachment-list">
-                        <?php foreach ($ENTRY_ATTACHMENTS as $attachment): ?>
-                            <li class="attachment" data-file="<?php echo $this->escape($attachment->getName())?>">
-                                <?php echo $this->escape($attachment->getName()) ?>
-                            </li>
-                        <?php endforeach ?>
-                    </ul>
                 <?php endif ?>
+                <a name="entry-attachments" href="#" class="attachment-list-toggle" <?php
+                    echo empty($ENTRY_ATTACHMENTS) ? 'style="display: none"' : ''
+                ?>><?php p_("Entry attachments") ?></a>
+                <ul class="entry-attachments attachment-list" <?php
+                    echo empty($ENTRY_ATTACHMENTS) ? 'style="display: none"' : ''
+                ?>>
+                    <?php foreach ($ENTRY_ATTACHMENTS as $attachment): ?>
+                        <li class="attachment" data-file="<?php echo $this->escape($attachment->getName())?>">
+                            <?php echo $this->escape($attachment->getName()) ?>
+                        </li>
+                    <?php endforeach ?>
+                </ul>
                 <?php if ($BLOG_ATTACHMENTS): ?>
                     <a name="blog-attachments" href="#" class="attachment-list-toggle"><?php p_("Blog attachments") ?></a>
                     <ul class="blog-attachments attachment-list">
@@ -181,14 +189,13 @@
                     </ul>
                 <?php endif ?>
 				<?php if ($num_uploads = System::instance()->sys_ini->value("entryconfig", "AllowInitUpload", 1)): ?>
-				<div class="upload_field">
-					<?php for ($i = 1; $i <= $num_uploads; $i++): ?>
+				<div id="fileupload" class="upload_field">
 					<div>
-						<label for="upload<?php echo $i?>">Select file</label>
-						<input type="file" name="upload[]" id="upload<?php echo $i?>" />
+						<label for="upload1">Select file</label>
+						<input type="file" name="upload[]" id="upload1" />
 					</div>
-					<?php endfor; ?>
 				</div>
+                <div id="filedrop" class="dropzone"></div>
 				<?php endif; ?>
 			</div>
 		</div>

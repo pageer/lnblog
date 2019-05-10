@@ -518,6 +518,8 @@ class WebPages extends BasePages {
             if (GET('ajax')) {
                 $response = array(
                     'id' => $ent->entryID(),
+                    'exists' => $ent->isEntry(),
+                    'isDraft' => $ent->isDraft(),
                     'content' => rawurlencode($ent->get())
                 );
                 echo json_encode($response);
@@ -577,14 +579,23 @@ class WebPages extends BasePages {
 
         $page_body = $tpl->process();
 
+        $entry_data = array(
+            'entryId' => $ent->entryID(),
+            'entryExists' => $ent->isEntry(),
+            'entryIsDraft' => $ent->isDraft(),
+        );
+        $this->getPage()->addInlineScript("window.entryData = " . json_encode($entry_data, true) . ";");
+
         $title = $is_art ? _("New Article") : _("New Entry");
         $this->getPage()->title = sprintf("%s - %s", $this->blog->name, $title);
         $this->getPage()->addStylesheet("form.css");
         $this->getPage()->addStylesheet("entry.css");
         $this->getPage()->addStylesheet("jquery.datetimepicker.css");
+        $this->getPage()->addStylesheet("dropzone.css");
         $this->getPage()->addScript("jquery.form.js");
         $this->getPage()->addScript("jquery.datetimepicker.js");
         $this->getPage()->addScript("editor.js");
+        $this->getPage()->addScript("dropzone.js");
         $this->getPage()->addScript("upload.js");
         $this->getPage()->addScript(lang_js());
         $this->getPage()->display($page_body, $this->blog);
@@ -608,6 +619,7 @@ class WebPages extends BasePages {
             $tpl->set('PUBLISHED', $entry->isPublished());
             $tpl->set('ARTICLE', $entry->isArticle());
             $tpl->set('SEND_PINGBACKS', $entry->send_pingback);
+            $tpl->set('ENTRYID', $entry->entryID());
         } else if ($is_article) {
             $tpl->set('ARTICLE', true);
             $tpl->set("GET_SHORT_PATH");
@@ -713,6 +725,13 @@ class WebPages extends BasePages {
              ($_GET["profile"] == $this->user->username() || $this->user->isAdministrator()) ) {
             $target = Path::mk(USER_DATA_PATH, $this->user->username());
         } elseif ($ent->isEntry() && System::instance()->canModify($ent, $this->user)) {
+            $entry_data = array(
+                'entryId' => $ent->entryID(),
+                'entryExists' => $ent->isEntry(),
+                'entryIsDraft' => $ent->isDraft(),
+            );
+            $this->getPage()->addInlineScript("window.entryData = " . json_encode($entry_data, true) . ";");
+
             $target = $ent->localpath();
             $entry_files = $ent->getAttachments();
             $blog_files = $this->blog->getAttachments();
@@ -732,13 +751,17 @@ class WebPages extends BasePages {
         if ($target) {
 
             $file_name = "upload";
+            $success = false;
+            $messages = [];
 
             if (! empty($_FILES)) {
                 $files = FileUpload::initUploads($_FILES[$file_name], $target);
 
-                $messages = $this->moveUploadedFiles($files);
+                $result = $this->moveUploadedFiles($files);
+                $messages = $result['messages'];
+                $success = $result['success'];
                 $msg = spf_(
-                    "Select files to upload to the above location." . 
+                    "Select files to upload to the above location." .
                         "  The file size limit is %s.",
                     ini_get("upload_max_filesize")
                 );
@@ -747,6 +770,18 @@ class WebPages extends BasePages {
                 }
 
                 $tpl->set("UPLOAD_MESSAGE", $msg);
+            }
+
+            if (POST('ajax') || GET('ajax')) {
+                if (!$success) {
+                    header("HTTP/1.0 500 Server Error");
+                }
+                header("Content-Type: application/json");
+                echo json_encode(array(
+                    'success' => $success,
+                    'messages' => $messages,
+                ));
+                return false;
             }
 
             $query_string = isset($_GET["blog"])?"?blog=".$_GET["blog"]:'';
@@ -777,14 +812,17 @@ class WebPages extends BasePages {
         }
 
         $this->getPage()->addStylesheet("form.css");
+        $this->getPage()->addStylesheet("dropzone.css");
         $this->getPage()->title = _("Upload file");
         $this->getPage()->addScript(lang_js());
+        $this->getPage()->addScript('dropzone.js');
         $this->getPage()->addScript('upload.js');
         $this->getPage()->display($body, $this->blog);
     }
 
     private function moveUploadedFiles($files) {
         $errors = [];
+        $result = true;
         foreach ($files as $f) {
             $upload_attempted =
                 $f->status() != FILEUPLOAD_NOT_INITIALIZED &&
@@ -792,11 +830,13 @@ class WebPages extends BasePages {
             if ($upload_attempted) {
                 $errors[] = $f->errorMessage();
                 if ($f->completed()) {
-                    $f->moveFile();
+                    $result = $result && $f->moveFile();
+                } else {
+                    $result = false;
                 }
             }
         }
-        return $errors;
+        return array("success" => $result, "messages" => $errors);
     }
 
     public function removefile() {
@@ -1426,8 +1466,9 @@ class WebPages extends BasePages {
 
     public function showdrafts() {
         if (isset($_GET['action']) && $_GET['action'] == 'edit') {
-            $this->entryedit();
-            return;
+            return $this->entryedit();
+        } elseif (isset($_GET['action']) && $_GET['action'] == 'upload') {
+            return $this->fileupload();
         }
 
         $list_months = false;
@@ -1874,6 +1915,11 @@ class WebPages extends BasePages {
     }
 
     protected function getEntry($path = false) {
+        // Pick up entry ID from a POST param so we can inject it for AJAX saves.
+        $path = empty($_POST['entryid']) ? false : $_POST['entryid'];
+        if ($path && strpos($_POST['entryid'], '/') === false) {
+            $path = BLOG_DRAFT_PATH . '/' . $path;
+        }
         return NewEntry($path, $this->getFs());
     }
 

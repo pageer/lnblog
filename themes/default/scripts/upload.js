@@ -1,5 +1,6 @@
 /*globals strings, lnblog, lbcode_editor, AJAX_URL */
 /*jshint regexp: false */
+Dropzone.autoDiscover = false;
 $(document).ready( function () {
 	
 	function initUploadFieldset(field, editor) {
@@ -150,13 +151,104 @@ $(document).ready( function () {
     });
     $('.attachment-list').toggle(false);
 
-    $('.attachment').each(function() {
-        var $link = $('<a href="#" title="' + strings.editor_removeLink + '">&times;</a>');
-        $link.on('click', removeUpload);
-        $(this).append($link);
-    });
+    var createRemoveLinks = function () {
+        $('.attachment .remove-link').remove();
+        $('.attachment').each(function() {
+            var $link = $('<a href="#" class="remove-link" title="' + strings.editor_removeLink + '">&times;</a>');
+            $link.on('click', removeUpload);
+            $(this).append($link);
+        });
+    };
+
+    createRemoveLinks();
 
 	$('.upload_field').each( function (index) {
 		initUploadFieldset(this, typeof(lbcode_editor) != 'undefined' ? lbcode_editor : false);
 	});
+
+    $('#fileupload').hide();
+    
+    var uploadUrl = function (files) {
+        var entryExists = (window.entryData || {}).entryExists;
+        var entryIsDraft = (window.entryData || {}).entryIsDraft;
+        var entryId = (window.entryData || {}).entryId;
+
+        if (!window.entryData) {
+            return '?action=upload&ajax=1';
+        } else if (entryExists) {
+            if (entryIsDraft) {
+                return '?action=upload&draft='+entryId+'&ajax=1';
+            }
+            return '?action=upload&ajax=1';
+        }
+        return '?action=newentry&save=draft&preview=yes&ajax=1';
+    };
+
+    var parameterData = function () {
+        if ($("#postform").length === 1) {
+            var result = {};
+            // This is a URL-encoded string, but we need json.
+            var formData = $("#postform").formSerialize();
+            var keys = formData.split("&");
+            for (var i = 0; i < keys.length; i++) {
+                var parts = keys[i].split("=", 2);
+                if (parts[0].indexOf("upload") === -1) {
+                    var value = (parts[1] || '').replace(/\+/g, " ");
+                    result[parts[0]] = unescape(value);
+                }
+            }
+            result['subject'] = result['subject'] || '-';
+            result['body'] = result['body'] || '-';
+            return result;
+        }
+        return {};
+    };
+
+    var uploadSuccess = function (file, response, data) {
+        console.log(response, typeof response);
+        var responseData = typeof response === 'string' ? JSON.parse(response) : response;
+        var hasEntryData = !!window.entryData;
+        var entryData = window.entryData || {};
+        var $new_file = $('<li class="attachment"></li>')
+            .attr('data-file', file.name)
+            .text(file.name);
+
+        // Update the stored entry information.
+        if (hasEntryData && !entryData.entryExists && responseData.id) {
+            window.entryData = {
+                entryId: responseData.id,
+                entryExists: responseData.exists,
+                entryIsDraft: responseData.isDraft
+            };
+
+            var $input = $('input[name="entryid"]');
+            console.log("Found?", $input.length);
+            if ($input.length === 0) {
+                console.log("Appending for element");
+                $input = $('<input type="hidden" name="entryid"/>');
+                $('#postform').append($input);
+            }
+            $input.val(responseData.id);
+        }
+
+        if (entryData.entryId) {
+            $('.entry-attachments').append($new_file);
+            $('a[name="entry-attachments"]').show();
+            $('.entry-attachments').show();
+        } else {
+            $('.blog-attachments').append($new_file);
+        }
+        createRemoveLinks();
+        return true;
+    };
+
+    $("#filedrop").dropzone({
+        url: uploadUrl,
+        paramName: 'upload',
+        params: parameterData,
+        addRemoveLinks: true,
+        init: function () {
+            this.on("success", uploadSuccess);
+        }
+    });
 } );
