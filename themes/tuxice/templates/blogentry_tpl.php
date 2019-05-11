@@ -72,7 +72,9 @@ if ($COMMENT_RSS_ENABLED) {
 <?php if (! empty($LOCAL_PINGBACKS)) { ?>
 <h4><?php p_("Related entries");?></h4>
 <ul>
-<?php foreach ($LOCAL_PINGBACKS as $p) { echo $p->get($SHOW_CONTROLS); } ?>
+<?php foreach ($LOCAL_PINGBACKS as $p): ?>
+    <li><?php echo $p->get($SHOW_CONTROLS) ?></li>
+<?php endforeach ?>
 </ul>
 <?php } /* End local pingback block */ 
 
