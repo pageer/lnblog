@@ -20,8 +20,10 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
     public function testEditEntry_WhenNewPostAndNoPermissions_DoesNotPublish() {
         $_POST['body'] = "This is a test entry";
         $_POST['post'] = 'post';
+        $this->entry->entryID()->willReturn('');
         $this->entry->isEntry()->willReturn(false);
         $this->entry->isPublished()->willReturn(false);
+        $this->entry->isDraft()->willReturn(false);
         $this->entry->isArticle()->willReturn(false);
         $this->entry->getAutoPublishDate()->willReturn('');
         $this->entry->getPostData()->willReturn(null);
@@ -43,8 +45,10 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->entry->data = 'some data';
         $this->entry->isEntry()->willReturn(false);
         $this->entry->isPublished()->willReturn(false);
+        $this->entry->isDraft()->willReturn(false);
         $this->system->canAddTo(Argument::any(), Argument::any())->willReturn(false);
         $this->system->canModify(Argument::any(), Argument::any())->willReturn(false);
+        $this->page->addInlineScript(Argument::any());
         $this->user->username()->willReturn('test');
 
         $this->page->display(Argument::containingString("permission denied"), Argument::any())->shouldBeCalled();
@@ -57,6 +61,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->entry->data = 'some data';
         $this->entry->isEntry()->willReturn(false);
         $this->entry->isPublished()->willReturn(false);
+        $this->entry->isDraft()->willReturn(false);
         $this->system->canAddTo(Argument::any(), Argument::any())->willReturn(true);
         $this->system->canModify(Argument::any(), Argument::any())->willReturn(true);
 
@@ -137,6 +142,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->entry->data = 'some data';
         $this->entry->isEntry()->willReturn(false);
         $this->entry->isPublished()->willReturn(false);
+        $this->entry->isDraft()->willReturn(false);
         $this->system->canAddTo($this->blog, $this->user)->willReturn(true);
         $this->system->canModify($this->blog, $this->user)->willReturn(false);
         $this->publisher->publishEntry($this->entry, Argument::any())->willThrow(new Exception("Publish Failure!"));
@@ -186,6 +192,8 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->entry->isEntry()->willReturn(true);
         $this->entry->isArticle()->willReturn(false);
         $this->entry->isPublished()->willReturn(false);
+        $this->entry->isDraft()->willReturn(true);
+        $this->entry->entryID()->willReturn('entries/2019/01/02_1234');
         $this->entry->getAutoPublishDate()->willReturn('');
         $this->entry->getPostData()->willReturn(null);
         $this->entry->raiseEvent(Argument::any())->willReturn(null);
@@ -207,6 +215,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->entry->data = 'some data';
         $this->entry->isEntry()->willReturn(true);
         $this->entry->isPublished()->willReturn(false);
+        $this->entry->isDraft()->willReturn(true);
         $this->entry->getAttachments()->willReturn([]);
         $this->system->canAddTo($this->blog, $this->user)->willReturn(false);
         $this->system->canModify($this->entry, $this->user)->willReturn(true);
@@ -245,6 +254,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->entry->data = 'some data';
         $this->entry->isEntry()->willReturn(true);
         $this->entry->isPublished()->willReturn(false);
+        $this->entry->isDraft()->willReturn(true);
         $this->entry->getAttachments()->willReturn([]);
         $this->user->exportVars(Argument::any())->willReturn(null);
         $this->system->canAddTo($this->blog, $this->user)->willReturn(false);
@@ -304,7 +314,13 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->webpage->entryedit();
         $output = ob_get_clean();
 
-        $this->assertEquals(json_encode(['id'=>'asdf', 'content'=> 'This%20is%20some%20markup']), $output);
+        $expectedResponse = json_encode([
+            'id'=>'asdf', 
+            'exists' => false,
+            'isDraft' => false,
+            'content'=> 'This%20is%20some%20markup'
+        ]);
+        $this->assertEquals($expectedResponse, $output);
     }
 
     public function testEditEntry_WhenPreviewAndSaveButNotAjax_Redirects() {
@@ -348,6 +364,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->entry->data = 'some data';
         $this->entry->isEntry()->willReturn(true);
         $this->entry->isPublished()->willReturn(false);
+        $this->entry->isDraft()->willReturn(true);
         $this->entry->getAttachments()->willReturn([]);
         $this->system->canAddTo($this->blog, $this->user)->willReturn(true);
         $this->system->canModify($this->entry, $this->user)->willReturn(true);
@@ -400,6 +417,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->entry->data = 'some data';
         $this->entry->isEntry()->willReturn(true);
         $this->entry->isPublished()->willReturn(false);
+        $this->entry->isDraft()->willReturn(true);
         $this->entry->getAttachments()->willReturn([]);
         $this->system->canAddTo($this->blog, $this->user)->willReturn(true);
         $this->system->canModify($this->entry, $this->user)->willReturn(true);
@@ -516,11 +534,13 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->page->setDisplayObject(Argument::any())->willReturn(null);
         $this->page->addStylesheet(Argument::any())->willReturn(null);
         $this->page->addScript(Argument::any())->willReturn(null);
+        $this->page->addInlineScript(Argument::any())->willReturn(null);
     }
 
     private function setUpForNewEntryWithPermissions() {
         $this->entry->isEntry()->willReturn(false);
         $this->entry->isPublished()->willReturn(false);
+        $this->entry->isDraft()->willReturn(false);
         $this->system->canAddTo($this->blog, $this->user)->willReturn(true);
         $this->system->canModify($this->entry, $this->user)->willReturn(true);
     }
