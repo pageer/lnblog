@@ -130,6 +130,7 @@ class BlogEntry extends Entry implements AttachmentContainer {
     public function getFile($path, $revision, $getvar='entry',
                      $subdir=BLOG_ENTRY_PATH,
                      $id_re='/^\d{4}\/\d{2}\/\d{2}_\d{4}\d?\d?$/') {
+        $blog = NewBlog();
         $path = trim($path);
 
         # Account for $getvar being an array.  If it is, just get the first
@@ -145,11 +146,15 @@ class BlogEntry extends Entry implements AttachmentContainer {
             $first_get = GET($getvar);
         }
 
+        $full_path = $this->fs->is_dir($path) ?
+            $path :
+            Path::mk($blog->home_path, $path);
+
         # Auto-detect the current entry.  If no path is given,
         # then assume the current directory.
-        if ($this->fs->is_dir($path)) {
+        if ($this->fs->is_dir($full_path)) {
 
-            $this->file = Path::mk($path, $revision);
+            $this->file = Path::mk($full_path, $revision);
             # Support old blog entry format.
             if (! $this->fs->file_exists($this->file) ) $this->tryOldFileName();
 
@@ -172,7 +177,6 @@ class BlogEntry extends Entry implements AttachmentContainer {
 
                 # If we can pass a short ID, it's assumed that we can find the
                 # current blog from the environment (query string, config.php, etc.)
-                $blog = NewBlog();
                 $entrypath = str_replace("/", PATH_DELIM, $entrypath );
 
                 if (is_array($subdir)) {
