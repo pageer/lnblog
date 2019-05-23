@@ -26,9 +26,8 @@
 # Inherits:
 # <LnBlogObject>
 
-define("USER_PROFILE_FILE", "user.xml");
-
 class User extends LnBlogObject {
+    const USER_PROFILE_FILE = "user.xml";
 
     public $username = '';
     public $passwd = '';
@@ -41,8 +40,9 @@ class User extends LnBlogObject {
     public $custom = array();
 
     private $set_cookies = true;
+    private $fs = null;
 
-    public static function get($usr=false, $pwd=false) {
+    public static function get($usr=false, $pwd=false, FS $fs = null) {
         $s_usr = SESSION(CURRENT_USER);
         $c_usr = COOKIE(CURRENT_USER);
         if (!$usr && $c_usr) {
@@ -52,9 +52,9 @@ class User extends LnBlogObject {
         }
 
         if ($usr && isset($_SESSION["user-".$usr])) {
-            return unserialize($_SESSION["user-".$usr]);
+            return new User($usr);
         } else {
-            return new User($usr, $pwd);
+            return new User($usr, $pwd, $fs);
         }
     }
 
@@ -63,13 +63,14 @@ class User extends LnBlogObject {
         return $user->checkLogin();
     }
 
-    public function __construct($uname=false, $pw=false) {
+    public function __construct($uname=false, $pw=false, FS $fs = null) {
 
         $this->username = $uname ? $uname : '';
+        $this->fs = $fs ?: NewFS();
 
-        $this->exclude_fields = array('salt', 'passwd', 'username');
+        $this->exclude_fields = array('salt', 'passwd', 'username', 'set_cookies', 'fs');
 
-        if ($uname && realpath(mkpath(USER_DATA_PATH,$uname,"passwd.php"))) {
+        if ($uname && $this->fs->realpath(mkpath(USER_DATA_PATH,$uname,"passwd.php"))) {
 
             $this->username = $uname;
             $password_hash = include USER_DATA_PATH."/$uname/passwd.php";
@@ -81,8 +82,8 @@ class User extends LnBlogObject {
                 $this->salt = false;
             }
 
-            $xmlfile = realpath(mkpath(USER_DATA_PATH,$uname,USER_PROFILE_FILE));
-            $inifile = realpath(mkpath(USER_DATA_PATH,$uname,"user.ini"));
+            $xmlfile = $this->fs->realpath(mkpath(USER_DATA_PATH,$uname,self::USER_PROFILE_FILE));
+            $inifile = $this->fs->realpath(mkpath(USER_DATA_PATH,$uname,"user.ini"));
 
             if ($xmlfile) {
                 $this->deserializeXML($xmlfile);
@@ -113,9 +114,9 @@ class User extends LnBlogObject {
     # True if the user exists, false otherwise.
     public function exists($uname=false) {
         if (! $uname) $uname = $this->username;
-        return realpath(mkpath(USER_DATA_PATH,$uname,"passwd.php")) &&
-               ( realpath(mkpath(USER_DATA_PATH,$uname,USER_PROFILE_FILE)) ||
-                 realpath(mkpath(USER_DATA_PATH,$uname,"user.ini")) );
+        return $this->fs->realpath(mkpath(USER_DATA_PATH,$uname,"passwd.php")) &&
+               ( $this->fs->realpath(mkpath(USER_DATA_PATH,$uname,self::USER_PROFILE_FILE)) ||
+                 $this->fs->realpath(mkpath(USER_DATA_PATH,$uname,"user.ini")) );
     }
 
     # Method: profileUrl
@@ -131,20 +132,6 @@ class User extends LnBlogObject {
         }
     }
 
-    protected function defaultProfileUrl() {
-        $blog = NewBlog();
-        if (file_exists(mkpath(USER_DATA_PATH,$this->username,"index.php"))) {
-            $qs = $blog->isBlog() ? array('blog'=>$blog->blogid) : false;
-            $ret = make_uri(localpath_to_uri(USER_DATA_PATH."/".$this->username."/"), $qs);
-        } else {
-            $qs = array("action" => "profile", "user"=>$this->username);
-            if ($blog->isBlog()) {
-                $qs['blog'] = $blog->blogid;
-            }
-            $ret = make_uri(INSTALL_ROOT_URL."index.php", $qs);
-        }
-        return $ret;
-    }
 
     # Method: getProfileUrl
     # Get the configured or default URL for the user's profile.
@@ -161,7 +148,7 @@ class User extends LnBlogObject {
     #
     # Parameters:
     # tpl - The template to put the data in, passed by reference.
-    function exportVars($tpl) {
+    public function exportVars($tpl) {
         if ($this->username) $tpl->set("USER_ID", $this->username);
         if ($this->fullname) $tpl->set("USER_NAME", $this->fullname);
         if ($this->email) $tpl->set("USER_EMAIL", $this->email);
@@ -200,18 +187,18 @@ class User extends LnBlogObject {
     #
     # Returns:
     # True if the changes were successfully saved, false otherwise.
-    function save() {
+    public function save() {
         if (!$this->username ||! $this->passwd) return false;
         $fs = NewFS();
 
         $data = "<?php\nreturn '" . $this->passwd . "';\n";
-        if (! is_dir(USER_DATA_PATH.PATH_DELIM.$this->username)) {
+        if (! $this->fs->is_dir(USER_DATA_PATH.PATH_DELIM.$this->username)) {
             $ret = $fs->mkdir(USER_DATA_PATH.PATH_DELIM.$this->username);
             if (! $ret) return $ret;
         }
         $ret = write_file(mkpath(USER_DATA_PATH,$this->username,"passwd.php"), $data);
         $data = $this->serializeXML();
-        $ret = write_file(mkpath(USER_DATA_PATH,$this->username,USER_PROFILE_FILE), $data);
+        $ret = write_file(mkpath(USER_DATA_PATH,$this->username,self::USER_PROFILE_FILE), $data);
         if ($ret) {
             $_SESSION["user-".$this->username] = serialize($this);
         }
@@ -227,15 +214,17 @@ class User extends LnBlogObject {
     # Returns:
     # If pwd is false, return the user's password hash.  Otherwise, a new
     # password is set and there is no return value.
-    function password($pwd=false) {
-        if (!$pwd) return $this->passwd;
-        else {
+    public function password($pwd=false) {
+        if (!$pwd) {
+            return $this->passwd;
+        } else {
             $this->passwd = password_hash($pwd, PASSWORD_DEFAULT);
 
             # Prevent password change from logging out on cookie-only config.
-            if ( $this->username == COOKIE(CURRENT_USER) )
+            if ( $this->username == COOKIE(CURRENT_USER) ) {
                 $this->setCookie(PW_HASH, $this->passwd,
                     (LOGIN_EXPIRE_TIME ? time() + LOGIN_EXPIRE_TIME:false));
+            }
         }
     }
 
@@ -248,9 +237,12 @@ class User extends LnBlogObject {
     # Returns:
     # The username if uid is false, otherwise the username is set and
     # there is no return value.
-    function username($uid=false) {
-        if (!$uid) return $this->username;
-        else $this->username = $uid;
+    public function username($uid=false) {
+        if (!$uid) {
+            return $this->username;
+        } else {
+            $this->username = $uid;
+        }
     }
 
     # Method: name
@@ -262,9 +254,12 @@ class User extends LnBlogObject {
     # Returns:
     # The user's full name if nm is false, otherwise the name is set and
     # there is no return value.
-    function name($nm=false) {
-        if (!$nm) return $this->fullname;
-        else $this->fullname = $nm;
+    public function name($nm=false) {
+        if (!$nm) {
+            return $this->fullname;
+        } else {
+            $this->fullname = $nm;
+        }
     }
 
     # Method: displayName
@@ -273,9 +268,12 @@ class User extends LnBlogObject {
     #
     # Returns:
     # A string contianing either the username or full name.
-    function displayName() {
-        if ($this->fullname) return $this->fullname;
-        else return $this->username;
+    public function displayName() {
+        if ($this->fullname) {
+            return $this->fullname;
+        } else {
+            return $this->username;
+        }
     }
 
     # Method: email
@@ -287,9 +285,12 @@ class User extends LnBlogObject {
     # Returns:
     # The user's e-mail address if mail is false, otherwise the address
     #  is set and there is no return value.
-    function email($mail=false) {
-        if (!$mail) return $this->email;
-        else $this->email = $mail;
+    public function email($mail=false) {
+        if (!$mail) {
+            return $this->email;
+        } else {
+            $this->email = $mail;
+        }
     }
 
     # Method: homepage
@@ -301,34 +302,12 @@ class User extends LnBlogObject {
     # Returns:
     # The user's homepage URL if url is false, otherwise the homepage
     # is set and there is no return value.
-    function homepage($url=false) {
-        if (!$url) return $this->homepage;
-        else $this->homepage = $url;
-    }
-
-    # Method: groups
-    # Lists the groups to which the user belongs.
-    #
-    # Returns:
-    # An array of group names to which the user belongs.
-
-    function groups() {
-        return System::instance()->getGroups($this->username);
-    }
-
-    # Method: defaultGroup
-    # Gets or sets the default group for this user.  This is the group to which
-    # all of the user's creations will belong by default.
-    #
-    # Parameters:
-    # Val - If set, the value to which the default group should be changed.
-    #
-    # Returns:
-    # A string with the name of the group.
-
-    function defaultGroup($val=false) {
-        if ($val) $this->default_group = $val;
-        else return $this->default_group;
+    public function homepage($url=false) {
+        if (!$url) {
+            return $this->homepage;
+        } else {
+            $this->homepage = $url;
+        }
     }
 
     # Method: addToGroup
@@ -339,8 +318,7 @@ class User extends LnBlogObject {
     #
     # Returns:
     # True on success, false on failure.
-
-    function addToGroup($groupname) {
+    public function addToGroup($groupname) {
         return System::instance()->addToGroup($this, $groupname);
     }
 
@@ -354,17 +332,13 @@ class User extends LnBlogObject {
     #
     # Returns:
     # False if the authentication fails, true otherwise.
-
     public function login($pwd) {
-
         # Reject empty usernames or passwords.
         if ( trim($this->username) == "" || trim($pwd) == "" ) {
             return false;
         }
 
-        # User does not exist.
-        #if ( ! isset($this->user_list[$this->username]) ) return false;
-
+        $ret = false;
         $ts = gmdate("M d Y H:i:s", time());
         if ($this->checkPassword($pwd)) {
             # If we have the old password format, convert on successful login
@@ -394,14 +368,14 @@ class User extends LnBlogObject {
                     (LOGIN_EXPIRE_TIME ? time() + LOGIN_EXPIRE_TIME:false));
                 $ret = true;
             }
-        } else $ret = false;
+        }
         return $ret;
     }
 
     # Method: logout
     # Logs the user out and destroys login tokens.
     # Note that this is also subject to <AUTH_USE_SESSION>
-    function logout() {
+    public function logout() {
         if (AUTH_USE_SESSION) {
             unset($_SESSION[CURRENT_USER]);
             unset($_SESSION[LOGIN_TOKEN]);
@@ -423,7 +397,7 @@ class User extends LnBlogObject {
     #
     # Returns:
     # True if the user has valid login tokens, false otherwise.
-    function checkLogin($uname=false) {
+    public function checkLogin($uname=false) {
         # If the constructor doesn't detect a user name, then we're obviously
         # not logged in.
         if (!$this->username) {
@@ -463,13 +437,42 @@ class User extends LnBlogObject {
     # True if the username is the same as that of the system administrator,
     # false otherwise.  Note that the system administrator's username
     # is controlled by the <ADMIN_USER> configuration constant.
-    function isAdministrator() {
+    public function isAdministrator() {
         return ($this->username == ADMIN_USER ||
                 System::instance()->inGroup($this->username, 'administrators'));
     }
 
+    # Method: enableCookies
+    # Used primarily for testing, sets whether cookies actually get set.
     public function enableCookies($enabled) {
         $this->set_cookies = $enabled;
+    }
+
+    private function defaultProfileUrl() {
+        $blog = NewBlog();
+        if ($this->fs->file_exists(mkpath(USER_DATA_PATH,$this->username,"index.php"))) {
+            $qs = $blog->isBlog() ? array('blog'=>$blog->blogid) : false;
+            $ret = make_uri(localpath_to_uri(USER_DATA_PATH."/".$this->username."/"), $qs);
+        } else {
+            $qs = array("action" => "profile", "user"=>$this->username);
+            if ($blog->isBlog()) {
+                $qs['blog'] = $blog->blogid;
+            }
+            $ret = make_uri(INSTALL_ROOT_URL."index.php", $qs);
+        }
+        return $ret;
+    }
+
+    private function groups() {
+        return System::instance()->getGroups($this->username);
+    }
+
+    private function defaultGroup($val=false) {
+        if ($val) {
+            $this->default_group = $val;
+        } else {
+            return $this->default_group;
+        }
     }
 
     private function setCookie($name, $value = '', $expires = 0) {
