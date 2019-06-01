@@ -65,7 +65,7 @@ class Pingback extends Trackback {
 
     # Method: globalID
     # Get the global identifier for this trackback.
-    function globalID() {
+    public function globalID() {
         $parent = $this->getParent();
         $id = $parent->globalID();
         if (defined('ENTRY_PINGBACK_DIR') && ENTRY_PINGBACK_DIR) {
@@ -80,8 +80,7 @@ class Pingback extends Trackback {
     #
     # Parameters:
     # ent - The entry into which to insert this pingback.
-
-    function insert($ent) {
+    public function insert($ent) {
         $this->raiseEvent("OnInsert");
         $ts = time();
         $this->ping_date = date("Y-m-d H:i:s T", $ts);
@@ -111,7 +110,7 @@ class Pingback extends Trackback {
     # Returns:
     # True if the data file exists and is under an entry pingback directory,
     # false otherwise
-    function isPingback($path=false) {
+    public function isPingback($path=false) {
         if (!$path) $path = $this->file;
         if ( $this->fs->file_exists($path) &&
              basename(dirname($path)) == ENTRY_PINGBACK_DIR ) {
@@ -126,8 +125,7 @@ class Pingback extends Trackback {
     #
     # Returns:
     # The anchor to use for this pingback.
-
-    function getAnchor() {
+    public function getAnchor() {
         $ret = basename($this->file);
         $ret = preg_replace("/.\w\w\w$/", "", $ret);
         $ret = "pingback".$ret;
@@ -142,8 +140,7 @@ class Pingback extends Trackback {
     #
     # Returns:
     # The name of the pingback file.
-
-    function getFilename($anchor) {
+    public function getFilename($anchor) {
         $ent = NewEntry();
         $ret = substr($anchor, 8);
         $ret .= PINGBACK_PATH_SUFFIX;
@@ -152,7 +149,7 @@ class Pingback extends Trackback {
         return $ret;
     }
 
-    function readOldFile($path) {
+    public function readOldFile($path) {
         $file_data = $this->fs->file($path);
         foreach ($file_data as $line) {
             $line = trim($line);
@@ -196,8 +193,7 @@ class Pingback extends Trackback {
     #
     # Returns:
     # The data to be sent to the client.
-
-    function get() {
+    public function get() {
         $blog = NewBlog();
         $u = NewUser();
         $tpl = NewTemplate('pingback_tpl.php');
@@ -232,26 +228,9 @@ class Pingback extends Trackback {
     #
     # Returns:
     # True if the source and target are on the same host, false otherwise.
-
-    function isLocal() {
+    public function isLocal() {
         $source_info = parse_url($this->source);
         $target_info = parse_url($this->target);
         return $source_info['host'] == $target_info['host'];
-    }
-
-    # Method: fetchPage
-    # Requests a URL from a remote host and returns the resulting data.
-    #
-    # Parameters:
-    # url     - The URL to fetch.
-    # headers - *Optional* boolean to only fetch the page headers.
-    #           *Defaults* to false.
-    #
-    # Returns:
-    # A string containing the HTTP headers and body of the requested URL.
-
-    function fetchPage($url, $headers=false) {
-        $client = new HttpClient();
-        return $client->fetchUrl($url, $headers);
     }
 }

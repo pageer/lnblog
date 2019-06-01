@@ -42,11 +42,11 @@ POSTRetrieved  - Fired after data has been retreived from an HTTP POST.
 */
 class BlogComment extends Entry {
 
-    var $postid;
-    var $name;
-    var $email;
-    var $url;
-    var $show_email;
+    public $postid;
+    public $name;
+    public $email;
+    public $url;
+    public $show_email;
 
     public function __construct ($path = "", $filesystem = null) {
         parent::__construct($filesystem ?: NewFS());
@@ -131,7 +131,8 @@ class BlogComment extends Entry {
         return $ret;
     }
 
-    /* Method: delete
+    /*
+    Method: delete
     Delete a comment.
 
     Returns:
@@ -318,7 +319,6 @@ class BlogComment extends Entry {
     Returns:
     True if the comment data file exists, false otherwise.
     */
-
     public function isComment($path=false) {
         if (!$path) $path = $this->file;
         return file_exists($path);
@@ -418,5 +418,4 @@ class BlogComment extends Entry {
 
         return $ret;
     }
-
 }

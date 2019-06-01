@@ -56,7 +56,8 @@ class TrackbackValidator extends Plugin {
         }
 
         $ent = $param->getParent();
-        $data = Pingback::fetchPage($param->url);
+        $client = new HttpClient();
+        $data = $client->fetchUrl($param->url, false);
         # If the permalink is in the page, it's legitimate, so return true.
         if (strpos($data, $ent->permalink()) > 0) {
             return true;

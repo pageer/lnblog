@@ -86,7 +86,8 @@ function get_ping($params) {
 
         $ping = NewPingback();
 
-        $content = $ping->fetchPage($sourceURI);
+        $client = new HttpClient();
+        $content = $client->fetchUrl($sourceURI, false);
         if (! $content) {
             return new xmlrpcresp(0, 16, "Unable to read source URI.");
         } elseif (! strpos($content, $targetURI)) {
