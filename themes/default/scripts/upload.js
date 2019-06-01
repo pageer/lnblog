@@ -181,6 +181,7 @@ $(document).ready( function () {
         dictDefaultMessage: strings.upload_droponeText,
         init: function () {
             this.on("success", uploadSuccess);
+            $('#fileupload').hide();
         }
     });
 } );

@@ -713,7 +713,7 @@ class WebPages extends BasePages {
         $num_fields = 1;
         $target_under_blog = "";
 
-        $ent = NewBlogEntry();
+        $ent = $this->getEntry();
         $tpl = NewTemplate(UPLOAD_TEMPLATE);
         $tpl->set("NUM_UPLOAD_FIELDS", $num_fields);
 
