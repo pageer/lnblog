@@ -5,7 +5,7 @@ use Prophecy\Argument;
 class WebPagesTest extends \PHPUnit\Framework\TestCase {
 
     public function testEditEntry_WhenEmptyPostAndNotLoggedIn_Shows403Error() {
-        $this->entry->isEntry()->willReturn(false);
+        $this->entry->isEntry()->willReturn(true);
         $this->entry->isArticle()->willReturn(false);
         $this->entry->getAutoPublishDate()->willReturn('');
         $this->entry->raiseEvent(Argument::any())->willReturn(null);
@@ -43,9 +43,9 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $_POST['post'] = 'post';
         $this->setUpEntryEditStubs(false);
         $this->entry->data = 'some data';
-        $this->entry->isEntry()->willReturn(false);
+        $this->entry->isEntry()->willReturn(true);
         $this->entry->isPublished()->willReturn(false);
-        $this->entry->isDraft()->willReturn(false);
+        $this->entry->isDraft()->willReturn(true);
         $this->system->canAddTo(Argument::any(), Argument::any())->willReturn(false);
         $this->system->canModify(Argument::any(), Argument::any())->willReturn(false);
         $this->page->addInlineScript(Argument::any());
@@ -59,9 +59,9 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
     public function testEditEntry_WhenLoggedInButNoPost_ShowsPage() {
         $this->setUpEntryEditStubs();
         $this->entry->data = 'some data';
-        $this->entry->isEntry()->willReturn(false);
+        $this->entry->isEntry()->willReturn(true);
         $this->entry->isPublished()->willReturn(false);
-        $this->entry->isDraft()->willReturn(false);
+        $this->entry->isDraft()->willReturn(true);
         $this->system->canAddTo(Argument::any(), Argument::any())->willReturn(true);
         $this->system->canModify(Argument::any(), Argument::any())->willReturn(true);
 
@@ -70,7 +70,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->webpage->entryedit();
     }
 
-    public function testEntryEdit_WhenEntryDoesNotExistAndPostParamPassed_Publishes() {
+    public function testEntryEdit_WhenEntryDoesNotExist_Returns403Error() {
         $_POST['body'] = "This is a test entry";
         $_POST['post'] = 'post';
         $this->setUpEntryEditStubs();
@@ -81,93 +81,10 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->system->canAddTo($this->blog, $this->user)->willReturn(true);
         $this->system->canModify($this->blog, $this->user)->willReturn(false);
 
-        $this->publisher->publishEntry($this->entry, Argument::any())->shouldBeCalled();
+        $this->page->error(403, "The draft entry asdf does not exist")->shouldBeCalled();
 
-        $this->webpage->entryedit();
-    }
-
-    public function testEntryEdit_WhenEntryDoesNotExistAndPostedWithArticleParam_PublishesAsArticle() {
-        $_POST['body'] = "This is a test entry";
-        $_POST['post'] = 'post';
-        $_POST['publisharticle'] = '1';
-        $this->setUpEntryEditStubs();
-        $this->entry->data = 'some data';
-        $this->entry->send_pingback = false;
-        $this->entry->isEntry()->willReturn(false);
-        $this->entry->isPublished()->willReturn(false);
-        $this->system->canAddTo($this->blog, $this->user)->willReturn(true);
-        $this->system->canModify($this->blog, $this->user)->willReturn(false);
-
-        $this->publisher->publishArticle($this->entry, Argument::any())->shouldBeCalled();
-
-        $this->webpage->entryedit();
-    }
-
-    public function testEntryEdit_WhenEntryDoesNotExistAndDraftSavedWithArticleParam_SavesDraftWithArticleFlag() {
-        $_POST['body'] = "This is a test entry";
-        $_POST['draft'] = 'draft';
-        $_POST['publisharticle'] = '1';
-        $this->setUpEntryEditStubs();
-        $this->entry->data = 'some data';
-        $this->entry->send_pingback = false;
-        $this->entry->isEntry()->willReturn(false);
-        $this->entry->isPublished()->willReturn(false);
-        $this->system->canAddTo($this->blog, $this->user)->willReturn(true);
-        $this->system->canModify($this->blog, $this->user)->willReturn(false);
-
-        $this->publisher->publishArticle($this->entry, Argument::any())->shouldNotBeCalled();
-        $this->publisher->createDraft($this->entry, Argument::any())->shouldBeCalled();
-
-        $this->webpage->entryedit();
-    }
-    public function testEntryEdit_WhenEntryDoesNotExistAndDraftParamPassed_CreatesDraft() {
-        $_POST['body'] = "This is a test entry";
-        $_POST['draft'] = 'draft';
-        $this->setUpEntryEditStubs();
-        $this->entry->data = 'some data';
-        $this->entry->isEntry()->willReturn(false);
-        $this->entry->isPublished()->willReturn(false);
-        $this->system->canAddTo($this->blog, $this->user)->willReturn(true);
-        $this->system->canModify($this->blog, $this->user)->willReturn(false);
-
-        $this->publisher->createDraft($this->entry, Argument::any())->shouldBeCalled();
-
-        $this->webpage->entryedit();
-    }
-
-    public function testEditEntry_WhenEntryDoesNotExistAndPublishFails_ShowsError() {
-        $_POST['body'] = "This is a test entry";
-        $_POST['post'] = 'post';
-        $this->setUpEntryEditStubs();
-        $this->entry->data = 'some data';
-        $this->entry->isEntry()->willReturn(false);
-        $this->entry->isPublished()->willReturn(false);
-        $this->entry->isDraft()->willReturn(false);
-        $this->system->canAddTo($this->blog, $this->user)->willReturn(true);
-        $this->system->canModify($this->blog, $this->user)->willReturn(false);
-        $this->publisher->publishEntry($this->entry, Argument::any())->willThrow(new Exception("Publish Failure!"));
-
-        $this->page->display(Argument::containingString("Publish Failure!"), $this->blog)->shouldBeCalled();
-
-        $this->webpage->entryedit();
-    }
-
-    public function testEditEntry_WhenEntryExistsButNotPublishedAndDraftParam_UpdatesEntry() {
-        $_POST['body'] = "This is a test entry";
-        $_POST['draft'] = 'draft';
-        $this->setUpEntryEditStubs();
-        $this->entry->data = 'some data';
-        $this->entry->send_pingback = false;
-        $this->entry->isEntry()->willReturn(true);
-        $this->entry->isPublished()->willReturn(false);
-        $this->entry->getAttachments()->willReturn([]);
-        $this->system->canAddTo($this->blog, $this->user)->willReturn(false);
-        $this->system->canModify($this->entry, $this->user)->willReturn(true);
-
-        $this->publisher->update($this->entry)->shouldBeCalled();
-        $this->page->redirect(Argument::any())->shouldBeCalled();
-
-        $this->webpage->entryedit();
+        $result = $this->webpage->entryedit();
+        $this->assertFalse($result);
     }
 
     public function testEditEntry_WhenEntryExistsAndPublishedAndPostParamPassed_UpdatesEntry() {
@@ -266,48 +183,18 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->webpage->entryedit();
     }
 
-    public function testEditEntry_WhenEntryDoesNotExistAndPreviewAndSaveParamsPassed_CreatesDraft() {
-        $_POST['body'] = "This is a test entry";
-        $_POST['preview'] = 'preview';
-        $_GET['save'] = 'draft';
-        $this->setUpEntryEditStubs();
-        $this->setUpForNewEntryWithPermissions();
-        $this->entry->data = 'some data';
-        $this->entry->get()->willReturn("This is a test entry");
-        $this->user->exportVars(Argument::any())->willReturn(null);
-
-        $this->publisher->createDraft($this->entry, Argument::any())->shouldBeCalled();
-
-        $this->webpage->entryedit();
-    }
-
-    public function testEditEntry_WhenEntryDoesNotExistAndPreviewPassedWithoutSave_DoesNotCreateDraft() {
-        $_POST['body'] = "This is a test entry";
-        $_POST['preview'] = 'preview';
-        $this->setUpEntryEditStubs();
-        $this->setUpForNewEntryWithPermissions();
-        $this->entry->data = 'some data';
-        $this->entry->get()->willReturn("This is a test entry");
-        $this->user->exportVars(Argument::any())->willReturn(null);
-        $this->page->display(Argument::any(), Argument::any())->willReturn(null);
-
-        $this->publisher->createDraft($this->entry, Argument::any())->shouldNotBeCalled();
-
-        $this->webpage->entryedit();
-    }
-
     public function testEditEntry_WhenPreviewAndSaveAndIsAjax_PrintsResponseWithUrlEncodedContentAndDoesNotRedirect() {
         $_POST['body'] = "This is some markup";
         $_POST['preview'] = 'preview';
         $_GET['save'] = 'draft';
         $_GET['ajax'] = 1;
         $this->setUpEntryEditStubs();
-        $this->setUpForNewEntryWithPermissions();
+        $this->setUpForEntrySaveWithPermissions();
         $this->entry->data = 'some data';
         $this->entry->get()->willReturn("This is some markup");
         $this->user->exportVars(Argument::any())->willReturn(null);
 
-        $this->publisher->createDraft($this->entry, Argument::any())->shouldBeCalled();
+        $this->publisher->update($this->entry)->shouldBeCalled();
         $this->page->redirect(Argument::any())->shouldNotBeCalled();
 
         ob_start();
@@ -316,7 +203,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
 
         $expectedResponse = json_encode([
             'id'=>'asdf', 
-            'exists' => false,
+            'exists' => true,
             'isDraft' => false,
             'content'=> 'This%20is%20some%20markup'
         ]);
@@ -328,10 +215,10 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $_POST['preview'] = 'preview';
         $_GET['save'] = 'draft';
         $this->setUpEntryEditStubs();
-        $this->setUpForNewEntryWithPermissions();
+        $this->setUpForEntrySaveWithPermissions();
         $this->entry->data = 'some data';
 
-        $this->publisher->createDraft($this->entry, Argument::any())->shouldBeCalled();
+        $this->publisher->update($this->entry)->shouldBeCalled();
         $this->page->redirect(Argument::any())->shouldBeCalled();
 
         $this->webpage->entryedit();
@@ -341,7 +228,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $_POST['body'] = "This is a test entry";
         $_POST['preview'] = 'preview';
         $this->setUpEntryEditStubs();
-        $this->setUpForNewEntryWithPermissions();
+        $this->setUpForEntrySaveWithPermissions();
         $this->entry->data = 'This is a test entry';
         $this->entry->get()->willReturn("This is a test entry");
         $this->user->exportVars(Argument::any())->willReturn(null);
@@ -452,6 +339,39 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->webpage->entryedit();
     }
 
+    public function testNewEntry_WhenUserNotLoggedIn_Returns403Error() {
+        $this->user->checkLogin()->willReturn(false);
+        $this->user->username()->willReturn('bob');
+
+        $this->page->error(403, Argument::any())->shouldBeCalled();
+
+        $this->webpage->newentry();
+    }
+
+    public function testNewEntry_WhenUserDoesNotHaveWritePermissions_Returns403Error() {
+        $this->user->checkLogin()->willReturn(true);
+        $this->user->username()->willReturn('bob');
+        $this->system->canAddTo($this->blog, $this->user)->willReturn(false);
+        $this->system->canModify($this->blog, $this->entry)->willReturn(true);
+        $this->entry->isEntry()->willReturn(false);
+
+        $this->page->error(403, Argument::any())->shouldBeCalled();
+
+        $this->webpage->newentry();
+    }
+
+    public function testNewEntry_WhenUserHasAccess_CreatesDraftEntryAndRedirects() {
+        $this->user->checkLogin()->willReturn(true);
+        $this->system->canAddTo($this->blog, $this->user)->willReturn(true);
+        $this->entry->isEntry()->willReturn(false);
+        $this->entry->uri('editDraft')->willReturn('./drafts/02_1234/');
+
+        $this->publisher->createDraft($this->entry)->shouldBeCalled();
+        $this->page->redirect('./drafts/02_1234/')->shouldBeCalled();
+
+        $this->webpage->newentry();
+    }
+
     public function testWebmention_WhenValid_AddsWebmention() {
         $_POST['source'] = 'http://yoursite.com/test1';
         $_POST['target'] = 'https://mysite.com/test2';
@@ -529,6 +449,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->entry->getPostData()->willReturn(null);
         $this->entry->raiseEvent(Argument::any())->willReturn(null);
         $this->entry->permalink()->willReturn('');
+        $this->entry->getAttachments()->willReturn([]);
         $this->user->checkLogin()->willReturn($logged_in);
         $this->page->redirect(Argument::any())->willReturn(null);
         $this->page->setDisplayObject(Argument::any())->willReturn(null);
@@ -537,8 +458,8 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->page->addInlineScript(Argument::any())->willReturn(null);
     }
 
-    private function setUpForNewEntryWithPermissions() {
-        $this->entry->isEntry()->willReturn(false);
+    private function setUpForEntrySaveWithPermissions() {
+        $this->entry->isEntry()->willReturn(true);
         $this->entry->isPublished()->willReturn(false);
         $this->entry->isDraft()->willReturn(false);
         $this->system->canAddTo($this->blog, $this->user)->willReturn(true);
@@ -595,6 +516,10 @@ class TestableWebPages extends WebPages {
 
     protected function getEntry($path = false) {
         return $this->test_entry ?: parent::getEntry($path);
+    }
+
+    protected function getNewEntry() {
+        return $this->test_entry ?: parent::getNewEntry();
     }
 
     protected function getPublisher() {

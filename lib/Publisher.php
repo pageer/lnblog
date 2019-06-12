@@ -55,6 +55,7 @@ class Publisher {
         $dir_path = Path::mk($basepath, $entry->getPath($curr_ts));
         $draft_created = false;
 
+        // Entry might not already exist if created through an API call.
         if (! $entry->isEntry()) {
             $this->createDraft($entry, $time);
             $draft_created = true;
@@ -115,17 +116,17 @@ class Publisher {
         if ($this->fs->is_dir($dir_path)) {
             throw new EntryAlreadyExists();
         } elseif (! $this->fs->is_dir($basepath)) {
-            $this->wrappers->createDirectoryWrappers($basepath, BLOG_ARTICLES);
+            $this->wrappers->createDirectoryWrappers($basepath, WrapperGenerator::BLOG_ARTICLES);
         }
 
         $this->raiseEvent($entry, "Article", "OnInsert");
 
         $this->renameEntry(dirname($entry->file), $dir_path);
 
-        $ret = $this->wrappers->createDirectoryWrappers($dir_path, ARTICLE_BASE);
-        $this->wrappers->createDirectoryWrappers(Path::mk($dir_path, ENTRY_COMMENT_DIR), ENTRY_COMMENTS);
-        $this->wrappers->createDirectoryWrappers(Path::mk($dir_path, ENTRY_TRACKBACK_DIR), ENTRY_TRACKBACKS);
-        $this->wrappers->createDirectoryWrappers(Path::mk($dir_path, ENTRY_PINGBACK_DIR), ENTRY_PINGBACKS);
+        $ret = $this->wrappers->createDirectoryWrappers($dir_path, WrapperGenerator::ARTICLE_BASE);
+        $this->wrappers->createDirectoryWrappers(Path::mk($dir_path, ENTRY_COMMENT_DIR), WrapperGenerator::ENTRY_COMMENTS);
+        $this->wrappers->createDirectoryWrappers(Path::mk($dir_path, ENTRY_TRACKBACK_DIR), WrapperGenerator::ENTRY_TRACKBACKS);
+        $this->wrappers->createDirectoryWrappers(Path::mk($dir_path, ENTRY_PINGBACK_DIR), WrapperGenerator::ENTRY_PINGBACKS);
 
         $this->updateFileForPublication($entry, $dir_path, $curr_ts, $draft_created);
 
@@ -312,7 +313,7 @@ class Publisher {
 
     private function createDraftsDirectory($draft_path) {
         if (! $this->fs->is_dir($draft_path)) {
-            $ret = $this->wrappers->createDirectoryWrappers($draft_path, BLOG_DRAFTS);
+            $ret = $this->wrappers->createDirectoryWrappers($draft_path, WrapperGenerator::BLOG_DRAFTS);
             if (! empty($ret)) {
                 throw new CouldNotCreateDirectory('Could not create drafts directory');
             }
@@ -329,24 +330,25 @@ class Publisher {
         if (! $ret) {
             throw new EntryWriteFailed("Could not create directory for new draft.");
         }
+        $ret = $this->wrappers->createDirectoryWrappers($path, WrapperGenerator::DRAFT_ENTRY_BASE);
     }
 
     private function createMonthDirectory($dir_path) {
         $month_path = dirname($dir_path);
         $year_path = dirname($month_path);
         if (! $this->fs->is_dir($year_path)) {
-            $this->wrappers->createDirectoryWrappers($year_path, YEAR_ENTRIES);
+            $this->wrappers->createDirectoryWrappers($year_path, WrapperGenerator::YEAR_ENTRIES);
         }
         if (! $this->fs->is_dir($month_path)) {
-            $this->wrappers->createDirectoryWrappers($month_path, MONTH_ENTRIES);
+            $this->wrappers->createDirectoryWrappers($month_path, WrapperGenerator::MONTH_ENTRIES);
         }
     }
 
     private function createEntryWrappers($dir_path) {
-        $this->wrappers->createDirectoryWrappers($dir_path, ENTRY_BASE);
-        $this->wrappers->createDirectoryWrappers(Path::mk($dir_path, ENTRY_COMMENT_DIR), ENTRY_COMMENTS);
-        $this->wrappers->createDirectoryWrappers(Path::mk($dir_path, ENTRY_TRACKBACK_DIR), ENTRY_TRACKBACKS);
-        $this->wrappers->createDirectoryWrappers(Path::mk($dir_path, ENTRY_PINGBACK_DIR), ENTRY_PINGBACKS);
+        $this->wrappers->createDirectoryWrappers($dir_path, WrapperGenerator::ENTRY_BASE);
+        $this->wrappers->createDirectoryWrappers(Path::mk($dir_path, ENTRY_COMMENT_DIR), WrapperGenerator::ENTRY_COMMENTS);
+        $this->wrappers->createDirectoryWrappers(Path::mk($dir_path, ENTRY_TRACKBACK_DIR), WrapperGenerator::ENTRY_TRACKBACKS);
+        $this->wrappers->createDirectoryWrappers(Path::mk($dir_path, ENTRY_PINGBACK_DIR), WrapperGenerator::ENTRY_PINGBACKS);
     }
 
     private function updateWithHistory(BlogEntry $entry, DateTime $time) {

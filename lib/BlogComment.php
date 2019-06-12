@@ -187,7 +187,8 @@ class BlogComment extends Entry {
         # If there is no data for this comment, then abort.
         if (! $this->data) return false;
         if (! is_dir($basepath) ) {
-            $ret = create_directory_wrappers($basepath, ENTRY_COMMENTS);
+            $wrappers = new WrapperGenerator($this->fs);
+            $ret = $wrappers->createDirectoryWrappers($basepath, WrapperGenerator::ENTRY_COMMENTS);
             if (! $ret) return false;
         }
 

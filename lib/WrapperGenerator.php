@@ -3,6 +3,20 @@
 # Encapsulates the legacy functions for generating directory wrappers.
 class WrapperGenerator {
 
+    const BLOG_BASE =  0;
+    const BLOG_ENTRIES =  1;
+    const YEAR_ENTRIES =  2;
+    const MONTH_ENTRIES =  3;
+    const ENTRY_BASE =  4;
+    const ENTRY_COMMENTS =  5;
+    const ARTICLE_BASE =  6;
+    const BLOG_ARTICLES =  7;
+    const ENTRY_TRACKBACKS =  8;
+    const ENTRY_DRAFTS =  9;
+    const ENTRY_PINGBACKS =  10;
+    const BLOG_DRAFTS =  11;
+    const DRAFT_ENTRY_BASE =  12;
+
     private $fs;
 
     public function __construct(FS $fs) {
@@ -39,7 +53,7 @@ class WrapperGenerator {
     	$ret_list = array();
     
     	switch ($type) {
-    		case BLOG_BASE:
+            case self::BLOG_BASE:
                 if (!$this->fs->is_dir($instpath)) {
                     return false;
                 }
@@ -60,64 +74,67 @@ class WrapperGenerator {
                     }
     			}
     			break;
-    		case BLOG_ENTRIES:
+            case self::BLOG_ENTRIES:
     			$filelist = array("index"=>"pages/showarchive");
     			$removelist = array("all");
     			$config_level = 1;
     			break;
-    		case BLOG_DRAFTS:
+            case self::BLOG_DRAFTS:
     			$filelist = array("index"=>"pages/showdrafts");
     			$config_level = 1;
     			break;
-    		case YEAR_ENTRIES:
+            case self::YEAR_ENTRIES:
     			$filelist = array("index"=>"pages/showarchive");
     			$config_level = 2;
     			break;
-    		case MONTH_ENTRIES:
+            case self::MONTH_ENTRIES:
     			$filelist = array("index"=>"pages/showarchive");
     			$removelist = array("day");
     			$config_level = 3;
     			break;
-    		case ENTRY_BASE:
+            case self::ENTRY_BASE:
     			$filelist = array("index"=>"pages/showitem");
     			$removelist = array("edit", "delete", "trackback", "uploadfile");
     			$config_level = 4;
     			break;
-    		case ENTRY_COMMENTS:
+            case self::ENTRY_COMMENTS:
     			$filelist = array("index"=>"pages/showitem");
     			$removelist = array("delete");
     			$config_level = strtolower($instpath) == 'article' ? 3 : 5;
     			break;
-    		case ENTRY_TRACKBACKS:
+            case self::ENTRY_TRACKBACKS:
     			$filelist = array("index"=>"pages/showitem");
     			$config_level = strtolower($instpath) == 'article' ? 3 : 5;
     			break;
-    		case ENTRY_PINGBACKS:
+            case self::ENTRY_PINGBACKS:
     			$filelist = array("index"=>"pages/showitem");
     			$config_level = strtolower($instpath) == 'article' ? 3 : 5;
     			break;
-    		case ARTICLE_BASE:
+            case self::ARTICLE_BASE:
     			# The same as for entries, but for some reason, I never added a delete.
     			$filelist = array("index"=>"pages/showitem");
     			$removelist = array("edit", "trackback", "uploadfile");
     			$config_level = 2;
     			break;
-    		case BLOG_ARTICLES:
+            case self::BLOG_ARTICLES:
     			$filelist = array("index"=>"pages/showarticles");
     			$config_level = 1;
     			break;
-    		case ENTRY_DRAFTS:
+            case self::ENTRY_DRAFTS:
     			$filelist = array("index"=>"pages/showdrafts");
     			$config_level = 1;
     			break;
+            case self::DRAFT_ENTRY_BASE:
+    			$filelist = array("index"=>"pages/editentry");
+                $config_level = 2;
+                break;
     	}
     
     	foreach ($filelist as $file=>$content) {
     		$curr_file = $current.$file.".php";
     		$body = "<?php\n";
     		$body .= config_php_string($config_level);
-    		$body .= "include(INSTALL_ROOT.DIRECTORY_SEPARATOR.\"".
-    			str_replace('/', DIRECTORY_SEPARATOR, $content).".php\");\n";
+    		$body .= "include(INSTALL_ROOT.DIRECTORY_SEPARATOR.\"$content.php\");\n";
     
     		$ret = $this->fs->write_file($curr_file, $body);
     		if (! $ret) $ret_list[] = $curr_file;

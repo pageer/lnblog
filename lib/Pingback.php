@@ -93,7 +93,8 @@ class Pingback extends Trackback {
         if (! $this->source) return false;
 
         if (! $this->fs->is_dir($dir)) {
-            $ret = create_directory_wrappers($dir, ENTRY_PINGBACKS, get_class($ent));
+            $wrappers = new WrapperGenerator($this->fs);
+            $ret = $wrappers->createDirectoryWrappers($dir, WrapperGenerator::ENTRY_PINGBACKS, get_class($ent));
         }
         $ret = $this->writeFileData($this->file);
         $this->raiseEvent("InsertComplete");

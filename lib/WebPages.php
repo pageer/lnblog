@@ -23,7 +23,7 @@ class WebPages extends BasePages {
     protected function getActionMap() {
         return array(
             'about'      => 'about',
-            'newentry'   => 'entryedit',
+            'newentry'   => 'newentry',
             'editentry'  => 'entryedit',
             'delentry'   => 'delentry',
             'delcomment' => 'delcomment',
@@ -41,6 +41,7 @@ class WebPages extends BasePages {
             'editfile'   => 'editfile',
             'blogpaths'  => 'blogpaths',
             'webmention' => 'webmention',
+            'drafts'     => 'showdrafts',
         );
     }
 
@@ -59,7 +60,9 @@ class WebPages extends BasePages {
     protected function verifyUserCanModifyBlog($redirect = '', $message = '') {
         if (! $this->user->checkLogin() || ! System::instance()->canModify($this->blog, $this->user)) {
             $this->redirectOr403($redirect, $message);
+            return false;
         }
+        return true;
     }
 
     protected function verifyUserIsLoggedIn($redirect = '', $message = '') {
@@ -546,20 +549,34 @@ class WebPages extends BasePages {
         return '';
     }
 
+    public function newentry() {
+        $ent = $this->getNewEntry();
+        if (! $this->check_perms($this->blog, $ent, $this->user)) {
+            $msg = spf_("permission denied: user %s cannot update this entry.", $this->user->username());
+            return $this->redirectOr403(null, $msg);
+        }
+        $this->getPublisher()->createDraft($ent);
+        $this->getPage()->redirect($ent->uri('editDraft'));
+        return false;
+    }
+
     public function entryedit() {
 
         $ent = $this->getEntry();
         $this->getPage()->setDisplayObject($ent->isEntry() ? $ent : $this->blog);
         $is_art = !empty($_POST['publisharticle']) || GET('type') == 'article';
-
-        $ent->raiseEvent('OnUpdateUiInit');
-
-        $tpl = $this->init_template($this->blog, $ent, $is_art);
+        if (!$ent->isEntry()) {
+            $message = spf_("The draft entry %s does not exist", $ent->entryID());
+            $this->getPage()->error(403, $message);
+            return false;
+        }
 
         if ( empty($_POST) && ! $this->user->checkLogin() ) {
             return $this->redirectOr403(null, _("Access to this page is restricted to logged-in users."));
         }
 
+        $ent->raiseEvent('OnUpdateUiInit');
+        $tpl = $this->init_template($this->blog, $ent, $is_art);
         $ent->getPostData();
 
         if (!empty($_POST)) {
@@ -1850,7 +1867,6 @@ class WebPages extends BasePages {
 
         $send_pingbacks = false;
         $do_preview = $this->editIsPreview();
-        $create_draft = $this->editIsDraft($ent);
         $save_entry = $this->editIsSave($ent);
 
         try {
@@ -1859,8 +1875,6 @@ class WebPages extends BasePages {
             } elseif ($this->editIsPost($ent)) {
                 $this->getPublisher()->publishEntry($ent);
                 $send_pingbacks = true;
-            } elseif ($create_draft) {
-                $this->getPublisher()->createDraft($ent);
             } elseif ($save_entry) {
                 $this->getPublisher()->update($ent);
                 $send_pingbacks = $ent->isPublished() && !$do_preview;
@@ -1916,10 +1930,12 @@ class WebPages extends BasePages {
 
     protected function getEntry($path = false) {
         // Pick up entry ID from a POST param so we can inject it for AJAX saves.
+        /*
         $path = empty($_POST['entryid']) ? false : $_POST['entryid'];
         if ($path && strpos($_POST['entryid'], '/') === false) {
             $path = BLOG_DRAFT_PATH . '/' . $path;
         }
+         */
         return NewEntry($path, $this->getFs());
     }
 
@@ -1930,6 +1946,10 @@ class WebPages extends BasePages {
             $this->publisher = new Publisher($this->blog, $this->user, $fs, $wrappers);
         }
         return $this->publisher;
+    }
+
+    protected function getNewEntry() {
+        return new BlogEntry();
     }
 
     protected function getSocialWebServer() {

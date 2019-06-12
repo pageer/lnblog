@@ -98,19 +98,7 @@ $(document).ready( function () {
     };
 
     var uploadUrl = function (files) {
-        var entryExists = (window.entryData || {}).entryExists;
-        var entryIsDraft = (window.entryData || {}).entryIsDraft;
-        var entryId = (window.entryData || {}).entryId;
-
-        if (!window.entryData) {
-            return '?action=upload&ajax=1';
-        } else if (entryExists) {
-            if (entryIsDraft) {
-                return '?action=upload&draft='+entryId+'&ajax=1';
-            }
-            return '?action=upload&ajax=1';
-        }
-        return '?action=newentry&save=draft&preview=yes&ajax=1';
+        return '?action=upload&ajax=1';
     };
 
     var parameterData = function () {
@@ -134,31 +122,12 @@ $(document).ready( function () {
     };
 
     var uploadSuccess = function (file, response, data) {
-        console.log(response, typeof response);
         var responseData = typeof response === 'string' ? JSON.parse(response) : response;
         var hasEntryData = !!window.entryData;
         var entryData = window.entryData || {};
         var $new_file = $('<li class="attachment"></li>')
             .attr('data-file', file.name)
             .text(file.name);
-
-        // Update the stored entry information.
-        if (hasEntryData && !entryData.entryExists && responseData.id) {
-            window.entryData = {
-                entryId: responseData.id,
-                entryExists: responseData.exists,
-                entryIsDraft: responseData.isDraft
-            };
-
-            var $input = $('input[name="entryid"]');
-            console.log("Found?", $input.length);
-            if ($input.length === 0) {
-                console.log("Appending for element");
-                $input = $('<input type="hidden" name="entryid"/>');
-                $('#postform').append($input);
-            }
-            $input.val(responseData.id);
-        }
 
         if (entryData.entryId) {
             $('.entry-attachments').append($new_file);

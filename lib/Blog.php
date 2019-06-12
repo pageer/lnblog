@@ -1009,13 +1009,13 @@ class Blog extends LnBlogObject implements AttachmentContainer {
         # Upgrade the base blog directory first.  All other directories will
         # get a copy of the config.php created here.
         $wrappers = new WrapperGenerator($this->fs);
-        $ret = $wrappers->createDirectoryWrappers($this->home_path, BLOG_BASE, $inst_path);
+        $ret = $wrappers->createDirectoryWrappers($this->home_path, WrapperGenerator::BLOG_BASE, $inst_path);
         if (! is_array($ret)) return false;
         else $fiels = $ret;
 
         # Upgrade the articles.
         $path = Path::mk($this->home_path, BLOG_ARTICLE_PATH);
-        $ret = $wrappers->createDirectoryWrappers($path, BLOG_ARTICLES);
+        $ret = $wrappers->createDirectoryWrappers($path, WrapperGenerator::BLOG_ARTICLES);
         $files = array_merge($files, $ret);
 
         $dir_list = $this->fs->scan_directory($path, true);
@@ -1026,28 +1026,28 @@ class Blog extends LnBlogObject implements AttachmentContainer {
             $pb_path = Path::mk($ent_path, ENTRY_PINGBACK_DIR);
             $ret = $this->writeEntryFileIfNeeded($ent_path);
             $files = array_merge($files, $ret);
-            $ret = $wrappers->createDirectoryWrappers($ent_path, ARTICLE_BASE);
+            $ret = $wrappers->createDirectoryWrappers($ent_path, WrapperGenerator::ARTICLE_BASE);
             $files = array_merge($files, $ret);
-            $ret = $wrappers->createDirectoryWrappers($cmt_path, ENTRY_COMMENTS, 'article');
+            $ret = $wrappers->createDirectoryWrappers($cmt_path, WrapperGenerator::ENTRY_COMMENTS, 'article');
             $files = array_merge($files, $ret);
-            $ret = $wrappers->createDirectoryWrappers($tb_path, ENTRY_TRACKBACKS, 'article');
+            $ret = $wrappers->createDirectoryWrappers($tb_path, WrapperGenerator::ENTRY_TRACKBACKS, 'article');
             $files = array_merge($files, $ret);
-            $ret = $wrappers->createDirectoryWrappers($pb_path, ENTRY_PINGBACKS, 'article');
+            $ret = $wrappers->createDirectoryWrappers($pb_path, WrapperGenerator::ENTRY_PINGBACKS, 'article');
             $files = array_merge($files, $ret);
         }
 
         $path = mkpath($this->home_path, BLOG_ENTRY_PATH);
-        $ret = $wrappers->createDirectoryWrappers($path, BLOG_ENTRIES);
+        $ret = $wrappers->createDirectoryWrappers($path, WrapperGenerator::BLOG_ENTRIES);
         $files = array_merge($files, $ret);
         $dir_list = $this->fs->scan_directory($path, true);
         foreach ($dir_list as $yr) {
             $year_path = Path::mk($path, $yr);
-            $ret = $wrappers->createDirectoryWrappers($year_path, YEAR_ENTRIES);
+            $ret = $wrappers->createDirectoryWrappers($year_path, WrapperGenerator::YEAR_ENTRIES);
             $files = array_merge($files, $ret);
             $year_list = $this->fs->scan_directory($year_path, true);
             foreach ($year_list as $mn) {
                 $month_path = $year_path.PATH_DELIM.$mn;
-                $ret = $wrappers->createDirectoryWrappers($month_path, MONTH_ENTRIES);
+                $ret = $wrappers->createDirectoryWrappers($month_path, WrapperGenerator::MONTH_ENTRIES);
                 $files = array_merge($files, $ret);
                 $month_list = $this->fs->scan_directory($month_path, true);
                 foreach ($month_list as $ent) {
@@ -1057,13 +1057,13 @@ class Blog extends LnBlogObject implements AttachmentContainer {
                     $pb_path = Path::mk($ent_path, ENTRY_PINGBACK_DIR);
                     $ret = $this->writeEntryFileIfNeeded($ent_path);
                     $files = array_merge($files, $ret);
-                    $ret = $wrappers->createDirectoryWrappers($ent_path, ENTRY_BASE);
+                    $ret = $wrappers->createDirectoryWrappers($ent_path, WrapperGenerator::ENTRY_BASE);
                     $files = array_merge($files, $ret);
-                    $ret = $wrappers->createDirectoryWrappers($cmt_path, ENTRY_COMMENTS);
+                    $ret = $wrappers->createDirectoryWrappers($cmt_path, WrapperGenerator::ENTRY_COMMENTS);
                     $files = array_merge($files, $ret);
-                    $ret = $wrappers->createDirectoryWrappers($tb_path, ENTRY_TRACKBACKS);
+                    $ret = $wrappers->createDirectoryWrappers($tb_path, WrapperGenerator::ENTRY_TRACKBACKS);
                     $files = array_merge($files, $ret);
-                    $ret = $wrappers->createDirectoryWrappers($pb_path, ENTRY_PINGBACKS);
+                    $ret = $wrappers->createDirectoryWrappers($pb_path, WrapperGenerator::ENTRY_PINGBACKS);
                     $files = array_merge($files, $ret);
 
                     # Update the "pretty permalink" wrapper scripts
@@ -1080,10 +1080,24 @@ class Blog extends LnBlogObject implements AttachmentContainer {
                 }
             }
         }
-        $path = Path::mk($this->home_path, BLOG_ARTICLE_PATH);
-        $ret = $wrappers->createDirectoryWrappers($path, BLOG_ARTICLES);
+
+        # Upgrade the drafts.
         $path = Path::mk($this->home_path, BLOG_DRAFT_PATH);
-        $ret = $wrappers->createDirectoryWrappers($path, ENTRY_DRAFTS);
+        $dir_list = $this->fs->scan_directory($path, true);
+        foreach ($dir_list as $draft) {
+            $ent_path = Path::mk($path, $draft);
+            $ret = $this->writeEntryFileIfNeeded($ent_path);
+            $files = array_merge($files, $ret);
+            $ret = $wrappers->createDirectoryWrappers($ent_path, WrapperGenerator::DRAFT_ENTRY_BASE);
+            $files = array_merge($files, $ret);
+        }
+
+        $path = Path::mk($this->home_path, BLOG_DRAFT_PATH);
+        $ret = $wrappers->createDirectoryWrappers($path, WrapperGenerator::ENTRY_DRAFTS);
+        $files = array_merge($files, $ret);
+
+        $path = Path::mk($this->home_path, BLOG_ARTICLE_PATH);
+        $ret = $wrappers->createDirectoryWrappers($path, WrapperGenerator::BLOG_ARTICLES);
         $files = array_merge($files, $ret);
         $dir_list = $this->fs->scan_directory($path, true);
         foreach ($dir_list as $ar) {
@@ -1091,11 +1105,12 @@ class Blog extends LnBlogObject implements AttachmentContainer {
             $ret = $this->writeEntryFileIfNeeded($ar_path);
             $files = array_merge($files, $ret);
             $cmt_path = $ar_path.PATH_DELIM.ENTRY_COMMENT_DIR;
-            $ret = $wrappers->createDirectoryWrappers($ar_path, ARTICLE_BASE);
+            $ret = $wrappers->createDirectoryWrappers($ar_path, WrapperGenerator::ARTICLE_BASE);
             $files = array_merge($files, $ret);
-            $ret = $wrappers->createDirectoryWrappers($cmt_path, ENTRY_COMMENTS);
+            $ret = $wrappers->createDirectoryWrappers($cmt_path, WrapperGenerator::ENTRY_COMMENTS);
             $files = array_merge($files, $ret);
         }
+
         $this->sw_version = PACKAGE_VERSION;
         $this->last_upgrade = date('r');
         $ret = $this->writeBlogData();
@@ -1183,7 +1198,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
         $ret = $this->createNonExistentDirectory($fs, $this->home_path);
         if ($ret) {
             $wrappers = new WrapperGenerator($fs);
-            $result = $wrappers->createDirectoryWrappers($this->home_path, BLOG_BASE, $inst_path);
+            $result = $wrappers->createDirectoryWrappers($this->home_path, WrapperGenerator::BLOG_BASE, $inst_path);
             # Returns an array of errors, so convert empty array to true.
             $ret = $ret && empty($result);
         }
@@ -1192,7 +1207,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
         $ret = $ret && $this->createNonExistentDirectory($fs, $p);
 
         if ($ret) {
-            $result = $wrappers->createDirectoryWrappers($p, BLOG_ENTRIES);
+            $result = $wrappers->createDirectoryWrappers($p, WrapperGenerator::BLOG_ENTRIES);
             $ret = $ret && empty($result);
         }
         $ret = $ret && $this->createNonExistentDirectory($fs,

@@ -28,6 +28,11 @@ abstract class BasePages {
         $this->fs = $fs ? $fs : NewFS();
     }
 
+    public function routeRequestWithDefault($default_action) {
+        $action = GET('action') ?: $default_action;
+        $this->routeRequest($action);
+    }
+
     public function routeRequest($action = null) {
         $action_map = $this->getActionMap();
         $action = $action ?: GET('action');

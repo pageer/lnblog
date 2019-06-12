@@ -51,7 +51,8 @@ class CreateDraftTest extends PublisherTestBase {
         $this->fs->mkdir_rec(Argument::any())->willReturn(true);
         $this->fs->write_file(Argument::any(), Argument::any())->willReturn(true);
 
-        $this->wrappers->createDirectoryWrappers('./drafts', BLOG_DRAFTS)->shouldBeCalled();
+        $this->wrappers->createDirectoryWrappers('./drafts', WrapperGenerator::BLOG_DRAFTS)->shouldBeCalled();
+        $this->wrappers->createDirectoryWrappers('./drafts/02_1234', WrapperGenerator::DRAFT_ENTRY_BASE)->shouldBeCalled();
 
         $this->publisher->createDraft($entry, $this->getTestTime());
     }
@@ -63,7 +64,7 @@ class CreateDraftTest extends PublisherTestBase {
         $entry = $this->getTestEntry();
         $this->fs->is_dir('./drafts')->willReturn(false);
         $this->fs->file_exists(Argument::any())->willReturn(false);
-        $this->wrappers->createDirectoryWrappers('./drafts', BLOG_DRAFTS)->willReturn(array('Error!'));
+        $this->wrappers->createDirectoryWrappers('./drafts', WrapperGenerator::BLOG_DRAFTS)->willReturn(array('Error!'));
 
         $this->publisher->createDraft($entry, $this->getTestTime());
     }

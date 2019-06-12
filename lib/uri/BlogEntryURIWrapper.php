@@ -59,8 +59,7 @@ class BlogEntryURIWrapper extends LnBlogObject {
     function edit() { return $this->base_uri."?action=editentry"; }
     function editDraft() {
         $b = NewBlog();
-        return make_uri($b->uri('drafts'),
-                        array('action'=>'edit', 'draft'=>$this->object->entryID()));
+        return make_uri($b->uri('drafts') . $this->object->entryID());
     }
 
     function delete() {

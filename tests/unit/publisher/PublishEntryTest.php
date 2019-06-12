@@ -170,8 +170,8 @@ class PublishEntryTest extends PublisherTestBase {
         $this->fs->is_dir('./entries/2017')->willReturn(false);
         $this->fs->is_dir('./entries/2017/01')->willReturn(false);
 
-        $this->wrappers->createDirectoryWrappers('./entries/2017', YEAR_ENTRIES);
-        $this->wrappers->createDirectoryWrappers('./entries/2017/01', MONTH_ENTRIES);
+        $this->wrappers->createDirectoryWrappers('./entries/2017', WrapperGenerator::YEAR_ENTRIES);
+        $this->wrappers->createDirectoryWrappers('./entries/2017/01', WrapperGenerator::MONTH_ENTRIES);
 
         $this->publisher->publishEntry($entry, $this->getTestTime());
     }
@@ -179,10 +179,10 @@ class PublishEntryTest extends PublisherTestBase {
     public function testPublishEntry_WhenRenameSucceeds_CreatesWrappers() {
         $entry = $this->setUpDraftEntryForSuccessfulPublish();
 
-        $this->wrappers->createDirectoryWrappers('./entries/2017/01/02_1234', ENTRY_BASE);
-        $this->wrappers->createDirectoryWrappers('./entries/2017/01/02_1234/comments', ENTRY_COMMENTS);
-        $this->wrappers->createDirectoryWrappers('./entries/2017/01/02_1234/trackbacks', ENTRY_TRACKBACKS);
-        $this->wrappers->createDirectoryWrappers('./entries/2017/01/02_1234/pingbacks', ENTRY_PINGBACKS);
+        $this->wrappers->createDirectoryWrappers('./entries/2017/01/02_1234', WrapperGenerator::ENTRY_BASE);
+        $this->wrappers->createDirectoryWrappers('./entries/2017/01/02_1234/comments', WrapperGenerator::ENTRY_COMMENTS);
+        $this->wrappers->createDirectoryWrappers('./entries/2017/01/02_1234/trackbacks', WrapperGenerator::ENTRY_TRACKBACKS);
+        $this->wrappers->createDirectoryWrappers('./entries/2017/01/02_1234/pingbacks', WrapperGenerator::ENTRY_PINGBACKS);
 
        $this->publisher->publishEntry($entry, $this->getTestTime());
     }

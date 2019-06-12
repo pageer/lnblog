@@ -139,10 +139,10 @@ class PublishArticleTest extends PublisherTestBase {
     public function testPublishArticle_WhenPublishSucceeds_CreatesDirectoryWrappers() {
         $entry = $this->setUpTestArticleForSuccessfulPublish();
         
-        $this->wrappers->createDirectoryWrappers('./content/some_stuff', ARTICLE_BASE)->shouldBeCalled();
-        $this->wrappers->createDirectoryWrappers('./content/some_stuff/comments', ENTRY_COMMENTS)->shouldBeCalled();
-        $this->wrappers->createDirectoryWrappers('./content/some_stuff/trackback', ENTRY_TRACKBACKS)->shouldBeCalled();
-        $this->wrappers->createDirectoryWrappers('./content/some_stuff/pingback', ENTRY_PINGBACKS)->shouldBeCalled();
+        $this->wrappers->createDirectoryWrappers('./content/some_stuff', WrapperGenerator::ARTICLE_BASE)->shouldBeCalled();
+        $this->wrappers->createDirectoryWrappers('./content/some_stuff/comments', WrapperGenerator::ENTRY_COMMENTS)->shouldBeCalled();
+        $this->wrappers->createDirectoryWrappers('./content/some_stuff/trackback', WrapperGenerator::ENTRY_TRACKBACKS)->shouldBeCalled();
+        $this->wrappers->createDirectoryWrappers('./content/some_stuff/pingback', WrapperGenerator::ENTRY_PINGBACKS)->shouldBeCalled();
 
         $this->publisher->publishArticle($entry, $this->getTestTime());
     }
@@ -151,12 +151,12 @@ class PublishArticleTest extends PublisherTestBase {
         $entry = $this->setUpTestArticleForSuccessfulPublish();
         $this->fs->is_dir('./content/some_stuff')->willReturn(false);
         $this->fs->is_dir('./content')->willReturn(false);
-        $this->wrappers->createDirectoryWrappers('./content/some_stuff', ARTICLE_BASE)->willReturn(true);
-        $this->wrappers->createDirectoryWrappers('./content/some_stuff/comments', ENTRY_COMMENTS)->willReturn(true);
-        $this->wrappers->createDirectoryWrappers('./content/some_stuff/trackback', ENTRY_TRACKBACKS)->willReturn(true);
-        $this->wrappers->createDirectoryWrappers('./content/some_stuff/pingback', ENTRY_PINGBACKS)->willReturn(true);
+        $this->wrappers->createDirectoryWrappers('./content/some_stuff', WrapperGenerator::ARTICLE_BASE)->willReturn(true);
+        $this->wrappers->createDirectoryWrappers('./content/some_stuff/comments', WrapperGenerator::ENTRY_COMMENTS)->willReturn(true);
+        $this->wrappers->createDirectoryWrappers('./content/some_stuff/trackback', WrapperGenerator::ENTRY_TRACKBACKS)->willReturn(true);
+        $this->wrappers->createDirectoryWrappers('./content/some_stuff/pingback', WrapperGenerator::ENTRY_PINGBACKS)->willReturn(true);
 
-        $this->wrappers->createDirectoryWrappers('./content', BLOG_ARTICLES)->willReturn(true)->shouldBeCalled();
+        $this->wrappers->createDirectoryWrappers('./content', WrapperGenerator::BLOG_ARTICLES)->willReturn(true)->shouldBeCalled();
 
         $this->publisher->publishArticle($entry, $this->getTestTime());
     }
