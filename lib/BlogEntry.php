@@ -623,7 +623,7 @@ class BlogEntry extends Entry implements AttachmentContainer {
         return $ts ? $ts->format('Y-m-d H:i:s') : '';
     }
 
-    # Method shouldAutoPublish
+    # Method: shouldAutoPublish
     # Determine if a draft is ready to be auto-published
     #
     # Returns:

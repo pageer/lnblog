@@ -1475,10 +1475,21 @@ class WebPages extends BasePages {
         $del_uri = $ent->uri('delete');
         $edit_uri = $ent->uri('editDraft');
         $title = $ent->subject ? $ent->subject : $ent->date;
-        $ret = '<a href="'.$edit_uri.'">'.$title.'</a> '.
-               '<span style="font-size: 80%; color: gray;">' . date("Y-m-d", $ent->post_ts) .
-               '</span> (<a href="'.$del_uri.'">'._("Delete").'</a>)';
-        return $ret;
+        $date = date("Y-m-d", $ent->post_ts);
+        $edit_date = date("Y-m-d", $ent->timestamp);
+        $pub_date = $ent->getAutoPublishDate();
+        $markup_template = 
+            '<a class="title" href="%1$s">%2$s</a>' .
+            '<a class="delete" href="%5$s" title="' . _("Delete") . '">&times;</a>' .
+            '<br />' .
+            '<span class="create date">' . _('Created') . ' %3$s</span>';
+        if ($date != $edit_date) {
+            $markup_template .= '<span class="edit date">' . _('Last edit') . ' %4$s</span>';
+        }
+        if ($pub_date) {
+            $markup_template .= '<span class="pub date">' . _("Set to auto-publish at") . ' %6$s</span>';
+        }
+        return sprintf($markup_template, $edit_uri, $title, $date, $edit_date, $del_uri, $pub_date);
     }
 
     public function showdrafts() {
@@ -1510,8 +1521,11 @@ class WebPages extends BasePages {
         $linklist = array_reverse($linklist);
 
         $tpl->set("ITEM_LIST", $linklist);
+        $tpl->set("LIST_CLASS", "draft-list");
+        $tpl->set("ITEM_CLASS", "draft");
         $body = $tpl->process();
 
+        $this->getPage()->addStylesheet("drafts.css");
         $this->getPage()->title = $title;
         $this->getPage()->display($body, $this->blog);
     }

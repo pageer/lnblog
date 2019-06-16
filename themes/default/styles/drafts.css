@@ -1,0 +1,13 @@
+.draft-list .draft .date {
+    font-size: 80%;
+    color: gray;
+    diplay: inline-block;
+    margin-right: 1em;
+}
+
+.draft-list .draft .delete {
+    font-size: 120%;
+    font-weight: bold;
+    display: inline-block;
+    margin-left: 0.5em;
+}
