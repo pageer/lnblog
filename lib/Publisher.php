@@ -196,6 +196,8 @@ class Publisher {
         $path = $this->getEntryDraftPath($entry, $ts, $draft_path);
         $this->createEntryDraftDirectory($path);
 
+        $this->applyBlogDefaults($entry);
+
         $entry->file = Path::mk($path, ENTRY_DEFAULT_FILE);
         $entry->uid = $this->user->username();
         $entry->setDates($ts);
@@ -298,6 +300,11 @@ class Publisher {
             $this->http_client = new HttpClient();
         }
         return $this->http_client;
+    }
+
+    private function applyBlogDefaults($entry) {
+        $entry->has_html = $this->blog->default_markup;
+        $entry->send_pingback = $this->blog->auto_pingback;
     }
 
     private function getArticleDirectoryPath($entry, $basepath) {
