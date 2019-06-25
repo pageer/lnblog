@@ -270,15 +270,61 @@ a.anchor:hover {
 	color: gray;
 }
 
+#responsive-menu,
+#responsive-close {
+    display: none;
+}
+
 /* Don't scrunch too far on small screens. */
 @media all and (max-width: 600px) {
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    #responsive-menu {
+        float: left;
+        font-size: 200%;
+        display: block;
+    }
+
+    #responsive-menu.hide {
+        display: none;
+    }
+
+    #responsive-close {
+        text-align: right;
+    }
+
+    #responsive-close a {
+        color: white !important;
+        text-decoration: none !important;
+        font-size: 200%;
+    }
+
     #pagecontent,
     #sidebar {
         float: none;
         width: 100%;
     }
+
     #banner {
         font-size: 80%;
+    }
+
+    #sidebar {
+        display: none;
+        background-color: rgba(249, 249, 249, 0.2);
+        border-bottom: 1px solid black;
+        position: absolute;
+        top: 0;
+        margin: 0;
+        padding: 0;
+    }
+
+    #sidebar.visible,
+    #responsive-close.visible {
+        display: block;
     }
 }
 

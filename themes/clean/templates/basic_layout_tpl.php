@@ -21,6 +21,7 @@
 <body>
 <!-- Site banner -->
 <div id="banner">
+    <div id="responsive-menu"><a href="#">&#9776;</a></div>
 <?php
 # Activate plugins that output the banner content.
 #
@@ -60,6 +61,7 @@ EventRegister::instance()->activateEventFull($tmp=false, "banner", "OutputComple
     </div>
     <!-- A sidebar -->
     <div id="sidebar">
+        <div id="responsive-close"><a href="#">&times;</a></div>
     <?php 
     # Activate the sidebar plugins.
     EventRegister::instance()->activateEventFull($tmp=false, "sidebar", "OnOutput");

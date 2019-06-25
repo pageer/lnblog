@@ -72,3 +72,16 @@ lnblog.addEvent(window, 'load', function() {
         };
     }
 });
+
+$(document).ready(function () {
+    $('#responsive-menu a').on('click', function () {
+        $('#sidebar').toggleClass('visible', true);
+        $('#responsive-close').toggleClass('visible', true);
+        $('#responsive-menu').toggleClass('hide', true);
+    });
+    $('#responsive-close a').on('click', function () {
+        $('#sidebar').toggleClass('visible', false);
+        $('#responsive-close').toggleClass('visible', false);
+        $('#responsive-menu').toggleClass('hide', false);
+    });
+});
