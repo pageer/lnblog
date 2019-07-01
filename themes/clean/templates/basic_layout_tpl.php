@@ -61,7 +61,12 @@ EventRegister::instance()->activateEventFull($tmp=false, "banner", "OutputComple
     </div>
     <!-- A sidebar -->
     <div id="sidebar">
-        <div id="responsive-close"><a href="#">&times;</a></div>
+        <div id="responsive-close">
+            <a href="#">
+                <span class="close-label"><?php p_("Close menu")?></span>
+                <span class="x">&times;</span>
+            </a>
+        </div>
     <?php 
     # Activate the sidebar plugins.
     EventRegister::instance()->activateEventFull($tmp=false, "sidebar", "OnOutput");

@@ -284,8 +284,9 @@ a.anchor:hover {
 
     #responsive-menu {
         float: left;
-        font-size: 200%;
+        font-size: 3em;
         display: block;
+        margin: 0 6px;
     }
 
     #responsive-menu.hide {
@@ -299,7 +300,15 @@ a.anchor:hover {
     #responsive-close a {
         color: white !important;
         text-decoration: none !important;
+    }
+
+    #responsive-close a .x {
         font-size: 200%;
+    }
+
+    #responsive-close a .close-label {
+        font-size: 120%;
+        vertical-align: text-bottom;
     }
 
     #pagecontent,
@@ -310,11 +319,18 @@ a.anchor:hover {
 
     #banner {
         font-size: 80%;
+        border-left: 0;
+        border-right: 0;
+    }
+
+    #menubar {
+        margin-right: 0;
+        margin-left: 0;
     }
 
     #sidebar {
         display: none;
-        background-color: rgba(249, 249, 249, 0.2);
+        background-color: rgba(86, 86, 86, 0.8);
         border-bottom: 1px solid black;
         position: absolute;
         top: 0;
