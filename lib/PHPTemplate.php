@@ -36,6 +36,7 @@ class PHPTemplate extends LnBlogObject {
     protected $file;   # The name of the template file to use.
     protected $vars;   # An array of variables to register in the template.
     protected $search_paths = array();  # The paths on which to search for templates.
+    protected $block_registry = array();
 
     # Property: helper_output
     # Whether HTML helpers should output their data in addition to returning it. */
@@ -185,8 +186,60 @@ class PHPTemplate extends LnBlogObject {
         return file_exists(Path::mk($path, $file));
     }
 
+    # Method: block
+    # Defines a template block for future use.  This is doen by associating
+    # a name with a function that outputs the desired markup.
+    #
+    # Parameters:
+    # name             - (string) The name of the template block, normally 
+    #                    of the form "filename.section", though this is 
+    #                    not enforced.
+    # content_callback - (callable) A function that outputs the desired 
+    #                    markup for this block.  It takes one parameter, 
+    #                    an array of values to inject into the template.
+    public function block($name, $content_callback) {
+        $this->block_registry[$name] = $content_callback;
+    }
+
+    # Method: showBlock
+    # Outputs a template block using the data set for this template.
+    # Note that the block must have been previously define.  Note that this 
+    # can be called inside a block definition to achieve block nesting.
+    #
+    # Parameters:
+    # name - (string) The name of the template block to output.
+    #
+    # Returns:
+    # The string returned by the block function, if any.
+    public function showBlock($name) {
+        $callback = $this->block_registry[$name];
+        return $callback($this->vars);
+    }
+
+    # Method: extends
+    # This declares that the current temlpate file extends one of the default
+    # theme template files.  This allows you to override specific blocks in a
+    # default template without having to duplicate all the other code.
+    #
+    # Note that this method should be called at the *top* of the template 
+    # before any of the blocks are defined.  If it isn't, you risk your
+    # blocks being clobbered by the default template.
+    #
+    # Parameters:
+    # template_name - (string) The name of the template to extend.
+    # theme - (string) The theme the template is in, "default" by default.
+    public function extends($template_name, $theme = 'default') {
+        $file = Path::mk(INSTALL_ROOT, 'themes', $theme, 'templates', $template_name);
+        extract($this->vars, EXTR_OVERWRITE);
+        include $file;
+    }
+
     /* Method: process
        Process the template and get the output.
+
+       If the template is using blocks rather than plain-old PHP/HTML, then
+       this method will look for a block named "main" and execute it if 
+       it is found.
 
        Parameters:
        return_results - (boolean) Determines whether the output should be returned
@@ -198,6 +251,9 @@ class PHPTemplate extends LnBlogObject {
         ob_start();
         extract($this->vars, EXTR_OVERWRITE);
         include $this->getTemplatePath();
+        if (isset($this->block_registry['main'])) {
+            $this->showBlock('main');
+        }
         if ($return_results) {
             $ret = ob_get_contents();
             ob_end_clean();

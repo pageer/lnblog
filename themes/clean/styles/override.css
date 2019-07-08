@@ -1,0 +1,15 @@
+.blogentry .comment.header {
+    padding: 0;
+    margin: 1em 0;
+    background: transparent;
+}
+
+.blogentry .comment.data {
+    padding: 1%;
+}
+
+.blogentry .comment.footer {
+    background-color: transparent;
+    padding: 0;
+    border: none;
+}

@@ -308,6 +308,9 @@ class Page extends LnBlogObject {
             header($name.": ".$value);
         }
     
+        // Put this last so that it can actually override things more easily.
+        $this->addStylesheet("override.css");
+
         $this->addMeta($content_type, false, "Content-type");
         $this->addMeta(PACKAGE_NAME." ".PACKAGE_VERSION, "generator");
         

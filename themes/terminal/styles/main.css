@@ -161,6 +161,85 @@ q { font-style: italic; }
 	background-color: black;
 }
 
+/***** Responsive layout stuff *****/
+#responsive-menu,
+#responsive-close {
+    display: none;
+}
+
+/* Don't scrunch too far on small screens. */
+@media all and (max-width: 600px) {
+    body,
+    #pagecontent,
+    textarea#data {
+        margin: 0;
+        padding: 0;
+    }
+
+    textarea#data {
+        width:99%;
+    }
+
+    #responsive-menu {
+        float: left;
+        font-size: 3em;
+        display: block;
+        margin: 0 6px;
+    }
+
+    #responsive-menu.hide {
+        display: none;
+    }
+
+    #responsive-close {
+        text-align: right;
+    }
+
+    #responsive-close a {
+        text-decoration: none !important;
+    }
+
+    #responsive-close a .x {
+        font-size: 200%;
+    }
+
+    #responsive-close a .close-label {
+        font-size: 120%;
+        vertical-align: text-bottom;
+    }
+
+    #pagecontent,
+    #sidebar {
+        width: 100%;
+    }
+
+    #banner {
+        font-size: 80%;
+        border-left: 0;
+        border-right: 0;
+    }
+
+    #menubar {
+        margin-right: 0;
+        margin-left: 0;
+    }
+
+    #sidebar {
+        display: none;
+        background: rgba(0, 0, 0, 0.8);
+        border-bottom: 1px solid white;
+        position: absolute;
+        top: 0;
+        margin: 0;
+        padding: 0;
+    }
+
+    #sidebar.visible,
+    #responsive-close.visible {
+        display: block;
+    }
+}
+
 @media print {
 
 	/* Styles for the page content area. */
