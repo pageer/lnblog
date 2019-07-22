@@ -559,6 +559,19 @@ function get_ip() {
     else return '127.0.0.1';
 }
 
+# Function: get_user_agent
+# Get the user's user-agent string, or a default if it is not set.
+#
+# Returns:
+# A string representing the user agent.
+function get_user_agent() {
+    if (isset($_SERVER['HTTP_USER_AGENT'])) {
+        return $_SERVER['HTTP_USER_AGENT'];
+    } else {
+        return 'Unknown/0.0';
+    }
+}
+
 # Returns the string to use for a config.php file.  The levels parameter
 # indicates how many levels down the directory containing this script is
 # from the blog root.  Note that this should account for situations where

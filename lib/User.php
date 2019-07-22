@@ -63,47 +63,19 @@ class User extends LnBlogObject {
         return $user->checkLogin();
     }
 
-    public function __construct($uname=false, $pw=false, FS $fs = null) {
+    public function __construct($uname=false, $pw=false, FS $fs = null, GlobalFunctions $globals = null) {
 
         $this->username = $uname ? $uname : '';
         $this->fs = $fs ?: NewFS();
+        $this->globals = $globals ?: new GlobalFunctions();
 
         $this->exclude_fields = array('salt', 'passwd', 'username', 'set_cookies', 'fs');
 
-        if ($uname && $this->fs->realpath(mkpath(USER_DATA_PATH,$uname,"passwd.php"))) {
+        $this->loadUserCredentials();
 
-            $this->username = $uname;
-            $password_hash = include USER_DATA_PATH."/$uname/passwd.php";
-            if ($password_hash === 1) {
-                $this->passwd = $pwd;
-                $this->salt = $salt;
-            } else {
-                $this->passwd = $password_hash;
-                $this->salt = false;
-            }
-
-            $xmlfile = $this->fs->realpath(mkpath(USER_DATA_PATH,$uname,self::USER_PROFILE_FILE));
-            $inifile = $this->fs->realpath(mkpath(USER_DATA_PATH,$uname,"user.ini"));
-
-            if ($xmlfile) {
-                $this->deserializeXML($xmlfile);
-            } elseif ($inifile) {
-                $ini = NewIniParser($inifile);
-                $this->fullname = $ini->value("userdata", "name", "");
-                $this->email    = $ini->value("userdata", "email", "");
-                $this->homepage = $ini->value("userdata", "homepage", "");
-                $this->default_group =
-                    $ini->value('userdata','default_group',
-                                System::instance()->sys_ini->value('security',
-                                                        'NewUserDefaultGroup',
-                                                        ''));
-                $this->custom = $ini->getSection("customdata");
-            }
-            $_SESSION["user-".$uname] = serialize($this);
-
+        if ($pw) {
+            $this->login($pw);
         }
-
-        if ($pw) $this->login($pw);
 
     }
 
@@ -113,10 +85,12 @@ class User extends LnBlogObject {
     # Returns:
     # True if the user exists, false otherwise.
     public function exists($uname=false) {
-        if (! $uname) $uname = $this->username;
-        return $this->fs->realpath(mkpath(USER_DATA_PATH,$uname,"passwd.php")) &&
-               ( $this->fs->realpath(mkpath(USER_DATA_PATH,$uname,self::USER_PROFILE_FILE)) ||
-                 $this->fs->realpath(mkpath(USER_DATA_PATH,$uname,"user.ini")) );
+        if (! $uname) {
+            $uname = $this->username;
+        }
+        return $this->fs->realpath($this->getPath("passwd.php", $uname)) &&
+               ( $this->fs->realpath($this->getPath(self::USER_PROFILE_FILE, $uname)) ||
+                 $this->fs->realpath($this->getPath("user.ini", $uname)) );
     }
 
     # Method: profileUrl
@@ -149,16 +123,26 @@ class User extends LnBlogObject {
     # Parameters:
     # tpl - The template to put the data in, passed by reference.
     public function exportVars($tpl) {
-        if ($this->username) $tpl->set("USER_ID", $this->username);
-        if ($this->fullname) $tpl->set("USER_NAME", $this->fullname);
-        if ($this->email) $tpl->set("USER_EMAIL", $this->email);
-        if ($this->default_group) $tpl->set("DEFAULT_GROUP",$this->defaultGroup());
+        if ($this->username) {
+            $tpl->set("USER_ID", $this->username);
+        }
+        if ($this->fullname) {
+            $tpl->set("USER_NAME", $this->fullname);
+        }
+        if ($this->email) {
+            $tpl->set("USER_EMAIL", $this->email);
+        }
+        if ($this->default_group) {
+            $tpl->set("DEFAULT_GROUP",$this->defaultGroup());
+        }
         $tpl->set("GROUPS", $this->groups());
         if (strpos($this->homepage, "http://") === false &&
             trim($this->homepage) != "") {
             $this->homepage = "http://".$this->homepage;
         }
-        if ($this->homepage) $tpl->set("USER_HOMEPAGE", $this->homepage);
+        if ($this->homepage) {
+            $tpl->set("USER_HOMEPAGE", $this->homepage);
+        }
         $tpl->set("USER_DISPLAY_NAME", $this->displayName() );
         $tpl->set("PROFILE_LINK", $this->getProfileUrl());
     }
@@ -188,17 +172,20 @@ class User extends LnBlogObject {
     # Returns:
     # True if the changes were successfully saved, false otherwise.
     public function save() {
-        if (!$this->username ||! $this->passwd) return false;
-        $fs = NewFS();
+        if (!$this->username ||! $this->passwd) {
+            return false;
+        }
 
         $data = "<?php\nreturn '" . $this->passwd . "';\n";
-        if (! $this->fs->is_dir(USER_DATA_PATH.PATH_DELIM.$this->username)) {
-            $ret = $fs->mkdir(USER_DATA_PATH.PATH_DELIM.$this->username);
-            if (! $ret) return $ret;
+        if (! $this->fs->is_dir($this->getPath(''))) {
+            $ret = $this->fs->mkdir($this->getPath(''));
+            if (! $ret) {
+                return $ret;
+            }
         }
-        $ret = write_file(mkpath(USER_DATA_PATH,$this->username,"passwd.php"), $data);
+        $ret = $this->fs->write_file($this->getPath("passwd.php"), $data);
         $data = $this->serializeXML();
-        $ret = write_file(mkpath(USER_DATA_PATH,$this->username,self::USER_PROFILE_FILE), $data);
+        $ret = $this->fs->write_file($this->getPath(self::USER_PROFILE_FILE), $data);
         if ($ret) {
             $_SESSION["user-".$this->username] = serialize($this);
         }
@@ -221,9 +208,10 @@ class User extends LnBlogObject {
             $this->passwd = password_hash($pwd, PASSWORD_DEFAULT);
 
             # Prevent password change from logging out on cookie-only config.
-            if ( $this->username == COOKIE(CURRENT_USER) ) {
-                $this->setCookie(PW_HASH, $this->passwd,
-                    (LOGIN_EXPIRE_TIME ? time() + LOGIN_EXPIRE_TIME:false));
+            if ( $this->username == COOKIE($this->config('CURRENT_USER')) ) {
+                $expire_time = $this->config('LOGIN_EXPIRE_TIME');
+                $this->setCookie($this->config('PW_HASH'), $this->passwd,
+                    ($expire_time ? time() + $expire_time : false));
             }
         }
     }
@@ -329,6 +317,7 @@ class User extends LnBlogObject {
     #
     # Parameters:
     # pwd - The password used to log in.
+    # time - Current time, injectable for testing purposes.
     #
     # Returns:
     # False if the authentication fails, true otherwise.
@@ -338,54 +327,62 @@ class User extends LnBlogObject {
             return false;
         }
 
-        $ret = false;
-        $ts = gmdate("M d Y H:i:s", time());
-        if ($this->checkPassword($pwd)) {
-            # If we have the old password format, convert on successful login
-            if (! $this->isNewFormatPasswordFile()) {
-                $this->passwd = password_hash($pwd, PASSWORD_DEFAULT);
-                $this->salt = false;
-                $this->save();
-            }
+        $current_user = $this->config('CURRENT_USER');
+        $login_token = $this->config('LOGIN_TOKEN');
+        $last_login_time = $this->config('LAST_LOGIN_TIME');
+        $login_expire_time = $this->config('LOGIN_EXPIRE_TIME');
+        $pw_hash = $this->config('PW_HASH');
 
-            if (AUTH_USE_SESSION) {
-                # Create a login token.
-                $token = md5(get_ip().$ts);
-                $_SESSION[CURRENT_USER] = $this->username;
-                $_SESSION[LOGIN_TOKEN] = $token;
-                $_SESSION[LAST_LOGIN_TIME] = $ts;
-                $this->setCookie(LAST_LOGIN_TIME, "$ts",
-                    (LOGIN_EXPIRE_TIME ? time()+LOGIN_EXPIRE_TIME:false));
-                $this->setCookie(CURRENT_USER, $this->username,
-                    (LOGIN_EXPIRE_TIME ? time()+LOGIN_EXPIRE_TIME:false));
-                $this->setCookie(LOGIN_TOKEN, $token,
-                    (LOGIN_EXPIRE_TIME ? time()+LOGIN_EXPIRE_TIME:false));
-                $ret = true;
-            } else {
-                $this->setCookie(CURRENT_USER, $this->username,
-                    (LOGIN_EXPIRE_TIME ? time() + LOGIN_EXPIRE_TIME:false));
-                $this->setCookie(PW_HASH, md5($this->passwd.get_ip()),
-                    (LOGIN_EXPIRE_TIME ? time() + LOGIN_EXPIRE_TIME:false));
-                $ret = true;
-            }
+        $time = $this->globals->time();
+        $expire_time = $login_expire_time ? $time + $login_expire_time : false;
+        $ts = gmdate("M d Y H:i:s", $time);
+
+        if (!$this->checkPassword($pwd)) {
+            return false;
         }
-        return $ret;
+
+        # If we have the old password format, convert on successful login
+        if (! $this->isNewFormatPasswordFile()) {
+            $this->passwd = password_hash($pwd, PASSWORD_DEFAULT);
+            $this->salt = false;
+            $this->save();
+        }
+
+        if ($this->config('AUTH_USE_SESSION')) {
+            # Create a login token.
+            $token = md5($this->getTokenLockComponent() . $ts);
+            $_SESSION[$current_user] = $this->username;
+            $_SESSION[$login_token] = $token;
+            $_SESSION[$last_login_time] = $ts;
+            $this->setCookie($last_login_time, "$ts", $expire_time);
+            $this->setCookie($current_user, $this->username, $expire_time);
+            $this->setCookie($login_token, $token, $expire_time);
+        } else {
+            $this->setCookie($current_user, $this->username, $expire_time);
+            $this->setCookie($pw_hash, md5($this->passwd . $this->getTokenLockComponent()), $expire_time);
+        }
+        return true;
     }
 
     # Method: logout
     # Logs the user out and destroys login tokens.
     # Note that this is also subject to <AUTH_USE_SESSION>
     public function logout() {
-        if (AUTH_USE_SESSION) {
-            unset($_SESSION[CURRENT_USER]);
-            unset($_SESSION[LOGIN_TOKEN]);
-            unset($_SESSION[LAST_LOGIN_TIME]);
-            $this->setCookie(CURRENT_USER, "", time() - 3600);
-            $this->setCookie(LOGIN_TOKEN, "", time() - 3600);
-            $this->setCookie(LAST_LOGIN_TIME, "", time() - 3600);
+        $current_user = $this->config('CURRENT_USER');
+        $login_token = $this->config('LOGIN_TOKEN');
+        $last_login_time = $this->config('LAST_LOGIN_TIME');
+        $login_expire_time = $this->config('LOGIN_EXPIRE_TIME');
+        $pw_hash = $this->config('PW_HASH');
+        if ($this->config('AUTH_USE_SESSION')) {
+            unset($_SESSION[$current_user]);
+            unset($_SESSION[$login_token]);
+            unset($_SESSION[$last_login_time]);
+            $this->setCookie($current_user, "", time() - 3600);
+            $this->setCookie($login_token, "", time() - 3600);
+            $this->setCookie($last_login_time, "", time() - 3600);
         } else {
-            $this->setCookie(CURRENT_USER, "", time() - 3600);
-            $this->setCookie(PW_HASH, "", time() - 3600);
+            $this->setCookie($current_user, "", time() - 3600);
+            $this->setCookie($pw_hash, "", time() - 3600);
         }
     }
 
@@ -404,16 +401,22 @@ class User extends LnBlogObject {
             return false;
         }
 
+        $current_user = $this->config('CURRENT_USER');
+        $login_token = $this->config('LOGIN_TOKEN');
+        $last_login_time = $this->config('LAST_LOGIN_TIME');
+        $login_expire_time = $this->config('LOGIN_EXPIRE_TIME');
+        $pw_hash = $this->config('PW_HASH');
+
         $auth_ok = false;
 
-        if (AUTH_USE_SESSION) {
+        if ($this->config('AUTH_USE_SESSION')) {
             # Check the stored login token and time against the one for the
             # current session.  Return false on failure, or if the current
             # session doesn't belong to the user we want.
-            $cookie_ts = COOKIE(LAST_LOGIN_TIME);
-            $auth_token = md5(get_ip().$cookie_ts);
-            $auth_ok = ($auth_token == SESSION(LOGIN_TOKEN) );
-            $auth_ok = $auth_ok && ($cookie_ts == SESSION(LAST_LOGIN_TIME) );
+            $cookie_ts = COOKIE($last_login_time);
+            $auth_token = md5($this->getTokenLockComponent() . $cookie_ts);
+            $auth_ok = ($auth_token == SESSION($login_token) );
+            $auth_ok = $auth_ok && ($cookie_ts == SESSION($last_login_time) );
             if ($uname) {
                 $auth_ok = $auth_ok && ($this->username == $uname);
             }
@@ -421,10 +424,10 @@ class User extends LnBlogObject {
             # Check the cookies for the user and password hash and compare to
             # the password hash for this user on the server.
             # This is NOT secure, but it is convenient.
-            $usr = COOKIE(CURRENT_USER);
-            $pwhash = COOKIE(PW_HASH);
+            $usr = COOKIE($current_user);
+            $pwhash = COOKIE($pw_hash);
             $auth_ok = ($this->username == $usr &&
-                        md5($this->passwd.get_ip()) == $pwhash);
+                        md5($this->passwd . $this->getTokenLockComponent()) == $pwhash);
         }
 
         return $auth_ok;
@@ -438,7 +441,7 @@ class User extends LnBlogObject {
     # false otherwise.  Note that the system administrator's username
     # is controlled by the <ADMIN_USER> configuration constant.
     public function isAdministrator() {
-        return ($this->username == ADMIN_USER ||
+        return ($this->username == $this->config('ADMIN_USER') ||
                 System::instance()->inGroup($this->username, 'administrators'));
     }
 
@@ -448,17 +451,54 @@ class User extends LnBlogObject {
         $this->set_cookies = $enabled;
     }
 
+    # Method: loadUserCredentials
+    # Load the user's password and any metadata.
+    private function loadUserCredentials() {
+        $passwd_path = $this->getPath( "passwd.php");
+        if (!$this->username || !$this->fs->realpath($passwd_path)) {
+            return;
+        }
+
+        $password_hash = include $this->getPath("passwd.php");
+        if ($password_hash === 1) {
+            $this->passwd = $pwd;
+            $this->salt = $salt;
+        } else {
+            $this->passwd = $password_hash;
+            $this->salt = false;
+        }
+
+        $xmlfile = $this->fs->realpath($this->getPath(self::USER_PROFILE_FILE));
+        $inifile = $this->fs->realpath($this->getPath("user.ini"));
+
+        if ($xmlfile) {
+            $this->deserializeXML($xmlfile);
+        } elseif ($inifile) {
+            $ini = NewIniParser($inifile);
+            $this->fullname = $ini->value("userdata", "name", "");
+            $this->email    = $ini->value("userdata", "email", "");
+            $this->homepage = $ini->value("userdata", "homepage", "");
+            $this->default_group =
+                $ini->value('userdata','default_group',
+                            System::instance()->sys_ini->value('security',
+                                                    'NewUserDefaultGroup',
+                                                    ''));
+            $this->custom = $ini->getSection("customdata");
+        }
+        $_SESSION["user-".$this->username] = serialize($this);
+    }
+
     private function defaultProfileUrl() {
         $blog = NewBlog();
-        if ($this->fs->file_exists(mkpath(USER_DATA_PATH,$this->username,"index.php"))) {
+        if ($this->fs->file_exists($this->getPath("index.php"))) {
             $qs = $blog->isBlog() ? array('blog'=>$blog->blogid) : false;
-            $ret = make_uri(localpath_to_uri(USER_DATA_PATH."/".$this->username."/"), $qs);
+            $ret = make_uri(localpath_to_uri($this->getPath('')), $qs);
         } else {
             $qs = array("action" => "profile", "user"=>$this->username);
             if ($blog->isBlog()) {
                 $qs['blog'] = $blog->blogid;
             }
-            $ret = make_uri(INSTALL_ROOT_URL."index.php", $qs);
+            $ret = make_uri($this->config('INSTALL_ROOT_URL')."index.php", $qs);
         }
         return $ret;
     }
@@ -476,13 +516,41 @@ class User extends LnBlogObject {
     }
 
     private function setCookie($name, $value = '', $expires = 0) {
-        if ($this->set_cookies) {
-            set_domain_cookie($name, $value, $expires);
+        $force_https_login = $this->config('FORCE_HTTPS_LOGIN');
+        $force_https = $this->config('FORCE_HTTPS_LOGIN');
+        $domain_name = $this->ifConfig('DOMAIN_NAME', '');
+        $can_send_over_protocol = !$force_https_login || SERVER('HTTPS');
+        if ($this->set_cookies && $can_send_over_protocol) {
+            $domain = $domain_name ? ("." . $domain_name) : '';
+            $this->globals->setcookie($name, $value, $expires, "/", $domain, $force_https);
         }
     }
 
     private function isNewFormatPasswordFile() {
+        # In the new format, the salt is included in the password hash.
         return $this->salt === false;
     }
 
+    private function getTokenLockComponent() {
+        return $this->config('LOGIN_IP_LOCK') ? get_ip() : get_user_agent();
+    }
+
+    private function getPath($file, $username = '') {
+        $user_data_path = $this->config('USER_DATA_PATH');
+        if (!$username) {
+            $username = $this->username;
+        }
+        return Path::mk($user_data_path, $username, $file);
+    }
+
+    private function config($var) {
+        return $this->globals->constant($var);
+    }
+
+    private function ifConfig($var, $default) {
+        if ($this->globals->defined($var)) {
+            return $this->globals->constant($var);
+        }
+        return $default;
+    }
 }

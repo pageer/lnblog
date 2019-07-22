@@ -447,6 +447,23 @@ define("FILE_UPLOAD_TARGET_DIRECTORIES", "files");
 # *Default* is true.
 @define("AUTH_USE_SESSION", true);
 
+# Constant: LOGIN_IP_LOCK
+# Lock logins to the current IP address, so that the user will be
+# logged out if the IP changes.  If false, then logins will be 
+# locked to the user agent instead.
+#
+# *Default* is false.
+@define("LOGIN_IP_LOCK", false);
+
+# Constant: FORCE_HTTPS_LOGIN
+# Force all logins to go through HTTPS.  Non-https attempts will 
+# be redirected and/or rejected.
+#
+# Note that this is not yet fully implemented.
+#
+# *Default* is false.
+@define("FORCE_HTTPS_LOGIN", false);
+
 # Constant: ADMIN_USER
 # Username of site administrator.  This is the only one who can add or
 # delete blogs.
