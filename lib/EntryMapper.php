@@ -20,7 +20,7 @@ class EntryMapper {
             $dir_path = dirname($local_path);
             $content = file($local_path);
 
-            $re = "/DIRECTORY_SEPARATOR.'(\d+_\d+)'.DIRECTORY_SEPARATOR/";
+            $re = "/DIRECTORY_SEPARATOR\s*.\s*['\"](\d+_\d+)['\"]\s*.\s*DIRECTORY_SEPARATOR/";
 
             $dir = '';
             if (preg_match($re, $content[0], $matches)) {
