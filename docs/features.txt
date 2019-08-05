@@ -13,11 +13,10 @@ Section: Core Features
 - Comments on both articles and entries.
 - Add tags (topics) to entries.
 - Draft entries with scheduled publication.
-- Supports TrackBack and Pingback notifications.
+- Supports notifications via Webmention, Pingback, and TrackBack.
 - Multiple user accounts.
 - Multiple weblogs per instance, with support for multiple subdomains.
 - Upload files to blogs, entries, and articles.
-- Can work with PHP's *safe_mode* turned on.
 - Post in multiple formats (plain text, HTML, Markdown, or a dialect of BBCode).
 - Support for Blogger 1.0 and MetaWeblog APIs.
 - Support for internationalization.
@@ -36,11 +35,11 @@ available plugins, refer to the "Standard Plugins" section of this documentation
 - Content Ban - Block comment/trackback/pingback spam based on regular expressions.
 - Disable Comment - Turn off comments/trackbacks/pingbacks for the entire blog.
 - Ipban - Block comments/trackbacks/pingbacks based on all or part of the IP address.
-- Linksleeve - Detect comment/trackback/pingback spam using <Linksleeve at http://www.linksleeve.org>.
 - Menubar Breadcrumbs - Put a "breadcrmb trail" in the page header.
 - Menubar Sitemap - Customizable site map or blog list for the page header.
+- Page Metatags - Customize META tags for descriptions, keywords, etc.
 - Private Blog - Make your blog private, so only specified users can access it.
-- Reply Notifier - Send e-mail notifications for comments/trackbacks/pingbacks
+- Reply Notifier - Send e-mail notifications for comments/trackbacks/pingbacks/webmentions.
 - Rss2 Generator - Automatically create RSS feeds for entries and comments.
 - Sidebar Archives - Show sidebar links to past months or years with entries.
 - Sidebar Articles - Show links to static articles.

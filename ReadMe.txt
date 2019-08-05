@@ -1,5 +1,5 @@
 LnBlog: A flexible file-base weblog
-Copyright (C) 2005-2011 Peter A. Geer <pageer@skepticats.com>
+Copyright (C) 2005-2019 Peter A. Geer <pageer@skepticats.com>
 
 About LnBlog
 ------------
@@ -18,7 +18,7 @@ http://www.skepticats.com/lnblog/content/download/lnblog_docs.zip
 
 Requirements
 ------------
-LnBlog needs a web server with PHP 5.3 or greater installed and the ability to
+LnBlog needs a web server with PHP 5.6 or greater installed and the ability to
 write to the file system.  Both Apache and IIS are supported and no database
 is required.  File writing through FTP is also supported, but is no longer a
 recommended configuration.  Support for the CURL, gettext, and either
@@ -66,7 +66,7 @@ http://www.skepticats.com/lnblog/content/plugins/
 License
 -------
 LnBlog: A flexible file-base weblog
-Copyright (C) 2005-2011 Peter A. Geer <pageer@skepticats.com>
+Copyright (C) 2005-2019 Peter A. Geer <pageer@skepticats.com>
 
 This program is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software 

@@ -1,3 +1,31 @@
+21-Feb-2019: Version 2.0.0
+Feature request #91: Add uploaded file awareness
+Feature request #72: Add webmention support
+Bug report #90: Plugin loading form broken
+Bug report #89: XSL sheet doesn't load - cross-domain request blocked
+Enhancement #58: Documentation cleanup
+Bug report #82: Article and pingback settings not saved with draft
+Enhancement #15: Separate admin pages
+Bug report #20: Code uses include_path to find config and other files
+Task #46: Switch to PHPUnit
+Bug report #83: TinyMCE plugin override of markup type is confsing
+Bug report #87: Make SSL work
+Bug report #75: Edit post link goes to edit blog
+Bug report #74: PCRE error in Blog::getPathFromEnvironment()
+
+12-Aug-2015: Version 1.3.0
+Bug report #73: Comments do not show homepage
+Enhancement #52: Fix editor form layout
+Enhancement #67: Clean up API stuff
+Feature request #69: Admin interface to remove blogs
+Bug report #71: Search plugin uses POST
+Bug report #68: Getting blog in subdirectory doesn't work properly
+Bug report #59: Need to be able to disable HTML editor on files
+Enhancement #60: Search plugin providers
+Feature request #61: Markdown text filter
+Feature request #62: Add support for Composer
+Feature request #63: Add a build system that invokes Composer
+
 06-Jun-2014: version 1.2.0
 Bug report 1: Missing security checks (pageer) - Fixed  
 Enhancement 2: Allow non-sucky profile links 

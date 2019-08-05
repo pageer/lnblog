@@ -20,14 +20,14 @@ re-arranged from the plugin management page.
 
 Section: Requirements
 
-LnBlog requires PHP 5.3 and  the ability to write files
-to the web server.  LnBlog *does* support running with *safe_mode* enabled by using an FTP
-connection to the local host.  However, it is preferable to simply use a server configuration
-that allows access to the filesystem.
+LnBlog requires PHP 5.6 or greater and the ability to write files
+to the web server.  LnBlog *does* support writing files by using an FTP
+connection to the local host, but this is a legacy feature intended to work
+around poorly-configured shared hosting providers.
 
-You can use any web server or operating system.  LnBlog is tested on Windows with IIS
-and Linux with Apache, but it should run on anything that rung PHP 5.3 or greater.
-No database or special extensions are required.
+You can use any web server or operating system.  LnBlog is tested on Apache running on Windows 
+and Linux, but should work on anything that will run a supported version of PHP.  You don't 
+need any database or other special server and no non-standard PHP extensions are required.
 
 If you want to use LnBlog in a language other than English, then the PHP gettext and iconv 
 extensions are highly recommended, but not strictly required.  The CURL extension is also 
@@ -54,7 +54,7 @@ For users who wish to install LnBlog from source, the procedure is similar, exce
 using the distribution ZIP archive, you would do the following.
 
 1) - Clone the LnBlog Mercurial repository using
-     "hg clone https://hg.skepticats.com/lnblog /path/to/www/LnBLog", where "/path/to/www" is the
+     "hg clone https://hg.skepticats.com/lnblog /path/to/www/LnBlog", where "/path/to/www" is the
      path to a web-accessible portion of your web server.
 2) - Change to the LnBlog clone directory and run "composer install --no-dev".  If you want to
      build the documentation or distribution archives, you will need to run simply "composer install"
@@ -99,7 +99,7 @@ doing it anyway won't hurt anything.
 Section: License
 
 LnBlog: A simple file-based weblog focused on design elegance.
-Copyright (C) 2005 Peter A. Geer <pageer@skepticats.com>
+Copyright (C) 2005 - 2019 Peter A. Geer <pageer@skepticats.com>
 
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation; either version 2 of the License, 
