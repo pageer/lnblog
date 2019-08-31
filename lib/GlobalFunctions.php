@@ -23,4 +23,8 @@ class GlobalFunctions {
     public function time() {
         return time();
     }
+
+    public function mail($to, $subject, $message, $additional_headers = '', $additional_parameters = '') {
+        return mail($to, $subject, $message, $additional_headers, $additional_parameters);
+    }
 }

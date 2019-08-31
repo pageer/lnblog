@@ -178,6 +178,84 @@ class UserTest extends \PHPUnit\Framework\TestCase {
         $this->assertFalse($check_login);
     }
 
+    public function testCreateAndVerifyPasswordReset_WhenTokenCreated_ShouldVerify() {
+        $this->setConstantReturns(['USER_DATA_PATH' => 'userdata']);
+        $this->globals->time()->willReturn(12345, 12346);
+        $this->configureMocksToReadAndWritePwreset('bob');
+
+        $user = $this->createUserWithoutDataRead('bob', '12345');
+        $token = $user->createPasswordReset();
+        $result = $user->verifyPasswordReset($token);
+
+        $this->assertTrue($result);
+    }
+
+    public function testCreateAndVerifyPasswordReset_WhenTokenHasExpired_ShouldNotVerify() {
+        $this->setConstantReturns(['USER_DATA_PATH' => 'userdata']);
+        // Second time, for verify, is past expiration.
+        $this->globals->time()->willReturn(12345, 112346);
+        $this->configureMocksToReadAndWritePwreset('bob');
+
+        $user = $this->createUserWithoutDataRead('bob', '12345');
+        $token = $user->createPasswordReset();
+        $result = $user->verifyPasswordReset($token);
+
+        $this->assertFalse($result);
+    }
+
+    public function testCreateAndVerifyPasswordReset_WhenVerifyingBadToken_ShouldNotVerify() {
+        $this->setConstantReturns(['USER_DATA_PATH' => 'userdata']);
+        $this->globals->time()->willReturn(12345, 12346);
+        $this->configureMocksToReadAndWritePwreset('bob');
+
+        $user = $this->createUserWithoutDataRead('bob', '12345');
+        $token = $user->createPasswordReset();
+        $result = $user->verifyPasswordReset('thisisajunktoken');
+
+        $this->assertFalse($result);
+    }
+
+    /**
+     * @expectedException RateLimitExceeded
+     */
+    public function testCreatePasswordReset_WhenMultipleAttemptsWithinSeconds_ThrowsRateLimitError() {
+        $this->setConstantReturns(['USER_DATA_PATH' => 'userdata']);
+        $this->globals->time()->willReturn(12345, 12346);
+
+        $this->configureMocksToReadAndWritePwreset('bob');
+
+        $user = $this->createUserWithoutDataRead('bob', '12345');
+        $token1 = $user->createPasswordReset();
+        $token2 = $user->createPasswordReset();
+    }
+
+    public function testInvalidatePasswordReset_WhenTokenExists_TokenNoLongerValidates() {
+        $this->setConstantReturns(['USER_DATA_PATH' => 'userdata']);
+        $this->globals->time()->willReturn(12345, 12446, 12447);
+        $this->configureMocksToReadAndWritePwreset('bob');
+
+        $user = $this->createUserWithoutDataRead('bob', '12345');
+        $token1 = $user->createPasswordReset();
+        $token2 = $user->createPasswordReset();
+        $user->invalidatePasswordReset($token1);
+        $result = $user->verifyPasswordReset($token1);
+
+        $this->assertFalse($result);
+    }
+
+    public function testInvalidatePasswordReset_WhenNoTokenAreLeft_DeletesPwresetFile() {
+        $this->setConstantReturns(['USER_DATA_PATH' => 'userdata']);
+        $this->globals->time()->willReturn(12345, 12446, 12447);
+        $this->configureMocksToReadAndWritePwreset('bob');
+
+        $this->fs->delete(Path::mk('userdata', 'bob', 'pwreset.php'))->shouldBeCalled();
+
+        $user = $this->createUserWithoutDataRead('bob', '12345');
+        $token1 = $user->createPasswordReset();
+        $user->invalidatePasswordReset($token1);
+
+    }
+
     protected function setUp() {
         $this->prophet = new \Prophecy\Prophet();
         $this->fs = $this->prophet->prophesize('NativeFS');
@@ -198,6 +276,31 @@ class UserTest extends \PHPUnit\Framework\TestCase {
         $user->passwd = password_hash('12345', PASSWORD_DEFAULT);
         $user->salt = $new_format ? false : '';
         return $user;
+    }
+
+    # Create a user without having to mock out the reading of metadata files.
+    private function createUserWithoutDataRead($username, $password) {
+        $user = $this->createUser('', $password, $new_format = true);
+        $user->username = $username;
+        return $user;
+    }
+
+    private function configureMocksToReadAndWritePwreset($username) {
+        $content = null;
+        $file_path = Path::mk('userdata', $username, 'pwreset.php');
+        $this->fs->write_file($file_path, Argument::any())->will(function($args) use (&$content) {
+            // The pwreset.php is a PHP file, so we can get the contents
+            // by stripping the php header and eval'ing it.
+            $string_data = trim(str_replace('<?php', '', $args[1]));
+            $content = eval($string_data);
+            return true;
+        });
+        $this->fs->file_exists($file_path)->willReturn(function ($args) use (&$content) {
+            return $content !== null;
+        });
+        $this->globals->include($file_path)->will(function ($args) use (&$content) {
+            return $content;
+        });
     }
 
     private function setConstantReturns($configs = []) {

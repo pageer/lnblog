@@ -30,7 +30,7 @@ class ReplyNotifier extends Plugin {
 
         if ($u->email() && !$owner_reply) {
             @mail($u->email(), $subject, $data,
-                  "From: LnBlog comment notifier <>");
+                  "From: LnBlog comment notifier <".EMAIL_FROM_ADDRESS.">");
         }
     }
 

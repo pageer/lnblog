@@ -42,6 +42,8 @@ class WebPages extends BasePages {
             'blogpaths'  => 'blogpaths',
             'webmention' => 'webmention',
             'drafts'     => 'showdrafts',
+            'forgot'     => 'forgotPassword',
+            'reset'      => 'resetPassword',
         );
     }
 
@@ -484,6 +486,117 @@ class WebPages extends BasePages {
         $this->getPage()->addStylesheet("form.css");
         $this->getPage()->title = $page_name;
         $this->getPage()->display($body, $this->blog);
+    }
+
+    public function forgotPassword() {
+        $username = POST('user');
+        $username = trim($username ?: GET('user'));
+        $confirm_email = trim(POST('email'));
+
+        $reset_token = '';
+        $message = '';
+        $error = '';
+        $template = NewTemplate('user_forgot_password_tpl.php');
+
+        $user = $this->getUserByName($username);
+        $email = $user->email();
+
+        $should_send_email = 
+            has_post() &&
+            $username &&
+            $email &&
+            $confirm_email &&
+            $email == $confirm_email;
+
+        if (has_post() && !$email) {
+            $error = spf_("No e-mail address is set for user %s! Unable to send reset code.", $username);
+        } elseif (has_post() && $email != $confirm_email) {
+            $error = spf_('The account e-mail address for %1$s does not match %1$2', $username, $confirm_email);
+        }
+
+        if ($should_send_email) {
+            try {
+                $reset_token = $user->createPasswordReset();
+            } catch (RateLimitExceeded $e) {
+                $error = _("Too many reset attempts.  Please wait a few minutes and try again.");
+            }
+            if ($reset_token) {
+                $email_body = spf_("Hi! A password reset for your LnBlog user account %1\$s. If you did not request this, please disregard this message.\r\n\r\nTo reset your password, visit the link below:\r\n%2\$s", $username, $this->blog->getURL() . "?action=reset&user=$username&token=$reset_token");
+                $mail_result = $this->getGlobalFunctions()->mail(
+                    $email,
+                    _("LnBlog account password reset"),
+                    $email_body,
+                    spf_(
+                        "From: LnBlog Account Management <%s>",
+                        $this->getGlobalFunctions()->constant('EMAIL_FROM_ADDRESS')
+                    )
+                );
+                if ($mail_result) {
+                    $message = spf_("A password reset link has been sent to %s.", $email);
+                } else {
+                    $error = _("Unable to send e-mail! Make sure your server is correctly configured.");
+                }
+            }
+        }
+
+        $template->set("SHOW_FORM", !$should_send_email);
+        $template->set("USERNAME", $username);
+        $template->set("EMAIL", $confirm_email);
+        $template->set("MESSAGE", $message);
+        $template->set("ERROR", $error);
+
+        $content = $template->process();
+        $this->getPage()->display($content, $this->blog);
+    }
+
+    public function resetPassword() {
+        $username = trim(POST('user') ?: GET('user'));
+        $token = trim(POST('token') ?: GET('token'));
+        $email = trim(POST('email'));
+        $password = trim(POST('password'));
+        $confirm_password = trim(POST('confirm-password'));
+        $user_email = '';
+        $error = '';
+        $token_is_valid = false;
+        $user = null;
+
+        if ($username && $token) {
+            $user = $this->getUserByName($username);
+            $user_email = $user->email();
+            $token_is_valid = $user->verifyPasswordReset($token);
+        }
+
+        $post_data_is_present = $email && $password && $confirm_password;
+        $post_data_is_valid = $user_email == $email && $token_is_valid && $password == $confirm_password;
+        $should_show_form = $token && $username && $token_is_valid;
+
+        if (!$token_is_valid) {
+            $error = _("Invalid password reset data!");
+        } elseif (has_post() && $user_email != $email) {
+            $error = _("Incorrect e-mail for this user.");
+        } elseif (has_post() && $password != $confirm_password) {
+            $error = _("Passwords do not match.");
+        }
+
+        if ($user && $post_data_is_present && $post_data_is_valid) {
+            $user->password($password);
+            $user->save();
+            $user->login($password);
+            $this->getPage()->redirect($this->blog->getURL());
+            return false;
+        }
+
+        $template = NewTemplate("user_reset_password_tpl.php");
+        $template->set('USERNAME', $username);
+        $template->set('TOKEN', $token);
+        $template->set('EMAIL', $email);
+        $template->set('PASSWORD', $password);
+        $template->set('CONFIRM_PASSWORD', $confirm_password);
+        $template->set('ERROR', $error);
+        $template->set('SHOW_FORM', $should_show_form);
+
+        $content = $template->process();
+        $this->getPage()->display($content, $this->blog);
     }
 
     private function updatePageFromEntrySaveResult($res, $tpl, $ent) {
@@ -1934,12 +2047,20 @@ class WebPages extends BasePages {
         $this->last_upload_error = $data;
     }
 
+    protected function getUserByName($username) {
+        return NewUser($username);
+    }
+
     protected function getPage() {
         return Page::instance();
     }
 
     protected function getFs() {
         return NewFS();
+    }
+
+    protected function getGlobalFunctions() {
+        return new GlobalFunctions();
     }
 
     protected function getEntry($path = false) {

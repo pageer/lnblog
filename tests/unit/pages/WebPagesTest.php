@@ -410,6 +410,252 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->page->error(500)->shouldHaveBeenCalled();
     }
 
+    public function testForgotPassword_WhenUsernameNotSet_PromptsForUsername() {
+        $_POST = [];
+        $_GET = [];
+
+        $this->page->display(Argument::containingString('Username'), Argument::any())->shouldBeCalled();
+
+        $this->webpage->forgotPassword();
+    }
+
+    public function testForgotPassword_WhenUserDoesNotHaveEmail_ShowsError() {
+        $_POST = ['user' => 'bob', 'email' => 'bob@bob.com'];
+        $_GET = [];
+        $test_user = $mock_user = $this->prophet->prophesize(User::class);
+        $test_user->email()->willReturn('');
+        $this->webpage->users = ['bob' => $test_user->reveal()];
+
+        $this->page->display(
+            Argument::containingString('No e-mail address is set'),
+            Argument::any()
+        )->shouldBeCalled();
+
+        $this->webpage->forgotPassword();
+    }
+
+    public function testForgotPassword_WhenUserEmailDoesNotMatch_ShowsError() {
+        $_POST = ['user' => 'bob', 'email' => 'bob@bob.com'];
+        $_GET = [];
+        $test_user = $mock_user = $this->prophet->prophesize(User::class);
+        $test_user->email()->willReturn('bob123@gmail.com');
+        $this->webpage->users = ['bob' => $test_user->reveal()];
+
+        $this->page->display(
+            Argument::containingString('e-mail address for bob does not match'),
+            Argument::any()
+        )->shouldBeCalled();
+
+        $this->webpage->forgotPassword();
+    }
+
+    public function testForgotPassword_WhenUsernameSetInGet_PromptsForEmailOnly() {
+        $_POST = [];
+        $_GET = ['user' => 'bob'];
+
+        $this->page->display(Argument::containingString('Username'), Argument::any())->shouldNotBeCalled();
+        $this->page->display(Argument::containingString('value="bob"'), Argument::any())->shouldBeCalled();
+
+        $this->webpage->forgotPassword();
+    }
+
+    public function testForgotPassword_WhenUsernameAndCofirmationValid_SendsEmail() {
+        $_POST = ['user' => 'bob', 'email' => 'bob@bob.com'];
+        $_GET = [];
+        $test_user = $mock_user = $this->prophet->prophesize(User::class);
+        $test_user->createPasswordReset()->willReturn("testtoken");
+        $test_user->email()->willReturn('bob@bob.com');
+        $this->webpage->users = ['bob' => $test_user->reveal()];
+        $this->blog->getURL()->willReturn('http://yourdomain.com/');
+        $this->global_functions->constant('EMAIL_FROM_ADDRESS')->willReturn('no-reply@yourdomain.com');
+
+        $this->global_functions->mail(
+            'bob@bob.com',
+            Argument::any(),
+            Argument::containingString('http://yourdomain.com/?action=reset&user=bob&token=testtoken'),
+            Argument::any()
+        )->willReturn(true)->shouldBeCalled();
+        $this->page->display(
+            Argument::containingString('link has been sent'),
+            Argument::any()
+        )->shouldBeCalled();
+
+        $this->webpage->forgotPassword();
+    }
+
+    public function testForgotPassword_WhenSendingMailFails_ShowWarning() {
+        $_POST = ['user' => 'bob', 'email' => 'bob@bob.com'];
+        $_GET = [];
+        $test_user = $mock_user = $this->prophet->prophesize(User::class);
+        $test_user->createPasswordReset()->willReturn("testtoken");
+        $test_user->email()->willReturn('bob@bob.com');
+        $this->webpage->users = ['bob' => $test_user->reveal()];
+        $this->blog->getURL()->willReturn('http://yourdomain.com/');
+        $this->global_functions->constant('EMAIL_FROM_ADDRESS')->willReturn('no-reply@yourdomain.com');
+        $this->global_functions->mail(
+            'bob@bob.com',
+            Argument::any(),
+            Argument::containingString('http://yourdomain.com/?action=reset&user=bob&token=testtoken'),
+            Argument::any()
+        )->willReturn(false);
+
+        $this->page->display(
+            Argument::containingString('Unable to send e-mail'),
+            Argument::any()
+        )->shouldBeCalled();
+
+        $this->webpage->forgotPassword();
+    }
+
+    public function testResetPassword_WhenGetWithUserAndTokenAndRequestValidates_PromptForPasswordReset() {
+        $_GET = ['user' => 'bob', 'token' => 'testtoken'];
+        $_POST = [];
+        $test_user = $mock_user = $this->prophet->prophesize(User::class);
+        $test_user->email()->willReturn('bob@bob.com');
+        $test_user->verifyPasswordReset('testtoken')->willReturn(true);
+        $this->webpage->users = ['bob' => $test_user->reveal()];
+
+        $this->page->display(
+            Argument::containingString('Confirm password:'),
+            Argument::any()
+        )->shouldBeCalled();
+
+        $this->webpage->resetPassword();
+    }
+
+    public function testResetPassword_WhenCodeMissingFromGet_ShowsError() {
+        $_GET = ['user' => 'bob', 'token' => ''];
+        $_POST = [];
+        $test_user = $mock_user = $this->prophet->prophesize(User::class);
+        $this->webpage->users = ['bob' => $test_user->reveal()];
+
+        $this->page->display(
+            Argument::containingString('Confirm password:'),
+            Argument::any()
+        )->shouldNotBeCalled();
+        $this->page->display(
+            Argument::containingString('Invalid password reset data'),
+            Argument::any()
+        )->shouldBeCalled();
+
+        $this->webpage->resetPassword();
+    }
+
+    public function testResetPassword_WhenUserMissingFromGet_ShowsError() {
+        $_GET = ['user' => '', 'token' => 'testtoken'];
+        $_POST = [];
+
+        $this->page->display(
+            Argument::containingString('Confirm password:'),
+            Argument::any()
+        )->shouldNotBeCalled();
+        $this->page->display(
+            Argument::containingString('Invalid password reset data'),
+            Argument::any()
+        )->shouldBeCalled();
+
+        $this->webpage->resetPassword();
+    }
+
+    public function testResetPassword_WhenPostHasValidData_ResetsPassword() {
+        $_GET = [];
+        $_POST = [
+            'user' => 'bob',
+            'token' => 'testtoken',
+            'email' => 'bob@bob.com',
+            'password' => '12345',
+            'confirm-password' => '12345'
+        ];
+        $test_user = $mock_user = $this->prophet->prophesize(User::class);
+        $test_user->email()->willReturn('bob@bob.com');
+        $test_user->verifyPasswordReset('testtoken')->willReturn(true);
+        $this->webpage->users = ['bob' => $test_user->reveal()];
+
+        $test_user->password('12345')->shouldBeCalled();
+        $test_user->save()->shouldBeCalled();
+        $test_user->login('12345')->shouldBeCalled();
+
+        $this->webpage->resetPassword();
+    }
+
+    public function testResetPassword_WhenPostedEmailValidationFails_ShowsErrorAndForm() {
+        $_GET = [];
+        $_POST = [
+            'user' => 'bob',
+            'token' => 'testtoken',
+            'email' => 'bob@gmail.com',
+            'password' => '12345',
+            'confirm-password' => '12345'
+        ];
+        $test_user = $mock_user = $this->prophet->prophesize(User::class);
+        $test_user->email()->willReturn('bob@bob.com');
+        $test_user->verifyPasswordReset('testtoken')->willReturn(true);
+        $this->webpage->users = ['bob' => $test_user->reveal()];
+
+        $this->page->display(
+            Argument::containingString('Confirm password:'),
+            Argument::any()
+        )->shouldBeCalled();
+        $this->page->display(
+            Argument::containingString('Incorrect e-mail for this user'),
+            Argument::any()
+        )->shouldBeCalled();
+
+        $this->webpage->resetPassword();
+    }
+
+    public function testResetPassword_WhenPostedPasswordsDoNotMatch_ShowsErrorAndForm() {
+        $_GET = [];
+        $_POST = [
+            'user' => 'bob',
+            'token' => 'testtoken',
+            'email' => 'bob@bob.com',
+            'password' => '12345',
+            'confirm-password' => 'blahblah'
+        ];
+        $test_user = $mock_user = $this->prophet->prophesize(User::class);
+        $test_user->email()->willReturn('bob@bob.com');
+        $test_user->verifyPasswordReset('testtoken')->willReturn(true);
+        $this->webpage->users = ['bob' => $test_user->reveal()];
+
+        $this->page->display(
+            Argument::containingString('Confirm password:'),
+            Argument::any()
+        )->shouldBeCalled();
+        $this->page->display(
+            Argument::containingString('Passwords do not match'),
+            Argument::any()
+        )->shouldBeCalled();
+
+        $this->webpage->resetPassword();
+    }
+
+    public function testResetPassword_WhenPostedCodeDoesNotValidate_ShowsErrorMessageWithoutForm() {
+        $_GET = [];
+        $_POST = [
+            'user' => 'bob',
+            'token' => 'testtoken',
+            'email' => 'bob@bob.com',
+            'password' => '12345',
+            'confirm-password' => '12345'
+        ];
+        $test_user = $mock_user = $this->prophet->prophesize(User::class);
+        $test_user->email()->willReturn('bob@bob.com');
+        $test_user->verifyPasswordReset('testtoken')->willReturn(false);
+        $this->webpage->users = ['bob' => $test_user->reveal()];
+
+        $this->page->display(
+            Argument::containingString('Confirm password:'),
+            Argument::any()
+        )->shouldNotBeCalled();
+        $this->page->display(
+            Argument::containingString('Invalid password reset data'),
+            Argument::any()
+        )->shouldBeCalled();
+
+        $this->webpage->resetPassword();
+    }
+
     protected function setUp() {
         EventRegister::instance()->clearAll();
         $_POST = [];
@@ -428,6 +674,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->publisher = $this->prophet->prophesize(Publisher::class);
         $this->mapper = $this->prophet->prophesize(EntryMapper::class);
         $this->social_server = $this->prophet->prophesize(SocialWebServer::class);
+        $this->global_functions = $this->prophet->prophesize(GlobalFunctions::class);
         $this->page = $this->prophet->prophesize(Page::class);
 
         $this->webpage = new TestableWebPages($this->blog->reveal(), $this->user->reveal());
@@ -436,6 +683,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->webpage->test_entry = $this->entry->reveal();
         $this->webpage->test_publisher = $this->publisher->reveal();
         $this->webpage->test_social_server = $this->social_server->reveal();
+        $this->webpage->test_global_functions = $this->global_functions->reveal();
     }
 
     protected function tearDown() {
@@ -509,6 +757,15 @@ class TestableWebPages extends WebPages {
     public $test_entry = null;
     public $test_page = null;
     public $test_publisher = null;
+    public $test_global_functions = null;
+    public $users = [];
+
+    protected function getUserByName($username) {
+        if (isset($this->users[$username])) {
+            return $this->users[$username];
+        }
+        return parent::getUserByName($username);
+    }
 
     protected function getPage() {
         return $this->test_page ?: parent::getPage();
@@ -528,5 +785,9 @@ class TestableWebPages extends WebPages {
 
     protected function getSocialWebServer() {
         return $this->test_social_server ?: parent::getSocialWebServer();
+    }
+
+    protected function getGlobalFunctions() {
+        return $this->test_global_functions ?: parent::getGlobalFunctions();
     }
 }

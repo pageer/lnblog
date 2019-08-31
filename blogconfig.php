@@ -185,6 +185,12 @@ if (file_exists(mkpath(INSTALL_ROOT,USER_DATA,"userconfig.php")) ) {
 # The *default* mode is "directory".
 @define("URI_TYPE", "directory");
 
+# Constant: EMAIL_FROM_ADDRESS
+# The "from" address that should be used for any e-mails that are sent.
+# This will be used in the "from" field with an appropriate human-readable
+# name, such as "From: LnBlog comment notifier <whatever@yourdomain.com>".
+@define("EMAIL_FROM_ADDRESS", "");
+
 ##############################################
 # Section Internationalization
 # Core configuration for i18n.

@@ -28,6 +28,8 @@
 
 class User extends LnBlogObject {
     const USER_PROFILE_FILE = "user.xml";
+    const RESET_RATE_LIMIT = 60;
+    const RESET_TOKEN_EXPIRATION = 84600;
 
     public $username = '';
     public $passwd = '';
@@ -41,6 +43,7 @@ class User extends LnBlogObject {
 
     private $set_cookies = true;
     private $fs = null;
+    private $globals = null;
 
     public static function get($usr=false, $pwd=false, FS $fs = null) {
         $s_usr = SESSION(CURRENT_USER);
@@ -69,7 +72,7 @@ class User extends LnBlogObject {
         $this->fs = $fs ?: NewFS();
         $this->globals = $globals ?: new GlobalFunctions();
 
-        $this->exclude_fields = array('salt', 'passwd', 'username', 'set_cookies', 'fs');
+        $this->exclude_fields = array('salt', 'passwd', 'username', 'set_cookies', 'fs', 'globals');
 
         $this->loadUserCredentials();
 
@@ -164,6 +167,71 @@ class User extends LnBlogObject {
             return $hash == $this->passwd;
         }
         return password_verify($pass, $this->passwd);
+    }
+
+    # Method: createPasswordReset
+    # Create a passoword reset code for the user.
+    #
+    # Returns:
+    # String containing the reset code.
+    public function createPasswordReset() {
+        $timestamp = $this->globals->time();
+        $reset_token = sha1(random_int(PHP_INT_MIN, PHP_INT_MAX));
+        $tokens = $this->getPasswordResetTokens();
+
+        foreach ($tokens as $token) {
+            if ($token['timestamp'] + self::RESET_RATE_LIMIT > $timestamp) {
+                throw new RateLimitExceeded();
+            }
+        }
+
+        $tokens[] = [
+            'timestamp' => $timestamp,
+            'token' => $reset_token,
+        ];
+        $this->savePasswordResetTokens($tokens);
+        return $reset_token;
+    }
+
+    # Method: verifyPasswordReset
+    # Checks that a supplied password reset code is valid.
+    #
+    # Parameters:
+    # code - String containing the reset code to validate
+    #
+    # Returns:
+    # True if the code is acceptable, false otherwise.
+    public function verifyPasswordReset($code) {
+        $current_time = $this->globals->time();
+        $token_list = $this->getPasswordResetTokens();
+        foreach ($token_list as $entry) {
+            $code_is_valid = $entry['token'] == $code;
+            $token_not_expired = $current_time < $entry['timestamp'] + self::RESET_TOKEN_EXPIRATION;
+            if ($code_is_valid && $token_not_expired) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    # Method: invalidatePasswordReset
+    # Deletes the record of a particular password reset code.  This is intended
+    # to be called after a code is used successfully.
+    #
+    # Parameters:
+    # code - String containing the code to invalidate.
+    public function invalidatePasswordReset($code) {
+        $current_time = $this->globals->time();
+        $new_token_list = [];
+        $token_list = $this->getPasswordResetTokens();
+        foreach ($token_list as $entry) {
+            $is_invalidated_token = $code == $entry['token'];
+            $is_expired = $entry['timestamp'] + self::RESET_TOKEN_EXPIRATION < $current_time;
+            if (!$is_invalidated_token && !$is_expired) {
+                $new_token_list[] = $entry;
+            }
+        }
+        $this->savePasswordResetTokens($new_token_list);
     }
 
     # Method: save
@@ -451,15 +519,37 @@ class User extends LnBlogObject {
         $this->set_cookies = $enabled;
     }
 
+    private function getPasswordResetTokens() {
+        $file_path = $this->getPath('pwreset.php');
+        if ($this->fs->file_exists($file_path)) {
+            $token_list = $this->globals->include($file_path);
+            if (is_array($token_list)) {
+                return $token_list;
+            }
+        }
+        return [];
+    }
+
+    private function savePasswordResetTokens($tokens) {
+        $file_path = $this->getPath('pwreset.php');
+        if (empty($tokens)) {
+            $this->fs->delete($file_path);
+        } else {
+            $content = "<?php\n";
+            $content .= "return " . var_export($tokens, true) . ";\n";
+            $this->fs->write_file($file_path, $content);
+        }
+    }
+
     # Method: loadUserCredentials
     # Load the user's password and any metadata.
     private function loadUserCredentials() {
-        $passwd_path = $this->getPath( "passwd.php");
+        $passwd_path = $this->getPath("passwd.php");
         if (!$this->username || !$this->fs->realpath($passwd_path)) {
             return;
         }
 
-        $password_hash = include $this->getPath("passwd.php");
+        $password_hash = $this->globals->include($this->getPath("passwd.php"));
         if ($password_hash === 1) {
             $this->passwd = $pwd;
             $this->salt = $salt;

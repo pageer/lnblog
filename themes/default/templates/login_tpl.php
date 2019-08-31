@@ -15,3 +15,27 @@
 <div><span class="basic_form_submit"><input type="submit" value="<?php p_('Submit');?>" /></span>
 <span class="basic_form_clear"><input type="reset" value="<?php p_('Clear');?>" /></span></div>
 </form>
+<div class="forgot-password-block">
+    <a id="forgot-password-link" href="?action=forgot">
+        <?php p_("Forgot password?") ?>
+    </a>
+</div>
+<script type="application/javascript">
+    $(document).ready(function() {
+        $('#forgot-password-link').on('click', function() {
+            var username = $('#<?php echo $UNAME?>').val();
+            if (username) {
+                var href = $(this).attr('href');
+                window.location = href + '&user=' + username;
+                console.log(href + '&user' + username);
+                return false;
+            }
+        });
+    });
+</script>
+<style type="text/css">
+.forgot-password-block {
+    text-align: center;
+    margin-top: 3em;
+}
+</style>
