@@ -111,9 +111,10 @@
 					$title = _("Auto-publish this entry at this date");
 					$date_string = $AUTO_PUBLISH_DATE ? date('Y-m-d h:i a', strtotime($AUTO_PUBLISH_DATE)) : '';
 					?>
-					<input type="checkbox" class="checktoggle" id="autopublish" name="autopublish" data-for="autopublishdate" value="1" <?php echo $AUTO_PUBLISH_DATE ? "checked" : ''?> />
+                    <input type="checkbox" class="checktoggle" id="autopublish" name="autopublish" 
+                           data-for="autopublishdate" value="1" <?php echo $AUTO_PUBLISH_DATE ? "checked" : ''?> />
 					<label for="autopublish" title="<?php echo $title?>"><?php p_("Auto-publish")?></label>
-					<input type="text" id="autopublishdate" name="autopublishdate" value="<?php echo $date_string?>" />
+					<input type="text" id="autopublishdate" name="autopublishdate" autocomplet="off" value="<?php echo $date_string?>" />
 				</div>
 				<?php endif; ?>
 
