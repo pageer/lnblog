@@ -7,7 +7,7 @@
         <mkdir dir="./build" />
     </target>
 
-	<target name="docs" depends="prepare">
+	<target name="docsold" depends="prepare">
 		
 		<echo msg="Creating documentation folder." />
 		<mkdir dir="./build/documentation" />
@@ -31,6 +31,9 @@
 		
 		<echo msg="Installing dependencies with Composer..." />
 		<exec command="composer install --no-dev --no-interaction" dir="./build/LnBlog-${version}" />
+
+        <echo msg="Installing JavaScript sependencies with Yarn..."/>
+        <echo command="yarn install" dir="./build/LnBlog-${version}">
     </target>
 
     <target name="distclean" depends="build">

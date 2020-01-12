@@ -1,0 +1,16 @@
+{
+  "name": "LnBlog",
+  "version": "2.1.0",
+  "description": "A simple, file-base weblog",
+  "main": "index.php",
+  "repository": "https://github.com/pageer/lnblog.git",
+  "author": "Peter Geer <pageer@skepticats.com>",
+  "license": "GPL-2.0-or-later",
+  "private": false,
+  "dependencies": {
+    "dropzone": "^5.5.1",
+    "jquery-datetime-picker": "^2.5.11",
+    "jquery-form": "^4.2.2",
+    "tinymce": "^5.1.5"
+  }
+}
