@@ -4,9 +4,9 @@ class NativeFsTest extends PHPUnit\Framework\TestCase {
     
     function testCreator() {
 		$fs = new NativeFS();
-		$this->assertEquals($fs->directory_mode, FS_DIRECTORY_MODE);
-		$this->assertEquals($fs->default_mode, FS_DEFAULT_MODE);
-		$this->assertEquals($fs->script_mode, FS_SCRIPT_MODE);
+		$this->assertEquals($fs->directory_mode, 0000);
+		$this->assertEquals($fs->default_mode, 0000);
+		$this->assertEquals($fs->script_mode, 0000);
 	}
 	
 	function testLocalpathToFSPath() {

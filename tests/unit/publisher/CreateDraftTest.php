@@ -1,4 +1,5 @@
 <?php
+
 use Prophecy\Argument;
 
 class CreateDraftTest extends PublisherTestBase {
@@ -46,9 +47,6 @@ class CreateDraftTest extends PublisherTestBase {
         $this->assertEquals('2017-01-02 12:34 Eastern Standard Time', $entry->date);
     }
 
-    /**
-     * @expectedException   EntryAlreadyExists
-     */
     public function testCreateDraft_WhenDraftAlreadyExists_Throws() {
         $entry = $this->getTestEntry();
         $entry->file = './drafts/02_1234/entry.xml';
@@ -56,6 +54,8 @@ class CreateDraftTest extends PublisherTestBase {
         $this->fs->file_exists('./drafts/02_1234/entry.xml')->willReturn(true);
         $this->fs->realpath('./drafts/02_1234/entry.xml')->willReturn('./drafts/02_1234/entry.xml');
         $this->fs->realpath('./drafts/02_1234/entry.xml')->willReturn('./drafts/02_1234/entry.xml');
+
+        $this->expectException(EntryAlreadyExists::class);
 
         $this->publisher->createDraft($entry, $this->getTestTime());
     }
@@ -73,21 +73,18 @@ class CreateDraftTest extends PublisherTestBase {
         $this->publisher->createDraft($entry, $this->getTestTime());
     }
 
-    /**
-     * @expectedException   CouldNotCreateDirectory
-     */
     public function testCreateDraft_WhenDraftDirDoesNotExistAndWrapperCreationFails_Throws() {
         $entry = $this->getTestEntry();
         $this->fs->is_dir('./drafts')->willReturn(false);
         $this->fs->file_exists(Argument::any())->willReturn(false);
         $this->wrappers->createDirectoryWrappers('./drafts', WrapperGenerator::BLOG_DRAFTS)->willReturn(array('Error!'));
 
+        
+        $this->expectException(CouldNotCreateDirectory::class);
+
         $this->publisher->createDraft($entry, $this->getTestTime());
     }
 
-    /**
-     * @expectedException   EntryWriteFailed
-     */
     public function testCreateDraft_WhenFileCreationFails_Throws() {
         $entry = $this->getTestEntry();
         $this->fs->is_dir('./drafts')->willReturn(false);
@@ -95,17 +92,18 @@ class CreateDraftTest extends PublisherTestBase {
         $this->fs->mkdir_rec('./drafts/02_1234')->willReturn(true);
         $this->fs->write_file('./drafts/02_1234/entry.xml', Argument::any())->willReturn(false);
 
+        $this->expectException(EntryWriteFailed::class);
+
         $this->publisher->createDraft($entry, $this->getTestTime());
     }
 
-    /**
-     * @expectedException   EntryWriteFailed
-     */
     public function testCreateDraft_WhenDirectoryCreationFails_Throws() {
         $entry = $this->getTestEntry();
         $this->fs->is_dir('./drafts')->willReturn(false);
         $this->fs->file_exists(Argument::any())->willReturn(false);
         $this->fs->mkdir_rec('./drafts/02_1234')->willReturn(false);
+
+        $this->expectException(EntryWriteFailed::class);
 
         $this->publisher->createDraft($entry, $this->getTestTime());
     }
@@ -118,14 +116,22 @@ class CreateDraftTest extends PublisherTestBase {
         $fs->is_dir('./drafts')->willReturn(true);
         $fs->is_dir('./drafts/02_1234')->willReturn(false);
         $fs->file_exists(Argument::any())->willReturn(false);
-        $fs->mkdir_rec('./drafts/02_1234')->willReturn(true);
-        $fs->write_file('./drafts/02_1234/entry.xml', Argument::any())->will(function($args) use ($fs) {
+        $fs->mkdir_rec('./drafts/02_1234')->will(function($args) use ($fs) {
+            $fs->is_dir('./drafts')->willReturn(true);
+            $fs->is_dir('./drafts/02_1234')->willReturn(true);
+            return true;
+        });
+        $fs->write_file('./drafts/02_1234/entry.xml', Argument::any())->will(function($args) use ($fs, $entry) {
             $fs->file_exists('./drafts/02_1234/entry.xml')->willReturn(true);
             $fs->realpath('./drafts/02_1234/entry.xml')->willReturn('./drafts/02_1234/entry.xml');
             return true;
         });
+        $this->task_manager->findByKey(Argument::any())->willReturn(null);
 
-        $this->fs->write_file('./drafts/02_1234/publish.txt', '2525-01-02 12:00:00')->shouldBeCalled();
+        $task_check = function ($arg) {
+            return $arg->runAfterTime() == new DateTime('2525-01-02 12:00:00');
+        };
+        $this->task_manager->add(Argument::that($task_check))->shouldBeCalled();
 
         $this->publisher->createDraft($entry, $this->getTestTime());
     }

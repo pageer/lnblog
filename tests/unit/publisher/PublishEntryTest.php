@@ -70,15 +70,14 @@ class PublishEntryTest extends PublisherTestBase {
         $this->publisher->publishEntry($entry, $this->getTestTime());
     }
 
-    /**
-     * @expectedException   TargetPathExists
-     */
     public function testPublishEntry_WhenBothPublishTargetDirsAlreadyExists_Throws() {
         $fs = $this->fs;
         $entry = new BlogEntry(null, $fs->reveal());
         $entry->file = './drafts/02_1234/entry.xml';
         $fs->file_exists(Argument::any())->willReturn(true);
         $fs->is_dir(Argument::any())->willReturn(true);
+
+        $this->expectException(TargetPathExists::class);
 
         $this->publisher->publishEntry($entry, $this->getTestTime());
     }
@@ -93,9 +92,6 @@ class PublishEntryTest extends PublisherTestBase {
         $this->publisher->publishEntry($entry, $this->getTestTime());
     }
 
-    /**
-     * @expectedException   EntryRenameFailed
-     */
     public function testPublishEntry_WhenRenameFails_Throws() {
         $fs = $this->fs;
         $entry = new BlogEntry(null, $fs->reveal());
@@ -105,6 +101,8 @@ class PublishEntryTest extends PublisherTestBase {
         $fs->is_dir(Argument::any())->willReturn(true);
         $fs->is_dir('./entries/2017/01/02_1234')->willReturn(false);
         $fs->rename('./drafts/02_1234', './entries/2017/01/02_1234')->willReturn(false);
+
+        $this->expectException(EntryRenameFailed::class);
 
         $this->publisher->publishEntry($entry, $this->getTestTime());
     }
@@ -141,7 +139,7 @@ class PublishEntryTest extends PublisherTestBase {
         $this->assertEquals('billybob', $entry->uid);
         $this->assertEquals($expected_time, $entry->post_ts);
         $this->assertEquals($expected_time, $entry->timestamp);
-        $this->assertContains('2017-01-02 12:34', $entry->date);
+        $this->assertStringContainsString('2017-01-02 12:34', $entry->date);
         $this->assertEquals('1.2.3.4', $entry->ip);
     }
 

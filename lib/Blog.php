@@ -42,6 +42,11 @@
  * OnArticelError   - Fired before populating template when on an error.
  */
 
+use LnBlog\Tasks\AutoPublishTask;
+use LnBlog\Tasks\TaskManager;
+use LnBlog\Tasks\TaskRepository;
+use Psr\Log\LoggerInterface;
+
 # Constant: ROOT_ID
 # Defines the magic string that denotes a blog on the server's document root.
 # Normally, LnBlog uses the document root-relative path to the blog as the blog
@@ -84,10 +89,24 @@ class Blog extends LnBlogObject implements AttachmentContainer {
 
     private $fs;
     private $filemanager;
+    private $task_manager;
+    private $logger;
 
-    public function __construct($path = "", $fs = null, $file_manager = null) {
+    public function __construct(
+        $path = "",
+        $fs = null,
+        $file_manager = null,
+        TaskManager $task_manager = null,
+        LoggerInterface $logger = null
+    ) {
         $this->fs = $fs ?: NewFS();
         $this->filemanager = $file_manager ?: new FileManager($this, $this->fs);
+        $this->logger = $logger ?: NewLogger();
+        $this->task_manager = $task_manager;
+        if (!$task_manager) {
+            $task_repository = new TaskRepository($this->fs);
+            $this->task_manager = new TaskManager($task_repository, $this->logger);
+        }
 
         if ($path) {
             $this->getPathFromPassedValue($path);
@@ -687,40 +706,6 @@ class Blog extends LnBlogObject implements AttachmentContainer {
         return $this->entrylist;
     }
 
-    # Method:autoPublishDrafts
-    # Publish any drafts which are scheduled for publication.
-    public function autoPublishDrafts() {
-        static $auto_publish_checked;// Don't do this more than once per request;
-
-        if ($auto_publish_checked) {
-            return;
-        }
-        $auto_publish_checked = true;
-
-        $art = NewBlogEntry();
-        $art_path = Path::mk($this->home_path, BLOG_DRAFT_PATH);
-
-        $art_list = $this->fs->scan_directory($art_path);
-        $ret = array();
-        foreach ($art_list as $dir) {
-            $pub_path = Path::mk($art_path, $dir, BlogEntry::AUTO_PUBLISH_FILE);
-            if ($this->fs->file_exists($pub_path) && $art->isEntry($ent_path = Path::mk($art_path, $dir))) {
-                $ent = NewEntry($ent_path);
-                if ($ent->shouldAutoPublish()) {
-                    $generator = new WrapperGenerator($this->fs);
-                    $user = NewUser();
-                    $publisher = new Publisher($this, $user, $this->fs, $generator);
-
-                    if ($ent->is_article) {
-                        $publisher->publishArticle($ent);
-                    } else {
-                        $publisher->publishEntry($ent);
-                    }
-                }
-            }
-        }
-    }
-
     /*
     Method: getDrafts
     Gets all the current drafts for this blog.
@@ -1088,6 +1073,8 @@ class Blog extends LnBlogObject implements AttachmentContainer {
             $ent_path = Path::mk($path, $draft);
             $ret = $this->writeEntryFileIfNeeded($ent_path);
             $files = array_merge($files, $ret);
+            $ret = $this->migrateAutoPublishIfNeeded($ent_path);
+            $files = array_merge($files, $ret);
             $ret = $wrappers->createDirectoryWrappers($ent_path, WrapperGenerator::DRAFT_ENTRY_BASE);
             $files = array_merge($files, $ret);
         }
@@ -1124,6 +1111,43 @@ class Blog extends LnBlogObject implements AttachmentContainer {
         return !$this->fs->file_exists($path);
     }
 
+    private function migrateAutoPublishIfNeeded($entry_path) {
+        $entry = new BlogEntry($entry_path, $this->fs);
+        $auto_publish_date = $entry->getAutoPublishDate();
+        if (!$auto_publish_date) {
+            return [];
+        }
+
+        $file = Path::mk($entry_path, BlogEntry::AUTO_PUBLISH_FILE);
+        if (!$this->fs->file_exists($file)) {
+            return [];
+        }
+
+        $generator = new WrapperGenerator($this->fs);
+        $user = NewUser();
+        $publisher = new Publisher($this, $user, $this->fs, $generator, $this->task_manager);
+
+        $contents = $this->fs->read_file($file);
+        $time = new DateTime(trim($contents));
+        $task = new AutoPublishTask($this->logger, $publisher);
+        $task->runAfterTime($time);
+        $task->data($entry);
+
+        try {
+            $this->task_manager->add($task);
+            $this->fs->delete($file);
+            return [];
+        } catch (Exception $e) {
+            $this->logger->error(
+                "Unable to migrate auto-publish setting to task", [
+                    'exception' => $e,
+                    'draftid' => $entry->entryID(),
+                ]
+            );
+            return [$entry->file];
+        }
+    }
+
     private function backupOldFileData($entry_path) {
         // Nothing to do for now.  May need in the future.
     }
@@ -1133,7 +1157,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
             $this->backupOldFileData($entry_path);
             $entry = new BlogEntry($entry_path, $this->fs);
             $ret = $entry->writeFileData();
-            return $ret ? [] : $entry->file;
+            return $ret ? [] : [$entry->file];
         }
         return [];
     }

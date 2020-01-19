@@ -58,13 +58,12 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase {
         $this->assertEquals('./blog/test.jpg', $files[0]->getPath());
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
     public function testGetAll_WhenDirectoryScanFails_ThrowsRuntimeException() {
         $entry = $this->prophet->prophesize('BlogEntry');
         $entry->localpath()->willReturn('./path/to/entry/');
         $this->fs->scandir('./path/to/entry/')->willReturn(false);
+
+        $this->expectException(RuntimeException::class);
 
         $manager = $this->createFileManager($entry->reveal());
         $manager->getAll();
@@ -82,39 +81,36 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase {
         $this->fs->delete('./path/to/entry/test.jpg')->shouldHaveBeenCalled();
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
     public function testRemove_WhenRemoveFails_ShouldThrowRuntimeException() {
         $entry = $this->prophet->prophesize('BlogEntry');
         $entry->localpath()->willReturn('./path/to/entry/');
         $this->setUpEntryFileListing('./path/to/entry/', ['test.jpg']);
         $this->fs->delete('./path/to/entry/test.jpg')->willReturn(false);
 
+        $this->expectException(RuntimeException::class);
+
         $manager = $this->createFileManager($entry->reveal());
         $manager->remove('test.jpg');
     }
 
-    /**
-     * @expectedException FileNotFound
-     */
     public function testRemove_WhenFileNotInRepository_ShouldThrowFileNotFound() {
         $entry = $this->prophet->prophesize('BlogEntry');
         $entry->localpath()->willReturn('./path/to/entry/');
         $this->setUpEntryFileListing('./path/to/entry/', []);
         $this->fs->delete('./path/to/entry/test.jpg')->willReturn(false);
 
+        $this->expectException(FileNotFound::class);
+
         $manager = $this->createFileManager($entry->reveal());
         $manager->remove('test.jpg');
     }
 
-    /**
-     * @expectedException FileIsProtected
-     */
     public function testRemove_WhenFileIsOnExclusionList_ShouldThrowFileIsProtected() {
         $entry = $this->prophet->prophesize('BlogEntry');
         $entry->localpath()->willReturn('./path/to/entry/');
         $this->setUpEntryFileListing('./path/to/entry/', []);
+
+        $this->expectException(FileIsProtected::class);
 
         $manager = $this->createFileManager($entry->reveal());
         $manager->remove('entry.xml');
@@ -156,26 +152,24 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase {
         $this->fs->copy('/path/to/entry.xml', './path/to/entry/example.xml')->shouldHaveBeenCalled();
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
     public function testAttach_WhenCopyFails_ShouldThrowException() {
         $entry = $this->prophet->prophesize('BlogEntry');
         $entry->localpath()->willReturn('./path/to/entry/');
         $this->setUpEntryFileListing('./path/to/entry/', []);
         $this->fs->copy('/path/to/doc.pdf', './path/to/entry/')->willReturn(false);
 
+        $this->expectException(RuntimeException::class);
+
         $manager = $this->createFileManager($entry->reveal());
         $manager->attach('/path/to/doc.pdf');
     }
 
-    /**
-     * @expectedException FileIsProtected
-     */
     public function testAttach_WhenFileIsBlacklisted_ShouldThrowFileIsProtectedError() {
         $entry = $this->prophet->prophesize('BlogEntry');
         $entry->localpath()->willReturn('./path/to/entry/');
         $this->setUpEntryFileListing('./path/to/entry/', []);
+
+        $this->expectException(FileIsProtected::class);
 
         $manager = $this->createFileManager($entry->reveal());
         $manager->attach('/path/to/entry.xml');
@@ -183,13 +177,12 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase {
         $this->fs->copy(Argument::any(), Argument::any())->shouldNotHaveBeenCalled();
     }
 
-    /**
-     * @expectedException FileIsProtected
-     */
     public function testAttach_WhenNewNameIsBlacklisted_ShouldThrowFileIsProtectedError() {
         $entry = $this->prophet->prophesize('BlogEntry');
         $entry->localpath()->willReturn('./path/to/entry/');
         $this->setUpEntryFileListing('./path/to/entry/', []);
+
+        $this->expectException(FileIsProtected::class);
 
         $manager = $this->createFileManager($entry->reveal());
         $manager->attach('/path/to/test.xml', 'entry.xml');
@@ -197,13 +190,13 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase {
         $this->fs->copy(Argument::any(), Argument::any())->shouldNotHaveBeenCalled();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         Path::$sep = '/';
         $this->prophet = new \Prophecy\Prophet();
         $this->fs = $this->prophet->prophesize('FS');
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->prophet->checkPredictions();
     }
 

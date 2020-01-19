@@ -251,7 +251,7 @@ function blogger_newPost($params) {
     $pwd = trim($password->scalarval());
     $usr = NewUser($uid);
     $fs = NewFS();
-    $publisher = new Publisher($blog, $usr, $fs, new WrapperGenerator($fs));
+    $publisher = new Publisher($blog, $usr, $fs, new WrapperGenerator($fs), new TaskManager());
 
     if ( !$usr->checkPassword($pwd) ||
          !System::instance()->canAddTo($blog, $usr) ) {
@@ -325,7 +325,7 @@ function blogger_editPost($params) {
     $pwd = trim($password->scalarval());
     $usr = NewUser($uid);
     $fs = NewFS();
-    $publisher = new Publisher($blog, $usr, $fs, new WrapperGenerator($fs));
+    $publisher = new Publisher($blog, $usr, $fs, new WrapperGenerator($fs), new TaskManager());
 
     if (!$usr->checkPassword($pwd) || !System::instance()->canModify($ent, $usr) ) {
         return new xmlrpcresp(0, $xmlrpcerruser+3, "Invalid password - cannot edit post");
@@ -391,7 +391,7 @@ function blogger_deletePost($params) {
     $pwd = trim($password->scalarval());
     $usr = NewUser($uid);
     $fs = NewFS();
-    $publisher = new Publisher($blog, $usr, $fs, new WrapperGenerator($fs));
+    $publisher = new Publisher($blog, $usr, $fs, new WrapperGenerator($fs), new TaskManager());
 
     $can_delete = $usr->checkPassword($pwd) &&
         System::instance()->canDelete($ent, $usr);
@@ -642,7 +642,7 @@ function metaWeblog_newPost($params) {
     $pwd = trim($password->scalarval());
     $usr = NewUser($uid);
     $fs = NewFS();
-    $publisher = new Publisher($blog, $usr, $fs, new WrapperGenerator($fs));
+    $publisher = new Publisher($blog, $usr, $fs, new WrapperGenerator($fs), new TaskManager());
 
     if ( !$usr->checkPassword($pwd) ||
          !System::instance()->canAddTo($blog, $usr) ) {
@@ -725,7 +725,7 @@ function metaWeblog_editPost($params) {
     $ent = NewBlogEntry($postpath);
     $blog = $ent->getParent();
 
-    $publisher = new Publisher($blog, $usr, $fs, new WrapperGenerator($fs));
+    $publisher = new Publisher($blog, $usr, $fs, new WrapperGenerator($fs), new TaskManager());
 
     if (!$usr->checkPassword($pwd) ||
         !System::instance()->canModify($ent, $usr) ) {

@@ -32,67 +32,59 @@ class SocialWebServerTest extends \PHPUnit\Framework\TestCase {
         $server->addWebmention($source, $target);
     }
 
-    /**
-     * @expectedException WebmentionInvalidReceive
-     */
     public function testAddWebmention_WhenSourceAndTargetAreTheSame_Throws() {
         $source = 'http://www.example.com/test1';
         $target = 'http://www.example.com/test1';
 
+        $this->expectException(WebmentionInvalidReceive::class);
+
         $server = $this->createSocialWebServer();
         $server->addWebmention($source, $target);
     }
 
-    /**
-     * @expectedException WebmentionInvalidReceive
-     */
     public function testAddWebmention_WhenTargetHasInvalidProtocol_Throws() {
         $source = 'https://www.example.com/test1';
         $target = 'sftp:///etc/passwd';
 
+        $this->expectException(WebmentionInvalidReceive::class);
+
         $server = $this->createSocialWebServer();
         $server->addWebmention($source, $target);
     }
 
-    /**
-     * @expectedException WebmentionInvalidReceive
-     */
     public function testAddWebmention_WhenSourceHasInvalidProtocol_Throws() {
         $source = 'ftp://yoursite.com/path1';
         $target = 'https://www.example.com/test1';
 
+        $this->expectException(WebmentionInvalidReceive::class);
+
         $server = $this->createSocialWebServer();
         $server->addWebmention($source, $target);
     }
 
-    /**
-     * @expectedException WebmentionInvalidReceive
-     */
     public function testAddWebmention_WhenTargetIsNotEntry_Throws() {
         $source = 'http://www.yoursite.com/path1';
         $target = 'https://www.mysite.com/test1';
         $this->mapper->getEntryFromUri($target)->willReturn(false);
 
+        $this->expectException(WebmentionInvalidReceive::class);
+
         $server = $this->createSocialWebServer();
         $server->addWebmention($source, $target);
     }
 
-    /**
-     * @expectedException WebmentionInvalidReceive
-     */
     public function testAddWebmention_WhenSourceDoesNotContainTarget_Throws() {
         $source = 'http://www.yoursite.com/path1';
         $target = 'https://www.mysite.com/test1';
         $this->mapper->getEntryFromUri($target)->willReturn($this->entry);
         $this->http_client->fetchUrl($source)->willReturn('Test page');
 
+        $this->expectException(WebmentionInvalidReceive::class);
+
         $server = $this->createSocialWebServer();
         $server->addWebmention($source, $target);
     }
 
-    /**
-     * @expectedException WebmentionInvalidReceive
-     */
     public function testAddWebmention_WhenPingbacksNotAccepted_Throws() {
         $source = 'http://www.yoursite.com/path1';
         $target = 'https://www.mysite.com/test1';
@@ -101,13 +93,12 @@ class SocialWebServerTest extends \PHPUnit\Framework\TestCase {
             ->willReturn("<a href='$target'>this is a link</a>");
         $this->entry->allow_pingback = false;
 
+        $this->expectException(WebmentionInvalidReceive::class);
+
         $server = $this->createSocialWebServer();
         $server->addWebmention($source, $target);
     }
 
-    /**
-     * @expectedException WebmentionInvalidReceive
-     */
     public function testAddWebmention_WhenEntryIsNotPublished_Throws() {
         $source = 'http://www.yoursite.com/path1';
         $target = 'https://www.mysite.com/test1';
@@ -115,6 +106,8 @@ class SocialWebServerTest extends \PHPUnit\Framework\TestCase {
         $this->http_client->fetchUrl($source)
             ->willReturn("<a href='$target'>this is a link</a>");
         $this->entry->isPublished()->willReturn(false);
+
+        $this->expectException(WebmentionInvalidReceive::class);
 
         $server = $this->createSocialWebServer();
         $server->addWebmention($source, $target);
@@ -135,14 +128,14 @@ class SocialWebServerTest extends \PHPUnit\Framework\TestCase {
         $this->entry->addReply(Argument::any())->shouldNotHaveBeenCalled();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         $this->prophet = new \Prophecy\Prophet();
         $this->entry = $this->prophet->prophesize(BlogEntry::class);
         $this->mapper = $this->prophet->prophesize(EntryMapper::class);
         $this->http_client = $this->prophet->prophesize(HttpClient::class);
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->prophet->checkPredictions();
     }
 

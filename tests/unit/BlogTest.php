@@ -42,7 +42,7 @@ class BlogTest extends PHPUnit\Framework\TestCase {
         $this->assertFalse($enabled);
     }
     
-    public function setUp() {
+    public function setUp(): void {
         Path::$sep = '/';
         $this->prophet = new \Prophecy\Prophet();
         $this->fs = $this->prophet->prophesize('FS');
@@ -50,7 +50,7 @@ class BlogTest extends PHPUnit\Framework\TestCase {
         $this->blog = new Blog("", $this->fs->reveal());
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         Path::$sep = DIRECTORY_SEPARATOR;
         $this->prophet->checkPredictions();
     }

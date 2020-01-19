@@ -11,7 +11,7 @@ class PublisherIntTest extends \PHPUnit\Framework\TestCase {
 
         $user = new User("testuser", "testpass");
 
-        $publisher = new Publisher($blog, $user, NewFS(), new WrapperGenerator(NewFS()));
+        $publisher = new Publisher($blog, $user, NewFS(), new WrapperGenerator(NewFS()), new TaskManager());
         $this->assertTrue(is_dir(self::TESTPATH));
 
         return $publisher;

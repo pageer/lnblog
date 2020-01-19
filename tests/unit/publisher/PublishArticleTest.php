@@ -4,15 +4,14 @@ use Prophecy\Argument;
 
 class PublishArticleTest extends PublisherTestBase {
 
-    /**
-     * @expectedException EntryAlreadyExists
-     */
     public function testPublishArticle_WhenTargetDirAlreadyExists_Throws() {
         $entry = $this->getTestDraftEntry();
         $this->fs->file_exists('./drafts/02_1234/entry.xml')->willReturn(true);
         $this->fs->realpath('./drafts/02_1234/entry.xml')->willReturn('./drafts/02_1234/entry.xml');
         $this->fs->is_dir('./content')->willReturn(true);
         $this->fs->is_dir('./content/some_stuff')->willReturn(true);
+
+        $this->expectException(EntryAlreadyExists::class);
 
         $this->publisher->publishArticle($entry, $this->getTestTime());
     }
@@ -57,9 +56,6 @@ class PublishArticleTest extends PublisherTestBase {
         $this->publisher->publishArticle($entry, $this->getTestTime());
     }
 
-    /**
-     * @expectedException   EntryRenameFailed
-     */
     public function testPublishArticle_WhenDraftRenameFail_Throws() {
         $entry = $this->getTestDraftEntry();
         $this->fs->file_exists('./drafts/02_1234/entry.xml')->willReturn(true);
@@ -68,6 +64,8 @@ class PublishArticleTest extends PublisherTestBase {
         $this->fs->is_dir('./content/some_stuff')->willReturn(false);
 
         $this->fs->rename('./drafts/02_1234', './content/some_stuff')->willReturn(false);
+
+        $this->expectException(EntryRenameFailed::class);
 
         $this->publisher->publishArticle($entry, $this->getTestTime());
     }
@@ -96,7 +94,7 @@ class PublishArticleTest extends PublisherTestBase {
         $this->assertEquals('billybob', $entry->uid);
         $this->assertEquals($expected_time, $entry->post_ts);
         $this->assertEquals($expected_time, $entry->timestamp);
-        $this->assertContains('2017-01-02 12:34', $entry->date);
+        $this->assertStringContainsString('2017-01-02 12:34', $entry->date);
         $this->assertEquals('1.2.3.4', $entry->ip);
     }
 

@@ -3,11 +3,10 @@ use Prophecy\Argument;
 
 class DeleteTest extends PublisherTestBase {
 
-    /**
-     * @expectedException EntryDoesNotExist
-     */
     public function testDelete_WhenEntryDoesNotExist_Throws() {
         $entry =  new BlogEntry(null, $this->fs->reveal());
+
+        $this->expectException(EntryDoesNotExist::class);
 
         $this->publisher->delete($entry, $this->getTestTime());
     }
@@ -99,9 +98,6 @@ class DeleteTest extends PublisherTestBase {
         $this->publisher->delete($entry, $time);
     }
 
-    /**
-     * @expectedException   EntryDeleteFailed
-     */
     public function testDelete_WhenNotTrackingHistoryAndDeleteFails_Throws() {
         $path = './entries/2017/03/02_1234/entry.xml';
         $entry = new BlogEntry(null, $this->fs->reveal());
@@ -112,13 +108,12 @@ class DeleteTest extends PublisherTestBase {
         $this->fs->file_exists(Argument::any())->willReturn(false);
         $this->fs->rmdir_rec('./entries/2017/03/02_1234')->willReturn(false);
 
+        $this->expectException(EntryDeleteFailed::class);
+
         $this->publisher->keepEditHistory(false);
         $this->publisher->delete($entry);
     }
 
-    /**
-     * @expectedException   EntryDeleteFailed
-     */
     public function testDelete_WhenTrackingHistoryAndRenameFails_Throws() {
         $path = './entries/2017/03/02_1234/entry.xml';
         $new_path = './entries/2017/03/02_1234/02_123400.xml';
@@ -130,10 +125,12 @@ class DeleteTest extends PublisherTestBase {
         $this->fs->file_exists(Argument::any())->willReturn(false);
         $this->fs->rename($path, $new_path)->willReturn(false);
 
+        $this->expectException(EntryDeleteFailed::class);
+
         $this->publisher->keepEditHistory(true);
         $this->publisher->delete($entry, $this->getTestTime());
     }
-    
+
     public function testDelete_WhenEntryIsDraft_DoesNotRaiseOnDeleteEvent() {
         $entry = $this->setUpTestDraftEntryForSuccessfulDelete();
         $this->fs->scandir(Argument::any())->willReturn(array());

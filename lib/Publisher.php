@@ -1,5 +1,8 @@
 <?php
 
+use LnBlog\Tasks\AutoPublishTask;
+use LnBlog\Tasks\TaskManager;
+
 # Class: Publisher
 # Handles publication of blog entries, including updates and deletions.
 class Publisher {
@@ -8,14 +11,22 @@ class Publisher {
     private $blog;
     private $user;
     private $wrappers;
+    private $task_manager;
     private $http_client;
     private $keepHistory;
 
-    public function __construct(Blog $blog, User $user, FS $fs, WrapperGenerator $wrappers) {
+    public function __construct(
+        Blog $blog,
+        User $user,
+        FS $fs,
+        WrapperGenerator $wrappers,
+        TaskManager $task_manager
+    ) {
         $this->blog = $blog;
         $this->user = $user;
         $this->fs = $fs;
         $this->wrappers = $wrappers;
+        $this->task_manager = $task_manager;
     }
 
     /* Method: keepEditHistory
@@ -208,7 +219,7 @@ class Publisher {
         $this->handleUploads($entry);
 
         if ($entry->autopublish) {
-            $entry->setAutoPublishDate($entry->autopublish_date);
+            $this->setAutoPublish($entry);
         }
 
         if (! $ret) {
@@ -402,10 +413,33 @@ class Publisher {
     }
 
     private function updateAutoPublishState($entry) {
-        if (!$entry->isPublished()) {
-            $pub_date = $entry->autopublish ? $entry->autopublish_date : '';
-            $entry->setAutoPublishDate($pub_date);
+        if ($entry->isPublished()) {
+            return;
         }
+        if ($entry->autopublish) {
+            $this->setAutoPublish($entry);
+        } else {
+            $this->unsetAutoPublish($entry);
+        }
+    }
+
+    private function setAutoPublish($entry) {
+        $pub_task = new AutoPublishTask();
+        $run_time = new DateTime($entry->autopublish_date);
+        $pub_task->runAfterTime($run_time);
+        $pub_task->data($entry);
+        $old_task = $this->task_manager->findByKey($pub_task);
+        if ($old_task) {
+            $this->task_manager->remove($old_task);
+        }
+        $this->task_manager->add($pub_task);
+    }
+
+    private function unsetAutoPublish($entry) {
+        $task = new AutoPublishTask();
+        $task->data($entry);
+        $pub_task = $this->task_manager->findByKey($task);
+        $this->task_manager->remove($pub_task);
     }
 
     private function updatePermalinkFile(BlogEntry $entry) {

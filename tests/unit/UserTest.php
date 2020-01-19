@@ -11,9 +11,9 @@ class UserTest extends \PHPUnit\Framework\TestCase {
         $logged_in = $user->login('12345');
 
         $this->assertTrue($logged_in);
-        $this->assertContains('May 23 1970 21:21:18', $_COOKIE[LAST_LOGIN_TIME]);
-        $this->assertContains('bob', $_COOKIE[CURRENT_USER]);
-        $this->assertContains(md5('127.0.0.1May 23 1970 21:21:18'), $_COOKIE[LOGIN_TOKEN]);
+        $this->assertStringContainsString('May 23 1970 21:21:18', $_COOKIE[LAST_LOGIN_TIME]);
+        $this->assertStringContainsString('bob', $_COOKIE[CURRENT_USER]);
+        $this->assertStringContainsString(md5('127.0.0.1May 23 1970 21:21:18'), $_COOKIE[LOGIN_TOKEN]);
     }
 
     public function testLogin_WhenSessionAuthAndIpLock_SetsSessionData() {
@@ -35,8 +35,8 @@ class UserTest extends \PHPUnit\Framework\TestCase {
         $logged_in = $user->login('12345');
 
         $this->assertTrue($logged_in);
-        $this->assertContains('bob', $_COOKIE[CURRENT_USER]);
-        $this->assertContains(md5($user->passwd . '127.0.0.1'), $_COOKIE[PW_HASH]);
+        $this->assertStringContainsString('bob', $_COOKIE[CURRENT_USER]);
+        $this->assertStringContainsString(md5($user->passwd . '127.0.0.1'), $_COOKIE[PW_HASH]);
     }
 
     public function testLogin_WhenPasswordDoesNotMatch_ReturnsFalse() {
@@ -215,14 +215,13 @@ class UserTest extends \PHPUnit\Framework\TestCase {
         $this->assertFalse($result);
     }
 
-    /**
-     * @expectedException RateLimitExceeded
-     */
     public function testCreatePasswordReset_WhenMultipleAttemptsWithinSeconds_ThrowsRateLimitError() {
         $this->setConstantReturns(['USER_DATA_PATH' => 'userdata']);
         $this->globals->time()->willReturn(12345, 12346);
 
         $this->configureMocksToReadAndWritePwreset('bob');
+
+        $this->expectException(RateLimitExceeded::class);
 
         $user = $this->createUserWithoutDataRead('bob', '12345');
         $token1 = $user->createPasswordReset();
@@ -256,7 +255,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
 
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         $this->prophet = new \Prophecy\Prophet();
         $this->fs = $this->prophet->prophesize('NativeFS');
         $this->globals = $this->prophet->prophesize(GlobalFunctions::class);
@@ -267,7 +266,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
         $this->globals->time()->willReturn(12345678);
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->prophet->checkPredictions();
     }
 

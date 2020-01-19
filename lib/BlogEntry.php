@@ -288,7 +288,9 @@ class BlogEntry extends Entry implements AttachmentContainer {
     public function globalID() {
         $root = calculate_server_root($this->file);
         $ret = dirname($this->file);
-        $ret = substr($ret, strlen($root));
+        if (strpos($ret, $root) === 0) {
+            $ret = substr($ret, strlen($root));
+        }
         $ret = str_replace(PATH_DELIM, '/', $ret);
         return trim($ret, '/');
     }
@@ -594,48 +596,18 @@ class BlogEntry extends Entry implements AttachmentContainer {
         }
     }
 
-    # Method setAutoPublishDate
-    # Sets the date at which a draft should auto-publish
-    #
-    # Parameters:
-    # date - The date to publish or null to cancel auto publish.
-    public function setAutoPublishDate($date) {
-        $date_ts = new DateTime($date);
-        $path = Path::mk($this->localpath(), self::AUTO_PUBLISH_FILE);
-        if ($date && $date_ts > new DateTime()) {
-            $this->fs->write_file($path, $date_ts->format('Y-m-d H:i:s'));
-        } elseif ($this->fs->file_exists($path)) {
-            $this->fs->delete($path);
-        }
-    }
-
     # Method: getAutoPublishDate
     # Get the auto-publish date.
     #
     # Returns:
     # The date string when publication will happen or empty string.
     public function getAutoPublishDate() {
-        $path = mkpath($this->localpath(), self::AUTO_PUBLISH_FILE);
-        $ts = 0;
-        if ($this->fs->file_exists($path)) {
-            $ts = new DateTime(trim($this->fs->read_file($path)));
+        $date = '';
+        if ($this->autopublish) {
+            $datetime = new DateTime($this->autopublish_date);
+            $date = $datetime->format('Y-m-d H:i:s');
         }
-        return $ts ? $ts->format('Y-m-d H:i:s') : '';
-    }
-
-    # Method: shouldAutoPublish
-    # Determine if a draft is ready to be auto-published
-    #
-    # Returns:
-    # True if the draft should be publised, false otherwise.
-    public function shouldAutoPublish() {
-        $path = mkpath($this->localpath(), self::AUTO_PUBLISH_FILE);
-        if ($this->fs->file_exists($path)) {
-            $ts = new DateTime(trim($this->fs->read_file($path)));
-            $now = new DateTime();
-            return $now >= $ts;
-        }
-        return false;
+        return $date;
     }
 
     /*

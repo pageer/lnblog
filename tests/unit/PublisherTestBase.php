@@ -1,38 +1,46 @@
 <?php
+
+use LnBlog\Tasks\TaskManager;
 use Prophecy\Argument;
 
 abstract class PublisherTestBase extends PHPUnit\Framework\TestCase {
 
-    protected function setUp() {
+    protected function setUp(): void {
         $_FILES = array();
         $_SERVER = array();
 
         Path::$sep = '/';
         $this->prophet = new \Prophecy\Prophet();
 
-        $this->blog = $this->prophet->prophesize('Blog');
+        $this->blog = $this->prophet->prophesize(Blog::class);
         $this->blog->home_path = '.';
 
-        $this->user = $this->prophet->prophesize('User');
+        $this->user = $this->prophet->prophesize(User::class);
+        $this->fs = $this->prophet->prophesize(FS::class);
+        $this->task_manager = $this->prophet->prophesize(TaskManager::class);
 
-        $this->fs = $this->prophet->prophesize('FS');
-
-        $this->system = $this->prophet->prophesize('System');
-        $this->sys_ini = $this->prophet->prophesize('INIParser');
+        $this->system = $this->prophet->prophesize(System::class);
+        $this->sys_ini = $this->prophet->prophesize(INIParser::class);
         $this->system->reveal()->sys_ini = $this->sys_ini->reveal();
         System::$static_instance = $this->system->reveal();
 
-        $this->wrappers = $this->prophet->prophesize('WrapperGenerator');
+        $this->wrappers = $this->prophet->prophesize(WrapperGenerator::class);
 
-        $this->http_client = $this->prophet->prophesize('HttpClient');
+        $this->http_client = $this->prophet->prophesize(HttpClient::class);
 
         EventRegister::instance()->clearAll();
 
-        $this->publisher = new TestablePublisher($this->blog->reveal(), $this->user->reveal(), $this->fs->reveal(), $this->wrappers->reveal());
+        $this->publisher = new TestablePublisher(
+            $this->blog->reveal(),
+            $this->user->reveal(),
+            $this->fs->reveal(),
+            $this->wrappers->reveal(),
+            $this->task_manager->reveal()
+        );
         $this->publisher->http_client = $this->http_client->reveal();
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         Path::$sep = DIRECTORY_SEPARATOR;
         $this->prophet->checkPredictions();
     }

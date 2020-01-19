@@ -656,7 +656,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->webpage->resetPassword();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         EventRegister::instance()->clearAll();
         $_POST = [];
         $_GET = [];
@@ -686,7 +686,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->webpage->test_global_functions = $this->global_functions->reveal();
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->prophet->checkPredictions();
     }
 

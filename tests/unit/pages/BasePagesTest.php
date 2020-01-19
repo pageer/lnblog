@@ -76,14 +76,14 @@ class BasePagesTest extends PHPUnit\Framework\TestCase {
         
     }
     
-    protected function setUp() {
+    protected function setUp(): void {
         $this->prophet = new \Prophecy\Prophet();
         $this->fs = $this->prophet->prophesize('FS');
         $this->page = new TestPages($this->fs->reveal());
         OtherTestPages::$last_action = '';
     }
     
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->prophet->checkPredictions();
     }
 }

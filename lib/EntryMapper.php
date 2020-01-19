@@ -31,4 +31,8 @@ class EntryMapper {
         }
         return false;
     }
+
+    public function getEntryFromId($entry_id) {
+        return NewEntry($entry_id);
+    }
 }

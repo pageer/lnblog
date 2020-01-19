@@ -1,15 +1,16 @@
 <?php
+
+use LnBlog\Tasks\AutoPublishTask;
 use Prophecy\Argument;
 
 class UpdateTest extends PublisherTestBase {
 
-    /**
-     * @expectedException EntryDoesNotExist
-     */
     public function testUpdate_WhenEntryDoesNotExist_Throws() {
         $entry = new BlogEntry("", $this->fs->reveal());
         $entry->body = "This is some text";
         $this->fs->file_exists(Argument::any())->willReturn(false);
+
+        $this->expectException(EntryDoesNotExist::class);
 
         $this->publisher->update($entry);
     }
@@ -37,7 +38,6 @@ class UpdateTest extends PublisherTestBase {
         $entry->body = "This is some text";
         $this->fs->file_exists($path)->willReturn(true);
         $this->fs->realpath($path)->willReturn($path);
-        $this->fs->file_exists("./drafts/02_1234/publish.txt")->willReturn(false);
         $this->fs->write_file($path, Argument::containingString('This is some text'))->willReturn(true);
 
         $this->fs->rename($path, './drafts/02_1234/02_123400.xml')->willReturn(true)->shouldBeCalled();
@@ -46,9 +46,6 @@ class UpdateTest extends PublisherTestBase {
         $this->publisher->update($entry, $this->getTestTime());
     }
     
-    /**
-     * @expectedException EntryWriteFailed
-     */
     public function testUpdate_WhenNotTrackingHistoryAndWriteFails_Throws() {
         $path = './drafts/02_1234/entry.xml';
         $entry = new BlogEntry("", $this->fs->reveal());
@@ -58,13 +55,12 @@ class UpdateTest extends PublisherTestBase {
         $this->fs->realpath($path)->willReturn($path);
         $this->fs->write_file($path, Argument::containingString('This is some text'))->willReturn(false);
 
+        $this->expectException(EntryWriteFailed::class);
+
         $this->publisher->keepEditHistory(false);
         $this->publisher->update($entry);
     }
 
-    /**
-     * @expectedException EntryRenameFailed
-     */
     public function testUpdate_WhenTrackingHistoryAndRenameFails_DoesNotWriteFile() {
         $path = './drafts/02_1234/entry.xml';
         $entry = new BlogEntry("", $this->fs->reveal());
@@ -74,14 +70,13 @@ class UpdateTest extends PublisherTestBase {
 
         $this->fs->rename($path, './drafts/02_1234/02_123400.xml')->willReturn(false)->shouldBeCalled();
         $this->fs->write_file(Argument::any(), Argument::any())->shouldNotBeCalled();
+        $this->expectException(EntryRenameFailed::class);
+     
 
         $this->publisher->keepEditHistory(true);
         $this->publisher->update($entry, $this->getTestTime());
     }
 
-    /**
-     * @expectedException EntryWriteFailed
-     */
     public function testUpdate_WhenTrackingHistoryAndWriteFails_ThrowsAndRenamesOldFileBack() {
         $path = './drafts/02_1234/entry.xml';
         $entry = new BlogEntry("", $this->fs->reveal());
@@ -90,6 +85,8 @@ class UpdateTest extends PublisherTestBase {
         $this->fs->realpath($path)->willReturn($path);
         $this->fs->rename($path, './drafts/02_1234/02_123400.xml')->willReturn(true);
         $this->fs->write_file(Argument::any(), Argument::any())->willReturn(false);
+
+        $this->expectException(EntryWriteFailed::class);
 
         $this->fs->rename('./drafts/02_1234/02_123400.xml', $path)->shouldBeCalled();
 
@@ -234,24 +231,31 @@ class UpdateTest extends PublisherTestBase {
     }
 
     public function testUpdate_WhenEntryIsNotPublisehedAndAutoPublishSet_WritesAutoPublishInfo() {
-        $path = './drafts/02_1234/publish.txt';
         $entry = $this->setUpTestDraftEntryForSuccessfulSave();
         $entry->autopublish = true;
         $entry->autopublish_date = "2525-01-02 12:00:00";
+        $this->task_manager->findByKey(Argument::any())->willReturn(null);
 
-        $this->fs->write_file($path, "2525-01-02 12:00:00")->shouldBeCalled();
+        $task_check = function ($arg) {
+            $run_time = $arg->runAfterTime();
+            $datetime = new DateTime("2525-01-02 12:00:00");
+            return $arg instanceof AutoPublishTask && $run_time == $datetime;
+        };
+        $this->task_manager->add(Argument::that($task_check))->shouldBeCalled();
 
         $this->publisher->update($entry, $this->getTestTime());
     }
 
     public function testUpdate_WhenAutoPubishWasSetAndNowUnset_DeletesAutoPublishInfo() {
-        $path = './drafts/02_1234/publish.txt';
         $entry = $this->setUpTestDraftEntryForSuccessfulSave();
         $entry->autopublish = false;
         $entry->autopublish_date = "2525-01-02 12:00:00";
-        $this->fs->file_exists($path)->willReturn(true);
+        $this->task_manager->findByKey(Argument::any())->willReturnArgument(0);
 
-        $this->fs->delete($path)->shouldBeCalled();
+        $task_check = function ($arg) {
+            return $arg->keyData() == './drafts/02_1234';
+        };
+        $this->task_manager->remove(Argument::that($task_check))->shouldBeCalled();
 
         $this->publisher->update($entry, $this->getTestTime());
     }

@@ -97,13 +97,13 @@ class XMLINITest extends PHPUnit\Framework\TestCase {
         $this->assertEquals("fuzz", $fuzz);
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         $this->prophet = new \Prophecy\Prophet();
         $this->fs = $this->prophet->prophesize('FS');
         $this->config = new XMLINI(false, $this->fs->reveal());
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->prophet->checkPredictions();
     }
 }

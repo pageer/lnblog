@@ -1,11 +1,14 @@
 <?php
 require_once __DIR__.'/../pages/pagelib.php';
 
+use LnBlog\Tasks\TaskManager;
+
 class WebPages extends BasePages {
 
     protected $blog;
     protected $user;
     protected $publisher;
+    protected $task_manager;
 
     private $last_pingback_results = array();
     private $last_upload_error = array();
@@ -1577,7 +1580,10 @@ class WebPages extends BasePages {
     }
 
     public function showblog() {
-        $this->blog->autoPublishDrafts();
+        if (!USE_CRON_SCRIPT) {
+            $this->getTaskManager()->runPendingTasks();
+        }
+
         $this->getPage()->setDisplayObject($this->blog);
 
         $content = $this->show_blog_page($this->blog);
@@ -2078,9 +2084,17 @@ class WebPages extends BasePages {
         if (!$this->publisher) {
             $fs = NewFS();
             $wrappers = new WrapperGenerator($fs);
-            $this->publisher = new Publisher($this->blog, $this->user, $fs, $wrappers);
+            $task_manager = $this->getTaskManager();
+            $this->publisher = new Publisher($this->blog, $this->user, $fs, $wrappers, $task_manager);
         }
         return $this->publisher;
+    }
+
+    protected function getTaskManager() {
+        if (!$this->task_manager) {
+            $this->task_manager = new TaskManager();
+        }
+        return $this->task_manager;
     }
 
     protected function getNewEntry() {

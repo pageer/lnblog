@@ -32,6 +32,10 @@
 # Note that this should really be a factory class, but PHP 4 doesn't allow
 # static methods, so it's more convenient just to make them functions.
 
+use Psr\Log\LoggerInterface;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+
 # Function: NewFS
 # Creates a new filesystem access object.
 function NewFS() {
@@ -48,6 +52,15 @@ function NewFS() {
         default:
             return new NativeFS;
     }
+}
+
+# Function: NewLogger
+# Create a new PSR logger object.
+function NewLogger() {
+    $logger = new Logger('lnblog');
+    $handler = new StreamHandler(mkpath(INSTALL_ROOT, 'application.log'));
+    $logger->pushHandler($handler);
+    return $logger;
 }
 
 # Function: NewPage

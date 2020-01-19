@@ -175,7 +175,7 @@ function calculate_document_root() {
     }
 
     # Find the location
-    $pos = strpos($curr_file, $curr_uri);
+    $pos = $curr_uri ? strpos($curr_file, $curr_uri) : false;
     while (! $pos && strlen($curr_uri) > 1) {
         $curr_uri = dirname($curr_uri);
         $pos = strpos($curr_file, $curr_uri);
