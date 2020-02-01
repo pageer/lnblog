@@ -66,7 +66,7 @@ class TinyMCEEditor extends Plugin {
         };
         <?php endif; ?>
 
-        jQuery(document).ready(function() {
+        var initialize_tinymce = function() {
             var $input_mode = $('#input_mode');
             var unconditional_display = selector ? true : false;
             var content_fetch_timer = null;
@@ -146,6 +146,15 @@ class TinyMCEEditor extends Plugin {
                         tinymce.remove();
                     }
                 });
+            }
+        };
+
+        jQuery(document).ready(function() {
+            try {
+                initialize_tinymce();
+            } catch (error) {
+                console.log("Unable to initialize TinyMCE editor");
+                console.log(error);
             }
         });
         // </script>
