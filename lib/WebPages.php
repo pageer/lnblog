@@ -1432,7 +1432,7 @@ class WebPages extends BasePages {
 
         if ( strtolower(GET('show')) == 'all' ) {
             $this->getPage()->addStylesheet("entry.css");
-            return $blog->getWeblog();
+            return $this->getWeblog();
         } else {
 
             $tpl = NewTemplate(LIST_TEMPLATE);
@@ -1473,7 +1473,7 @@ class WebPages extends BasePages {
             $body = spf_("No entry found for %d-%d-%d", $year, $month, $day);
         } else {
             $this->getPage()->addStyleSheet("entry.css");
-            $body = $blog->getWeblog();
+            $body = $this->getWeblog();
         }
         return $body;
     }
@@ -1570,15 +1570,6 @@ class WebPages extends BasePages {
         $this->getPage()->display($body, $this->blog);
     }
 
-    # Function: show_blog_page
-    # Shows the main blog page.  This is typically the front page of the blog.
-    protected function show_blog_page(&$blog) {
-        $ret = $blog->getWeblog();
-        $this->getPage()->title = $blog->title();
-        $this->getPage()->addStylesheet("entry.css");
-        return $ret;
-    }
-
     public function showblog() {
         if (!USE_CRON_SCRIPT) {
             $this->getTaskManager()->runPendingTasks();
@@ -1586,7 +1577,13 @@ class WebPages extends BasePages {
 
         $this->getPage()->setDisplayObject($this->blog);
 
-        $content = $this->show_blog_page($this->blog);
+        $content = $this->showFrontPageEntry();
+        if (!$content) {
+            $content = $this->getWeblog();
+        }
+
+        $this->getPage()->title = $this->blog->title();
+        $this->getPage()->addStylesheet("entry.css");
         $this->getPage()->display($content, $this->blog);
     }
 
@@ -1919,7 +1916,7 @@ class WebPages extends BasePages {
 
             $ret = $this->blog->getEntriesByTag($tag_list, $limit, true);
             if ($show_posts) {
-                $body = $this->blog->getWeblog();
+                $body = $this->getWeblog();
                 $this->getPage()->addStylesheet("entry.css");
             } else {
                 $links = array();
@@ -2105,5 +2102,57 @@ class WebPages extends BasePages {
         $mapper = new EntryMapper();
         $client = new HttpClient();
         return new SocialWebServer($mapper, $client);
+    }
+
+    private function getWeblog() {
+        $ret = '';
+        $offset = $this->getCurrentOffset();
+        if (! $this->blog->entrylist) {
+            #$this->blog->getRecent();
+            $this->blog->getEntries($this->blog->max_entries, $offset);
+        }
+        foreach ($this->blog->entrylist as $ent) {
+            $show_ctl = 
+                System::instance()->canModify($ent, $this->user) && 
+                $this->user->checkLogin();
+            $ret .= $ent->get($show_ctl);
+        }
+        if ($ret) {
+            $ret .= $this->addPager();
+        } else {
+            $ret = "<p>"._("There are no entries for this weblog.")."</p>";
+        }
+        return $ret;
+    }
+
+    private function showFrontPageEntry() {
+        if ($this->blog->front_page_entry) {
+            $ent = NewEntry($this->blog->front_page_entry);
+            if ($ent->isEntry()) {
+                $show_ctl =
+                    System::instance()->canModify($ent, $this->user) &&
+                    $u->checkLogin();
+                return $ent->get($show_ctl);
+            }
+        }
+        return '';
+    }
+
+    private function addPager() {
+        $page = (int) GET('page');
+        $markup = '';
+        $template = NewTemplate('pager_tpl.php');
+        $template->set('PAGE', $page);
+        $template->set('PAGE_VAR', 'page');
+        $template->set('INCREMENT', 1);
+        $template->set('START_PAGE', 1);
+        $template->set('MORE_ENTRIES', $this->blog->has_more_entries);
+        return $template->process();
+    }
+
+    private function getCurrentOffset() {
+        $page = (int) GET('page');
+        $page = $page > 0 ? $page : 1;
+        return ($page - 1) * $this->blog->max_entries;
     }
 }

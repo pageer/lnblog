@@ -1,6 +1,9 @@
 syntax: glob
 
 pending-tasks.json
+application.log
+blogconfig.cfg
+userdata/fsconfig.php
 
 vendor
 build

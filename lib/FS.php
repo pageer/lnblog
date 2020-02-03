@@ -273,7 +273,7 @@ abstract class FS {
         return scandir($directory, $sorting_order);
     }
 
-    # Function: scan_directory
+    # Method: scan_directory
     # Does essentially the same thing as scandir on PHP 5.  Gets all the entries
     # in the given directory.
     #
@@ -296,6 +296,19 @@ abstract class FS {
         }
         closedir($dirhand);
         return $dir_list;
+    }
+
+    # Method: glob
+    # Does a shell wildcard glob and returns the results.
+    #
+    # Parameters:
+    # expression = (string) The wildcard pattern to match.
+    # flags - (int) A bitmask of flags to manipulate the glob behavior.
+    #
+    # Returns:
+    # An array containing the list of matched files and/or directories.
+    public function glob($expression, $flags = 0) {
+        return glob($expression, $flags);
     }
 
     # Method: filesize

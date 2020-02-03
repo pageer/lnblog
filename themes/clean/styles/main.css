@@ -270,6 +270,23 @@ a.anchor:hover {
 	color: gray;
 }
 
+.pager .link {
+    display: block;
+    position: absolute;
+    margin-bottom: 20px;
+}
+
+.pager-prev {
+    left: 0;
+    text-align: left;
+
+}
+
+.pager-next {
+    right: 0;
+    text-align: right;
+}
+
 #responsive-menu,
 #responsive-close {
     display: none;
@@ -370,8 +387,8 @@ q { font-style: italic; }
 	#banner, 
 	#menubar, 
 	#sidebar, 
-	#commentsubmit {
+	#commentsubmit,
+   .pager {
 		display: none;
 	}
-
 }

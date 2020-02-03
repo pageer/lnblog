@@ -247,7 +247,22 @@ a.anchor:hover {
 	color: gray;
 }
 
+.pager .link {
+    display: block;
+    position: absolute;
+    margin-bottom: 20px;
+}
 
+.pager-prev {
+    left: 0;
+    text-align: left;
+
+}
+
+.pager-next {
+    right: 0;
+    text-align: right;
+}
 
 /* Basic form styles for sidebar and comment form. */
 input[type='checkbox']:focus,
@@ -355,7 +370,8 @@ q { font-style: italic; }
 	#banner, 
 	#menubar, 
 	#sidebar, 
-	#commentsubmit {
+	#commentsubmit,
+   .pager {
 		display: none;
 	}
 

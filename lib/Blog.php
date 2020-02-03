@@ -80,6 +80,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     public $url_method = '';
 
     public $entrylist = array();
+    public $has_more_entries = false;
     public $last_blogentry = null;
     public $last_article = null;
     public $custom_fields = array();
@@ -608,15 +609,25 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     Returns:
     An array of BlogEntry objects.
     */
-    public function getEntries($number=-1,$offset=0) {
+    public function getEntries($number = -1, $offset = 0) {
+        $this->getEntriesRecursive($number, $offset);
+        #$this->getEntriesByGlob($number, $offset);
+        return $this->entrylist;
+    }
+
+    private function getEntriesRecursive($number=-1,$offset=0) {
 
         $entry = NewBlogEntry();
         $this->entrylist = array();
-        if ($number == 0) return;
+        if ($number == 0) {
+            return [];
+        }
 
         $ent_dir = Path::mk($this->home_path, BLOG_ENTRY_PATH);
         $num_scanned = 0;
         $num_found = 0;
+
+        $this->has_more_entries = false;
 
         $year_list = $this->fs->scan_directory($ent_dir, true);
         rsort($year_list);
@@ -632,16 +643,55 @@ class Blog extends LnBlogObject implements AttachmentContainer {
                     $ent_path = Path::mk($path, $e);
                     if ( $entry->isEntry($ent_path) ) {
                         if ($num_scanned >= $offset) {
-                            $this->entrylist[] = NewBlogEntry($ent_path);
                             $num_found++;
                             # If we've hit the max, then break out of all 3 loops.
-                            if ($num_found >= $number && $number >= 0) break 3;
+                            if ($num_found > $number && $number >= 0) {
+                                $this->has_more_entries = true;
+                                break 3;
+                            }
+                            $this->entrylist[] = NewBlogEntry($ent_path);
                         }
                         $num_scanned++;
                     }
                 }  # End month loop
             }  # End year loop
         }  # End archive loop
+        return $this->entrylist;
+    }
+
+    private function getEntriesByGlob($number = -1, $offset = 0) {
+        if ($number == 0) {
+            return [];
+        }
+
+        $this->entrylist = [];
+        $num_scanned = 0;
+        $num_found = 0;
+
+        # This glob should find all of the entry.xml files, which are required
+        # for valid entries, in a single step.
+        $entry_file_glob = Path::mk($this->home_path, BLOG_ENTRY_PATH, '*', '*', '*', ENTRY_DEFAULT_FILE);
+        $files = $this->fs->glob($entry_file_glob);
+        /*
+        $entry_list = array_reverse($files);
+
+        if ($number > 0) {
+            $entry_list = array_slice($entry_list, $offset, $number);
+        }
+         */
+        if ($number > 0) {
+            $offset = -1 * ($offset + $number);
+            $files2 = array_slice($files, $offset, $number);
+        }
+
+        $entry_list = array_reverse(isset($files2) ? $files2 : $files);
+
+        $instantiator = function ($entry_path) {
+            return NewBlogEntry(dirname($entry_path));
+        };
+        
+        $this->entrylist = array_map($instantiator, $entry_list);
+        $this->has_more_entries = count($entry_list) - $offset - $number > 0;
         return $this->entrylist;
     }
 
@@ -943,34 +993,6 @@ class Blog extends LnBlogObject implements AttachmentContainer {
         $tpl->set("BLOG_GATHER_REPLIES", $this->gather_replies);
         $tpl->set("BLOG_AUTO_PINGBACK", $this->autoPingbackEnabled());
         $tpl->set("BLOG_FRONT_PAGE_ABSTRACT", $this->front_page_abstract);
-    }
-
-    /*
-    Method: getWeblog
-    Gets the markup to display for the front page of a weblog.
-
-    Returns:
-    A string holding the HTML to display.
-    */
-    public function getWeblog () {
-        $ret = "";
-        $u = NewUser();
-
-        if ($this->front_page_entry) {
-            $ent = NewEntry($this->front_page_entry);
-            if ($ent->isEntry()) {
-                $show_ctl = System::instance()->canModify($ent, $u) && $u->checkLogin();
-                return $ent->get($show_ctl);
-            }
-        }
-
-        if (! $this->entrylist) $this->getRecent();
-        foreach ($this->entrylist as $ent) {
-            $show_ctl = System::instance()->canModify($ent, $u) && $u->checkLogin();
-            $ret .= $ent->get($show_ctl);
-        }
-        if (! $ret) $ret = "<p>"._("There are no entries for this weblog.")."</p>";
-        return $ret;
     }
 
     /*
