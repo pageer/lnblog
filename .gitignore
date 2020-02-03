@@ -1,5 +1,7 @@
 syntax: glob
 
+pending-tasks.json
+
 vendor
 build
 node_modules
@@ -13,4 +15,4 @@ tags
 tags.temp
 
 .komodotools
-.phpunit.resul.cache
+.phpunit.result.cache
