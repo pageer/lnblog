@@ -322,10 +322,29 @@ $(window).on('beforeunload', function unloadHandler() {
     }
 });
 
+var auto_save_key = "savepostdata." + window.location.pathname;
+var post_save_timeout = function () {
+    if (typeof localStorage != 'undefined') {
+        localStorage.setItem(auto_save_key, current_text_content);
+        setTimeout(post_save_timeout, 5000);
+    }
+};
+setTimeout(post_save_timeout, 5000);
+
 $(document).ready(function () {
 	
 	original_text_content = $('#body').val();
 	current_text_content = original_text_content;
+
+    if (typeof localStorage != 'undefined') {
+        var saved_data = localStorage.getItem(auto_save_key);
+        if (saved_data && saved_data != original_text_content) {
+            if (window.confirm(strings.editor_restoreText)) {
+                $('#body').val(saved_data);
+                current_text_content = saved_data;
+            }
+        }
+    }
 	
 	$('#body').on('change', function bodyChange() {
 		current_text_content = $(this).val();
@@ -409,7 +428,12 @@ $(document).ready(function () {
 			
 			$('#postform').hide().ajaxSubmit(options);
 			return false;
-		}
+		} else {
+            // Clear out the stored post data because it's being saved now.
+            if (typeof localStorage != 'undefined') {
+                localStorage.removeItem(auto_save_key);
+            }
+        }
 		// Make the submission not prompt to leave the page.
 		current_text_content = original_text_content;
 		return true;

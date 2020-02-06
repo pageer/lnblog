@@ -18,5 +18,7 @@ var strings = {
     editor_leavePrompt: "You have unsaved changes.  Do you really want to leave the page?",
     editor_removeLink: "Remove file",
 
+    editor_restoreText: "Found unsaved changes for this entry.  Restore them?",
+
     upload_droponeText: "Drag-and-drop files or click here to upload"
 };
