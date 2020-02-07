@@ -1,0 +1,16 @@
+RewriteEngine On
+
+<Files .htaccess>
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+<Files .gitignore>
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+<FilesMatch "\.(cfg|log|xml|json|lock)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>

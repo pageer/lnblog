@@ -1,0 +1,17 @@
+RewriteEngine On
+
+# Protect the htaccess file
+<Files system.ini>
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+<Files groups.ini>
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+<Files profile.ini>
+    Order Allow,Deny
+    Deny from all
+</Files>
