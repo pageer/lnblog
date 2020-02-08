@@ -49,7 +49,7 @@ class ReplyNotifier extends Plugin {
             $cmt_user = NewUser($param->uid);
             $param->name = $cmt_user->displayName();
             $param->email = $cmt_user->email();
-            $param->url = $cmr_user->homepage();
+            $param->url = $cmt_user->homepage();
         }
 
         $subject = spf_("Comment on %s", $parent->subject);
