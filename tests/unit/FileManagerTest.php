@@ -5,9 +5,7 @@ use Prophecy\Argument;
 class FileManagerTest extends \PHPUnit\Framework\TestCase {
 
     public function testGetAll_WhenEntryContainsJpegs_ReturnsOnlyAttachedFiles() {
-        $entry = $this->prophet->prophesize('BlogEntry');
-        $entry->localpath()->willReturn('./path/to/entry/');
-        $this->setUpEntryFileListing('./path/to/entry/', ['test.jpg']);
+        $entry = $this->createBlogEntry(['test.jpg']);
 
         $manager = $this->createFileManager($entry->reveal());
         $files = $manager->getAll();
@@ -19,6 +17,14 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase {
 
     public function testGetAll_WhenBlogContainsJpegs_ReturnsOnlyAttachedFiles() {
         $blog = $this->prophet->prophesize('Blog');
+        $blog->getManagedFiles()->willReturn([
+            'index.php',
+            'pathconfig.php',
+            'blogdata.ini',
+            'ip_ban.txt',
+            're_ban.txt',
+            'plugins.xml',
+        ]);
         $mock_blog = $blog->reveal();
         $mock_blog->home_path = './blog';
         $this->fs->scandir('./blog')->willReturn([
@@ -59,8 +65,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function testGetAll_WhenDirectoryScanFails_ThrowsRuntimeException() {
-        $entry = $this->prophet->prophesize('BlogEntry');
-        $entry->localpath()->willReturn('./path/to/entry/');
+        $entry = $this->createBlogEntry();
         $this->fs->scandir('./path/to/entry/')->willReturn(false);
 
         $this->expectException(RuntimeException::class);
@@ -70,9 +75,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function testRemove_WhenFileExistsForEntry_ShouldDeleteFile() {
-        $entry = $this->prophet->prophesize('BlogEntry');
-        $entry->localpath()->willReturn('./path/to/entry/');
-        $this->setUpEntryFileListing('./path/to/entry/', ['test.jpg']);
+        $entry = $this->createBlogEntry(['test.jpg']);
         $this->fs->delete('./path/to/entry/test.jpg')->willReturn(true);
 
         $manager = $this->createFileManager($entry->reveal());
@@ -82,9 +85,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function testRemove_WhenRemoveFails_ShouldThrowRuntimeException() {
-        $entry = $this->prophet->prophesize('BlogEntry');
-        $entry->localpath()->willReturn('./path/to/entry/');
-        $this->setUpEntryFileListing('./path/to/entry/', ['test.jpg']);
+        $entry = $this->createBlogEntry(['test.jpg']);
         $this->fs->delete('./path/to/entry/test.jpg')->willReturn(false);
 
         $this->expectException(RuntimeException::class);
@@ -94,9 +95,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function testRemove_WhenFileNotInRepository_ShouldThrowFileNotFound() {
-        $entry = $this->prophet->prophesize('BlogEntry');
-        $entry->localpath()->willReturn('./path/to/entry/');
-        $this->setUpEntryFileListing('./path/to/entry/', []);
+        $entry = $this->createBlogEntry();
         $this->fs->delete('./path/to/entry/test.jpg')->willReturn(false);
 
         $this->expectException(FileNotFound::class);
@@ -106,9 +105,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function testRemove_WhenFileIsOnExclusionList_ShouldThrowFileIsProtected() {
-        $entry = $this->prophet->prophesize('BlogEntry');
-        $entry->localpath()->willReturn('./path/to/entry/');
-        $this->setUpEntryFileListing('./path/to/entry/', []);
+        $entry = $this->createBlogEntry();
 
         $this->expectException(FileIsProtected::class);
 
@@ -117,9 +114,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function testAttach_WhenFileValid_ShouldCopyFile() {
-        $entry = $this->prophet->prophesize('BlogEntry');
-        $entry->localpath()->willReturn('./path/to/entry/');
-        $this->setUpEntryFileListing('./path/to/entry/', []);
+        $entry = $this->createBlogEntry();
         $this->fs->copy('/path/to/doc.pdf', './path/to/entry/')->willReturn(true);
 
         $manager = $this->createFileManager($entry->reveal());
@@ -129,9 +124,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function testAttach_WhenFileAlreadyExists_ShouldRecopyFile() {
-        $entry = $this->prophet->prophesize('BlogEntry');
-        $entry->localpath()->willReturn('./path/to/entry/');
-        $this->setUpEntryFileListing('./path/to/entry/', ['doc.pdf']);
+        $entry = $this->createBlogEntry();
         $this->fs->copy('/path/to/doc.pdf', './path/to/entry/')->willReturn(true);
 
         $manager = $this->createFileManager($entry->reveal());
@@ -141,9 +134,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function testAttach_WhenNewNameProvidedForBlacklistedFile_ShouldCopyFileToNewName() {
-        $entry = $this->prophet->prophesize('BlogEntry');
-        $entry->localpath()->willReturn('./path/to/entry/');
-        $this->setUpEntryFileListing('./path/to/entry/', []);
+        $entry = $this->createBlogEntry();
         $this->fs->copy('/path/to/entry.xml', './path/to/entry/example.xml')->willReturn(true);
 
         $manager = $this->createFileManager($entry->reveal());
@@ -153,9 +144,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function testAttach_WhenCopyFails_ShouldThrowException() {
-        $entry = $this->prophet->prophesize('BlogEntry');
-        $entry->localpath()->willReturn('./path/to/entry/');
-        $this->setUpEntryFileListing('./path/to/entry/', []);
+        $entry = $this->createBlogEntry();
         $this->fs->copy('/path/to/doc.pdf', './path/to/entry/')->willReturn(false);
 
         $this->expectException(RuntimeException::class);
@@ -165,9 +154,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function testAttach_WhenFileIsBlacklisted_ShouldThrowFileIsProtectedError() {
-        $entry = $this->prophet->prophesize('BlogEntry');
-        $entry->localpath()->willReturn('./path/to/entry/');
-        $this->setUpEntryFileListing('./path/to/entry/', []);
+        $entry = $this->createBlogEntry();
 
         $this->expectException(FileIsProtected::class);
 
@@ -178,9 +165,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function testAttach_WhenNewNameIsBlacklisted_ShouldThrowFileIsProtectedError() {
-        $entry = $this->prophet->prophesize('BlogEntry');
-        $entry->localpath()->willReturn('./path/to/entry/');
-        $this->setUpEntryFileListing('./path/to/entry/', []);
+        $entry = $this->createBlogEntry();
 
         $this->expectException(FileIsProtected::class);
 
@@ -202,6 +187,14 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase {
 
     private function createFileManager($object) {
         return new FileManager($object, $this->fs->reveal());
+    }
+
+    private function createBlogEntry(array $files = []) {
+        $entry = $this->prophet->prophesize('BlogEntry');
+        $entry->localpath()->willReturn('./path/to/entry/');
+        $entry->getManagedFiles()->willReturn(['index.php', 'entry.xml']);
+        $this->setUpEntryFileListing('./path/to/entry/', $files);
+        return $entry;
     }
 
     private function setUpEntryFileListing($path, $extra_files) {

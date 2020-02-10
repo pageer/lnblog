@@ -1159,6 +1159,15 @@ class BlogEntry extends Entry implements AttachmentContainer {
         $this->filemanager->remove($name);
     }
 
+    # Method: getManagedFiles
+    # Get a list of system files that are managed by the entry and
+    # are therefore excluded from uploads.
+    #
+    # Returns: An array of file names.
+    public function getManagedFiles() {
+        return ['entry.xml', 'index.php', 'sticky.txt'];
+    }
+
     # Method: addReply
     # Inserts a reply (comment, pingback, etc.) to the entry.
     #

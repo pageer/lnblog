@@ -961,16 +961,47 @@ class Blog extends LnBlogObject implements AttachmentContainer {
         return $this->auto_pingback ? $this->auto_pingback != 'none' : false;
     }
 
+    # Method: getAttachments
+    # Get a list of files attached to this blog.
+    #
+    # Returns: Array of AttachedFile objects
     public function getAttachments() {
         return $this->filemanager->getAll();
     }
 
+    # Method: addAttachment
+    # Add an attached file to the blog.
+    #
+    # Parameters:
+    # path - The local file path to the file to attach.
+    # name - Optional name of the file.  Default is the existing name.
     public function addAttachment($path, $name = '') {
         $this->filemanager->attach($path, $name);
     }
 
+    # Method: removeAttachment
+    # Remove a file that is attached to the blog.
+    #
+    # Parameter:
+    # name - The name of the file to remove.
     public function removeAttachment($name) {
         $this->filemanager->remove($name);
+    }
+
+    # Method: getManagedFiles
+    # Get a list of system files that are managed by the blog and
+    # are therefore excluded from uploads.
+    #
+    # Returns: An array of file names.
+    public function getManagedFiles() {
+        return [
+            'index.php',
+            'pathconfig.php',
+            'blogdata.ini',
+            'ip_ban.txt',
+            're_ban.txt',
+            'plugins.xml',
+        ];
     }
 
     /*

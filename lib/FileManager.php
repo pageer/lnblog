@@ -62,21 +62,7 @@ class FileManager {
     }
 
     private function getExcludedEntries() {
-        $excluded = ['.', '..'];
-        if ($this->parent instanceof BlogEntry) {
-            $excluded = array_merge($excluded, ['entry.xml', 'index.php']);
-        } elseif ($this->parent instanceof Blog) {
-            $blog_exclusions = [
-                'index.php',
-                'pathconfig.php',
-                'blogdata.ini',
-                'ip_ban.txt',
-                're_ban.txt',
-                'plugins.xml',
-            ];
-            $excluded = array_merge($excluded, $blog_exclusions);
-        }
-        return $excluded;
+        return array_merge(['.', '..'], $this->parent->getManagedFiles());
     }
 
     private function getRepositoryPath() {
