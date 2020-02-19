@@ -337,7 +337,7 @@ class WebPages extends BasePages {
             $tpl->set("PAGE_TITLE", _("Edit Text File"));
         }
 
-        if (substr($file, 0, 9) == 'userdata/') {
+        if (substr($file, 0, 9) == 'userdata' . DIRECTORY_SEPARATOR) {
             $file = Path::mk(USER_DATA_PATH, substr($file, 9));
         } else {
             $file = Path::mk($relpath, $file);

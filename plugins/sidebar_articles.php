@@ -92,7 +92,7 @@ class Articles extends Plugin {
         if (System::instance()->canModify($blg, $u)) {
             $items[] = [
                 'description' => ahref(
-                    $blg->uri('editfile', $this->custom_links),
+                    $blg->uri('editfile', ['file' => $this->custom_links]),
                     _("Add custom links")
                 ),
                 'style'=>'margin-top: 0.5em'
