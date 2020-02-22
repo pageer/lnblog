@@ -436,15 +436,16 @@ class BlogEntry extends Entry implements AttachmentContainer {
     Get the title and permalink without retreiving the entire article.
 
     Parameters:
-    path - The unique ID for the article.
+    path - The unique ID for the article.  Defaults to current ID if entry exists.
 
     Returns:
     A two-element array, with "link" and "title" for the permalink and
     subject of the article.
     */
 
-    public function readSticky($path) {
+    public function readSticky($path = null) {
         $old_path = $this->file;
+        $path = $path ?: $this->file;
         if ($this->fs->is_dir($path)) {
             $this->file = Path::mk($path, ENTRY_DEFAULT_FILE);
         } else {

@@ -8,7 +8,23 @@
 # one link tag per line, same as the other "list of links" files.
 
 class Articles extends Plugin {
-    public function __construct($do_output=0) {
+    private $blog;
+    private $user;
+    private $fs;
+    private $system;
+
+    public function __construct(
+        $do_output = 0,
+        Blog $blog = null,
+        User $user = null,
+        FS $fs = null,
+        System $system = null
+    ) {
+        $this->blog = $blog;
+        $this->user = $user;
+        $this->fs = $fs ?: NewFS();
+        $this->system = $system ?: System::instance();
+
         $this->plugin_desc = _("List the articles for a blog.");
         $this->plugin_version = "0.2.5";
         $this->header = _("Articles");
@@ -53,19 +69,19 @@ class Articles extends Plugin {
 
     function buildOutput($parm=false) {
 
-        $blg = NewBlog();
-        $u = NewUser();
+        $blg = $this->blog ?: NewBlog();
+        $u = $this->user ?: NewUser();
         if (! $blg->isBlog()) {
-            return false;
+            return '';
         }
 
         $art_list = $blg->getArticleList();
-        $tpl = NewTemplate("sidebar_panel_tpl.php");
-        $items = array();
-
         if (count($art_list) === 0) {
             return '';
         }
+
+        $tpl = NewTemplate("sidebar_panel_tpl.php");
+        $items = array();
 
         if ($this->header) {
             $tpl->set("PANEL_TITLE", ahref($blg->uri('articles'), $this->header));
@@ -75,10 +91,19 @@ class Articles extends Plugin {
             $items[] = ahref($art['link'], htmlspecialchars($art['title']));
         }
 
-        if ( is_file(mkpath($blg->home_path, $this->custom_links)) ) {
-            $data = file(mkpath($blg->home_path, $this->custom_links));
+        $path = Path::mk($blg->home_path, $this->custom_links);
+        if ($this->fs->is_file($path)) {
+            $file_content = $this->fs->read_file($path);
+            // Remove crap added by WYSIWYG HTML editors.
+            $file_content = preg_replace('|(</[^>]+>)|', "$1\n", $file_content);
+            $file_content = preg_replace('|&nbsp;|i', " ", $file_content);
+            $file_content = strip_tags($file_content, '<A>');
+            $data = explode("\n", $file_content);
             foreach ($data as $line) {
-                $items[] = $line;
+                $line = trim($line);
+                if ($line) {
+                    $items[] = $line;
+                }
             }
         }
 
@@ -89,7 +114,7 @@ class Articles extends Plugin {
             ];
         }
 
-        if (System::instance()->canModify($blg, $u)) {
+        if ($this->system->canModify($blg, $u)) {
             $items[] = [
                 'description' => ahref(
                     $blg->uri('editfile', ['file' => $this->custom_links]),

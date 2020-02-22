@@ -790,17 +790,26 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     Method: getArticles
     Returns a list of all articles, in no particular order.
 
+    Parameters:
+    number      - *Optional* number of articles to return.  Default is all.
+
     Returns:
     An array of Article objects.
     */
-    public function getArticles() {
+    public function getArticles($number = null) {
         $art = NewEntry();
         $art_path = Path::get($this->home_path, BLOG_ARTICLE_PATH);
         $art_list = scan_directory($art_path);
         $ret = array();
+        $count = 0;
         foreach ($art_list as $dir) {
-            if ($art->checkArticlePath($art_path.$dir) ) {
-                $ret[] = NewEntry($art_path.$dir);
+            $path = Path::mk($art_path, $dir);
+            if ($art->checkArticlePath($path)) {
+                $ret[] = NewEntry($path);
+                $count++;
+            }
+            if ($number && $count >= $number) {
+                break;
             }
         }
         return $ret;
@@ -820,29 +829,15 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     is two elements indexed as "title" and "link".  These represent the title
     of the article and the permalink to it respectively.
     */
-    public function getArticleList($number=false, $sticky_only=true) {
-        $art = NewEntry();
-        $art_path = Path::mk($this->home_path, BLOG_ARTICLE_PATH);
-        $art_list = scan_directory($art_path);
-        if (!$art_list) $art_list = array();
+    public function getArticleList($number = null, $sticky_only = true) {
         $ret = array();
-        $count = 0;
-        foreach ($art_list as $dir) {
-            if ( ! $sticky_only && $art->checkArticlePath(Path::mk($art_path, $dir)) ) {
-                $sticky_test = $art->readSticky(Path::mk($art_path, $dir));
-                if ($sticky_test) {
-                    $ret[] = $sticky_test;
-                } else {
-                    $a = NewEntry(Path::mk($art_path, $dir));
-                    $ret[] = array("title"=>$a->subject, "link"=>$a->permalink());
-                }
-                $count++;
-            } elseif ($sticky_only && $art->isSticky(Path::mk($art_path, $dir)) ) {
-                $ret[] = $art->readSticky(Path::mk($art_path, $dir));
-                $count++;
+        $art_list = $this->getArticles($number);
+        foreach ($art_list as $art) {
+            if ($art->isSticky() ) {
+                $ret[] = $art->readSticky();
+            } elseif (!$sticky_only) {
+                $ret[] = array("title"=>$art->subject, "link"=>$art->permalink());
             }
-
-            if ($number && $count >= $number) break;
         }
         return $ret;
     }
