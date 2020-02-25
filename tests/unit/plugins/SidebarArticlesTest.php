@@ -195,6 +195,39 @@ class SidebarArticlesTest extends \PHPUnit\Framework\TestCase {
         $this->assertEquals($expected, $this->htmlToLines($output));
     }
 
+    public function testBuildOutput_WhenCustomLinksFileButNoStickyArticles_ShowsOnlyLinks() {
+        $list = [];
+        $file_content = '<p><a href="http://foo.com">Foo</a><br>' .
+            '<a href="http://bar.com">Bar</a><br />' .
+            '<a href="http://bazz.com">Bazz</a></p>';
+        $this->blog->isBlog()->willReturn(true);
+        $this->blog->uri('articles')->willReturn('./content/');
+        $this->blog->uri('editfile', ['file' => 'links.htm'])->willReturn('?editfile=links.htm');
+        $this->blog->getArticleList()->willReturn($list);
+        $blog = $this->blog->reveal();
+        $blog->home_path = '.';
+        $user = $this->user->reveal();
+        $this->fs->is_file('./links.htm')->willReturn(true);
+        $this->fs->read_file('./links.htm')->willReturn($file_content);
+        $fs = $this->fs->reveal();
+        $this->system->canModify($blog, $user)->willReturn(false);
+        $system = $this->system->reveal();
+
+        $plugin = new Articles(0, $blog, $user, $fs, $system);
+        $plugin->static_link = false;
+        $plugin->header = '';
+        $output = $plugin->buildOutput();
+
+        $expected = [
+            '<ul>',
+            '<li><a href="http://foo.com">Foo</a></li>',
+            '<li><a href="http://bar.com">Bar</a></li>',
+            '<li><a href="http://bazz.com">Bazz</a></li>',
+            '</ul>',
+        ];
+        $this->assertEquals($expected, $this->htmlToLines($output));
+    }
+
     public function testBuildOutput_WhenNoStickyArticles_NoOutput() {
         $list = [];
         $this->blog->isBlog()->willReturn(true);

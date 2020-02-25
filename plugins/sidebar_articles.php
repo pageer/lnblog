@@ -75,13 +75,15 @@ class Articles extends Plugin {
             return '';
         }
 
+        $path = Path::mk($blg->home_path, $this->custom_links);
+
         $art_list = $blg->getArticleList();
-        if (count($art_list) === 0) {
+        if (count($art_list) === 0 && !$this->fs->is_file($path)) {
             return '';
         }
 
         $tpl = NewTemplate("sidebar_panel_tpl.php");
-        $items = array();
+        $items = [];
 
         if ($this->header) {
             $tpl->set("PANEL_TITLE", ahref($blg->uri('articles'), $this->header));
@@ -91,7 +93,6 @@ class Articles extends Plugin {
             $items[] = ahref($art['link'], htmlspecialchars($art['title']));
         }
 
-        $path = Path::mk($blg->home_path, $this->custom_links);
         if ($this->fs->is_file($path)) {
             $file_content = $this->fs->read_file($path);
             // Remove crap added by WYSIWYG HTML editors.
