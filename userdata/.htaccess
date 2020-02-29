@@ -1,17 +1,16 @@
 RewriteEngine On
 
-# Protect the htaccess file
-<Files system.ini>
+<FilesMatch "^(system|groups|profile)\.ini$">
     Order Allow,Deny
     Deny from all
-</Files>
+</FilesMatch>
 
-<Files groups.ini>
+<FilesMatch "^(re_ban|ip_ban)\.txt$">
     Order Allow,Deny
     Deny from all
-</Files>
+</FilesMatch>
 
-<Files profile.ini>
+<FilesMatch "^(plugins|user)\.xml$">
     Order Allow,Deny
     Deny from all
-</Files>
+</FilesMatch>

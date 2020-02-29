@@ -1,16 +1,31 @@
 RewriteEngine On
 
-<Files .htaccess>
-    Order Allow,Deny
-    Deny from all
-</Files>
-
 <Files .gitignore>
     Order Allow,Deny
     Deny from all
 </Files>
 
-<FilesMatch "\.(cfg|log|xml|json|lock)$">
+<Files blogconfig.cfg>
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+<Files application.log>
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+<FilesMatch "^(build|phpunit)\.xml$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+<FilesMatch "^(composer|package|pending-tasks)\.json$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+<FilesMatch "^(composer|yarn)\.lock$">
     Order Allow,Deny
     Deny from all
 </FilesMatch>
