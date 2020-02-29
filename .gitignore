@@ -4,6 +4,11 @@ pending-tasks.json
 application.log
 blogconfig.cfg
 userdata/fsconfig.php
+userdata/system.ini
+userdata/groups.ini
+userdata/ip_ban.txt
+userdata/re_ban.txt
+userdata/plugins.xml
 
 vendor
 build
