@@ -12,14 +12,69 @@
 
 class System {
 
+    private static $default_group_ini = [
+        'administrators' => [
+            'Comment' => 'Can perform administrative actions like adding users and blogs.',
+            'Level' => 255,
+            'Members' => 'administrator',
+        ],
+        'editors' => [
+            'Comment' => "Can create content and modify other user's content.",
+            'Level' => 200,
+            'Members' => '',
+        ],
+        'writers' => [
+            'Comment' => 'Can post and modify their own content.',
+            'Level' => 120,
+            'Members' => '',
+        ],
+        'readers' => [
+            'Comment' => 'Can log in and post comments.',
+            'Level' => 50,
+            'Members' => '',
+        ],
+        'guests' => [
+            'Comment' => 'Unauthenticated users.',
+            'Level' => 0,
+            'Members' => '*',
+        ],
+    ];
+
+    private static $default_system_ini = [
+        'security' => [
+            'NewUserDefaultGroup' => 'writers',
+            'AnonymousGroup' => 'guests',
+        ],
+        'entryconfig' => [
+            'AllowInitUpload' => 1,
+            'AllowLocalPingback' =>  1,
+            'GroupReplies' => 0,
+        ],
+        'register' => [
+            'BlogList' => '',
+        ],
+        'plugins' => [
+            'EventDefaultOff' => 0,
+            'EventForceOff' => 0,
+        ],
+    ];
+
+    // NOTE: Public for unit testing purposes (which is not great...)
     static public $static_instance;
 
     public function __construct() {
-        $this->userdata = defined("USER_DATA_PATH")?USER_DATA_PATH:"";
+        $this->userdata = defined("USER_DATA_PATH") ? USER_DATA_PATH : "";
 
-        $this->group_ini = new INIParser(Path::mk($this->userdata, "groups.ini"));
-        $this->sys_ini = new INIParser(Path::mk($this->userdata, "system.ini"));
+        $groups_ini_path = Path::mk($this->userdata, "groups.ini");
+        $sys_ini_path = Path::mk($this->userdata, "system.ini");
 
+        $group_ini_defaults = INIParser::fromArray(self::$default_group_ini, $groups_ini_path);
+        $this->group_ini = new INIParser($groups_ini_path);
+        $this->group_ini->merge($group_ini_defaults);
+
+        $sys_ini_defaults = INIParser::fromArray(self::$default_system_ini, $sys_ini_path);
+        $this->sys_ini = new INIParser($sys_ini_path);
+        $this->sys_ini->merge($sys_ini_defaults);
     }
 
     public static function instance() {
@@ -448,8 +503,6 @@ class System {
         return $ret;
 
     }
-
-
 }
 
 $SYSTEM = System::instance();

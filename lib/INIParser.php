@@ -30,13 +30,23 @@ class INIParser {
 
     private $fs;
 
+    # Method: fromArray
+    # Converts an associative array into an INIParser object
+    public static function fromArray(array $ini_array, $filename = null, $fs = null) {
+        $parser = new INIParser();
+        $parser->fs = $fs ?: NewFS();
+        $parser->filename = $filename;
+        $parser->data = $ini_array;
+        return $parser;
+    }
+
     public function __construct($file=false, $fs = null) {
         $this->fs = $fs ?: NewFS();
         $this->current_section = false;
         $this->case_insensitive = true;
         $this->data = array();
         if ( $file ) $this->filename = $file;
-        if ( $this->fs->file_exists($this->filename) ) {
+        if ( $this->filename && $this->fs->file_exists($this->filename) ) {
             $this->readFile();
         }
     }
@@ -264,5 +274,4 @@ class INIParser {
             }
         }
     }
-
 }

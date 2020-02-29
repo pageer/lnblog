@@ -183,11 +183,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
         $system = System::instance();
         $path = test_server_root($id);
         if ( ! $this->fs->is_dir($path) ) {
-            $path = $system->sys_ini->value("bloglist", $id);
-            if (! $this->fs->is_dir($path)) {
-                echo spf_("Unable to locate blogID %s.  Make sure the ID is correct or add an entry to the [bloglist] section of system.ini.", $id);
-                return false;
-            }
+            return false;
         }
         return $path;
     }
