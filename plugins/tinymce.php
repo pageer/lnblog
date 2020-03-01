@@ -53,7 +53,12 @@ class TinyMCEEditor extends Plugin {
             gecko_spellcheck: true,
             content_css: "css/content.css",
             toolbar: "bold italic underline | style-code | bullist numlist | forecolor backcolor | link image media emoticons | preview",
-            removed_menuitems: "newdocument"
+            removed_menuitems: "newdocument",
+            mobile: {
+                theme: 'mobile',
+                toolbar: ['bold', 'italic', 'underline', 'link', 'unlink', 'image', 'bullist', 'numlist', 'fontsizeselect', 'forecolor', 'styleselect', 'undo', 'redo', 'removeformat'],
+                plugins: ['autolink', 'lists'],
+            }
         };
         <?php else: ?>
         var init = {
@@ -62,6 +67,9 @@ class TinyMCEEditor extends Plugin {
                 ed.on("change", function(e) {
                     current_text_content = ed.getContent();
                 });
+            },
+            mobile: {
+                theme: 'mobile'
             }
         };
         <?php endif; ?>
