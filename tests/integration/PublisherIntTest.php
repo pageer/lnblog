@@ -1,5 +1,7 @@
 <?php
 
+use LnBlog\Tasks\TaskManager;
+
 class PublisherIntTest extends \PHPUnit\Framework\TestCase {
 
     const TESTPATH = "temp/publishertest";

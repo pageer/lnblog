@@ -549,10 +549,11 @@ class User extends LnBlogObject {
             return;
         }
 
-        $password_hash = $this->globals->include($this->getPath("passwd.php"));
+        $defined_vars = [];
+        $password_hash = $this->globals->include($this->getPath("passwd.php"), $defined_vars);
         if ($password_hash === 1) {
-            $this->passwd = $pwd;
-            $this->salt = $salt;
+            $this->passwd = $defined_vars['pwd'];
+            $this->salt = $defined_vars['salt'];
         } else {
             $this->passwd = $password_hash;
             $this->salt = false;

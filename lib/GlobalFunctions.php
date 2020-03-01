@@ -8,8 +8,21 @@ class GlobalFunctions {
         setcookie($name, $value, $expires, $path, $domain, $secure, $http_only);
     }
 
-    public function include($path) {
-        return include $path;
+    # Method: include
+    # This is a wrapper around the native "include" construct.
+    #
+    # In addition to returning the result of the inclusion, this function takes a 
+    # reference parameter that returns a hash of all variables defined in the 
+    # current scope.  This is because we sometimes want access to any variables that
+    # the include file defines, but by calling the include within this wrapper they
+    # become local to the wrapper.  This reference variables gives us a way to pass
+    # those values back to the caller.
+    public function include($path, &$global_include_wrapper_defined_vars = null) {
+        $global_include_wrapper_result = include $path;
+        $global_include_wrapper_defined_vars = get_defined_vars();
+        unset($global_include_wrapper_defined_vars['global_include_wrapper_defined_vars']);
+        unset($global_include_wrapper_defined_vars['global_include_wrapper_result']);
+        return $global_include_wrapper_result;
     }
 
     public function constant($name) {
