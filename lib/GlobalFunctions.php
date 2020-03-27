@@ -33,8 +33,16 @@ class GlobalFunctions {
         return defined($name);
     }
 
-    public function time() {
+    public function time($use_datetime = false) {
+        if ($use_datetime) {
+            $datetime = new DateTime();
+            return $datetime->getTimestamp();
+        }
         return time();
+    }
+
+    public function sleep($seconds) {
+        sleep($seconds);
     }
 
     public function mail($to, $subject, $message, $additional_headers = '', $additional_parameters = '') {

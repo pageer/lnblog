@@ -18,6 +18,9 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+use LnBlog\User\AuthLog;
+use LnBlog\User\LoginLimiter;
+
 # Class: User
 # Class to manipulate and authenticate users.  All details of user
 # management, including checking authentication, should be done through
@@ -44,6 +47,7 @@ class User extends LnBlogObject {
     private $set_cookies = true;
     private $fs = null;
     private $globals = null;
+    private $limiter = null;
 
     public static function get($usr=false, $pwd=false, FS $fs = null) {
         $s_usr = SESSION(CURRENT_USER);
@@ -57,7 +61,9 @@ class User extends LnBlogObject {
         if ($usr && isset($_SESSION["user-".$usr])) {
             return new User($usr);
         } else {
-            return new User($usr, $pwd, $fs);
+            $user = new User($usr, $fs);
+            $user->login($pwd);
+            return $user;
         }
     }
 
@@ -66,20 +72,20 @@ class User extends LnBlogObject {
         return $user->checkLogin();
     }
 
-    public function __construct($uname=false, $pw=false, FS $fs = null, GlobalFunctions $globals = null) {
-
+    public function __construct(
+        $uname=false,
+        FS $fs = null,
+        GlobalFunctions $globals = null,
+        LoginLimiter $limiter = null
+    ) {
         $this->username = $uname ? $uname : '';
         $this->fs = $fs ?: NewFS();
         $this->globals = $globals ?: new GlobalFunctions();
+        $this->limiter = $limiter ?: new LoginLimiter($this, $this->fs, $this->globals);
 
         $this->exclude_fields = array('salt', 'passwd', 'username', 'set_cookies', 'fs', 'globals');
 
         $this->loadUserCredentials();
-
-        if ($pw) {
-            $this->login($pw);
-        }
-
     }
 
     # Method: exists
@@ -150,6 +156,27 @@ class User extends LnBlogObject {
         $tpl->set("PROFILE_LINK", $this->getProfileUrl());
     }
 
+    public function authenticateCredentials($password) {
+        if (!$this->limiter->canLogIn($wait = false)) {
+            throw new UserLockedOut();
+        }
+
+        $result = $this->checkPassword($password);
+        $time = new DateTime('@' . $this->globals->time());
+
+        $log = $result ? 
+            AuthLog::success($time, get_ip(), get_user_agent()) :
+            AuthLog::failure($time, get_ip(), get_user_agent());
+
+        $this->limiter->logAttempt($log);
+
+        if (!$this->limiter->canLogIn($wait = true)) {
+            throw new UserAccountLocked();
+        }
+
+        return $result;
+    }
+
     # Method: checkPassword
     # Checks if a password is valid for the current user.
     #
@@ -158,7 +185,7 @@ class User extends LnBlogObject {
     #
     # Returns:
     # True if the password is correct, false owtherwise.
-    public function checkPassword($pass) {
+    private function checkPassword($pass) {
         if (!trim($pass)) {
             return false;
         }
@@ -405,7 +432,7 @@ class User extends LnBlogObject {
         $expire_time = $login_expire_time ? $time + $login_expire_time : false;
         $ts = gmdate("M d Y H:i:s", $time);
 
-        if (!$this->checkPassword($pwd)) {
+        if (!$this->authenticateCredentials($pwd)) {
             return false;
         }
 

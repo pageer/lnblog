@@ -265,7 +265,7 @@ class AdminPages extends BasePages {
 
         if ( POST($user_name) && POST($password) ) {
             $usr = NewUser(trim(POST($user_name)));
-            $ret = $usr->login(POST($password));
+            $ret = $this->attemptLogin($usr, POST($password));
             if (POST("referer")) {
                 if ( strstr(POST('referer'), 'login.php') !== false ||
                      strstr(POST('referer'), 'logout.php') !== false ) {

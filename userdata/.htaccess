@@ -14,3 +14,8 @@ RewriteEngine On
     Order Allow,Deny
     Deny from all
 </FilesMatch>
+
+<FilesMatch "^logins\.json$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>

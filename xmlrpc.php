@@ -8,6 +8,8 @@ require_once __DIR__."/blogconfig.php";
 require_once __DIR__."/lib/creators.php";
 require_once __DIR__."/lib/utils.php";
 
+use LnBlog\Tasks\TaskManager;
+
 $function_map = array(
     "blogger.newPost"       => array("function"=>"blogger_newPost"),
     "blogger.editPost"      => array("function"=>"blogger_editPost"),
@@ -253,9 +255,9 @@ function blogger_newPost($params) {
     $fs = NewFS();
     $publisher = new Publisher($blog, $usr, $fs, new WrapperGenerator($fs), new TaskManager());
 
-    if ( !$usr->checkPassword($pwd) ||
-         !System::instance()->canAddTo($blog, $usr) ) {
-        return new xmlrpcresp(0, $xmlrpcerruser+3, "Invalid password - cannot create new post");
+    $check = System::instance()->canAddTo($blog, $usr);
+    if ($error = authenticate_user($usr, $pwd, $check) !== true) {
+        return $error;
     }
 
     $ent = NewBlogEntry();
@@ -327,8 +329,9 @@ function blogger_editPost($params) {
     $fs = NewFS();
     $publisher = new Publisher($blog, $usr, $fs, new WrapperGenerator($fs), new TaskManager());
 
-    if (!$usr->checkPassword($pwd) || !System::instance()->canModify($ent, $usr) ) {
-        return new xmlrpcresp(0, $xmlrpcerruser+3, "Invalid password - cannot edit post");
+    $check = System::instance()->canModify($ent, $usr);
+    if ($error = authenticate_user($usr, $pwd, $check) !== true) {
+        return $error;
     }
 
     # Test for initial lines to set the subject and/or tags.
@@ -393,11 +396,9 @@ function blogger_deletePost($params) {
     $fs = NewFS();
     $publisher = new Publisher($blog, $usr, $fs, new WrapperGenerator($fs), new TaskManager());
 
-    $can_delete = $usr->checkPassword($pwd) &&
-        System::instance()->canDelete($ent, $usr);
-
-    if (!$can_delete) {
-        return new xmlrpcresp(0, $xmlrpcerruser+3, "Invalid password - cannot edit post");
+    $check = System::instance()->canDelete($ent, $usr);
+    if ($error = authenticate_user($usr, $pwd, $check) !== true) {
+        return $error;
     }
 
     try {
@@ -430,24 +431,23 @@ function blogger_getUsersBlogs($params) {
     $pwd = trim($password->scalarval());
     $usr = NewUser($uid);
 
-    if ( $usr->checkPassword($pwd) ) {
-        $blogs = System::instance()->getUserBlogs($usr);
-        if (! empty($blogs)) {
-            $resp_arr = array();
-            foreach ($blogs as $blg) {
-                $resp_arr[] = new xmlrpcval(
-                              array("url"=> new xmlrpcval($blg->getURL()),
-                                    "blogName"=>new xmlrpcval($blg->name),
-                                    "blogid"=>new xmlrpcval($blg->blogid)),
-                                          "struct");
-            }
-            $ret = new xmlrpcresp(new xmlrpcval($resp_arr, "array"));
-        } else {
-            $ret = new xmlrpcresp(0,$xmlrpcerruser+4, "This user has no blogs");
-        }
+    if ($error = authenticate_user($usr, $pwd, true) !== true) {
+        return $error;
+    }
 
+    $blogs = System::instance()->getUserBlogs($usr);
+    if (! empty($blogs)) {
+        $resp_arr = array();
+        foreach ($blogs as $blg) {
+            $resp_arr[] = new xmlrpcval(
+                          array("url"=> new xmlrpcval($blg->getURL()),
+                                "blogName"=>new xmlrpcval($blg->name),
+                                "blogid"=>new xmlrpcval($blg->blogid)),
+                                      "struct");
+        }
+        $ret = new xmlrpcresp(new xmlrpcval($resp_arr, "array"));
     } else {
-        $ret = new xmlrpcresp(0,$xmlrpcerruser+3, "Invalid password");
+        $ret = new xmlrpcresp(0,$xmlrpcerruser+4, "This user has no blogs");
     }
     return $ret;
 }
@@ -476,62 +476,60 @@ function blogger_getUserInfo($params) {
     $pwd = trim($password->scalarval());
     $usr = NewUser($uid);
 
-    if ( $usr->checkPassword($pwd) ) {
-
-        $space_pos = strpos($usr->name(), " ");
-
-        # First, let's check for some common custom field names
-        # for both the first and last names.  If we don't find anything,
-        # then try to extrapolate from the real name.
-        if (isset($usr->firstname)) {
-            $fname = $usr->firstname;
-        } elseif (isset($usr->first_name)) {
-            $fname = $usr->first_name;
-        } elseif (isset($usr->fname)) {
-            $fname = $usr->fname;
-        } else {
-            if ( $space_pos > 0 ) {
-                $fname = substr($usr->name(), 0, $space_pos);
-            } else {
-                $fname = $usr->name();
-            }
-        }
-
-        # Here's the same for the last name.
-        if (isset($usr->lastname)) {
-            $lname = $usr->lastname;
-        } elseif (isset($usr->last_name)) {
-            $lname = $usr->last_name;
-        } elseif (isset($usr->lname)) {
-            $lname = $usr->lname;
-        } else {
-            if ( $space_pos > 0 ) {
-                $lname = substr($usr->name(), $space_pos + 1);
-            } else {
-                $lname = $usr->name();
-            }
-        }
-
-        # Let's try it for the nickname too.
-        if (isset($usr->nickname)) {
-            $nickname = $usr->nickname;
-        } else {
-            $nickname = $usr->name();
-        }
-
-        $user_arr = new xmlrpcval(
-                        array('nickname'=>new xmlrpcval($nickname, 'string'),
-                              'userid'=>new xmlrpcval($uid, 'string'),
-                              'url'=>new xmlrpcval($usr->homepage(), 'string'),
-                              'email'=>new xmlrpcval($usr->email(), 'string'),
-                              'lastname'=>new xmlrpcval($lname, 'string'),
-                              'firstname'=>new xmlrpcval($fname, 'string')),
-                        'struct');
-        $ret = new xmlrpcresp($user_arr);
-    } else {
-        $ret = new xmlrpcresp(0,$xmlrpcerruser+3, "Invalid password");
+    if ($error = authenticate_user($usr, $pwd, true) !== true) {
+        return $error;
     }
-    return $ret;
+
+    $space_pos = strpos($usr->name(), " ");
+
+    # First, let's check for some common custom field names
+    # for both the first and last names.  If we don't find anything,
+    # then try to extrapolate from the real name.
+    if (isset($usr->firstname)) {
+        $fname = $usr->firstname;
+    } elseif (isset($usr->first_name)) {
+        $fname = $usr->first_name;
+    } elseif (isset($usr->fname)) {
+        $fname = $usr->fname;
+    } else {
+        if ( $space_pos > 0 ) {
+            $fname = substr($usr->name(), 0, $space_pos);
+        } else {
+            $fname = $usr->name();
+        }
+    }
+
+    # Here's the same for the last name.
+    if (isset($usr->lastname)) {
+        $lname = $usr->lastname;
+    } elseif (isset($usr->last_name)) {
+        $lname = $usr->last_name;
+    } elseif (isset($usr->lname)) {
+        $lname = $usr->lname;
+    } else {
+        if ( $space_pos > 0 ) {
+            $lname = substr($usr->name(), $space_pos + 1);
+        } else {
+            $lname = $usr->name();
+        }
+    }
+
+    # Let's try it for the nickname too.
+    if (isset($usr->nickname)) {
+        $nickname = $usr->nickname;
+    } else {
+        $nickname = $usr->name();
+    }
+
+    $user_arr = new xmlrpcval(
+                    array('nickname'=>new xmlrpcval($nickname, 'string'),
+                          'userid'=>new xmlrpcval($uid, 'string'),
+                          'url'=>new xmlrpcval($usr->homepage(), 'string'),
+                          'email'=>new xmlrpcval($usr->email(), 'string'),
+                          'lastname'=>new xmlrpcval($lname, 'string'),
+                          'firstname'=>new xmlrpcval($fname, 'string')),
+                    'struct');
+    return new xmlrpcresp($user_arr);
 }
 
 # Method: blogger.getTemplate
@@ -644,9 +642,9 @@ function metaWeblog_newPost($params) {
     $fs = NewFS();
     $publisher = new Publisher($blog, $usr, $fs, new WrapperGenerator($fs), new TaskManager());
 
-    if ( !$usr->checkPassword($pwd) ||
-         !System::instance()->canAddTo($blog, $usr) ) {
-        return new xmlrpcresp(0, $xmlrpcerruser+3, "Invalid login - cannot create new post");
+    $check = System::instance()->canAddTo($blog, $usr);
+    if ($error = authenticate_user($usr, $pwd, $check) !== true) {
+        return $error;
     }
 
     $ent = NewBlogEntry();
@@ -727,9 +725,9 @@ function metaWeblog_editPost($params) {
 
     $publisher = new Publisher($blog, $usr, $fs, new WrapperGenerator($fs), new TaskManager());
 
-    if (!$usr->checkPassword($pwd) ||
-        !System::instance()->canModify($ent, $usr) ) {
-        return new xmlrpcresp(0, $xmlrpcerruser+3, "Invalid login - cannot edit this post");
+    $check = System::instance()->canModify($ent, $usr);
+    if ($error = authenticate_user($usr, $pwd, $check) !== true) {
+        return $error;
     }
 
     while ($list = $content->structeach()) {
@@ -801,18 +799,17 @@ function metaWeblog_getPost($params) {
     # I think we can safely skip the permissions check here, since all the
     # information is public anyway.  We'll just check for authentication
     # instead.
-    if ( $usr->checkPassword($pwd) ) {
+    if ($error = authenticate_user($usr, $pwd, true) !== true) {
+        return $error;
+    }
 
-        $ent = NewBlogEntry($postpath);
+    $ent = NewBlogEntry($postpath);
 
-        if ($ent->isEntry()) {
-            $ret = new xmlrpcresp(entry_to_struct($ent));
-        } else {
-            $ret = new xmlrpcresp(0, $xmlrpcerruser+2, "Entry does not exist");
-        }
+    if ($ent->isEntry()) {
+        $ret = new xmlrpcresp(entry_to_struct($ent));
     } else {
-        $ret = new xmlrpcresp(0, $xmlrpcerruser+3, "Invalid login - cannot get this post");
-     }
+        $ret = new xmlrpcresp(0, $xmlrpcerruser+2, "Entry does not exist");
+    }
     return $ret;
 }
 
@@ -850,37 +847,37 @@ function metaWeblog_newMediaObject($params) {
     $usr = NewUser($uid);
     $blog = NewBlog($blogid->scalarval());
 
-    if ( $usr->checkPassword($pwd) && System::instance()->canModify($blog, $usr) ) {
+    $check = System::instance()->canModify($blog, $usr);
+    if ($error = authenticate_user($usr, $pwd, true) !== true) {
+        return $error;
+    }
 
-        $name = $data->structmem('name');
-        $type = $data->structmem('type');
-        $bits = $data->structmem('bits');
-        @$ent = $data->structmem('entryid');
+    $name = $data->structmem('name');
+    $type = $data->structmem('type');
+    $bits = $data->structmem('bits');
+    @$ent = $data->structmem('entryid');
 
-        if (! empty($ent)) {
-            $postpath = $ent->scalarval();
-            if (PATH_DELIM != '/')
-                $postpath = str_replace("/", PATH_DELIM, $postpath);
-            $postpath = calculate_document_root().PATH_DELIM.$postpath;
-            $entry = NewEntry($postpath);
-            if ($entry->isEntry() && System::instance()->canModify($entry,$usr)) {
-                $path = mkpath($entry->localpath(), $name->scalarval());
-            } else {
-                return new xmlrpcresp(0, $xmlrpcerruser+3, "Invalid login - cannot add files to this entry");
-            }
+    if (! empty($ent)) {
+        $postpath = $ent->scalarval();
+        if (PATH_DELIM != '/')
+            $postpath = str_replace("/", PATH_DELIM, $postpath);
+        $postpath = calculate_document_root().PATH_DELIM.$postpath;
+        $entry = NewEntry($postpath);
+        if ($entry->isEntry() && System::instance()->canModify($entry,$usr)) {
+            $path = mkpath($entry->localpath(), $name->scalarval());
         } else {
-            $path = mkpath($blog->home_path, $name->scalarval());
-        }
-        $ret = write_file($path, base64_decode($bits->scalarval()));
-
-        if ($ret) {
-            $url = new xmlrpcval(localpath_to_uri($path), 'string');
-            $ret = new xmlrpcresp(new xmlrpcval(array('url'=>$url), 'struct'));
-        } else {
-            $ret = new xmlrpcresp(0, $xmlrpcerruser+4, "Cannot create file $name");
+            return new xmlrpcresp(0, $xmlrpcerruser+3, "Invalid login - cannot add files to this entry");
         }
     } else {
-        $ret = new xmlrpcresp(0, $xmlrpcerruser+3, "Invalid login - cannot add files to this blog");
+        $path = mkpath($blog->home_path, $name->scalarval());
+    }
+    $ret = write_file($path, base64_decode($bits->scalarval()));
+
+    if ($ret) {
+        $url = new xmlrpcval(localpath_to_uri($path), 'string');
+        $ret = new xmlrpcresp(new xmlrpcval(array('url'=>$url), 'struct'));
+    } else {
+        $ret = new xmlrpcresp(0, $xmlrpcerruser+4, "Cannot create file $name");
     }
     return $ret;
 }
@@ -910,42 +907,41 @@ function metaWeblog_getCategories($params) {
 
     # Again, let's just skip the permissions check since this information is
     # public anyway.
-    if ( $usr->checkPassword($pwd) ) {
+    if ($error = authenticate_user($usr, $pwd, true) !== true) {
+        return $error;
+    }
 
-        $blog = NewBlog($blogid->scalarval());
+    $blog = NewBlog($blogid->scalarval());
 
-        if ($blog->isBlog()) {
-            $arr = array();
-            $base_feed_path = mkpath($blog->home_path,BLOG_FEED_PATH);
-            $base_feed_uri = $blog->uri('base').BLOG_FEED_PATH.'/';
-            foreach ($blog->tag_list as $tag) {
-                $cat = array();
-                $cat['description'] = new xmlrpcval(htmlspecialchars($tag), 'string');
-                $cat['categoryName'] = new xmlrpcval(htmlspecialchars($tag), 'string');
-                $cat['categoryId'] = new xmlrpcval(htmlspecialchars($tag), 'string');
-                $cat['htmlUrl'] = new xmlrpcval($blog->uri('tags').'?tag='.urlencode($tag), 'string');
+    if ($blog->isBlog()) {
+        $arr = array();
+        $base_feed_path = mkpath($blog->home_path,BLOG_FEED_PATH);
+        $base_feed_uri = $blog->uri('base').BLOG_FEED_PATH.'/';
+        foreach ($blog->tag_list as $tag) {
+            $cat = array();
+            $cat['description'] = new xmlrpcval(htmlspecialchars($tag), 'string');
+            $cat['categoryName'] = new xmlrpcval(htmlspecialchars($tag), 'string');
+            $cat['categoryId'] = new xmlrpcval(htmlspecialchars($tag), 'string');
+            $cat['htmlUrl'] = new xmlrpcval($blog->uri('tags').'?tag='.urlencode($tag), 'string');
 
-                $topic = preg_replace('/\W/', '', $tag);
-                $rdf_file = $topic.'_'.PluginManager::instance()->plugin_config->value("RSS1FeedGenerator", "feed_file", "news.rdf");
-                $xml_file = $topic.'_'.PluginManager::instance()->plugin_config->value("RSS2FeedGenerator", "feed_file", "news.xml");
-                if (file_exists($base_feed_path.PATH_DELIM.$xml_file)) {
-                    $rss_url = $base_feed_uri.$xml_file;
-                } elseif (file_exists($base_feed_path.PATH_DELIM.$rdf_file)) {
-                    $rss_url = $base_feed_uri.$rdf_file;
-                } else {
-                    $rss_url = '';
-                }
-
-                $cat['rssUrl'] = new xmlrpcval($rss_url, 'string');
-                $arr[$tag] = new xmlrpcval($cat, 'struct');
+            $topic = preg_replace('/\W/', '', $tag);
+            $rdf_file = $topic.'_'.PluginManager::instance()->plugin_config->value("RSS1FeedGenerator", "feed_file", "news.rdf");
+            $xml_file = $topic.'_'.PluginManager::instance()->plugin_config->value("RSS2FeedGenerator", "feed_file", "news.xml");
+            if (file_exists($base_feed_path.PATH_DELIM.$xml_file)) {
+                $rss_url = $base_feed_uri.$xml_file;
+            } elseif (file_exists($base_feed_path.PATH_DELIM.$rdf_file)) {
+                $rss_url = $base_feed_uri.$rdf_file;
+            } else {
+                $rss_url = '';
             }
-            $ret = new xmlrpcresp(new xmlrpcval($arr, 'struct'));
-        } else {
-            $ret = new xmlrpcresp(0, $xmlrpcerruser+2, "Blog does not exist");
+
+            $cat['rssUrl'] = new xmlrpcval($rss_url, 'string');
+            $arr[$tag] = new xmlrpcval($cat, 'struct');
         }
+        $ret = new xmlrpcresp(new xmlrpcval($arr, 'struct'));
     } else {
-        $ret = new xmlrpcresp(0, $xmlrpcerruser+3, "Invalid login");
-     }
+        $ret = new xmlrpcresp(0, $xmlrpcerruser+2, "Blog does not exist");
+    }
     return $ret;
 }
 
@@ -976,23 +972,22 @@ function metaWeblog_getRecentPosts($params) {
 
     # Again, let's just skip the permissions check since this information is
     # public anyway.
-    if ( $usr->checkPassword($pwd) ) {
+    if ($error = authenticate_user($usr, $pwd, true) !== true) {
+        return $error;
+    }
 
-        $blog = NewBlog($blogid->scalarval());
+    $blog = NewBlog($blogid->scalarval());
 
-        if ($blog->isBlog()) {
-            $entries = $blog->getRecent($numposts->scalarval());
-            $arr = array();
-            foreach ($entries as $ent) {
-                $arr[] = entry_to_struct($ent);
-            }
-            $ret = new xmlrpcresp(new xmlrpcval($arr, 'array'));
-        } else {
-            $ret = new xmlrpcresp(0, $xmlrpcerruser+2, "Blog does not exist");
+    if ($blog->isBlog()) {
+        $entries = $blog->getRecent($numposts->scalarval());
+        $arr = array();
+        foreach ($entries as $ent) {
+            $arr[] = entry_to_struct($ent);
         }
+        $ret = new xmlrpcresp(new xmlrpcval($arr, 'array'));
     } else {
-        $ret = new xmlrpcresp(0, $xmlrpcerruser+3, "Invalid login");
-     }
+        $ret = new xmlrpcresp(0, $xmlrpcerruser+2, "Blog does not exist");
+    }
     return $ret;
 }
 
@@ -1038,28 +1033,27 @@ function mt_getRecentPostTitles($params) {
 
     # Again, let's just skip the permissions check since this information is
     # public anyway.
-    if ( $usr->checkPassword($pwd) ) {
+    if ($error = authenticate_user($usr, $pwd, true) !== true) {
+        return $error;
+    }
 
-        $blog = NewBlog($blogid->scalarval());
+    $blog = NewBlog($blogid->scalarval());
 
-        if ($blog->isBlog()) {
-            $entries = $blog->getRecent($numposts->scalarval());
-            $arr = array();
-            foreach ($entries as $ent) {
-                $post = array();
-                $post['dateCreated'] = new xmlrpcval(fmdate(ENTRY_DATE_FORMAT, $ent->post_ts), 'dateTime.iso8601');
-                $post['userid'] = new xmlrpcval($ent->uid, 'string');
-                $post['postid'] = new xmlrpcval($ent->globalID(), 'string');
-                $post['title'] = new xmlrpcval($ent->subject, 'string');
-                $arr[] = new xmlrpcval($post, 'struct');
-            }
-            $ret = new xmlrpcresp(new xmlrpcval($arr, 'array'));
-        } else {
-            $ret = new xmlrpcresp(0, $xmlrpcerruser+2, "Blog does not exist");
+    if ($blog->isBlog()) {
+        $entries = $blog->getRecent($numposts->scalarval());
+        $arr = array();
+        foreach ($entries as $ent) {
+            $post = array();
+            $post['dateCreated'] = new xmlrpcval(fmdate(ENTRY_DATE_FORMAT, $ent->post_ts), 'dateTime.iso8601');
+            $post['userid'] = new xmlrpcval($ent->uid, 'string');
+            $post['postid'] = new xmlrpcval($ent->globalID(), 'string');
+            $post['title'] = new xmlrpcval($ent->subject, 'string');
+            $arr[] = new xmlrpcval($post, 'struct');
         }
+        $ret = new xmlrpcresp(new xmlrpcval($arr, 'array'));
     } else {
-        $ret = new xmlrpcresp(0, $xmlrpcerruser+3, "Invalid login");
-     }
+        $ret = new xmlrpcresp(0, $xmlrpcerruser+2, "Blog does not exist");
+    }
     return $ret;
 }
 
@@ -1079,25 +1073,24 @@ function mt_getCategoryList($params) {
 
     # Again, let's just skip the permissions check since this information is
     # public anyway.
-    if ( $usr->checkPassword($pwd) ) {
+    if ($error = authenticate_user($usr, $pwd, true) !== true) {
+        return $error;
+    }
 
-        $blog = NewBlog($blogid->scalarval());
+    $blog = NewBlog($blogid->scalarval());
 
-        if ($blog->isBlog()) {
-            $arr = array();
-            foreach ($blog->tag_list as $tag) {
-                $cat = array();
-                $cat['categoryId'] = new xmlrpcval($tag, 'string');
-                $cat['categoryName'] = new xmlrpcval($tag, 'string');
-                $arr[] = new xmlrpcval($cat, 'struct');
-            }
-            $ret = new xmlrpcresp(new xmlrpcval($arr, 'array'));
-        } else {
-            $ret = new xmlrpcresp(0, $xmlrpcerruser+2, "Blog does not exist");
+    if ($blog->isBlog()) {
+        $arr = array();
+        foreach ($blog->tag_list as $tag) {
+            $cat = array();
+            $cat['categoryId'] = new xmlrpcval($tag, 'string');
+            $cat['categoryName'] = new xmlrpcval($tag, 'string');
+            $arr[] = new xmlrpcval($cat, 'struct');
         }
+        $ret = new xmlrpcresp(new xmlrpcval($arr, 'array'));
     } else {
-        $ret = new xmlrpcresp(0, $xmlrpcerruser+3, "Invalid login");
-     }
+        $ret = new xmlrpcresp(0, $xmlrpcerruser+2, "Blog does not exist");
+    }
     return $ret;
 }
 
@@ -1117,26 +1110,25 @@ function mt_getPostCategories($params) {
 
     # Again, let's just skip the permissions check since this information is
     # public anyway.
-    if ( $usr->checkPassword($pwd) ) {
+    if ($error = authenticate_user($usr, $pwd, true) !== true) {
+        return $error;
+    }
 
-        $ent = NewBlogEntry($postid->scalarval());
+    $ent = NewBlogEntry($postid->scalarval());
 
-        if ($ent->isEntry()) {
-            $arr = array();
-            foreach ($ent->tags() as $tag) {
-                $cat = array();
-                $cat['categoryID'] = new xmlrpcval($tag, 'string');
-                $cat['categoryName'] = new xmlrpcval($tag, 'string');
-                $cat['isPrimary'] = new xmlrpcval(false, 'boolean');
-                $arr[$tag] = new xmlrpcval($cat, 'struct');
-            }
-            $ret = new xmlrpcresp(new xmlrpcval($arr, 'struct'));
-        } else {
-            $ret = new xmlrpcresp(0, $xmlrpcerruser+2, "Post does not exist");
+    if ($ent->isEntry()) {
+        $arr = array();
+        foreach ($ent->tags() as $tag) {
+            $cat = array();
+            $cat['categoryID'] = new xmlrpcval($tag, 'string');
+            $cat['categoryName'] = new xmlrpcval($tag, 'string');
+            $cat['isPrimary'] = new xmlrpcval(false, 'boolean');
+            $arr[$tag] = new xmlrpcval($cat, 'struct');
         }
+        $ret = new xmlrpcresp(new xmlrpcval($arr, 'struct'));
     } else {
-        $ret = new xmlrpcresp(0, $xmlrpcerruser+3, "Invalid login");
-     }
+        $ret = new xmlrpcresp(0, $xmlrpcerruser+2, "Post does not exist");
+    }
     return $ret;
 }
 
@@ -1157,26 +1149,25 @@ function mt_setPostCategories($params) {
 
     # Again, let's just skip the permissions check since this information is
     # public anyway.
-    if ( $usr->checkPassword($pwd) ) {
+    if ($error = authenticate_user($usr, $pwd, true) !== true) {
+        return $error;
+    }
 
-        $ent = NewBlogEntry($postid->scalarval());
+    $ent = NewBlogEntry($postid->scalarval());
 
-        if ($ent->isEntry()) {
-            $tags = array();
-            for ($i=0; $i < $cats->arraysize(); $i++) {
-                $mem = $cats->arraymem($i);
-                $cat = $mem->structmem('categoryId');
-                $tags[] = $cat->scalarval();
-            }
-            $ent->tags($tags);
-            $ret = $ent->update();
-            $ret = new xmlrpcresp(new xmlrpcval($ret, 'boolean'));
-        } else {
-            $ret = new xmlrpcresp(0, $xmlrpcerruser+2, "Post does not exist");
+    if ($ent->isEntry()) {
+        $tags = array();
+        for ($i=0; $i < $cats->arraysize(); $i++) {
+            $mem = $cats->arraymem($i);
+            $cat = $mem->structmem('categoryId');
+            $tags[] = $cat->scalarval();
         }
+        $ent->tags($tags);
+        $ret = $ent->update();
+        $ret = new xmlrpcresp(new xmlrpcval($ret, 'boolean'));
     } else {
-        $ret = new xmlrpcresp(0, $xmlrpcerruser+3, "Invalid login");
-     }
+        $ret = new xmlrpcresp(0, $xmlrpcerruser+2, "Post does not exist");
+    }
     return $ret;
 }
 
@@ -1284,6 +1275,29 @@ function mt_getTrackbackPings($params) {
 # True on success, a fault on failure.
 function mt_publishPost($params) {
     return new xmlrpcresp(new xmlrpcval(true, 'boolean'));
+}
+
+function authenticate_user($usr, $pwd, $check) {
+    global $xmlrpcerruser;
+    try {
+        if ( !$usr->authenticateCredentials($pwd) || !$check) {
+            return new xmlrpcresp(0, $xmlrpcerruser+3, "Invalid password - cannot create new post");
+        }
+    } catch (UserLockedOut $locked_out) {
+        return new xmlrpcresp(0, $xmlrpcerruser+5, "Invalid login - user account is currently locked");
+    } catch (UserAccountLocked $locked) {
+        $template = NewTemplate("user_lockout_tpl.php");
+        $template->set('USER', $usr);
+        $template->set('MODE', 'email');
+        mail(
+            $usr->email(),
+            _("LnBlog account locked"),
+            $template->process(),
+            "From: LnBlog notifier <".EMAIL_FROM_ADDRESS.">"
+        );
+        return new xmlrpcresp(0, $xmlrpcerruser+6, "Invalid login - too many attempts, account locked");
+    }
+    return true;
 }
 
 $server = new xmlrpc_server($function_map);

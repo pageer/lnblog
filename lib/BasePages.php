@@ -20,12 +20,14 @@
 abstract class BasePages {
 
     protected $fs;
+    protected $globals;
 
     abstract protected function getActionMap();
     abstract protected function defaultAction();
 
-    public function __construct($fs = null) {
-        $this->fs = $fs ? $fs : NewFS();
+    public function __construct(FS $fs = null, GlobalFunctions $globals = null) {
+        $this->fs = $fs ?: NewFS();
+        $this->globals = $globals ?: new GlobalFunctions();
     }
 
     public function routeRequestWithDefault($default_action) {
@@ -75,6 +77,32 @@ abstract class BasePages {
         }
 
         $this->defaultAction();
+    }
+
+    # Attempt to log in.  If the user is locked out, just totally bail out.
+    protected function attemptLogin(User $user, $password) {
+        $template = NewTemplate("user_lockout_tpl.php");
+        $template->set('USER', $user);
+        try {
+            return $user->login($password);
+        } catch (UserAccountLocked $locked_out) {
+            $template->set('MODE', 'email');
+            $this->globals->mail(
+                $user->email(), 
+                _("LnBlog account locked"),
+                $template->process(),
+                "From: LnBlog notifier <".EMAIL_FROM_ADDRESS.">"
+            );
+            $template->set('MODE', 'new');
+            header("HTTP/1.0 429 Too Many Requests");
+            echo $template->process();
+            exit;
+        } catch (UserLockedOut $locked) {
+            $template->set('MODE', 'existing');
+            header("HTTP/1.0 429 Too Many Requests");
+            echo $template->process();
+            exit;
+        }
     }
 
     protected function getThemeAssetPath($type, $name) {

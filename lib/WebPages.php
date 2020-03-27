@@ -475,7 +475,7 @@ class WebPages extends BasePages {
             $usr->save();
 
             if ($pwd_change) {
-                $usr->login(POST('passwd'));
+                $this->attemptLogin($usr, POST('passwd'));
             }
 
             $this->getPage()->redirect($redir_page);
@@ -584,7 +584,7 @@ class WebPages extends BasePages {
         if ($user && $post_data_is_present && $post_data_is_valid) {
             $user->password($password);
             $user->save();
-            $user->login($password);
+            $this->attemptLogin($user, $password);
             $this->getPage()->redirect($this->blog->getURL());
             return false;
         }

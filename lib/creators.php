@@ -129,9 +129,8 @@ function NewTemplate($tpl="") {
 #
 # Parameters:
 # usr - The *optional* username of the user represented by this object.
-# pwd - The *optional* associated password.
-function NewUser($usr=false, $pwd=false) {
-    return User::get($usr, $pwd);
+function NewUser($usr=false) {
+    return User::get($usr);
 }
 
 # Function: NewFileUpload
