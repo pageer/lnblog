@@ -36,7 +36,7 @@ class User extends LnBlogObject {
 
     public $username = '';
     public $passwd = '';
-    public $salt = '';
+    public $salt = false;
     public $fullname = '';
     public $email = '';
     public $homepage = '';

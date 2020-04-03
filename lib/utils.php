@@ -162,13 +162,19 @@ function scan_directory($path, $dirs_only=false) {
 function calculate_document_root() {
 
     # Bail out if DOCUMENT_ROOT is already defined.
-    if ( defined("DOCUMENT_ROOT") ) return DOCUMENT_ROOT;
+    if ( defined("DOCUMENT_ROOT") ) {
+        return DOCUMENT_ROOT;
+    }
 
     # Get the current URL and the path to the file.
     $curr_uri = current_uri();
     $curr_file = getcwd().PATH_DELIM.basename($curr_uri);
-    if (! file_exists($curr_file)) $curr_file = getcwd();
-    if (PATH_DELIM != "/") $curr_uri = str_replace("/", PATH_DELIM, $curr_uri);
+    if (! file_exists($curr_file)) {
+        $curr_file = getcwd();
+    }
+    if (PATH_DELIM != "/") {
+        $curr_uri = str_replace("/", PATH_DELIM, $curr_uri);
+    }
 
     if ( preg_match(URI_TO_LOCALPATH_MATCH_RE, $curr_uri) ) {
         $curr_uri = preg_replace(URI_TO_LOCALPATH_MATCH_RE, URI_TO_LOCALPATH_REPLACE_RE,$curr_uri);

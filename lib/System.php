@@ -16,7 +16,7 @@ class System {
         'administrators' => [
             'Comment' => 'Can perform administrative actions like adding users and blogs.',
             'Level' => 255,
-            'Members' => 'administrator',
+            'Members' => '',
         ],
         'editors' => [
             'Comment' => "Can create content and modify other user's content.",
@@ -300,14 +300,21 @@ class System {
         $ret = false;
         $userid = $usr->username();
 
-        if (! $this->groupExists($group)) return false;
+        if (! $this->groupExists($group)) {
+            return false;
+        }
 
         $members = trim($this->group_ini->value($group, "Members"));
 
-        if (!$members) $list = array();
-        else $list = explode(',', $members);
+        if (!$members) {
+            $list = array();
+        } else {
+            $list = explode(',', $members);
+        }
 
-        if (in_array($userid, $list)) return true;
+        if (in_array($userid, $list)) {
+            return true;
+        }
 
         $list[] = $userid;
         $list = implode(",", $list);
@@ -405,103 +412,6 @@ class System {
     # Like <canAddTo>, except determines if the user can delete the object.
     public function canDelete($parm, $usr=false) {
         return $this->canModify($parm,$usr);
-    }
-
-    ########## Junk code ###############3
-
-    # Function: calculate_document_root
-    # An alternate way to find the document root.  This one works by comparing
-    # the current URL on the server to the current directory.  The idea is that
-    # we can find the location of the current URL in the path and remove it to
-    # get the document root.  Note that this function IS case-sensitive.
-    #
-    # Returns:
-    # The calculated document root path.
-
-    function calculate_document_root() {
-
-        # Bail out if DOCUMENT_ROOT is already defined.
-        if ( defined("DOCUMENT_ROOT") ) return DOCUMENT_ROOT;
-
-        # Get the current URL and the path to the file.
-        $curr_uri = current_uri();
-        $curr_file = getcwd().PATH_DELIM.basename($curr_uri);
-        if (! file_exists($curr_file)) $curr_file = getcwd();
-        if (PATH_DELIM != "/") $curr_uri = str_replace("/", PATH_DELIM, $curr_uri);
-
-        if ( preg_match(URI_TO_LOCALPATH_MATCH_RE, $curr_uri) ) {
-            $curr_uri = preg_replace(URI_TO_LOCALPATH_MATCH_RE, URI_TO_LOCALPATH_REPLACE_RE,$curr_uri);
-        }
-
-        # Find the location
-        $pos = strpos($curr_file, $curr_uri);
-        while (! $pos && strlen($curr_uri) > 1) {
-            $curr_uri = dirname($curr_uri);
-            $pos = strpos($curr_file, $curr_uri);
-        }
-        return substr($curr_file, 0, $pos + 1);
-
-    }
-
-    function calculate_server_root($path, $assume_subdomain=false) {
-
-        $ret = '';
-
-        if ($this->subdomainroot && $this->docroot) {
-
-            # If the path doesn't start with either the subdomain or document
-            # root, then something is very, very wrong, so we need to bail
-            # the hell out and do it loud!
-            if ( ! (strpos($path, DOCUMENT_ROOT)  === 0 ||
-                    strpos($path, SUBDOMAIN_ROOT) === 0) ) {
-                echo "Bad file passed to calculate_server_root() in ".__FILE__.
-                     ".  The path '".$path."' is not under the document root (".
-                      DOCUMENT_ROOT.") or the subdomain root (".SUBDOMAIN_ROOT.
-                      ").  Cannot get server root.";
-                return false;
-            }
-
-            # Case 1 - The document root and subdomain root aretitle the same.
-            if (SUBDOMAIN_ROOT == DOCUMENT_ROOT) {
-
-                $ret = DOCUMENT_ROOT;
-
-            # Case 2 - The document root is inside subdomain root.
-            } elseif (strpos(DOCUMENT_ROOT, SUBDOMAIN_ROOT) === 0) {
-
-                # If the path contains the document root, assume that we're NOT
-                # in a subdomain.
-                $ret = ( strpos($path, DOCUMENT_ROOT) === 0) ?
-                       DOCUMENT_ROOT: SUBDOMAIN_ROOT;
-
-            # Case 3 - The subdomain root is inside the document root.
-            } elseif (strpos(SUBDOMAIN_ROOT, DOCUMENT_ROOT) === 0) {
-
-                # If the path is in the document root, but not the subdomain
-                # root, then we're definitely not in a subdomain.
-                if (strpos($path, DOCUMENT_ROOT) === 0 &&
-                    strpos($path, SUBDOMAIN_ROOT) === false) {
-                    $ret = DOCUMENT_ROOT;
-                } else {
-                    # Otherwise, there's no way to tell if the directory is a subdomain
-                    # without hitting the network, so just pass the decision to the caller.
-                    $ret = $assume_subdomain ? SUBDOMAIN_ROOT : DOCUMENT_ROOT;
-                }
-
-            # Case 4 - The two directories are independent.
-            } else {
-                # If path is under the document, return that.  Otherwise, return the
-                # subdomain root.  This ends up the same as case 2.
-                $ret = ( strpos($path, DOCUMENT_ROOT) === 0) ?
-                       DOCUMENT_ROOT: SUBDOMAIN_ROOT;
-            }
-
-        } else {
-            $ret = calculate_document_root();
-        }
-
-        return $ret;
-
     }
 }
 

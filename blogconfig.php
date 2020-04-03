@@ -758,8 +758,10 @@ require_once INSTALL_ROOT."/lib/utils.php";
 # there is no current blog set up.
 @define("THEME_NAME", "default");
 
+# If this is not defined, then the initial setup hasn't been done,
+# so set this to empty to make the URLs relative.
 if (! defined("INSTALL_ROOT_URL")) {
-    define("INSTALL_ROOT_URL", localpath_to_uri(INSTALL_ROOT, false));
+    define("INSTALL_ROOT_URL", "");
 }
 
 # Include constants for classes.

@@ -33,8 +33,6 @@ class AdminPages extends BasePages {
             'profile' => 'userinfo',
             'fssetup' => 'fssetup',
             'editfile' => 'WebPages::editfile',
-            'docroot' => 'docroot_test',
-            'ftproot' => 'ftproot_test',
             'useredit' => 'WebPages::editlogin',
             'webmention' => 'WebPages::webmention',
         );
@@ -494,7 +492,10 @@ class AdminPages extends BasePages {
                 $ret = $usr->save();
 
                 if ($ret) {
-                    if ($first_user) $ret = $usr->addToGroup('administrators');
+                    if ($first_user) {
+                        $ret = $usr->addToGroup('administrators');
+                        $ret = $ret && $this->attemptLogin($usr, POST('passwd'));
+                    }
                     if (!$ret) {
                         $tpl->set("FORM_MESSAGE",
                                   _("Error: Failed to make this user an administrator."));
@@ -781,72 +782,6 @@ class AdminPages extends BasePages {
 
     }
 
-    public function ftproot_test() {
-        $tpl = NewTemplate(FTPROOT_TEST_TEMPLATE);
-
-        $user = trim(POST("uid"));
-        $tpl->set("USER", $user);
-        $pass = trim(POST("pwd"));
-        $tpl->set("PASS", $pass);
-        $hostname = trim(POST("host"));
-        $tpl->set("HOSTNAME", $hostname);
-        $test_file = getcwd().PATH_DELIM."ReadMe.txt";
-        $tpl->set("TEST_FILE", $test_file);
-        $tpl->set("TARGETPAGE", current_file());
-        $ftp_root = "";
-        $test_status = false;
-        $ftp_path = "";
-        $error_message = "";
-        $curr_dir = getcwd();
-        $tpl->set("CURR_DIR", $curr_dir);
-
-        if ($user && $pass && $hostname) {
-
-            $ftp = new FTPFS($hostname, $user, $pass);
-            if ($ftp->status !== false) {
-
-                if (! POST("ftproot")) {
-                    $ftp_root = $this->find_dir($test_file, $ftp->connection);
-                } else {
-                    $ftp_root = POST("ftproot");
-                }
-                $ftp->ftp_root = $ftp_root;
-
-                $test_status = $this->ftp_file_exists($test_file, $ftp);
-                $ftp_path = $ftp->localpathToFSPath($test_file);
-
-            } else $error_message = _("Unable to connect to FTP server.");
-        }
-
-        $tpl->set("FTP_ROOT", $ftp_root);
-        $tpl->set("FTP_PATH", $ftp_path);
-        $tpl->set("ERROR_MESSAGE", $error_message);
-        $tpl->set("TEST_STATUS", $test_status);
-
-        echo $tpl->process();
-    }
-
-    public function docroot_test() {
-        $tpl = NewTemplate(DOCROOT_TEST_TEMPLATE);
-        $curr_dir = getcwd();
-        $tpl->set("CURR_DIR", $curr_dir);
-        $tpl->set("TARGETFILE", current_file());
-        if (POST("docroot")) {
-            $doc_root = POST("docroot");
-        } else {
-            $doc_root = calculate_document_root();
-            define("DOCUMENT_ROOT", $doc_root);
-        }
-        $tpl->set("DOC_ROOT", $doc_root);
-        $target_url = localpath_to_uri($curr_dir.PATH_DELIM."ReadMe.txt");
-        $tpl->set("TARGET_URL", $target_url);
-        $documentation_path = $doc_root.PATH_DELIM.basename($curr_dir).PATH_DELIM."ReadMe.txt";
-        $tpl->set("DOCUMENTATION_PATH", $documentation_path);
-        $documentation_exists = file_exists($documentation_path);
-        $tpl->set("DOCUMENTATION_EXISTS", $documentation_exists);
-        echo $tpl->process();
-    }
-
     # Test how and if native file writing works.
     protected function nativefs_test() {
 
@@ -1008,18 +943,17 @@ class AdminPages extends BasePages {
     }
 
     public function fssetup() {
-        if ( file_exists(USER_DATA_PATH.PATH_DELIM.FS_PLUGIN_CONFIG) ) {
+        if ( file_exists(Path::mk(USER_DATA_PATH, FS_PLUGIN_CONFIG)) ) {
             $this->redirect('index');
         }
 
-        Page::instance()->title = sprintf(_("%s File Writing"), PACKAGE_NAME);
-        $form_title = _("Configure File Writing Support");
+        Page::instance()->title = sprintf(_("%s Configuration"), PACKAGE_NAME);
 
         $tpl = NewTemplate(FS_CONFIG_TEMPLATE);
 
         $tpl->set("FORM_ACTION", '');
 
-        if ( has_post() ) {
+        if (has_post()) {
 
             $this->template_set_post_data($tpl);
             $field_test = $this->check_fields();
@@ -1028,73 +962,20 @@ class AdminPages extends BasePages {
             # of it should be wrapped in a document root calculation function
             # for legacy versions.  However....
 
-            $fields = array("docroot"=>"DOCUMENT_ROOT", "subdomroot"=>"SUBDOMAIN_ROOT",
-                            "domain"=>"DOMAIN_NAME", "permfile"=>"FS_DEFAULT_MODE",
-                            "permdir"=>"FS_DIRECTORY_MODE",
-                            "permscript"=>"FS_SCRIPT_MODE");
+            define('FS_DEFAULT_MODE', 0);
+            define('FS_DIRECTORY_MODE', 0);
+            define('FS_SCRIPT_MODE', 0);
+            define("FS_PLUGIN", "nativefs");
+
+            $fields = array(
+                "docroot"=>"DOCUMENT_ROOT",
+                "subdomroot"=>"SUBDOMAIN_ROOT",
+                "domain"=>"DOMAIN_NAME",
+            );
             foreach ($fields as $key=>$val) {
                 if (POST($key)) {
-                    if (preg_match("/FS_.*_MODE/", $val)) {
-                        $num = trim(POST($key));
-                        $num = octdec((int)$num);
-                        define($val, $num);
-                    } else {
-                        define($val, trim(POST($key)));
-                    }
+                    define($val, trim(POST($key)));
                 }
-            }
-
-            if ( POST("use_ftp") == "nativefs" ) {
-
-                define("FS_PLUGIN", "nativefs");
-
-            } elseif ( POST("use_ftp") == "ftpfs" ) {
-
-                # Check that all required fields have been specified.
-                $vars = array("ftp_user", "ftp_pwd", "ftp_conf", "ftp_host", "ftp_root");
-                $has_all_data = true;
-                foreach ($vars as $val) {
-                    $has_all_data = $has_all_data && ( trim(POST($val)) != "" );
-                }
-
-                # Make a vain attempt to guess the FTP root.
-                if ( trim(POST("ftp_user")) && trim(POST("ftp_pwd")) && trim(POST("ftp_conf"))
-                     && trim(POST("ftp_host")) && trim(POST("ftp_pwd")) == trim(POST("ftp_conf"))
-                      && ! trim(POST("ftp_root")) ) {
-                    $ftp_root_test_result = $this->test_ftproot();
-                }
-
-                if ($has_all_data) {
-
-                    if ( trim(POST("ftp_pwd")) == trim(POST("ftp_conf")) ) {
-
-                        define("FS_PLUGIN", "ftpfs");
-                        define("FTPFS_USER", trim(POST("ftp_user")) );
-                        define("FTPFS_PASSWORD",trim( POST("ftp_pwd")) );
-                        define("FTPFS_HOST", trim(POST("ftp_host")) );
-                        if (isset($ftp_root_test_result)) {
-                            $ftproot = $ftp_root_test_result;
-                        } else {
-                            $ftproot = trim(POST("ftp_root"));
-                        }
-                        define("FTP_ROOT", $ftproot);
-                        if (trim(POST("ftp_prefix")) != '') {
-                            define("FTPFS_PATH_PREFIX", trim(POST("ftp_prefix")) );
-                        }
-
-                    } else {
-                        $tpl->set("FORM_MESSAGE", _("Error: Passwords do not match."));
-                    }
-                } elseif (trim(POST("ftp_pwd")) != trim(POST("ftp_conf"))) {
-                    $tpl->set("FORM_MESSAGE", _("Error: Passwords do not match."));
-                } elseif (isset($ftp_root)) {
-                    $tpl->set("FORM_MESSAGE", spf_("Error: The auto-detected FTP root directory %s was not acceptable.  You will have to set this manually.", $ftp_root));
-                } else {
-                    $tpl->set("FORM_MESSAGE", _("Error: For FTP file writing, you must fill in the FTP login information."));
-                }
-
-            } else {
-                $tpl->set("FORM_MESSAGE", _("Error: No file writing method selected."));
             }
 
             $content = $this->serialize_constants();
@@ -1110,20 +991,14 @@ class AdminPages extends BasePages {
                     @$ret = $fs->mkdir_rec(USER_DATA_PATH);
                 }
                 if (is_dir(USER_DATA_PATH)) {
-                    $ret = $fs->write_file(USER_DATA_PATH.PATH_DELIM.FS_PLUGIN_CONFIG, $content);
+                    $ret = $fs->write_file(Path::mk(USER_DATA_PATH, FS_PLUGIN_CONFIG), $content);
                 }
 
                 if ( $ret) {
                     $this->redirect("index");
                 } else {
-                    if (FS_PLUGIN == "ftpfs") {
-                        $tpl->set("FORM_MESSAGE", sprintf(
-                            _("Error: Could not create fsconfig.php file.  Make sure that the directory %s exists on the server and is writable to %s."),
-                            USER_DATA_PATH, FTPFS_USER));
-                    } else {
-                        $tpl->set("FORM_MESSAGE", sprintf(
-                            _("Error: Could not create fsconfig.php file.  Make sure that the directory %s exists on the server and is writable to the web server user."), USER_DATA_PATH));
-                    }
+                    $tpl->set("FORM_MESSAGE", sprintf(
+                        _("Error: Could not create fsconfig.php file.  Make sure that the directory %s exists on the server and is writable to the web server user."), USER_DATA_PATH));
                 }
 
             } else {
@@ -1133,18 +1008,12 @@ class AdminPages extends BasePages {
             }
 
         } else {
-            $tpl->set("HOSTTYPE", "suexec");
             $tpl->set("HOST", "localhost");
             $tpl->set("DOC_ROOT", calculate_document_root() );
-            $tpl->set("PERMDIR", '0000');
-            $tpl->set("PERMSCRIPT", '0000');
-            $tpl->set("PERMFILE", '0000');
-
         }
 
         $body = $tpl->process();
         Page::instance()->addStylesheet("form.css");
-        Page::instance()->addScript("fs_setup.js");
         Page::instance()->display($body);
     }
 }
