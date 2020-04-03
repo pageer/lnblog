@@ -7,6 +7,9 @@
 require_once __DIR__."/blogconfig.php";
 require_once __DIR__."/lib/creators.php";
 require_once __DIR__."/lib/utils.php";
+require_once __DIR__.'/vendor/phpxmlrpc/phpxmlrpc/lib/xmlrpc.inc';
+require_once __DIR__.'/vendor/phpxmlrpc/phpxmlrpc/lib/xmlrpcs.inc';
+require_once __DIR__.'/vendor/phpxmlrpc/phpxmlrpc/lib/xmlrpc_wrappers.inc';
 
 use LnBlog\Tasks\TaskManager;
 
@@ -256,7 +259,7 @@ function blogger_newPost($params) {
     $publisher = new Publisher($blog, $usr, $fs, new WrapperGenerator($fs), new TaskManager());
 
     $check = System::instance()->canAddTo($blog, $usr);
-    if ($error = authenticate_user($usr, $pwd, $check) !== true) {
+    if (true !== $error = authenticate_user($usr, $pwd, $check)) {
         return $error;
     }
 
@@ -330,7 +333,7 @@ function blogger_editPost($params) {
     $publisher = new Publisher($blog, $usr, $fs, new WrapperGenerator($fs), new TaskManager());
 
     $check = System::instance()->canModify($ent, $usr);
-    if ($error = authenticate_user($usr, $pwd, $check) !== true) {
+    if (true !== $error = authenticate_user($usr, $pwd, $check)) {
         return $error;
     }
 
@@ -397,7 +400,7 @@ function blogger_deletePost($params) {
     $publisher = new Publisher($blog, $usr, $fs, new WrapperGenerator($fs), new TaskManager());
 
     $check = System::instance()->canDelete($ent, $usr);
-    if ($error = authenticate_user($usr, $pwd, $check) !== true) {
+    if (true !== $error = authenticate_user($usr, $pwd, $check)) {
         return $error;
     }
 
@@ -431,7 +434,7 @@ function blogger_getUsersBlogs($params) {
     $pwd = trim($password->scalarval());
     $usr = NewUser($uid);
 
-    if ($error = authenticate_user($usr, $pwd, true) !== true) {
+    if (true !== $error = authenticate_user($usr, $pwd, true)) {
         return $error;
     }
 
@@ -476,7 +479,7 @@ function blogger_getUserInfo($params) {
     $pwd = trim($password->scalarval());
     $usr = NewUser($uid);
 
-    if ($error = authenticate_user($usr, $pwd, true) !== true) {
+    if (true !== $error = authenticate_user($usr, $pwd, true)) {
         return $error;
     }
 
@@ -643,7 +646,7 @@ function metaWeblog_newPost($params) {
     $publisher = new Publisher($blog, $usr, $fs, new WrapperGenerator($fs), new TaskManager());
 
     $check = System::instance()->canAddTo($blog, $usr);
-    if ($error = authenticate_user($usr, $pwd, $check) !== true) {
+    if (true !== $error = authenticate_user($usr, $pwd, $check)) {
         return $error;
     }
 
@@ -726,7 +729,7 @@ function metaWeblog_editPost($params) {
     $publisher = new Publisher($blog, $usr, $fs, new WrapperGenerator($fs), new TaskManager());
 
     $check = System::instance()->canModify($ent, $usr);
-    if ($error = authenticate_user($usr, $pwd, $check) !== true) {
+    if (true !== $error = authenticate_user($usr, $pwd, $check)) {
         return $error;
     }
 
@@ -799,7 +802,7 @@ function metaWeblog_getPost($params) {
     # I think we can safely skip the permissions check here, since all the
     # information is public anyway.  We'll just check for authentication
     # instead.
-    if ($error = authenticate_user($usr, $pwd, true) !== true) {
+    if (true !== $error = authenticate_user($usr, $pwd, true)) {
         return $error;
     }
 
@@ -848,7 +851,7 @@ function metaWeblog_newMediaObject($params) {
     $blog = NewBlog($blogid->scalarval());
 
     $check = System::instance()->canModify($blog, $usr);
-    if ($error = authenticate_user($usr, $pwd, true) !== true) {
+    if (true !== $error = authenticate_user($usr, $pwd, true)) {
         return $error;
     }
 
@@ -907,7 +910,7 @@ function metaWeblog_getCategories($params) {
 
     # Again, let's just skip the permissions check since this information is
     # public anyway.
-    if ($error = authenticate_user($usr, $pwd, true) !== true) {
+    if (true !== $error = authenticate_user($usr, $pwd, true)) {
         return $error;
     }
 
@@ -972,7 +975,7 @@ function metaWeblog_getRecentPosts($params) {
 
     # Again, let's just skip the permissions check since this information is
     # public anyway.
-    if ($error = authenticate_user($usr, $pwd, true) !== true) {
+    if (true !== $error = authenticate_user($usr, $pwd, true)) {
         return $error;
     }
 
@@ -1033,7 +1036,7 @@ function mt_getRecentPostTitles($params) {
 
     # Again, let's just skip the permissions check since this information is
     # public anyway.
-    if ($error = authenticate_user($usr, $pwd, true) !== true) {
+    if (true !== $error = authenticate_user($usr, $pwd, true)) {
         return $error;
     }
 
@@ -1073,7 +1076,7 @@ function mt_getCategoryList($params) {
 
     # Again, let's just skip the permissions check since this information is
     # public anyway.
-    if ($error = authenticate_user($usr, $pwd, true) !== true) {
+    if (true !== $error = authenticate_user($usr, $pwd, true)) {
         return $error;
     }
 
@@ -1110,7 +1113,7 @@ function mt_getPostCategories($params) {
 
     # Again, let's just skip the permissions check since this information is
     # public anyway.
-    if ($error = authenticate_user($usr, $pwd, true) !== true) {
+    if (true !== $error = authenticate_user($usr, $pwd, true)) {
         return $error;
     }
 
@@ -1149,7 +1152,7 @@ function mt_setPostCategories($params) {
 
     # Again, let's just skip the permissions check since this information is
     # public anyway.
-    if ($error = authenticate_user($usr, $pwd, true) !== true) {
+    if (true !== $error = authenticate_user($usr, $pwd, true)) {
         return $error;
     }
 
@@ -1281,7 +1284,7 @@ function authenticate_user($usr, $pwd, $check) {
     global $xmlrpcerruser;
     try {
         if ( !$usr->authenticateCredentials($pwd) || !$check) {
-            return new xmlrpcresp(0, $xmlrpcerruser+3, "Invalid password - cannot create new post");
+            return new xmlrpcresp(0, $xmlrpcerruser+3, "Error authenticating credentials");
         }
     } catch (UserLockedOut $locked_out) {
         return new xmlrpcresp(0, $xmlrpcerruser+5, "Invalid login - user account is currently locked");

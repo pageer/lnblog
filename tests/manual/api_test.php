@@ -15,6 +15,9 @@ $HOSTNAME = isset($_GET['host']) ? $_GET['host'] : 'localhost';
 $PORT = isset($_GET['port']) ? $_GET['port'] : 80;
 
 require __DIR__.'/../../vendor/autoload.php';
+require '../../vendor/phpxmlrpc/phpxmlrpc/lib/xmlrpc.inc';
+require '../../vendor/phpxmlrpc/phpxmlrpc/lib/xmlrpcs.inc';
+require '../../vendor/phpxmlrpc/phpxmlrpc/lib/xmlrpc_wrappers.inc';
 ?>
 <html>
 <head><title>MetaWeblog API Test</title></head>

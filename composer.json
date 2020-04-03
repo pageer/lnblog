@@ -4,7 +4,7 @@
     },
     "require": {
         "erusev/parsedown": "1.6.3",
-        "phpxmlrpc/phpxmlrpc": "3.0.0",
+        "phpxmlrpc/phpxmlrpc": "~4.0",
         "monolog/monolog": "1.*"
     },
     "require-dev": {
