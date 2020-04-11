@@ -39,7 +39,7 @@ class WebPages extends BasePages {
             'plugins'    => 'AdminPages::pluginsetup',
             'tags'       => 'tagsearch',
             'pluginload' => 'AdminPages::pluginloading',
-            'profile'    => 'AdminPager::userinfo',
+            'profile'    => 'AdminPages::userinfo',
             'managereply'=> 'managereplies',
             'editfile'   => 'editfile',
             'blogpaths'  => 'blogpaths',
