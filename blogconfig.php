@@ -759,9 +759,12 @@ require_once INSTALL_ROOT."/lib/utils.php";
 @define("THEME_NAME", "default");
 
 # If this is not defined, then the initial setup hasn't been done,
-# so set this to empty to make the URLs relative.
+# so set this to the directory of the current path.
 if (! defined("INSTALL_ROOT_URL")) {
-    define("INSTALL_ROOT_URL", "");
+    $url_path = @parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    # The index.php may or may not be present - chop it off if it is.
+    $url_path = preg_replace('/index\.php$/', '', $url_path);
+    define("INSTALL_ROOT_URL", $url_path);
 }
 
 # Include constants for classes.

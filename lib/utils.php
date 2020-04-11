@@ -166,6 +166,10 @@ function calculate_document_root() {
         return DOCUMENT_ROOT;
     }
 
+    if (isset($_SERVER['DOCUMENT_ROOT'])) {
+        return $_SERVER['DOCUMENT_ROOT'];
+    }
+
     # Get the current URL and the path to the file.
     $curr_uri = current_uri();
     $curr_file = getcwd().PATH_DELIM.basename($curr_uri);
