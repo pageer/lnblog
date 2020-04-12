@@ -57,7 +57,7 @@ class BasePagesTest extends PHPUnit\Framework\TestCase {
     }
     
     public function testRouteRequest_WhenActionIsClassAndMethod_InstantiatesClassAndCallsMethod() {
-        $this->page->action_map = array('something' => 'OtherTestPages::someaction');
+        $this->page->action_map = array('something' => [OtherTestPages::class, 'someaction']);
         
         $this->page->routeRequest('something');
         

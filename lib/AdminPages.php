@@ -32,9 +32,9 @@ class AdminPages extends BasePages {
             'plugins' => 'pluginsetup',
             'profile' => 'userinfo',
             'fssetup' => 'fssetup',
-            'editfile' => 'WebPages::editfile',
-            'useredit' => 'WebPages::editlogin',
-            'webmention' => 'WebPages::webmention',
+            'editfile' => [WebPages::class, 'editfile'],
+            'useredit' => [WebPages::class, 'editlogin'],
+            'webmention' => [WebPages::class, 'webmention'],
         );
     }
 

@@ -40,9 +40,9 @@ abstract class BasePages {
         $action = $action ?: GET('action');
         $action_method = isset($action_map[$action]) ? $action_map[$action] : null;
 
-        if ($action_method && strpos($action_method, '::') !== false) {
+        if (is_array($action_method) && count($action_method) === 2) {
 
-            list($class, $method) = explode('::', $action_method, 2);
+            list($class, $method) = $action_method;
             $object = new $class();
             return $object->$method();
 
