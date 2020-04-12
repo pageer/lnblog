@@ -219,14 +219,14 @@ class PublisherIntTest extends \PHPUnit\Framework\TestCase {
 
     /**** Setup ****/
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         $fs = NewFS();
         if (is_dir(self::TESTPATH)) {
             $fs->rmdir_rec(self::TESTPATH);
         }
     }
 
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass(): void {
         $fs = NewFS();
         if (is_dir(self::TESTPATH)) {
             $fs->rmdir_rec(self::TESTPATH);

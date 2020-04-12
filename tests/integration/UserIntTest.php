@@ -52,11 +52,11 @@ class UserIntTest extends \PHPUnit\Framework\TestCase {
         $this->assertRegexp("/return '.*';/", $file_content);
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         $this->created_users = [];
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         foreach ($this->created_users as $username) {
             $this->removeUserDirectory($username);
         }

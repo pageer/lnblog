@@ -1,13 +1,13 @@
 <?php
 class NativeFsIntTest extends \PHPUnit\Framework\TestCase {
-    function setUp() {
+    function setUp(): void {
         $this->init_dir = getcwd();
         if (! is_dir("temp")) {
             mkdir("temp");
         }
     }
 
-    function tearDown() {
+    function tearDown(): void {
         @unlink("temp/writefile.txt");
         @unlink("temp/writefile.php");
         @rmdir("temp/foo/baz/bizz");

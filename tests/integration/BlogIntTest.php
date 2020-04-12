@@ -39,11 +39,11 @@ class BlogIntTest extends \PHPUnit\Framework\TestCase {
 
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         $this->removeTempDir();
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->removeTempDir();
     }
 
