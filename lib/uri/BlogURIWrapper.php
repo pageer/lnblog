@@ -4,7 +4,11 @@ class BlogURIWrapper extends LnBlogObject {
 
     function BlogURIWrapper(&$blog) {
         $this->object = $blog;
-        $this->base_uri = localpath_to_uri($blog->home_path);
+        if (defined('BLOG_ROOT_URL')) {
+            $this->base_uri = BLOG_ROOT_URL;
+        } else {
+            $this->base_uri = localpath_to_uri($blog->home_path);
+        }
         $this->separator = "&amp;";
     }
 
