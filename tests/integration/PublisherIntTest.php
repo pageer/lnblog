@@ -231,5 +231,8 @@ class PublisherIntTest extends \PHPUnit\Framework\TestCase {
         if (is_dir(self::TESTPATH)) {
             $fs->rmdir_rec(self::TESTPATH);
         }
+        if (is_dir("feeds")) {
+            $fs->rmdir_rec("feeds");
+        }
     }
 }

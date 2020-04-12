@@ -49,8 +49,11 @@ class BlogIntTest extends \PHPUnit\Framework\TestCase {
 
     protected function removeTempDir() {
         $fs = new NativeFS();
-        if ($fs->is_dir("test_temp") && is_writeable("temp")) {
+        if ($fs->is_dir("test_temp")) {
             $fs->rmdir_rec("test_temp");
+        }
+        if ($fs->is_dir("feeds")) {
+            $fs->rmdir_rec("feeds");
         }
     }
 }

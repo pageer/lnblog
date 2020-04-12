@@ -27,23 +27,25 @@
 	
     <target name="build" depends="prepare">
         <echo msg="Copying files to build directory..." />
-		<exec command="hg archive ./build/LnBlog-${version}" dir="." />
+		<exec command="git clone . ./build/LnBlog-${version}" dir="." />
 		
 		<echo msg="Installing dependencies with Composer..." />
 		<exec command="composer install --no-dev --no-interaction" dir="./build/LnBlog-${version}" />
 
-        <echo msg="Installing JavaScript sependencies with Yarn..."/>
-        <echo command="yarn install" dir="./build/LnBlog-${version}">
+        <!-- This is not yet used - JS dependencies are still external or in-repo. -->
+        <!--
+        <echo msg="Installing JavaScript sependencies with Yarn..." />
+        <exec command="yarn install" dir="./build/LnBlog-${version}" />
+        -->
     </target>
 
     <target name="distclean" depends="build">
 		<echo msg="Cleaning up unneeded project files..." />
 		<delete>
 			<fileset dir="./build/LnBlog-${version}">
-				<include name=".hg*" />
+				<include name=".git*" />
 			</fileset>
 		</delete>
-		<delete file="./build/LnBlog-${version}/LnBlog.komodoproject" />
 		<delete dir="./build/LnBlog-${version}/tests" />
 		<delete dir="./build/LnBlog-${version}/docs" />
 		<delete dir="./build/LnBlog-${version}/doc_project" />
@@ -68,7 +70,7 @@
 		<exec command="sha1sum LnBlog-${version}.zip" dir="./build" output="./build/LnBlog-${version}.sha1" />
 		
 		<echo msg="Generating GPG signature..." />
-		<exec command="gpg --output LnBlog-${version}.sig --detatch-sig LnBlog-${version}.zip" dir="./build" />
+		<exec command="gpg --output LnBlog-${version}.sig --detach-sign LnBlog-${version}.zip" dir="./build" />
 
         <echo msg="Dist build complete!" />
     </target>

@@ -1,5 +1,5 @@
 LnBlog: A flexible file-base weblog
-Copyright (C) 2005-2019 Peter A. Geer <pageer@skepticats.com>
+Copyright (C) 2005-2020 Peter A. Geer <pageer@skepticats.com>
 
 About LnBlog
 ------------
@@ -27,20 +27,20 @@ mime-magic or fileinfo extensions is helpful, but not required.
 Installation
 ------------
 There are two ways to install: from the distribution ZIP file downloaded from
-the LnBlog webpage (recommended) or from source, i.e. the cloned Mercurial repository.
+the LnBlog webpage (recommended) or from source, i.e. the cloned Git repository.
 
 To install the distribution ZIP file, simply extract the ZIP archive and upload 
 the resulting folder to the publicly accessible portion of your web server.
 After that, open a web browser go to the URL corresponding to that location.
 This will start the graphical configuration process.  You will be prompted to 
-configure file writing and create an initial user account, after which you will 
+confirm path information and create an initial user account, after which you will 
 be taken to the administration page where you can create more users, create blog,
 and set other options.
 
 To install directly from a copy of the source repository, you will need to have
 Composer installed (http://getcomposer.org/).  Just move the the source directory
 to the web-accessible portion of your web server and run "composer install" from
-that directory.  You can then run webup process as described above.
+that directory.  You can then run web setup process as described above.
 
 Upgrade
 -------
@@ -52,21 +52,13 @@ subdirectory from your old  LnBlog directory to the new one, overwriting existin
 files.
 
 If you installed from source, you can simply pull updates from the Mercurial
-repository by running "hg pull -u".  You may also need to run "composer update"
+repository by running "git pull origin master".  You may also need to run "composer update"
 if new third-party dependencies have been added.
-
-Plugins
--------
-LnBlog supports an event-driven plugin system and ships with a large number of 
-standard plugins.  There are also a number of non-standard plugins available 
-from the official web site.  These include extra sidebar panels, JavaScript 
-rich-text editors, and others.  These can be downloaded from:
-http://www.skepticats.com/lnblog/content/plugins/
 
 License
 -------
 LnBlog: A flexible file-base weblog
-Copyright (C) 2005-2019 Peter A. Geer <pageer@skepticats.com>
+Copyright (C) 2005-2020 Peter A. Geer <pageer@skepticats.com>
 
 This program is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software 
