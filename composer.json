@@ -1,10 +1,13 @@
 {
+    "name": "pageer/lnblog",
+    "description": "A simple file-based weblog",
+    "license": "GPL-2.0-or-later",
     "autoload": {
         "psr-4": {"LnBlog\\": "lib"}
     },
     "require": {
         "php": ">=5.6.0",
-        "erusev/parsedown": "1.6.3",
+        "erusev/parsedown": "1.6.*",
         "phpxmlrpc/phpxmlrpc": "~4.0",
         "monolog/monolog": "1.*"
     },
