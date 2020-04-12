@@ -3,7 +3,7 @@ Title: Configuration files
 File: pathconfig.php
 
 There is a pathconfig.php file in the root directory of each weblog.  The purpose of this 
-file is simply to the path and URL to the LnBlog installation and to define the URL to 
+file is to define the path and URL to the LnBlog installation and to define the URL to 
 the blog root directory.  You can edit these values with the <blogpaths.php> page. 
 
 Note that the only time you would really want to change this is when you move
@@ -41,57 +41,12 @@ errors when the file loads.  Therefore, this is recommended only for people who 
 doing.
 
 File: fsconfig.php
-Stores data storage configuration.  See below.
 
 Section: Format of fsconfig.php
 
-The following describes the content and rationale of the fsconfig.php file.
-
-Topic: File Writing Overview
-
-Currently, LnBlog only stores data by writing it to text files on the web
-server.  However, it supports two methods for doing this.  One is to use 
-standard file-writing functions and the other is to use FTP.  These are 
-refferred to, respectively, as NativeFS and FTPFS.  Deciding 
-between these is the first configuration step for LnBlog and is done by
-the <fs_setup.php> script.  This script creates the fsconfig.php file, 
-which should not be present in an initial installation.
-
-The reason for having two types of filesystem writing is that many web hosts
-use PHP's *safe_mode* feature to provide added security.  One of the 
-restrictions this imposes is that scripts can only read files from the disk
-if the owner of the file is the same as the owner of the script.  In some shared
-hosting environments (such as those using Mod_PHP), PHP runs and writes files as
-a system accout, whereas the scripts themselves would be owned by
-the user account of the site operator, so scripts would not be able to read any 
-of the files they created.  This restriction can be bypassed by performing 
-file writing via FTP, as this allows scripts to connect to the FTP server as
-the site owner, not a system user.  This also has the beneficial effect that 
-the files created by the scripts will be owned by the user account, so that
-they can be more easily managed via an FTP client.
-
-If you have the option, it is recommended that you use NativeFS.  It is by far
-the faster, more reliable, and easier to configure.  FTPFS only exists to work
-around security restrictions created by certain configurations.  Furthermore, note
-that *safe_mode* was deprecated in PHP 5.3 and removed from PHP 5.4, so unless you're
-stuck on a very old version of PHP, it is unlikely that you will need FTPFS.
-
-Topic: Technical Details
-
-Writing to the filesystem is carried out using an abstract interface class.
-This class defines the basic functions of the file-writing subsystem, such 
-as creating directories, deleting files, and writing text data to a file.
-There are NativeFS and FTPFS subclasses which implement this interface.  
-LnBlog writes files by using a wrapper function in the <creators.php> file 
-to instantiate the correct class based on a constant defined in the 
-fsconfig.php file.  
-
-The fsconfig.php file is a simple PHP source code file which contains only 
-a series of constant definitions.  If necessary, these definitions can be 
-changed by hand, although this is not recommended.  Note that which 
-definitions are actually present depends on the type of file writing used.
-If NativeFS is used, there is no extra configuration needed, but FTPFS 
-requires various user authentication details.
+This file is a series of constant definitions, which determine some of the system configuration.
+The exact contents will depend on the particular configuration, which is defined when you set
+up LnBlog.  The available settings are described below.
 
 Group: Standard Constants
 
@@ -106,9 +61,32 @@ path component of the URL.
 
 Constant: FS_PLUGIN
 This determines which filesystem writing method to use.
-Currently, there are only two options, "nativefs" and "ftpfs".
+Currently, the only supported settings is "nativefs".  Previous versions supported an "ftpfs"
+option in order to bypass safe-mode restrictions.  But since safe-mode has long since been removed
+from PHP, that feature is now deprecated.  It still exists and can be used by setting
+this value and the associated constants below, but it is not avialable from the configuration
+interface and it is not tested.
+
+Group: Subdomain Configuration Constants
+
+These settings are optional.  They are only used if you wish to create blogs on different subdomains than
+the one that LnBlog is installed on.
+
+Constant: SUBDOMAIN_ROOT
+The directory under which subdomain document roots will are located.
+It is expected that subdomains will be under this directory in a folder with the
+name of the subdomain, e.g. if this is "/var/www/hosts" and your domain is
+"example.com", this would assume that the document root for "foobar.example.com" is
+in "/var/www/hosts/foobar".  This is optional and not needed if you don't plan to put
+blogs on different subdomains.
+
+Constant: DOMAIN_NAME
+The main domain name under which subdomains are created.  This is optional and not 
+needed if you don't plan to put blogs on different subdomains.
 
 Group: FTPFS-only Constants
+
+These settings are only used by the now-deprecated FTPFS plugin.
 
 Constant: FTPFS_USER
 The username to use when establishing an FTP connection.
@@ -129,8 +107,7 @@ Constant: FTP_ROOT
 The full path on the server to the user's FTP root.
 In other words, this is the highest directory the user can access through 
 FTP.  In some cases, it will be the root directory, or "/".  In other cases,
-it may be something like "/home/username/".  If you are unsure, you can use
-the <ftproot_test.php> script to try different possibilities.
+it may be something like "/home/username/".
 
 The purpose of this constant is to convert paths on the FTP server into path
 on the web server.  Because FTP servers often restrict users to a certain 
