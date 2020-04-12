@@ -16,7 +16,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
         $this->setConstantReturns([]);
         $this->globals->time()->willReturn(12345);
         $user = $this->createUser('bob', 'password', $new_format = true);
-        $this->loginLimiter->canLogIn()->willReturn(true);
+        $this->loginLimiter->canLogIn(Argument::any())->willReturn(true);
 
         $time = new DateTime("@12345");
         $log = AuthLog::success($time, '1.2.3.4', 'Chrome');
@@ -33,7 +33,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
         $this->setConstantReturns([]);
         $this->globals->time()->willReturn(12345);
         $user = $this->createUser('bob', 'asdf1234', true);
-        $this->loginLimiter->canLogIn()->willReturn(true);
+        $this->loginLimiter->canLogIn(Argument::any())->willReturn(true);
 
         $time = new DateTime("@12345");
         $log = AuthLog::failure($time, '1.2.3.4', 'Chrome');
@@ -50,7 +50,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
         $this->setConstantReturns([]);
         $this->globals->time()->willReturn(12345);
         $user = $this->createUser('bob', 'asdf1234', true);
-        $this->loginLimiter->canLogIn()->willReturn(true, false);
+        $this->loginLimiter->canLogIn(Argument::any())->willReturn(true, false);
 
         $time = new DateTime("@12345");
         $log = AuthLog::failure($time, '1.2.3.4', 'Chrome');
@@ -64,7 +64,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
     public function testAuthenticateUser_WhenLockedOut_ThrowsWithLoginNotCalled() {
         $this->setConstantReturns([]);
         $user = $this->createUser('bob', 'password', true);
-        $this->loginLimiter->canLogIn()->willReturn(false);
+        $this->loginLimiter->canLogIn(Argument::any())->willReturn(false);
 
         $this->expectExceptionObject(new UserLockedOut());
 
@@ -73,7 +73,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
 
     public function testLogin_WhenSessionAuthAndIpLock_SetsLoginCookies() {
         $this->setConstantReturns(['AUTH_USE_SESSION' => true, 'LOGIN_IP_LOCK' => true]);
-        $this->loginLimiter->canLogIn()->willReturn(true);
+        $this->loginLimiter->canLogIn(Argument::any())->willReturn(true);
         $this->loginLimiter->logAttempt(Argument::any())->shouldBeCalled();
 
         $user = $this->createUser('bob', '12345', $new_format = true);
@@ -87,7 +87,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
 
     public function testLogin_WhenSessionAuthAndIpLock_SetsSessionData() {
         $this->setConstantReturns(['AUTH_USE_SESSION' => true, 'LOGIN_IP_LOCK' => true]);
-        $this->loginLimiter->canLogIn()->willReturn(true);
+        $this->loginLimiter->canLogIn(Argument::any())->willReturn(true);
         $this->loginLimiter->logAttempt(Argument::any())->shouldBeCalled();
 
         $user = $this->createUser('bob', '12345', $new_format = true);
@@ -101,7 +101,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
 
     public function testLogin_WhenCookieAuthAndIpLock_SetsLoginCookies() {
         $this->setConstantReturns(['AUTH_USE_SESSION' => false, 'LOGIN_IP_LOCK' => true]);
-        $this->loginLimiter->canLogIn()->willReturn(true);
+        $this->loginLimiter->canLogIn(Argument::any())->willReturn(true);
         $this->loginLimiter->logAttempt(Argument::any())->shouldBeCalled();
 
         $user = $this->createUser('bob', '12345', $new_format = true);
@@ -114,7 +114,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
 
     public function testLogin_WhenPasswordDoesNotMatch_ReturnsFalse() {
         $this->setConstantReturns([]);
-        $this->loginLimiter->canLogIn()->willReturn(true);
+        $this->loginLimiter->canLogIn(Argument::any())->willReturn(true);
         $this->loginLimiter->logAttempt(Argument::any())->shouldBeCalled();
 
         $user = $this->createUser('bob', '12345', $new_format = true);
@@ -143,7 +143,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
 
     public function testCheckLogin_WhenSessionAuthAndIpLockEnabled_VerifiesLoginToken() {
         $this->setConstantReturns(['AUTH_USE_SESSION' => true, 'LOGIN_IP_LOCK' => true]);
-        $this->loginLimiter->canLogIn()->willReturn(true);
+        $this->loginLimiter->canLogIn(Argument::any())->willReturn(true);
         $this->loginLimiter->logAttempt(Argument::any())->shouldBeCalled();
 
         $user = $this->createUser('bob', '12345', $new_format = true);
@@ -155,7 +155,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
 
     public function testCheckLogin_WhenCookieAuthAndIpLockEnabled_VerifiesLoginToken() {
         $this->setConstantReturns(['AUTH_USE_SESSION' => false, 'LOGIN_IP_LOCK' => true]);
-        $this->loginLimiter->canLogIn()->willReturn(true);
+        $this->loginLimiter->canLogIn(Argument::any())->willReturn(true);
         $this->loginLimiter->logAttempt(Argument::any())->shouldBeCalled();
 
         $user = $this->createUser('bob', '12345', $new_format = true);
@@ -176,7 +176,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
 
     public function testCheckLogin_WhenSessionAuthAndCookieNotPresent_ReturnsFalse() {
         $this->setConstantReturns(['AUTH_USE_SESSION' => true, 'LOGIN_IP_LOCK' => true]);
-        $this->loginLimiter->canLogIn()->willReturn(true);
+        $this->loginLimiter->canLogIn(Argument::any())->willReturn(true);
         $this->loginLimiter->logAttempt(Argument::any())->shouldBeCalled();
 
         $user = $this->createUser('bob', '12345', $new_format = true);
@@ -189,7 +189,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
 
     public function testCheckLogin_WhenSessionAuthWithIpLockEnabledAndIpAddressChanges_ReturnsFalse() {
         $this->setConstantReturns(['AUTH_USE_SESSION' => true, 'LOGIN_IP_LOCK' => true]);
-        $this->loginLimiter->canLogIn()->willReturn(true);
+        $this->loginLimiter->canLogIn(Argument::any())->willReturn(true);
         $this->loginLimiter->logAttempt(Argument::any())->shouldBeCalled();
 
         $user = $this->createUser('bob', '12345', $new_format = true);
@@ -203,7 +203,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
 
     public function testCheckLogin_WhenSessionAuthWithIpLockDisabledAndIpAddressChanges_ReturnsTrue() {
         $this->setConstantReturns(['AUTH_USE_SESSION' => true, 'LOGIN_IP_LOCK' => false]);
-        $this->loginLimiter->canLogIn()->willReturn(true);
+        $this->loginLimiter->canLogIn(Argument::any())->willReturn(true);
         $this->loginLimiter->logAttempt(Argument::any())->shouldBeCalled();
 
         $user = $this->createUser('bob', '12345', $new_format = true);
@@ -217,7 +217,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
 
     public function testCheckLogin_WhenSessionAuthWithIpLockDisabledAndUserAgentChanges_ReturnsFalse() {
         $this->setConstantReturns(['AUTH_USE_SESSION' => true, 'LOGIN_IP_LOCK' => false]);
-        $this->loginLimiter->canLogIn()->willReturn(true);
+        $this->loginLimiter->canLogIn(Argument::any())->willReturn(true);
         $this->loginLimiter->logAttempt(Argument::any())->shouldBeCalled();
 
         $user = $this->createUser('bob', '12345', $new_format = true);
@@ -231,7 +231,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
 
     public function testCheckLogin_WhenCookieAuthWithIpLockEnabledAndIpAddressChanges_ReturnsFalse() {
         $this->setConstantReturns(['AUTH_USE_SESSION' => false, 'LOGIN_IP_LOCK' => true]);
-        $this->loginLimiter->canLogIn()->willReturn(true);
+        $this->loginLimiter->canLogIn(Argument::any())->willReturn(true);
         $this->loginLimiter->logAttempt(Argument::any())->shouldBeCalled();
 
         $user = $this->createUser('bob', '12345', $new_format = true);
@@ -245,7 +245,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
 
     public function testCheckLogin_WhenCookieAuthWithIpLockDisabledAndIpAddressChanges_ReturnsTrue() {
         $this->setConstantReturns(['AUTH_USE_SESSION' => false, 'LOGIN_IP_LOCK' => false]);
-        $this->loginLimiter->canLogIn()->willReturn(true);
+        $this->loginLimiter->canLogIn(Argument::any())->willReturn(true);
         $this->loginLimiter->logAttempt(Argument::any())->shouldBeCalled();
 
         $user = $this->createUser('bob', '12345', $new_format = true);
@@ -259,7 +259,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
 
     public function testCheckLogin_WhenCookieAuthWithIpLockDisabledAndUserAgentChanges_ReturnsFalse() {
         $this->setConstantReturns(['AUTH_USE_SESSION' => false, 'LOGIN_IP_LOCK' => false]);
-        $this->loginLimiter->canLogIn()->willReturn(true);
+        $this->loginLimiter->canLogIn(Argument::any())->willReturn(true);
         $this->loginLimiter->logAttempt(Argument::any())->shouldBeCalled();
 
         $user = $this->createUser('bob', '12345', $new_format = true);

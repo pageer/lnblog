@@ -128,6 +128,6 @@ class TaskRepository {
         if ($this->queue_path) {
             return $this->queue_path;
         }
-        return Path::mk(INSTALL_ROOT, self::QUEUE_FILE);
+        return Path::mk(USER_DATA_PATH, self::QUEUE_FILE);
     }
 }

@@ -13,12 +13,12 @@ class UserLimitTest extends PHPUnit\Framework\TestCase {
         $this->setUpFileToReturn('bob', [
             [
                 'status' => 'success',
-                'time' => '2020-01-02 12:13:14',
+                'time' => '2020-01-02T12:13:14-05:00',
                 'ip' => '1.2.3.4',
                 'user_agent' => 'Chrome'
             ], [
                 'status' => 'failure',
-                'time' => '2020-01-03 13:14:15',
+                'time' => '2020-01-03T13:14:15-05:00',
                 'ip' => '2.3.4.5',
                 'user_agent' => 'Firefox'
             ]
@@ -28,8 +28,8 @@ class UserLimitTest extends PHPUnit\Framework\TestCase {
         $logins = $limiter->getLoginAttempts();
 
         $expected_logs = [
-            AuthLog::success(new DateTime('2020-01-02 12:13:14'), '1.2.3.4', 'Chrome'),
-            AuthLog::failure(new DateTime('2020-01-03 13:14:15'), '2.3.4.5', 'Firefox'),
+            AuthLog::success(new DateTime('2020-01-02T12:13:14-05:00'), '1.2.3.4', 'Chrome'),
+            AuthLog::failure(new DateTime('2020-01-03T13:14:15-05:00'), '2.3.4.5', 'Firefox'),
         ];
         $this->assertEquals($expected_logs, $logins);
     }
@@ -63,7 +63,7 @@ class UserLimitTest extends PHPUnit\Framework\TestCase {
         $expected_data = json_encode([
             [
                 'status' => 'success',
-                'time' => '2020-01-02 12:13:14',
+                'time' => '2020-01-02T12:13:14-05:00',
                 'ip' => '1.2.3.4',
                 'user_agent' => 'Chrome'
             ]
@@ -72,7 +72,7 @@ class UserLimitTest extends PHPUnit\Framework\TestCase {
                  ->willReturn(100)
                  ->shouldBeCalled();
 
-        $log = AuthLog::success(new DateTime('2020-01-02 12:13:14'), '1.2.3.4', 'Chrome');
+        $log = AuthLog::success(new DateTime('2020-01-02T12:13:14'), '1.2.3.4', 'Chrome');
         $limiter = $this->createLoginLimiter(new User('bob'));
         $limiter->logAttempt($log);
     }
@@ -80,7 +80,7 @@ class UserLimitTest extends PHPUnit\Framework\TestCase {
     public function testLogAttempt_WhenLogOverflows_Truncate() {
         $test_row = [
             'status' => 'success',
-            'time' => '2020-01-02 12:13:14',
+            'time' => '2020-01-02T12:13:14-05:00',
             'ip' => '1.2.3.4',
             'user_agent' => 'Chrome'
         ];
@@ -92,7 +92,7 @@ class UserLimitTest extends PHPUnit\Framework\TestCase {
         $expected_rows = array_fill(0, 99, $test_row);
         $expected_rows[] = [
             'status' => 'failure',
-            'time' => '2020-01-03 12:15:14',
+            'time' => '2020-01-03T12:15:14-05:00',
             'ip' => '1.2.3.4',
             'user_agent' => 'Chrome'
         ];
@@ -101,7 +101,7 @@ class UserLimitTest extends PHPUnit\Framework\TestCase {
                  ->willReturn(1000)
                  ->shouldBeCalled();
 
-        $log = AuthLog::failure(new DateTime('2020-01-03 12:15:14'), '1.2.3.4', 'Chrome');
+        $log = AuthLog::failure(new DateTime('2020-01-03T12:15:14-05:00'), '1.2.3.4', 'Chrome');
         $limiter = $this->createLoginLimiter(new User('bob'));
         $limiter->logAttempt($log);
     }
@@ -110,7 +110,7 @@ class UserLimitTest extends PHPUnit\Framework\TestCase {
         $this->setUpFileToReturn('bob', [
             [
                 'status' => 'success',
-                'time' => '2020-01-02 12:13:14',
+                'time' => '2020-01-02T12:13:14-05:00',
                 'ip' => '1.2.3.4',
                 'user_agent' => 'Chrome'
             ]
@@ -119,12 +119,12 @@ class UserLimitTest extends PHPUnit\Framework\TestCase {
         $expected_data = json_encode([
             [
                 'status' => 'success',
-                'time' => '2020-01-02 12:13:14',
+                'time' => '2020-01-02T12:13:14-05:00',
                 'ip' => '1.2.3.4',
                 'user_agent' => 'Chrome'
             ], [
                 'status' => 'failure',
-                'time' => '2020-01-03 13:14:15',
+                'time' => '2020-01-03T13:14:15-05:00',
                 'ip' => '2.3.4.5',
                 'user_agent' => 'Firefox'
             ]
@@ -133,7 +133,7 @@ class UserLimitTest extends PHPUnit\Framework\TestCase {
                  ->willReturn(100)
                  ->shouldBeCalled();
 
-        $log = AuthLog::failure(new DateTime('2020-01-03 13:14:15'), '2.3.4.5', 'Firefox');
+        $log = AuthLog::failure(new DateTime('2020-01-03T13:14:15-05:00'), '2.3.4.5', 'Firefox');
         $limiter = $this->createLoginLimiter(new User('bob'));
         $limiter->logAttempt($log);
     }
@@ -146,21 +146,21 @@ class UserLimitTest extends PHPUnit\Framework\TestCase {
 
         $this->expectException(FileWriteFailed::class);
 
-        $log = AuthLog::success(new DateTime('2020-01-02 12:13:14'), '1.2.3.4', 'Chrome');
+        $log = AuthLog::success(new DateTime('2020-01-02T12:13:14-05:00'), '1.2.3.4', 'Chrome');
         $limiter = $this->createLoginLimiter(new User('bob'));
         $limiter->logAttempt($log);
     }
 
     public function testCanLogIn_WhenAttemptLimitExceeded_ReturnsFalse() {
         $this->setUpFileToReturn('bob', [
-            ['status' => 'failure', 'time' => '2020-01-03 13:09:21', 'ip' => '1.2.3.4', 'user_agent' => 'Chrome' ],
-            ['status' => 'failure', 'time' => '2020-01-03 13:14:15', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
-            ['status' => 'failure', 'time' => '2020-01-03 13:14:16', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
-            ['status' => 'failure', 'time' => '2020-01-03 13:14:17', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
-            ['status' => 'failure', 'time' => '2020-01-03 13:14:18', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
+            ['status' => 'failure', 'time' => '2020-01-03T13:09:21-05:00', 'ip' => '1.2.3.4', 'user_agent' => 'Chrome' ],
+            ['status' => 'failure', 'time' => '2020-01-03T13:14:15-05:00', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
+            ['status' => 'failure', 'time' => '2020-01-03T13:14:16-05:00', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
+            ['status' => 'failure', 'time' => '2020-01-03T13:14:17-05:00', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
+            ['status' => 'failure', 'time' => '2020-01-03T13:14:18-05:00', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
         ]);
         $this->globals->sleep(Argument::any())->shouldBeCalled();
-        $this->globals->time()->willReturn(strtotime('2020-01-03 13:14:20'));
+        $this->globals->time(Argument::any())->willReturn(strtotime('2020-01-03 13:14:20'));
 
         $limiter = $this->createLoginLimiter(new User('bob'));
         $result = $limiter->canLogIn();
@@ -170,12 +170,12 @@ class UserLimitTest extends PHPUnit\Framework\TestCase {
 
     public function testCanLogIn_WhenAttemptHasFailures_DelaysByNumberOfFailures() {
         $this->setUpFileToReturn('bob', [
-            ['status' => 'success', 'time' => '2020-01-03 13:12:11', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
-            ['status' => 'failure', 'time' => '2020-01-03 13:12:21', 'ip' => '1.2.3.4', 'user_agent' => 'Chrome' ],
-            ['status' => 'failure', 'time' => '2020-01-03 13:14:15', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
-            ['status' => 'failure', 'time' => '2020-01-03 13:14:16', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
+            ['status' => 'success', 'time' => '2020-01-03T13:12:11-05:00', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
+            ['status' => 'failure', 'time' => '2020-01-03T13:12:21-05:00', 'ip' => '1.2.3.4', 'user_agent' => 'Chrome' ],
+            ['status' => 'failure', 'time' => '2020-01-03T13:14:15-05:00', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
+            ['status' => 'failure', 'time' => '2020-01-03T13:14:16-05:00', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
         ]);
-        $this->globals->time()->willReturn(strtotime('2020-01-03 13:14:20'));
+        $this->globals->time(Argument::any())->willReturn(strtotime('2020-01-03 13:14:20'));
 
         $this->globals->sleep(6)->shouldBeCalled();
 
@@ -185,12 +185,12 @@ class UserLimitTest extends PHPUnit\Framework\TestCase {
 
     public function testCanLogIn_WhenAttemptHasFailuresAndNoWait_DoesNotSleep() {
         $this->setUpFileToReturn('bob', [
-            ['status' => 'success', 'time' => '2020-01-03 13:12:11', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
-            ['status' => 'failure', 'time' => '2020-01-03 13:12:21', 'ip' => '1.2.3.4', 'user_agent' => 'Chrome' ],
-            ['status' => 'failure', 'time' => '2020-01-03 13:14:15', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
-            ['status' => 'failure', 'time' => '2020-01-03 13:14:16', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
+            ['status' => 'success', 'time' => '2020-01-03T13:12:11-05:00', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
+            ['status' => 'failure', 'time' => '2020-01-03T13:12:21-05:00', 'ip' => '1.2.3.4', 'user_agent' => 'Chrome' ],
+            ['status' => 'failure', 'time' => '2020-01-03T13:14:15-05:00', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
+            ['status' => 'failure', 'time' => '2020-01-03T13:14:16-05:00', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
         ]);
-        $this->globals->time()->willReturn(strtotime('2020-01-03 13:14:20'));
+        $this->globals->time(Argument::any())->willReturn(strtotime('2020-01-03 13:14:20'));
 
         $this->globals->sleep(Argument::any())->shouldNotBeCalled();
 
@@ -200,14 +200,14 @@ class UserLimitTest extends PHPUnit\Framework\TestCase {
 
     public function testCanLogIn_WhenEnoughFailuresButNotInPeriod_ReturnsTrue() {
         $this->setUpFileToReturn('bob', [
-            ['status' => 'failure', 'time' => '2020-01-03 02:09:21', 'ip' => '1.2.3.4', 'user_agent' => 'Chrome' ],
-            ['status' => 'failure', 'time' => '2020-01-03 13:14:15', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
-            ['status' => 'failure', 'time' => '2020-01-03 13:14:16', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
-            ['status' => 'failure', 'time' => '2020-01-03 13:14:17', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
-            ['status' => 'failure', 'time' => '2020-01-03 13:14:18', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
+            ['status' => 'failure', 'time' => '2020-01-03T02:09:21-05:00', 'ip' => '1.2.3.4', 'user_agent' => 'Chrome' ],
+            ['status' => 'failure', 'time' => '2020-01-03T13:14:15-05:00', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
+            ['status' => 'failure', 'time' => '2020-01-03T13:14:16-05:00', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
+            ['status' => 'failure', 'time' => '2020-01-03T13:14:17-05:00', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
+            ['status' => 'failure', 'time' => '2020-01-03T13:14:18-05:00', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
         ]);
         $this->globals->sleep(Argument::any())->shouldBeCalled();
-        $this->globals->time()->willReturn(strtotime('2020-01-03 13:14:20'));
+        $this->globals->time(Argument::any())->willReturn(strtotime('2020-01-03 13:14:20'));
 
         $limiter = $this->createLoginLimiter(new User('bob'));
         $result = $limiter->canLogIn();
@@ -217,15 +217,15 @@ class UserLimitTest extends PHPUnit\Framework\TestCase {
 
     public function testCanLogIn_WhenEnoughFailuresButAlsoSuccesses_ReturnsFalse() {
         $this->setUpFileToReturn('bob', [
-            ['status' => 'failure', 'time' => '2020-01-03 13:14:15', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
-            ['status' => 'failure', 'time' => '2020-01-03 13:14:15', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
-            ['status' => 'failure', 'time' => '2020-01-03 13:14:16', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
-            ['status' => 'success', 'time' => '2020-01-03 13:14:16', 'ip' => '2.3.4.5', 'user_agent' => 'Chrome'],
-            ['status' => 'failure', 'time' => '2020-01-03 13:14:17', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
-            ['status' => 'failure', 'time' => '2020-01-03 13:14:18', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
+            ['status' => 'failure', 'time' => '2020-01-03T13:14:15-05:00', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
+            ['status' => 'failure', 'time' => '2020-01-03T13:14:15-05:00', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
+            ['status' => 'failure', 'time' => '2020-01-03T13:14:16-05:00', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
+            ['status' => 'success', 'time' => '2020-01-03T13:14:16-05:00', 'ip' => '2.3.4.5', 'user_agent' => 'Chrome'],
+            ['status' => 'failure', 'time' => '2020-01-03T13:14:17-05:00', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
+            ['status' => 'failure', 'time' => '2020-01-03T13:14:18-05:00', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
         ]);
         $this->globals->sleep(Argument::any())->shouldBeCalled();
-        $this->globals->time()->willReturn(strtotime('2020-01-03 13:14:20'));
+        $this->globals->time(Argument::any())->willReturn(strtotime('2020-01-03 13:14:20'));
 
         $limiter = $this->createLoginLimiter(new User('bob'));
         $result = $limiter->canLogIn();
@@ -238,21 +238,21 @@ class UserLimitTest extends PHPUnit\Framework\TestCase {
         $this->globals->sleep(Argument::any())->shouldBeCalled();
         $this->fs->file_exists("userdata/bob/logins.json")->willReturn(true);
         $this->fs->read_file("userdata/bob/logins.json")->willReturn(json_encode([
-            ['status' => 'failure', 'time' => '2020-01-03 13:14:15', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
-            ['status' => 'failure', 'time' => '2020-01-03 13:14:15', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
-            ['status' => 'failure', 'time' => '2020-01-03 13:14:16', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
-            ['status' => 'success', 'time' => '2020-01-03 13:14:16', 'ip' => '2.3.4.5', 'user_agent' => 'Chrome'],
-            ['status' => 'failure', 'time' => '2020-01-03 13:14:17', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
+            ['status' => 'failure', 'time' => '2020-01-03T13:14:15-05:00', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
+            ['status' => 'failure', 'time' => '2020-01-03T13:14:15-05:00', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
+            ['status' => 'failure', 'time' => '2020-01-03T13:14:16-05:00', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
+            ['status' => 'success', 'time' => '2020-01-03T13:14:16-05:00', 'ip' => '2.3.4.5', 'user_agent' => 'Chrome'],
+            ['status' => 'failure', 'time' => '2020-01-03T13:14:17-05:00', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
         ]));
-        $this->globals->time()->willReturn(strtotime('2020-01-03 13:14:20'));
+        $this->globals->time(Argument::any())->willReturn(strtotime('2020-01-03 13:14:20'));
 
         $expected_content = json_encode([
-            ['status' => 'failure', 'time' => '2020-01-03 13:14:15', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
-            ['status' => 'failure', 'time' => '2020-01-03 13:14:15', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
-            ['status' => 'failure', 'time' => '2020-01-03 13:14:16', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
-            ['status' => 'success', 'time' => '2020-01-03 13:14:16', 'ip' => '2.3.4.5', 'user_agent' => 'Chrome'],
-            ['status' => 'failure', 'time' => '2020-01-03 13:14:17', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
-            ['status' => 'failure', 'time' => '2020-01-03 13:14:20', 'ip' => '2.3.4.5', 'user_agent' => 'Chrome'],
+            ['status' => 'failure', 'time' => '2020-01-03T13:14:15-05:00', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
+            ['status' => 'failure', 'time' => '2020-01-03T13:14:15-05:00', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
+            ['status' => 'failure', 'time' => '2020-01-03T13:14:16-05:00', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
+            ['status' => 'success', 'time' => '2020-01-03T13:14:16-05:00', 'ip' => '2.3.4.5', 'user_agent' => 'Chrome'],
+            ['status' => 'failure', 'time' => '2020-01-03T13:14:17-05:00', 'ip' => '2.3.4.5', 'user_agent' => 'Firefox'],
+            ['status' => 'failure', 'time' => '2020-01-03T13:14:20-05:00', 'ip' => '2.3.4.5', 'user_agent' => 'Chrome'],
         ]);
         $this->fs->write_file("userdata/bob/logins.json", $expected_content)->willReturn(100)->shouldBeCalled();
 
@@ -267,6 +267,8 @@ class UserLimitTest extends PHPUnit\Framework\TestCase {
 
     protected function setUp(): void {
         Path::$sep = Path::UNIX_SEP;
+        $this->tz = date_default_timezone_get();
+        date_default_timezone_set("America/New_York");
         $this->prophet = new \Prophecy\Prophet();
         $this->fs = $this->prophet->prophesize(FS::class);
         $this->globals = $this->prophet->prophesize(GlobalFunctions::class);
@@ -274,6 +276,7 @@ class UserLimitTest extends PHPUnit\Framework\TestCase {
 
     protected function tearDown(): void {
         Path::$sep = DIRECTORY_SEPARATOR;
+        date_default_timezone_set($this->tz);
         $this->prophet->checkPredictions();
     }
 

@@ -12,7 +12,7 @@ class TaskRepositoryTest extends \PHPUnit\Framework\TestCase {
     public function testCreate_ValidTaskNoQueue_WritesToFile() {
         $run_at = new DateTime('2005-06-07T18:19+04:00');
         $task = $this->createTestTask($run_at, ['test' => 123]);
-        $this->fs->file_exists('./pending-tasks.json')->willReturn(false);
+        $this->fs->file_exists('./userdata/pending-tasks.json')->willReturn(false);
 
         $expected_data = json_encode([
             [
@@ -21,12 +21,12 @@ class TaskRepositoryTest extends \PHPUnit\Framework\TestCase {
                 'data' => ['test' => 123],
             ],
         ]);
-        $this->fs->write_file('./pending-tasks.json', $expected_data)
+        $this->fs->write_file('./userdata/pending-tasks.json', $expected_data)
              ->willReturn(true)
              ->shouldBeCalled();
 
         $repository = new TaskRepository($this->fs->reveal());
-        $repository->setTaskQueuePath('./' . TaskRepository::QUEUE_FILE);
+        $repository->setTaskQueuePath('./userdata/' . TaskRepository::QUEUE_FILE);
         $repository->create($task);
     }
 
@@ -49,12 +49,12 @@ class TaskRepositoryTest extends \PHPUnit\Framework\TestCase {
             'data' => ['test' => 123],
         ];
         $expected_data = json_encode($expected_queue);
-        $this->fs->write_file('./pending-tasks.json', $expected_data)
+        $this->fs->write_file('./userdata/pending-tasks.json', $expected_data)
              ->willReturn(true)
              ->shouldBeCalled();
 
         $repository = new TaskRepository($this->fs->reveal());
-        $repository->setTaskQueuePath('./' . TaskRepository::QUEUE_FILE);
+        $repository->setTaskQueuePath('./userdata/' . TaskRepository::QUEUE_FILE);
         $repository->create($task);
     }
 
@@ -73,7 +73,7 @@ class TaskRepositoryTest extends \PHPUnit\Framework\TestCase {
         $this->expectException(TaskAlreadyExists::class);
 
         $repository = new TaskRepository($this->fs->reveal());
-        $repository->setTaskQueuePath('./' . TaskRepository::QUEUE_FILE);
+        $repository->setTaskQueuePath('./userdata/' . TaskRepository::QUEUE_FILE);
         $repository->create($task);
     }
 
@@ -89,13 +89,13 @@ class TaskRepositoryTest extends \PHPUnit\Framework\TestCase {
                 'data' => ['test' => 123],
             ]
         ]);
-        $this->fs->write_file('./pending-tasks.json', $expected_data)
+        $this->fs->write_file('./userdata/pending-tasks.json', $expected_data)
              ->willReturn(false)
              ->shouldBeCalled();
         $this->expectException(TaskUpdateFailed::class);
 
         $repository = new TaskRepository($this->fs->reveal());
-        $repository->setTaskQueuePath('./' . TaskRepository::QUEUE_FILE);
+        $repository->setTaskQueuePath('./userdata/' . TaskRepository::QUEUE_FILE);
         $repository->create($task);
     }
 
@@ -123,12 +123,12 @@ class TaskRepositoryTest extends \PHPUnit\Framework\TestCase {
                 'data' => null,
             ],
         ]);
-        $this->fs->write_file('./pending-tasks.json', $expected_data)
+        $this->fs->write_file('./userdata/pending-tasks.json', $expected_data)
              ->willReturn(true)
              ->shouldBeCalled();
 
         $repository = new TaskRepository($this->fs->reveal());
-        $repository->setTaskQueuePath('./' . TaskRepository::QUEUE_FILE);
+        $repository->setTaskQueuePath('./userdata/' . TaskRepository::QUEUE_FILE);
         $repository->delete($task);
     }
 
@@ -138,11 +138,11 @@ class TaskRepositoryTest extends \PHPUnit\Framework\TestCase {
         $current_queue = [];
         $this->configureForCurrentQueue($current_queue);
 
-        $this->fs->write_file('./pending-tasks.json', json_encode([]))
+        $this->fs->write_file('./userdata/pending-tasks.json', json_encode([]))
              ->shouldNotBeCalled();
 
         $repository = new TaskRepository($this->fs->reveal());
-        $repository->setTaskQueuePath('./' . TaskRepository::QUEUE_FILE);
+        $repository->setTaskQueuePath('./userdata/' . TaskRepository::QUEUE_FILE);
         $repository->delete($task);
     }
 
@@ -170,13 +170,13 @@ class TaskRepositoryTest extends \PHPUnit\Framework\TestCase {
                 'data' => null,
             ],
         ]);
-        $this->fs->write_file('./pending-tasks.json', $expected_data)
+        $this->fs->write_file('./userdata/pending-tasks.json', $expected_data)
              ->willReturn(false)
              ->shouldBeCalled();
         $this->expectException(TaskUpdateFailed::class);
 
         $repository = new TaskRepository($this->fs->reveal());
-        $repository->setTaskQueuePath('./' . TaskRepository::QUEUE_FILE);
+        $repository->setTaskQueuePath('./userdata/' . TaskRepository::QUEUE_FILE);
         $repository->delete($task);
     }
 
@@ -192,7 +192,7 @@ class TaskRepositoryTest extends \PHPUnit\Framework\TestCase {
         $this->configureForCurrentQueue($current_queue);
 
         $repository = new TaskRepository($this->fs->reveal());
-        $repository->setTaskQueuePath('./' . TaskRepository::QUEUE_FILE);
+        $repository->setTaskQueuePath('./userdata/' . TaskRepository::QUEUE_FILE);
         $tasks = $repository->getAll();
 
         $this->assertCount(1, $tasks);
@@ -205,7 +205,7 @@ class TaskRepositoryTest extends \PHPUnit\Framework\TestCase {
         $this->configureForCurrentQueue($current_queue);
 
         $repository = new TaskRepository($this->fs->reveal());
-        $repository->setTaskQueuePath('./' . TaskRepository::QUEUE_FILE);
+        $repository->setTaskQueuePath('./userdata/' . TaskRepository::QUEUE_FILE);
         $tasks = $repository->getAll();
 
         $this->assertCount(0, $tasks);
@@ -225,7 +225,7 @@ class TaskRepositoryTest extends \PHPUnit\Framework\TestCase {
         $this->expectException(TaskInvalid::class);
 
         $repository = new TaskRepository($this->fs->reveal());
-        $repository->setTaskQueuePath('./' . TaskRepository::QUEUE_FILE);
+        $repository->setTaskQueuePath('./userdata/' . TaskRepository::QUEUE_FILE);
         $tasks = $repository->getAll();
     }
 
@@ -251,7 +251,7 @@ class TaskRepositoryTest extends \PHPUnit\Framework\TestCase {
     }
 
     private function configureForCurrentQueue($queue) {
-        $this->fs->file_exists('./pending-tasks.json')->willReturn(true);
-        $this->fs->read_file('./pending-tasks.json')->willReturn(json_encode($queue));
+        $this->fs->file_exists('./userdata/pending-tasks.json')->willReturn(true);
+        $this->fs->read_file('./userdata/pending-tasks.json')->willReturn(json_encode($queue));
     }
 }
