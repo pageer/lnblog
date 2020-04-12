@@ -10,17 +10,12 @@ RewriteEngine On
     Deny from all
 </Files>
 
-<Files application.log>
-    Order Allow,Deny
-    Deny from all
-</Files>
-
 <FilesMatch "^(build|phpunit)\.xml$">
     Order Allow,Deny
     Deny from all
 </FilesMatch>
 
-<FilesMatch "^(composer|package|pending-tasks)\.json$">
+<FilesMatch "^(composer|package)\.json$">
     Order Allow,Deny
     Deny from all
 </FilesMatch>

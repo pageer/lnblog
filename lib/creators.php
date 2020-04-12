@@ -58,7 +58,7 @@ function NewFS() {
 # Create a new PSR logger object.
 function NewLogger() {
     $logger = new Logger('lnblog');
-    $handler = new StreamHandler(mkpath(INSTALL_ROOT, 'application.log'));
+    $handler = new StreamHandler(mkpath(USER_DATA_PATH, 'application.log'));
     $logger->pushHandler($handler);
     return $logger;
 }

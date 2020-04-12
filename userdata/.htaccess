@@ -1,5 +1,10 @@
 RewriteEngine On
 
+<Files application.log>
+    Order Allow,Deny
+    Deny from all
+</Files>
+
 <FilesMatch "^(system|groups|profile)\.ini$">
     Order Allow,Deny
     Deny from all
@@ -11,6 +16,11 @@ RewriteEngine On
 </FilesMatch>
 
 <FilesMatch "^(plugins|user)\.xml$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+<FilesMatch "^pending-tasks\.json$">
     Order Allow,Deny
     Deny from all
 </FilesMatch>
