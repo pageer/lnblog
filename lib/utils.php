@@ -480,6 +480,8 @@ function localpath_to_uri($path, $full_uri=true, $https=false) {
         $url_path = substr($url_path, $slashpos + 1);
     } elseif ($root !== '/') { # TODO: Kill this check with fire
         $url_path = str_replace($root, "", $full_path);
+    } else {
+        $url_path = $full_path;
     }
 
     # Remove any drive letter.
