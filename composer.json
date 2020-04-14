@@ -17,6 +17,6 @@
         "phpunit/phpunit": "^8.5"
     },
     "scripts": {
-        "test": "phpunit"
+        "test": "vendor/bin/phpunit"
     }
 }
