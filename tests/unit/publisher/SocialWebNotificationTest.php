@@ -29,7 +29,7 @@ class SocialWebNotificationTest extends PublisherTestBase {
             ->willReturn($page_headers);
 
         $payload = 'source=http:///./entries/2017/01/02_1234&target=http://www.example.com/test';
-        $this->http_client->sendPost('http://www.example.com/ping', $payload)
+        $this->http_client->sendPost('http://www.example.com/ping', Argument::any())
             ->willReturn(new HttpResponse(''))
             ->shouldBeCalled();
         $this->http_client->sendXmlRpcMessage()->shouldNotBeCalled();
