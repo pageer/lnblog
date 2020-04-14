@@ -37,7 +37,7 @@ abstract class PublisherTestBase extends PHPUnit\Framework\TestCase {
             $this->wrappers->reveal(),
             $this->task_manager->reveal()
         );
-        $this->publisher->http_client = $this->http_client->reveal();
+        $this->publisher->setHttpClient($this->http_client->reveal());
     }
 
     protected function tearDown(): void {
@@ -182,10 +182,14 @@ abstract class PublisherTestBase extends PHPUnit\Framework\TestCase {
 }
 
 class TestablePublisher extends Publisher {
-    public $http_client = null;
+    private $client = null;
+
+    public function setHttpClient($client) {
+        $this->client = $client;
+    }
 
     protected function getHttpClient() {
-        return $this->http_client;
+        return $this->client;
     }
 }
 

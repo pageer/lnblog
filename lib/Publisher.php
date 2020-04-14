@@ -12,9 +12,8 @@ class Publisher {
     private $user;
     private $wrappers;
     private $task_manager;
+    private $http_client;
     private $keepHistory;
-
-    protected $http_client;
 
     public function __construct(
         Blog $blog,
