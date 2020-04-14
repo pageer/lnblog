@@ -478,7 +478,7 @@ function localpath_to_uri($path, $full_uri=true, $https=false) {
         $slashpos = strpos($url_path, PATH_DELIM);
         $subdomain = substr($url_path, 0, $slashpos);
         $url_path = substr($url_path, $slashpos + 1);
-    } else {
+    } elseif ($root !== '/') { # TODO: Kill this check with fire
         $url_path = str_replace($root, "", $full_path);
     }
 
