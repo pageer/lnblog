@@ -15,8 +15,5 @@
         "phing/phing": "2.*",
         "phpspec/prophecy": "^1.10",
         "phpunit/phpunit": "^8.5"
-    },
-    "scripts": {
-        "test": "vendor/bin/phpunit"
     }
 }

@@ -2,6 +2,12 @@
 
 <project name="LnBlog" default="dist">
 
+    <property name="srcDir" value="." />
+
+    <target name="tests">
+        <exec command="vendor/bin/phpunit" dir="${srcDir}" passthru="true" checkreturn="true" />
+    </target>
+
     <target name="prepare">
         <echo msg="Making directory ./build" />
         <mkdir dir="./build" />
