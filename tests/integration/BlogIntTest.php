@@ -2,9 +2,6 @@
 
 class BlogIntTest extends \PHPUnit\Framework\TestCase {
 
-    function testFail() {
-        $this->assertTrue(false);
-    }
     function testInsertDelete() {
 
         $currdir = getcwd();
