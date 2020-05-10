@@ -18,7 +18,7 @@ http://www.skepticats.com/lnblog/content/download/lnblog_docs.zip
 
 Requirements
 ------------
-LnBlog needs a web server with PHP 5.6 or greater installed and the ability to
+LnBlog needs a web server with PHP 7.0 or greater installed and the ability to
 write to the file system.  Both Apache and IIS are supported and no database
 is required.  File writing through FTP is also supported, but is no longer a
 recommended configuration.  Support for the CURL, gettext, and either
