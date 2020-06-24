@@ -4,6 +4,25 @@
 
     <property name="srcDir" value="." />
 
+    <target name="messages">
+        <echo msg="Updating translation files..." />
+        <apply executable="xgettext" parallel="true" dir=".">
+            <arg value="-LPHP" />
+            <arg value="--keyword=_:1" />
+            <arg value="--keyword=p_:1" />
+            <arg value="--keyword=pf_:1" />
+            <arg value="--keyword=spf_:1" />
+            <arg value="-o" />
+            <arg value="po/messages.pot" />
+            <fileset dir=".">
+                <include name="*.php" />
+                <include name="**/*.php" />
+                <exclude name="tests/" />
+                <exclude name="vendor/" />
+            </fileset>
+        </apply>
+    </target>
+
     <target name="tests">
         <exec command="vendor/bin/phpunit" dir="${srcDir}" passthru="true" checkreturn="true" />
     </target>
@@ -31,7 +50,7 @@
 		<exec command="naturaldocs doc_project" dir="." />
 	</target>
 	
-    <target name="build" depends="prepare">
+    <target name="build" depends="prepare,messages">
         <echo msg="Copying files to build directory..." />
 		<exec command="git clone . ./build/LnBlog-${version}" dir="." />
 		

@@ -40,10 +40,10 @@ distributions, these are either installed by default or available from standard 
 On Windows, you will need to download them separately.  The GNUWin32 project has a handy installer available at <http://gnuwin32.sourceforge.net/packages/gettext.htm>.  You will simply need to run the 
 installer and add the "C:\Program Files\GnuWin32\bin" directory to your path.
 
-The first step is extracting the translation strings.  (If a messages.pot file was already included in your copy of LnBlog, you may skip this step.)  If you are using a UNIX or Linux system, then you can 
-do this by opening a command prompt, changing to the LnBlog directory, and running the following
+The first step is extracting the translation strings.  (If a messages.pot file was already included in your copy of LnBlog, you may skip this step.)  
+You can do this by opening a command prompt, changing to the LnBlog directory, and running the following
 command.
-| xgettext -LPHP --keyword=_:1 --keyword=p_:1 --keyword=pf_:1 --keyword=spf_:1 -o messages.pot `find -name "*.php"`
+| vendor/bin/phing messages
 This will create a template PO file that will be the basis for your translation.
 
 The next step is to your initial translation file.  To do this, run the command below.
