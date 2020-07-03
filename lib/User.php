@@ -161,6 +161,10 @@ class User extends LnBlogObject {
             throw new UserLockedOut();
         }
 
+        if (!$this->exists()) {
+            return false;
+        }
+
         $result = $this->checkPassword($password);
         $time = new DateTime('@' . $this->globals->time());
 

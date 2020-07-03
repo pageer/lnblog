@@ -272,7 +272,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function testCreateAndVerifyPasswordReset_WhenTokenCreated_ShouldVerify() {
-        $this->setConstantReturns(['USER_DATA_PATH' => 'userdata']);
+        $this->setConstantReturns();
         $this->globals->time()->willReturn(12345, 12346);
         $this->configureMocksToReadAndWritePwreset('bob');
 
@@ -284,7 +284,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function testCreateAndVerifyPasswordReset_WhenTokenHasExpired_ShouldNotVerify() {
-        $this->setConstantReturns(['USER_DATA_PATH' => 'userdata']);
+        $this->setConstantReturns();
         // Second time, for verify, is past expiration.
         $this->globals->time()->willReturn(12345, 112346);
         $this->configureMocksToReadAndWritePwreset('bob');
@@ -297,7 +297,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function testCreateAndVerifyPasswordReset_WhenVerifyingBadToken_ShouldNotVerify() {
-        $this->setConstantReturns(['USER_DATA_PATH' => 'userdata']);
+        $this->setConstantReturns();
         $this->globals->time()->willReturn(12345, 12346);
         $this->configureMocksToReadAndWritePwreset('bob');
 
@@ -309,7 +309,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function testCreatePasswordReset_WhenMultipleAttemptsWithinSeconds_ThrowsRateLimitError() {
-        $this->setConstantReturns(['USER_DATA_PATH' => 'userdata']);
+        $this->setConstantReturns();
         $this->globals->time()->willReturn(12345, 12346);
 
         $this->configureMocksToReadAndWritePwreset('bob');
@@ -322,7 +322,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function testInvalidatePasswordReset_WhenTokenExists_TokenNoLongerValidates() {
-        $this->setConstantReturns(['USER_DATA_PATH' => 'userdata']);
+        $this->setConstantReturns();
         $this->globals->time()->willReturn(12345, 12446, 12447);
         $this->configureMocksToReadAndWritePwreset('bob');
 
@@ -336,7 +336,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function testInvalidatePasswordReset_WhenNoTokenAreLeft_DeletesPwresetFile() {
-        $this->setConstantReturns(['USER_DATA_PATH' => 'userdata']);
+        $this->setConstantReturns();
         $this->globals->time()->willReturn(12345, 12446, 12447);
         $this->configureMocksToReadAndWritePwreset('bob');
 
@@ -373,6 +373,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
         );
         $user->passwd = password_hash($password, PASSWORD_DEFAULT);
         $user->salt = $new_format ? false : '';
+        $this->setUpUserExists($username);
         return $user;
     }
 
@@ -380,6 +381,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
     private function createUserWithoutDataRead($username, $password) {
         $user = $this->createUser('', $password, $new_format = true);
         $user->username = $username;
+        $this->setUpUserExists($username);
         return $user;
     }
 
@@ -401,11 +403,18 @@ class UserTest extends \PHPUnit\Framework\TestCase {
         });
     }
 
+    private function setUpUserExists($username) {
+        $this->fs->realpath("userdata/$username/passwd.php")->willReturn(true);
+        $this->fs->realpath("userdata/$username/user.xml")->willReturn(true);
+        $this->fs->realpath("userdata/$username/user.ini")->willReturn(false);
+    }
+
     private function setConstantReturns($configs = []) {
         $defaults = [
             'AUTH_USE_SESSION' => true,
             'LOGIN_IP_LOCK' => true,
             'FORCE_HTTPS_LOGIN' => false,
+            'USER_DATA_PATH' => 'userdata',
         ];
         $configs = array_merge($defaults, $configs);
         $this->globals->defined(Argument::any())->will(function ($args) use ($configs) {
