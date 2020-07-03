@@ -1,8 +1,14 @@
 <?php
 class BlogEntryURIWrapper extends LnBlogObject {
+    private $url_map = [];
+
     function BlogEntryURIWrapper(&$ent) {
         $this->object = $ent;
-        $this->base_uri = localpath_to_uri(dirname($ent->file));
+        $blog = $ent->getParent();
+        $this->url_map = [
+            $blog->home_path => $blog->getUrl(),
+        ];
+        $this->base_uri = localpath_to_uri(dirname($ent->file), $this->url_map);
         $this->separator = "&amp;";
     }
 
@@ -21,20 +27,20 @@ class BlogEntryURIWrapper extends LnBlogObject {
                 while ( file_exists( $base_path.$i.".php" ) ) {
                     $contents = file_get_contents($base_path.$i.".php");
                     if (strpos($contents, basename(dirname($ent->file)))) {
-                        return localpath_to_uri($base_path.$i.".php");
+                        return localpath_to_uri($base_path.$i.".php", $this->url_map);
                     }
                     $i++;
                 }
                 return $this->base_uri;
             } else {
-                return localpath_to_uri($pretty_file);
+                return localpath_to_uri($pretty_file, $this->url_map);
             }
         } else {
             $pretty_file = $ent->calcPrettyPermalink(true);
             if ($pretty_file)
                 $pretty_file = mkpath(dirname($ent->localpath()),$pretty_file);
             if ( file_exists($pretty_file) ) {
-                return localpath_to_uri($pretty_file);
+                return localpath_to_uri($pretty_file, $this->url_map);
             } else {
                 return $this->base_uri;;
             }

@@ -436,14 +436,13 @@ function current_url() {
 # Convert a local path to a URI.
 #
 # Parameters:
-# path     - The path to convert.
-# full_uri - *Option* to return the full URI, as opposed to just a
-#            root-relative URI.  *Defaults* to true.
+# path          - The path to convert.
+# base_path_map - Map of possible base paths to base URLs.
 #
 # Returns:
 # A string with the URL oc the given path.
 
-function localpath_to_uri($path, $full_uri=true, $https=false) {
+function localpath_to_uri($path, $base_path_map = []) {
 
     if (file_exists($path)) $full_path = realpath($path);
     else $full_path = $path;
@@ -463,6 +462,24 @@ function localpath_to_uri($path, $full_uri=true, $https=false) {
         $root = strtolower($root);
         $subdom_root= strtolower($subdom_root);
         $full_path = strtolower($full_path);
+    }
+
+    $host = '';
+    $port = '';
+    $path = '';
+    foreach ($base_path_map as $root_path => $root_url) {
+        if ( strtoupper( substr(PHP_OS,0,3) ) == 'WIN' ) {
+            $found_match = stripos($full_path, $root_path) === 0;
+        } else {
+            $found_match = strpos($full_path, $root_path) === 0;
+        }
+        if ($found_match) {
+            $host = parse_url($root_url, PHP_URL_HOST);
+            $port = parse_url($root_url, PHP_URL_PORT);
+            $path = parse_url($root_url, PHP_URL_PATH);
+            $end_path = substr($full_path, strlen($root_path) + 1);
+            $path = $path . $end_path;
+        }
     }
 
     $subdomain = '';
@@ -496,19 +513,24 @@ function localpath_to_uri($path, $full_uri=true, $https=false) {
     # slash here if we don't already have one.
     if (substr($url_path, 0, 1) != "/") $url_path = "/".$url_path;
 
-    if ($full_uri) {
-        # Add the protocol and server.
-        $protocol = ($https ? "https" : "http");
-        if (SERVER("HTTPS") == "on") $protocol = "https";
+    # Add the protocol and server.
+    $protocol = 'http';
+    if (SERVER("HTTPS") == "on") $protocol = "https";
+    if (!$host) {
         $host = SERVER("SERVER_NAME");
-        $port = SERVER("SERVER_PORT");
-        if ($port == 80 || $port == "") $port = "";
-        else $port = ":".$port;
-        if ($subdomain) {
-            $host = $subdomain.".".DOMAIN_NAME;
-        }
-        $url_path = $protocol."://".$host.$port.$url_path;
+    } elseif ($subdomain) {
+        $host = $subdomain.".".DOMAIN_NAME;
     }
+    if (!$port) {
+        $port = SERVER("SERVER_PORT");
+    }
+    if ($port == 80 || !$port) $port = "";
+    else $port = ":".$port;
+    if ($path) {
+        $url_path = $path;
+    }
+    $url_path = $protocol."://".$host.$port.$url_path;
+
     return $url_path;
 }
 

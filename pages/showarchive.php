@@ -1,4 +1,4 @@
 <?php
-session_start();
+initialize_session();
 $page = new WebPages();
-$page->showarchive();
+$page->routeRequest('showarchive');

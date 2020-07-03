@@ -16,8 +16,9 @@
 <fieldset>
 <form id="postform" method="post" action="<?php echo $FORM_ACTION?>"
 	  enctype="multipart/form-data" accept-charset="<?php echo DEFAULT_CHARSET?>"
-
 	<?php echo !empty($PREVIEW_DATA) ? 'style="display:none"' : ''?>>
+
+    <?php $this->outputCsrfField() ?>
 
     <?php if (isset($ENTRYID)): ?>
         <input type="hidden" name="entryid" value="<?php echo $ENTRYID?>" />

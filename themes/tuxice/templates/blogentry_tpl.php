@@ -73,7 +73,7 @@ if ($COMMENT_RSS_ENABLED) {
 <h4><?php p_("Related entries");?></h4>
 <ul>
 <?php foreach ($LOCAL_PINGBACKS as $p): ?>
-    <li><?php echo $p->get($SHOW_CONTROLS) ?></li>
+    <li><?php echo $p->get($this->pages, $SHOW_CONTROLS) ?></li>
 <?php endforeach ?>
 </ul>
 <?php } /* End local pingback block */ 
@@ -82,7 +82,7 @@ if ( ! empty($TRACKBACKS) ) { ?>
 <h3><?php p_("TrackBacks");?> 
 <a href="<?php echo $SHOW_TRACKBACK_LINK; ?>" title="<?php p_("TrackBack page");?>">#</a></h3>
 <ul class="trackbacks replies">
-<?php foreach ($TRACKBACKS as $p) { echo $p->get($SHOW_CONTROLS); } ?>
+<?php foreach ($TRACKBACKS as $p) { echo $p->get($this->pages, $SHOW_CONTROLS); } ?>
 </ul>
 <?php } /* End TrackBack block */
 
@@ -90,7 +90,7 @@ if ( ! empty($PINGBACKS) ) { ?>
 <h3><?php p_("Pingbacks");?> 
 <a href="<?php echo $SHOW_PINGBACK_LINK; ?>" title="<?php p_("PingBack page");?>">#</a></h3>
 <ul class="pingbacks replies">
-<?php foreach ($PINGBACKS as $p) { echo $p->get($SHOW_CONTROLS); } ?>
+<?php foreach ($PINGBACKS as $p) { echo $p->get($this->pages, $SHOW_CONTROLS); } ?>
 </ul>
 <?php } /* End Pingback block */
 
@@ -98,7 +98,7 @@ if ( ! empty($COMMENTS) ) { ?>
 <h3><?php p_("Comments");?> 
 <a href="<?php echo $COMMENT_LINK; ?>" title="<?php p_("Comment page");?>">#</a></h3>
 <ul class="comments replies">
-<?php foreach ($COMMENTS as $p) { echo $p->get($SHOW_CONTROLS); } ?>
+<?php foreach ($COMMENTS as $p) { echo $p->get($this->pages, $SHOW_CONTROLS); } ?>
 </ul>
 <?php } /* End comment block */ ?>
 </div>

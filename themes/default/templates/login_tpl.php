@@ -3,6 +3,7 @@
 <p><?php echo $FORM_MESSAGE; ?></p>
 <?php } ?>
 <form class="centered" method="post" action="<?php echo $FORM_ACTION; ?>">
+<?php $this->outputCsrfField() ?>
 <div>
 	<label for="<?php echo $UNAME; ?>"><?php p_('Username');?></label>
 	<input type="text" id="<?php echo $UNAME; ?>" name="<?php echo $UNAME; ?>" <?php if (isset($UNAME_VALUE)) echo 'value="'.$UNAME_VALUE.'" '; ?> autofocus />

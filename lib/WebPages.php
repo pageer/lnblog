@@ -25,28 +25,31 @@ class WebPages extends BasePages {
 
     protected function getActionMap() {
         return array(
-            'about'      => 'about',
-            'newentry'   => 'newentry',
-            'editentry'  => 'entryedit',
-            'delentry'   => 'delentry',
-            'delcomment' => 'delcomment',
-            'edit'       => 'updateblog',
-            'login'      => [AdminPages::class, 'bloglogin'],
-            'logout'     => [AdminPages::class, 'bloglogout'],
-            'upload'     => 'fileupload',
-            'removefile' => 'removefile',
-            'useredit'   => 'editlogin',
-            'plugins'    => [AdminPages::class, 'pluginsetup'],
-            'tags'       => 'tagsearch',
-            'pluginload' => [AdminPages::class, 'pluginloading'],
-            'profile'    => [AdminPages::class, 'userinfo'],
-            'managereply'=> 'managereplies',
-            'editfile'   => 'editfile',
-            'blogpaths'  => 'blogpaths',
-            'webmention' => 'webmention',
-            'drafts'     => 'showdrafts',
-            'forgot'     => 'forgotPassword',
-            'reset'      => 'resetPassword',
+            'about'        => 'about',
+            'newentry'     => 'newentry',
+            'editentry'    => 'entryedit',
+            'delentry'     => 'delentry',
+            'delcomment'   => 'delcomment',
+            'edit'         => 'updateblog',
+            'login'        => [AdminPages::class, 'bloglogin'],
+            'logout'       => [AdminPages::class, 'bloglogout'],
+            'upload'       => 'fileupload',
+            'removefile'   => 'removefile',
+            'useredit'     => 'editlogin',
+            'plugins'      => [AdminPages::class, 'pluginsetup'],
+            'tags'         => 'tagsearch',
+            'pluginload'   => [AdminPages::class, 'pluginloading'],
+            'profile'      => [AdminPages::class, 'userinfo'],
+            'managereply'  => 'managereplies',
+            'editfile'     => 'editfile',
+            'blogpaths'    => 'blogpaths',
+            'webmention'   => 'webmention',
+            'drafts'       => 'showdrafts',
+            'forgot'       => 'forgotPassword',
+            'reset'        => 'resetPassword',
+            'showitem'     => 'showitem',
+            'showarticles' => 'showartiles',
+            'showarchive'  => 'showarchive',
         );
     }
 
@@ -87,7 +90,7 @@ class WebPages extends BasePages {
     }
 
     public function about() {
-        $tpl = NewTemplate("about_tpl.php");
+        $tpl = $this->createTemplate("about_tpl.php");
 
         $tpl->set("NAME", PACKAGE_NAME);
         $tpl->set("VERSION", PACKAGE_VERSION);
@@ -105,7 +108,7 @@ class WebPages extends BasePages {
         $blog_path = $this->reqVar("blogpath");
 
         $blog = NewBlog($blog_path);
-        $tpl = NewTemplate("blog_path_tpl.php");
+        $tpl = $this->createTemplate("blog_path_tpl.php");
         $this->getPage()->setDisplayObject($blog);
 
         $inst_root = INSTALL_ROOT;
@@ -146,7 +149,7 @@ class WebPages extends BasePages {
         # which determines if the resposne is to be deleted.
         extract($this->get_posted_responses());
 
-        $tpl = NewTemplate('confirm_tpl.php');
+        $tpl = $this->createTemplate('confirm_tpl.php');
         $tpl->set("CONFIRM_PAGE", current_file() );
         $tpl->set("OK_ID", 'conf');
         $tpl->set("OK_LABEL", _("Yes"));
@@ -273,7 +276,7 @@ class WebPages extends BasePages {
             exit;
         }
 
-        $tpl = NewTemplate(CONFIRM_TEMPLATE);
+        $tpl = $this->createTemplate(CONFIRM_TEMPLATE);
         $tpl->set("CONFIRM_TITLE", $is_art ? _("Remove article?") : _("Remove entry?"));
         $tpl->set("CONFIRM_MESSAGE",$message);
         #$tpl->set("CONFIRM_PAGE", current_file() );
@@ -322,7 +325,7 @@ class WebPages extends BasePages {
             $this->redirectOr403(SERVER("referer"), $message_403);
         }
 
-        $tpl = NewTemplate("file_edit_tpl.php");
+        $tpl = $this->createTemplate("file_edit_tpl.php");
 
         # Prepare template for link list display.
         if (GET("list")) {
@@ -424,7 +427,7 @@ class WebPages extends BasePages {
         $user_name = "user";
         $reset="reset";  # Set to 1 to reset the password.
 
-        $tpl = NewTemplate("login_create_tpl.php");
+        $tpl = $this->createTemplate("login_create_tpl.php");
         $tpl->set("FORM_TITLE", $form_title);
         $tpl->set("FORM_ACTION", current_file());
         $tpl->set("FULLNAME_VALUE", htmlentities($usr->name()) );
@@ -499,7 +502,7 @@ class WebPages extends BasePages {
         $reset_token = '';
         $message = '';
         $error = '';
-        $template = NewTemplate('user_forgot_password_tpl.php');
+        $template = $this->createTemplate('user_forgot_password_tpl.php');
 
         $user = $this->getUserByName($username);
         $email = $user->email();
@@ -589,7 +592,7 @@ class WebPages extends BasePages {
             return false;
         }
 
-        $template = NewTemplate("user_reset_password_tpl.php");
+        $template = $this->createTemplate("user_reset_password_tpl.php");
         $template->set('USERNAME', $username);
         $template->set('TOKEN', $token);
         $template->set('EMAIL', $email);
@@ -639,12 +642,12 @@ class WebPages extends BasePages {
                     'id' => $ent->entryID(),
                     'exists' => $ent->isEntry(),
                     'isDraft' => $ent->isDraft(),
-                    'content' => rawurlencode($ent->get())
+                    'content' => rawurlencode($ent->get($this))
                 );
                 echo json_encode($response);
                 return false;
             } else {
-                $tpl->set("PREVIEW_DATA", $ent->get() );
+                $tpl->set("PREVIEW_DATA", $ent->get($this) );
             }
         } else {
             $this->getPage()->redirect($ent->permalink());
@@ -743,7 +746,7 @@ class WebPages extends BasePages {
     }
 
     protected function init_template($blog, $entry, $is_article = false) {
-        $tpl = NewTemplate(ENTRY_EDIT_TEMPLATE);
+        $tpl = $this->createTemplate(ENTRY_EDIT_TEMPLATE);
         $tpl->set('PUBLISHED', false);
 
         $this->entry_set_template($tpl, $entry);
@@ -847,7 +850,7 @@ class WebPages extends BasePages {
         $target_under_blog = "";
 
         $ent = $this->getEntry();
-        $tpl = NewTemplate(UPLOAD_TEMPLATE);
+        $tpl = $this->createTemplate(UPLOAD_TEMPLATE);
         $tpl->set("NUM_UPLOAD_FIELDS", $num_fields);
 
         $blog_files = [];
@@ -1073,19 +1076,6 @@ class WebPages extends BasePages {
                 }
                 $index++;
             }
-
-            # Here we extract any response that may have been passed in the query string.
-            $getvars = array('comment', 'delete', 'response');
-            foreach ($getvars as $var) {
-                if (GET($var)) {
-                    $obj = get_response_object(GET($var), $this->user);
-                    if ($obj) {
-                        $response_array[] = $obj;
-                    } else {
-                        $denied_array[] = GET($var);
-                    }
-                }
-            }
         }
 
         return compact('response_array', 'denied_array');
@@ -1190,7 +1180,7 @@ class WebPages extends BasePages {
     }
 
     protected function show_reply_list(&$main_obj) {
-        $tpl = NewTemplate(LIST_TEMPLATE);
+        $tpl = $this->createTemplate(LIST_TEMPLATE);
 
         if (GET('year') || GET('month')) {
             $repl_array = $this->get_archive_objects($main_obj, GET('type'));
@@ -1229,7 +1219,7 @@ class WebPages extends BasePages {
 
         extract($this->get_posted_responses());
 
-        $tpl = NewTemplate('confirm_tpl.php');
+        $tpl = $this->createTemplate('confirm_tpl.php');
         $tpl->set("CONFIRM_PAGE", make_uri(false, false, false) );
         $tpl->set("OK_ID", 'conf');
         $tpl->set("OK_LABEL", _("Yes"));
@@ -1325,7 +1315,7 @@ class WebPages extends BasePages {
         $title = spf_("All entries for %s.", $this->blog->name);
         $this->blog->getRecent(-1);
 
-        $tpl = NewTemplate(LIST_TEMPLATE);
+        $tpl = $this->createTemplate(LIST_TEMPLATE);
         $tpl->set("LIST_TITLE", spf_("Archive of %s", $title));
 
         $LINK_LIST = array();
@@ -1343,7 +1333,7 @@ class WebPages extends BasePages {
 
     function show_base_archives(&$blog) {
 
-        $tpl = NewTemplate(LIST_TEMPLATE);
+        $tpl = $this->createTemplate(LIST_TEMPLATE);
 
         if ( strtolower(GET('list')) == 'yes') {
             $list = $blog->getRecentMonthList(0);
@@ -1383,7 +1373,7 @@ class WebPages extends BasePages {
     }
 
     function show_year_archives(&$blog, $year) {
-        $tpl = NewTemplate(LIST_TEMPLATE);
+        $tpl = $this->createTemplate(LIST_TEMPLATE);
 
         if ( strtolower(GET('list')) == 'yes' ) {
             $ents = $blog->getYear($year);
@@ -1435,7 +1425,7 @@ class WebPages extends BasePages {
             return $this->getWeblog();
         } else {
 
-            $tpl = NewTemplate(LIST_TEMPLATE);
+            $tpl = $this->createTemplate(LIST_TEMPLATE);
 
             $links = array();
             foreach ($list as $ent) {
@@ -1558,7 +1548,7 @@ class WebPages extends BasePages {
         $list = scan_directory(getcwd(), true);
         sort($list);
 
-        $tpl = NewTemplate(LIST_TEMPLATE);
+        $tpl = $this->createTemplate(LIST_TEMPLATE);
         $tpl->set("LIST_TITLE", spf_("%s articles", $this->blog->name));
 
         $LINK_LIST = $this->blog->getArticleList(false, false);
@@ -1626,7 +1616,7 @@ class WebPages extends BasePages {
 
         $title = spf_("%s - Drafts", $this->blog->name);
 
-        $tpl = NewTemplate(LIST_TEMPLATE);
+        $tpl = $this->createTemplate(LIST_TEMPLATE);
         $tpl->set("LIST_TITLE", spf_("Drafts for %s", $this->blog->name));
 
         $drafts = $this->blog->getDrafts();
@@ -1659,14 +1649,14 @@ class WebPages extends BasePages {
         # comment if one has been posted, and set "remember me" cookies.
         $comm_output = '';
         if ($ent->allow_comment) {
-            $comm_output = handle_comment($ent, true);
+            $comm_output = handle_comment($this, $ent, true);
         }
 
         $content = '';
 
         # Allow a query string to get just the comment form, not the actual comments.
         if (! GET('post')) {
-            $content = show_comments($ent, $usr);
+            $content = show_comments($this, $ent, $usr);
             # Extra styles to add.  Build the list as we go to keep from including more
             # style sheets than we need to.
             $this->getPage()->addStylesheet("reply.css");
@@ -1690,7 +1680,7 @@ class WebPages extends BasePages {
         $this->getPage()->addScript(lang_js());
         $this->getPage()->addStylesheet("reply.css");
         $this->getPage()->addScript("entry.js");
-        $body = show_pingbacks($ent, $usr);
+        $body = show_pingbacks($this, $ent, $usr);
         if (! $body) $body = '<p>'.
             spf_('There are no pingbacks for %s',
                  sprintf('<a href="%s">\'%s\'</a>',
@@ -1706,7 +1696,7 @@ class WebPages extends BasePages {
         $this->getPage()->addScript(lang_js());
         $this->getPage()->addStylesheet("reply.css");
         $this->getPage()->addScript("entry.js");
-        $body = show_trackbacks($ent, $usr);
+        $body = show_trackbacks($this, $ent, $usr);
         if (! $body) {
             $body = '<p>'.spf_('There are no trackbacks for %s',
                                sprintf('<a href="%s">\'%s\'</a>',
@@ -1719,7 +1709,7 @@ class WebPages extends BasePages {
     # Show the page from which users can send a TrackBack ping.
     protected function show_trackback_ping_page(&$blog, &$ent, &$usr) {
 
-        $tpl = NewTemplate("send_trackback_tpl.php");
+        $tpl = $this->createTemplate("send_trackback_tpl.php");
 
         if (System::instance()->canModify($ent, $usr) && $usr->checkLogin()) {
             $tb = NewTrackback();
@@ -1783,7 +1773,7 @@ class WebPages extends BasePages {
         # comment if one has been posted, and set "remember me" cookies.
         $comm_output = '';
         if ($ent->allow_comment) {
-            $comm_output = handle_comment($ent);
+            $comm_output = handle_comment($this, $ent);
         }
 
         # Get the entry AFTER posting the comment so that the comment count is right.
@@ -1900,7 +1890,7 @@ class WebPages extends BasePages {
             foreach ($this->blog->tag_list as $tag) {
                 $links[] = array('link'=>$this->blog->uri('tags', $tag), 'title'=>ucwords($tag));
             }
-            $tpl = NewTemplate(LIST_TEMPLATE);
+            $tpl = $this->createTemplate(LIST_TEMPLATE);
             $tpl->set("LIST_TITLE", _("Topics for this weblog"));
             $tpl->set("LINK_LIST", $links);
             $body = $tpl->process();
@@ -1923,7 +1913,7 @@ class WebPages extends BasePages {
                 foreach ($ret as $ent) {
                     $links[] = array("link"=>$ent->permalink(), "title"=>$ent->subject);
                 }
-                $tpl = NewTemplate(LIST_TEMPLATE);
+                $tpl = $this->createTemplate(LIST_TEMPLATE);
                 $tpl->set("LIST_TITLE", _("Entries filed under: ").implode(", ", $tag_list));
                 $tpl->set("LIST_FOOTER", '<a href="?show=all&amp;tag='.$tags.'">'.
                                             _("Display all entries at once").'</a>');
@@ -1943,7 +1933,7 @@ class WebPages extends BasePages {
 
         $blog = NewBlog($blog_path);
         $usr = User::get();
-        $tpl = NewTemplate("blog_modify_tpl.php");
+        $tpl = $this->createTemplate("blog_modify_tpl.php");
         $this->getPage()->setDisplayObject($blog);
 
         if (! $usr->checkLogin() || ! System::instance()->canModify($blog, $usr)) {
@@ -2054,10 +2044,6 @@ class WebPages extends BasePages {
         return NewUser($username);
     }
 
-    protected function getPage() {
-        return Page::instance();
-    }
-
     protected function getFs() {
         return NewFS();
     }
@@ -2115,7 +2101,7 @@ class WebPages extends BasePages {
             $show_ctl = 
                 System::instance()->canModify($ent, $this->user) && 
                 $this->user->checkLogin();
-            $ret .= $ent->get($show_ctl);
+            $ret .= $ent->get($this, $show_ctl);
         }
         if ($ret) {
             $ret .= $this->addPager();
@@ -2132,7 +2118,7 @@ class WebPages extends BasePages {
                 $show_ctl =
                     System::instance()->canModify($ent, $this->user) &&
                     $u->checkLogin();
-                return $ent->get($show_ctl);
+                return $ent->get($this, $show_ctl);
             }
         }
         return '';
@@ -2141,7 +2127,7 @@ class WebPages extends BasePages {
     private function addPager() {
         $page = (int) GET('page');
         $markup = '';
-        $template = NewTemplate('pager_tpl.php');
+        $template = $this->createTemplate('pager_tpl.php');
         $template->set('PAGE', $page);
         $template->set('PAGE_VAR', 'page');
         $template->set('INCREMENT', 1);

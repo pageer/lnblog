@@ -22,6 +22,7 @@ if (isset($COMMENT_FORM_MESSAGE)) {
 EventRegister::instance()->activateEventFull($tmp=false, "commentform", "BeforeForm");?>
 <fieldset>
 <form id="commentform" method="post" action="<?php echo $FORM_TARGET;?>" accept-charset="<?php echo DEFAULT_CHARSET;?>">
+<?php $this->outputCsrfField() ?>
 <?php EventRegister::instance()->activateEventFull($tmp=false, "commentform", "FormBegin");?>
 <div>
 <label class="basic_form_label" for="subject"><?php p_("Subject"); ?></label>

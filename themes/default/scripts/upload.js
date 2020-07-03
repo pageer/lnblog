@@ -54,6 +54,10 @@ $(document).ready( function () {
         var url = (window.AJAX_URL || '') + '?action=removefile';
 
         var query_params = window.location.search.substr(1).split('&');
+        var data = {
+            'file': file_name,
+            'xrf-token': $('input[name="xrf-token"]').val()
+        }
         for (var i = 0; i < query_params.length; i++) {
             var pieces = query_params[i].split('=');
             if (pieces[0] === 'draft') {
@@ -62,7 +66,7 @@ $(document).ready( function () {
         }
 
         if (should_remove) {
-            $.post(url, {file: file_name})
+            $.post(url, data)
                 .done(function() {
                     var $list = $node.closest('.attachment-list');
                     $node.remove();
@@ -118,7 +122,9 @@ $(document).ready( function () {
             result['body'] = result['body'] || '-';
             return result;
         }
-        return {};
+        return {
+            'xrf-token': $('input[name="xrf-token"]').val()
+        };
     };
 
     var uploadSuccess = function (file, response, data) {

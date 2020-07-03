@@ -3,6 +3,7 @@
 <p><strong><?php echo $UPDATE_MESSAGE; ?></strong></p>
 <?php } ?>
 <form method="post" action="<?php echo current_file();?>">
+<?php $this->outputCsrfField() ?>
 <table>
 <tr><th>Plugin File</th><th>Load Order</th><th>Enabled</th></tr>
 <?php foreach ($PLUGIN_LIST as $file=>$val) { ?>

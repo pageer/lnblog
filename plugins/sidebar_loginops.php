@@ -14,6 +14,7 @@ class LoginOps extends Plugin {
         parent::__construct();
 
         $this->registerNoEventOutputHandler("sidebar", "output");
+        $this->registerNoEventOutputCompleteHandler("sidebar", "outputend");
 
         if ($do_output) {
             $this->output();
@@ -84,6 +85,20 @@ class LoginOps extends Plugin {
 <?php
     }   # End function
 
+    public function outputend($param = false) {
+        $usr = NewUser();
+        $blg = NewBlog();
+        if (! $blg->isBlog()) {
+            return false;
+        }
+        $root = $blg->getURL();
+        if ($usr->checkLogin()) {
+            return false;
+        }
+        ?>
+<p class="login-link"><a href="<?php echo $blg->uri('login'); ?>"><?php p_("User Login"); ?></a></p>
+        <?php
+    }
 }
 
 if (! PluginManager::instance()->plugin_config->value('loginops', 'creator_output', 0)) {

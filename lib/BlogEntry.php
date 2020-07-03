@@ -798,13 +798,13 @@ class BlogEntry extends Entry implements AttachmentContainer {
     Returns:
     A string containing the markup.
     */
-    public function get($show_edit_controls=false) {
+    public function get(BasePages $web_page, $show_edit_controls=false) {
         ob_start();
         $this->raiseEvent("OnOutput");
         $ret = ob_get_contents();
         ob_end_clean();
 
-        $tmp = NewTemplate($this->template_file);
+        $tmp = NewTemplate($this->template_file, $web_page);
         $blog = $this->getParent();
         $usr = NewUser($this->uid);
         $usr->exportVars($tmp);

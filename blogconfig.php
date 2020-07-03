@@ -50,6 +50,22 @@ define("USE_CRON_SCRIPT", false);
 # Alias for DIRECTORY_SEPARATOR
 define("PATH_DELIM", DIRECTORY_SEPARATOR);
 
+# Function: initialize_session
+# Starts the user's HTTP session
+function initialize_session() {
+    if (version_compare(phpversion(), '7.3.0', '>=')) {
+        session_set_cookie_params(['samesite' => 'Lax']);
+        session_start();
+    } else {
+        session_start();
+        $path = ini_get('session.cookie_path');
+        $domain = ini_get('session.cookie_domain');
+        $http_only = ini_get('session.cookie_httponly') ? 'HttpOnly;' : '';
+        $session_id = session_id();
+        header("Set-Cookie: PHPSESSID=$session_id; path=$path; domain=$domain; $http_only SameSite=Lax");
+    }
+}
+
 # Function: mkpath
 # A globally accessible convenience function that takes a variable number
 # of arguments and strings them together with PATH_DELIM.
@@ -476,6 +492,13 @@ define("FILE_UPLOAD_TARGET_DIRECTORIES", "files");
 #
 # *Default* is false.
 @define("FORCE_HTTPS_LOGIN", false);
+
+# Constant: BLOCK_ON_MISSING_ORIGIN
+# Part of CSRF protection.  If this is true, POST requests will be denied
+# if the same-site origin check fails because the origin URL could not
+# be determined.  Turn this off if your server is not receiving
+# "Origin" or "Referer" headers.
+@define("BLOCK_ON_MISSING_ORIGIN", true);
 
 # Constant: ADMIN_USER
 # Username of site administrator.  This is the only one who can add or

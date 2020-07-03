@@ -4,6 +4,7 @@
 ?>
 <h1><?php pf_("%s System Administration", PACKAGE_NAME) ?></h1>
 <form method="post" action="<?php echo $FORM_ACTION ?>">
+<?php $this->outputCsrfField() ?>
 <h3><?php p_('Add Features') ?></h3>
 <ul>
 <li><a href="?action=plugins"><?php p_("Configure site-wide plugins") ?></a></li>

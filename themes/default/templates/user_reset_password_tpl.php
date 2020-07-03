@@ -4,6 +4,7 @@
 
 <?php if ($SHOW_FORM): ?>
     <form method="post">
+        <?php $this->outputCsrfField() ?>
         <div>
             <label>
                 <span><?php p_("Confirm e-mail:")?></span>

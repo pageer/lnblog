@@ -9,6 +9,7 @@
 <p style="color: red"><?php echo $UPDATE_MESSAGE;?></p>
 <?php } ?>
 <form method="post" action="<?php echo $POST_PAGE;?>">
+<?php $this->outputCsrfField() ?>
 <?php if (0) { /*Comment out BLOG_ROOT_URL section. */ ?>
 <div>
 <label for="blogrooturl"><?php p_("Blog root URL"); ?></label>

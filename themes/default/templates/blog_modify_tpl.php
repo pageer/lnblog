@@ -13,6 +13,7 @@
 <?php endif ?>
 
 <form id="addblog" method="post" action="<?php echo $POST_PAGE; ?>">
+    <?php $this->outputCsrfField() ?>
     <?php if (isset($SHOW_BLOG_PATH)): /* for new blogs */ ?>
         <div>
         <?php $msg = spf_("The path on the server where your blog will be created.  Enter an absolute path or a path relative to the server's document root.  To make the document root a blog, enter %s.  To make a subdomain a blog, enter the subdomain name.", ROOT_ID);?>

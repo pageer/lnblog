@@ -38,6 +38,7 @@ if (! empty($LINK_LIST) || ! empty($ITEM_LIST)) {
 	
 	if (isset($FORM_ACTION)) { ?>
 <form method="post" action="<?php echo $FORM_ACTION;?>">
+    <?php $this->outputCsrfField() ?>
 	<?php 
 		if (isset($FORM_HEADER)) echo $FORM_HEADER;
 	}

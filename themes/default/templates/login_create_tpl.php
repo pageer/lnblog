@@ -3,6 +3,7 @@
 <p><?php echo $FORM_MESSAGE; ?></p>
 <?php } ?>
 <form method="post" action="<?php echo $FORM_ACTION; ?>">
+<?php $this->outputCsrfField() ?>
 <?php if (isset($UNAME)) { ?>
 <div>
 <label for="<?php echo $UNAME; ?>"><?php p_('Username'); ?></label>

@@ -1,4 +1,5 @@
 <form method="post" action="<?php echo $POST_PAGE;?>">
+<?php $this->outputCsrfField() ?>
 <fieldset>
 <legend><?php p_("Page Banner");?></legend>
 <legend><?php P_("Background");?></legend>

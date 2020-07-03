@@ -1,8 +1,4 @@
 <?php
-session_start();
+initialize_session();
 $page = new WebPages();
-if (isset($_GET['action'])) {
-    $page->routeRequest();
-} else {
-    $page->showitem();
-}
+$page->routeRequestWithDefault('showitem');

@@ -4,6 +4,7 @@
 
 <?php if ($SHOW_FORM): ?>
     <form method="post">
+        <?php $this->outputCsrfField() ?>
         <?php if ($USERNAME): ?>
         <input type="hidden" name="user"
                value="<?php echo $this->escape($USERNAME)?>" />

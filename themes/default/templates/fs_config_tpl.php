@@ -2,6 +2,7 @@
 <p><strong style="color: red"><?php echo $FORM_MESSAGE; ?></strong></p>
 <?php } ?>
 <form method="post" action="<?php echo $FORM_ACTION; ?>">
+<?php $this->outputCsrfField() ?>
 <fieldset>
 <legend style="font-weight: bold"><?php p_("Path Information"); ?></legend>
 <h3><?php p_("Document Root"); ?></h3>

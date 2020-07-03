@@ -8,6 +8,7 @@
 
 <fieldset>
 	<form id="fileupload" enctype="multipart/form-data" action="<?php echo $TARGET; ?>" method="post">
+        <?php $this->outputCsrfField() ?>
         <div  class="upload_field">
             <div>
                 <input type="hidden" name="MAX_FILE_SIZE" value="<?php echo $MAX_SIZE; ?>" />

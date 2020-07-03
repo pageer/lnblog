@@ -115,11 +115,18 @@ abstract class Plugin extends LnBlogObject{
     # off.
     public function registerNoEventOutputHandler($target, $function_name) {
         $system_default = System::instance()->sys_ini->value("plugins","EventForceOff", 0);
-        if ( $this->no_event || $system_default) {
-            # If either of these is true, then don't set the event handler
-            # and rely on explicit invocation for output.
-        } else {
+        if (!$this->no_event && !$system_default) {
             $this->registerEventHandler($target, "OnOutput", $function_name);
+        }
+    }
+
+    # Method: registerNoEventOutputCompleteHandler
+    # Register a handler to do output in the case that "no event" is turned
+    # off.
+    public function registerNoEventOutputCompleteHandler($target, $function_name) {
+        $system_default = System::instance()->sys_ini->value("plugins","EventForceOff", 0);
+        if (!$this->no_event && !$system_default) {
+            $this->registerEventHandler($target, "OutputComplete", $function_name);
         }
     }
 
@@ -137,13 +144,16 @@ abstract class Plugin extends LnBlogObject{
     *Optionally* returns the form markup as a string.
     */
 
-    public function showConfig($page) {
+    public function showConfig($page, $csrf_token) {
         if (! $this->member_list) return false;
 
         echo "<fieldset>\n";
         echo '<form method="post" ';
         echo 'action="'.current_uri(true).'" ';
         echo "id=\"plugin_config\">\n";
+        echo '<input type="hidden" name="' . 
+            BasePages::TOKEN_POST_FIELD .
+            '" value="' . $csrf_token . '" />';
 
         foreach ($this->member_list as $mem=>$config) {
             if (! isset($config["control"])) $config["control"] = "text";

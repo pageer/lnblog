@@ -1,4 +1,4 @@
 <?php
-session_start();
+initialize_session();
 $pages = new WebPages();
 $pages->routeRequest();

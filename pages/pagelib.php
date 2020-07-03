@@ -13,6 +13,7 @@
 # markup, setting appropriate cookies, and actually inserting the new comments.
 #
 # Parameters:
+# page          - The BasePages object representing the current page.
 # ent           - The entry we're dealing with.
 # use_comm_link - *Optional* boolean, defaults to false.  If this is set to
 #                 true, then the page will be redirected to the comments page
@@ -22,10 +23,10 @@
 # Returns:
 # The markup to be inserted into the page for the comment form.
 
-function handle_comment(&$ent, $use_comm_link=false) {
+function handle_comment(BasePages $page, &$ent, $use_comm_link=false) {
 
     Page::instance()->addStylesheet("form.css");
-    $comm_tpl = NewTemplate(COMMENT_FORM_TEMPLATE);
+    $comm_tpl = NewTemplate(COMMENT_FORM_TEMPLATE, $page);
     # Set form information saved in cookies.
     if (COOKIE('comment_url'))
         $comm_tpl->set("COMMENT_URL", COOKIE('comment_url'));
@@ -142,7 +143,7 @@ function blog_get_post_data(&$blog) {
     $blog->front_page_entry = POST('main_entry');
 }
 
-function show_comments(&$ent, &$usr, $sort_asc=true) {
+function show_comments(BasePages $page, &$ent, &$usr, $sort_asc=true) {
 
     $title = spf_('Comments on <a href="%s">%s</a>',
                   $ent->permalink(), htmlspecialchars($ent->subject));
@@ -151,11 +152,11 @@ function show_comments(&$ent, &$usr, $sort_asc=true) {
 #                   'itemclass'=>'comment', 'listtitle'=>$title,
 #                   'typename'=>_("comments"));
     $cmts = $ent->getComments();
-    return show_replies($ent, $usr, $cmts, $title);
+    return show_replies($page, $ent, $usr, $cmts, $title);
 
 }
 
-function show_trackbacks(&$ent, &$usr, $sort_asc=true) {
+function show_trackbacks(BasePages $page, &$ent, &$usr, $sort_asc=true) {
     $title = spf_('Trackbacks on <a href="%s">%s</a>',
                   $ent->permalink(), $ent->subject);
 #   $params = array('path'=>ENTRY_TRACKBACK_DIR, 'ext'=>TRACKBACK_PATH_SUFFIX,
@@ -163,22 +164,10 @@ function show_trackbacks(&$ent, &$usr, $sort_asc=true) {
 #                   'itemclass'=>'trackback', 'listclass'=>'tblist',
 #                   'listtitle'=>$title, 'typename'=>_("TrackBacks"));
     $tbs = $ent->getTrackbacks();
-    return show_replies($ent, $usr, $tbs, $title);
+    return show_replies($page, $ent, $usr, $tbs, $title);
 }
 
-/*
-function show_pingbacks(&$ent, &$usr, $sort_asc=true, ) {
-    $title = spf_('Pingbacks on <a href="%s">%s</a>',
-                  $ent->permalink(), $ent->subject);
-    $params = array('path'=>ENTRY_PINGBACK_DIR, 'ext'=>PINGBACK_PATH_SUFFIX,
-                    'creator'=>'NewPingback', 'sort_asc'=>$sort_asc,
-                    'itemclass'=>'pingback', 'listclass'=>'pblist',
-                    'listtitle'=>$title, 'typename'=>_("Pingbacks"));
-    return show_replies($ent, $usr, $params);
-}
-*/
-
-function show_pingbacks(&$ent, &$usr, $sort_asc=true) {
+function show_pingbacks(BasePages $page, &$ent, &$usr, $sort_asc=true) {
     $title = spf_('Pingbacks on <a href="%s">%s</a>',
                   $ent->permalink(), $ent->subject);
 
@@ -187,7 +176,7 @@ function show_pingbacks(&$ent, &$usr, $sort_asc=true) {
 #                   'itemclass'=>'pingback', 'listclass'=>'pblist',
 #                   'listtitle'=>$title, 'typename'=>_("Pingbacks"));
     $pbs = $ent->getPingbacks();
-    return show_replies($ent, $usr, $pbs, $title);
+    return show_replies($page, $ent, $usr, $pbs, $title);
 }
 
 function show_remote_pingbacks(&$ent, &$usr, $sort_asc=true) {
@@ -212,11 +201,12 @@ function reply_boxes($idx, &$obj) {
 # Gets the HTML for replies of the given type in a list.
 #
 # Parameters:
+# page    - THe BasePages object representing the current page.
 # ent     - A reference to the entry for which to get replies.
 # usr     - A reference to the current user.
 # replies - An array of reply objects.
 
-function show_replies(&$ent, &$usr, &$replies, $title) {
+function show_replies(BasePages $page, &$ent, &$usr, &$replies, $title) {
 
     $ret = "";
     $count = 0;
@@ -237,7 +227,7 @@ function show_replies(&$ent, &$usr, &$replies, $title) {
     # Suppress markup entirely if there are no replies of the given type.
     if (isset($reply_text)) {
 
-        $tpl = NewTemplate(LIST_TEMPLATE);
+        $tpl = NewTemplate(LIST_TEMPLATE, $page);
 
         if (System::instance()->canModify($reply, $usr)) {
 
@@ -273,7 +263,7 @@ function show_replies(&$ent, &$usr, &$replies, $title) {
 
 }
 
-function show_all_replies(&$ent, &$usr) {
+function show_all_replies(BasePages $page, &$ent, &$usr) {
 
     # Get an array of each kind of reply.
     $pingbacks = $ent->getReplyArray(
@@ -309,7 +299,7 @@ function show_all_replies(&$ent, &$usr) {
     # Suppress markup entirely if there are no replies of the given type.
     if (isset($reply_text)) {
 
-        $tpl = NewTemplate(LIST_TEMPLATE);
+        $tpl = NewTemplate(LIST_TEMPLATE, $page);
 
         if (System::instance()->canModify($reply, $usr)) {
             $tpl->set("FORM_HEADER",

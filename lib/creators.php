@@ -120,8 +120,8 @@ function NewBlogComment($param=false) {
 
 # Function: NewTemplate
 # Creates a new template object.
-function NewTemplate($tpl="") {
-    return new PHPTemplate($tpl);
+function NewTemplate($tpl="", $page=null) {
+    return new PHPTemplate($tpl, $page);
 }
 
 # Function: NewUser

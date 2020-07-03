@@ -59,7 +59,7 @@ class AdminPages extends BasePages {
     }
 
     private function show_confirm_page($title, $message, $page, $yes_id, $yes_label, $no_id, $no_label, $data_id, $data) {
-        $tpl = NewTemplate('confirm_tpl.php');
+        $tpl = $this->createTemplate('confirm_tpl.php');
         $tpl->set('CONFIRM_TITLE', $title);
         $tpl->set('CONFIRM_MESSAGE', $message);
         $tpl->set('CONFIRM_PAGE', $page);
@@ -122,7 +122,7 @@ class AdminPages extends BasePages {
         $upgrade = "upgrade";
         Page::instance()->title = sprintf(_("%s Administration"), PACKAGE_NAME);
 
-        $tpl = NewTemplate('blog_admin_tpl.php');
+        $tpl = $this->createTemplate('blog_admin_tpl.php');
         $tpl->set("SHOW_NEW");
         $tpl->set("FORM_ACTION", current_file());
 
@@ -184,6 +184,7 @@ class AdminPages extends BasePages {
                 $tpl->set("DELETE_STATUS", $status);
 
             } else {
+                //-- Check whether this is safe...
                 $this->show_confirm_page(_("Confirm blog deletion"), spf_("Really delete blog '%s'?", POST('delete')), current_file(),
                                   'delete_btn', _('Yes'), 'cancel_btn', _('No'), 'delete', POST('delete'));
             }
@@ -249,7 +250,7 @@ class AdminPages extends BasePages {
         $user_name = "user";
         $password = "passwd";
 
-        $tpl = NewTemplate(LOGIN_TEMPLATE);
+        $tpl = $this->createTemplate(LOGIN_TEMPLATE);
         $tpl->set("FORM_TITLE", $form_name);
         $tpl->set("FORM_ACTION", current_file());
         $tpl->set("UNAME", $user_name);
@@ -305,7 +306,7 @@ class AdminPages extends BasePages {
 
         $redir_url = $blog->isBlog() ? $blog->getURL() : "?action=index";
 
-        $tpl = NewTemplate(CONFIRM_TEMPLATE);
+        $tpl = $this->createTemplate(CONFIRM_TEMPLATE);
         $tpl->set("CONFIRM_TITLE", _("Logout"));
         $tpl->set("CONFIRM_MESSAGE", _("Do you really want to log out?"));
         $tpl->set("CONFIRM_PAGE", current_file());
@@ -350,7 +351,7 @@ class AdminPages extends BasePages {
             $this->redirect("login");
             exit;
         }
-        $tpl = NewTemplate("blog_modify_tpl.php");
+        $tpl = $this->createTemplate("blog_modify_tpl.php");
         $blog->owner = $usr->username();
 
         if (POST("blogpath")) $blog->home_path = POST("blogpath");
@@ -422,7 +423,7 @@ class AdminPages extends BasePages {
     # constant in the userdata/userconfig.php file.
     public function newlogin() {
         $redir_page = "index.php";
-        $tpl = NewTemplate(CREATE_LOGIN_TEMPLATE);
+        $tpl = $this->createTemplate(CREATE_LOGIN_TEMPLATE);
 
         # Check if there is at least one administrator.
         # If not, then we need to create one.
@@ -573,7 +574,7 @@ class AdminPages extends BasePages {
             exit;
         }
 
-        $tpl = NewTemplate(PLUGIN_LOAD_TEMPLATE);
+        $tpl = $this->createTemplate(PLUGIN_LOAD_TEMPLATE);
 
         if (has_post()) {
 
@@ -667,7 +668,7 @@ class AdminPages extends BasePages {
             $body .= '<li>'._('Version').': '.$plug->plugin_version.'</li>';
             $body .= '<li>'._('Description').': '.$plug->plugin_desc.'</li></ul>';
             ob_start();
-            $ret = $plug->showConfig(Page::instance());
+            $ret = $plug->showConfig(Page::instance(), $this->getCsrfToken());
             $buff = ob_get_contents();
             ob_end_clean();
             $body .= is_string($ret) ? $ret : $buff;
@@ -699,7 +700,7 @@ class AdminPages extends BasePages {
         $uid = preg_replace("/\W/", "", $uid);
 
         $usr = NewUser($uid);
-        $tpl = NewTemplate("user_info_tpl.php");
+        $tpl = $this->createTemplate("user_info_tpl.php");
         Page::instance()->setDisplayObject($usr);
         $usr->exportVars($tpl);
 
@@ -817,65 +818,6 @@ class AdminPages extends BasePages {
         return $ret;
     }
 
-    # Test to autodetect the FTP root directory for the given account.
-    protected function test_ftproot() {
-        require "/lib/ftpfs.php";
-        @$ftp = new FTPFS(trim(POST("ftp_host")),
-                          trim(POST("ftp_user")), trim(POST("ftp_pwd")) );
-        if ($ftp->status !== false) {
-
-            # Try to calculate the FTP root.
-            ftp_chdir($ftp->connection, "/");
-            $ftp_list = ftp_nlist($ftp->connection, ".");
-
-            $file = getcwd().PATH_DELIM."blogconfig.php";
-            $drive = substr($file, 0, 2);
-
-            # Get the current path into an array.
-            if (PATH_DELIM != "/") {
-                if (substr($file, 1, 1) == ":") $file = substr($file, 3);
-                $file = str_replace(PATH_DELIM, "/", $file);
-            }
-
-            if (substr($file, 0, 1) == "/") $file = substr($file, 1);
-            $dir_list = explode("/", $file);
-
-            # For each local directory element, loop through contents of
-            # the FTP root directory.  If the current element is in FTP root,
-            # then the parent of the current element is the root.
-            # $ftp_root starts at root and has the current directory appended
-            # at the end of each outer loop iteration.  Thus, $ftp_root
-            # always holds the parent of the currently processing directory.
-            # Note that we must account for Windows drive letters.
-            if (PATH_DELIM == "/") {
-                $ftp_root = "/";
-            } else {
-                $ftp_root = $drive.PATH_DELIM;
-            }
-            foreach ($dir_list as $dir) {
-                foreach ($ftp_list as $ftpdir) {
-                    if ($dir == $ftpdir && $ftpdir != ".." && $ftpdir != ".") {
-                        break 2;
-                    }
-                }
-                $ftp_root .= $dir.PATH_DELIM;
-            }
-
-            # Now check that the result we got is OK.
-            $ftp->ftp_root = $ftp_root;
-            $dir_list = ftp_nlist($ftp->connection,
-                                    $ftp->localpathToFSPath(getcwd()));
-            if (! is_array($dir_list)) $dir_list = array();
-
-            foreach ($dir_list as $ent) {
-                if ("blogconfig.php" == basename($ent)) {
-                    return $ftp_root;
-                }
-            }
-        }
-        return false;
-    }
-
     # Check that all required fields have been populated by the user.
     protected function check_fields() {
         $errs = array();
@@ -949,7 +891,7 @@ class AdminPages extends BasePages {
 
         Page::instance()->title = sprintf(_("%s Configuration"), PACKAGE_NAME);
 
-        $tpl = NewTemplate(FS_CONFIG_TEMPLATE);
+        $tpl = $this->createTemplate(FS_CONFIG_TEMPLATE);
 
         $tpl->set("FORM_ACTION", '');
 

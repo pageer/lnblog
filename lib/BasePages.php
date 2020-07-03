@@ -17,7 +17,13 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
+use Psr\Log\LoggerInterface;
+
 abstract class BasePages {
+
+    const CSRF_TOKEN = 'xrf_tok';
+    const TOKEN_POST_FIELD = 'xrf-token';
 
     protected $fs;
     protected $globals;
@@ -25,17 +31,48 @@ abstract class BasePages {
     abstract protected function getActionMap();
     abstract protected function defaultAction();
 
-    public function __construct(FS $fs = null, GlobalFunctions $globals = null) {
+    public function __construct(FS $fs = null, GlobalFunctions $globals = null, LoggerInterface $logger = null) {
         $this->fs = $fs ?: NewFS();
         $this->globals = $globals ?: new GlobalFunctions();
+        $this->logger = $logger ?: NewLogger();
     }
 
     public function routeRequestWithDefault($default_action) {
-        $action = GET('action') ?: $default_action;
+        $action = GET('action');
+        $action_map = $this->getActionMap();
+        if (!isset($action_map[$action])) {
+            $action = $default_action;
+        }
         $this->routeRequest($action);
     }
 
     public function routeRequest($action = null) {
+        $action = $action ?: GET('action');
+        $has_post_data = has_post() || !empty($_FILES);
+        $allowedActions = $this->getCsrfWhitelist();
+        if ($has_post_data && !in_array($action, $allowedActions)) {
+            try {
+                $this->validateCsrfToken($_POST);
+                $this->validateOriginHeaders($_SERVER);
+            } catch (CsrfDetected $e) {
+                $this->getPage()->error(400);
+            }
+        }
+        return $this->handleRequestRouting($action);
+    }
+
+    public function getCsrfWhitelist() {
+        return ['webmention'];
+    }
+
+    public function getCsrfToken() {
+        if (empty($_SESSION[self::CSRF_TOKEN])) {
+            $_SESSION[self::CSRF_TOKEN] = hash('sha256', random_int(PHP_INT_MIN, PHP_INT_MAX));
+        }
+        return $_SESSION[self::CSRF_TOKEN];
+    }
+
+    protected function handleRequestRouting($action) {
         $action_map = $this->getActionMap();
         $action = $action ?: GET('action');
         $action_method = isset($action_map[$action]) ? $action_map[$action] : null;
@@ -138,6 +175,66 @@ abstract class BasePages {
 
     protected function scriptPath($name) {
         return $this->getThemeAssetPath("scripts", $name);
+    }
+
+    protected function validateCsrfToken($post_data) {
+        $context = ['uri' => $_SERVER['REQUEST_URI'] ?? ''];
+        if (empty($post_data[self::TOKEN_POST_FIELD])) {
+            $this->logger->warning("CSRF token not present in POST data", $context);
+            throw new CsrfDetected("Token is missing");
+        }
+
+        $csrf_token = $this->getCsrfToken();
+        if ($post_data[self::TOKEN_POST_FIELD] != $csrf_token) {
+            $this->logger->error("CSRF token present but not valid", $context);
+            throw new CsrfDetected("Token not valid");
+        }
+    }
+
+    protected function validateOriginHeaders($server_vars) {
+        $context = ['uri' => $server_vars['REQUEST_URI'] ?? ''];
+        $target_origin_domain = '';
+        $source_origin_domain = '';
+
+        if (defined('BLOG_ROOT_URL')) {
+            $target_origin_domain = parse_url(BLOG_ROOT_URL, PHP_URL_HOST);
+        } elseif (!empty($server_vars['HTTP_HOST'])) {
+            $target_origin_domain = $server_vars['HTTP_HOST'];
+        } elseif (!empty($server_vars['HTTP_X_FORWARDED_HOST'])) {
+            $target_origin_domain = $server_vars['HTTP_X_FORWARDED_HOST'];
+        }
+
+        if (!empty($server_vars['HTTP_ORIGIN'])) {
+            $source_origin_domain = parse_url($server_vars['HTTP_ORIGIN'], PHP_URL_HOST);
+        } elseif (!empty($server_vars['HTTP_REFERER'])) {
+            $source_origin_domain = parse_url($server_vars['HTTP_REFERER'], PHP_URL_HOST);
+        }
+
+        if (!$source_origin_domain && $this->shouldBlockOnMissingOrigin()) {
+            $this->logger->error("No request origin was found, blocking request", $context);
+            throw new CsrfDetected("Request origin not found");
+        }
+
+        if ($source_origin_domain && $source_origin_domain !== $target_origin_domain) {
+            $context += ['source' => $source_origin_domain, 'target' => $target_origin_domain];
+            $this->logger->error("Origins do not match", $context);
+            throw new CsrfDetected("Origin mismatch");
+        }
+    }
+
+    private function shouldBlockOnMissingOrigin() {
+        if ($this->globals->defined("BLOCK_ON_MISSING_ORIGIN")) {
+            return $this->globals->constant("BLOCK_ON_MISSING_ORIGIN");
+        }
+        return true;
+    }
+
+    protected function createTemplate(string $template_name) {
+        return new PHPTemplate($template_name, $this);
+    }
+
+    protected function getPage() {
+        return Page::instance();
     }
 
     private function dumpAssetFile($file, $default) {

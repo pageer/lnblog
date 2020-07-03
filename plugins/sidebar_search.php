@@ -178,7 +178,7 @@ class SidebarSearch extends Plugin {
                     }
                 }
                 if ($res == count($terms)) {
-                    $subject = $ent->subject ?: $ent->prettyDate($this->post_ts);
+                    $subject = $ent->subject ?: $ent->prettyDate($ent->post_ts);
                     $ret[] = array("link"=>$ent->permalink(), "title"=>$subject);
                 }
             }

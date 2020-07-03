@@ -35,6 +35,7 @@ class PHPTemplate extends LnBlogObject {
 
     protected $file;   # The name of the template file to use.
     protected $vars;   # An array of variables to register in the template.
+    protected $pages;
     protected $search_paths = array();  # The paths on which to search for templates.
     protected $block_registry = array();
 
@@ -44,9 +45,10 @@ class PHPTemplate extends LnBlogObject {
 
     public static $template_paths = array();
 
-    public function __construct($file="") {
+    public function __construct($file="", BasePages $pages_obj = null) {
         $this->file = $file;
         $this->vars = array();
+        $this->pages = $pages_obj;
     }
 
     /* Method: get
@@ -179,6 +181,18 @@ class PHPTemplate extends LnBlogObject {
             }
         }
         return '';
+    }
+
+    public function outputCsrfField() {
+        if (!$this->pages) {
+            throw new RuntimeException('No page object set on template');
+        }
+
+        printf(
+            '<input type="hidden" name="%s" value="%s" />',
+            BasePages::TOKEN_POST_FIELD,
+            $this->pages->getCsrfToken()
+        );
     }
 
     protected function templateExists($path, $file_name = null) {
