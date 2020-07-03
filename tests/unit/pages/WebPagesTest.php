@@ -150,7 +150,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->setUpEntryEditStubs();
         $this->entry->data = 'some data';
         $this->entry->send_pingback = false;
-        $this->entry->get()->willReturn("This is a test entry");
+        $this->entry->get(Argument::any())->willReturn("This is a test entry");
         $this->entry->isEntry()->willReturn(true);
         $this->entry->isPublished()->willReturn(false);
         $this->entry->getAttachments()->willReturn([]);
@@ -166,7 +166,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
     public function testEditEntry_WhenEntryExistsAndPreviewParamPassedWithoutSaveParams_DoesNotSaveEntry() {
         $_POST['body'] = "This is a test entry";
         $_POST['preview'] = 'preview';
-        $this->entry->get()->willReturn("This is a test entry");
+        $this->entry->get(Argument::any())->willReturn("This is a test entry");
         $this->setUpEntryEditStubs();
         $this->entry->data = 'some data';
         $this->entry->isEntry()->willReturn(true);
@@ -191,7 +191,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->setUpEntryEditStubs();
         $this->setUpForEntrySaveWithPermissions();
         $this->entry->data = 'some data';
-        $this->entry->get()->willReturn("This is some markup");
+        $this->entry->get(Argument::any())->willReturn("This is some markup");
         $this->user->exportVars(Argument::any())->willReturn(null);
 
         $this->publisher->update($this->entry)->shouldBeCalled();
@@ -230,7 +230,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->setUpEntryEditStubs();
         $this->setUpForEntrySaveWithPermissions();
         $this->entry->data = 'This is a test entry';
-        $this->entry->get()->willReturn("This is a test entry");
+        $this->entry->get(Argument::any())->willReturn("This is a test entry");
         $this->user->exportVars(Argument::any())->willReturn(null);
 
         $this->page->display(Argument::containingString("This is a test entry"), Argument::any())->shouldBeCalled();
@@ -691,6 +691,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
     }
 
     private function setUpEntryEditStubs($logged_in = true) {
+        $this->entry->getParent()->willReturn($this->blog);
         $this->entry->entryID()->willReturn('asdf');
         $this->entry->isArticle()->willReturn(false);
         $this->entry->getAutoPublishDate()->willReturn('');
@@ -707,6 +708,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
     }
 
     private function setUpForEntrySaveWithPermissions() {
+        $this->entry->getParent()->willReturn($this->blog);
         $this->entry->isEntry()->willReturn(true);
         $this->entry->isPublished()->willReturn(false);
         $this->entry->isDraft()->willReturn(false);
