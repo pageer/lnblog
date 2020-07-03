@@ -468,7 +468,11 @@ function localpath_to_uri($path, $base_path_map = []) {
     $port = '';
     $path = '';
     foreach ($base_path_map as $root_path => $root_url) {
-        if ( strtoupper( substr(PHP_OS,0,3) ) == 'WIN' ) {
+        # Avoid "empty needle" notices in tests.
+        if (!$root_path) {
+            continue;
+        }
+        if (strtoupper( substr(PHP_OS,0,3) ) == 'WIN' ) {
             $found_match = stripos($full_path, $root_path) === 0;
         } else {
             $found_match = strpos($full_path, $root_path) === 0;
