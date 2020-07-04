@@ -71,7 +71,6 @@
 				<include name=".git*" />
 			</fileset>
 		</delete>
-		</delete>
 		<delete dir="./build/LnBlog-${version}/.github" />
 		<delete dir="./build/LnBlog-${version}/tests" />
 		<delete dir="./build/LnBlog-${version}/docs" />
