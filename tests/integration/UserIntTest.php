@@ -65,17 +65,33 @@ class UserIntTest extends \PHPUnit\Framework\TestCase {
     private function createOldUserDirectory($username, $hash, $salt) {
         $directory = USER_DATA_PATH . DIRECTORY_SEPARATOR . $username;
         $passwd_file = $directory . DIRECTORY_SEPARATOR . "passwd.php";
+        $user_file = $directory . DIRECTORY_SEPARATOR . "user.ini";
         mkdir($directory);
-        $content = "<?php\n\$pwd = \"$hash\";\n\$salt = \"$salt\";\n?>";
-        file_put_contents($passwd_file, $content);
+        $passwd_content = "<?php\n\$pwd = \"$hash\";\n\$salt = \"$salt\";\n?>";
+        $user_content = <<<EOT
+[userdata]
+name = Bob admin
+EOT;
+        file_put_contents($passwd_file, $passwd_content);
+        file_put_contents($user_file, $user_content);
     }
 
     private function createNewUserDirectory($username, $hash) {
         $directory = USER_DATA_PATH . DIRECTORY_SEPARATOR . $username;
         $passwd_file = $directory . DIRECTORY_SEPARATOR . "passwd.php";
+        $user_file = $directory . DIRECTORY_SEPARATOR . "user.xml";
         mkdir($directory);
-        $content = "<?php\nreturn '$hash';\n";
-        file_put_contents($passwd_file, $content);
+        $passwd_content = "<?php\nreturn '$hash';\n";
+        $user_content = <<<EOT
+<?xml version="1.0" encoding="utf-8"?>
+<User>
+<fullname>Bob Admin</fullname>
+<custom type="array">
+</custom>
+</User>
+EOT;
+        file_put_contents($passwd_file, $passwd_content);
+        file_put_contents($user_file, $user_content);
     }
 
     private function removeUserDirectory(string $username) {
