@@ -71,6 +71,8 @@
 				<include name=".git*" />
 			</fileset>
 		</delete>
+		</delete>
+		<delete dir="./build/LnBlog-${version}/.github" />
 		<delete dir="./build/LnBlog-${version}/tests" />
 		<delete dir="./build/LnBlog-${version}/docs" />
 		<delete dir="./build/LnBlog-${version}/doc_project" />
@@ -104,4 +106,8 @@
 		<echo msg="Starting PHP server on port 4080" />
 		<exec command="php -S localhost:4080" dir=".." />
 	</target>
+
+    <target name="count">
+        <exec command="cloc --exclude-list-file=cloc-exclude-list.txt ." passthru="true"/>
+    </target>
 </project>

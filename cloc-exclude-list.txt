@@ -1,0 +1,6 @@
+vendor
+node_modules
+themes/default/scripts/dropzone.js             
+themes/default/scripts/jquery.datetimepicker.js
+themes/default/scripts/jquery.form.js          
+
