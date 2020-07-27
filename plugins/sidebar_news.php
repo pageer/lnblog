@@ -42,8 +42,13 @@ class News extends Plugin {
 
     function output() {
         $blg = NewBlog();
-        if (! $blg->isBlog() ) return false;
+        if (! $blg->isBlog() ) {
+            return false;
+        }
         $ent = NewBlogEntry();
+
+        $show_rss1 = PluginManager::instance()->pluginLoaded('RSS1FeedGenerator');
+        $show_rss2 = PluginManager::instance()->pluginLoaded('RSS2FeedGenerator');
 
         $rss1_file = PluginManager::instance()->plugin_config->value(
             "rss1feedgenerator", "feed_file", "news.rdf");
@@ -64,23 +69,35 @@ class News extends Plugin {
         $feed_links = array();
 
         $tpl = NewTemplate("sidebar_panel_tpl.php");
-        if ($this->header) $tpl->set('PANEL_TITLE', $this->header);
-        if (! $this->std_icons) $tpl->set('PANEL_CLASS', 'imglist');
+        if ($this->header) {
+            $tpl->set('PANEL_TITLE', $this->header);
+        }
+        if (! $this->std_icons) {
+            $tpl->set('PANEL_CLASS', 'imglist');
+        }
 
         $feeds = array();
         # Elements are path, url, RSS version, and "is comment feed".
         if (! $this->feed_url) {
-            $feeds[] = array(mkpath($blog_feeds,$rss2_file),
-                                    $blog_feeds_url.$rss2_file, 2, false);
-            $feeds[] = array(mkpath($blog_feeds,$rss1_file),
-                                    $blog_feeds_url.$rss1_file, 1, false);
+            if ($show_rss2) {
+                $feeds[] = array(mkpath($blog_feeds,$rss2_file),
+                                        $blog_feeds_url.$rss2_file, 2, false);
+            }
+            if ($show_rss1) {
+                $feeds[] = array(mkpath($blog_feeds,$rss1_file),
+                                        $blog_feeds_url.$rss1_file, 1, false);
+            }
         } else {
             $feeds[] = array(false, $this->feed_url, 0, false);
         }
-        $feeds[] = array(mkpath($entry_feeds,$rss2_comments),
-                                $entry_feeds_url.$rss2_comments, 2, true);
-        $feeds[] = array(mkpath($entry_feeds,$rss1_comments),
-                                $entry_feeds_url.$rss2_comments, 1, true);
+        if ($show_rss2) {
+            $feeds[] = array(mkpath($entry_feeds,$rss2_comments),
+                                    $entry_feeds_url.$rss2_comments, 2, true);
+        }
+        if ($show_rss1) {
+            $feeds[] = array(mkpath($entry_feeds,$rss1_comments),
+                                    $entry_feeds_url.$rss2_comments, 1, true);
+        }
 
         foreach ($feeds as $feed) {
 
@@ -162,6 +179,9 @@ class News extends Plugin {
             return false;
         }
 
+        $show_rss1 = PluginManager::instance()->pluginLoaded('RSS1FeedGenerator');
+        $show_rss2 = PluginManager::instance()->pluginLoaded('RSS2FeedGenerator');
+
         $param = Page::instance();
         $rss1_file = PluginManager::instance()->plugin_config->value(
             "rss1feedgenerator", "feed_file", "news.rdf");
@@ -179,14 +199,14 @@ class News extends Plugin {
             $rss2_comments_file = mkpath($base_path, $rss2_comments);
             $rss1_comments_file = mkpath($base_path, $rss1_comments);
 
-            if (file_exists($rss2_comments_file) ) {
+            if ($show_rss2 && file_exists($rss2_comments_file) ) {
                 $param->addRSSFeed($param->display_object->uri('base').
                                    ENTRY_COMMENT_DIR."/".$rss2_comments,
                                    "application/rss+xml", _("Comments - RSS 2.0"));
             }
 
             # RSS 1 comments
-            if (file_exists($rss1_comments_file) ) {
+            if ($show_rss1 && file_exists($rss1_comments_file) ) {
                 $param->addRSSFeed($param->display_object->uri('base').
                                    ENTRY_COMMENT_DIR."/".$rss1_comments,
                                    "application/xml", _("Comments - RSS 1.0"));
@@ -205,7 +225,7 @@ class News extends Plugin {
 
             if (! $this->feed_url) {
                 # RSS2 entries
-                if (file_exists($obj->home_path.PATH_DELIM.
+                if ($show_rss2 && file_exists($obj->home_path.PATH_DELIM.
                                 BLOG_FEED_PATH.PATH_DELIM.$rss2_file) ) {
                     $param->addRSSFeed($obj->getURL().
                                     BLOG_FEED_PATH."/".$rss2_file,
@@ -213,7 +233,7 @@ class News extends Plugin {
                 }
 
                 # RSS1 entries
-                if (file_exists($obj->home_path.PATH_DELIM.
+                if ($show_rss1 && file_exists($obj->home_path.PATH_DELIM.
                                 BLOG_FEED_PATH.PATH_DELIM.$rss1_file) ) {
                     $param->addRSSFeed($obj->getURL().
                                     BLOG_FEED_PATH."/".$rss1_file,
@@ -224,8 +244,6 @@ class News extends Plugin {
             }
         }
     }
-
-
 }
 
 if (! PluginManager::instance()->plugin_config->value('news', 'creator_output', 0)) {

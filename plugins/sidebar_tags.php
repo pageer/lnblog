@@ -46,6 +46,9 @@ class TagList extends Plugin {
 			return false;
 		}
 
+        $show_rss1 = PluginManager::instance()->pluginLoaded('RSS1FeedGenerator');
+        $show_rss2 = PluginManager::instance()->pluginLoaded('RSS2FeedGenerator');
+
 		$base_feed_path = $blg->home_path.PATH_DELIM.BLOG_FEED_PATH;
 		$base_feed_uri = $blg->uri('base').BLOG_FEED_PATH.'/';
 		
@@ -67,10 +70,10 @@ class TagList extends Plugin {
 				$rdf_uri = false;
 				$xml_uri = false;
 
-				if (file_exists($base_feed_path.PATH_DELIM.$rdf_file)) {
+				if ($show_rss1 && file_exists($base_feed_path.PATH_DELIM.$rdf_file)) {
 					$rdf_uri = $base_feed_uri.$rdf_file;
 				}
-				if (file_exists($base_feed_path.PATH_DELIM.$xml_file)) {
+				if ($show_rss2 && file_exists($base_feed_path.PATH_DELIM.$xml_file)) {
 					$xml_uri = $base_feed_uri.$xml_file;
 				}
 
