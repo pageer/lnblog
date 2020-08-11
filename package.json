@@ -12,6 +12,6 @@
     "jquery": "^3.5.1",
     "jquery-datetime-picker": "^2.5.11",
     "jquery-form": "^4.2.2",
-    "tinymce": "^5.1.5"
+    "tinymce": "^5.4.0"
   }
 }
