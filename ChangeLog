@@ -1,3 +1,17 @@
+04-Jul-2020: Version 2.1.0
+Responsive layout (enhancement #11)
+Drag-and-drop plugin loading (enhancement #4)
+Auto-save for post editor (enhancement #1)
+Paginated browsing (enhancement #5)
+Asynchronous task runner (enhancement #6)
+Deprecate file writing config (enhancement #13)
+CSRF protection (enhancement #2)
+Login attempt throttling (enhancement #3)
+Make IP locking of session tokens optional (enhancement #10)
+Password reset feature (enhancement #9)
+Image and other links for drafts don't work in TinyMCE (bug #12)
+Some file editor links don't work (bug #8)
+
 21-Feb-2019: Version 2.0.0
 Feature request #91: Add uploaded file awareness
 Feature request #72: Add webmention support
