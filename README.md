@@ -1,62 +1,94 @@
-LnBlog: A flexible file-base weblog
-Copyright (C) 2005-2020 Peter A. Geer <pageer@skepticats.com>
-
 About LnBlog
-------------
+============
 LnBlog is a weblog system that is written in PHP and stores data in text files.
 It aims to provide a rich feature set with maximum flexibility while remaining
 low on requirements.
 
 Documentation
--------------
+=============
 Full documentation is available at the LnBlog website.  It can be viewed online 
-at the following URL:
-http://www.skepticats.com/lnblog/documentation/
+at the following URL:  
+https://www.skepticats.com/lnblog/documentation/
+
 You may also download a copy of the documentation for local viewing at the 
-following location:
-http://www.skepticats.com/lnblog/content/download/lnblog_docs.zip
+following location:  
+https://www.skepticats.com/lnblog/content/download/lnblog_docs.zip
 
 Requirements
-------------
+============
 LnBlog needs a web server with PHP 7.0 or greater installed and the ability to
-write to the file system.  Both Apache and IIS are supported and no database
-is required.  File writing through FTP is also supported, but is no longer a
-recommended configuration.  Support for the CURL, gettext, and either
-mime-magic or fileinfo extensions is helpful, but not required.  
+read and write to the local filesystem.  Support for the CURL, gettext, and 
+either mime-magic or fileinfo extensions is helpful, but no non-standard 
+extensions are required.
+
+No database is needed and no particular web server is required.  LnBlog
+is tested with Apache running on Windows and Linux.  Other web servers and
+operating systems should work, but are not actively tested.
 
 Installation
-------------
+============
 There are two ways to install: from the distribution ZIP file downloaded from
 the LnBlog webpage (recommended) or from source, i.e. the cloned Git repository.
 
-To install the distribution ZIP file, simply extract the ZIP archive and upload 
+Installing from zip archive
+---------------------------
+To install the [ZIP file distribution](https://www.skepticats.com/lnblog/content/download/),
+ simply extract the ZIP archive and upload 
 the resulting folder to the publicly accessible portion of your web server.
 After that, open a web browser go to the URL corresponding to that location.
 This will start the graphical configuration process.  You will be prompted to 
 confirm path information and create an initial user account, after which you will 
-be taken to the administration page where you can create more users, create blog,
+be taken to the administration page where you can create more users, create blogs,
 and set other options.
 
-To install directly from a copy of the source repository, you will need to have
-Composer installed (http://getcomposer.org/).  Just move the the source directory
-to the web-accessible portion of your web server and run "composer install" from
-that directory.  You can then run web setup process as described above.
+Building from source
+--------------------
+To build LnBlog from source you will need the following installed on your system:
+* Git
+* PHP
+* Composer
+* Node.JS/NPM
 
-Upgrade
--------
-To upgrade an existing LnBlog installation, extract the new ZIP archive and 
-upload the folder to your server.  You should then rename your old LnBLog 
-directory to, e.g., LnBlog-old, and rename the new one in its place (i.e., give
-it the same name the old version had).  Lastly, copy or move the userdata 
-subdirectory from your old  LnBlog directory to the new one, overwriting existing
-files.
+To get the latest code and create an installable build, run the following
+commands from the console:
 
-If you installed from source, you can simply pull updates from the Mercurial
-repository by running "git pull origin master".  You may also need to run "composer update"
-if new third-party dependencies have been added.
+```
+git clone https://github.com/pageer/lnblog.git
+cd lnblog
+composer install --dev
+vendor/bin/phing -Dversion='latest' build
+```
+
+This will create the directory `build/LnBlog-latest/`, which contains the same files
+as the zip archive distribution described above.  You can copy that directory to 
+the web-accessible portion of your web server and follow the installation instructions above.
+
+Note that it is also possible to put the directory pulled from Git directly on your 
+web server.  This makes it easy to pull updates to the code at will.  However, you will
+have to manually handle changes to third-party dependencies.  For PHP dependencies, this means
+you will have to run `composer install` to pull in updates.  For JavaScript dependencies,
+you should create a build as described above and recursively copy the contents of the 
+`build/third-party/` directory into `themes/default/` using something like this command:
+
+```
+cp -R build/third-party/* themes/default/
+```
+
+When pulling new changes, you may have to repeat these steps if any of the external 
+dependencies change.  (Look for changes in `composer.lock`, `packages.json`, or `build.xml`.)
+
+Upgrading
+=========
+To upgrade an existing LnBlog installation, extract the new ZIP archive 
+(or create a new build from source) and upload the folder to your server.  You should 
+then rename your old LnBLog directory to, e.g., LnBlog-old, and rename the new one 
+in its place (i.e., give it the same name the old version had).  If your `userdata` directory
+is contained inside the LnBlog directory, you should move it from the old version to the new one.
+(Note: it is now recommended to keep your `userdata` directory alongside the code direcory,
+not inside it.)
 
 License
--------
+=======
 LnBlog: A flexible file-base weblog
 Copyright (C) 2005-2020 Peter A. Geer <pageer@skepticats.com>
 
@@ -74,5 +106,5 @@ program; if not, write to the Free Software Foundation, Inc., 675 Mass Ave,
 Cambridge, MA 02139, USA.
 
 Credits
--------
+=======
 Icons taken from Fam Fam Silk <http://www.famfamfam.com/lab/icons/silk/>
