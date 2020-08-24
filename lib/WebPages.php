@@ -724,14 +724,14 @@ class WebPages extends BasePages {
 
         $title = $is_art ? _("New Article") : _("New Entry");
         $this->getPage()->title = sprintf("%s - %s", $this->blog->name, $title);
+        $this->getPage()->addPackage('jquery-form');
+        $this->getPage()->addPackage('jquery-datetime-picker');
+        $this->getPage()->addPackage('dropzone');
+        $this->getPage()->addPackage('tag-it');
+        $this->getPage()->addPackage('tinymce');
         $this->getPage()->addStylesheet("form.css");
         $this->getPage()->addStylesheet("entry.css");
-        $this->getPage()->addStylesheet("jquery.datetimepicker.css");
-        $this->getPage()->addStylesheet("dropzone.css");
-        $this->getPage()->addScript("jquery.form.js");
-        $this->getPage()->addScript("jquery.datetimepicker.js");
         $this->getPage()->addScript("editor.js");
-        $this->getPage()->addScript("dropzone.js");
         $this->getPage()->addScript("upload.js");
         $this->getPage()->addScript(lang_js());
         $this->getPage()->display($page_body, $this->blog);
@@ -947,11 +947,10 @@ class WebPages extends BasePages {
             $body .= "</h3>";
         }
 
+        $this->getPage()->addPackage('dropzone');
         $this->getPage()->addStylesheet("form.css");
-        $this->getPage()->addStylesheet("dropzone.css");
         $this->getPage()->title = _("Upload file");
         $this->getPage()->addScript(lang_js());
-        $this->getPage()->addScript('dropzone.js');
         $this->getPage()->addScript('upload.js');
         $this->getPage()->display($body, $this->blog);
     }

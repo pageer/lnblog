@@ -695,30 +695,28 @@ function getlink($name, $type=false) {
 
     $blog = NewBlog();
 
-    # Check the blog directory
-    if ( defined("BLOG_ROOT") &&
-         file_exists(BLOG_ROOT.PATH_DELIM.$l_type.PATH_DELIM.$name) ) {
+    $url_map = [];
+    if (defined("BLOG_ROOT")) {
+        $url_map[Path::mk(BLOG_ROOT, $l_type, $name)] = 
+            $blog->uri('base').$l_type."/".$name;
+        $url_map[Path::mk(BLOG_ROOT, "third-party", $l_type, $name)] = 
+            $blog->uri('base')."third-party/$l_type/$name";
+    }
+    $url_map[Path::mk(USER_DATA_PATH, "themes", THEME_NAME, $l_type, $name)] =
+        INSTALL_ROOT_URL.USER_DATA."/themes/".THEME_NAME."/$l_type/$name";
+    $url_map[Path::mk(INSTALL_ROOT, "themes", THEME_NAME, $l_type, $name)] =
+        INSTALL_ROOT_URL."themes/".THEME_NAME."/$l_type/$name";
+    $url_map[Path::mk(INSTALL_ROOT, "themes", "default", $l_type, $name)] =
+        INSTALL_ROOT_URL."themes/default/$l_type/$name";
+    $url_map[Path::mk(INSTALL_ROOT, "third-party", $l_type, $name)] =
+        INSTALL_ROOT_URL."third-party/$l_type/$name";
 
-        $ret = $blog->uri('base').$l_type."/".$name;
-
-    # Try the userdata directory
-    } elseif ( file_exists(USER_DATA_PATH.PATH_DELIM."themes".PATH_DELIM.THEME_NAME.
-                           PATH_DELIM.$l_type.PATH_DELIM.$name) ) {
-        $ret = INSTALL_ROOT_URL.USER_DATA."/themes/".THEME_NAME."/".$l_type."/".$name;
-
-    # Check the current theme directory
-    } elseif ( file_exists(INSTALL_ROOT.PATH_DELIM."themes".PATH_DELIM.THEME_NAME.
-                           PATH_DELIM.$l_type.PATH_DELIM.$name) ) {
-        $ret = INSTALL_ROOT_URL."themes/".THEME_NAME."/".$l_type."/".$name;
-
-    # Try the default theme
-    } elseif ( file_exists(
-                 mkpath(INSTALL_ROOT,"themes","default",$l_type,$name) ) ) {
-        $ret = INSTALL_ROOT_URL."themes/default/".$l_type."/".$name;
-
-    # Last case: nothing found, so return the original string.
-    } else {
-        $ret = $name;
+    $ret = $name;
+    foreach ($url_map as $path => $url) {
+        if (file_exists($path)) {
+            $ret = $url;
+            break;
+        }
     }
 
     $urlinfo = parse_url($ret);

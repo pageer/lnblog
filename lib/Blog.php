@@ -1039,8 +1039,11 @@ class Blog extends LnBlogObject implements AttachmentContainer {
         # get a copy of the config.php created here.
         $wrappers = new WrapperGenerator($this->fs);
         $ret = $wrappers->createDirectoryWrappers($this->home_path, WrapperGenerator::BLOG_BASE, $inst_path);
-        if (! is_array($ret)) return false;
-        else $fiels = $ret;
+        if (! is_array($ret)) {
+            return false;
+        } else {
+            $files = $ret;
+        }
 
         # Upgrade the articles.
         $path = Path::mk($this->home_path, BLOG_ARTICLE_PATH);
@@ -1142,10 +1145,28 @@ class Blog extends LnBlogObject implements AttachmentContainer {
             $files = array_merge($files, $ret);
         }
 
+        # Make sure third-part scripts are present
+        $third_party_path = Path::mk($this->home_path, 'third-party');
+        $src_path = Path::mk(INSTALL_ROOT, 'third-party');
+        $root_domain = parse_url(INSTALL_ROOT_URL, PHP_URL_HOST);
+        $blog_domain = parse_url($this->getURL(), PHP_URL_HOST);
+        if ($root_domain != $blog_domain && !$this->fs->is_link($third_party_path)) {
+            if ($this->fs->is_dir($third_party_path)) {
+                $ret = $this->fs->copy_rec($src_path, $third_party_path);
+            } else {
+                $ret = $this->fs->symlink($src_path, $third_party_path);
+            }
+            if (!$ret) {
+                $files[] = $third_party_path;
+            }
+        }
+
         $this->sw_version = PACKAGE_VERSION;
         $this->last_upgrade = date('r');
         $ret = $this->writeBlogData();
-        if (! $ret) $files[] = Path::mk($this->home_path, BLOG_CONFIG_PATH);
+        if (! $ret) {
+            $files[] = Path::mk($this->home_path, BLOG_CONFIG_PATH);
+        }
         $this->raiseEvent("UpgradeComplete");
         return $files;
     }

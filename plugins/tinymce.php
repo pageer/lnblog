@@ -23,12 +23,10 @@ class TinyMCEEditor extends Plugin {
         $this->addOption("theme", _("TinyMCE theme to use"), "advanced", "select",
             array("basic" => _("Basic"), "advanced" => _("Advanced"))
         );
-        $this->addOption("url", _('URL to TinyMCE'), '//cdn.tinymce.com/4/tinymce.min.js');
         parent::__construct();
     }
 
     public function show_editor($selector = '') {
-        Page::instance()->addExternalScript($this->url);
         ob_start();
         ?>
         // <script>
@@ -43,15 +41,13 @@ class TinyMCEEditor extends Plugin {
                     current_text_content = ed.getContent();
                 });
             },
-            theme: "modern",
+            theme: "silver",
             plugins: [
                 "link lists image searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime",
-                "media nonbreaking hr charmap table contextmenu directionality emoticons template paste textcolor ",
-                "preview stylebuttons"
+                "media nonbreaking hr charmap table directionality emoticons template paste preview"
             ],
             browser_spellcheck: true,
             gecko_spellcheck: true,
-            content_css: "css/content.css",
             toolbar: "bold italic underline | style-code | bullist numlist | forecolor backcolor | link image media emoticons | preview",
             removed_menuitems: "newdocument",
             mobile: {
@@ -87,7 +83,7 @@ class TinyMCEEditor extends Plugin {
             // Style buttons plugin from http://blog.ionelmc.ro/2013/10/17/tinymce-formatting-toolbar-buttons/
             tinyMCE.PluginManager.add('stylebuttons', function(editor, url) {
                 ['pre', 'p', 'code', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'].forEach(function(name){
-                    editor.addButton('style-' + name, {
+                    editor.ui.registry.addButton('style-' + name, {
                         tooltip: 'Toggle ' + name,
                         text: name.toUpperCase(),
                         onClick: function() { editor.execCommand('mceToggleFormat', false, name); },

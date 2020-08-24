@@ -438,4 +438,18 @@ $(document).ready(function () {
 		current_text_content = original_text_content;
 		return true;
 	});
+
+    var availableTags = $('#tag_list option').map(function (idx, value) {
+        var val = $(value).val();
+        return val ? val : null;
+    });
+
+    $('#tags').tagit({
+        singleField: true,
+        allowSpaces: true,
+        availableTags: availableTags,
+        placeholderText: strings.editor_tagBoxPlaceholder,
+        showAutocompleteOnFocus: true
+    })
+    $('#tag_list').hide();
 });

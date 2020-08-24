@@ -18,6 +18,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+use LnBlog\Ui\VendorPackages;
+
 /*
 Class: Page
 Represents a web page.  This class is primarily concerned with making sure 
@@ -32,7 +34,6 @@ InitComplete   - Fired after object initialization is complete.
 OnOutput       - Fired when processing for HTML output starts.
 OutputComplete - Fired after the HTML output has been performed.
 */
-
 class Page extends LnBlogObject {
 
     /*
@@ -67,17 +68,17 @@ class Page extends LnBlogObject {
     public $metatags = array();
     public $headers = array();
     public $links = array();
+
+    private $vendor;
     
     public function __construct($ref=null) {
+        $this->vendor = new VendorPackages();
     
         $this->raiseEvent("OnInit");
         $this->display_object = $ref;
 
-        if (LOCAL_JQUERY_NAME) {
-            $this->addScript(LOCAL_JQUERY_NAME);
-        } else {
-            $this->addExternalScript('//code.jquery.com/jquery-1.11.3.min.js');
-        }
+        $this->addPackage('jquery');
+
         $this->addScript("lnblog_lib.js");
         $this->addStylesheet("main.css");
         
@@ -85,23 +86,7 @@ class Page extends LnBlogObject {
         
         $this->raiseEvent("InitComplete");      
     }
-    
-    # Method: includeJqueryUi
-    # Add links to include jQuery UI.
-    public function includeJqueryUi() {
-        if (LOCAL_JQUERYUI_NAME) {
-            $this->addScript(LOCAL_JQUERYUI_NAME);
-        } else {
-            $this->addExternalScript('//code.jquery.com/ui/1.11.4/jquery-ui.min.js');
-        }
-        if (LOCAL_JQUERYUI_THEME_NAME) {
-            $this->addStylesheet(LOCAL_JQUERYUI_THEME_NAME);
-        } else {
-            $theme = defined('JQUERYUI_THEME') ? JQUERYUI_THEME : DEFAULT_JQUERYUI_THEME;
-            $this->addExternalStylesheet("//code.jquery.com/ui/1.11.4/themes/$theme/jquery-ui.css");
-        }
-    }
-    
+
     # Method: instance
     # Get the instance for the page singleton.
     public static function instance() {
@@ -110,6 +95,15 @@ class Page extends LnBlogObject {
             $inst = new Page();
         }
         return $inst;
+    }
+    
+    # Method: addPackage
+    # Adds a third-party package to the page, e.g. jQuery.
+    #
+    # Parameters:
+    # name - The name of the package to add
+    public function addPackage(string $name) {
+        $this->vendor->addPackage($name);
     }
     
     # Method: setDisplayObject
@@ -313,7 +307,9 @@ class Page extends LnBlogObject {
 
         $this->addMeta($content_type, false, "Content-type");
         $this->addMeta(PACKAGE_NAME." ".PACKAGE_VERSION, "generator");
-        
+
+        $this->vendor->addSelectedPackagesToPage($this);
+
         $head = NewTemplate(PAGE_HEAD_TEMPLATE);
         $head->set("DOCTYPE", $this->doctype);
         $head->set("PAGE_TITLE", $this->title);
@@ -323,7 +319,9 @@ class Page extends LnBlogObject {
         $head->set("SCRIPTS",$this->scripts);
         $head->set("LINKS", $this->links);
         
-        if ($blog && is_a($blog, 'Blog')) $blog->exportVars($head);
+        if ($blog && is_a($blog, 'Blog')) {
+            $blog->exportVars($head);
+        }
         $head->set("PAGE_CONTENT", $page_body);
 
         echo $head->process();

@@ -219,6 +219,46 @@ abstract class FS {
     # False on failure, an unspecified non-false value on success.
     public abstract function write_file($path, $contents);
 
+    # Method: copy_rec
+    # Recursively copy a directory.  If called on a file, it will just
+    # copy the file.
+    #
+    # Parameters:
+    # src  - The source directory to copy
+    # dest - The destination directory
+    #
+    # Returns:
+    # True on success, false if any part of the operation (file copy or
+    # directory creation) fails.
+    public function copy_rec($src, $dest) {
+        $ret = true;
+
+        if (! $this->is_dir($src)) {
+            return $this->copy($src, $dest);
+        }
+
+        if (! $this->is_dir($dest)) {
+            $ret = $this->mkdir($dest);
+        }
+
+        if (!$ret) {
+            return $ret;
+        }
+
+        $dirhand = opendir($dir);
+        while ($ret && false !== ( $ent = readdir($dirhand))) {
+            if ($ent == "." || $ent == "..") {
+                continue;
+            }
+            $from_path = $src . DIRECTORY_SEPARATOR . $ent;
+            $to_path = $dest . DIRECTORY_SEPARATOR . $ent;
+            $ret = $this->copy_rec($from_path, $to_path);
+        }
+        closedir($dirhand);
+
+        return $ret;
+    }
+
     # Method: read_file
     # Read a file from disk.
     #
@@ -330,8 +370,20 @@ abstract class FS {
     }
 
     # Method: realpath
-    # Wrapper around native realpath function
+    # Wrapper around native realpath function.
     public function realpath($path) {
         return realpath($path);
+    }
+
+    # Method: is_link
+    # Wrapper around native is_link function.
+    public function is_link($path) {
+        return is_link($path);
+    }
+
+    # Method: symlink
+    # Wrapper around native symlink function.
+    public function symlink($src, $dest) {
+        return symlink($src, $dest);
     }
 }

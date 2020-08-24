@@ -20,5 +20,7 @@ var strings = {
 
     editor_restoreText: "Found unsaved changes for this entry.  Restore them?",
 
+    editor_tagBoxPlaceholder: "Tags for this entry",
+
     upload_droponeText: "Drag-and-drop files or click here to upload"
 };

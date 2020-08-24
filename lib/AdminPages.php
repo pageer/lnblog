@@ -628,7 +628,7 @@ class AdminPages extends BasePages {
 
         $tpl->set("PLUGIN_LIST", $disp_list);
 
-        Page::instance()->includeJqueryUi();
+        Page::instance()->addPackage('jquery-ui');
         Page::instance()->title = spf_("%s Plugin Loading Configuration", PACKAGE_NAME);
         Page::instance()->display($tpl->process());
     }

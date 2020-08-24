@@ -3,10 +3,13 @@
 <project name="LnBlog" default="dist">
 
     <property name="srcDir" value="." />
+    <property name="buildDir" value="${srcDir}/build" />
+    <property name="outputDir" value="${buildDir}/LnBlog-${version}" />
+    <property name="clientOutputDir" value="${outputDir}/third-party" />
 
     <target name="messages">
         <echo msg="Updating translation files..." />
-        <apply executable="xgettext" parallel="true" dir=".">
+        <apply executable="xgettext" parallel="true" dir="${srcDir}">
             <arg value="-LPHP" />
             <arg value="--keyword=_:1" />
             <arg value="--keyword=p_:1" />
@@ -28,23 +31,23 @@
     </target>
 
     <target name="prepare">
-        <echo msg="Making directory ./build" />
-        <mkdir dir="./build" />
+        <echo msg="Making directory ${buildDir}" />
+        <mkdir dir="${buildDir}" />
     </target>
 
 	<target name="docsold" depends="prepare">
 		
 		<echo msg="Creating documentation folder." />
-		<mkdir dir="./build/documentation" />
+        <mkdir dir="${buildDir}/documentation" />
 		
 		<echo msg="Building NaturalDocs 1.52 documentation..." />
-		<exec command="naturaldocs -i . -o HTML build/documentation -p doc_project -ro
+        <exec command="naturaldocs -i . -o HTML ${buildDir}/documentation -p doc_project -ro
 		               -xi vendor -xi build -xi themes -i themes/default" dir="." />
 	</target>
 	<target name="docs" depends="prepare">
 		
 		<echo msg="Creating documentation folder." />
-		<mkdir dir="./build/documentation" />
+        <mkdir dir="${buildDir}/documentation" />
 		
 		<echo msg="Building NaturalDocs 2.x documentation..." />
 		<exec command="naturaldocs doc_project" dir="." />
@@ -52,51 +55,97 @@
 	
     <target name="build" depends="prepare,messages">
         <echo msg="Copying files to build directory..." />
-		<exec command="git clone . ./build/LnBlog-${version}" dir="." />
+        <exec command="git clone . ${outputDir}" dir="." />
 		
 		<echo msg="Installing dependencies with Composer..." />
-		<exec command="composer install --no-dev --no-interaction" dir="./build/LnBlog-${version}" />
+        <exec command="composer install --no-dev --no-interaction" dir="${outputDir}" />
 
-        <!-- This is not yet used - JS dependencies are still external or in-repo. -->
-        <!--
-        <echo msg="Installing JavaScript sependencies with Yarn..." />
-        <exec command="yarn install" dir="./build/LnBlog-${version}" />
-        -->
+        <echo msg="Installing JavaScript sependencies with NPM..." />
+        <exec command="npm install" dir="${outputDir}" />
+
+        <mkdir dir="${clientOutputDir}/" />
+        <copy file="${outputDir}/node_modules/jquery/dist/jquery.min.js" 
+             todir="${clientOutputDir}/scripts/" />
+        <copy file="${outputDir}/node_modules/jquery-datetime-picker/build/jquery.datetimepicker.full.min.js" 
+            tofile="${clientOutputDir}/scripts/jquery.datetime.picker.js" />
+        <copy file="${outputDir}/node_modules/jquery-datetime-picker/build/jquery.datetimepicker.min.css" 
+            tofile="${clientOutputDir}/styles/jquery.datetime.picker.css" />
+        <copy file="${outputDir}/node_modules/jquery-form/dist/jquery.form.min.js" 
+            tofile="${clientOutputDir}/scripts/jquery.form.js" />
+        <copy file="${outputDir}/node_modules/dropzone/dist/min/dropzone.min.js" 
+            tofile="${clientOutputDir}/scripts/dropzone.js" />
+        <copy file="${outputDir}/node_modules/dropzone/dist/min/dropzone.min.css" 
+            tofile="${clientOutputDir}/styles/dropzone.css" />
+        <copy file="${outputDir}/node_modules/jquery-ui-dist/jquery-ui.min.js" 
+            tofile="${clientOutputDir}/scripts/jquery-ui.min.js" />
+        <copy file="${outputDir}/node_modules/jquery-ui-dist/jquery-ui.min.css" 
+            tofile="${clientOutputDir}/styles/jquery-ui.min.css" />
+        <copy file="${outputDir}/node_modules/jquery-ui-dist/jquery-ui.structure.min.css" 
+            tofile="${clientOutputDir}/styles/jquery-ui.structure.min.css" />
+        <copy file="${outputDir}/node_modules/jquery-ui-dist/jquery-ui.theme.min.css" 
+            tofile="${clientOutputDir}/styles/jquery-ui.theme.min.css" />
+        <mkdir dir="${outputDir}/themes/default/styles/images" />
+        <copy todir="${clientOutputDir}/styles/images">
+            <fileset dir="${outputDir}/node_modules/jquery-ui-dist/images">
+                <include name="*.png" />
+            </fileset>
+        </copy>
+        <copy file="${outputDir}/node_modules/tag-it/js/tag-it.min.js" 
+            tofile="${clientOutputDir}/scripts/tag-it.js" />
+        <copy file="${outputDir}/node_modules/tag-it/css/jquery.tagit.css" 
+            tofile="${clientOutputDir}/styles/jquery.tagit.css" />
+        <copy todir="${clientOutputDir}/scripts">
+            <fileset dir="${outputDir}/node_modules/tinymce">
+                <include name="**/*.min.js" />
+                <include name="**/*.min.css" />
+            </fileset>
+        </copy>
+
+        <copy todir="${outputDir}/themes/default/scripts">
+            <fileset dir="${clientOutputDir}/scripts">
+                <include name="**" />
+            </fileset>
+        </copy>
+        <copy todir="${outputDir}/themes/default/styles">
+            <fileset dir="${clientOutputDir}/styles">
+                <include name="**" />
+            </fileset>
+        </copy>
     </target>
 
     <target name="distclean" depends="build">
 		<echo msg="Cleaning up unneeded project files..." />
 		<delete>
-			<fileset dir="./build/LnBlog-${version}">
+            <fileset dir="${outputDir}">
 				<include name=".git*" />
 			</fileset>
 		</delete>
-		<delete dir="./build/LnBlog-${version}/.github" />
-		<delete dir="./build/LnBlog-${version}/tests" />
-		<delete dir="./build/LnBlog-${version}/docs" />
-		<delete dir="./build/LnBlog-${version}/doc_project" />
-		<delete dir="./build/LnBlog-${version}/vendor/erusev/parsedown/test" />
-		<delete dir="./build/LnBlog-${version}/vendor/phpxmlrpc/phpxmlrpc/test" />
-		<delete dir="./build/LnBlog-${version}/vendor/phpxmlrpc/phpxmlrpc/doc" />
-		<delete dir="./build/LnBlog-${version}/vendor/phpxmlrpc/phpxmlrpc/demo" />
-		<delete dir="./build/LnBlog-${version}/vendor/phpxmlrpc/phpxmlrpc/extras" />
+        <delete dir="${outputDir}/.github" />
+        <delete dir="${outputDir}/tests" />
+        <delete dir="${outputDir}/docs" />
+        <delete dir="${outputDir}/doc_project" />
+        <delete dir="${outputDir}/vendor/erusev/parsedown/test" />
+        <delete dir="${outputDir}/vendor/phpxmlrpc/phpxmlrpc/test" />
+        <delete dir="${outputDir}/vendor/phpxmlrpc/phpxmlrpc/doc" />
+        <delete dir="${outputDir}/vendor/phpxmlrpc/phpxmlrpc/demo" />
+        <delete dir="${outputDir}/vendor/phpxmlrpc/phpxmlrpc/extras" />
     </target>
 	
     <target name="dist" depends="distclean">
         <echo msg="Creating archive..." />
 
-        <zip destfile="./build/LnBlog-${version}.zip">
-            <fileset dir="./build/LnBlog-${version}">
+        <zip destfile="${buildDir}/LnBlog-${version}.zip">
+            <fileset dir="${outputDir}">
                 <include name="**" />
             </fileset>
         </zip>
 		
 		<echo msg="Generating checksums..." />
-		<exec command="md5sum LnBlog-${version}.zip" dir="./build" output="./build/LnBlog-${version}.md5"/>
-		<exec command="sha1sum LnBlog-${version}.zip" dir="./build" output="./build/LnBlog-${version}.sha1" />
+        <exec command="md5sum LnBlog-${version}.zip" dir="${buildDir}" output="LnBlog-${version}.md5"/>
+        <exec command="sha1sum LnBlog-${version}.zip" dir="${buildDir}" output="LnBlog-${version}.sha1" />
 		
 		<echo msg="Generating GPG signature..." />
-		<exec command="gpg --output LnBlog-${version}.sig --detach-sign LnBlog-${version}.zip" dir="./build" />
+        <exec command="gpg --output LnBlog-${version}.sig --detach-sign LnBlog-${version}.zip" dir="${buildDir}" />
 
         <echo msg="Dist build complete!" />
     </target>
