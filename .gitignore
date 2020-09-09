@@ -13,6 +13,7 @@ userdata/plugins.xml
 vendor
 build
 node_modules
+third-party
 doc_project/Data
 doc_project/Working Data
 doc_project/*_Backup.txt
