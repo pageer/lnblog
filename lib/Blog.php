@@ -1307,7 +1307,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
         $ret = $ret && $this->createDirectoryIfDoesNotExist($path);
 
         if ($ret) {
-            $result = $wrappers->createDirectoryWrappers($p, WrapperGenerator::BLOG_ENTRIES);
+            $result = $wrappers->createDirectoryWrappers($path, WrapperGenerator::BLOG_ENTRIES);
             $ret = $ret && empty($result);
         }
         $path = Path::get($this->home_path, BLOG_FEED_PATH);
