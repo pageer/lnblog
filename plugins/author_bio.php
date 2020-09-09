@@ -11,7 +11,7 @@ class AuthorBio extends Plugin {
     public $bio;
 
     public function __construct($do_output=false) {
-        $this->plugin_version = '0.1.1';
+        $this->plugin_version = '0.1.2';
         $this->plugin_desc = _('Display information about the author in the sidebar.');
 
         # Option: Sidebar box title
@@ -63,10 +63,10 @@ class AuthorBio extends Plugin {
         .bio_picture img {
             border: 1px solid black;
             box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, .5);
+            max-width: 100%;
         }
         .bio_content {
-            font-size: 80%;
-            text-align: center;
+            margin-top: 1em;
         }
         <?php if (0) { ?></style><?php }
         $ret = ob_get_clean();
