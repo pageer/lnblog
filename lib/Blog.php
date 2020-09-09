@@ -1146,19 +1146,9 @@ class Blog extends LnBlogObject implements AttachmentContainer {
         }
 
         # Make sure third-part scripts are present
-        $third_party_path = Path::mk($this->home_path, 'third-party');
-        $src_path = Path::mk(INSTALL_ROOT, 'third-party');
-        $root_domain = parse_url(INSTALL_ROOT_URL, PHP_URL_HOST);
-        $blog_domain = parse_url($this->getURL(), PHP_URL_HOST);
-        if ($root_domain != $blog_domain && !$this->fs->is_link($third_party_path)) {
-            if ($this->fs->is_dir($third_party_path)) {
-                $ret = $this->fs->copy_rec($src_path, $third_party_path);
-            } else {
-                $ret = $this->fs->symlink($src_path, $third_party_path);
-            }
-            if (!$ret) {
-                $files[] = $third_party_path;
-            }
+        $ret = $this->createThirdPartyClientLibraries();
+        if (!$ret) {
+            $files[] = Path::mk($this->home_path, 'third-party');
         }
 
         $this->sw_version = PACKAGE_VERSION;
@@ -1170,6 +1160,23 @@ class Blog extends LnBlogObject implements AttachmentContainer {
         $this->raiseEvent("UpgradeComplete");
         return $files;
     }
+
+    public function createThirdPartyClientLibraries() {
+        $ret = true;
+        $third_party_path = Path::mk($this->home_path, 'third-party');
+        $src_path = Path::mk(INSTALL_ROOT, 'third-party');
+        $root_domain = parse_url(INSTALL_ROOT_URL, PHP_URL_HOST);
+        $blog_domain = parse_url($this->getURL(), PHP_URL_HOST);
+        if ($root_domain != $blog_domain && !$this->fs->is_link($third_party_path)) {
+            if ($this->fs->is_dir($third_party_path)) {
+                $ret = $this->fs->copy_rec($src_path, $third_party_path);
+            } else {
+                $ret = $this->fs->symlink($src_path, $third_party_path);
+            }
+        }
+        return $ret;
+    }
+
 
     private function shouldWriteEntryDataFile($entry_path) {
         $path = Path::mk($entry_path, ENTRY_DEFAULT_FILE);
@@ -1267,9 +1274,13 @@ class Blog extends LnBlogObject implements AttachmentContainer {
         $p = new Path($path ? $path : $this->home_path);
         $this->home_path = $p->getCanonical();
 
-        $ret = $this->createBlogDirectories($this->fs, INSTALL_ROOT);
+        $ret = $this->createBlogDirectories(INSTALL_ROOT);
 
         $this->setBlogID();
+
+        if ($ret) {
+            $ret = $this->createThirdPartyClientLibraries();
+        }
 
         if ($ret) {
             $this->sw_version = PACKAGE_VERSION;
@@ -1282,36 +1293,34 @@ class Blog extends LnBlogObject implements AttachmentContainer {
         return (bool)$ret;
     }
 
-    private function createBlogDirectories(&$fs, $inst_path) {
+    private function createBlogDirectories($inst_path) {
 
-        $ret = $this->createNonExistentDirectory($fs, $this->home_path);
+        $ret = $this->createDirectoryIfDoesNotExist($this->home_path);
         if ($ret) {
-            $wrappers = new WrapperGenerator($fs);
+            $wrappers = new WrapperGenerator($this->fs);
             $result = $wrappers->createDirectoryWrappers($this->home_path, WrapperGenerator::BLOG_BASE, $inst_path);
             # Returns an array of errors, so convert empty array to true.
             $ret = $ret && empty($result);
         }
 
-        $p = Path::get($this->home_path, BLOG_ENTRY_PATH);
-        $ret = $ret && $this->createNonExistentDirectory($fs, $p);
+        $path = Path::get($this->home_path, BLOG_ENTRY_PATH);
+        $ret = $ret && $this->createDirectoryIfDoesNotExist($path);
 
         if ($ret) {
             $result = $wrappers->createDirectoryWrappers($p, WrapperGenerator::BLOG_ENTRIES);
             $ret = $ret && empty($result);
         }
-        $ret = $ret && $this->createNonExistentDirectory($fs,
-            Path::get($this->home_path, BLOG_FEED_PATH));
+        $path = Path::get($this->home_path, BLOG_FEED_PATH);
+        $ret = $ret && $this->createDirectoryIfDoesNotExist($path);
 
         return $ret;
     }
 
-    private function createNonExistentDirectory(&$fs, $dir) {
-        if (! is_dir($dir) ) {
-            $ret = $fs->mkdir_rec($dir);
-            return $ret;
-        } else {
-            return true;
+    private function createDirectoryIfDoesNotExist($dir) {
+        if (is_dir($dir) ) {
+            return true; 
         }
+        return $this->fs->mkdir_rec($dir);
     }
 
     # Method: update

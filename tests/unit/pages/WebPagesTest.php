@@ -49,6 +49,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->system->canAddTo(Argument::any(), Argument::any())->willReturn(false);
         $this->system->canModify(Argument::any(), Argument::any())->willReturn(false);
         $this->page->addInlineScript(Argument::any());
+        $this->page->addPackage(Argument::any())->willReturn(null);
         $this->user->username()->willReturn('test');
 
         $this->page->display(Argument::containingString("permission denied"), Argument::any())->shouldBeCalled();
@@ -64,6 +65,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->entry->isDraft()->willReturn(true);
         $this->system->canAddTo(Argument::any(), Argument::any())->willReturn(true);
         $this->system->canModify(Argument::any(), Argument::any())->willReturn(true);
+        $this->page->addPackage(Argument::any())->willReturn(null);
 
         $this->page->display(Argument::containingString("textarea"), Argument::any())->shouldBeCalled();
 
@@ -80,6 +82,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->entry->isPublished()->willReturn(false);
         $this->system->canAddTo($this->blog, $this->user)->willReturn(true);
         $this->system->canModify($this->blog, $this->user)->willReturn(false);
+        $this->page->addPackage(Argument::any())->willReturn(null);
 
         $this->page->error(403, "The draft entry asdf does not exist")->shouldBeCalled();
 
@@ -137,6 +140,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->system->canAddTo($this->blog, $this->user)->willReturn(false);
         $this->system->canModify($this->entry, $this->user)->willReturn(true);
         $this->publisher->update($this->entry)->willThrow(new Exception("Update Failure!"));
+        $this->page->addPackage(Argument::any())->willReturn(null);
 
         $this->page->display(Argument::containingString("Update Failure!"), $this->blog)->shouldBeCalled();
 
@@ -177,6 +181,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->system->canAddTo($this->blog, $this->user)->willReturn(false);
         $this->system->canModify($this->entry, $this->user)->willReturn(true);
         $this->page->display(Argument::any(), Argument::any())->willReturn(null);
+        $this->page->addPackage(Argument::any())->willReturn(null);
 
         $this->publisher->update($this->entry, Argument::any())->shouldNotBeCalled();
 
@@ -232,6 +237,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->entry->data = 'This is a test entry';
         $this->entry->get(Argument::any())->willReturn("This is a test entry");
         $this->user->exportVars(Argument::any())->willReturn(null);
+        $this->page->addPackage(Argument::any())->willReturn(null);
 
         $this->page->display(Argument::containingString("This is a test entry"), Argument::any())->shouldBeCalled();
 
@@ -259,6 +265,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->sys_ini->value("entryconfig", 'EditorOnBottom', 0)->willReturn(0);
         $this->sys_ini->value("entryconfig", 'AllowInitUpload', 1)->willReturn(1);
         $this->page->refresh(Argument::any(), Argument::any())->willReturn(null);
+        $this->page->addPackage(Argument::any())->willReturn(null);
         $this->publisher->publishEntry(Argument::any())->will(function($args) use ($ping_data) {
             EventRegister::instance()->activateEventFull(null, 'BlogEntry', 'PingbackComplete', $ping_data);
         });
@@ -288,6 +295,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->sys_ini->value("entryconfig", 'EditorOnBottom', 0)->willReturn(0);
         $this->sys_ini->value("entryconfig", 'AllowInitUpload', 1)->willReturn(1);
         $this->page->refresh(Argument::any(), Argument::any())->willReturn(null);
+        $this->page->addPackage(Argument::any())->willReturn(null);
         $this->publisher->publishEntry(Argument::any())->will(function($args) use ($ping_data) {
             EventRegister::instance()->activateEventFull(null, 'BlogEntry', 'PingbackComplete', $ping_data);
         });
@@ -309,6 +317,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->system->canAddTo($this->blog, $this->user)->willReturn(true);
         $this->system->canModify($this->entry, $this->user)->willReturn(true);
         $this->page->refresh(Argument::any(), Argument::any())->willReturn(null);
+        $this->page->addPackage(Argument::any())->willReturn(null);
         $this->publisher->publishEntry(Argument::any())->will(function($args) {
             EventRegister::instance()->activateEventFull(null, 'BlogEntry', 'UploadError', array("Error moving uploaded file"));
         });
@@ -330,6 +339,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->system->canAddTo($this->blog, $this->user)->willReturn(true);
         $this->system->canModify($this->entry, $this->user)->willReturn(true);
         $this->page->refresh(Argument::any(), Argument::any())->willReturn(null);
+        $this->page->addPackage(Argument::any())->willReturn(null);
         $this->publisher->publishEntry(Argument::any())->will(function($args) {
             EventRegister::instance()->activateEventFull(null, 'BlogEntry', 'UploadSuccess');
         });
