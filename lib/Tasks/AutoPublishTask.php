@@ -114,7 +114,7 @@ class AutoPublishTask implements Task {
     private function getPublisher() {
         if (!$this->publisher) {
             $fs = NewFS();
-            $user = NewUser();
+            $user = NewUser($this->entry->uid ?? '');
             $wrappers = new WrapperGenerator($fs);
             $task_manager = new TaskManager();
             $this->publisher = new Publisher($this->blog, $user, $fs, $wrappers, $task_manager);
