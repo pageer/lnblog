@@ -351,8 +351,23 @@ $(document).ready(function () {
 	});
 	
 	// Auto-publish widgets
+	// NOTE: Current release of jQuery DateTimePicker is bugged.
+	// Last update messed up the allowed times so that they start on the current minute.
+	// This is to set them back to "on the hour".
+	var allowedTimes = [];
+	for (var i = 1; i < 24; i++) {
+		allowedTimes.push(i + ':00');
+	}
 	$('#autopublishdate').datetimepicker({
-		format: 'Y-m-d h:i a'
+		format: 'Y-m-d h:i a',
+		hours12: true,
+		allowTimes: allowedTimes,
+		// Last update messed up the selector so that the selected time in the UI is
+		// decremented when you bring it back up.  Possibly related to time zones
+		// and daylight savings time.  In any case, this keeps that from propagating
+		// to the textbox and changing the time you JUST set to an hour earlier.
+		// The UI is still wrong, but I don't care enough to fix that right now.
+		validateOnBlur: false
 	});
 	
 	$('.checktoggle[data-for]').on('change', function() {
