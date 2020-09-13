@@ -1035,6 +1035,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
         $this->raiseEvent("OnUpgrade");
         $inst_path = $this->fs->getcwd();
         $files = array();
+
         # Upgrade the base blog directory first.  All other directories will
         # get a copy of the config.php created here.
         $wrappers = new WrapperGenerator($this->fs);
@@ -1068,6 +1069,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
             $files = array_merge($files, $ret);
         }
 
+        # Upgrade the regular blog entries.
         $path = mkpath($this->home_path, BLOG_ENTRY_PATH);
         $ret = $wrappers->createDirectoryWrappers($path, WrapperGenerator::BLOG_ENTRIES);
         $files = array_merge($files, $ret);
@@ -1115,6 +1117,10 @@ class Blog extends LnBlogObject implements AttachmentContainer {
 
         # Upgrade the drafts.
         $path = Path::mk($this->home_path, BLOG_DRAFT_PATH);
+        $ret = $wrappers->createDirectoryWrappers($path, WrapperGenerator::ENTRY_DRAFTS);
+        $files = array_merge($files, $ret);
+
+        $path = Path::mk($this->home_path, BLOG_DRAFT_PATH);
         $dir_list = $this->fs->scan_directory($path, true);
         foreach ($dir_list as $draft) {
             $ent_path = Path::mk($path, $draft);
@@ -1123,25 +1129,6 @@ class Blog extends LnBlogObject implements AttachmentContainer {
             $ret = $this->migrateAutoPublishIfNeeded($ent_path);
             $files = array_merge($files, $ret);
             $ret = $wrappers->createDirectoryWrappers($ent_path, WrapperGenerator::DRAFT_ENTRY_BASE);
-            $files = array_merge($files, $ret);
-        }
-
-        $path = Path::mk($this->home_path, BLOG_DRAFT_PATH);
-        $ret = $wrappers->createDirectoryWrappers($path, WrapperGenerator::ENTRY_DRAFTS);
-        $files = array_merge($files, $ret);
-
-        $path = Path::mk($this->home_path, BLOG_ARTICLE_PATH);
-        $ret = $wrappers->createDirectoryWrappers($path, WrapperGenerator::BLOG_ARTICLES);
-        $files = array_merge($files, $ret);
-        $dir_list = $this->fs->scan_directory($path, true);
-        foreach ($dir_list as $ar) {
-            $ar_path = $path.PATH_DELIM.$ar;
-            $ret = $this->writeEntryFileIfNeeded($ar_path);
-            $files = array_merge($files, $ret);
-            $cmt_path = $ar_path.PATH_DELIM.ENTRY_COMMENT_DIR;
-            $ret = $wrappers->createDirectoryWrappers($ar_path, WrapperGenerator::ARTICLE_BASE);
-            $files = array_merge($files, $ret);
-            $ret = $wrappers->createDirectoryWrappers($cmt_path, WrapperGenerator::ENTRY_COMMENTS);
             $files = array_merge($files, $ret);
         }
 
@@ -1172,6 +1159,11 @@ class Blog extends LnBlogObject implements AttachmentContainer {
                 $ret = $this->fs->copy_rec($src_path, $third_party_path);
             } else {
                 $ret = $this->fs->symlink($src_path, $third_party_path);
+                # If the symlinking fails (maybe we're running on Windows and lack permissions),
+                # then try to fall back to copying the directory.
+                if (!$ret) {
+                    $ret = $this->fs->copy_rec($src_path, $third_party_path);
+                }
             }
         }
         return $ret;
@@ -1180,7 +1172,11 @@ class Blog extends LnBlogObject implements AttachmentContainer {
 
     private function shouldWriteEntryDataFile($entry_path) {
         $path = Path::mk($entry_path, ENTRY_DEFAULT_FILE);
-        return !$this->fs->file_exists($path);
+        $entry = new BlogEntry($entry_path, $this->fs);
+        if (!$this->fs->file_exists($path) || !$entry->uid) {
+            return $entry;
+        }
+        return false;
     }
 
     private function migrateAutoPublishIfNeeded($entry_path) {
@@ -1225,9 +1221,11 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     }
 
     private function writeEntryFileIfNeeded($entry_path) {
-        if ($this->shouldWriteEntryDataFile($entry_path)) {
-            $this->backupOldFileData($entry_path);
-            $entry = new BlogEntry($entry_path, $this->fs);
+        if ($entry = $this->shouldWriteEntryDataFile($entry_path)) {
+            $this->backupOldFileData($entry);
+            if (!$entry->uid) {
+                $entry->uid = $this->owner;
+            }
             $ret = $entry->writeFileData();
             return $ret ? [] : [$entry->file];
         }

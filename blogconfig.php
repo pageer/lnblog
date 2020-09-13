@@ -787,6 +787,7 @@ if (! defined("INSTALL_ROOT_URL")) {
     $url_path = @parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
     # The index.php may or may not be present - chop it off if it is.
     $url_path = preg_replace('/index\.php$/', '', $url_path);
+    $url_path = localpath_to_uri($url_path);
     define("INSTALL_ROOT_URL", $url_path);
 }
 
