@@ -120,6 +120,7 @@ class WebPages extends BasePages {
         if (has_post()) {
             $inst_root = POST("installroot");
             $inst_url = POST("installrooturl");
+            $blog_url = POST("blogurl");
             $ret = write_file(mkpath(BLOG_ROOT,"pathconfig.php"),
                               pathconfig_php_string($inst_root, $inst_url, $blog_url));
             if (!$ret) {
@@ -130,6 +131,7 @@ class WebPages extends BasePages {
             }
         }
 
+        $tpl->set("BLOG_URL", $blog_url);
         $tpl->set("INST_URL", $inst_url);
         $tpl->set("INST_ROOT", $inst_root);
         $tpl->set("POST_PAGE", current_file());
@@ -1330,7 +1332,7 @@ class WebPages extends BasePages {
         $this->getPage()->display($body, $this->blog);
     }
 
-    function show_base_archives(&$blog) {
+    private function show_base_archives(&$blog) {
 
         $tpl = $this->createTemplate(LIST_TEMPLATE);
 
@@ -1371,7 +1373,7 @@ class WebPages extends BasePages {
         return $tpl->process();
     }
 
-    function show_year_archives(&$blog, $year) {
+    private function show_year_archives(&$blog, $year) {
         $tpl = $this->createTemplate(LIST_TEMPLATE);
 
         if ( strtolower(GET('list')) == 'yes' ) {

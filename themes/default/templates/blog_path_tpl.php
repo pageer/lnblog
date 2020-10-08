@@ -25,7 +25,11 @@
 <input id="installrooturl" name="installrooturl" size="30" value="<?php echo $INST_URL;?>" />
 </div>
 <div>
+<label for="blogurl"><?php p_("URL for this blog"); ?></label>
+<input id="blogurl" name="blogurl" size="30" value="<?php echo $BLOG_URL;?>" />
+</div>
+<div>
 <span class="basic_form_submit"><input name="submit" id="submit" type="submit" value="<?php p_("Submit"); ?>" /></span>
-<span class="basic_form_clear"><input name="clear" id="clear" type="reset" value="<?php p_("Clear"); ?>" /></span>
+<span class="basic_form_clear"><input name="clear" id="clear" type="reset" value="<?php p_("Reset"); ?>" /></span>
 </div>
 </form>
