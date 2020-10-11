@@ -19,7 +19,7 @@ class TinyMCEEditor extends Plugin {
 
     public function __construct() {
         $this->plugin_desc = _("Use TinyMCE for the post editor and file editor.");
-        $this->plugin_version = "0.2.2";
+        $this->plugin_version = "0.3.0";
         $this->addOption("theme", _("TinyMCE theme to use"), "advanced", "select",
             array("basic" => _("Basic"), "advanced" => _("Advanced"))
         );
@@ -35,12 +35,6 @@ class TinyMCEEditor extends Plugin {
         var selector = "<?php echo $selector?>";
         <?php if ($this->theme == 'advanced'): ?>
         var init = {
-            selector: selector || 'textarea#body',
-            setup: function(ed) {
-                ed.on("change", function(e) {
-                    current_text_content = ed.getContent();
-                });
-            },
             theme: "silver",
             plugins: [
                 "link lists image searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime",
@@ -49,6 +43,7 @@ class TinyMCEEditor extends Plugin {
             browser_spellcheck: true,
             gecko_spellcheck: true,
             toolbar: "bold italic underline | style-code | bullist numlist | forecolor backcolor | link image media emoticons | preview",
+            contextmenu: "link linkchecker image imagetools table spellchecker configurepermanentpen",
             removed_menuitems: "newdocument",
             mobile: {
                 theme: 'mobile',
@@ -58,17 +53,19 @@ class TinyMCEEditor extends Plugin {
         };
         <?php else: ?>
         var init = {
-            selector: selector || 'textarea#body',
-            setup: function(ed) {
-                ed.on("change", function(e) {
-                    current_text_content = ed.getContent();
-                });
-            },
             mobile: {
                 theme: 'mobile'
             }
         };
         <?php endif; ?>
+
+        init['selector'] = selector || 'textarea#body',
+        init['setup'] = function(ed) {
+            ed.on("change", function(e) {
+                current_text_content = ed.getContent();
+            });
+        };
+        init['relative_urls'] = false;
 
         var initialize_tinymce = function() {
             var $input_mode = $('#input_mode');
@@ -79,30 +76,6 @@ class TinyMCEEditor extends Plugin {
             if (window.location.href.match('[?&]list=yes')) {
                 return;
             }
-
-            // Style buttons plugin from http://blog.ionelmc.ro/2013/10/17/tinymce-formatting-toolbar-buttons/
-            tinyMCE.PluginManager.add('stylebuttons', function(editor, url) {
-                ['pre', 'p', 'code', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'].forEach(function(name){
-                    editor.ui.registry.addButton('style-' + name, {
-                        tooltip: 'Toggle ' + name,
-                        text: name.toUpperCase(),
-                        onClick: function() { editor.execCommand('mceToggleFormat', false, name); },
-                        onPostRender: function() {
-                            var self = this;
-                            var setup = function() {
-                                editor.formatter.formatChanged(name, function(state) {
-                                    self.active(state);
-                                });
-                            };
-                            if (editor.formatter) {
-                                setup();
-                            } else {
-                                editor.on('init', setup);
-                            }
-                        }
-                    });
-                });
-            });
 
             var setContentFetchInterval = function() {
                 content_fetch_timer = setInterval(function tinymceUpdate() {
