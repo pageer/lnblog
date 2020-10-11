@@ -175,9 +175,9 @@ class BlogComment extends Entry {
         $usr = NewUser();
         if (!$this->uid) $this->uid = $usr->username();
 
-        $basepath = mkpath($entry->localpath(), ENTRY_COMMENT_DIR);
+        $basepath = Path::mk($entry->localpath(), ENTRY_COMMENT_DIR);
 
-        $this->file = mkpath($basepath, $this->getPath($curr_ts).COMMENT_PATH_SUFFIX);
+        $this->file = Path::mk($basepath, $this->getPath($curr_ts).COMMENT_PATH_SUFFIX);
         $this->date = fmtdate(ENTRY_DATE_FORMAT, $curr_ts);
         $this->timestamp = $curr_ts;
         $this->ip = get_ip();
@@ -280,7 +280,7 @@ class BlogComment extends Entry {
         $ent = NewEntry($entid);
         $ret = substr($cmtid, 7);
         $ret .= COMMENT_PATH_SUFFIX;
-        $ret = mkpath($ent->localpath(),ENTRY_COMMENT_DIR,$ret);
+        $ret = Path::mk($ent->localpath(),ENTRY_COMMENT_DIR,$ret);
         $ret = realpath($ret);
         return $ret;
     }

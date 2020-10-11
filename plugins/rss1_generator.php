@@ -180,7 +180,7 @@ class RSS1FeedGenerator extends Plugin {
             $feed = new RSS1();
             $topic = preg_replace('/\W/','',$tag);
             $file = $topic.'_'.$this->feed_file;
-            $path = mkpath($blog->home_path,BLOG_FEED_PATH,$file);
+            $path = Path::mk($blog->home_path,BLOG_FEED_PATH,$file);
             $feed_url = localpath_to_uri($path);
 
             $feed->url = $feed_url;

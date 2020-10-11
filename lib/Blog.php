@@ -297,7 +297,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     */
     public function getDay($year, $month, $day) {
         $fmtday = sprintf("%02d", $day);
-        $month_dir = mkpath(BLOG_ROOT,BLOG_ENTRY_PATH,
+        $month_dir = Path::mk(BLOG_ROOT,BLOG_ENTRY_PATH,
                             $year,sprintf("%02d", $month));
         $day_list = $this->fs->scan_directory($month_dir, true);
         rsort($day_list);
@@ -335,7 +335,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
         $ret = 0;
         foreach ($day_list as $dy) {
             if ( substr($dy, 0, 2) == $fmtday &&
-                 $ent->isEntry(mkpath($month_dir,$dy)) ) {
+                 $ent->isEntry(Path::mk($month_dir,$dy)) ) {
                 $ret++;
             }
         }
@@ -375,7 +375,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
         }
         rsort($ent_list);
         foreach ($ent_list as $ent)
-            $this->entrylist[] = NewBlogEntry(mkpath($curr_dir, $ent));
+            $this->entrylist[] = NewBlogEntry(Path::mk($curr_dir, $ent));
         return $this->entrylist;
     }
 
@@ -1070,7 +1070,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
         }
 
         # Upgrade the regular blog entries.
-        $path = mkpath($this->home_path, BLOG_ENTRY_PATH);
+        $path = Path::mk($this->home_path, BLOG_ENTRY_PATH);
         $ret = $wrappers->createDirectoryWrappers($path, WrapperGenerator::BLOG_ENTRIES);
         $files = array_merge($files, $ret);
         $dir_list = $this->fs->scan_directory($path, true);

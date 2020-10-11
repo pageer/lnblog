@@ -18,7 +18,7 @@ class BlogEntryURIWrapper extends LnBlogObject {
         $ent = $this->object;
         $pretty_file = $ent->calcPrettyPermalink();
         if ($pretty_file)
-            $pretty_file = mkpath(dirname($ent->localpath()),$pretty_file);
+            $pretty_file = Path::mk(dirname($ent->localpath()),$pretty_file);
         if ( file_exists($pretty_file) ) {
             # Check for duplicated entry subjects.
             $base_path = substr($pretty_file, 0, strlen($pretty_file)-5);
@@ -38,7 +38,7 @@ class BlogEntryURIWrapper extends LnBlogObject {
         } else {
             $pretty_file = $ent->calcPrettyPermalink(true);
             if ($pretty_file)
-                $pretty_file = mkpath(dirname($ent->localpath()),$pretty_file);
+                $pretty_file = Path::mk(dirname($ent->localpath()),$pretty_file);
             if ( file_exists($pretty_file) ) {
                 return localpath_to_uri($pretty_file, $this->url_map);
             } else {

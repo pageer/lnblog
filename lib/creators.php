@@ -39,8 +39,8 @@ use Monolog\Handler\StreamHandler;
 # Function: NewFS
 # Creates a new filesystem access object.
 function NewFS() {
-    if ( file_exists(mkpath(USER_DATA_PATH, FS_PLUGIN_CONFIG)) ) {
-        require_once(mkpath(USER_DATA_PATH, FS_PLUGIN_CONFIG));
+    if ( file_exists(Path::mk(USER_DATA_PATH, FS_PLUGIN_CONFIG)) ) {
+        require_once(Path::mk(USER_DATA_PATH, FS_PLUGIN_CONFIG));
     } else {
         if (!defined("FS_PLUGIN")) define("FS_PLUGIN", "nativefs");
     }
@@ -58,7 +58,7 @@ function NewFS() {
 # Create a new PSR logger object.
 function NewLogger() {
     $logger = new Logger('lnblog');
-    $handler = new StreamHandler(mkpath(USER_DATA_PATH, 'application.log'));
+    $handler = new StreamHandler(Path::mk(USER_DATA_PATH, 'application.log'));
     $logger->pushHandler($handler);
     return $logger;
 }

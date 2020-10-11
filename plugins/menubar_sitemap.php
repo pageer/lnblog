@@ -60,8 +60,8 @@ class SiteMap extends Plugin {
         if ( $blog->isBlog() &&
              file_exists(BLOG_ROOT.PATH_DELIM.$this->link_file) ) {
             $map_file = BLOG_ROOT.PATH_DELIM.$this->link_file;
-        } elseif (is_file(mkpath(USER_DATA_PATH,$this->link_file))) {
-            $map_file = mkpath(USER_DATA_PATH,$this->link_file);
+        } elseif (is_file(Path::mk(USER_DATA_PATH,$this->link_file))) {
+            $map_file = Path::mk(USER_DATA_PATH,$this->link_file);
         } else {
             $map_file = '';
         }

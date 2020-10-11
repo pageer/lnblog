@@ -66,17 +66,6 @@ function initialize_session() {
     }
 }
 
-# Function: mkpath
-# A globally accessible convenience function that takes a variable number
-# of arguments and strings them together with PATH_DELIM.
-#
-# Returns:
-# A string with each of the arguments separated by PATH_DELIM.
-function mkpath() {
-    $args = func_get_args();
-    return Path::mk($args);
-}
-
 # Function: get_blog_path
 # A quick global function to define get the path to the current blog even
 # if the BLOG_ROOT constant is not defined.
@@ -95,11 +84,11 @@ function get_blog_path() {
 
 
         if ( defined("SUBDOMAIN_ROOT") &&
-             is_dir(mkpath(SUBDOMAIN_ROOT, $path)) ) {
-            return mkpath(SUBDOMAIN_ROOT, $path);
+             is_dir(Path::mk(SUBDOMAIN_ROOT, $path)) ) {
+            return Path::mk(SUBDOMAIN_ROOT, $path);
         }
 
-        return mkpath(DOCUMENT_ROOT, $path);
+        return Path::mk(DOCUMENT_ROOT, $path);
     } else {
         return false;
     }
@@ -126,8 +115,8 @@ $parent_dir = dirname($curr_dir);
 $dir_names = array('userdata', 'users', 'profiles');
 
 foreach ($dir_names as $dir) {
-    if (is_dir(mkpath($parent_dir, $dir))) {
-        $data_path = mkpath($parent_dir, $dir);
+    if (is_dir(Path::mk($parent_dir, $dir))) {
+        $data_path = Path::mk($parent_dir, $dir);
         define("USER_DATA", $dir);
     }
 }
@@ -135,7 +124,7 @@ foreach ($dir_names as $dir) {
 # Directory name where user data is stored. The standard name is "userdata".
 
 if (! isset($data_path)) {
-    $data_path = mkpath($curr_dir, 'userdata');
+    $data_path = Path::mk($curr_dir, 'userdata');
     define("USER_DATA", "userdata");
 }
 
@@ -143,8 +132,8 @@ if (! isset($data_path)) {
 define("USER_DATA_PATH", $data_path);
 
 $cfg_file = '';
-if (file_exists(mkpath(USER_DATA_PATH, "userconfig.cfg"))) {
-    $cfg_file = mkpath(USER_DATA_PATH, "userconfig.cfg");
+if (file_exists(Path::mk(USER_DATA_PATH, "userconfig.cfg"))) {
+    $cfg_file = Path::mk(USER_DATA_PATH, "userconfig.cfg");
 }
 
 # Look for the userconfig.cfg and define any variables in it.
@@ -173,7 +162,7 @@ define("FS_PLUGIN_CONFIG", "fsconfig.php");
 # Since we were able to include this file, we must already have the installation
 # directory in the path.  So we can just include userdata/fsconfig.php and not
 # have to worry about the exact path.
-@include_once(mkpath(USER_DATA_PATH, FS_PLUGIN_CONFIG));
+@include_once(Path::mk(USER_DATA_PATH, FS_PLUGIN_CONFIG));
 
 if (defined("DOCUMENT_ROOT") && ! is_dir(DOCUMENT_ROOT) &&
     (! defined("CHECK_DOCUMENT_ROOT") || CHECK_DOCUMENT_ROOT == true) ) {
@@ -189,7 +178,7 @@ if (! defined("INSTALL_ROOT")) {
 
 # Check for the file's existence first, because it turns out this is
 # actually faster when the file doesn't exist.
-if (file_exists(mkpath(INSTALL_ROOT,USER_DATA,"userconfig.php")) ) {
+if (file_exists(Path::mk(INSTALL_ROOT,USER_DATA,"userconfig.php")) ) {
     include(USER_DATA."/userconfig.php");
 }
 

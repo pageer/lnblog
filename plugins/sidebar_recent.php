@@ -100,9 +100,9 @@ class Recent extends Plugin {
     function cachepath($new=false) {
         if ($this->cache_base_path) {
             if ($new) {
-                return mkpath($this->cache_base_path, "cache", get_class($this)."_old_output.cache");
+                return Path::mk($this->cache_base_path, "cache", get_class($this)."_old_output.cache");
             } else {
-                return mkpath($this->cache_base_path, "cache", get_class($this)."_new_output.cache");
+                return Path::mk($this->cache_base_path, "cache", get_class($this)."_new_output.cache");
             }
         } else {
             return false;

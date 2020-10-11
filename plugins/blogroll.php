@@ -62,7 +62,7 @@ class Blogroll extends Plugin {
     }
 
     function get_file_path(&$blog) {
-        $file = mkpath($blog->home_path, $this->file);
+        $file = Path::mk($blog->home_path, $this->file);
         if ($this->file && file_exists($file)) return $file;
         else return false;
     }

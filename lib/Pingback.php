@@ -86,9 +86,9 @@ class Pingback extends Trackback {
         $this->ping_date = date("Y-m-d H:i:s T", $ts);
         $this->timestamp = time();
         $this->ip = get_ip();
-        $this->file = mkpath($ent->localpath(), ENTRY_PINGBACK_DIR,
+        $this->file = Path::mk($ent->localpath(), ENTRY_PINGBACK_DIR,
                              $ts.PINGBACK_PATH_SUFFIX);
-        $dir = mkpath($ent->localpath(), ENTRY_PINGBACK_DIR);
+        $dir = Path::mk($ent->localpath(), ENTRY_PINGBACK_DIR);
 
         if (! $this->source) return false;
 
@@ -145,7 +145,7 @@ class Pingback extends Trackback {
         $ent = NewEntry();
         $ret = substr($anchor, 8);
         $ret .= PINGBACK_PATH_SUFFIX;
-        $ret = mkpath($ent->localpath(),ENTRY_PINGBACK_DIR,$ret);
+        $ret = Path::mk($ent->localpath(),ENTRY_PINGBACK_DIR,$ret);
         $ret = $this->fs->realpath($ret);
         return $ret;
     }

@@ -121,7 +121,7 @@ class WebPages extends BasePages {
             $inst_root = POST("installroot");
             $inst_url = POST("installrooturl");
             $blog_url = POST("blogurl");
-            $ret = write_file(mkpath(BLOG_ROOT,"pathconfig.php"),
+            $ret = write_file(Path::mk(BLOG_ROOT,"pathconfig.php"),
                               pathconfig_php_string($inst_root, $inst_url, $blog_url));
             if (!$ret) {
                 $tpl->set("UPDATE_MESSAGE", _("Error updating blog paths."));
@@ -446,8 +446,8 @@ class WebPages extends BasePages {
         $tpl->set("UPLOAD_DESC", _("Upload file to profile") );
 
         # Populate the form with custom profile fields.
-        $priv_path = mkpath(USER_DATA_PATH,$usr->username(),CUSTOM_PROFILE);
-        $cust_path = mkpath(USER_DATA_PATH,CUSTOM_PROFILE);
+        $priv_path = Path::mk(USER_DATA_PATH,$usr->username(),CUSTOM_PROFILE);
+        $cust_path = Path::mk(USER_DATA_PATH,CUSTOM_PROFILE);
         $cust_ini = NewINIParser($priv_path);
         $cust_ini->merge(NewINIParser($cust_path));
 
@@ -877,7 +877,7 @@ class WebPages extends BasePages {
             $target = $this->blog->home_path;
             $blog_files = $this->blog->getAttachments();
             if ($target_under_blog) {
-                $target = mkpath($target, $target_under_blog);
+                $target = Path::mk($target, $target_under_blog);
             }
         }
 

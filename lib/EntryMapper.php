@@ -26,7 +26,7 @@ class EntryMapper {
             if (preg_match($re, $content[0], $matches)) {
                 $dir = $matches[1];
             }
-            $dir = mkpath($dir_path, $dir);
+            $dir = Path::mk($dir_path, $dir);
             return NewEntry($dir);
         }
         return false;

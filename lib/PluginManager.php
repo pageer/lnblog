@@ -244,12 +244,12 @@ class PluginManager {
      */
     function testFile($plug) {
         $paths = array(
-            mkpath(INSTALL_ROOT,'plugins',$plug),
-            mkpath(USER_DATA_PATH,'plugins',$plug),
+            Path::mk(INSTALL_ROOT,'plugins',$plug),
+            Path::mk(USER_DATA_PATH,'plugins',$plug),
         );
         $blog = NewBlog();
         if ($blog->isBlog()) {
-            $paths[] = mkpath($blog->home_path,'plugins',$plug);
+            $paths[] = Path::mk($blog->home_path,'plugins',$plug);
         }
         foreach ($paths as $path) {
             if (file_exists($path)) {

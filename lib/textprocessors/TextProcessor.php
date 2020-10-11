@@ -172,15 +172,15 @@ abstract class TextProcessor {
         $searchpath = array($this->entry->localpath());
         $upload_dirs = explode(",", FILE_UPLOAD_TARGET_DIRECTORIES);
         foreach ($upload_dirs as $dir) {
-            $searchpath[] = mkpath($parent->home_path, $dir);
+            $searchpath[] = Path::mk($parent->home_path, $dir);
         }
         $searchpath[] = $parent->home_path;
         
         $temp_uri = str_replace("/", PATH_DELIM, $uri);
         
         foreach ($searchpath as $path) {
-            if (file_exists(mkpath($path, $temp_uri))) {
-                $uri = localpath_to_uri(mkpath($path, $temp_uri));
+            if (file_exists(Path::mk($path, $temp_uri))) {
+                $uri = localpath_to_uri(Path::mk($path, $temp_uri));
                 break;
             }
         }

@@ -267,9 +267,9 @@ function calculate_server_root($path, $assume_subdomain=false) {
 
 function test_server_root($path, $assume_subdomain=false) {
     $ret = false;
-    $doc_path = mkpath(calculate_document_root(), $path);
+    $doc_path = Path::mk(calculate_document_root(), $path);
     if (defined("SUBDOMAIN_ROOT")) {
-        $sub_path = mkpath(SUBDOMAIN_ROOT, $path);
+        $sub_path = Path::mk(SUBDOMAIN_ROOT, $path);
         if ($doc_path == $sub_path) {
             $ret = $doc_path;
         } elseif ( file_exists($doc_path) && file_exists($sub_path) ) {
@@ -575,9 +575,9 @@ function uri_to_localpath($uri) {
 
         $pos = strpos($url_bits['host'], DOMAIN_NAME);
         $tmp_path = substr($url_bits['host'], 0, $pos - 1);
-        $path = mkpath(SUBDOMAIN_ROOT, $tmp_path, $path);
+        $path = Path::mk(SUBDOMAIN_ROOT, $tmp_path, $path);
     } else {
-        $path = mkpath(DOCUMENT_ROOT, $path);
+        $path = Path::mk(DOCUMENT_ROOT, $path);
     }
 
     $p = new Path($path);
@@ -865,7 +865,7 @@ function get_entry_from_uri($uri) {
         if (preg_match($re, $content[0], $matches)) {
             $dir = $matches[1];
         } else $dir = '';
-        $dir = mkpath($dir_path, $dir);
+        $dir = Path::mk($dir_path, $dir);
         $ent = NewEntry($dir);
 
     # In the future, we will want to add conditions for checking query strings

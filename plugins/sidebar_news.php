@@ -62,7 +62,7 @@ class News extends Plugin {
         $rss2_comments = PluginManager::instance()->plugin_config->value(
             "rss2feedgenerator", "comment_file", "comments.xml");
         $entry_feeds = $ent->isEntry() ?
-                       mkpath($ent->localpath(),ENTRY_COMMENT_DIR) :
+                       Path::mk($ent->localpath(),ENTRY_COMMENT_DIR) :
                        '';
         $entry_feeds_url = $ent->commentlink();
 
@@ -80,22 +80,22 @@ class News extends Plugin {
         # Elements are path, url, RSS version, and "is comment feed".
         if (! $this->feed_url) {
             if ($show_rss2) {
-                $feeds[] = array(mkpath($blog_feeds,$rss2_file),
+                $feeds[] = array(Path::mk($blog_feeds,$rss2_file),
                                         $blog_feeds_url.$rss2_file, 2, false);
             }
             if ($show_rss1) {
-                $feeds[] = array(mkpath($blog_feeds,$rss1_file),
+                $feeds[] = array(Path::mk($blog_feeds,$rss1_file),
                                         $blog_feeds_url.$rss1_file, 1, false);
             }
         } else {
             $feeds[] = array(false, $this->feed_url, 0, false);
         }
         if ($show_rss2) {
-            $feeds[] = array(mkpath($entry_feeds,$rss2_comments),
+            $feeds[] = array(Path::mk($entry_feeds,$rss2_comments),
                                     $entry_feeds_url.$rss2_comments, 2, true);
         }
         if ($show_rss1) {
-            $feeds[] = array(mkpath($entry_feeds,$rss1_comments),
+            $feeds[] = array(Path::mk($entry_feeds,$rss1_comments),
                                     $entry_feeds_url.$rss2_comments, 1, true);
         }
 
@@ -195,9 +195,9 @@ class News extends Plugin {
         $obj_type = strtolower(get_class($param->display_object));
         if ($obj_type == 'blogentry' || $obj_type == 'article') {
             # RSS 2 comments
-            $base_path = mkpath($param->display_object->localpath(),ENTRY_COMMENT_DIR);
-            $rss2_comments_file = mkpath($base_path, $rss2_comments);
-            $rss1_comments_file = mkpath($base_path, $rss1_comments);
+            $base_path = Path::mk($param->display_object->localpath(),ENTRY_COMMENT_DIR);
+            $rss2_comments_file = Path::mk($base_path, $rss2_comments);
+            $rss1_comments_file = Path::mk($base_path, $rss1_comments);
 
             if ($show_rss2 && file_exists($rss2_comments_file) ) {
                 $param->addRSSFeed($param->display_object->uri('base').

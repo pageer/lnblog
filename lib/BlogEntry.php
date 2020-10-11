@@ -181,19 +181,19 @@ class BlogEntry extends Entry implements AttachmentContainer {
 
                 if (is_array($subdir)) {
                     foreach ($subdir as $s) {
-                        $f = mkpath($blog->home_path,$s,$entrypath,$revision);
+                        $f = Path::mk($blog->home_path,$s,$entrypath,$revision);
                         if ($this->fs->file_exists($f)) $this->file = $f;
                     }
                     if (! $this->file) {
-                        $this->file = mkpath($blog->home_path,$subdir[0],$entrypath,$revision);
+                        $this->file = Path::mk($blog->home_path,$subdir[0],$entrypath,$revision);
                     }
-                } else $this->file = mkpath($blog->home_path,$subdir,$entrypath,$revision);
+                } else $this->file = Path::mk($blog->home_path,$subdir,$entrypath,$revision);
 
 
             } else {
                 # If we don't have a short entry ID, assume it's a global ID.
                 $entrypath = test_server_root($entrypath);
-                $this->file = mkpath($entrypath,$revision);
+                $this->file = Path::mk($entrypath,$revision);
             }
 
             if (! $this->fs->file_exists($this->file)) {
@@ -222,7 +222,7 @@ class BlogEntry extends Entry implements AttachmentContainer {
     # property if that does exist.
     public function tryOldFileName() {
         $tmpfile = dirname($this->file);
-        $tmpfile = mkpath($tmpfile,"current.htm");
+        $tmpfile = Path::mk($tmpfile,"current.htm");
         if ($this->fs->file_exists($tmpfile)) {
             $this->file = $tmpfile;
         }
@@ -323,16 +323,16 @@ class BlogEntry extends Entry implements AttachmentContainer {
         # absolutizing.
         # No slash = relative to entry directory.
         if (strpos($enc, '/') === false) {
-            $path = mkpath($this->localpath(), $enc);
+            $path = Path::mk($this->localpath(), $enc);
 
         # Slash but not at start = relative to blog directory
         } elseif (! strpos($enc, ':') && substr($enc, 1, 1) != '/') {
             $blog = $this->getParent();
-            $path = mkpath($blog->home_path, $enc);
+            $path = Path::mk($blog->home_path, $enc);
 
         # Slash at start, no colon = root-relatice path
         } elseif (! strpos($enc, ':') && substr($enc, 1, 1) == '/') {
-            $path = mkpath(DOCUMENT_ROOT, $enc);
+            $path = Path::mk(DOCUMENT_ROOT, $enc);
         } else {
             $path = uri_to_localpath($enc);
         }
@@ -769,7 +769,7 @@ class BlogEntry extends Entry implements AttachmentContainer {
         if (PluginManager::instance()->pluginLoaded("RSS2FeedGenerator")) {
             $gen = new RSS2FeedGenerator();
             if ($gen->comment_file) {
-                $feed_uri = localpath_to_uri(mkpath($this->localpath(),$gen->comment_file));
+                $feed_uri = localpath_to_uri(Path::mk($this->localpath(),$gen->comment_file));
                 $tmp->set("COMMENT_RSS_ENABLED");
                 $tmp->set("COMMENT_FEED_LINK", $feed_uri);
             }

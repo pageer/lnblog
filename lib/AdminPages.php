@@ -464,7 +464,7 @@ class AdminPages extends BasePages {
         $tpl->set("EMAIL", $email);
         $tpl->set("HOMEPAGE", $homepage);
 
-        $cust_path = mkpath(USER_DATA_PATH,CUSTOM_PROFILE);
+        $cust_path = Path::mk(USER_DATA_PATH,CUSTOM_PROFILE);
         $cust_ini = NewINIParser($cust_path);
         $section = $cust_ini->getSection(CUSTOM_PROFILE_SECTION);
         $tpl->set("CUSTOM_FIELDS", $section);
@@ -705,8 +705,8 @@ class AdminPages extends BasePages {
         Page::instance()->setDisplayObject($usr);
         $usr->exportVars($tpl);
 
-        $priv_path = mkpath(USER_DATA_PATH,$usr->username(),"profile.ini");
-        $cust_path = mkpath(USER_DATA_PATH,"profile.ini");
+        $priv_path = Path::mk(USER_DATA_PATH,$usr->username(),"profile.ini");
+        $cust_path = Path::mk(USER_DATA_PATH,"profile.ini");
         $cust_ini = NewINIParser($priv_path);
         $cust_ini->merge(NewINIParser($cust_path));
 
@@ -714,7 +714,7 @@ class AdminPages extends BasePages {
         $tpl->set("CUSTOM_VALUES", $usr->custom);
 
         $ret = $tpl->process();
-        $user_file = mkpath(USER_DATA_PATH,$uid,"profile.htm");
+        $user_file = Path::mk(USER_DATA_PATH,$uid,"profile.htm");
 
         if (file_exists($user_file)) {
             $ret .= implode("\n", file($user_file));

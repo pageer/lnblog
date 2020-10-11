@@ -232,7 +232,7 @@ class Trackback extends LnBlogObject {
         } else {
             $ts = time();
             $this->ping_date = date("Y-m-d H:i:s T", $ts);
-            $path = mkpath($parent->localpath(), ENTRY_TRACKBACK_DIR,
+            $path = Path::mk($parent->localpath(), ENTRY_TRACKBACK_DIR,
                            $ts.TRACKBACK_PATH_SUFFIX);
             $ret = $this->writeFileData($path);
             if (! $ret) $error = _("Unable to save ping data.");
@@ -431,7 +431,7 @@ class Trackback extends LnBlogObject {
         $ent = NewEntry($entid);
         $ret = substr($tbid, 9);
         $ret .= TRACKBACK_PATH_SUFFIX;
-        $ret = mkpath($ent->localpath(),ENTRY_TRACKBACK_DIR,$ret);
+        $ret = Path::mk($ent->localpath(),ENTRY_TRACKBACK_DIR,$ret);
         $ret = realpath($ret);
         return $ret;
     }

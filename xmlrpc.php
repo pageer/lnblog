@@ -867,12 +867,12 @@ function metaWeblog_newMediaObject($params) {
         $postpath = calculate_document_root().PATH_DELIM.$postpath;
         $entry = NewEntry($postpath);
         if ($entry->isEntry() && System::instance()->canModify($entry,$usr)) {
-            $path = mkpath($entry->localpath(), $name->scalarval());
+            $path = Path::mk($entry->localpath(), $name->scalarval());
         } else {
             return new xmlrpcresp(0, $xmlrpcerruser+3, "Invalid login - cannot add files to this entry");
         }
     } else {
-        $path = mkpath($blog->home_path, $name->scalarval());
+        $path = Path::mk($blog->home_path, $name->scalarval());
     }
     $ret = write_file($path, base64_decode($bits->scalarval()));
 
@@ -918,7 +918,7 @@ function metaWeblog_getCategories($params) {
 
     if ($blog->isBlog()) {
         $arr = array();
-        $base_feed_path = mkpath($blog->home_path,BLOG_FEED_PATH);
+        $base_feed_path = Path::mk($blog->home_path,BLOG_FEED_PATH);
         $base_feed_uri = $blog->uri('base').BLOG_FEED_PATH.'/';
         foreach ($blog->tag_list as $tag) {
             $cat = array();

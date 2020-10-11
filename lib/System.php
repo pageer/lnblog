@@ -164,13 +164,13 @@ class System {
     # Returns:
     # An array of theme names.
     public function getThemeList() {
-        $dir = scan_directory(mkpath(INSTALL_ROOT,"themes"), true);
-        if (is_dir(mkpath(USER_DATA_PATH,"themes"))) {
-            $user_dir = scan_directory(mkpath(USER_DATA_PATH,"themes"), true);
+        $dir = scan_directory(Path::mk(INSTALL_ROOT,"themes"), true);
+        if (is_dir(Path::mk(USER_DATA_PATH,"themes"))) {
+            $user_dir = scan_directory(Path::mk(USER_DATA_PATH,"themes"), true);
             if ($user_dir) $dir = array_merge($dir, $user_dir);
         }
-        if (defined("BLOG_ROOT") && is_dir(mkpath(BLOG_ROOT,"themes"))) {
-            $blog_dir = scan_directory(mkpath(BLOG_ROOT,"themes"), true);
+        if (defined("BLOG_ROOT") && is_dir(Path::mk(BLOG_ROOT,"themes"))) {
+            $blog_dir = scan_directory(Path::mk(BLOG_ROOT,"themes"), true);
             if ($blog_dir) $dir = array_merge($dir, $blog_dir);
         }
         $dir = array_unique($dir);
@@ -332,7 +332,7 @@ class System {
     # at least one existing user in the administrators group, false otherwise.
 
     public function hasAdministrator() {
-        $has_admin = file_exists(mkpath(USER_DATA_PATH,ADMIN_USER,"passwd.php"));
+        $has_admin = file_exists(Path::mk(USER_DATA_PATH,ADMIN_USER,"passwd.php"));
         if (! $has_admin) {
             $users = $this->getUserList();
             foreach ($users as $u) {

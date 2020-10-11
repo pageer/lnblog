@@ -297,8 +297,7 @@ class RSS2FeedGenerator extends Plugin {
             $feed->link_stylesheet = $this->feed_style;
             $feed->link_xslsheet = $this->feed_xsl;
             $topic = preg_replace('/\W/', '', $tag);
-            #$path = mkpath($blog->home_path,BLOG_FEED_PATH,$topic.'_'.$this->feed_file);
-            $path = mkpath($blog->home_path,BLOG_FEED_PATH,$topic.$this->cat_suffix);
+            $path = Path::mk($blog->home_path,BLOG_FEED_PATH,$topic.$this->cat_suffix);
             $feed_url = localpath_to_uri($path);
 
             $feed->url = $feed_url;
