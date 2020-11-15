@@ -39,13 +39,6 @@ spl_autoload_register('class_autoload', false, true);
 ##########################################
 # Section: Essentials
 
-# Constant: USE_CRON_SCRIPT
-# Determines whether tasks should be run asynchronously using cron or
-# some other scheuling system.  If this is false, tasks will be run on
-# page load, which can impact performance and execution time-frame.
-# Note that this affects scheduled publishing, so the default is false.
-define("USE_CRON_SCRIPT", false);
-
 # Constant: PATH_DELIM
 # Alias for DIRECTORY_SEPARATOR
 define("PATH_DELIM", DIRECTORY_SEPARATOR);
@@ -181,6 +174,13 @@ if (! defined("INSTALL_ROOT")) {
 if (file_exists(Path::mk(INSTALL_ROOT,USER_DATA,"userconfig.php")) ) {
     include(USER_DATA."/userconfig.php");
 }
+
+# Constant: USE_CRON_SCRIPT
+# Determines whether tasks should be run asynchronously using cron or
+# some other scheuling system.  If this is false, tasks will be run on
+# page load, which can impact performance and execution time-frame.
+# Note that this affects scheduled publishing, so the default is false.
+@define("USE_CRON_SCRIPT", false);
 
 # Put this definition after we initialize userconfig.cfg, so that it can be
 # changed.
