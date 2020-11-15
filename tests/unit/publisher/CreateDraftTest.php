@@ -44,7 +44,7 @@ class CreateDraftTest extends PublisherTestBase {
 
         $this->assertEquals('billybob', $entry->uid);
         $this->assertEquals($this->getTestTime()->getTimestamp(), $entry->timestamp);
-        $this->assertStringContainsString('2017-01-02 12:34', $entry->date);
+        $this->assertStringContainsString('2017-01-02 12:34', $entry->prettyDate());
     }
 
     public function testCreateDraft_WhenDraftAlreadyExists_Throws() {

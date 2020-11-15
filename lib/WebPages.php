@@ -1581,7 +1581,7 @@ class WebPages extends BasePages {
     protected function draft_item_markup(&$ent) {
         $del_uri = $ent->uri('delete');
         $edit_uri = $ent->uri('editDraft');
-        $title = $ent->subject ? $ent->subject : $ent->date;
+        $title = $ent->subject ? $ent->subject : $ent->prettyDate();
         $date = date("Y-m-d", $ent->post_ts);
         $edit_date = date("Y-m-d", $ent->timestamp);
         $pub_date = $ent->getAutoPublishDate();

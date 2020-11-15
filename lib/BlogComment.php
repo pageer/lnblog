@@ -52,7 +52,6 @@ class BlogComment extends Entry {
         parent::__construct($filesystem ?: NewFS());
         $this->raiseEvent("OnInit");
         $this->ip = get_ip();
-        $this->date = "";
         $this->timestamp = 0;
         $this->subject = "";
         $this->data = "";
@@ -64,11 +63,18 @@ class BlogComment extends Entry {
         $this->show_email = COMMENT_EMAIL_VIEW_PUBLIC;
         $this->exclude_fields = array('exclude_fields', 'metadata_fields',
                                       'file', 'fs');
-        $this->metadata_fields = array("id"=>"postid", "uid"=>"userid",
-            "name"=>"name", "email"=>"e-mail", "url"=>"url",
-            "show_email"=>"show_email", "date"=>"date",
-            "timestamp"=>"timestamp", "post_ts"=>"posttimestamp",
-            "ip"=>"ip", "subject"=>"subject");
+        $this->metadata_fields = array(
+            "id"=>"postid",
+            "uid"=>"userid",
+            "name"=>"name",
+            "email"=>"e-mail",
+            "url"=>"url",
+            "show_email"=>"show_email",
+            "timestamp"=>"timestamp",
+            "post_ts"=>"posttimestamp",
+            "ip"=>"ip",
+            "subject"=>"subject"
+        );
 
         if ( file_exists($this->file) ) {
             $this->readFileData();
@@ -178,7 +184,6 @@ class BlogComment extends Entry {
         $basepath = Path::mk($entry->localpath(), ENTRY_COMMENT_DIR);
 
         $this->file = Path::mk($basepath, $this->getPath($curr_ts).COMMENT_PATH_SUFFIX);
-        $this->date = fmtdate(ENTRY_DATE_FORMAT, $curr_ts);
         $this->timestamp = $curr_ts;
         $this->ip = get_ip();
 

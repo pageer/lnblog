@@ -104,7 +104,6 @@ class BlogEntry extends Entry implements AttachmentContainer {
         $this->metadata_fields = array(
             "id"=>"postid",
             "uid"=>"userid",
-            "date"=>"date",
             "timestamp"=>"timestamp",
             "post_ts"=>"posttimestamp",
             "ip"=>"ip",
@@ -590,7 +589,6 @@ class BlogEntry extends Entry implements AttachmentContainer {
         # Set the timestamp and date, plus the ones for the original post, if
         # this is a new entry.
         $curr_ts = $curr_ts ? $curr_ts : time();
-        $this->date = fmtdate(ENTRY_DATE_FORMAT, $curr_ts);
         $this->timestamp = $curr_ts;
         if (! $this->post_ts) {
             $this->post_ts = $curr_ts;

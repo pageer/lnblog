@@ -139,7 +139,7 @@ class PublishEntryTest extends PublisherTestBase {
         $this->assertEquals('billybob', $entry->uid);
         $this->assertEquals($expected_time, $entry->post_ts);
         $this->assertEquals($expected_time, $entry->timestamp);
-        $this->assertStringContainsString('2017-01-02 12:34', $entry->date);
+        $this->assertStringContainsString('2017-01-02 12:34', $entry->prettyDate());
         $this->assertEquals('1.2.3.4', $entry->ip);
     }
 

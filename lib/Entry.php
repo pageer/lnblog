@@ -31,9 +31,6 @@ abstract class Entry extends LnBlogObject{
     /* The IP address logged for this object at last modification. */
     public $ip = '';
 
-    /* The human-readable date when the object was last modified. */
-    public $date = '';
-
     /* The UNIX timestamp when the object was last modified. */
     public $timestamp = 0;
 
@@ -76,7 +73,6 @@ abstract class Entry extends LnBlogObject{
     public $metadata_fields = array(
         "id"=>"PostID",
         "uid"=>"UserID",
-        "date"=>"Date",
         "timestamp"=>"Timestamp",
         "post_ts"=>"PostTimeStemp",
         "ip"=>"IP",
