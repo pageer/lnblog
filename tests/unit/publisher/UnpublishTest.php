@@ -68,6 +68,7 @@ class UnpublishTest extends PublisherTestBase {
     public function testUnpublish_WhenRenameSucceeds_RemovesPrettyPermalink() {
         $entry = new BlogEntry(null, $this->fs->reveal());
         $entry->subject = 'Test Entry';
+        $entry->permalink_name = 'Test_Entry.php';
         $entry->file = './entries/2017/01/02_1234/entry.xml';
         $entry->post_ts = strtotime('2017-01-02 12:34:00');
         $this->fs->scandir(Argument::any())->willReturn(array());

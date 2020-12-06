@@ -57,10 +57,10 @@ class Breadcrumbs extends Plugin {
                 $ret .= $this->list_wrap($blog->uri('articles'), _("Articles"));
             } elseif (is_numeric($tok) && strlen($tok) == 4) {
                 $year = $tok;
-                $ret .= $this->list_wrap($blog->uri('listyear', $tok), $tok);
+                $ret .= $this->list_wrap($blog->uri('listyear', ['year' => $tok]), $tok);
             } elseif (is_numeric($tok) && strlen($tok) == 2 && isset($year)) {
                 $month = fmtdate("%B", mktime(0,0,0,$tok,1,2000));
-                $ret .= $this->list_wrap($blog->uri('listmonth', $year, $tok), $month);
+                $ret .= $this->list_wrap($blog->uri('listmonth', ['year' => $year, 'month' => $tok]), $month);
             } elseif ($tok == ENTRY_PINGBACK_DIR) {
                 $ret .= $this->list_wrap($ent->uri('pingback'), _("Pingbacks"));
             } elseif ($tok == ENTRY_TRACKBACK_DIR) {
@@ -83,7 +83,7 @@ class Breadcrumbs extends Plugin {
         if (GET('action') == 'tags') {
             $ret .= $this->list_wrap($blog->uri('tags'), _('Tags'));
             if (GET('tag')) {
-                $ret .= $this->list_wrap($blog->uri('tags', htmlspecialchars(GET('tag'))), htmlspecialchars(GET('tag')));
+                $ret .= $this->list_wrap($blog->uri('tags', ['tag' =>htmlspecialchars(GET('tag'))]), htmlspecialchars(GET('tag')));
             }
         }
 

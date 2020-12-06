@@ -48,6 +48,8 @@ class BlogComment extends Entry {
     public $url;
     public $show_email;
 
+    public $parent;
+
     public function __construct ($path = "", $filesystem = null) {
         parent::__construct($filesystem ?: NewFS());
         $this->raiseEvent("OnInit");
@@ -62,7 +64,7 @@ class BlogComment extends Entry {
         $this->has_html = MARKUP_NONE;
         $this->show_email = COMMENT_EMAIL_VIEW_PUBLIC;
         $this->exclude_fields = array('exclude_fields', 'metadata_fields',
-                                      'file', 'fs');
+                                      'file', 'fs', 'url_resolver', 'parent');
         $this->metadata_fields = array(
             "id"=>"postid",
             "uid"=>"userid",
@@ -92,14 +94,6 @@ class BlogComment extends Entry {
             $this->url = $usr->homepage();
         }
         $this->raiseEvent("InitComplete");
-    }
-
-    # Method: uri
-    # Get the URI for various functions.
-
-    public function uri($type) {
-        $uri = create_uri_object($this);
-        return $uri->$type();
     }
 
     /*
@@ -339,11 +333,15 @@ class BlogComment extends Entry {
     A BlogEntry.
     */
     public function getParent() {
-        if (file_exists($this->file)) {
-            return NewEntry(dirname(dirname($this->file)));
-        } else {
-            return NewEntry();
+        if ($this->parent) {
+            return $this->parent;
         }
+        if (file_exists($this->file)) {
+            $ret = NewEntry(dirname(dirname($this->file)));
+        } else {
+            $ret = NewEntry();
+        }
+        return $ret;
     }
 
     /*

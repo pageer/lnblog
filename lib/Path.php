@@ -36,6 +36,7 @@ class Path {
     }
 
     public static function implodePath($sep, $path) {
+        $path = array_filter($path);
         $ret = implode($sep, $path);
         return str_replace($sep.$sep, $sep, $ret);
     }

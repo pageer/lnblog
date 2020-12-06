@@ -16,9 +16,19 @@
     <?php $this->outputCsrfField() ?>
     <?php if (isset($SHOW_BLOG_PATH)): /* for new blogs */ ?>
         <div>
-        <?php $msg = spf_("The path on the server where your blog will be created.  Enter an absolute path or a path relative to the server's document root.  To make the document root a blog, enter %s.  To make a subdomain a blog, enter the subdomain name.", ROOT_ID);?>
+        <?php $msg = _("The unique internal identifier for the blog.");?>
+            <label for="blogid" title="<?php echo $msg?>"><?php p_("Blog ID") ?></label>
+            <input id="blogid" name="blogid"  title="<?php echo $msg?>" value="<?php echo $BLOG_id?>" />
+        </div>
+        <div>
+        <?php $msg = _("The absolute path on the server where your blog will be created.");?>
             <label for="blogpath" title="<?php echo $msg?>"><?php p_("Blog path") ?></label>
-            <input id="blogpath" name="blogpath"  title="<?php echo $msg?>" value="<?php echo $BLOG_PATH_REL?>" />
+            <input id="blogpath" name="blogpath"  title="<?php echo $msg?>" value="<?php echo $BLOG_PATH?>" />
+        </div>
+        <div>
+        <?php $msg = _("The URL of the blog directory (this may depend on your server configuration).");?>
+            <label for="blogurl" title="<?php echo $msg?>"><?php p_("Blog URL") ?></label>
+            <input id="blogurl" name="blogurl"  title="<?php echo $msg?>" value="<?php echo $BLOG_URL?>" />
         </div>
     <?php endif ?>
     <?php if (isset($BLOG_OWNER)):?>

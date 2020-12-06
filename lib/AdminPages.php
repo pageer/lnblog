@@ -155,13 +155,32 @@ class AdminPages extends BasePages {
             $tpl->set("UPGRADE_STATUS", $status);
 
         } elseif ( POST('register') && POST('register_btn') ) {
-            $blog = NewBlog(POST('register'));
+            $error_msg = '';
+            $blogid = POST('register');
+            $blogpath = POST('register_path');
+            $blogurl = POST('register_url');
+            $blog = NewBlog($blogpath);
+            $blog->blogid = $blogid;
+            $path = new UrlPath($blogpath, $blogurl);
+
+            try {
+                $this->validateBlogRegistration($blogid, $blogpath, $blogurl);
+            } catch (Exception $e) {
+                $error_msg = $e->getMessage();
+            }
+
             if (! $blog->isBlog()) {
                 $status = spf_("The path '%s' is not an LnBlog weblog.", POST('register'));
+            } elseif ($error_msg) {
+                $status = $error_msg;
             } else {
-                $ret = System::instance()->registerBlog($blog->blogid);
-                if ($ret) $status = spf_("Blog %s successfully registered.", $blog->blogid);
-                else $status = spf_("Registration error: exited with code %s", $ret);
+                try {
+                    SystemConfig::instance()->registerBlog($blogid, $path);
+                    SystemConfig::instance()->writeConfig();
+                    $status = spf_("Blog %s successfully registered.", $blog->blogid);
+                } catch (FileWriteFailed $e) {
+                    $status = spf_("Registration error: exited with code %s", $ret);
+                }
             }
             $tpl->set("REGISTER_STATUS", $status);
 
@@ -173,7 +192,14 @@ class AdminPages extends BasePages {
                 if (! $blog->isBlog()) {
                     $status = spf_("The path '%s' is not an LnBlog weblog.", POST('delete'));
                 } else {
-                    $ret = System::instance()->unregisterBlog($blog->blogid);
+                    try {
+                        SystemConfig::instance()->unregisterBlog($blog->blogid);
+                        SystemConfig::instance()->writeConfig();
+                        $ret = true;
+                    } catch (FileWriteFailed $e) {
+                        $ret = false
+                    }
+
                     $ret = $ret && $blog->delete();
                     if ($ret) {
                         $status = spf_("Blog %s successfully deleted.", $blog->blogid);
@@ -189,10 +215,8 @@ class AdminPages extends BasePages {
                                   'delete_btn', _('Yes'), 'cancel_btn', _('No'), 'delete', POST('delete'));
             }
         } elseif ( POST('fixperm') && POST('fixperm_btn') ) {
-            $p = new Path();
-            if ($p->isAbsolute(POST('fixperm'))) $fixperm_path = trim(POST('fixperm'));
-            else $fixperm_path = calculate_document_root().PATH_DELIM.trim(POST('fixperm'));
-            $b = NewBlog(POST($fixperm_path));
+            $fixperm_path = trim(POST('fixperm'));
+            $b = NewBlog($fixperm_path);
             $upgrade_status = $b->fixDirectoryPermissions();
             if ($upgrade_status) $status = _("Permission update completed successfully.");
             else $status = spf_("Error: Update exited with status %s.", $upgrade_status);
@@ -354,39 +378,56 @@ class AdminPages extends BasePages {
         $tpl = $this->createTemplate("blog_modify_tpl.php");
         $blog->owner = $usr->username();
 
-        if (POST("blogpath")) $blog->home_path = POST("blogpath");
-        else $blog->home_path = "myblog";
+        if (POST("blogpath")) {
+            $blog->home_path = POST("blogpath");
+        } else {
+            $base_path = dirname(SystemConfig::instance()->installRoot()->path());
+            $blog->home_path = Path::mk($base_path, "myblog");
+        }
+
+        if (POST("blogid")) {
+            $blog->blogid = POST("blogid");
+        } else {
+            $blog->blogid = 'myblog';
+        }
 
         if (has_post()) {
-
             $blog->owner = POST("owner");
             blog_get_post_data($blog);
         }
 
         $tpl->set("SHOW_BLOG_PATH");
-        $tpl->set("BLOG_PATH_REL", $blog->home_path);
+        $tpl->set("BLOG_ID", $blog->blogid);
+        $tpl->set("BLOG_URL", POST("blogurl"));
         $tpl->set("BLOG_OWNER", $blog->owner);
         blog_set_template($tpl, $blog);
         $tpl->set("BLOG_PATH", $blog->home_path);
         $tpl->set("POST_PAGE", current_file());
         $tpl->set("UPDATE_TITLE", _("Create new weblog"));
 
-        # If the user doesn't give us an absolute path, assume it's relative
-        # to the DOCUMENT_ROOT.  We put it down here so that the form data
-        # gets displayed as it was entered.
-        $p = new Path($blog->home_path);
-        if (! $p->isAbsolute($blog->home_path)) {
-            $blog->home_path = Path::mk(calculate_document_root(),$blog->home_path);
-        }
-
         if ( has_post() ) {
+            $blogid = POST('blogid');
+            $blogpath = POST('blogpath');
+            $blogurl = POST('blogurl');
+            $validation_error = '';
+            try {
+                $this->validateBlogRegistration($blogid, $blogpath, $blogurl);
+            } catch (Exception $err) {
+                $validation_error = $err->getMessage();
+            }
             $ret = false;
-            if (strcasecmp(realpath($blog->home_path), realpath(INSTALL_ROOT)) == 0) {
-                $tpl->set("UPDATE_MESSAGE", spf_("The blog path you specified is the same as your %s installation path.  This is not allowed, as it will break your installation.  Please choose a different path for your blog.", PACKAGE_NAME));
+            if ($validation_error) {
+                $tpl->set("UPDATE_MESSAGE", $validation_error);
             } else {
                 $ret = $blog->insert();
                 if ($ret) {
-                    $ret = System::instance()->registerBlog($blog->blogid);
+                    try {
+                        SystemConfig::instance()->registerBlog($blog->blogid, new UrlPath($blog->home_path, $blogurl));
+                        SystemConfig::instance()->writeConfig();
+                        $ret = true;
+                    } catch (FileWriteFailed $e) {
+                        $ret = false;
+                    }
                     if ($ret) {
                         Page::instance()->redirect($blog->getURL());
                         exit;
@@ -819,39 +860,12 @@ class AdminPages extends BasePages {
         return $ret;
     }
 
-    # Check that all required fields have been populated by the user.
-    protected function check_fields() {
-        $errs = array();
-        $plugin = trim(POST('use_ftp'));
-
-        if (trim(POST("docroot")) != '') $errs[] = _("No document root set.");
-
-        $ret = (POST('use_ftp') == 'ftpfs' || POST('use_ftp') == 'nativefs');
-        if (! $ret) $errs[] = _("Invalid file writing mode.");
-
-        $ret = is_numeric(POST('permdir')) && strlen(POST('permdir')) == 4;
-        $ret = $ret && is_numeric(POST('permscript')) && strlen(POST('permscript')) == 4;
-        $ret = $ret && is_numeric(POST('permfile')) && strlen(POST('permfile')) == 4;
-        if (! $ret) $errs[] = _("Invalid permissions specified.");
-
-
-        if ($plugin == 'nativefs') {
-            # Nothing to do?
-        } elseif ($plugin == 'ftpfs') {
-            if (trim(POST('ftp_user')) == '') $errs[] = _("Missing FTP username.");
-            if (trim(POST('ftp_pwd')) == '') $errs[] = _("Missing FTP password.");
-            if (trim(POST('ftp_conf')) == '') $errs[] = _("Missing FTP password confirmation.");
-            if (trim(POST('ftp_host')) == '') $errs[] = _("Missing FTP hostname.");
-
-            if (POST('ftp_pwd') != POST('ftp_conf')) $errs[] = _("FTP passwords do not match.");
-        }
-
-        if (count($errs) > 0) return $errs;
-        else return true;
-    }
-
     protected function template_set_post_data(&$tpl) {
-        $tpl->set("DOC_ROOT", POST("docroot") );
+        $tpl->set('INSTALL_ROOT', POST('installroot'));
+        $tpl->set('INSTALL_ROOT_URL', POST('installrooturl'));
+        $tpl->set('USERDATA', POST('userdata'));
+        $tpl->set('USERDATA_URL', POST('userdataurl'));
+
         if (POST("use_ftp") == "ftpfs") $tpl->set("USE_FTP", POST("use_ftp") );
         $tpl->set("USER", POST("ftp_user") );
         $tpl->set("PASS", POST("ftp_pwd") );
@@ -867,7 +881,7 @@ class AdminPages extends BasePages {
 
     protected function serialize_constants() {
         $ret = '';
-        $consts = array("DOCUMENT_ROOT", "SUBDOMAIN_ROOT", "DOMAIN_NAME",
+        $consts = array(
                         "FS_PLUGIN", "FTPFS_USER",
                         "FTPFS_PASSWORD", "FTPFS_HOST",
                         "FTP_ROOT", "FTPFS_PATH_PREFIX",
@@ -886,7 +900,8 @@ class AdminPages extends BasePages {
     }
 
     public function fssetup() {
-        if ( file_exists(Path::mk(USER_DATA_PATH, FS_PLUGIN_CONFIG)) ) {
+        $config = SystemConfig::instance();
+        if ($config->configExists()) {
             $this->redirect('index');
         }
 
@@ -899,64 +914,102 @@ class AdminPages extends BasePages {
         if (has_post()) {
 
             $this->template_set_post_data($tpl);
-            $field_test = $this->check_fields();
+            
+            $install_root = POST('installroot');
+            $install_root_url = POST('installrooturl');
+            $userdata = POST('userdata');
+            $userdata_url = POST('userdataurl');
+            $error = '';
 
-            # Note that DOCUMENT_ROOT is not strictly required, as all uses
-            # of it should be wrapped in a document root calculation function
-            # for legacy versions.  However....
+            try {
+                $this->validateInstallRootAndUserdata($install_root, $install_root_url, $userdata, $userdata_url);
+                $config->installRoot(new UrlPath($install_root, $install_root_url);
+                $config->userData(new UrlPath($userdata, $userdata_url);
+                $config->writeConfig();
+            } catch (Exception $e) {
+                $error = $e->getMessage();
+            }
 
             define('FS_DEFAULT_MODE', 0);
             define('FS_DIRECTORY_MODE', 0);
             define('FS_SCRIPT_MODE', 0);
             define("FS_PLUGIN", "nativefs");
 
-            $fields = array(
-                "docroot"=>"DOCUMENT_ROOT",
-                "subdomroot"=>"SUBDOMAIN_ROOT",
-                "domain"=>"DOMAIN_NAME",
-            );
-            foreach ($fields as $key=>$val) {
-                if (POST($key)) {
-                    define($val, trim(POST($key)));
-                }
-            }
-
             $content = $this->serialize_constants();
 
-            if ($content) {
+            @$fs = NewFS();
+            $content = str_replace('\\', '\\\\', $content);
 
-                @$fs = NewFS();
-                $content = str_replace('\\', '\\\\', $content);
-
-                # Try to create the fsconfig file.  Suppress error messages so users
-                # don't get scared by expected permissions problems.
-                if (! is_dir(USER_DATA_PATH)) {
-                    @$ret = $fs->mkdir_rec(USER_DATA_PATH);
-                }
-                if (is_dir(USER_DATA_PATH)) {
-                    $ret = $fs->write_file(Path::mk(USER_DATA_PATH, FS_PLUGIN_CONFIG), $content);
-                }
-
-                if ( $ret) {
-                    $this->redirect("index");
-                } else {
-                    $tpl->set("FORM_MESSAGE", sprintf(
-                        _("Error: Could not create fsconfig.php file.  Make sure that the directory %s exists on the server and is writable to the web server user."), USER_DATA_PATH));
-                }
-
-            } else {
-                if (! $tpl->varSet("FORM_MESSAGE") ) {
-                    $tpl->set("FORM_MESSAGE", _("Unexpected error: missing data?"));
+            if (! is_dir($config->userData())) {
+                $ret = $fs->mkdir_rec($config->userData());
+                if (!$ret) {
+                    $error = _("Unable to create directory %s", $userdata);
                 }
             }
 
-        } else {
-            $tpl->set("HOST", "localhost");
-            $tpl->set("DOC_ROOT", calculate_document_root() );
+            if (is_dir($config->userData())) {
+                $ret = $fs->write_file(Path::mk($config->userData(), FS_PLUGIN_CONFIG), $content);
+                if (!$ret) {
+                    $error = _("Unable to create directory %s/%s", $userdata, FS_PLUGIN_CONFIG);
+                }
+            }
+
+            if (!$error) {
+                $this->redirect("index");
+            } else {
+                $tpl->set("FORM_MESSAGE", spf_("Error: ", $error));
+            }
         }
 
         $body = $tpl->process();
         Page::instance()->addStylesheet("form.css");
         Page::instance()->display($body);
+    }
+
+    private function validateBlogRegistration(string $blogid, string $path, string $url) {
+        $realpath = $this->fs->realpath($path);
+        $registry = SystemConfig::instance()->blogRegistry();
+        $install_root = SystemConfig::instance()->installRoot();
+        $userdata = SystemConfig::instance()->userData();
+
+        if (isset($registry[$blogid])) {
+            throw new Exception(spf_("Blog ID '%s' is already registered", $blogid));
+        }
+
+        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+            throw new Exception(spf_("The URL '%s' is not a valid URL", $url));
+        }
+
+        if ($realpath == $this->fs->realpath($install_root)) {
+            throw new Exception(spf_("The blog path you specified is the same as your %s installation path.  This is not allowed, as it will break your installation.  Please choose a different path for your blog.", PACKAGE_NAME));
+        }
+
+        if ($realpath == $this->fs->realpath($userdata)) {
+            throw new Exception(spf_("The blog path you specified is the same as your %s userdata path.  This is not supported.", PACKAGE_NAME));
+        }
+
+        foreach ($registry as $blogid => $urlpath) {
+            $blog_path = $this->fs->realpath($urlpath->path());
+            if ($realpath == $blog_path) {
+                throw new Exception(spf_("The blog path '%s' is already registered.", $path));
+            }
+            if ($url == $urlpath->url()) {
+                throw new Exception(spf_("The blog URL '%s' is already registered.", $url));
+            }
+        }
+    }
+
+    private function validateInstallRootAndUserdata(string $install_root, string $install_root_url, string $userdata, string $userdata_url) {
+        if (!$this->file_exists(Path::mk($install_root, 'blogconfig.php'))) {
+            throw new Exception(spf_("The path '%s' is not a valid %s installation", $install_root, PACKAGE_NAME));
+        }
+
+        if (!filter_var($install_root_url, FILTER_VALIDATE_URL)) {
+            throw new Exception(sfp_("The URL '%s' is not valid", $install_root_url));
+        }
+
+        if (!filter_var($userdata_url, FILTER_VALIDATE_URL)) {
+            throw new Exception(sfp_("The URL '%s' is not valid", $userdata_url));
+        }
     }
 }

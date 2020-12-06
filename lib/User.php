@@ -614,7 +614,8 @@ class User extends LnBlogObject {
         $blog = NewBlog();
         if ($this->fs->file_exists($this->getPath("index.php"))) {
             $qs = $blog->isBlog() ? array('blog'=>$blog->blogid) : false;
-            $ret = make_uri(localpath_to_uri($this->getPath('')), $qs);
+            $resolver = new UrlResolver();
+            $ret = $resolver->localpathToUri($this->getPath(''));
         } else {
             $qs = array("action" => "profile", "user"=>$this->username);
             if ($blog->isBlog()) {
@@ -658,7 +659,7 @@ class User extends LnBlogObject {
     }
 
     private function getPath($file, $username = '') {
-        $user_data_path = $this->config('USER_DATA_PATH');
+        $user_data_path = SystemConfig::instance()->userData()->path();
         if (!$username) {
             $username = $this->username;
         }

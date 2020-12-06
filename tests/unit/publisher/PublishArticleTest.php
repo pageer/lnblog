@@ -303,7 +303,7 @@ class PublishArticleTest extends PublisherTestBase {
     }
 
     private function getTestDraftEntry() {
-        $entry = new BlogEntry(null, $this->fs->reveal());
+        $entry = new BlogEntry(null, $this->fs->reveal(), null, $this->resolver->reveal());
         $entry->file = './drafts/02_1234/entry.xml';
         $entry->article_path = 'some_stuff';
         return $entry;
@@ -311,12 +311,15 @@ class PublishArticleTest extends PublisherTestBase {
 
     private function setUpTestArticleForSuccessfulPublish() {
         $entry = $this->getTestDraftEntry();
+        $this->resolver->localpathToUri(Argument::any(), Argument::any(), Argument::any())->willReturnArgument(0);
+        $this->resolver->generateRoute(Argument::any(), Argument::any(), Argument::any())->willReturnArgument(0);
         $fs = $this->fs;
         $fs->file_exists('./drafts/02_1234/entry.xml')->willReturn(true);
         $fs->realpath('./drafts/02_1234/entry.xml')->willReturn('./drafts/02_1234/entry.xml');
         $fs->file_exists('./content/some_stuff/sticky.txt')->willReturn(false);
         $fs->is_dir('./content')->willReturn(true);
         $fs->is_dir('./content/some_stuff')->willReturn(false);
+        $fs->file_exists('./content/some_stuff/')->willReturn(false);
         $fs->rename('./drafts/02_1234', './content/some_stuff')->will(function($args) use ($fs) {
             $fs->file_exists('./content/some_stuff/entry.xml')->willReturn(true);
             $fs->realpath('./content/some_stuff/entry.xml')->willReturn('./content/some_stuff/entry.xml');

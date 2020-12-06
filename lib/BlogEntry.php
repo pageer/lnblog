@@ -55,12 +55,16 @@ class BlogEntry extends Entry implements AttachmentContainer {
     public $is_sticky = false;
     public $autopublish = false;
     public $autopublish_date = '';
+    public $permalink_name = '';
+    
+    # Note: This is for test injection
+    public $parent = null;
 
     private $filemanager;
 
-    public function __construct($path = "", $filesystem = null, $file_manager = null) {
+    public function __construct($path = "", $filesystem = null, $file_manager = null, UrlResolver $resolver = null) {
         $fs = $filesystem ?: NewFS();
-        parent::__construct($fs);
+        parent::__construct($fs, $resolver);
 
         $this->filemanager = $file_manager ?: new FileManager($this, $fs);
 
@@ -100,6 +104,8 @@ class BlogEntry extends Entry implements AttachmentContainer {
             "template_file",
             "file",
             "fs",
+            "url_resolver",
+            "parent",
         );
         $this->metadata_fields = array(
             "id"=>"postid",
@@ -120,6 +126,7 @@ class BlogEntry extends Entry implements AttachmentContainer {
             "allow_pingback"=>"allowpingback",
             "enclosure"=>"enclosure",
             "is_sticky"=>"is_sticky",
+            "permalink_name" => "permalink_name",
         );
     }
 
@@ -191,7 +198,7 @@ class BlogEntry extends Entry implements AttachmentContainer {
 
             } else {
                 # If we don't have a short entry ID, assume it's a global ID.
-                $entrypath = test_server_root($entrypath);
+                $entrypath = $this->getPathFromGlobalId($entrypath);
                 $this->file = Path::mk($entrypath,$revision);
             }
 
@@ -236,6 +243,9 @@ class BlogEntry extends Entry implements AttachmentContainer {
     A Blog object.
     */
     public function getParent() {
+        if ($this->parent) {
+            return $this->parent;
+        }
         if ($this->fs->file_exists($this->file)) {
             $dir = $this->file;
             # If this is an article, the blog is 3 levels up.
@@ -248,6 +258,7 @@ class BlogEntry extends Entry implements AttachmentContainer {
                 $ret = NewBlog($dir);
             }
         } else $ret = NewBlog();
+        $this->parent = $ret;
         return $ret;
     }
 
@@ -285,12 +296,15 @@ class BlogEntry extends Entry implements AttachmentContainer {
     # A string with the unique ID.
 
     public function globalID() {
-        $root = calculate_server_root($this->file);
-        $ret = dirname($this->file);
-        if (strpos($ret, $root) === 0) {
-            $ret = substr($ret, strlen($root));
+        $blog = $this->getParent();
+        $filepath = $this->fs->realpath(dirname($this->file));
+        $root = $this->fs->realpath($blog->home_path);
+        $ret = substr_replace($filepath, '', 0, strlen($root));
+        $ret = str_replace(Path::$sep, '/', $ret);
+        if (strpos($ret, '/') !== 0) {
+            $ret = '/' . $ret;
         }
-        $ret = str_replace(PATH_DELIM, '/', $ret);
+        $ret = $blog->blogid . $ret;
         return trim($ret, '/');
     }
 
@@ -328,17 +342,13 @@ class BlogEntry extends Entry implements AttachmentContainer {
         } elseif (! strpos($enc, ':') && substr($enc, 1, 1) != '/') {
             $blog = $this->getParent();
             $path = Path::mk($blog->home_path, $enc);
-
-        # Slash at start, no colon = root-relatice path
-        } elseif (! strpos($enc, ':') && substr($enc, 1, 1) == '/') {
-            $path = Path::mk(DOCUMENT_ROOT, $enc);
         } else {
-            $path = uri_to_localpath($enc);
+            $path = $this->url_resolver->uriToLocalpath($enc, $this->getParent());
         }
 
         if ($this->fs->file_exists($path)) {
             $ret = array();
-            $ret['url'] = localpath_to_uri($path);
+            $ret['url'] = $this->url_resolver->localpathToUri($path, $this->getParent());
             $ret['length'] = $this->fs->filesize($path);
             if (extension_loaded("fileinfo")) {
                 $mh = finfo_open(FILEINFO_MIME|FILEINFO_PRESERVE_ATIME);
@@ -566,25 +576,6 @@ class BlogEntry extends Entry implements AttachmentContainer {
         return $this->uri("comment");
     }
 
-    /*
-    Method: uri
-    Gets the URI of the a specified page.
-
-    Parameters:
-    link - The page for which you want the URI.  Valid values are
-           "page", "
-
-    Returns:
-    A string holding the relevant URI.
-    */
-
-    public function uri($type) {
-        $uri = create_uri_object($this);
-        $args = func_get_args();
-
-        return $uri->$type($args);
-    }
-
     public function setDates($curr_ts = null) {
         # Set the timestamp and date, plus the ones for the original post, if
         # this is a new entry.
@@ -613,6 +604,24 @@ class BlogEntry extends Entry implements AttachmentContainer {
     Method: calcPrettyPermalink
     Calculates a file name for a "pretty" permalink wrapper script.
 
+    Returns:
+    The string to be used for the file name.
+    */
+    public function calcPrettyPermalink() {
+        $ret = trim($this->subject);
+        $ret = str_replace(array("'", '"'), "", $ret);
+        $ret = strtolower($ret);
+        $ret = preg_replace("/[^a-z0-9]+/", "-", $ret);
+        $ret = trim($ret, '-');
+        $ret .= ".php";
+        return $ret;
+    }
+
+    /*
+    Method: calcLegacyPermalink
+    Calculates a file name for a "pretty" permalink wrapper script using the
+    old, ugly permalink computation.
+
     Parameters:
     use_broken_regex - *Optional* parameter to calculate the URI based on the
                        ugly regex used in LnBlog < 0.7.  *Defaults* to false.
@@ -620,7 +629,7 @@ class BlogEntry extends Entry implements AttachmentContainer {
     Returns:
     The string to be used for the file name.
     */
-    public function calcPrettyPermalink($use_broken_regex=false) {
+    public function calcLegacyPermalink($use_broken_regex=false) {
         $ret = trim($this->subject);
         if (!$use_broken_regex) {
             $ret = str_replace(array("'", '"'), "_", $ret);
@@ -644,25 +653,16 @@ class BlogEntry extends Entry implements AttachmentContainer {
     */
     public function makePrettyPermalink() {
         $subfile = $this->calcPrettyPermalink();
+        $ret = false;
         if ($subfile) {
             # Put the wrapper in the parent of the entry directory.
             $path = dirname(dirname($this->file));
             $dir_path = basename(dirname($this->file));
             $path = Path::mk($path, $subfile);
-            # Check that there isn't already a file by this name.
-            if ($this->fs->file_exists($path)) {
-                $i = 2;
-                # Get rid of the .php extension
-                $base = substr($path, 0, strlen($path) - 5);
-                while ($this->fs->file_exists($path)) {
-                    $path = $base.$i.".php";
-                    $i++;
-                }
-            }
             $content =  "<?php \$entrypath = dirname(__FILE__).DIRECTORY_SEPARATOR.'".$dir_path."'.DIRECTORY_SEPARATOR; " .
                 "chdir(\$entrypath); include \$entrypath.'index.php';";
             $ret = $this->fs->write_file($path, $content);
-        } else $ret = false;
+        }
         return $ret;
     }
 
@@ -732,7 +732,7 @@ class BlogEntry extends Entry implements AttachmentContainer {
 
         $tagurls = array();
         foreach ($this->tags() as $tag) {
-            $tagurls[htmlspecialchars($tag)] = $blog->uri("tags", urlencode($tag));
+            $tagurls[htmlspecialchars($tag)] = $blog->uri("tags", ['tag' =>urlencode($tag)]);
         }
         $tmp->set("TAG_URLS", $tagurls);
 
@@ -767,7 +767,7 @@ class BlogEntry extends Entry implements AttachmentContainer {
         if (PluginManager::instance()->pluginLoaded("RSS2FeedGenerator")) {
             $gen = new RSS2FeedGenerator();
             if ($gen->comment_file) {
-                $feed_uri = localpath_to_uri(Path::mk($this->localpath(),$gen->comment_file));
+                $feed_uri = $this->url_resolver->localpathToUri(Path::mk($this->localpath(),$gen->comment_file), $this->getParent());
                 $tmp->set("COMMENT_RSS_ENABLED");
                 $tmp->set("COMMENT_FEED_LINK", $feed_uri);
             }
@@ -1174,5 +1174,19 @@ class BlogEntry extends Entry implements AttachmentContainer {
     # reply - The reply object ot insert
     public function addReply($reply) {
         $result = $reply->insert($this);
+    }
+
+    private function getPathFromGlobalId($globalid) {
+        $blogs = SystemConfig::instance()->blogRegistry();
+        foreach ($blogs as $Sblogid => $urlpath) {
+            if (strpos($globalis, $blogid) === 0) {
+                $relpath = substr_replace($globalid, '', 0, strlen($blogid));
+                $path = Path::mk($urlpath->path(), $relpath);
+                if ($this->fs->file_exists($path)) {
+                    return $path;
+                }
+            }
+        }
+        return false;
     }
 }

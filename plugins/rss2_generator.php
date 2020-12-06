@@ -201,20 +201,21 @@ class RSS2FeedGenerator extends Plugin {
     }
 
     function updateCommentRSS2 ($cmt) {
+        $resolver = new UrlResolver();
 
-        #if (method_exists($cmt, 'isComment') && $cmt->isComment()) {
         if (is_a($cmt, "BlogComment")) {
             $parent = $cmt->getParent();
         } else {
             $parent = $cmt;
         }
+        $blog = $parent->getParent();
 
         $feed = new RSS2();
         $feed->link_stylesheet = $this->feed_style;
         $feed->link_xslsheet = $this->feed_xsl;
         $comment_path = $parent->localpath().PATH_DELIM.ENTRY_COMMENT_DIR;
         $path = $comment_path.PATH_DELIM.$this->comment_file;
-        $feed_url = localpath_to_uri($path);
+        $feed_url = $resolver->localpathToUri($path, $blog);
 
         $feed->url = $feed_url;
         #$feed->image = $this->image;
@@ -237,14 +238,14 @@ class RSS2FeedGenerator extends Plugin {
     }
 
     function updateBlogRSS2 (&$entry) {
-
+        $resolver = new UrlResolver();
         $usr = NewUser();
         $feed = new RSS2();
         $feed->link_stylesheet = $this->feed_style;
         $feed->link_xslsheet = $this->feed_xsl;
         $blog = $entry->getParent();
         $path = $blog->home_path.PATH_DELIM.BLOG_FEED_PATH.PATH_DELIM.$this->feed_file;
-        $feed_url = localpath_to_uri($path);
+        $feed_url = $resolver->localpathToUri($path, $blog);
 
         $feed->url = $feed_url;
         $feed->image = $blog->image;
@@ -284,7 +285,7 @@ class RSS2FeedGenerator extends Plugin {
     }
 
     function updateBlogRSS2ByEntryTopic (&$entry) {
-
+        $resolver = new UrlResolver();
         $blog = $entry->getParent();
         $ret = true;
 
@@ -298,7 +299,7 @@ class RSS2FeedGenerator extends Plugin {
             $feed->link_xslsheet = $this->feed_xsl;
             $topic = preg_replace('/\W/', '', $tag);
             $path = Path::mk($blog->home_path,BLOG_FEED_PATH,$topic.$this->cat_suffix);
-            $feed_url = localpath_to_uri($path);
+            $feed_url = $resolver->localpathToUri($path, $blog);
 
             $feed->url = $feed_url;
             $feed->image = $blog->image;

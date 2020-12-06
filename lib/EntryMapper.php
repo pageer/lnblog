@@ -2,13 +2,15 @@
 
 class EntryMapper {
     private $fs = null;
+    private $resolver = null;
 
-    public function __construct(FS $filesystem = null) {
+    public function __construct(FS $filesystem = null, UrlResolver $resolver = null) {
         $this->fs = $filesystem ?: NewFS();
+        $this->resolver = $resolver ?: new UrlResolver(SystemConfig::instance(), $this->fs);
     }
 
     public function getEntryFromUri($uri) {
-        $local_path = uri_to_localpath($uri);
+        $local_path = $this->resolver->uriToLocalpath($uri);
 
         if (is_dir($local_path)) {
             return NewEntry($local_path);

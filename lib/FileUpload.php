@@ -183,8 +183,9 @@ class FileUpload extends LnBlogObject {
         }
         switch ($err) {
             case FILEUPLOAD_NO_ERROR:
+                $resolver = new UrlResolver(SystemConfig::instance(), $this->fs);
                 $ret = spf_("File '<a href=\"%s\">%s</a>' successfully uploaded.",
-                            localpath_to_uri(Path::mk($this->destdir, $this->destname)),
+                            $resolver->absoluteLocalpathToUri(Path::mk($this->destdir, $this->destname)),
                             $this->destname);
                 break;
             case FILEUPLOAD_NO_FILE:

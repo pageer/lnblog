@@ -65,8 +65,8 @@ class WrapperGenerator {
     			if (! $this->fs->file_exists($current."pathconfig.php")) {
     				$inst_root = $this->fs->realpath($instpath);
     				$blog_root = $this->fs->realpath($path);
-    				$inst_url = localpath_to_uri($inst_root);
-    				$blog_url = localpath_to_uri($blog_root);
+    				$inst_url = SystemConfig::instance()->installRoot()->url();
+    				$blog_url = $this->findBlogRoot($blog_root);
     				$config_data = pathconfig_php_string($inst_root, $inst_url, $blog_url);
     				$ret = $this->fs->write_file($current."pathconfig.php", $config_data);
                     if (! $ret) {
@@ -171,4 +171,13 @@ class WrapperGenerator {
         }
     }
 
+    private function findBlogRoot($path) {
+        $registry = SystemConfig::instance()->blogRegistry();
+        foreach ($registry as $blogid => $urlpath) {
+            if ($urlpath->path() == $path) {
+                return $urlpath->url();
+            }
+        }
+        return '';
+    }
 }

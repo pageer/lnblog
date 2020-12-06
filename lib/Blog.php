@@ -47,15 +47,9 @@ use LnBlog\Tasks\TaskManager;
 use LnBlog\Tasks\TaskRepository;
 use Psr\Log\LoggerInterface;
 
-# Constant: ROOT_ID
-# Defines the magic string that denotes a blog on the server's document root.
-# Normally, LnBlog uses the document root-relative path to the blog as the blog
-# identifier, but this is the empty string for the document root.  Therefore,
-# this constant sets a magic value to use.
-@define("ROOT_ID", ".");
-
 class Blog extends LnBlogObject implements AttachmentContainer {
 
+    public $blogid = '';
     public $name = '';
     public $description = '';
     public $home_path = '';
@@ -91,6 +85,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     private $fs;
     private $filemanager;
     private $task_manager;
+    private $url_resolver;
     private $logger;
 
     public function __construct(
@@ -98,10 +93,12 @@ class Blog extends LnBlogObject implements AttachmentContainer {
         $fs = null,
         $file_manager = null,
         TaskManager $task_manager = null,
+        UrlResolver $url_resolver = null,
         LoggerInterface $logger = null
     ) {
         $this->fs = $fs ?: NewFS();
         $this->filemanager = $file_manager ?: new FileManager($this, $this->fs);
+        $this->url_resolver = $url_resolver ?: new UrlResolver(SystemConfig::instance(), $this->fs);
         $this->logger = $logger ?: NewLogger();
         $this->task_manager = $task_manager;
         if (!$task_manager) {
@@ -145,10 +142,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     }
 
     private function getPathFromPassedValue($path) {
-        if ($path == ROOT_ID) {
-            $this->home_path = calculate_document_root();
-            $this->blogid = ROOT_ID;
-        } elseif ($this->fs->is_dir($path)) {
+        if ($this->fs->is_dir($path)) {
             $path = $this->fs->realpath($path);
             $this->home_path = $this->fs->realpath($path);
             $this->setBlogID();
@@ -159,10 +153,17 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     }
 
     private function setBlogID() {
-        $root = calculate_server_root($this->home_path);
-        $this->blogid = trim(substr($this->home_path, strlen($root)),  DIRECTORY_SEPARATOR);
-        if (! $this->blogid) {
-            $this->blogid = ROOT_ID;
+        if ($this->blogid) {
+            return;
+        }
+        $blogs = SystemConfig::instance()->blogRegistry();
+        $homepath = $this->fs->realpath($this->home_path);
+        foreach ($blogs as $blogid => $urlpath) {
+            $blogpath = $this->fs->realpath($urlpath->path());
+            if ($homepath == $blogpath) {
+                $this->blogid = $blogid;
+                return;
+            }
         }
     }
 
@@ -180,12 +181,11 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     }
 
     private function getBlogPath($id) {
-        $system = System::instance();
-        $path = test_server_root($id);
-        if ( ! $this->fs->is_dir($path) ) {
-            return false;
+        $blogs = SystemConfig::instance()->blogRegistry();
+        if (isset($blogs[$id])) {
+            return $blogs[$id]->path();
         }
-        return $path;
+        return false;
     }
 
     /*
@@ -514,35 +514,16 @@ class Blog extends LnBlogObject implements AttachmentContainer {
        Get the URI of the designated resource.
 
         Parameters:
-        type            - The type of URI to get, e.g. permalink, edit link, etc.
-        data parameters - All other parameters after the first are interpreted
-                          as additional data for the URL query string.  The
-                          exact meaning of each parameter depends on the URL type.
+        type   - The type of URI to get, e.g. permalink, edit link, etc.
+        params - All other parameters after the first are interpreted
+                 as additional data for the URL query string.  The
+                 exact meaning of each parameter depends on the URL type.
 
         Returns:
         A string with the permalink.
     */
-    public function uri($type) {
-        $uri = create_uri_object($this);
-
-        $args = array();
-        for ($i=1; $i < func_num_args(); $i++) {
-            $args[$i] = func_get_arg($i);
-        }
-
-        # This is hideously ugly, but convenient based on the need for
-        # backware compatibility.
-        if (func_num_args() == 1) {
-            return $uri->$type();
-        } elseif (func_num_args() == 2) {
-            return $uri->$type($args[1]);
-        } elseif (func_num_args() == 3) {
-            return $uri->$type($args[1], $args[2]);
-        } elseif (func_num_args() == 4) {
-            return $uri->$type($args[1], $args[2], $args[3]);
-        } else {
-            return false;
-        }
+    public function uri($type, $params = []) {
+        return $this->url_resolver->generateRoute($type, $this, $params);
     }
 
     /*
@@ -1022,7 +1003,6 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     This is an upgrade function that will create new config and wrapper
     scripts to upgrade a directory of blog data to the current version.
     The data files will only be modified if required.  Copies of the old
-    files should be left as a backup.
 
     Precondition:
     It is assumed that this function will only be run from the package
@@ -1173,7 +1153,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     private function shouldWriteEntryDataFile($entry_path) {
         $path = Path::mk($entry_path, ENTRY_DEFAULT_FILE);
         $entry = new BlogEntry($entry_path, $this->fs);
-        if (!$this->fs->file_exists($path) || !$entry->uid) {
+        if (!$this->fs->file_exists($path) || !$entry->uid || !$entry->permalink_name) {
             return $entry;
         }
         return false;
@@ -1225,6 +1205,17 @@ class Blog extends LnBlogObject implements AttachmentContainer {
             $this->backupOldFileData($entry);
             if (!$entry->uid) {
                 $entry->uid = $this->owner;
+            }
+            # Update entries that are missing a permalink in the metadata
+            if (!$entry->permalink_name) {
+                $base_path = dirname($entry->file);
+                $permalink = $entry->calcLegacyPermalink();
+                $old_permalink = $entry->calcLegacyPermalink(true);
+                if ($this->fs->file_exists(Path::mk($base_path, $permalink))) {
+                    $entry->permalink_name = $permalink;
+                } elseif ($this->fs->file_exists(Path::mk($base_path, $old_permalink))) {
+                    $entry->permalink_name = $old_permalink;
+                }
             }
             $ret = $entry->writeFileData();
             return $ret ? [] : [$entry->file];

@@ -18,6 +18,7 @@ abstract class PublisherTestBase extends PHPUnit\Framework\TestCase {
         $this->user = $this->prophet->prophesize(User::class);
         $this->fs = $this->prophet->prophesize(FS::class);
         $this->task_manager = $this->prophet->prophesize(TaskManager::class);
+        $this->resolver = $this->prophet->prophesize(UrlResolver::class);
 
         $this->system = $this->prophet->prophesize(System::class);
         $this->sys_ini = $this->prophet->prophesize(INIParser::class);
@@ -65,10 +66,19 @@ abstract class PublisherTestBase extends PHPUnit\Framework\TestCase {
     }
 
     private function setUpEntryForSuccessfulSave($path) {
-        $entry = new BlogEntry(null, $this->fs->reveal());
+        $entry = new BlogEntry(null, $this->fs->reveal(), null, $this->resolver->reveal());
+        $entry->parent = new Blog();
+        $entry->parent->blogid = '.';
+        $entry->parent->home_path = '.';
+        $entry->subject = 'test';
         $entry->file = $path;
+        $this->resolver->localpathToUri(Argument::any(), Argument::any(), Argument::any())->willReturnArgument(0);
+        $this->resolver->generateRoute(Argument::any(), Argument::any(), Argument::any())->willReturnArgument(0);
         $this->fs->file_exists($path)->willReturn(true);
-        $this->fs->realpath($path)->willReturn($path);
+        $this->fs->file_exists(dirname($path))->willReturn(true);
+        $this->fs->file_exists(dirname($path) . '/')->willReturn(true);
+        $this->fs->file_exists(dirname(dirname($path)) . '/test.php')->willReturn(true);
+        $this->fs->realpath(Argument::any())->willReturnArgument(0);
         $this->fs->write_file($path, Argument::any())->willReturn(true);
         return $entry;
     }

@@ -320,9 +320,6 @@ function blogger_editPost($params) {
     $content = $params->getParam(4);
     $publish = $params->getParam(5);
 
-    #$postpath = $postid->scalarval();
-    #if (PATH_DELIM != '/') $postpath = str_replace("/", PATH_DELIM, $postpath);
-    #$postpath = calculate_document_root().PATH_DELIM.$postpath;
     $ent = NewEntry($postid->scalarval());
     $blog = $ent->getParent();
 
@@ -720,9 +717,6 @@ function metaWeblog_editPost($params) {
     $fs = NewFS();
 
     $postpath = $postid->scalarval();
-    if (PATH_DELIM != '/') $postpath = str_replace("/", PATH_DELIM, $postpath);
-    $postpath = calculate_document_root().PATH_DELIM.$postpath;
-
     $ent = NewBlogEntry($postpath);
     $blog = $ent->getParent();
 
@@ -794,9 +788,6 @@ function metaWeblog_getPost($params) {
     $usr = NewUser($uid);
 
     $postpath = $postid->scalarval();
-    if (PATH_DELIM != '/') $postpath = str_replace("/", PATH_DELIM, $postpath);
-    $postpath = calculate_document_root().PATH_DELIM.$postpath;
-
     $ret = false;
 
     # I think we can safely skip the permissions check here, since all the
@@ -862,9 +853,6 @@ function metaWeblog_newMediaObject($params) {
 
     if (! empty($ent)) {
         $postpath = $ent->scalarval();
-        if (PATH_DELIM != '/')
-            $postpath = str_replace("/", PATH_DELIM, $postpath);
-        $postpath = calculate_document_root().PATH_DELIM.$postpath;
         $entry = NewEntry($postpath);
         if ($entry->isEntry() && System::instance()->canModify($entry,$usr)) {
             $path = Path::mk($entry->localpath(), $name->scalarval());
@@ -877,7 +865,8 @@ function metaWeblog_newMediaObject($params) {
     $ret = write_file($path, base64_decode($bits->scalarval()));
 
     if ($ret) {
-        $url = new xmlrpcval(localpath_to_uri($path), 'string');
+        $resolver = new UrlResolver();
+        $url = new xmlrpcval($resolver->localpathToUri($path, $blog), 'string');
         $ret = new xmlrpcresp(new xmlrpcval(array('url'=>$url), 'struct'));
     } else {
         $ret = new xmlrpcresp(0, $xmlrpcerruser+4, "Cannot create file $name");
@@ -925,7 +914,7 @@ function metaWeblog_getCategories($params) {
             $cat['description'] = new xmlrpcval(htmlspecialchars($tag), 'string');
             $cat['categoryName'] = new xmlrpcval(htmlspecialchars($tag), 'string');
             $cat['categoryId'] = new xmlrpcval(htmlspecialchars($tag), 'string');
-            $cat['htmlUrl'] = new xmlrpcval($blog->uri('tags').'?tag='.urlencode($tag), 'string');
+            $cat['htmlUrl'] = new xmlrpcval($blog->uri('tags', ['tag' => urlencode($tag)]), 'string');
 
             $topic = preg_replace('/\W/', '', $tag);
             $rdf_file = $topic.'_'.PluginManager::instance()->plugin_config->value("RSS1FeedGenerator", "feed_file", "news.rdf");

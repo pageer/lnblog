@@ -101,7 +101,7 @@ class SidebarArticlesTest extends \PHPUnit\Framework\TestCase {
         ];
         $this->blog->isBlog()->willReturn(true);
         $this->blog->uri('articles')->willReturn('./content/');
-        $this->blog->uri('editfile', ['file' => 'links.htm'])->willReturn('?editfile=links.htm');
+        $this->blog->uri('editfile', ['file' => 'links.htm'])->willReturn('?action=editfile&file=links.htm');
         $this->blog->getArticleList()->willReturn($list);
         $blog = $this->blog->reveal();
         $user = $this->user->reveal();
@@ -117,7 +117,7 @@ class SidebarArticlesTest extends \PHPUnit\Framework\TestCase {
         $expected = [
             '<ul>',
             '<li><a href="./content/test1">Test1</a></li>',
-            '<li style="margin-top: 0.5em"><a href="?editfile=links.htm">Add custom links</a></li>',
+            '<li style="margin-top: 0.5em"><a href="?action=editfile&file=links.htm">Add custom links</a></li>',
             '</ul>',
         ];
         $this->assertEquals($expected, $this->htmlToLines($output));

@@ -117,6 +117,7 @@ class RSS1FeedGenerator extends Plugin {
     }
 
     function updateCommentRSS1(&$cmt) {
+        $resolver = new UrlResolver();
 
         #if (method_exists($cmt, 'isComment') && $cmt->isComment()) {
         if (is_a($cmt, "BlogComment")) {
@@ -130,9 +131,9 @@ class RSS1FeedGenerator extends Plugin {
         $comment_path = $parent->localpath().PATH_DELIM.ENTRY_COMMENT_DIR;
 
         $path = $comment_path.PATH_DELIM.$this->comment_file;
-        $feed_url = localpath_to_uri($path);
+        $feed_url = $resolver->localpathToUri($path, $blog);
 
-        $feed->url = localpath_to_uri($path);
+        $feed->url = $feed_url;
         #$feed->image = $this->image;
         $feed->title = $parent->subject;
         $feed->description = $parent->subject;
@@ -147,11 +148,11 @@ class RSS1FeedGenerator extends Plugin {
     }
 
     function updateBlogRSS1 ($entry) {
-
+        $resolver = new UrlResolver();
         $feed = new RSS1();
         $blog = $entry->getParent();
         $path = $blog->home_path.PATH_DELIM.BLOG_FEED_PATH.PATH_DELIM.$this->feed_file;
-        $feed_url = localpath_to_uri($path);
+        $feed_url = $resolver->localpathToUri($path, $blog);
 
         $feed->url = $feed_url;
         $feed->image = $blog->image;
@@ -169,7 +170,7 @@ class RSS1FeedGenerator extends Plugin {
     }
 
     function updateBlogRSS1ByEntryTopic ($entry) {
-
+        $resolver = new UrlResolver();
         $blog = $entry->getParent();
         $ret = true;
 
@@ -181,7 +182,7 @@ class RSS1FeedGenerator extends Plugin {
             $topic = preg_replace('/\W/','',$tag);
             $file = $topic.'_'.$this->feed_file;
             $path = Path::mk($blog->home_path,BLOG_FEED_PATH,$file);
-            $feed_url = localpath_to_uri($path);
+            $feed_url = $resolver->localpathToUri($path, $blog);
 
             $feed->url = $feed_url;
             $feed->image = $blog->image;

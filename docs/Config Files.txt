@@ -50,15 +50,6 @@ up LnBlog.  The available settings are described below.
 
 Group: Standard Constants
 
-Constant: DOCUMENT_ROOT
-This is the full local path to the web server's document root, 
-i.e. the root directory from which files are served.  This is not to be
-confused with the doc_root setting in the php.ini file.
-
-This setting is used to convert local paths into URLs.  Basically, this
-path is stripped from the full paths to files and directories to get the 
-path component of the URL.
-
 Constant: FS_PLUGIN
 This determines which filesystem writing method to use.
 Currently, the only supported settings is "nativefs".  Previous versions supported an "ftpfs"
@@ -66,23 +57,6 @@ option in order to bypass safe-mode restrictions.  But since safe-mode has long 
 from PHP, that feature is now deprecated.  It still exists and can be used by setting
 this value and the associated constants below, but it is not avialable from the configuration
 interface and it is not tested.
-
-Group: Subdomain Configuration Constants
-
-These settings are optional.  They are only used if you wish to create blogs on different subdomains than
-the one that LnBlog is installed on.
-
-Constant: SUBDOMAIN_ROOT
-The directory under which subdomain document roots will are located.
-It is expected that subdomains will be under this directory in a folder with the
-name of the subdomain, e.g. if this is "/var/www/hosts" and your domain is
-"example.com", this would assume that the document root for "foobar.example.com" is
-in "/var/www/hosts/foobar".  This is optional and not needed if you don't plan to put
-blogs on different subdomains.
-
-Constant: DOMAIN_NAME
-The main domain name under which subdomains are created.  This is optional and not 
-needed if you don't plan to put blogs on different subdomains.
 
 Group: FTPFS-only Constants
 

@@ -10,6 +10,8 @@ abstract class TextProcessor {
         'MarkdownTextProcessor',
     );
 
+    private $url_resolver;
+
     # Property: text
     # (string) The original, unformatted text.
     protected $text = '';
@@ -97,9 +99,10 @@ abstract class TextProcessor {
         return $filters;
     }
     
-    public function __construct(Entry $entry = null, $text = '') {
+    public function __construct(Entry $entry = null, $text = '', UrlResolver $resolver = null) {
         $this->entry = $entry;
         $this->text = $text;
+        $this->url_resolver = $resolver ?: new UrlResolver(SystemConfig::instance(), NewFS());
     }
     
     /* Method: setText
@@ -178,14 +181,7 @@ abstract class TextProcessor {
         
         $temp_uri = str_replace("/", PATH_DELIM, $uri);
         
-        foreach ($searchpath as $path) {
-            if (file_exists(Path::mk($path, $temp_uri))) {
-                $uri = localpath_to_uri(Path::mk($path, $temp_uri));
-                break;
-            }
-        }
-    
-        return $uri;
+        return $this->url_resolver->localpathToUri($path, $parent, $this->entry);
     }
     
     /* Method: sanitizeText

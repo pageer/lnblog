@@ -10,19 +10,9 @@
 <?php } ?>
 <form method="post" action="<?php echo $POST_PAGE;?>">
 <?php $this->outputCsrfField() ?>
-<?php if (0) { /*Comment out BLOG_ROOT_URL section. */ ?>
 <div>
-<label for="blogrooturl"><?php p_("Blog root URL"); ?></label>
-<input id="blogrooturl" name="blogrooturl" size="30" value="<?php echo $BLOG_URL;?>" />
-</div>
-<?php } ?>
-<div>
-<label for="installroot"><?php p_("LnBlog installation root"); ?></label>
-<input id="installroot" name="installroot" size="30" value="<?php echo $INST_ROOT;?>" />
-</div>
-<div>
-<label for="installrooturl"><?php p_("LnBlog installation URL"); ?></label>
-<input id="installrooturl" name="installrooturl" size="30" value="<?php echo $INST_URL;?>" />
+<label for="blogroot"><?php p_("Blog root path"); ?></label>
+<input id="blogroot" name="blogroot" size="30" value="<?php echo $BLOG_ROOT;?>" />
 </div>
 <div>
 <label for="blogurl"><?php p_("URL for this blog"); ?></label>

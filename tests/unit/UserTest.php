@@ -416,6 +416,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
             'FORCE_HTTPS_LOGIN' => false,
             'USER_DATA_PATH' => 'userdata',
         ];
+        SystemConfig::instance()->userData(new UrlPath('userdata', ''));
         $configs = array_merge($defaults, $configs);
         $this->globals->defined(Argument::any())->will(function ($args) use ($configs) {
             return isset($configs[$args[0]]);

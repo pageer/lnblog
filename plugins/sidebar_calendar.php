@@ -66,20 +66,6 @@ class SidebarCalendar extends Plugin {
         }
         $arr['plugin'] = 'sidebar_calendar';
         return make_uri('index.php', $arr);
-
-        $ret = localpath_to_uri(__FILE__);
-        $urlinfo = parse_url($ret);
-        if ( isset($urlinfo['host']) &&
-             SERVER("SERVER_NAME") != $urlinfo['host'] ) {
-            $blog = NewBlog();
-            $ret = $blog->uri('plugin',
-                              str_replace(".php", "", basename(__FILE__)),
-                              $arr);
-        } else {
-            $ret = make_uri($ret, $arr);
-        }
-
-        return $ret;
     }
 
     function add_style(&$param) {
@@ -105,7 +91,7 @@ class SidebarCalendar extends Plugin {
         for ($i = $prev_days - $first_day + 1; $i <= $prev_days; $i++) {
             $days[] = array('day'=>$i, 'month'=>$tmp_month, 'year'=>$tmp_year,
                             'count'=>$blog->getDayCount($tmp_year, $tmp_month, $i),
-                            'uri'=>$blog->uri('showday', $tmp_year, $tmp_month, $i));
+                            'uri'=>$blog->uri('showday', ['year' => $tmp_year, 'month' => $tmp_month, 'day' => $i]));
         }
 
         # Get an array of the days in the month and the number of entries for
@@ -113,7 +99,7 @@ class SidebarCalendar extends Plugin {
         for ($i = 1; $i <= $num_days; $i++) {
             $days[] = array('day'=>$i, 'month'=>$month, 'year'=>$year,
                             'count'=>$blog->getDayCount($year, $month, $i),
-                            'uri'=>$blog->uri('showday', $year, $month, $i));
+                            'uri'=>$blog->uri('showday', ['year' => $year, 'month' => $month, 'day' => $i]));
         }
 
         # Now fill out the calendar with the ending and starting days of the
@@ -124,7 +110,7 @@ class SidebarCalendar extends Plugin {
         for ($i = 1; $i <= 7 - $last_day; $i++) {
             $days[] = array('day'=>$i, 'month'=>$tmp_month, 'year'=>$tmp_year,
                             'count'=>$blog->getDayCount($tmp_year, $tmp_month, $i),
-                            'uri'=>$blog->uri('showday', $tmp_year, $tmp_month, $i));
+                            'uri'=>$blog->uri('showday', ['year' => $tmp_year, 'month' => $tmp_month, 'day' => $i]));
         }
 
         return $days;
@@ -192,14 +178,14 @@ class SidebarCalendar extends Plugin {
 
         $months = $blog->getMonthList($year);
         if (calendar_binsearch_monthlist($months, $year, $month, 0, count($months))) {
-            $content .= '<a href="'.$blog->uri('listmonth', $year, $month).'">'.
+            $content .= '<a href="'.$blog->uri('listmonth', ['year' => $year, 'month' => $month]).'">'.
                         fmtdate("%B", $date_ts)."</a> ".
-                        '<a href="'.$blog->uri('listyear', $year).'">'.
+                        '<a href="'.$blog->uri('listyear', ['year' => $year]).'">'.
                         fmtdate("%Y", $date_ts).'</a>';
         } else {
             $content .= fmtdate("%B", $date_ts)." ";
             if ($months) {
-                $content .= '<a href="'.$blog->uri('listyear', $year).'">'.fmtdate("%Y", $date_ts).'</a>';
+                $content .= '<a href="'.$blog->uri('listyear', ['year' => $year]).'">'.fmtdate("%Y", $date_ts).'</a>';
             } else {
                 $content .= fmtdate('%Y', $date_ts);
             }

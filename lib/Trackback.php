@@ -51,14 +51,17 @@ class Trackback extends LnBlogObject {
     public $ip;
     public $file;
 
-    public $exclude_fields = array('fs');
+    public $exclude_fields = array('fs', 'parent', 'url_resolver', 'http_client');
+    public $parent = null;
 
     protected $fs;
     protected $http_client;
+    protected $url_resolver;
 
-    public function __construct($path=false, $fs = null, $http_client = null) {
+    public function __construct($path=false, $fs = null, $http_client = null, UrlResolver $resolver = null) {
         $this->fs = $fs ?: NewFS();
-        $this->http_client = $http_client ?: new HttpClient();
+        $this->url_resolver = $resolver ?: new UrlResolver(SystemConfig::instance(), $this->fs);
+         $this->http_client = $http_client ?: new HttpClient();
 
         $this->raiseEvent("OnInit");
 
@@ -101,11 +104,16 @@ class Trackback extends LnBlogObject {
     # A BlogEntry or Article object, depending on the context.
 
     function getParent() {
-        if ($this->fs->file_exists($this->file)) {
-            return NewEntry(dirname(dirname($this->file)));
-        } else {
-            return NewEntry();
+        if ($this->parent) {
+            return $this->parent;
         }
+        if ($this->fs->file_exists($this->file)) {
+            $ret = NewEntry(dirname(dirname($this->file)));
+        } else {
+            $ret = NewEntry();
+        }
+        $this->parent = $ret;
+        return $ret;
     }
 
     # Method: isTrackback
@@ -132,9 +140,8 @@ class Trackback extends LnBlogObject {
     # Method: uri
     # Get the URI for various functions
 
-    function uri($type) {
-        $uri = create_uri_object($this);
-        return $uri->$type();
+    function uri($type, $params = []) {
+        return $this->url_resolver->generateRoute($type, $this, $params);
     }
 
     # Method: getPostData

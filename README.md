@@ -68,10 +68,10 @@ web server.  This makes it easy to pull updates to the code at will.  However, y
 have to manually handle changes to third-party dependencies.  For PHP dependencies, this means
 you will have to run `composer install` to pull in updates.  For JavaScript dependencies,
 you should create a build as described above and recursively copy the contents of the 
-`build/third-party/` directory into `themes/default/` using something like this command:
+`build/third-party/` directory into the root LnBLog directory using something like this command:
 
 ```
-cp -R build/third-party/* themes/default/
+cp -R build/third-party/ . 
 ```
 
 When pulling new changes, you may have to repeat these steps if any of the external 

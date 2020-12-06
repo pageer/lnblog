@@ -133,9 +133,9 @@ class Blogroll extends Plugin {
         if ($this->caption) {
             if ($blog->isBlog()) {
                 $tpl->set('TITLE_LINK',
-                          $blog->uri('plugin',
-                                     str_replace(".php", '', basename(__FILE__)),
-                                     array('show'=>'yes')));
+                          $blog->uri('plugin', [
+                                     'plugin' => str_replace(".php", '', basename(__FILE__)),
+                                     'show'=>'yes']));
             }
             $tpl->set('PANEL_TITLE', $this->caption);
         }

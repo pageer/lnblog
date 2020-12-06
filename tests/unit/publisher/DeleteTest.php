@@ -16,6 +16,7 @@ class DeleteTest extends PublisherTestBase {
         $link_path = './entries/2017/03/Some_Stuff.php';
         $entry = new BlogEntry(null, $this->fs->reveal());
         $entry->subject = 'Some Stuff';
+        $entry->permalink_name = 'Some_Stuff.php';
         $entry->file = $path;
         $this->fs->rmdir_rec(Argument::any())->willReturn(true);
         $this->fs->scandir(Argument::any())->willReturn(array());
@@ -37,6 +38,7 @@ class DeleteTest extends PublisherTestBase {
         $entry = new BlogEntry(null, $this->fs->reveal());
         $entry->subject = 'Some Stuff';
         $entry->file = $path;
+        $entry->permalink_name = 'Some_Stuff.php';
         $this->fs->rmdir_rec(Argument::any())->willReturn(true);
         $this->fs->file_exists($path)->willReturn(true);
         $this->fs->realpath($path)->willReturn($path);

@@ -41,7 +41,16 @@
 </li>
 <li>
 <label for="register"><?php p_("Register a blog with the system") ?></label>
+<br>
+<label for="register"><?php p_("Blog ID") ?></label>
 <input type="text" id="register" name="register" />
+<br>
+<label for="register"><?php p_("Blog path") ?></label>
+<input type="text" id="register_path" name="register_path" />
+<br>
+<label for="register"><?php p_("Blog URL") ?></label>
+<input type="text" id="register_url" name="register_url" />
+<br>
 <input type="submit" id="register_btn" name="register_btn" value="<?php p_("Register") ?>" />
 <?php if (isset($REGISTER_STATUS)) { ?>
 <p><?php pf_("Registration Status: %s", "<strong>".$REGISTER_STATUS."</strong>") ?></p>

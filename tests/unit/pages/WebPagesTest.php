@@ -158,6 +158,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->entry->isEntry()->willReturn(true);
         $this->entry->isPublished()->willReturn(false);
         $this->entry->getAttachments()->willReturn([]);
+        $this->entry->uri(Argument::any())->willReturn('.');
         $this->user->exportVars(Argument::any())->willReturn(null);
         $this->system->canAddTo($this->blog, $this->user)->willReturn(false);
         $this->system->canModify($this->entry, $this->user)->willReturn(true);
@@ -222,6 +223,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->setUpEntryEditStubs();
         $this->setUpForEntrySaveWithPermissions();
         $this->entry->data = 'some data';
+        $this->entry->uri(Argument::any())->willReturn('.');
 
         $this->publisher->update($this->entry)->shouldBeCalled();
         $this->page->redirect(Argument::any())->shouldBeCalled();

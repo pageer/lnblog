@@ -128,7 +128,7 @@ class PluginManager {
 
     function getConfig() {
         $global_config = NewConfigFile(USER_DATA_PATH.PATH_DELIM."plugins.xml");
-        $blog_path = get_blog_path();
+        $blog_path = $this->getBlogPath();
         if ($blog_path) {
             $blog_config = NewConfigFile($blog_path.PATH_DELIM."plugins.xml");
             $blog_config->merge($global_config);
@@ -172,7 +172,7 @@ class PluginManager {
 
     function getFileList() {
         $plugin_dir_list = array();
-        $blog_path = get_blog_path();
+        $blog_path = $this->getBlogPath();
         if ($blog_path) 
             $plugin_dir_list[] = $blog_path.PATH_DELIM."plugins";
         $plugin_dir_list[] = USER_DATA_PATH.PATH_DELIM."plugins";
@@ -216,7 +216,7 @@ class PluginManager {
 
     function loadPlugins() {
         $paths = array(USER_DATA_PATH, INSTALL_ROOT);
-        $blog_path = get_blog_path();
+        $blog_path = $this->getBlogPath();
         if ($blog_path) {
             array_unshift($paths, $blog_path);
         }
@@ -259,4 +259,15 @@ class PluginManager {
         return false;
     }
     
+    private function getBlogPath() {
+        if ( defined("BLOG_ROOT") ) {
+            return BLOG_ROOT;
+        } elseif (isset($_GET['blog'])) {
+            $reg = SystemConfig::instance()->blogRegistry();
+            if (isset($reg[$blogid])) {
+                return $reg[$blogid]->path();
+            }
+        }
+        return false;
+    }
 }

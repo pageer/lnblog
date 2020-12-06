@@ -104,37 +104,38 @@ class WebPages extends BasePages {
     }
 
     public function blogpaths() {
-
         $blog_path = $this->reqVar("blogpath");
 
         $blog = NewBlog($blog_path);
         $tpl = $this->createTemplate("blog_path_tpl.php");
         $this->getPage()->setDisplayObject($blog);
 
-        $inst_root = INSTALL_ROOT;
-        $inst_url = INSTALL_ROOT_URL;
+        $blog_root = $blog-home_path;
         $blog_url = $blog->getURL();
 
         $this->verifyUserCanModifyBlog($blog->uri('login'));
 
         if (has_post()) {
-            $inst_root = POST("installroot");
-            $inst_url = POST("installrooturl");
+            $blog_root = POST("blogroot");
             $blog_url = POST("blogurl");
-            $ret = write_file(Path::mk(BLOG_ROOT,"pathconfig.php"),
-                              pathconfig_php_string($inst_root, $inst_url, $blog_url));
-            if (!$ret) {
-                $tpl->set("UPDATE_MESSAGE", _("Error updating blog paths."));
+            if ($this->fs->is_dir($blog_root)) {
+                SystemConfig::instance()->registerBlog(basename($blog_root), new UrlPath($blog_root, $blog_url));
+                SystemConfig::instance()->writeConfig();
+                $ret = write_file(Path::mk(BLOG_ROOT,"pathconfig.php"),
+                                  pathconfig_php_string($inst_root, $inst_url, $blog_url));
+                if (!$ret) {
+                    $tpl->set("UPDATE_MESSAGE", _("Error updating blog paths."));
+                } else {
+                    $this->getPage()->redirect($blog_url);
+                    exit;
+                }
             } else {
-                $this->getPage()->redirect($blog_url);
-                exit;
+                $tpl->set("UPDATE_MESSAGE", spf_("The given blog path '%s' is not a directory."));
             }
         }
 
         $tpl->set("BLOG_URL", $blog_url);
-        $tpl->set("INST_URL", $inst_url);
-        $tpl->set("INST_ROOT", $inst_root);
-        $tpl->set("POST_PAGE", current_file());
+        $tpl->set("BLOG_ROOT", $blog_root);
         $tpl->set("UPDATE_TITLE", sprintf(_("Update paths for %s"), $blog->name));
 
         $body = $tpl->process();
@@ -381,9 +382,10 @@ class WebPages extends BasePages {
                                            basename(SITEMAP_FILE), PACKAGE_NAME));
             $tpl->set("PAGE_TITLE", _("Create site map"));
         } else {
+            $resolver = new UrlResolver();
             $tpl->set("FILE_PATH", $file);
             $tpl->set("FILE_SIZE", file_exists($file)?filesize($file):0);
-            $tpl->set("FILE_URL", localpath_to_uri($file));
+            $tpl->set("FILE_URL", $resolver->localpathToUri($file, $this->blog));
             $tpl->set("FILE", $file);
         }
 
@@ -628,9 +630,7 @@ class WebPages extends BasePages {
             return false;
         } elseif ($this->editIsPreview()) {
             if (GET('save') == 'draft' && !GET('ajax')) {
-                $uri = create_uri_object($ent);
-                $uri->separator = '&';
-                $this->getPage()->redirect($uri->editDraft(true));
+                $this->getPage()->redirect($ent->uri('editDraft'));
                 return false;
             }
 
@@ -927,13 +927,15 @@ class WebPages extends BasePages {
                 ($query_string?"&amp;":"?")."profile=".$_GET["profile"] :
                 "";
 
+            $resolver = new UrlResolver();
+
             $tpl->set("TARGET", current_file().$query_string);
             $size = ini_get("upload_max_filesize");
             $size = str_replace("K", "000", $size);
             $size = str_replace("M", "000000", $size);
             $tpl->set("MAX_SIZE", $size);
             $tpl->set("FILE", $file_name);
-            $tpl->set("TARGET_URL", localpath_to_uri($target) );
+            $tpl->set("TARGET_URL", $resolver->localpathToUri($target, $this->blog) );
             $tpl->set("BLOG_ATTACHMENTS", $blog_files);
             $tpl->set("ENTRY_ATTACHMENTS", $entry_files);
 
@@ -1400,7 +1402,7 @@ class WebPages extends BasePages {
 
         if (System::instance()->canModify($blog))
             $footer_text .= ' | <a href="'.
-                            $blog->uri('manage_year', $year).'">'.
+                            $blog->uri('manage_year', ['year' => $year]).'">'.
                             #make_uri(false, array('action'=>'manage_reply'), false).
                             _("Manage replies").'</a>';
         $footer_text .= " | ".
@@ -1436,7 +1438,7 @@ class WebPages extends BasePages {
             $footer_text = '<a href="?show=all">'.
                            _("Show all entries at once").'</a>'.
                            (System::instance()->canModify($blog) ?
-                            ' | <a href="'.$blog->uri('manage_month', $year, $month).'">'.
+                            ' | <a href="'.$blog->uri('manage_month', ['year' => $year, 'month' => $month]).'">'.
                             _("Manage replies").'</a>' : '').
                            ' | <a href="'.$blog->getURL().BLOG_ENTRY_PATH."/$year/".
                            '">'.spf_("Back to archive of %s", $year).'</a>';
@@ -1889,7 +1891,7 @@ class WebPages extends BasePages {
 
             $links = array();
             foreach ($this->blog->tag_list as $tag) {
-                $links[] = array('link'=>$this->blog->uri('tags', $tag), 'title'=>ucwords($tag));
+                $links[] = array('link'=>$this->blog->uri('tags', ['tag' =>$tag]), 'title'=>ucwords($tag));
             }
             $tpl = $this->createTemplate(LIST_TEMPLATE);
             $tpl->set("LIST_TITLE", _("Topics for this weblog"));
@@ -1949,10 +1951,14 @@ class WebPages extends BasePages {
             if ($usr->username() == ADMIN_USER && POST("blogowner") ) {
                 $blog->owner = POST("blogowner");
             }
+            $blogid = POST('blogid');
+            $blogpath = POST('blogpath');
+            $blogurl = POST('blogurl');
             blog_get_post_data($blog);
 
             $ret = $blog->update();
-            System::instance()->registerBlog($blog->blogid);
+            $urlpath = new UrlPath($blogpath, $blogurl);
+            SystemConfig::instance()->registerBlog($blogid, $urlpath);
             if (!$ret) $tpl->set("UPDATE_MESSAGE", _("Error: unable to update blog."));
             else $this->getPage()->redirect($blog->getURL());
         }

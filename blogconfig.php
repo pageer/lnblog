@@ -36,6 +36,10 @@ require_once __DIR__.'/vendor/autoload.php';
 // Prepend our own autoloaders to the queue.
 spl_autoload_register('class_autoload', false, true);
 
+# Pull in the base system config info and set up the handful of legacy constants
+# that we still depend on.
+SystemConfig::instance()->definePathConstants();
+
 ##########################################
 # Section: Essentials
 
@@ -56,34 +60,6 @@ function initialize_session() {
         $http_only = ini_get('session.cookie_httponly') ? 'HttpOnly;' : '';
         $session_id = session_id();
         header("Set-Cookie: PHPSESSID=$session_id; path=$path; domain=$domain; $http_only SameSite=Lax");
-    }
-}
-
-# Function: get_blog_path
-# A quick global function to define get the path to the current blog even
-# if the BLOG_ROOT constant is not defined.
-#
-# Returns:
-# The full path to the blog.
-function get_blog_path() {
-    if ( defined("BLOG_ROOT") ) {
-        return BLOG_ROOT;
-    } elseif (isset($_GET['blog'])) {
-        $path = str_replace('/', DIRECTORY_SEPARATOR, $_GET['blog']);
-        //if (PATH_DELIM != "/") {
-        //  $path = str_replace("/", PATH_DELIM, $path);
-        //}
-        //$path = preg_replace("/[^\w|"."\\".PATH_DELIM."]/", "", $path);
-
-
-        if ( defined("SUBDOMAIN_ROOT") &&
-             is_dir(Path::mk(SUBDOMAIN_ROOT, $path)) ) {
-            return Path::mk(SUBDOMAIN_ROOT, $path);
-        }
-
-        return Path::mk(DOCUMENT_ROOT, $path);
-    } else {
-        return false;
     }
 }
 
@@ -121,9 +97,6 @@ if (! isset($data_path)) {
     define("USER_DATA", "userdata");
 }
 
-# Set the path for system-wide user data files.
-define("USER_DATA_PATH", $data_path);
-
 $cfg_file = '';
 if (file_exists(Path::mk(USER_DATA_PATH, "userconfig.cfg"))) {
     $cfg_file = Path::mk(USER_DATA_PATH, "userconfig.cfg");
@@ -157,22 +130,11 @@ define("FS_PLUGIN_CONFIG", "fsconfig.php");
 # have to worry about the exact path.
 @include_once(Path::mk(USER_DATA_PATH, FS_PLUGIN_CONFIG));
 
-if (defined("DOCUMENT_ROOT") && ! is_dir(DOCUMENT_ROOT) &&
-    (! defined("CHECK_DOCUMENT_ROOT") || CHECK_DOCUMENT_ROOT == true) ) {
-    echo "The document root is defined as ".DOCUMENT_ROOT.", but the is_dir(DOCUMENT_ROOT) check failed.  Your installation is broken.  Edit your ".FS_PLUGIN_CONFIG." file to reflect the correct document root directory or ensure that PHP can read that directory and its parent.<br />This message was generated from the file ".__FILE__;
-}
-
-# If we do not have the INSTALL_ROOT defined from a previously included
-# pathconfig.php, then we need to take care of that.  We'll try to get the
-# blog's pathconfig.php file, and failing that, we'll just use the cwd.
-if (! defined("INSTALL_ROOT")) {
-    define("INSTALL_ROOT", dirname(__FILE__));
-}
-
 # Check for the file's existence first, because it turns out this is
 # actually faster when the file doesn't exist.
-if (file_exists(Path::mk(INSTALL_ROOT,USER_DATA,"userconfig.php")) ) {
-    include(USER_DATA."/userconfig.php");
+$USER_CONFIG_PATH = Path::mk(INSTALL_ROOT,USER_DATA,"userconfig.php");
+if (file_exists($USER_CONFIG_PATH)) {
+    include $USER_CONFIG_PATH;
 }
 
 # Constant: USE_CRON_SCRIPT
@@ -265,7 +227,7 @@ define("PACKAGE_URL", "http://lnblog.skepticats.com/");
 
 # Add I18N support here, as this is currently the earliest we can do it.
 # Refer to the lib/i18n.php file for details.
-require_once INSTALL_ROOT."/lib/i18n.php";
+require_once __DIR__."/lib/i18n.php";
 # Constant: PACKAGE_DESCRIPTION
 # The offical text-blurb description of the software.
 define("PACKAGE_DESCRIPTION", spf_("%s: a simple and (hopefully) elegant weblog", PACKAGE_NAME));
@@ -730,27 +692,11 @@ define("FILE_UPLOAD_TARGET_DIRECTORIES", "files");
 # Set the time zone for date functions.
 date_default_timezone_set(DEFAULT_TIME_ZONE);
 
-
-if (! defined("BLOG_ROOT")) {
-    $blog_path = get_blog_path();
-    if ($blog_path) {
-        define("BLOG_ROOT", $blog_path);
-    }
-}
-
 # Get the theme for the blog.  I'd like to do this in the Blog class, but
 # we need to set the constant even when we don't have a current blog, so
 # we'll do it here instead.
 if ( defined("BLOG_ROOT") ) {
-    $cfg_file = BLOG_ROOT.PATH_DELIM.BLOG_CONFIG_PATH;
-} elseif (isset($_GET['blog'])) {
-    $cfg_file = DOCUMENT_ROOT.PATH_DELIM.
-        preg_replace("/[^A-Za-z0-9\-_\/]/", "", $_GET['blog']).PATH_DELIM.BLOG_CONFIG_PATH;
-}
-
-if (isset($cfg_file) && ! is_file($cfg_file)) {
-    $cfg_file = substr_replace($cfg_file, "blogdata.txt",
-                               strlen($cfg_file) - strlen(BLOG_CONFIG_PATH));
+    $cfg_file = Path::mk(BLOG_ROOT, BLOG_CONFIG_PATH);
 }
 
 if (isset($cfg_file) && is_file($cfg_file)) {
@@ -764,38 +710,28 @@ if (isset($cfg_file) && is_file($cfg_file)) {
     }
 }
 
-require_once INSTALL_ROOT."/lib/utils.php";
+require_once __DIR__."/lib/utils.php";
 
 # Set constants to make themes work.  Most of these are defaults for when
 # there is no current blog set up.
 @define("THEME_NAME", "default");
 
-# If this is not defined, then the initial setup hasn't been done,
-# so set this to the directory of the current path.
-if (! defined("INSTALL_ROOT_URL")) {
-    $url_path = @parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-    # The index.php may or may not be present - chop it off if it is.
-    $url_path = preg_replace('/index\.php$/', '', $url_path);
-    $url_path = localpath_to_uri($url_path);
-    define("INSTALL_ROOT_URL", $url_path);
-}
-
 # Include constants for classes.
-require_once INSTALL_ROOT."/lib/constants.php";
+require_once __DIR__."/lib/constants.php";
 
 # Include the library of wrapper functions, which will be used to actually
 # create objects by including the right file at the right time.
 # This is for parsimony of includes.
-require_once INSTALL_ROOT."/lib/creators.php";
+require_once __DIR__."/lib/creators.php";
 
 # Now that everything is initialized, we can create the global event register
 # and plugin manager and create a top-level page for handling output..
 # TODO: Need to get rid of all the globals and switch to singleton instance calls.
 # Then we can get rid of this.
-require_once INSTALL_ROOT."/lib/EventRegister.php";
-require_once INSTALL_ROOT."/lib/Page.php";
-require_once INSTALL_ROOT.'/lib/System.php';
-require_once INSTALL_ROOT."/lib/PluginManager.php";
+require_once __DIR__."/lib/EventRegister.php";
+require_once __DIR__."/lib/Page.php";
+require_once __DIR__.'/lib/System.php';
+require_once __DIR__."/lib/PluginManager.php";
 
 # Initialize the plugins
 PluginManager::instance()->loadPlugins();

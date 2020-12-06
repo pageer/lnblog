@@ -456,7 +456,7 @@ class Publisher {
 
     private function deletePermalinkFile(BlogEntry $entry) {
         if (! $entry->isArticle()) {
-            $subfile = $entry->calcPrettyPermalink();
+            $subfile = $entry->permalink_name;
             $subfile = Path::mk(dirname(dirname($entry->file)), $subfile);
             if ($this->fs->file_exists($subfile)) {
                 $this->fs->delete($subfile);

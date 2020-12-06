@@ -25,7 +25,7 @@ class UpdateTest extends PublisherTestBase {
         $entry->file = $path;
         $entry->body = "This is some text";
         $this->fs->file_exists($path)->willReturn(true);
-        $this->fs->realpath($path)->willReturn($path);
+        $this->fs->realpath(Argument::any())->willReturnArgument(0);
         $this->fs->file_exists("./drafts/02_1234/publish.txt")->willReturn(false);
 
         $this->fs->rename(Argument::any())->shouldNotBeCalled();
@@ -41,7 +41,7 @@ class UpdateTest extends PublisherTestBase {
         $entry->file = $path;
         $entry->body = "This is some text";
         $this->fs->file_exists($path)->willReturn(true);
-        $this->fs->realpath($path)->willReturn($path);
+        $this->fs->realpath(Argument::any())->willReturnArgument(0);
         $this->fs->write_file($path, Argument::containingString('This is some text'))->willReturn(true);
 
         $this->fs->rename($path, './drafts/02_1234/02_123400.xml')->willReturn(true)->shouldBeCalled();
@@ -56,7 +56,7 @@ class UpdateTest extends PublisherTestBase {
         $entry->file = $path;
         $entry->body = "This is some text";
         $this->fs->file_exists($path)->willReturn(true);
-        $this->fs->realpath($path)->willReturn($path);
+        $this->fs->realpath(Argument::any())->willReturnArgument(0);
         $this->fs->write_file($path, Argument::containingString('This is some text'))->willReturn(false);
 
         $this->expectException(EntryWriteFailed::class);
@@ -70,7 +70,7 @@ class UpdateTest extends PublisherTestBase {
         $entry = new BlogEntry("", $this->fs->reveal());
         $entry->file = $path;
         $this->fs->file_exists($path)->willReturn(true);
-        $this->fs->realpath($path)->willReturn($path);
+        $this->fs->realpath(Argument::any())->willReturnArgument(0);
 
         $this->fs->rename($path, './drafts/02_1234/02_123400.xml')->willReturn(false)->shouldBeCalled();
         $this->fs->write_file(Argument::any(), Argument::any())->shouldNotBeCalled();
@@ -86,7 +86,7 @@ class UpdateTest extends PublisherTestBase {
         $entry = new BlogEntry("", $this->fs->reveal());
         $entry->file = $path;
         $this->fs->file_exists($path)->willReturn(true);
-        $this->fs->realpath($path)->willReturn($path);
+        $this->fs->realpath(Argument::any())->willReturnArgument(0);
         $this->fs->rename($path, './drafts/02_1234/02_123400.xml')->willReturn(true);
         $this->fs->write_file(Argument::any(), Argument::any())->willReturn(false);
 
@@ -101,9 +101,9 @@ class UpdateTest extends PublisherTestBase {
     public function testUpdate_WhenEntryIsPublishedAndPermalinkDoesNotExist_WritesPrettyPermalinkFile() {
         $entry = $this->setUpTestPublishedEntryForSuccessfulSave();
         $entry->subject = 'Some Stuff';
-        $this->fs->file_exists('./entries/2017/01/Some_Stuff.php')->willReturn(false);
+        $this->fs->file_exists('./entries/2017/01/some-stuff.php')->willReturn(false);
 
-        $this->fs->write_file('./entries/2017/01/Some_Stuff.php', Argument::containingString('02_1234'))->shouldBeCalled();
+        $this->fs->write_file('./entries/2017/01/some-stuff.php', Argument::containingString('02_1234'))->shouldBeCalled();
 
         $this->publisher->keepEditHistory(false);
         $this->publisher->update($entry, $this->getTestTime());
@@ -114,7 +114,7 @@ class UpdateTest extends PublisherTestBase {
         $this->fs->file_exists("./drafts/02_1234/publish.txt")->willReturn(false);
         $entry->subject = 'Some Stuff';
 
-        $this->fs->write_file(Argument::containingString('Some_Stuff.php'), Argument::any())->shouldNotBeCalled();
+        $this->fs->write_file(Argument::containingString('some-stuff.php'), Argument::any())->shouldNotBeCalled();
 
         $this->publisher->keepEditHistory(false);
         $this->publisher->update($entry, $this->getTestTime());
@@ -124,7 +124,7 @@ class UpdateTest extends PublisherTestBase {
         $entry = $this->setUpTestArticleForSuccessfulSave();
         $entry->subject = 'Some Stuff';
 
-        $this->fs->write_file(Argument::containingString('Some_Stuff.php'), Argument::any())->shouldNotBeCalled();
+        $this->fs->write_file(Argument::containingString('some-stuff.php'), Argument::any())->shouldNotBeCalled();
 
         $this->publisher->keepEditHistory(false);
         $this->publisher->update($entry, $this->getTestTime());
@@ -145,7 +145,7 @@ class UpdateTest extends PublisherTestBase {
         $entry = $this->setUpTestPublishedEntryForSuccessfulSave();
         $entry->subject = 'Some Stuff';
         $entry->is_sticky = 1;
-        $this->fs->file_exists(Argument::containingString('Some_Stuff.php'), Argument::any())->willReturn(true);
+        $this->fs->file_exists(Argument::containingString('some-stuff.php'), Argument::any())->willReturn(true);
 
         $this->fs->write_file('./content/some_stuff/sticky.txt', Argument::any())->willReturn(true)->shouldNotBeCalled();
 

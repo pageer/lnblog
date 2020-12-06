@@ -28,7 +28,7 @@ class SocialWebNotificationTest extends PublisherTestBase {
         $this->http_client->fetchUrl('http://www.example.com/test', true)
             ->willReturn($page_headers);
 
-        $payload = 'source=http:///./entries/2017/01/02_1234&target=http://www.example.com/test';
+        $payload = 'source=./entries/2017/01/02_1234/&target=http://www.example.com/test';
         $this->http_client->sendPost('http://www.example.com/ping', Argument::any())
             ->willReturn(new HttpResponse(''))
             ->shouldBeCalled();
@@ -64,7 +64,7 @@ class SocialWebNotificationTest extends PublisherTestBase {
             ->willReturn($page_content);
 
         $this->http_client->sendXmlRpcMessage()->shouldNotBeCalled();
-        $payload = 'source=http:///./entries/2017/01/02_1234&target=http://www.example.com/test';
+        $payload = 'source=./entries/2017/01/02_1234/&target=http://www.example.com/test';
         $this->http_client->sendPost("http://www.example.com/ping", $payload)
             ->willReturn(new HttpResponse(''))
             ->shouldBeCalled();
@@ -82,7 +82,7 @@ class SocialWebNotificationTest extends PublisherTestBase {
             ->willReturn($page_content);
 
         $this->http_client->sendXmlRpcMessage()->shouldNotBeCalled();
-        $payload = 'source=http:///./entries/2017/01/02_1234&target=http://www.example.com/test';
+        $payload = 'source=./entries/2017/01/02_1234/&target=http://www.example.com/test';
         $this->http_client->sendPost("http://www.example.com/ping", $payload)
             ->willReturn(new HttpResponse(''))
             ->shouldBeCalled();
@@ -97,7 +97,7 @@ class SocialWebNotificationTest extends PublisherTestBase {
         $this->http_client->fetchUrl($target_url, true)->willReturn("Content-Type: text/html");
         $this->http_client->fetchUrl($target_url, false)->willReturn($page_content);
 
-        $payload = 'source=http:///./entries/2017/01/02_1234&target=http://www.example.com/test/foo';
+        $payload = 'source=./entries/2017/01/02_1234/&target=http://www.example.com/test/foo';
         $this->http_client->sendPost("http://www.example.com/test/ping", $payload)
             ->willReturn(new HttpResponse(''))
             ->shouldBeCalled();
@@ -112,7 +112,7 @@ class SocialWebNotificationTest extends PublisherTestBase {
         $this->http_client->fetchUrl($target_url, true)->willReturn("Content-Type: text/html");
         $this->http_client->fetchUrl($target_url, false)->willReturn($page_content);
 
-        $payload = 'source=http:///./entries/2017/01/02_1234&target=http://www.example.com/test';
+        $payload = 'source=./entries/2017/01/02_1234/&target=http://www.example.com/test';
         $this->http_client->sendPost("http://www.example.com/ping", $payload)
             ->willReturn(new HttpResponse(''))
             ->shouldBeCalled();
@@ -127,7 +127,7 @@ class SocialWebNotificationTest extends PublisherTestBase {
         $this->http_client->fetchUrl($target_url, true)->willReturn("Content-Type: text/html");
         $this->http_client->fetchUrl($target_url, false)->willReturn($page_content);
 
-        $payload = 'source=http:///./entries/2017/01/02_1234&target=https://www.example.com/test';
+        $payload = 'source=./entries/2017/01/02_1234/&target=https://www.example.com/test';
         $this->http_client->sendPost("https://www.example.com/ping?test=yes", $payload)
             ->willReturn(new HttpResponse(''))
             ->shouldBeCalled();

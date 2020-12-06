@@ -150,143 +150,6 @@ function scan_directory($path, $dirs_only=false) {
     return $dir_list;
 }
 
-# Function: calculate_document_root
-# An alternate way to find the document root.  This one works by comparing
-# the current URL on the server to the current directory.  The idea is that
-# we can find the location of the current URL in the path and remove it to
-# get the document root.  Note that this function IS case-sensitive.
-#
-# Returns:
-# The calculated document root path.
-
-function calculate_document_root() {
-
-    # Bail out if DOCUMENT_ROOT is already defined.
-    if ( defined("DOCUMENT_ROOT") ) {
-        return DOCUMENT_ROOT;
-    }
-
-    if (isset($_SERVER['DOCUMENT_ROOT'])) {
-        return $_SERVER['DOCUMENT_ROOT'];
-    }
-
-    # Get the current URL and the path to the file.
-    $curr_uri = current_uri();
-    $curr_file = getcwd().PATH_DELIM.basename($curr_uri);
-    if (! file_exists($curr_file)) {
-        $curr_file = getcwd();
-    }
-    if (PATH_DELIM != "/") {
-        $curr_uri = str_replace("/", PATH_DELIM, $curr_uri);
-    }
-
-    if ( preg_match(URI_TO_LOCALPATH_MATCH_RE, $curr_uri) ) {
-        $curr_uri = preg_replace(URI_TO_LOCALPATH_MATCH_RE, URI_TO_LOCALPATH_REPLACE_RE,$curr_uri);
-    }
-
-    # Find the location
-    $pos = $curr_uri ? strpos($curr_file, $curr_uri) : false;
-    while (! $pos && strlen($curr_uri) > 1) {
-        $curr_uri = dirname($curr_uri);
-        $pos = strpos($curr_file, $curr_uri);
-    }
-    return substr($curr_file, 0, $pos + 1);
-
-}
-
-function calculate_server_root($path, $assume_subdomain=false) {
-
-    $ret = '';
-
-    if (defined("SUBDOMAIN_ROOT") && defined("DOCUMENT_ROOT")) {
-
-        # If the path doesn't start with either the subdomain or document
-        # root, then something is very, very wrong, so we need to bail
-        # the hell out and do it loud!
-        if ( ! (strpos($path, DOCUMENT_ROOT)  === 0 ||
-                strpos($path, SUBDOMAIN_ROOT) === 0) ) {
-            echo "Bad file passed to calculate_server_root() in ".__FILE__.
-                 ".  The path '".$path."' is not under the document root (".
-                  DOCUMENT_ROOT.") or the subdomain root (".SUBDOMAIN_ROOT.
-                  ").  Cannot get server root.";
-            return false;
-        }
-
-        # Case 1 - The document root and subdomain root are the same.
-        if (SUBDOMAIN_ROOT == DOCUMENT_ROOT) {
-
-            $ret = DOCUMENT_ROOT;
-
-        # Case 2 - The document root is inside subdomain root.
-        } elseif (strpos(DOCUMENT_ROOT, SUBDOMAIN_ROOT) === 0) {
-
-            # If the path contains the document root, assume that we're NOT
-            # in a subdomain.
-            $ret = ( strpos($path, DOCUMENT_ROOT) === 0) ?
-                   DOCUMENT_ROOT: SUBDOMAIN_ROOT;
-
-        # Case 3 - The subdomain root is inside the document root.
-        } elseif (strpos(SUBDOMAIN_ROOT, DOCUMENT_ROOT) === 0) {
-
-            # If the path is in the document root, but not the subdomain
-            # root, then we're definitely not in a subdomain.
-            if (strpos($path, DOCUMENT_ROOT) === 0 &&
-                strpos($path, SUBDOMAIN_ROOT) === false) {
-                $ret = DOCUMENT_ROOT;
-            } else {
-                # Otherwise, there's no way to tell if the directory is a subdomain
-                # without hitting the network, so just pass the decision to the caller.
-                $ret = $assume_subdomain ? SUBDOMAIN_ROOT : DOCUMENT_ROOT;
-            }
-
-        # Case 4 - The two directories are independent.
-        } else {
-            # If path is under the document, return that.  Otherwise, return the
-            # subdomain root.  This ends up the same as case 2.
-            $ret = ( strpos($path, DOCUMENT_ROOT) === 0) ?
-                   DOCUMENT_ROOT: SUBDOMAIN_ROOT;
-        }
-
-    } else {
-        $ret = calculate_document_root();
-    }
-
-    return $ret;
-
-}
-
-# Function: test_server_root
-# Tests a root-relative path against the document root and subdomain root
-# directory and determines which one "works."
-#
-# Parameters:
-# path - The root-relative path to test.
-# assume_subdomain - Optional boolean which, when set to true, tells the routine
-#                    to assume a subdomain path when the test results are
-#                    ambiguous.  Defaults to *false*.
-
-function test_server_root($path, $assume_subdomain=false) {
-    $ret = false;
-    $doc_path = Path::mk(calculate_document_root(), $path);
-    if (defined("SUBDOMAIN_ROOT")) {
-        $sub_path = Path::mk(SUBDOMAIN_ROOT, $path);
-        if ($doc_path == $sub_path) {
-            $ret = $doc_path;
-        } elseif ( file_exists($doc_path) && file_exists($sub_path) ) {
-            $ret = $assume_subdomain ? $sub_path : $doc_path;
-        } elseif ( file_exists($doc_path) && ! file_exists($sub_path) ) {
-            $ret = $doc_path;
-        } elseif ( ! file_exists($doc_path) && file_exists($sub_path) ) {
-            $ret = $sub_path;
-        } else {
-            $ret = false;
-        }
-    } else {
-        if (file_exists($doc_path)) $ret = $doc_path;
-    }
-    return $ret;
-}
-
 # Function: SESSION
 # A wrapper for the $_SESSION superglobal.  Provides a handy
 # way to avoid undefined variable warnings without explicitly calling
@@ -432,159 +295,6 @@ function current_url() {
     return $protocol."://".$host.$port.$path;
 }
 
-# Function: localpath_to_uri
-# Convert a local path to a URI.
-#
-# Parameters:
-# path          - The path to convert.
-# base_path_map - Map of possible base paths to base URLs.
-#
-# Returns:
-# A string with the URL oc the given path.
-
-function localpath_to_uri($path, $base_path_map = []) {
-
-    if (file_exists($path)) $full_path = realpath($path);
-    else $full_path = $path;
-
-    # Add a trailing slash if the path is a directory.
-    if (is_dir($full_path)) $full_path .= PATH_DELIM;
-
-    $root = calculate_document_root();
-    $subdom_root = '';
-    if (defined("SUBDOMAIN_ROOT")) {
-        $subdom_root = SUBDOMAIN_ROOT;
-    }
-
-    # Normalize to lower case on Windows in order to avoid problems
-    # with case-sensitive substring removal.
-    if ( strtoupper( substr(PHP_OS,0,3) ) == 'WIN' ) {
-        $root = strtolower($root);
-        $subdom_root= strtolower($subdom_root);
-        $full_path = strtolower($full_path);
-    }
-
-    $host = '';
-    $port = '';
-    $path = '';
-    foreach ($base_path_map as $root_path => $root_url) {
-        # Avoid "empty needle" notices in tests.
-        if (!$root_path) {
-            continue;
-        }
-        if (strtoupper( substr(PHP_OS,0,3) ) == 'WIN' ) {
-            $found_match = stripos($full_path, $root_path) === 0;
-        } else {
-            $found_match = strpos($full_path, $root_path) === 0;
-        }
-        if ($found_match) {
-            $host = parse_url($root_url, PHP_URL_HOST);
-            $port = parse_url($root_url, PHP_URL_PORT);
-            $path = parse_url($root_url, PHP_URL_PATH);
-            $end_path = substr($full_path, strlen($root_path) + 1);
-            $path = $path . $end_path;
-        }
-    }
-
-    $subdomain = '';
-
-    # Account for user home directories in path.  Please note that this is
-    # an ugly, ugly hack to make this function work when I'm testing on my
-    # local workstation, where I use ~/www for by web root.
-    if ( preg_match(LOCALPATH_TO_URI_MATCH_RE, $full_path) ) {
-        #$url_path = '/~'.basename(dirname($root)).$url_path;
-        $url_path = preg_replace(LOCALPATH_TO_URI_MATCH_RE, LOCALPATH_TO_URI_REPLACE_RE, $full_path);
-    } elseif ($subdom_root && strpos($full_path, $subdom_root) === 0) {
-        $url_path = str_replace($subdom_root, "", $full_path);
-        $slashpos = strpos($url_path, PATH_DELIM);
-        $subdomain = substr($url_path, 0, $slashpos);
-        $url_path = substr($url_path, $slashpos + 1);
-    } elseif ($root !== '/') { # TODO: Kill this check with fire
-        $url_path = str_replace($root, "", $full_path);
-    } else {
-        $url_path = $full_path;
-    }
-
-    # Remove any drive letter.
-    if ( strtoupper( substr(PHP_OS,0,3) ) == 'WIN' )
-        $url_path = preg_replace("/[A-Za-z]:(.*)/", "$1", $url_path);
-    # Convert to forward slashes.
-    if (PATH_DELIM != "/")
-        $url_path = str_replace(PATH_DELIM, "/", $url_path);
-
-    # The URI should *always* be absolute.  Therefore, we allow for the
-    # DOCUMENT_ROOT to have a slash at the end by prepending a
-    # slash here if we don't already have one.
-    if (substr($url_path, 0, 1) != "/") $url_path = "/".$url_path;
-
-    # Add the protocol and server.
-    $protocol = 'http';
-    if (SERVER("HTTPS") == "on") $protocol = "https";
-    if (!$host) {
-        $host = SERVER("SERVER_NAME");
-    } elseif ($subdomain) {
-        $host = $subdomain.".".DOMAIN_NAME;
-    }
-    if (!$port) {
-        $port = SERVER("SERVER_PORT");
-    }
-    if ($port == 80 || !$port) $port = "";
-    else $port = ":".$port;
-    if ($path) {
-        $url_path = $path;
-    }
-    $url_path = $protocol."://".$host.$port.$url_path;
-
-    return $url_path;
-}
-
-# Function: uri_to_localpath
-# The reverse of <localpath_to_uri>, this function takes a URI handled by LnBlog
-# and converts it into a local path to the file or directory in question.  This
-# function assumes that the URI is fully qualified, e.g.
-# |http://somehost.com/somepath/somefile.ext
-# Note that this may or may not play well with Apache .htaccess files.
-#
-# Parameters:
-# uri - The URI to convert.
-#
-# Returns:
-# A string containing the local path referenced by the URI.  Not that this path
-# may or may not exist.
-
-function uri_to_localpath($uri) {
-
-    $url_bits = parse_url($uri);
-    if (! $url_bits) return '';
-
-    #$protocol = isset($url_bits['scheme']) ? $url_bits['scheme'] : '';
-    #$domain = isset($url_bits['host']) ? $url_bits['host'] : '';
-    $path = isset($url_bits['path']) ? $url_bits['path'] : '';
-
-    # Account for user home directories in path.  Please note that this is
-    # an ugly, ugly hack to make this function work when I'm testing on my
-    # local workstation, where I use ~/www for by web root.
-    if ( preg_match(URI_TO_LOCALPATH_MATCH_RE, $path) ) {
-        $path = preg_replace(URI_TO_LOCALPATH_MATCH_RE, URI_TO_LOCALPATH_REPLACE_RE, $path);
-    }
-
-    if (defined("DOMAIN_NAME") && defined("SUBDOMAIN_ROOT") &&
-        isset($url_bits['host']) &&
-        preg_match('/'.str_replace('.','\.',DOMAIN_NAME).'$/', DOMAIN_NAME) &&
-        strpos($url_bits['host'], DOMAIN_NAME) > 1) {
-
-        $pos = strpos($url_bits['host'], DOMAIN_NAME);
-        $tmp_path = substr($url_bits['host'], 0, $pos - 1);
-        $path = Path::mk(SUBDOMAIN_ROOT, $tmp_path, $path);
-    } else {
-        $path = Path::mk(DOCUMENT_ROOT, $path);
-    }
-
-    $p = new Path($path);
-    return $p->getCanonical();
-
-}
-
 # Function: get_ip
 # Quick function to get the user's IP address.  This should probably be
 # extended to account for proxies and such.
@@ -617,8 +327,7 @@ function get_user_agent() {
 # don't think anything else accounts for this yet.
 
 function config_php_string($levels) {
-    $ret = 'if (! defined("PATH_SEPARATOR") ) define("PATH_SEPARATOR", strtoupper(substr(PHP_OS,0,3)==\'WIN\')?\';\':\':\');'."\n";
-    $ret .= 'if (! defined("BLOG_ROOT")) define("BLOG_ROOT", ';
+    $ret .= '$BLOG_ROOT_DIR = ';
     $file_part = 'dirname(__FILE__)';
     if ($levels > 0) {
         for ($i = 1; $i <= $levels; $i++) {
@@ -626,17 +335,17 @@ function config_php_string($levels) {
             $file_part = 'dirname(' . $file_part . ')';
         }
     }
-    $ret .= "$file_part);\n";
-    $ret .= 'require_once(BLOG_ROOT.DIRECTORY_SEPARATOR."pathconfig.php");'."\n";
-    $ret .= 'require_once(INSTALL_ROOT.DIRECTORY_SEPARATOR."blogconfig.php");'."\n";
+    $ret .= "$file_part;\n";
+    $ret .= 'require_once "$BLOG_ROOT_DIR/pathconfig.php";'."\n";
+    $ret .= 'require_once INSTALL_ROOT."/blogconfig.php");'."\n";
     return $ret;
 }
 
-function pathconfig_php_string($inst_root, $inst_url, $blog_url) {
+function pathconfig_php_string($inst_root) {
     $config_data = "<?php\n";
-    $config_data .= '@define("INSTALL_ROOT", \''.$inst_root."');\n";
-    $config_data .= '@define("INSTALL_ROOT_URL", \''.$inst_url."');\n";
-    $config_data .= '@define("BLOG_ROOT_URL", \''.$blog_url."');\n";
+    $config_data .= "# Update this path if the LnBlog directory moves\n";
+    $config_data .= "require_once '$inst_root/lib/SystemConfig.php';\n";
+    $config_data .= 'SystemConfig::instance()->definePathConstants(__DIR__);' . "\n";
     return $config_data;
 }
 
@@ -849,7 +558,8 @@ function set_domain_cookie($name, $value='', $expire=0) {
 # Function: get_entry_from_uri
 # Takes a URI and converts it into an entry object.
 function get_entry_from_uri($uri) {
-    $local_path = uri_to_localpath($uri);
+    $resolver = new UrlResolver();
+    $local_path = $resolver->uriToLocalpath($uri);
 
     if (is_dir($local_path)) {
         $ent = NewEntry($local_path);

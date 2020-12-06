@@ -7,6 +7,9 @@ class PublishEntryTest extends PublisherTestBase {
     public function testPublishEntry_WhenEntryDoesNotExists_SaveAsDraftAndMovesDirectory() {
         $fs = $this->fs;
         $entry = new BlogEntry(null, $fs->reveal());
+        $entry->subject = 'test';
+        $fs->file_exists(Argument::containingString('test.php'))->willReturn(true);
+        $fs->write_file(Argument::containingString('test.php'), Argument::any())->willReturn(true);
         $fs->file_exists('./drafts/02_1234/entry.xml')->willReturn(false);
         $this->fs->file_exists("./drafts/02_1234/publish.txt")->willReturn(false);
         $fs->is_dir(Argument::any())->willReturn(false);
@@ -28,8 +31,11 @@ class PublishEntryTest extends PublisherTestBase {
     public function testPublishEntry_WhenSavingDraft_SavesUploadOnlyOnce() {
         $fs = $this->fs;
         $entry = new BlogEntry(null, $fs->reveal());
+        $entry->subject = 'test';
         $event_stub = $this->setUpForMultipleUploadSuccess();
         $path = './drafts/02_1234/entry.xml';
+        $fs->file_exists(Argument::containingString('test.php'))->willReturn(true);
+        $fs->write_file(Argument::containingString('test.php'), Argument::any())->willReturn(true);
         $fs->file_exists($path)->willReturn(false);
         $fs->realpath($path)->willReturn($path);
         $this->fs->file_exists("./drafts/02_1234/publish.txt")->willReturn(false);
@@ -57,6 +63,9 @@ class PublishEntryTest extends PublisherTestBase {
         $fs = $this->fs;
         $entry = new BlogEntry(null, $fs->reveal());
         $entry->file = './drafts/02_1234/entry.xml';
+        $entry->subject = 'test';
+        $fs->file_exists(Argument::containingString('test.php'))->willReturn(true);
+        $fs->write_file(Argument::containingString('test.php'), Argument::any())->willReturn(true);
         $fs->file_exists('./drafts/02_1234/entry.xml')->willReturn(true);
         $fs->is_dir(Argument::any())->willReturn(true);
         $fs->is_dir('./entries/2017/01/02_123400')->willReturn(false);
@@ -87,7 +96,7 @@ class PublishEntryTest extends PublisherTestBase {
         $entry->subject = 'Some Weird Stuff';
         $entry->file = './drafts/02_1234/entry.xml';
 
-        $this->fs->write_file('./entries/2017/01/Some_Weird_Stuff.php', Argument::any())->willReturn(true)->shouldBeCalled();
+        $this->fs->write_file('./entries/2017/01/some-weird-stuff.php', Argument::any())->willReturn(true)->shouldBeCalled();
 
         $this->publisher->publishEntry($entry, $this->getTestTime());
     }

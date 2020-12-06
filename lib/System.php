@@ -84,61 +84,6 @@ class System {
         return self::$static_instance;
     }
 
-    # Method: registerBlog
-    # Registers a blog with the system.  This lets the system know that
-    # the blog's directory is handled by LnBlog.
-    #
-    # Parameters:
-    # blogid - The path to the blog.  This should be relative to the server's
-    #          document root directory, e.g. a blog at
-    #          http://somehost.com/blogs/techblog/ would use the blogid
-    #          *blogs/techblog*.
-    # Returns:
-    # True if the blog is registered correctly or is already registered,
-    # false if it fails to register.
-
-    public function registerBlog($blogid) {
-        $list = trim($this->sys_ini->value("register", "BlogList"));
-        if (! $list) {
-            $list = array();
-        } else {
-            $list = explode(",", $list);
-        }
-        $blogid = trim($blogid);
-        if (in_array($blogid, $list)) {
-            return true;
-        } else {
-            $list[] = $blogid;
-            $list = implode(",", $list);
-            $this->sys_ini->setValue("register", "BlogList", $list);
-            return $this->sys_ini->writeFile();
-        }
-    }
-
-    # Method: unregisterBlog
-    # Unregisters a blog with the system.  This reverses registerBlog().
-    #
-    # Parameters:
-    # blogid - THe path to the blog, as with registerBlog.
-    #
-    # Returns:
-    # True on success, false on failure or if the blog was not registered.
-    public function unregisterBlog($blogid) {
-        $blogid = trim($blogid);
-        $list = trim($this->sys_ini->value("register", "BlogList"));
-        if ($list) {
-            $list = explode(",", $list);
-            $pos = array_search($blogid, $list);
-            if ($pos !== false) {
-                unset($list[$pos]);
-                $list = implode(",", $list);
-                $this->sys_ini->setValue("register", "BlogList", $list);
-                return $this->sys_ini->writeFile();
-            }
-        }
-        return false;
-    }
-
     # Method: getBlogList
     # Get a list of blogs handled by LnBlog.
     #
@@ -146,12 +91,10 @@ class System {
     # An array of blog objects.
 
     public function getBlogList() {
-        $list = trim($this->sys_ini->value("register", "BlogList"));
-        if (! $list) return array();
-        $list = explode(",", $list);
+        $list = SystemConfig::instance()->blogRegistry();
         $ret = array();
-        foreach ($list as $item) {
-            $b = NewBlog($item);
+        foreach ($list as $key => $item) {
+            $b = NewBlog($item->path());
             $b->skip_root = true;
             $ret[] = $b;
         }

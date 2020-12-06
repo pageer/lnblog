@@ -52,8 +52,7 @@ class CreateDraftTest extends PublisherTestBase {
         $entry->file = './drafts/02_1234/entry.xml';
         $this->fs->is_dir('./drafts')->willReturn(true);
         $this->fs->file_exists('./drafts/02_1234/entry.xml')->willReturn(true);
-        $this->fs->realpath('./drafts/02_1234/entry.xml')->willReturn('./drafts/02_1234/entry.xml');
-        $this->fs->realpath('./drafts/02_1234/entry.xml')->willReturn('./drafts/02_1234/entry.xml');
+        $this->fs->realpath(Argument::any())->willReturnArgument(0);
 
         $this->expectException(EntryAlreadyExists::class);
 
@@ -123,7 +122,7 @@ class CreateDraftTest extends PublisherTestBase {
         });
         $fs->write_file('./drafts/02_1234/entry.xml', Argument::any())->will(function($args) use ($fs, $entry) {
             $fs->file_exists('./drafts/02_1234/entry.xml')->willReturn(true);
-            $fs->realpath('./drafts/02_1234/entry.xml')->willReturn('./drafts/02_1234/entry.xml');
+            $fs->realpath(Argument::any())->willReturnArgument(0);
             return true;
         });
         $this->task_manager->findByKey(Argument::any())->willReturn(null);

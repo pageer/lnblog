@@ -83,9 +83,11 @@ abstract class Entry extends LnBlogObject{
     );
 
     protected $fs;
+    protected $url_resolver;
 
-    protected function __construct(FS $filesystem) {
+    protected function __construct(FS $filesystem, UrlResolver $resolver = null) {
         $this->fs = $filesystem;
+        $this->url_resolver = $resolver ?: new UrlResolver(SystemConfig::instance(), $this->fs);
     }
 
     /*
@@ -284,15 +286,6 @@ abstract class Entry extends LnBlogObject{
             $this->deserializeXML($this->fs->read_file($this->file));
         }
 
-        if (is_subclass_of($this, 'BlogEntry')) {
-            $this->id = str_replace(PATH_DELIM, '/',
-                                    substr(dirname($this->file),
-                                    strlen(calculate_document_root()) ) );
-        } else {
-            $this->id = str_replace(PATH_DELIM, '/',
-                                    substr($this->file, strlen(calculate_document_root())) );
-        }
-
         if (! $this->post_ts) {
             $this->post_ts = $this->fs->filemtime($this->file);
         }
@@ -342,5 +335,22 @@ abstract class Entry extends LnBlogObject{
             $this->fs->mkdir_rec(dirname($this->file));
         $ret = $this->fs->write_file($this->file, $file_data);
         return $ret;
+    }
+
+    /*
+       Method: uri
+       Get the URI of the designated resource.
+
+        Parameters:
+        type   - The type of URI to get, e.g. permalink, edit link, etc.
+        params - All other parameters after the first are interpreted
+                 as additional data for the URL query string.  The
+                 exact meaning of each parameter depends on the URL type.
+
+        Returns:
+        A string with the permalink.
+    */
+    public function uri($type, $params = []) {
+        return $this->url_resolver->generateRoute($type, $this, $params);
     }
 }

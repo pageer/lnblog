@@ -47,8 +47,10 @@ class Pingback extends Trackback {
     public $exclude_fields = array('fs');
     public $is_webmention = false;
 
-    public function __construct($path=false, $fs = null) {
+    public function __construct($path=false, $fs = null, $http_client = null, UrlResolver $resolver = null) {
         $this->fs = $fs ?: NewFS();
+        $this->url_resolver = $resolver ?: new UrlResolver(SystemConfig::instance(), $this->fs);
+        $this->http_client = $http_client ?: new HttpClient();
 
         $this->raiseEvent("OnInit");
 
