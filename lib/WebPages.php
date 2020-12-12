@@ -2126,7 +2126,7 @@ class WebPages extends BasePages {
             if ($ent->isEntry()) {
                 $show_ctl =
                     System::instance()->canModify($ent, $this->user) &&
-                    $u->checkLogin();
+                    $this->user->checkLogin();
                 return $ent->get($this, $show_ctl);
             }
         }
