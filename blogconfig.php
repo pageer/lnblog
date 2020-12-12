@@ -38,7 +38,7 @@ spl_autoload_register('class_autoload', false, true);
 
 # Pull in the base system config info and set up the handful of legacy constants
 # that we still depend on.
-SystemConfig::instance()->definePathConstants();
+SystemConfig::instance()->definePathConstants($BLOG_ROOT_DIR ?? '');
 
 ##########################################
 # Section: Essentials
@@ -697,6 +697,11 @@ date_default_timezone_set(DEFAULT_TIME_ZONE);
 # we'll do it here instead.
 if ( defined("BLOG_ROOT") ) {
     $cfg_file = Path::mk(BLOG_ROOT, BLOG_CONFIG_PATH);
+} elseif (!empty($_GET['blog'])) {
+    $blogs = SystemConfig::instance()->blogRegistry();
+    if (isset($blogs[$_GET['blog']])) {
+        $cfg_file = Path::mk($blogs[$_GET['blog']]->path(), BLOG_CONFIG_PATH);
+    }
 }
 
 if (isset($cfg_file) && is_file($cfg_file)) {

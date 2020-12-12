@@ -7,6 +7,19 @@
 # themes directories to get a list of themes.  This really should be moved 
 # outside the template, but for the time being, just don't modify it.
 ?>
+<script type="application/javascript">
+$(document).ready(function () {
+    var default_path = '<?php echo $DEFAULT_PATH?>';
+    var default_url = '<?php echo $DEFAULT_URL?>';
+    var path_sep = '<?php echo $PATH_SEP?>';
+
+    $('#blogid').on('change', function () {
+        var path = default_path + path_sep + $(this).val().replace('/', path_sep) + path_sep;
+        $('#blogpath').val(path);
+        $('#blogurl').val(default_url + $(this).val() + '/');
+    });
+});
+</script>
 <h2><?php echo $UPDATE_TITLE; ?></h2>
 <?php if (isset($UPDATE_MESSAGE)): ?>
     <p style="color: red"><?php echo $UPDATE_MESSAGE; ?></p>
@@ -18,7 +31,7 @@
         <div>
         <?php $msg = _("The unique internal identifier for the blog.");?>
             <label for="blogid" title="<?php echo $msg?>"><?php p_("Blog ID") ?></label>
-            <input id="blogid" name="blogid"  title="<?php echo $msg?>" value="<?php echo $BLOG_id?>" />
+            <input id="blogid" name="blogid"  title="<?php echo $msg?>" value="<?php echo $BLOG_ID?>" />
         </div>
         <div>
         <?php $msg = _("The absolute path on the server where your blog will be created.");?>

@@ -283,8 +283,8 @@ function current_file($no_escape=false) {
 # Returns:
 # The absolute URL of the requested script.
 
-function current_url() {
-    $path = SERVER("PHP_SELF");
+function current_url($force_path = '') {
+    $path = $force_path ?: SERVER("PHP_SELF");
     # Add the protocol and server.
     $protocol = "http";
     if (SERVER("HTTPS") == "on") $protocol = "https";
@@ -327,7 +327,7 @@ function get_user_agent() {
 # don't think anything else accounts for this yet.
 
 function config_php_string($levels) {
-    $ret .= '$BLOG_ROOT_DIR = ';
+    $ret = '$BLOG_ROOT_DIR = ';
     $file_part = 'dirname(__FILE__)';
     if ($levels > 0) {
         for ($i = 1; $i <= $levels; $i++) {
@@ -337,15 +337,14 @@ function config_php_string($levels) {
     }
     $ret .= "$file_part;\n";
     $ret .= 'require_once "$BLOG_ROOT_DIR/pathconfig.php";'."\n";
-    $ret .= 'require_once INSTALL_ROOT."/blogconfig.php");'."\n";
     return $ret;
 }
 
 function pathconfig_php_string($inst_root) {
     $config_data = "<?php\n";
     $config_data .= "# Update this path if the LnBlog directory moves\n";
-    $config_data .= "require_once '$inst_root/lib/SystemConfig.php';\n";
-    $config_data .= 'SystemConfig::instance()->definePathConstants(__DIR__);' . "\n";
+    $config_data .= '$BLOG_ROOT_DIR = __DIR__;' . "\n";
+    $config_data .= "require_once '$inst_root/blogconfig.php';\n";
     return $config_data;
 }
 
@@ -432,7 +431,7 @@ function getlink($name, $type=false) {
     if (isset($urlinfo['host']) &&
         $l_type == LINK_SCRIPT &&
         SERVER("SERVER_NAME") != $urlinfo['host']) {
-        $ret = $blog->uri('script', $name);
+        $ret = $blog->uri('script', ['script' => $name]);
     }
 
     // HACK: There is a not insignificant chance that this will break something.

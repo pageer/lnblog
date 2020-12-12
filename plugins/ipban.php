@@ -197,7 +197,7 @@ class IPBan extends Plugin {
         if ($usr->isAdministrator()) {
             echo '<li><a href="'.
                 make_uri(INSTALL_ROOT_URL.'index.php',
-                         array('action' => 'editfile', 'file'=>'userdata/'.$banfile)).
+                         array('action' => 'editfile', 'target' => 'userdata', 'file'=>$banfile)).
                 '">'._("Global IP blacklist").'</a></li>';
         }
     }

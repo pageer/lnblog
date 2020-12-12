@@ -28,7 +28,12 @@ class UrlResolver {
         $path_obj = new Path();
         $roots = [];
         $is_absolute = $path_obj->isAbsolute($path);
-        $file = $is_absolute ? $this->fs->realpath($path) : '';
+        if ($is_absolute) {
+            $file = $this->fs->realpath($path);
+            if (substr($path, -1) == Path::$sep & substr($file, -1) != Path::$sep) {
+                $file .= Path::$sep;
+            }
+        }
         $registry = $this->config->blogRegistry();
 
         if ($entry) {
@@ -191,7 +196,7 @@ class UrlResolver {
                 return $blog_root . '?action=logout';
             case 'editfile':
                 $this->validateParams($params, ['file']);
-                $query = $this->combineParams($params, ['file', 'profile', 'map', 'list', 'richedit']);
+                $query = $this->combineParams($params, ['file', 'profile', 'map', 'list', 'richedit', 'target']);
                 return $blog_root . '?action=editfile' . ($query ? "&$query" : '');
             case 'edituser':
                 return $blog_root . '?action=useredit';
@@ -216,6 +221,7 @@ class UrlResolver {
 
     private function getEntryRoute($action, BlogEntry $entry, $params) {
         $base_dir = dirname($entry->file);
+        $sep = Path::$sep;
         switch ($action) {
             case 'permalink':
             case 'entry':
@@ -226,28 +232,28 @@ class UrlResolver {
                         return $this->localpathToUri($permalink_file, $entry->getParent());
                     }
                 }
-                return $this->localpathToUri("$base_dir/", $entry->getParent());
+                return $this->localpathToUri($base_dir . $sep, $entry->getParent());
             case 'base':
-                return $this->localpathToUri("$base_dir/", $entry->getParent());
+                return $this->localpathToUri($base_dir . $sep, $entry->getParent());
             case 'basepage':
-                return $this->localpathToUri("$base_dir/index.php", $entry->getParent());
+                return $this->localpathToUri($base_dir . $sep . 'index.php', $entry->getParent());
             case 'comment':
-                $url = sprintf('%s/%s/', $base_dir, ENTRY_COMMENT_DIR);
+                $url = sprintf("%s$sep%s$sep", $base_dir, ENTRY_COMMENT_DIR);
                 return $this->localpathToUri($url, $entry->getParent());
             case 'commentpage':
-                $url = sprintf('%s/%s/index.php', $base_dir, ENTRY_COMMENT_DIR);
+                $url = sprintf("%s$sep%s{$sep}index.php", $base_dir, ENTRY_COMMENT_DIR);
                 return $this->localpathToUri($url, $entry->getParent());
             case 'send_tb':
-                $url = sprintf('%s/%s/?action=ping', $base_dir, ENTRY_TRACKBACK_DIR);
+                $url = sprintf("%s$sep%s$sep?action=ping", $base_dir, ENTRY_TRACKBACK_DIR);
                 return $this->localpathToUri($url, $entry->getParent());
             case 'get_tb':
-                $url = sprintf('%s/%s/index.php', $base_dir, ENTRY_TRACKBACK_DIR);
+                $url = sprintf("%s$sep%s{$sep}index.php", $base_dir, ENTRY_TRACKBACK_DIR);
                 return $this->localpathToUri($url, $entry->getParent());
             case 'trackback':
-                $url = sprintf('%s/%s/', $base_dir, ENTRY_TRACKBACK_DIR);
+                $url = sprintf("%s$sep%s$sep", $base_dir, ENTRY_TRACKBACK_DIR);
                 return $this->localpathToUri($url, $entry->getParent());
             case 'pingback':
-                $url = sprintf('%s/%s/', $base_dir, ENTRY_PINGBACK_DIR);
+                $url = sprintf("%s$sep%s$sep", $base_dir, ENTRY_PINGBACK_DIR);
                 return $this->localpathToUri($url, $entry->getParent());
             case 'upload':
                 return $this->localpathToUri($base_dir, $entry->getParent()) . '/?action=upload';

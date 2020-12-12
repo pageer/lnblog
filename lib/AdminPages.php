@@ -112,8 +112,11 @@ class AdminPages extends BasePages {
     # are raised when this upgrade feature is run, so that plugins may perform
     # any needed updates at that time.
     public function index() {
+        $configs_exist = 
+            $this->fs->file_exists(Path::mk(INSTALL_ROOT, SystemConfig::PATH_CONFIG_NAME)) &&
+            $this->fs->file_exists(Path::mk(USER_DATA_PATH, FS_PLUGIN_CONFIG));
 
-        if ( ! file_exists(USER_DATA_PATH.PATH_DELIM.FS_PLUGIN_CONFIG) ) {
+        if (!$configs_exist) {
             $this->redirect("fssetup");
             exit;
         }
@@ -125,6 +128,8 @@ class AdminPages extends BasePages {
         $tpl = $this->createTemplate('blog_admin_tpl.php');
         $tpl->set("SHOW_NEW");
         $tpl->set("FORM_ACTION", current_file());
+
+        $this->populateBlogPathDefaults($tpl);
 
         # Check if there is at least one administrator.
         # If not, then we need to create one.
@@ -197,7 +202,7 @@ class AdminPages extends BasePages {
                         SystemConfig::instance()->writeConfig();
                         $ret = true;
                     } catch (FileWriteFailed $e) {
-                        $ret = false
+                        $ret = false;
                     }
 
                     $ret = $ret && $blog->delete();
@@ -396,9 +401,17 @@ class AdminPages extends BasePages {
             blog_get_post_data($blog);
         }
 
+        $blogurl = POST('blogurl');
+        if (!$blogurl) {
+            $lnblog_name = basename(SystemConfig::instance()->installRoot()->path());
+            $blogurl = preg_replace("|$lnblog_name/|i", $blog->blogid, SystemConfig::instance()->installRoot()->url());
+        }
+
+        $this->populateBlogPathDefaults($tpl);
+
         $tpl->set("SHOW_BLOG_PATH");
         $tpl->set("BLOG_ID", $blog->blogid);
-        $tpl->set("BLOG_URL", POST("blogurl"));
+        $tpl->set("BLOG_URL", $blogurl);
         $tpl->set("BLOG_OWNER", $blog->owner);
         blog_set_template($tpl, $blog);
         $tpl->set("BLOG_PATH", $blog->home_path);
@@ -419,21 +432,17 @@ class AdminPages extends BasePages {
             if ($validation_error) {
                 $tpl->set("UPDATE_MESSAGE", $validation_error);
             } else {
-                $ret = $blog->insert();
+                try {
+                    SystemConfig::instance()->registerBlog($blog->blogid, new UrlPath($blog->home_path, $blogurl));
+                    $ret = $blog->insert();
+                    SystemConfig::instance()->writeConfig();
+                } catch (FileWriteFailed $e) {
+                    $blog->delete();
+                    $ret = false;
+                }
                 if ($ret) {
-                    try {
-                        SystemConfig::instance()->registerBlog($blog->blogid, new UrlPath($blog->home_path, $blogurl));
-                        SystemConfig::instance()->writeConfig();
-                        $ret = true;
-                    } catch (FileWriteFailed $e) {
-                        $ret = false;
-                    }
-                    if ($ret) {
-                        Page::instance()->redirect($blog->getURL());
-                        exit;
-                    } else {
-                        $tpl->set("UPDATE_MESSAGE", _("Blog create but not registered.  This means the system will not list it on the admin pages.  Please try registering this blog by hand from the administration page."));
-                    }
+                    Page::instance()->redirect($blog->getURL());
+                    exit;
                 } else {
                     $tpl->set("UPDATE_MESSAGE", _("Error creating blog.  This could be a problem with the file permissions on your server.  Please refer to the <a href=\"http://www.skepticats.com/LnBlog/documentation/\">documentation</a> for more information."));
                 }
@@ -736,6 +745,10 @@ class AdminPages extends BasePages {
     }
 
     public function userinfo() {
+        if (GET('blog')) {
+            $blog = NewBlog(GET('blog'));
+            SystemConfig::instance()->definePathConstants($blog->home_path);
+        }
         $uid = GET("user");
         $uid = $uid ? $uid : POST("user");
         $uid = $uid ? $uid : basename(getcwd());
@@ -757,7 +770,7 @@ class AdminPages extends BasePages {
         $ret = $tpl->process();
         $user_file = Path::mk(USER_DATA_PATH,$uid,"profile.htm");
 
-        if (file_exists($user_file)) {
+        if ($this->fs->file_exists($user_file)) {
             $ret .= implode("\n", file($user_file));
         }
 
@@ -861,11 +874,6 @@ class AdminPages extends BasePages {
     }
 
     protected function template_set_post_data(&$tpl) {
-        $tpl->set('INSTALL_ROOT', POST('installroot'));
-        $tpl->set('INSTALL_ROOT_URL', POST('installrooturl'));
-        $tpl->set('USERDATA', POST('userdata'));
-        $tpl->set('USERDATA_URL', POST('userdataurl'));
-
         if (POST("use_ftp") == "ftpfs") $tpl->set("USE_FTP", POST("use_ftp") );
         $tpl->set("USER", POST("ftp_user") );
         $tpl->set("PASS", POST("ftp_pwd") );
@@ -910,6 +918,11 @@ class AdminPages extends BasePages {
         $tpl = $this->createTemplate(FS_CONFIG_TEMPLATE);
 
         $tpl->set("FORM_ACTION", '');
+        $install_root = dirname(__DIR__);
+        $install_root_url = preg_replace('|index\.php.*|', '', current_url());
+        $lnblog_dir_name = basename(dirname(__DIR__));
+        $userdata = Path::mk(dirname(dirname(__DIR__)), USER_DATA);
+        $userdata_url = preg_replace("|$lnblog_dir_name/index.php\.*|i", USER_DATA . '/', current_url());
 
         if (has_post()) {
 
@@ -923,8 +936,8 @@ class AdminPages extends BasePages {
 
             try {
                 $this->validateInstallRootAndUserdata($install_root, $install_root_url, $userdata, $userdata_url);
-                $config->installRoot(new UrlPath($install_root, $install_root_url);
-                $config->userData(new UrlPath($userdata, $userdata_url);
+                $config->installRoot(new UrlPath($install_root, $install_root_url));
+                $config->userData(new UrlPath($userdata, $userdata_url));
                 $config->writeConfig();
             } catch (Exception $e) {
                 $error = $e->getMessage();
@@ -961,6 +974,11 @@ class AdminPages extends BasePages {
             }
         }
 
+        $tpl->set('INSTALL_ROOT', $install_root);
+        $tpl->set('INSTALL_ROOT_URL', $install_root_url);
+        $tpl->set('USERDATA', $userdata);
+        $tpl->set('USERDATA_URL', $userdata_url);
+
         $body = $tpl->process();
         Page::instance()->addStylesheet("form.css");
         Page::instance()->display($body);
@@ -980,11 +998,11 @@ class AdminPages extends BasePages {
             throw new Exception(spf_("The URL '%s' is not a valid URL", $url));
         }
 
-        if ($realpath == $this->fs->realpath($install_root)) {
+        if ($realpath == $this->fs->realpath($install_root->path())) {
             throw new Exception(spf_("The blog path you specified is the same as your %s installation path.  This is not allowed, as it will break your installation.  Please choose a different path for your blog.", PACKAGE_NAME));
         }
 
-        if ($realpath == $this->fs->realpath($userdata)) {
+        if ($realpath == $this->fs->realpath($userdata->path())) {
             throw new Exception(spf_("The blog path you specified is the same as your %s userdata path.  This is not supported.", PACKAGE_NAME));
         }
 
@@ -1000,7 +1018,7 @@ class AdminPages extends BasePages {
     }
 
     private function validateInstallRootAndUserdata(string $install_root, string $install_root_url, string $userdata, string $userdata_url) {
-        if (!$this->file_exists(Path::mk($install_root, 'blogconfig.php'))) {
+        if (!$this->fs->file_exists(Path::mk($install_root, 'blogconfig.php'))) {
             throw new Exception(spf_("The path '%s' is not a valid %s installation", $install_root, PACKAGE_NAME));
         }
 
@@ -1011,5 +1029,18 @@ class AdminPages extends BasePages {
         if (!filter_var($userdata_url, FILTER_VALIDATE_URL)) {
             throw new Exception(sfp_("The URL '%s' is not valid", $userdata_url));
         }
+    }
+
+    private function populateBlogPathDefaults(PHPTemplate $tpl) {
+        $inst_root = SystemConfig::instance()->installRoot()->path();
+        $default_path = dirname($inst_root);
+        if (Path::isWindows()) {
+            $default_path = str_replace('\\', '\\\\', $default_path);
+        }
+        $tpl->set("DEFAULT_PATH", $default_path);
+        $lnblog_name = basename($inst_root);
+        $default_url = preg_replace("|$lnblog_name/|i", '', SystemConfig::instance()->installRoot()->url());
+        $tpl->set("DEFAULT_URL", $default_url);
+        $tpl->set("PATH_SEP", Path::isWindows() ? '\\\\' : Path::$sep);
     }
 }

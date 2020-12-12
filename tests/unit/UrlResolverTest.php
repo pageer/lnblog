@@ -72,6 +72,13 @@ class UrlResolverTest extends \PHPUnit\Framework\TestCase {
                 false,
                 'https://foobar.mysite.com/content/foo/buzz.png'
             ],
+            'absolute in blog with trailing slash, returns in blog with slash' => [
+                '/var/www/foobar/public_html/content/foo/',
+                [],
+                true,
+                false,
+                'https://foobar.mysite.com/content/foo/'
+            ],
             'relative in userdata, return in userdata' => [
                 'bob/buzz.png',
                 [

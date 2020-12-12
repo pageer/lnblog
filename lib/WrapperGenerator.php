@@ -62,17 +62,15 @@ class WrapperGenerator {
     			                    "uploadfile", "map", "useredit", "plugins",
     			                    "tags", "pluginload", "profile");
     			$config_level = 0;
-    			if (! $this->fs->file_exists($current."pathconfig.php")) {
-    				$inst_root = $this->fs->realpath($instpath);
-    				$blog_root = $this->fs->realpath($path);
-    				$inst_url = SystemConfig::instance()->installRoot()->url();
-    				$blog_url = $this->findBlogRoot($blog_root);
-    				$config_data = pathconfig_php_string($inst_root, $inst_url, $blog_url);
-    				$ret = $this->fs->write_file($current."pathconfig.php", $config_data);
-                    if (! $ret) {
-                        $ret_list[] = $current."pathconfig.php";
-                    }
-    			}
+                $inst_root = $this->fs->realpath($instpath);
+                $blog_root = $this->fs->realpath($path);
+                $inst_url = SystemConfig::instance()->installRoot()->url();
+                $blog_url = $this->findBlogRoot($blog_root);
+                $config_data = pathconfig_php_string($inst_root, $inst_url, $blog_url);
+                $ret = $this->fs->write_file($current."pathconfig.php", $config_data);
+                if (! $ret) {
+                    $ret_list[] = $current."pathconfig.php";
+                }
     			break;
             case self::BLOG_ENTRIES:
     			$filelist = array("index"=>"pages/showarchive");

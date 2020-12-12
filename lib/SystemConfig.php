@@ -2,6 +2,7 @@
 
 class SystemConfig {
     const DEFAULT_USERDATA_NAME = 'userdata';
+    const PATH_CONFIG_NAME = 'pathconfig.php';
 
     private $globals;
     private $fs;
@@ -93,7 +94,7 @@ class SystemConfig {
         $output = "<?php\nreturn $output;\n";
         $result = $this->fs->write_file($this->getPathConfigFile(), $output);
         if (!$result) {
-            throw new FileWriteFailed("Could not write pathconfig.php");
+            throw new FileWriteFailed(spf_("Could not write %s", self::PATH_CONFIG_NAME));
         }
     }
 
@@ -112,13 +113,16 @@ class SystemConfig {
     # but are still used by a lot of existing code, and so aren't going away yet.
     public function definePathConstants(string $blog_dir = '') {
         $this->loadPathConfig();
-        if (defined("INSTALL_ROOT")) {
-            return;
+        if (!defined("INSTALL_ROOT")) {
+            define("INSTALL_ROOT", $this->installRoot()->path());
         }
-        define("INSTALL_ROOT", $this->installRoot()->path());
-        define("INSTALL_ROOT_URL", $this->installRoot()->url());
-        define("USER_DATA_PATH", $this->userData()->path());
-        if ($blog_dir) {
+        if (!defined("INSTALL_ROOT_URL")) {
+            define("INSTALL_ROOT_URL", $this->installRoot()->url());
+        }
+        if (!defined("USER_DATA_PATH")) {
+            define("USER_DATA_PATH", $this->userData()->path());
+        }
+        if ($blog_dir && !defined("BLOG_ROOT")) {
             $blog_path = $this->fs->realpath($blog_dir);
             foreach ($this->blogRegistry() as $urlpath) {
                 if ($this->fs->realpath($urlpath->path()) == $blog_path) {
@@ -140,6 +144,6 @@ class SystemConfig {
     }
 
     private function getPathConfigFile(): string {
-        return __DIR__ . '/../pathconfig.php';
+        return Path::mk(__DIR__, '..', self::PATH_CONFIG_NAME);
     }
 }

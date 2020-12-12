@@ -263,6 +263,7 @@ class PluginManager {
         if ( defined("BLOG_ROOT") ) {
             return BLOG_ROOT;
         } elseif (isset($_GET['blog'])) {
+            $blogid = $_GET['blog'];
             $reg = SystemConfig::instance()->blogRegistry();
             if (isset($reg[$blogid])) {
                 return $reg[$blogid]->path();

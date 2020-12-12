@@ -110,7 +110,7 @@ class WebPages extends BasePages {
         $tpl = $this->createTemplate("blog_path_tpl.php");
         $this->getPage()->setDisplayObject($blog);
 
-        $blog_root = $blog-home_path;
+        $blog_root = $blog->home_path;
         $blog_url = $blog->getURL();
 
         $this->verifyUserCanModifyBlog($blog->uri('login'));
@@ -299,10 +299,10 @@ class WebPages extends BasePages {
     public function editfile() {
 
         $file = GET("file");
-        if (PATH_DELIM  != '/') {
-            $file = str_replace('/', PATH_DELIM, $file);
+        if (Path::isWindows()) {
+            $file = str_replace('/', Path::$sep, $file);
         }
-        $file = str_replace("..".PATH_DELIM, '', $file);
+        $file = str_replace("..".Path::$sep, '', $file);
 
         $ent = NewBlogEntry();
 
@@ -314,6 +314,8 @@ class WebPages extends BasePages {
 
         if ( GET("profile") == $this->user->username() ) {
             $relpath = Path::get(USER_DATA_PATH, $this->user->username());
+        } elseif (GET('target') == 'userdata') {
+            $relpath = USER_DATA_PATH;
         } elseif ($ent->isEntry() ) {
             $this->getPage()->setDisplayObject($ent);
             $relpath = $ent->localpath();

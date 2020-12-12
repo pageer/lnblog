@@ -212,6 +212,7 @@ class Publisher {
         $entry->file = Path::mk($path, ENTRY_DEFAULT_FILE);
         $entry->uid = $this->user->username();
         $entry->setDates($ts);
+        $entry->permalink_name = $entry->calcPrettyPermalink();
 
         $file_data = $entry->serializeXML();
         $ret = $this->fs->write_file($entry->file, $file_data);
@@ -255,6 +256,7 @@ class Publisher {
 
         $entry->ip = get_ip();
         $entry->setDates($time->getTimestamp());
+        $entry->permalink_name = $entry->calcPrettyPermalink();
 
         $this->updateEntry($entry, $time);
 
@@ -537,6 +539,7 @@ class Publisher {
         $entry->post_ts = $curr_ts;
         $entry->setDates($curr_ts);
         $entry->ip = get_ip();
+        $entry->permalink_name = $entry->calcPrettyPermalink();
 
         if (!$draft_created) {
             $ret = $this->handleUploads($entry);

@@ -145,7 +145,7 @@ class User extends LnBlogObject {
             $tpl->set("DEFAULT_GROUP",$this->defaultGroup());
         }
         $tpl->set("GROUPS", $this->groups());
-        if (strpos($this->homepage, "http://") === false &&
+        if (strpos($this->homepage, "://") === false &&
             trim($this->homepage) != "") {
             $this->homepage = "http://".$this->homepage;
         }

@@ -2,6 +2,42 @@
 # Template: blog_admin_tpl.php
 # This page contains the markup for the main administration page.
 ?>
+<style>
+.registerbox {
+    margin-left: 2em;
+}
+.registerbox div {
+    margin-bottom: 4px;
+}
+.registerbox label {
+    display: inline-block;
+    width: 6em;
+    text-align: right;
+}
+.registerbox input[type="text"] {
+    width: 50%;
+}
+.registerbox #register_btn {
+    margin-left: 8em;
+}
+</style>
+<script type="application/javascript">
+$(document).ready(function () {
+    var default_path = '<?php echo $DEFAULT_PATH?>';
+    var default_url = '<?php echo $DEFAULT_URL?>';
+    var path_sep = '<?php echo $PATH_SEP?>';
+
+    $('#toggle-reg').on('click', function () {
+        $('#regbox').toggle();
+    });
+
+    $('#register').on('change', function () {
+        var path = default_path + path_sep + $(this).val().replace('/', path_sep) + path_sep;
+        $('#register_path').val(path);
+        $('#register_url').val(default_url + $(this).val() + '/');
+    });
+});
+</script>
 <h1><?php pf_("%s System Administration", PACKAGE_NAME) ?></h1>
 <form method="post" action="<?php echo $FORM_ACTION ?>">
 <?php $this->outputCsrfField() ?>
@@ -9,9 +45,9 @@
 <ul>
 <li><a href="?action=plugins"><?php p_("Configure site-wide plugins") ?></a></li>
 <li><a href="?action=pluginload"><?php p_("Configure enabled plugins and load order") ?></a></li>
-<li><a href="?action=editfile&file=userdata/system.ini"><?php p_("Edit system.ini file") ?></a></li>
-<li><a href="?action=editfile&file=userdata/groups.ini"><?php p_("Edit groups.ini file") ?></a></li>
-<li><a href="?action=editfile&map=yes&file=userdata/sitemap.htm&list=yes"><?php p_("Modify site-wide menubar") ?></a></li>
+<li><a href="?action=editfile&target=userdata&file=system.ini"><?php p_("Edit system.ini file") ?></a></li>
+<li><a href="?action=editfile&target=userdata&file=groups.ini"><?php p_("Edit groups.ini file") ?></a></li>
+<li><a href="?action=editfile&map=yes&target=userdata&file=sitemap.htm&list=yes"><?php p_("Modify site-wide menubar") ?></a></li>
 <li><a href="?action=newlogin"><?php p_("Add new user") ?></a></li>
 <li>Edit existing user
 <select id="username" name="username">
@@ -41,20 +77,25 @@
 </li>
 <li>
 <label for="register"><?php p_("Register a blog with the system") ?></label>
-<br>
-<label for="register"><?php p_("Blog ID") ?></label>
-<input type="text" id="register" name="register" />
-<br>
-<label for="register"><?php p_("Blog path") ?></label>
-<input type="text" id="register_path" name="register_path" />
-<br>
-<label for="register"><?php p_("Blog URL") ?></label>
-<input type="text" id="register_url" name="register_url" />
-<br>
-<input type="submit" id="register_btn" name="register_btn" value="<?php p_("Register") ?>" />
-<?php if (isset($REGISTER_STATUS)) { ?>
-<p><?php pf_("Registration Status: %s", "<strong>".$REGISTER_STATUS."</strong>") ?></p>
-<?php } ?>
+<a id="toggle-reg" href="#regbox">[<?php p_('Toggle')?>]</a>
+<div id="regbox" class="registerbox">
+    <div>
+        <label for="register"><?php p_("Blog ID") ?></label>
+        <input type="text" id="register" name="register" />
+    </div>
+    <div>
+        <label for="register"><?php p_("Blog path") ?></label>
+        <input type="text" id="register_path" name="register_path" />
+    <div>
+    </div>
+        <label for="register"><?php p_("Blog URL") ?></label>
+        <input type="text" id="register_url" name="register_url" />
+    </div>
+    <input type="submit" id="register_btn" name="register_btn" value="<?php p_("Register") ?>" />
+    <?php if (isset($REGISTER_STATUS)) { ?>
+    <p><?php pf_("Registration Status: %s", "<strong>".$REGISTER_STATUS."</strong>") ?></p>
+    <?php } ?>
+</div>
 </li>
 <li>
 <label for="fixperm"><?php p_("Fix directory permissions on blog") ?></label>

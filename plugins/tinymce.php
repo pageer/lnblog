@@ -36,6 +36,7 @@ class TinyMCEEditor extends Plugin {
         <?php if ($this->theme == 'advanced'): ?>
         var init = {
             theme: "silver",
+            convert_urls: false,
             plugins: [
                 "link lists image searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime",
                 "media nonbreaking hr charmap table directionality emoticons template paste preview"
@@ -63,6 +64,7 @@ class TinyMCEEditor extends Plugin {
         init['setup'] = function(ed) {
             ed.on("change", function(e) {
                 current_text_content = ed.getContent();
+                $(selector).val(current_text_content);
             });
         };
         init['relative_urls'] = false;

@@ -57,7 +57,7 @@ class TagList extends Plugin {
 			if (! $tag) {
 				continue;
 			}
-			$l = '<a href="'.$blg->uri('tags', urlencode($tag)).'">'.
+			$l = '<a href="'.$blg->uri('tags', ['tag' => urlencode($tag)]).'">'.
 			     htmlspecialchars($tag).'</a>';
 			if ($this->show_feeds) {
 				$topic = preg_replace('/\W/','',$tag);

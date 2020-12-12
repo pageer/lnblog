@@ -24,6 +24,10 @@ class Path {
         return $p->getPath();
     }
 
+    public function isWindows() {
+        return self::$sep === self::WINDOWS_SEP;
+    }
+
     public function isAbsolute($path) {
         switch($this->dirsep) {
             case self::WINDOWS_SEP:

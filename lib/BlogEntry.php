@@ -1178,8 +1178,8 @@ class BlogEntry extends Entry implements AttachmentContainer {
 
     private function getPathFromGlobalId($globalid) {
         $blogs = SystemConfig::instance()->blogRegistry();
-        foreach ($blogs as $Sblogid => $urlpath) {
-            if (strpos($globalis, $blogid) === 0) {
+        foreach ($blogs as $blogid => $urlpath) {
+            if (strpos($globalid, $blogid) === 0) {
                 $relpath = substr_replace($globalid, '', 0, strlen($blogid));
                 $path = Path::mk($urlpath->path(), $relpath);
                 if ($this->fs->file_exists($path)) {

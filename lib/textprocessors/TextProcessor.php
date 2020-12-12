@@ -179,9 +179,16 @@ abstract class TextProcessor {
         }
         $searchpath[] = $parent->home_path;
         
-        $temp_uri = str_replace("/", PATH_DELIM, $uri);
+        $temp_uri = str_replace("/", Path::$sep, $uri);
         
-        return $this->url_resolver->localpathToUri($path, $parent, $this->entry);
+        $new_url = $this->url_resolver->localpathToUri($temp_uri, $parent, $this->entry);
+
+        # Assume the URL is root-relative, and just put the domain and protocol on the front.
+        if ($new_url == $temp_uri && substr($uri, 0, 1) === '/') {
+            $new_url = current_url($uri);
+        }
+
+        return $new_url;
     }
     
     /* Method: sanitizeText
