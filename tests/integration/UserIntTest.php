@@ -66,7 +66,8 @@ class UserIntTest extends \PHPUnit\Framework\TestCase {
         $directory = USER_DATA_PATH . DIRECTORY_SEPARATOR . $username;
         $passwd_file = $directory . DIRECTORY_SEPARATOR . "passwd.php";
         $user_file = $directory . DIRECTORY_SEPARATOR . "user.ini";
-        mkdir($directory);
+        $result = mkdir($directory, 0777, true);
+        $this->assertTrue($result, "Could not make directory $directory");
         $passwd_content = "<?php\n\$pwd = \"$hash\";\n\$salt = \"$salt\";\n?>";
         $user_content = <<<EOT
 [userdata]
