@@ -953,15 +953,15 @@ class AdminPages extends BasePages {
             @$fs = NewFS();
             $content = str_replace('\\', '\\\\', $content);
 
-            if (! is_dir($config->userData())) {
-                $ret = $fs->mkdir_rec($config->userData());
+            if (! is_dir($config->userData()->path())) {
+                $ret = $fs->mkdir_rec($config->userData()->path());
                 if (!$ret) {
                     $error = _("Unable to create directory %s", $userdata);
                 }
             }
 
-            if (is_dir($config->userData())) {
-                $ret = $fs->write_file(Path::mk($config->userData(), FS_PLUGIN_CONFIG), $content);
+            if (is_dir($config->userData()->path())) {
+                $ret = $fs->write_file(Path::mk($config->userData()->path(), FS_PLUGIN_CONFIG), $content);
                 if (!$ret) {
                     $error = _("Unable to create directory %s/%s", $userdata, FS_PLUGIN_CONFIG);
                 }
