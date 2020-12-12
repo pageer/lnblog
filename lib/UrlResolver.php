@@ -226,11 +226,10 @@ class UrlResolver {
             case 'permalink':
             case 'entry':
             case 'page':
-                if ($entry->permalink_name) {
-                    $permalink_file = Path::mk(dirname($base_dir), $entry->permalink_name);
-                    if ($this->fs->file_exists($permalink_file)) {
-                        return $this->localpathToUri($permalink_file, $entry->getParent());
-                    }
+                $permalink_name = $entry->permalink_name ?: $entry->calcLegacyPermalink();
+                $permalink_file = Path::mk(dirname($base_dir), $permalink_name);
+                if ($permalink_name && $this->fs->file_exists($permalink_file)) {
+                    return $this->localpathToUri($permalink_file, $entry->getParent());
                 }
                 return $this->localpathToUri($base_dir . $sep, $entry->getParent());
             case 'base':
