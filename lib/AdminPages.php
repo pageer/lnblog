@@ -954,7 +954,9 @@ class AdminPages extends BasePages {
 
             if (! is_dir($config->userData()->path())) {
                 $ret = $fs->mkdir_rec($config->userData()->path());
-                if (!$ret) {
+                if ($ret) {
+                    $fs->copy(Path::mk($install_root, 'userdata', '.htaccess'), Path::mk($userdata, '.htaccess'));
+                } else {
                     $error = _("Unable to create directory %s", $userdata);
                 }
             }
