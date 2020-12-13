@@ -12,13 +12,13 @@ class EntryMapper {
     public function getEntryFromUri($uri) {
         $local_path = $this->resolver->uriToLocalpath($uri);
 
-        if (is_dir($local_path)) {
+        if ($this->fs->is_dir($local_path)) {
             return NewEntry($local_path);
         }
 
         # If the resulting entry is a file, then see if it's a PHP wrapper script
         # for entry pretty-permalinks.
-        if (is_file($local_path)) {
+        if ($this->fs->is_file($local_path)) {
             $dir_path = dirname($local_path);
             $content = file($local_path);
 

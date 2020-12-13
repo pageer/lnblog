@@ -117,6 +117,8 @@ class UrlResolver {
         $blog_registry = $this->config->blogRegistry();
         if ($blog && $blog_registry[$blog->blogid]) {
             array_unshift($roots, $blog_registry[$blog->blogid]);
+        } else {
+            $roots = array_merge($roots, $blog_registry);
         }
         
         foreach ($roots as $root) {
