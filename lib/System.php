@@ -107,13 +107,14 @@ class System {
     # Returns:
     # An array of theme names.
     public function getThemeList() {
-        $dir = scan_directory(Path::mk(INSTALL_ROOT,"themes"), true);
+        $fs = NewFS();
+        $dir = $fs->scan_directory(Path::mk(INSTALL_ROOT,"themes"), true);
         if (is_dir(Path::mk(USER_DATA_PATH,"themes"))) {
-            $user_dir = scan_directory(Path::mk(USER_DATA_PATH,"themes"), true);
+            $user_dir = $fs->scan_directory(Path::mk(USER_DATA_PATH,"themes"), true);
             if ($user_dir) $dir = array_merge($dir, $user_dir);
         }
         if (defined("BLOG_ROOT") && is_dir(Path::mk(BLOG_ROOT,"themes"))) {
-            $blog_dir = scan_directory(Path::mk(BLOG_ROOT,"themes"), true);
+            $blog_dir = $fs->scan_directory(Path::mk(BLOG_ROOT,"themes"), true);
             if ($blog_dir) $dir = array_merge($dir, $blog_dir);
         }
         $dir = array_unique($dir);

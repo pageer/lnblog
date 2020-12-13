@@ -776,7 +776,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     public function getArticles($number = null) {
         $art = NewEntry();
         $art_path = Path::get($this->home_path, BLOG_ARTICLE_PATH);
-        $art_list = scan_directory($art_path);
+        $art_list = $this->fs->scan_directory($art_path);
         $ret = array();
         $count = 0;
         foreach ($art_list as $dir) {

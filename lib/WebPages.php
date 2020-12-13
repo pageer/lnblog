@@ -1443,7 +1443,7 @@ class WebPages extends BasePages {
 
         $year_dir = basename(getcwd());
         $title = $this->blog->name." - ".$year_dir;
-        $list = scan_directory(getcwd(), true);
+        $list = $this->fs->scan_directory(getcwd(), true);
         sort($list);
 
         $tpl = $this->createTemplate(LIST_TEMPLATE);

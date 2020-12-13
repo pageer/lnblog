@@ -28,53 +28,6 @@ define("LINK_IMAGE", "images");
 define("LINK_STYLESHEET", "styles");
 define("LINK_SCRIPT", "scripts");
 
-# Function: mkdir_rec
-# Makes directory recursively.
-# As with <write_file>, is a wrapper around the FS interface.  Same deal.
-#
-# Parameters:
-# path - The path to create.
-# mode - The *optional* octal directory permissions for the path.
-#
-# Returns:
-# Passes on the return value of the underlying class method.
-
-function mkdir_rec($path, $mode=false) {
-    $fs = NewFS();
-    # Only pass mode if it is specified.  This lets us default to the
-    # appropriate default mode for the concrete subclass of FS, which is
-    # different between, say, FTPFS and NativeFS.
-    if ($mode) $ret = $fs->mkdir_rec($path, $mode);
-    else $ret = $fs->mkdir_rec($path);
-    return $ret;
-}
-
-# Function: scan_directory
-# Does essentially the same thing as scandir on PHP 5.  Gets all the entries
-# in the given directory.
-#
-# Parameters:
-# path      - The directory path to scan.
-# dirs_only - *Optional* parameter to list only the directories in the path.
-#             The *default* is false.
-#
-# Returns:
-# An array of directory entry names, removing "." and ".." entries.
-
-function scan_directory($path, $dirs_only=false) {
-    if (! is_dir($path)) return array();
-    $dirhand = opendir($path);
-    $dir_list = array();
-    while ( false !== ($ent = readdir($dirhand)) ) {
-        if ($ent != "." && $ent != "..") {
-            if (! $dirs_only) $dir_list[] = $ent;
-            else if (is_dir($path.PATH_DELIM.$ent)) $dir_list[] = $ent;
-        }
-    }
-    closedir($dirhand);
-    return $dir_list;
-}
-
 # Function: SESSION
 # A wrapper for the $_SESSION superglobal.  Provides a handy
 # way to avoid undefined variable warnings without explicitly calling

@@ -875,7 +875,7 @@ class BlogEntry extends Entry implements AttachmentContainer {
     public function getReplyCount($params) {
         $dir_path = dirname($this->file);
         $dir_path = $dir_path.PATH_DELIM.$params['path'];
-        $dir_array = scan_directory($dir_path);
+        $dir_array = $this->fs->scan_directory($dir_path);
         if ($dir_array === false) return false;
 
         $count = 0;
@@ -915,7 +915,7 @@ class BlogEntry extends Entry implements AttachmentContainer {
         $dir_path = dirname($this->file);
         $dir_path = $dir_path.PATH_DELIM.$params['path'];
         if (! is_dir($dir_path)) return array();
-        else $reply_dir = scan_directory($dir_path);
+        else $reply_dir = $this->fs->scan_directory($dir_path);
 
         $reply_files = array();
         foreach ($reply_dir as $file) {
