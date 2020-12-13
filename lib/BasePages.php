@@ -222,6 +222,49 @@ abstract class BasePages {
         }
     }
 
+    # Function: blogGetPostData
+    # Get data from the HTTP POST and put it into the blog object.
+    #
+    # Parameters:
+    # blog - The blog to populate.
+    protected function blogGetPostData(Blog $blog) {
+        $blog->name = POST("blogname");
+        $blog->writers(POST("writelist") );
+        $blog->description = POST("desc");
+        $blog->image = POST("image");
+        $blog->theme = POST("theme");
+        $blog->max_entries = POST("maxent");
+        $blog->max_rss = POST("maxrss");
+        $blog->allow_enclosure = POST("allow_enc")?1:0;
+        $blog->default_markup = POST("blogmarkup");
+        $blog->auto_pingback = POST('pingback')?1:0;
+        $blog->gather_replies = POST('replies')?1:0;
+        $blog->front_page_abstract = POST('use_abstract')?1:0;
+        $blog->front_page_entry = POST('main_entry');
+    }
+
+    # Function: blogSetTemplate
+    # Sets template variables for display of a blog.
+    #
+    # Parameters:
+    # tpl - The template to populate.
+    # ent - the BlogEntry or Article with which to populate the template.
+    protected function blogSetTemplate(PHPTemplate $tpl, Blog $blog) {
+        $tpl->set("BLOG_NAME", $blog->name);
+        $tpl->set("BLOG_WRITERS", implode(",", $blog->writers() ) );
+        $tpl->set("BLOG_DESC", $blog->description);
+        $tpl->set("BLOG_IMAGE", $blog->image);
+        $tpl->set("BLOG_THEME", $blog->theme);
+        $tpl->set("BLOG_MAX", $blog->max_entries);
+        $tpl->set("BLOG_RSS_MAX", $blog->max_rss);
+        $tpl->set("BLOG_ALLOW_ENC", $blog->allow_enclosure);
+        $tpl->set("BLOG_DEFAULT_MARKUP", $blog->default_markup);
+        $tpl->set("BLOG_AUTO_PINGBACK", $blog->autoPingbackEnabled());
+        $tpl->set("BLOG_GATHER_REPLIES", $blog->gather_replies);
+        $tpl->set("BLOG_FRONT_PAGE_ABSTRACT", $blog->front_page_abstract);
+        $tpl->set("BLOG_MAIN_ENTRY", $blog->front_page_entry);
+    }
+
     private function shouldBlockOnMissingOrigin() {
         if ($this->globals->defined("BLOCK_ON_MISSING_ORIGIN")) {
             return $this->globals->constant("BLOCK_ON_MISSING_ORIGIN");

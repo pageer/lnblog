@@ -18,6 +18,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+use LnBlog\Model\Reply;
+
 # Class: Trackback
 # Class for TrackBack entries.  This attempts to comply with theTrackBack
 # specification at http://www.sixapart.com/pronet/docs/trackback_spec
@@ -39,7 +41,7 @@
 # OnOutput        - Fired when starting to process for display.
 # OutputComplete  - Fired when output is sent to the client.
 
-class Trackback extends LnBlogObject {
+class Trackback extends LnBlogObject implements Reply {
 
     # The only required element is the URL
 
