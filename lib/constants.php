@@ -71,18 +71,7 @@ define("MARKUP_MARKDOWN", 3);
 # Constant: UPDATE_SUCCESS
 # Update succeeded.
 define("UPDATE_SUCCESS", 1);
-# Constant: UPDATE_NO_DATA_ERROR
-# Update failed because entry has no body data.
-define("UPDATE_NO_DATA_ERROR", 0);
-# Constant: UPDATE_ENTRY_ERROR
-# Generic error message.
-define("UPDATE_ENTRY_ERROR", -1);
 define("UPDATE_RSS1_ERROR", -2);
-define("UPDATE_RSS2_ERROR", -3);
-# Constant: UPDATE_AUTH_ERROR
-# The update failed because the user is not logged in 
-# or because he lacks sufficient permissions.
-define("UPDATE_AUTH_ERROR", -4);
 
 # Section: FileUpload Error Codes
 # Status constants used for file uploading.

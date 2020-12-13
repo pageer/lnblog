@@ -61,6 +61,7 @@ class IPBan extends Plugin {
     # Write the ban list to disk.
 
     function updateList($add_list, $do_global=false) {
+        $fs = NewFS();
         $blog = NewBlog();
         $usr = NewUser();
         if ( $blog->isBlog() && System::instance()->canModify($blog, $usr) && !$do_global) {
@@ -80,7 +81,7 @@ class IPBan extends Plugin {
             if ($content != '') $content .= "\n";
             $content .= trim($ip);
         }
-        $ret = write_file($file, $content);
+        $ret = $fs->write_file($file, $content);
     }
 
     function addBanLink(&$cmt) {

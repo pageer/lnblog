@@ -124,7 +124,7 @@ class WebPages extends BasePages {
             if ($this->fs->is_dir($blog_root)) {
                 SystemConfig::instance()->registerBlog(basename($blog_root), new UrlPath($blog_root, $blog_url));
                 SystemConfig::instance()->writeConfig();
-                $ret = write_file(Path::mk(BLOG_ROOT,"pathconfig.php"),
+                $ret = $this->fs->write_file(Path::mk(BLOG_ROOT,"pathconfig.php"),
                                   pathconfig_php_string($inst_root, $inst_url, $blog_url));
                 if (!$ret) {
                     $tpl->set("UPDATE_MESSAGE", _("Error updating blog paths."));
@@ -283,7 +283,7 @@ class WebPages extends BasePages {
         if (has_post()) {
 
             $data = POST("output");
-            $ret = write_file($file, $data);
+            $ret = $this->fs->write_file($file, $data);
 
             if (! $ret) {
                 $tpl->set("EDIT_ERROR", _("Cannot create file"));

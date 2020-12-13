@@ -831,6 +831,8 @@ function metaWeblog_getPost($params) {
 function metaWeblog_newMediaObject($params) {
     global $xmlrpcerruser;
 
+    $fs = NewFS();
+
     $blogid = $params->getParam(0);
     $username = $params->getParam(1);
     $password = $params->getParam(2);
@@ -862,7 +864,7 @@ function metaWeblog_newMediaObject($params) {
     } else {
         $path = Path::mk($blog->home_path, $name->scalarval());
     }
-    $ret = write_file($path, base64_decode($bits->scalarval()));
+    $ret = $fs->write_file($path, base64_decode($bits->scalarval()));
 
     if ($ret) {
         $resolver = new UrlResolver();
