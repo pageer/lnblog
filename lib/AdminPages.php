@@ -17,7 +17,6 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-require_once __DIR__.'/../pages/pagelib.php';
 
 class AdminPages extends BasePages {
 
@@ -398,7 +397,7 @@ class AdminPages extends BasePages {
 
         if (has_post()) {
             $blog->owner = POST("owner");
-            blog_get_post_data($blog);
+            $this->blogGetPostData($blog);
         }
 
         $blogurl = POST('blogurl');
@@ -413,7 +412,7 @@ class AdminPages extends BasePages {
         $tpl->set("BLOG_ID", $blog->blogid);
         $tpl->set("BLOG_URL", $blogurl);
         $tpl->set("BLOG_OWNER", $blog->owner);
-        blog_set_template($tpl, $blog);
+        $this->blogSetTemplate($tpl, $blog);
         $tpl->set("BLOG_PATH", $blog->home_path);
         $tpl->set("POST_PAGE", current_file());
         $tpl->set("UPDATE_TITLE", _("Create new weblog"));

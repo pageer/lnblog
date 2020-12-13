@@ -160,8 +160,6 @@ Group: Test Scripts  {
    File: pingback_test.php  (C:\Users\pageer\Documents\Projects\lnblog\pingback_test.php)
    }  # Group: Test Scripts
 
-File: pagelib.php  (C:\Users\pageer\Documents\Projects\lnblog\pages\pagelib.php)
-
 Group: Index  {
 
    Index: Everything

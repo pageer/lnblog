@@ -18,6 +18,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+use LnBlog\Model\Reply;
+
 /*
 Class: BlogComment
 Represents a comment on a blog entry or article.
@@ -40,7 +42,7 @@ OnOutput       - Fired before output is generated.
 OutputComplete - Fired after output has finished being generated.
 POSTRetrieved  - Fired after data has been retreived from an HTTP POST.
 */
-class BlogComment extends Entry {
+class BlogComment extends Entry implements Reply {
 
     public $postid;
     public $name;
@@ -285,7 +287,7 @@ class BlogComment extends Entry {
     }
 
     # Method: globalID
-    # Get the global identifier for this trackback.
+    # Get the global identifier for this comment.
     public function globalID() {
         $parent = $this->getParent();
         $id = $parent->globalID();

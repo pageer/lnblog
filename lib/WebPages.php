@@ -1,6 +1,7 @@
 <?php
-require_once __DIR__.'/../pages/pagelib.php';
 
+use LnBlog\Model\EntryFactory;
+use LnBlog\Model\Reply;
 use LnBlog\Tasks\TaskManager;
 
 class WebPages extends BasePages {
@@ -9,14 +10,16 @@ class WebPages extends BasePages {
     protected $user;
     protected $publisher;
     protected $task_manager;
+    protected $factory;
 
     private $last_pingback_results = array();
     private $last_upload_error = array();
 
-    public function __construct(Blog $blog = null, User $user = null) {
+    public function __construct(Blog $blog = null, User $user = null, EntryFactory $factory = null) {
         parent::__construct();
         $this->user = $user ?: NewUser();
         $this->blog = $blog ?: NewBlog();
+        $this->factory = $factory ?: new EntryFactory();
         $this->getPage()->setDisplayObject($this->blog);
 
         EventRegister::instance()->addHandler('BlogEntry', 'PingbackComplete', $this, 'handlePingbackComplete');
@@ -149,96 +152,22 @@ class WebPages extends BasePages {
 
         $this->verifyUserIsLoggedIn();
 
-        # which determines if the resposne is to be deleted.
-        extract($this->get_posted_responses());
-
-        $tpl = $this->createTemplate('confirm_tpl.php');
-        $tpl->set("CONFIRM_PAGE", current_file() );
-        $tpl->set("OK_ID", 'conf');
-        $tpl->set("OK_LABEL", _("Yes"));
-        $tpl->set("CANCEL_ID", _("Cancel"));
-        $tpl->set("CANCEL_LABEL", _("Cancel"));
-        $tpl->set("PASS_DATA_ID", "responselist");
-
-        $anchors = '';
-
-        if ( count($response_array) <= 0 ) {
-
-            # No permission to delete anything, so bail out.
-
-            $title = _("Permission denied");
-            $message = _("You do not have permission to delete any of the selected responses.");
-
-        } elseif ( count($response_array) > 0 && count($denied_array) > 0 ) {
-
-            # We have some responses that can't be deleted, so confirm with the user.
-
-            $title = _("Delete responses");
-            $good_list = '';
-            $bad_list = '';
-
-            foreach ($response_array as $resp) {
-                $anchors .= ($anchors == '' ? '' : ',').$resp->getAnchor();
-                $good_list .= get_list_text($resp);
-            }
-
-            foreach ($denied_array as $obj) {
-                $bad_list .= get_list_text($obj);
-            }
-
-            $message = _("Delete the following responses?").
-                       '<ul>'.$good_list.'</ul>'.
-                       _('The following responses will <strong>not</strong> be deleted because you do not have sufficient permissions.').
-                       '<ul>'.$bad_list.'</ul>';
-
-        } elseif (POST('conf') || GET("conf") == "yes") {
-
-            # We already have confirmation, either from the form or the query string,
-            # and a list of only valid responses, so now we can actually delete them.
-
-            $ret = do_delete($response_array);
-
-            if ( count($ret) > 0) {
-
-                $list = '';
-
-                foreach ($ret as $obj) {
-                    $anchors .= ($anchors == '' ? '' : ',').$resp->getAnchor();
-                    $list .= get_link_text($obj);
-                }
-                $title = _("Error deleting responses");
-                $message = _("Unable to delete the following responses.  Do you want to try again?");
-                $message .= $list;
-            } else {
-                $this->getPage()->redirect($entry->permalink());
-                exit;
-            }
-
-        } else {
-
-            # Last is the case where we have all good responses, but no confirmation.
-
-            $list = '';
-
-            foreach ($response_array as $resp) {
-                $anchors .= ($anchors == '' ? '' : ',').$resp->getAnchor();
-                $list .= get_list_text($resp);
-            }
-
-            $title = _("Delete responses");
-            $message = _("Do you want to delete the following responses?");
-            $message .= $list;
-
+        $responses = POST('replies') ?: [];
+        # TODO: Kill this with fire
+        if (!$responses && GET('delete')) {
+            $type = preg_replace('|^([a-z]+)\d.*$|', '/$1s/#', GET('delete'));
+            $global_id = $entry->globalID() . $type . GET('delete');
+            $responses = [$global_id];
         }
+        var_dump($responses);
+        $result = $this->handleDeletes($responses);
 
-        $tpl->set("CONFIRM_TITLE", $title);
-        $tpl->set("CONFIRM_MESSAGE",$message);
-        $tpl->set("PASS_DATA", $anchors);
-
-        $body = $tpl->process();
-        $this->getPage()->title = sprintf("%s - %s", $this->blog->name, $title);
-
-        $this->getPage()->display($body, $this->blog);
+        if ($result === true) {
+            $this->getPage()->redirect($entry->permalink());
+            exit;
+        }
+        $this->getPage()->title = sprintf("%s - %s", $this->blog->name, _('Delete replies'));
+        $this->getPage()->display($result, $this->blog);
     }
 
     public function delentry() {
@@ -1009,8 +938,9 @@ class WebPages extends BasePages {
 
         $this->getPage()->setDisplayObject($main_obj);
 
-        if ($this->has_posted_responses()) {
-            $body = $this->handle_deletes();
+        $responses = POST('replies') ?: [];
+        if ($responses) {
+            $body = $this->handleDeletes($responses);
             if ($body === true) {
                 #$this->getPage()->redirect(make_uri(false, false, false, '&'));
                 # It seems that the POST data is passed on when you redirect to the same
@@ -1026,64 +956,31 @@ class WebPages extends BasePages {
     }
 
     protected function get_display_markup(&$item, $count) {
-        $ret = reply_boxes($count, $item);
+        $ret = $this->replyBoxes($item);
         $ret .= '<a href="'.$item->permalink().'">'.$item->title()."</a>";
         return $ret;
     }
 
-    protected function has_posted_responses() {
-        if (POST('responselist')) {
-            return true;
-        } elseif (POST('responseid0')) {
-            $count = 0;
-            while (POST("responseid$count")) $count++;
-            for ($i = 0; $i <= $count; $i++) {
-                if (POST("response$i"))     return true;
-            }
-            return false;
-        } else {
-            return false;
-        }
-    }
+    protected function getPostedResponses(array $responses, User $user) {
+        $result = [
+            'allowed' => [],
+            'denied' => [],
+        ];
 
-    protected function get_posted_responses() {
-        $index = 1;
-        $response_array = array();
-        $denied_array = array();
-
-        if (POST('responselist')) {
-
-            $anchors = explode(',', $_POST['responselist']);
-            foreach ($anchors as $a) {
-                $obj = get_response_object($a, $this->user);
-                if ($obj) {
-                    $response_array[] = $obj;
+        foreach ($responses as $response) {
+            try {
+                $reply = $this->factory->getReply($response);
+                if (System::instance()->canDelete($reply, $user)) {
+                    $result['allowed'][] = $reply;
                 } else {
-                    $denied_array[] = $a;
+                    $result['denied'][] = $response;
                 }
-            }
-
-        } else {
-
-            # For multiple deletes, there are two lists of fields.  The responseid#
-            # is the anchor for that response, wile the response# is the
-            # corresponding checkbox
-
-            $index = 0;
-            while ( isset($_POST['responseid'.$index]) ) {
-                if ( POST('response'.$index) ) {
-                    $obj = get_response_object($_POST['responseid'.$index], $this->user);
-                    if ($obj) {
-                        $response_array[] = $obj;
-                    } else {
-                        $denied_array[] = $_POST['responseid'.$index];
-                    }
-                }
-                $index++;
+            } catch (EntryNotFound $e) {
+                $result['denied'][] = $response;
             }
         }
 
-        return compact('response_array', 'denied_array');
+        return $result;
     }
 
     protected function get_reply_list(&$blog, &$ent) {
@@ -1220,9 +1117,18 @@ class WebPages extends BasePages {
         return $tpl->process();
     }
 
-    protected function handle_deletes() {
+    protected function handleDeletes(array $responses) {
+        $replies = $this->getPostedResponses($responses, $this->user);
 
-        extract($this->get_posted_responses());
+        $get_list_text = function ($obj) {
+            if (! is_object($obj)) {
+                return '<li>'.$obj."</li>\n";
+            } else {
+                return '<li>'.$obj->getAnchor().
+                       ' - <a href="'.$obj->permalink().'">'.
+                       $obj->title()."</a></li>\n";
+            }
+        };
 
         $tpl = $this->createTemplate('confirm_tpl.php');
         $tpl->set("CONFIRM_PAGE", make_uri(false, false, false) );
@@ -1230,32 +1136,28 @@ class WebPages extends BasePages {
         $tpl->set("OK_LABEL", _("Yes"));
         $tpl->set("CANCEL_ID", _("Cancel"));
         $tpl->set("CANCEL_LABEL", _("Cancel"));
-        $tpl->set("PASS_DATA_ID", "responselist");
+        $tpl->set("PASS_DATA_ID", "replies[]");
 
         $anchors = '';
 
-        if ( count($response_array) <= 0 ) {
-
+        if ( count($replies['allowed']) <= 0 ) {
             # No permission to delete anything, so bail out.
-
             $title = _("Permission denied");
             $message = _("You do not have permission to delete any of the selected responses.");
 
-        } elseif ( count($response_array) > 0 && count($denied_array) > 0 ) {
-
+        } elseif ( count($replies['allowed']) > 0 && count($replies['denied']) > 0 ) {
             # We have some responses that can't be deleted, so confirm with the user.
-
             $title = _("Delete responses");
             $good_list = '';
             $bad_list = '';
 
-            foreach ($response_array as $resp) {
-                $anchors .= ($anchors == '' ? '' : ',').$resp->getAnchor();
-                $good_list .= get_list_text($resp);
+            foreach ($replies['allowed'] as $resp) {
+                $anchors .= ($anchors == '' ? '' : ',').$resp->globalID();
+                $good_list .= $get_list_text($resp);
             }
 
-            foreach ($denied_array as $obj) {
-                $bad_list .= get_list_text($obj);
+            foreach ($replies['denied'] as $obj) {
+                $bad_list .= $get_list_text($obj);
             }
 
             $message = _("Delete the following responses?").
@@ -1267,15 +1169,18 @@ class WebPages extends BasePages {
 
             # We already have confirmation, either from the form or the query string,
             # and a list of only valid responses, so now we can actually delete them.
-
-            $ret = do_delete($response_array);
+            $ret = [];
+            foreach ($replies['allowed'] as $reply) {
+                $success = $reply->delete();
+                if (!$success) {
+                    $ret[] = $reply;
+                }
+            }
 
             if ( count($ret) > 0) {
-
                 $list = '';
-
                 foreach ($ret as $obj) {
-                    $anchors .= ($anchors == '' ? '' : ',').$resp->getAnchor();
+                    $anchors .= ($anchors == '' ? '' : ',').$resp->globalID();
                     $list .= get_link_text($obj);
                 }
                 $title = _("Error deleting responses");
@@ -1289,20 +1194,16 @@ class WebPages extends BasePages {
             }
 
         } else {
-
             # Last is the case where we have all good responses, but no confirmation.
-
             $list = '';
-
-            foreach ($response_array as $resp) {
+            foreach ($replies['allowed'] as $resp) {
                 $anchors .= ($anchors == '' ? '' : ',').$resp->globalID();
-                $list .= get_list_text($resp);
+                $list .= $get_list_text($resp);
             }
 
             $title = _("Delete responses");
             $message = _("Do you want to delete the following responses?");
             $message .= $list;
-
         }
 
         $tpl->set("CONFIRM_TITLE", $title);
@@ -1517,25 +1418,17 @@ class WebPages extends BasePages {
         $day = isset($_GET['day']) ? sprintf("%02d", GET("day") ) : false;
 
         if ($year && $month && $day) {
-
             $body = $this->show_day_archives($this->blog, $year, $month, $day);
             if (is_array($body)) {
                 $this->getPage()->redirect( $body[1] );
                 exit;
             }
-
         } elseif ($year && $month) {
-
             $body = $this->show_month_archives($this->blog, $year, $month);
-
         } elseif ($year) {
-
             $body = $this->show_year_archives($this->blog, $year);
-
         } else {
-
             $body = $this->show_base_archives($this->blog);
-
         }
 
         if (GET('ajax')) {
@@ -1641,27 +1534,30 @@ class WebPages extends BasePages {
         $this->getPage()->display($body, $this->blog);
     }
 
-    # Function: show_comment_page
+    # Function: showCommentPage
     # Show the page of comments on the entry.
-    protected function show_comment_page(&$blg, &$ent, &$usr) {
+    protected function showCommentPage(&$blg, &$ent, &$usr) {
 
         $this->getPage()->title = $ent->title() . " - " . $blg->title();
 
         # This code will detect if a comment has been submitted and, if so,
         # will add it.  We do this before printing the comments so that a
         # new comment will be displayed on the page.
-        # Here we include and call handle_comment() to output a comment form, add a
+        # Here we include and call handleComment() to output a comment form, add a
         # comment if one has been posted, and set "remember me" cookies.
         $comm_output = '';
         if ($ent->allow_comment) {
-            $comm_output = handle_comment($this, $ent, true);
+            $comm_output = $this->handleComment($this, $ent, true);
         }
 
         $content = '';
 
         # Allow a query string to get just the comment form, not the actual comments.
         if (! GET('post')) {
-            $content = show_comments($this, $ent, $usr);
+            $title = spf_('Comments on <a href="%s">%s</a>',
+                          $ent->permalink(), htmlspecialchars($ent->subject));
+            $cmts = $ent->getComments();
+            $content = $this->showReplies($ent, $usr, $cmts, $title);
             # Extra styles to add.  Build the list as we go to keep from including more
             # style sheets than we need to.
             $this->getPage()->addStylesheet("reply.css");
@@ -1677,15 +1573,18 @@ class WebPages extends BasePages {
 
     }
 
-    # Function: show_pingback_page
+    # Function: showPingbackPage
     # Show the page of Pingbacks for the entry.
-    protected function show_pingback_page(&$blg, &$ent, &$usr) {
+    protected function showPingbackPage(&$blg, &$ent, &$usr) {
 
         $this->getPage()->title = $ent->title() . " - " . $blg->title();
         $this->getPage()->addScript(lang_js());
         $this->getPage()->addStylesheet("reply.css");
         $this->getPage()->addScript("entry.js");
-        $body = show_pingbacks($this, $ent, $usr);
+        $title = spf_('Pingbacks on <a href="%s">%s</a>',
+                      $ent->permalink(), $ent->subject);
+        $pbs = $ent->getPingbacks();
+        $body = $this->showReplies($ent, $usr, $pbs, $title);
         if (! $body) $body = '<p>'.
             spf_('There are no pingbacks for %s',
                  sprintf('<a href="%s">\'%s\'</a>',
@@ -1693,15 +1592,18 @@ class WebPages extends BasePages {
         return $body;
     }
 
-    # Function: show_trackback_page
+    # Function: showTrackbackPage
     # Shows the page of TrackBacks for the entry.
-    protected function show_trackback_page(&$blg, &$ent, &$usr) {
+    protected function showTrackbackPage(&$blg, &$ent, &$usr) {
 
         $this->getPage()->title = $ent->title() . " - " . $blg->title();
         $this->getPage()->addScript(lang_js());
         $this->getPage()->addStylesheet("reply.css");
         $this->getPage()->addScript("entry.js");
-        $body = show_trackbacks($this, $ent, $usr);
+        $title = spf_('Trackbacks on <a href="%s">%s</a>',
+                      $ent->permalink(), $ent->subject);
+        $tbs = $ent->getTrackbacks();
+        $body = $this->showReplies($ent, $usr, $tbs, $title);
         if (! $body) {
             $body = '<p>'.spf_('There are no trackbacks for %s',
                                sprintf('<a href="%s">\'%s\'</a>',
@@ -1710,9 +1612,9 @@ class WebPages extends BasePages {
         return $body;
     }
 
-    # Function: show_trackback_ping_page
+    # Function: showTrackbackPingPage
     # Show the page from which users can send a TrackBack ping.
-    protected function show_trackback_ping_page(&$blog, &$ent, &$usr) {
+    protected function showTrackbackPingPage(&$blog, &$ent, &$usr) {
 
         $tpl = $this->createTemplate("send_trackback_tpl.php");
 
@@ -1770,15 +1672,15 @@ class WebPages extends BasePages {
         return $tpl->process();
     }
 
-    # Function: show_entry_page
+    # Function: showEntryPage
     # Handles displaying the main permalink for a BlogEntry or Article.
-    protected function show_entry_page(&$blg, &$ent, &$usr) {
+    protected function showEntryPage(&$blg, &$ent, &$usr) {
 
-        # Here we include and call handle_comment() to output a comment form, add a
+        # Here we include and call handleComment() to output a comment form, add a
         # comment if one has been posted, and set "remember me" cookies.
         $comm_output = '';
         if ($ent->allow_comment) {
-            $comm_output = handle_comment($this, $ent);
+            $comm_output = $this->handleComment($this, $ent);
         }
 
         # Get the entry AFTER posting the comment so that the comment count is right.
@@ -1787,7 +1689,7 @@ class WebPages extends BasePages {
         $content =  $ent->getFull($show_ctl);
 
         if (System::instance()->sys_ini->value("entryconfig", "GroupReplies", 0)) {
-            $content .= show_all_replies($ent, $usr);
+            $content .= $this->showAllReplies($ent, $usr);
         }
 
         # Add comment form if applicable.
@@ -1858,25 +1760,15 @@ class WebPages extends BasePages {
             exit;
 
         } elseif ( strtolower(GET("action")) == 'ping' ) {
-
-            $content = $this->show_trackback_ping_page($this->blog, $ent, $this->user);
-
+            $content = $this->showTrackbackPingPage($this->blog, $ent, $this->user);
         } elseif ( $page_type == 'pingback' || $page_type == ENTRY_PINGBACK_DIR) {
-
-            $content = $this->show_pingback_page($this->blog, $ent, $this->user);
-
+            $content = $this->showPingbackPage($this->blog, $ent, $this->user);
         } elseif ( $page_type == 'trackback' || $page_type == ENTRY_TRACKBACK_DIR ) {
-
-            $content = $this->show_trackback_page($this->blog, $ent, $this->user);
-
+            $content = $this->showTrackbackPage($this->blog, $ent, $this->user);
         } elseif ( $page_type == 'comment' || $page_type == ENTRY_COMMENT_DIR ) {
-
-            $content = $this->show_comment_page($this->blog, $ent, $this->user);
-
+            $content = $this->showCommentPage($this->blog, $ent, $this->user);
         } else {
-
-            $content = $this->show_entry_page($this->blog, $ent, $this->user);
-
+            $content = $this->showEntryPage($this->blog, $ent, $this->user);
         }
 
         $this->getPage()->display($content);
@@ -1956,7 +1848,7 @@ class WebPages extends BasePages {
             $blogid = POST('blogid');
             $blogpath = POST('blogpath');
             $blogurl = POST('blogurl');
-            blog_get_post_data($blog);
+            $this->blogGetPostData($blog);
 
             $ret = $blog->update();
             $urlpath = new UrlPath($blogpath, $blogurl);
@@ -1968,7 +1860,7 @@ class WebPages extends BasePages {
         if ($usr->username() == ADMIN_USER) {
             $tpl->set("BLOG_OWNER", $blog->owner);
         }
-        blog_set_template($tpl, $blog);
+        $this->blogSetTemplate($tpl, $blog);
         $tpl->set("POST_PAGE", current_file());
         $tpl->set("UPDATE_TITLE", sprintf(_("Update %s"), $blog->name));
 
@@ -2149,5 +2041,229 @@ class WebPages extends BasePages {
         $page = (int) GET('page');
         $page = $page > 0 ? $page : 1;
         return ($page - 1) * $this->blog->max_entries;
+    }
+ 
+    # Function: handleComment
+    # Handles comments posted to an entry.  This includes generating the form
+    # markup, setting appropriate cookies, and actually inserting the new comments.
+    #
+    # Parameters:
+    # page          - The BasePages object representing the current page.
+    # ent           - The entry we're dealing with.
+    # use_comm_link - *Optional* boolean, defaults to false.  If this is set to
+    #                 true, then the page will be redirected to the comments page
+    #                 after a successful comment post.  If not, then the redirect
+    #                 will be to the entry permalink.
+    #
+    # Returns:
+    # The markup to be inserted into the page for the comment form.
+    private function handleComment(BasePages $page, &$ent, $use_comm_link=false) {
+
+        Page::instance()->addStylesheet("form.css");
+        $comm_tpl = NewTemplate(COMMENT_FORM_TEMPLATE, $page);
+        # Set form information saved in cookies.
+        if (COOKIE('comment_url'))
+            $comm_tpl->set("COMMENT_URL", COOKIE('comment_url'));
+        if (COOKIE('comment_name'))
+            $comm_tpl->set("COMMENT_NAME", COOKIE('comment_name'));
+        if (COOKIE('comment_email'))
+            $comm_tpl->set("COMMENT_EMAIL", COOKIE('comment_email'));
+        if (COOKIE('comment_showemail'))
+            $comm_tpl->set("COMMENT_SHOWEMAIL", COOKIE('comment_showemail'));
+        $comm_tpl->set("FORM_TARGET", $ent->uri("basepage"));
+
+        if ($ent->getCommentCount() == 0) {
+            if ($use_comm_link) $comm_tpl->set("PARENT_TITLE", trim($ent->subject));
+            $comm_tpl->set("PARENT_URL", $ent->permalink());
+        }
+
+        if (has_post()) {
+
+            $cmt = NewBlogComment();
+            $cmt->getPostData();
+
+            $err = false;
+            $ret = false;
+            if ($cmt->data) {
+                # Filter out some obviouisly invalid data
+                if ( strpos(POST('subject'), "\n") !== false ||
+                     strpos(POST('username'), "\n") !== false ||
+                     strpos(POST('email'), "\n") !== false ||
+                     strpos(POST('homepage'), "\n") !== false ) {
+                    $err = _("Error: line breaks are only allowed in the comment body.  What are you, a spam bot?");
+                } else {
+                    $ret = $cmt->insert($ent);
+                }
+            } else {
+                $err = _("Error: you must include something in the comment body.");
+            }
+
+            if ($ret && !$err) {
+                # If the "remember me" box is checked, save the info in cookies.
+                if (POST("remember")) {
+                    $path = "/";  # Do we want to do daomain cookies?
+                    $exp = time()+2592000;  # Expire cookies after one month.
+                    if (POST("username"))
+                        setcookie("comment_name", POST("username"), $exp, $path);
+                    if (POST("email"))
+                        setcookie("comment_email", POST("email"), $exp, $path);
+                    if (POST("homepage"))
+                        setcookie("comment_url", POST("homepage"), $exp, $path);
+                    if (POST("showemail"))
+                        setcookie("comment_showemail", POST("showemail"), $exp, $path);
+                }
+                # Redirect to prevent double-posts.
+                if ($use_comm_link) Page::instance()->redirect($ent->uri('comment'));
+                else Page::instance()->redirect($ent->permalink());
+            } else {
+                # Set the data back in the form, along with error messages.
+                $comm_tpl->set("COMMENT_DATA", POST('data'));
+                $comm_tpl->set("COMMENT_SUBJECT", POST('subject'));
+                $comm_tpl->set("COMMENT_URL", POST('homepage'));
+                $comm_tpl->set("COMMENT_NAME", POST('username'));
+                $comm_tpl->set("COMMENT_EMAIL", POST('email'));
+                $comm_tpl->set("COMMENT_SHOWEMAIL", POST('showemail'));
+                $comm_tpl->set("COMMENT_FORM_MESSAGE", $err ? $err :
+                               _("Error: unable to add commtent please try again."));
+            }
+        }
+
+        return $comm_tpl->process();
+    }
+
+    # Function: show_replies
+    # Gets the HTML for replies of the given type in a list.
+    #
+    # Parameters:
+    # ent     - A reference to the entry for which to get replies.
+    # usr     - A reference to the current user.
+    # replies - An array of reply objects.
+    private function showReplies(&$ent, &$usr, &$replies, $title) {
+        $page = $this;
+        $ret = "";
+        $count = 0;
+        if ($replies) {
+            $reply_text = array();
+            $count = 0;
+            foreach ($replies as $reply) {
+                if (! isset($reply_type)) $reply_type = get_class($reply);
+                $tmp = $reply->get();
+                if (System::instance()->canModify($reply, $usr)) {
+                    $tmp = $this->replyBoxes($reply).$tmp;
+                    $count += 1;
+                }
+                $reply_text[] = $tmp;
+            }
+        }
+
+        # Suppress markup entirely if there are no replies of the given type.
+        if (isset($reply_text)) {
+
+            $tpl = NewTemplate(LIST_TEMPLATE, $page);
+
+            if (System::instance()->canModify($reply, $usr)) {
+
+                $typename = '';
+
+                $tpl->set("FORM_HEADER", "<p>".
+                          spf_("Delete marked %s", get_class($replies[0])).' '.
+                          '<input type="submit" value="'._("Delete").'" />'.
+                          '<input type="button" value="'._("Select all").
+                          '" onclick="mark_type(\''.$reply_type.'\')" />'.
+                          '<input type="hidden" name="replycount" value="'.
+                          count($reply_text).'" />'."</p>\n");
+
+                $blog = $ent->getParent();
+                $qs = array('blog'=>$blog->blogid);
+                if ($ent->isEntry()) $qs['entry'] = $ent->entryID();
+                else $qs['article'] = $ent->entryID();
+                $url = make_uri(false, array('action' => 'delcomment'));
+                $tpl->set("FORM_ACTION", $url);
+            }
+
+            $tpl->set("ITEM_CLASS", strtolower(get_class($replies[0])));
+            $tpl->set("ORDERED");
+            $tpl->set("LIST_TITLE", $title);
+            $tpl->set("ITEM_LIST", $reply_text);
+            $ret = $tpl->process();
+        }
+
+        return $ret;
+    }
+
+    private function showAllReplies(&$ent, &$usr) {
+        $page = $this;
+        # Get an array of each kind of reply.
+        $pingbacks = $ent->getReplyArray(
+            array('path'=>ENTRY_PINGBACK_DIR, 'ext'=>PINGBACK_PATH_SUFFIX,
+                  'creator'=>'NewPingback', 'sort_asc'=>true));
+        $trackbacks = $ent->getReplyArray(
+            array('path'=>ENTRY_TRACKBACK_DIR, 'ext'=>TRACKBACK_PATH_SUFFIX,
+                  'creator'=>'NewTrackback', 'sort_asc'=>true));
+        $comments = $ent->getReplyArray(
+            array('path'=>ENTRY_COMMENT_DIR, 'ext'=>COMMENT_PATH_SUFFIX,
+                  'creator'=>'NewBlogComment', 'sort_asc'=>true));
+
+        # Merge the arrays and sort entries based on the ping_date and/or timestamp.
+        $replies = array_merge($pingbacks, $trackbacks, $comments);
+        $reply_compare = function (&$a, &$b) {
+            $a_ts = isset($a->timestamp) ? $a->timestamp : strtotime($a->ping_date);
+            $b_ts = isset($b->timestamp) ? $b->timestamp : strtotime($b->ping_date);
+            return $a_th <=> $b_ts;
+        };
+        usort($replies, 'reply_compare');
+
+        $ret = "";
+        $count = 0;
+        if ($replies) {
+            $reply_text = array();
+            $count = 0;
+
+            foreach ($replies as $reply) {
+                $tmp = $reply->get();
+                if (System::instance()->canModify($reply, $usr)) {
+                    $tmp = $this->replyBoxes($reply).$tmp;
+                    $count += 1;
+                }
+                $reply_text[] = $tmp;
+            }
+        }
+
+        # Suppress markup entirely if there are no replies of the given type.
+        if (isset($reply_text)) {
+
+            $tpl = NewTemplate(LIST_TEMPLATE, $page);
+
+            if (System::instance()->canModify($reply, $usr)) {
+                $tpl->set("FORM_HEADER",
+                          spf_("<p>Delete marked replies %s</p>",
+                          '<input type="submit" value="'._("Delete").'" />'.
+                          '<input type="button" value="'._("Select all").'" onclick="mark_all();" />'.
+                          '<input type="hidden" name="replycount" value="'.
+                          count($reply_text).'" />'));
+
+                $blog = $ent->getParent();
+                $qs = array('blog'=>$blog->blogid);
+                if ($ent->isEntry()) $qs['entry'] = $ent->entryID();
+                else $qs['article'] = $ent->entryID();
+                $url = make_uri(false, array('action' => 'delcomment'));
+                $tpl->set("FORM_ACTION", $url);
+            }
+
+            $tpl->set("ITEM_CLASS", 'reply');
+            $tpl->set("LIST_CLASS", 'replylist');
+            $tpl->set("ORDERED");
+            $tpl->set("LIST_TITLE", spf_('Replies on <a href="%s">%s</a>',
+                      $ent->permalink(), $ent->subject));
+            $tpl->set("ITEM_LIST", $reply_text);
+            $ret = $tpl->process();
+        }
+
+        return $ret;
+    }
+
+    private function replyBoxes(Reply $obj) {
+        $id = $obj->globalID();
+        return '<span><input type="checkbox" name="replies[]" value="'.$id.'" /></span>';
     }
 }

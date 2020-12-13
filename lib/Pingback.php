@@ -17,6 +17,9 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
+use LnBlog\Model\Reply;
+
 # Class: Pingback
 # Represents a Pingback ping.  Pingbacks are similar in purpose to Trackbacks,
 # but are fully automated (as per the spec, no user interaction required) and
@@ -34,7 +37,7 @@
 # OnOutput        - Fired when starting to process for display.
 # OutputComplete  - Fired when output is sent to the client.
 
-class Pingback extends Trackback {
+class Pingback extends Trackback implements Reply {
 
     public $target = '';
     public $source = '';
