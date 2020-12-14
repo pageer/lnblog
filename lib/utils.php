@@ -418,20 +418,6 @@ function make_uri($base=false, $query_string=false, $no_get=true,
     return $ret;
 }
 
-# Function: set_domain_cookie
-# A convenience wrapper for the setcookie() function.  If the DOMAIN_NAME
-# constant is set, then this will set the cookie for .domain.whatever, but will
-# simply skip the domain parameter otherwise.  This also sets the path to the
-# root directory.
-
-function set_domain_cookie($name, $value='', $expire=0) {
-    if (defined('DOMAIN_NAME')) {
-        setcookie($name, $value, $expire, '/', '.'.DOMAIN_NAME);
-    } else {
-        setcookie($name, $value, $expire, '/');
-    }
-}
-
 # Function: get_entry_from_uri
 # Takes a URI and converts it into an entry object.
 function get_entry_from_uri($uri) {
