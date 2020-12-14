@@ -126,6 +126,7 @@ class NativeFS extends FS
     }
 
     public function write_file($path, $contents) {
+        $old_umask = 0;
         $mask = $this->isScript($path) ? $this->script_mode : $this->default_mode;
 
         if ($mask) {

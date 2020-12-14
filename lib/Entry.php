@@ -215,7 +215,7 @@ abstract class Entry extends LnBlogObject
     public function getAbstract($numchars=500) {
         if (!$this->data || $numchars < 1) return '';
         if ($this->has_html == MARKUP_BBCODE) {
-            $data = $this->bbcodeToHTML($this->data, true);
+            $data = TextProcessor::get(MARKUP_BBCODE, $this, $this->data)->getHtml();
         } elseif ($this->has_html == MARKUP_HTML) {
             $data = strip_tags($this->data);
         } else {

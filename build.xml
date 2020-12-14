@@ -26,6 +26,11 @@
         </apply>
     </target>
 
+    <target name="checks">
+        <exec command="vendor/bin/phpcs" dir="${srcDir}" passthru="true" checkreturn="true" />
+        <exec command="vendor/bin/phpstan analyze" dir="${srcDir}" passthru="true" checkreturn="true" />
+    </target>
+
     <target name="tests">
         <exec command="vendor/bin/phpunit" dir="${srcDir}" passthru="true" checkreturn="true" />
     </target>

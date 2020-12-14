@@ -242,6 +242,7 @@ function pathconfig_php_string($inst_root) {
 # returns the name parameter as-is.
 
 function getlink($name, $type=false) {
+    $l_type = false;
     if ($type) {
         $l_type = $type;
     } else {

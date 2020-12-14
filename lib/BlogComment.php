@@ -52,6 +52,7 @@ class BlogComment extends Entry implements Reply
     public $show_email;
 
     public $parent;
+    public $control_bar= [];
 
     public function __construct ($path = "", $filesystem = null) {
         parent::__construct($filesystem ?: NewFS());
@@ -67,7 +68,7 @@ class BlogComment extends Entry implements Reply
         $this->has_html = MARKUP_NONE;
         $this->show_email = COMMENT_EMAIL_VIEW_PUBLIC;
         $this->exclude_fields = array('exclude_fields', 'metadata_fields',
-                                      'file', 'fs', 'url_resolver', 'parent');
+                                      'file', 'fs', 'url_resolver', 'parent', 'control_bar');
         $this->metadata_fields = array(
             "id"=>"postid",
             "uid"=>"userid",

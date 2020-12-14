@@ -45,7 +45,7 @@ class RSS2Entry {
     var $enclosure;
     var $guid;
 
-    function RSS2Entry($link="", $title="", $desc="", $comm="", $guid="",
+    function __construct($link="", $title="", $desc="", $comm="", $guid="",
                        $auth="", $cat="", $pdate="", $cmtrss="", $cmtcount="",
                        $enclos=false) {
         $this->link = $link;
@@ -121,7 +121,7 @@ class RSS2 {
     var $entrylist;
     var $link_stylesheet;
 
-    function RSS2() {
+    function __construct() {
         $this->url = "";
         $this->title = "";
         $this->description = "";

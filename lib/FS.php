@@ -246,7 +246,7 @@ abstract class FS
             return $ret;
         }
 
-        $dirhand = opendir($dir);
+        $dirhand = opendir($src);
         while ($ret && false !== ( $ent = readdir($dirhand))) {
             if ($ent == "." || $ent == "..") {
                 continue;

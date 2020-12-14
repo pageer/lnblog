@@ -48,8 +48,10 @@ class Pingback extends Trackback implements Reply
     public $ping_date = '';
     public $timestamp = '';
     public $file = '';
-    public $exclude_fields = array('fs');
+    public $exclude_fields = array('fs', 'control_bar');
     public $is_webmention = false;
+
+    public $control_bar = [];
 
     public function __construct($path=false, $fs = null, $http_client = null, UrlResolver $resolver = null) {
         $this->fs = $fs ?: NewFS();

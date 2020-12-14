@@ -12,7 +12,7 @@ class RSS1Entry {
     var $title;
     var $description;
 
-    function RSS1Entry($link="", $title="", $desc="") {
+    function __construct($link="", $title="", $desc="") {
         $this->link = $link;
         $this->title = $title;
         if ($desc) $this->description = $desc;
@@ -45,7 +45,7 @@ class RSS1 {
     var $image;
     var $entrylist;
 
-    function RSS1() {
+    function __construct() {
         $this->url = "";
         $this->site = "";
         $this->title = "";

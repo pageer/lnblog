@@ -14,6 +14,7 @@ class LnBlogXMLConfig extends LnBlogObject
 # data value limit, among other things.
 class XMLINI
 {
+    public $data;
 
     private $fs;
     private $filename;

@@ -23,6 +23,7 @@ if (extension_loaded("gettext")) {
     # current language, then the str parameter is returned.
 
     function _($str) {
+        $strings = [];
         if (file_exists(
             INSTALL_ROOT.PATH_DELIM.
             LOCALEDIR.PATH_DELIM.LANGUAGE.".php"

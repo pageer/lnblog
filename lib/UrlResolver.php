@@ -27,6 +27,7 @@ class UrlResolver
     # String containing the URI or the unmodified path if it could not be converted.
     public function localpathToUri($path, Blog $blog = null, BlogEntry $entry = null) {
         $path_obj = new Path();
+        $file = '';
         $roots = [];
         $is_absolute = $path_obj->isAbsolute($path);
         if ($is_absolute) {

@@ -57,14 +57,14 @@ class SimpleXMLReader
             $data = $this->file;
         }
 
-        $this->parser = xml_parser_create();
+        $parser = xml_parser_create();
         
-        xml_set_object($this->parser, $this);
-        xml_set_element_handler($this->parser, "do_open", "do_close");
-        xml_set_character_data_handler($this->parser, "do_cdata");
+        xml_set_object($parser, $this);
+        xml_set_element_handler($parser, "do_open", "do_close");
+        xml_set_character_data_handler($parser, "do_cdata");
 
-        $ret = xml_parse($this->parser, $data);
-        xml_parser_free($this->parser);
+        $ret = xml_parse($parser, $data);
+        xml_parser_free($parser);
     }
 
     public function make_array($arr) {

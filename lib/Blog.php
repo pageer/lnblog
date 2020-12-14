@@ -89,6 +89,8 @@ class Blog extends LnBlogObject implements AttachmentContainer
     private $url_resolver;
     private $logger;
 
+    private $entry_list = [];
+
     public function __construct(
         $path = "",
         $fs = null,
@@ -301,7 +303,7 @@ class Blog extends LnBlogObject implements AttachmentContainer
     public function getDay($year, $month, $day) {
         $fmtday = sprintf("%02d", $day);
         $month_dir = Path::mk(
-            BLOG_ROOT, BLOG_ENTRY_PATH,
+            $this->home_path, BLOG_ENTRY_PATH,
             $year, sprintf("%02d", $month)
         );
         $day_list = $this->fs->scan_directory($month_dir, true);
@@ -333,7 +335,7 @@ class Blog extends LnBlogObject implements AttachmentContainer
     public function getDayCount($year, $month, $day) {
         $fmtday = sprintf("%02d", $day);
         $month_dir = Path::mk(
-            BLOG_ROOT, BLOG_ENTRY_PATH,
+            $this->home_path, BLOG_ENTRY_PATH,
             $year, sprintf("%02d", $month)
         );
         #$day_list = glob($month_dir.PATH_DELIM.$fmtday."*");
@@ -1292,10 +1294,9 @@ class Blog extends LnBlogObject implements AttachmentContainer
     }
 
     private function createBlogDirectories($inst_path) {
-
+        $wrappers = new WrapperGenerator($this->fs);
         $ret = $this->createDirectoryIfDoesNotExist($this->home_path);
         if ($ret) {
-            $wrappers = new WrapperGenerator($this->fs);
             $result = $wrappers->createDirectoryWrappers($this->home_path, WrapperGenerator::BLOG_BASE, $inst_path);
             # Returns an array of errors, so convert empty array to true.
             $ret = $ret && empty($result);

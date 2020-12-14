@@ -123,17 +123,13 @@ class WebPages extends BasePages
             $blog_root = POST("blogroot");
             $blog_url = POST("blogurl");
             if ($this->fs->is_dir($blog_root)) {
-                SystemConfig::instance()->registerBlog(basename($blog_root), new UrlPath($blog_root, $blog_url));
-                SystemConfig::instance()->writeConfig();
-                $ret = $this->fs->write_file(
-                    Path::mk(BLOG_ROOT, "pathconfig.php"),
-                    pathconfig_php_string($inst_root, $inst_url, $blog_url)
-                );
-                if (!$ret) {
-                    $tpl->set("UPDATE_MESSAGE", _("Error updating blog paths."));
-                } else {
+                try {
+                    SystemConfig::instance()->registerBlog(basename($blog_root), new UrlPath($blog_root, $blog_url));
+                    SystemConfig::instance()->writeConfig();
                     $this->getPage()->redirect($blog_url);
                     exit;
+                } catch (Exception $e) {
+                    $tpl->set("UPDATE_MESSAGE", spf_("Error updating blog paths - %s.", $e->getMessage()));
                 }
             } else {
                 $tpl->set("UPDATE_MESSAGE", spf_("The given blog path '%s' is not a directory."));
@@ -379,8 +375,6 @@ class WebPages extends BasePages
         $tpl->set("HOMEPAGE_VALUE", htmlentities($usr->homepage()));
         $tpl->set("PROFILEPAGE_VALUE", htmlentities($usr->profileUrl()));
 
-        $this->blog_qs = ($this->blog->isBlog() ? "blog=".$this->blog->blogid."&amp;" : "");
-
         $tpl->set("UPLOAD_LINK", $this->blog->uri("upload", ['profile' => $usr->username()]));
         $edit_link_data = ["file"=>"profile.htm", 'profile'=>$usr->username()];
         $tpl->set("PROFILE_EDIT_LINK", $this->blog->uri("editfile", $edit_link_data));
@@ -399,6 +393,7 @@ class WebPages extends BasePages
 
         if (has_post()) {
 
+            $pwd_change = false;
             if ( trim(POST('passwd')) &&
                  trim(POST('passwd')) == trim(POST('confirm'))) {
                 $pwd_change = true;
@@ -406,8 +401,6 @@ class WebPages extends BasePages
             } elseif ( trim(POST('passwd')) &&
                        trim(POST('passwd')) == trim(POST('confirm'))) {
                 $tpl->set("FORM_MESSAGE", _("The passwords you entered do not match."));
-            } else {
-                $pwd_change = false;
             }
 
             $usr->name(trim(POST('fullname')));
@@ -706,7 +699,7 @@ class WebPages extends BasePages
             $tpl->set("PINGBACKS", false);
             $tpl->set("HAS_HTML", $blog->default_markup);
             $send_pingbacks = $entry->isEntry() ?
-                $this->send_pingback :
+                $entry->send_pingback :
                 $blog->autoPingbackEnabled();
             $tpl->set('SEND_PINGBACKS', $send_pingbacks);
         } else {
@@ -934,7 +927,7 @@ class WebPages extends BasePages
                 $this->blog->removeAttachment($file_name);
             }
         } catch (Exception $e) {
-            $this->getPage()->error(500, "Could not delete file '$file'");
+            $this->getPage()->error(500, "Could not delete file '$file_name'");
         }
     }
 
@@ -1196,8 +1189,8 @@ class WebPages extends BasePages
             if ( count($ret) > 0) {
                 $list = '';
                 foreach ($ret as $obj) {
-                    $anchors .= ($anchors == '' ? '' : ',').$resp->globalID();
-                    $list .= get_link_text($obj);
+                    $anchors .= ($anchors == '' ? '' : ',').$obj->globalID();
+                    $list .= $get_list_text($obj);
                 }
                 $title = _("Error deleting responses");
                 $message = _("Unable to delete the following responses.  Do you want to try again?");
@@ -2184,11 +2177,12 @@ class WebPages extends BasePages
         $page = $this;
         $ret = "";
         $count = 0;
+        $reply_type = '';
+        $reply_text = [];
         if ($replies) {
-            $reply_text = array();
             $count = 0;
             foreach ($replies as $reply) {
-                if (! isset($reply_type)) $reply_type = get_class($reply);
+                if (!$reply_type) $reply_type = get_class($reply);
                 $tmp = $reply->get();
                 if (System::instance()->canModify($reply, $usr)) {
                     $tmp = $this->replyBoxes($reply).$tmp;
@@ -2199,11 +2193,11 @@ class WebPages extends BasePages
         }
 
         # Suppress markup entirely if there are no replies of the given type.
-        if (isset($reply_text)) {
+        if ($reply_text) {
 
             $tpl = NewTemplate(LIST_TEMPLATE, $page);
 
-            if (System::instance()->canModify($reply, $usr)) {
+            if (System::instance()->canModify($ent, $usr)) {
 
                 $typename = '';
 
@@ -2256,7 +2250,7 @@ class WebPages extends BasePages
         $reply_compare = function (&$a, &$b) {
             $a_ts = isset($a->timestamp) ? $a->timestamp : strtotime($a->ping_date);
             $b_ts = isset($b->timestamp) ? $b->timestamp : strtotime($b->ping_date);
-            return $a_th <=> $b_ts;
+            return $a_ts <=> $b_ts;
         };
         usort($replies, 'reply_compare');
 
@@ -2281,7 +2275,7 @@ class WebPages extends BasePages
 
             $tpl = NewTemplate(LIST_TEMPLATE, $page);
 
-            if (System::instance()->canModify($reply, $usr)) {
+            if (System::instance()->canModify($ent, $usr)) {
                 $tpl->set(
                     "FORM_HEADER",
                     spf_(

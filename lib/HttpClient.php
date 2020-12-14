@@ -1,5 +1,9 @@
 <?php
 
+require_once __DIR__.'/../vendor/phpxmlrpc/phpxmlrpc/lib/xmlrpc.inc';
+require_once __DIR__.'/../vendor/phpxmlrpc/phpxmlrpc/lib/xmlrpcs.inc';
+require_once __DIR__.'/../vendor/phpxmlrpc/phpxmlrpc/lib/xmlrpc_wrappers.inc';
+
 /**
  * Class: HttpClient
  * A simple class for making HTTP requests.

@@ -25,7 +25,7 @@ class HttpResponse
     }
 
     public function header($name) {
-        return isset($this->header[$name]) ? $this->header[$name] : '';
+        return isset($this->headers[$name]) ? $this->headers[$name] : '';
     }
 
     public function headers() {

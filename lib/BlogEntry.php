@@ -99,12 +99,10 @@ class BlogEntry extends Entry implements AttachmentContainer
         $this->allow_tb = true;
         $this->allow_pingback = true;
         $this->send_pingback = true;
-        $this->template_file = "blogentry_summary_tpl.php";
         $this->custom_fields = array();
         $this->exclude_fields = array(
             "exclude_fields",
             "metadata_fields",
-            "template_file",
             "file",
             "fs",
             "url_resolver",
@@ -805,7 +803,7 @@ class BlogEntry extends Entry implements AttachmentContainer
         $ret = ob_get_contents();
         ob_end_clean();
 
-        $tmp = NewTemplate($this->template_file, $web_page);
+        $tmp = NewTemplate("blogentry_summary_tpl.php", $web_page);
         $blog = $this->getParent();
         $usr = NewUser($this->uid);
         $usr->exportVars($tmp);

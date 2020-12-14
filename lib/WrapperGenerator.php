@@ -51,6 +51,7 @@ class WrapperGenerator
         $parent = dirname($path).PATH_DELIM;
         $config_level = 0;
         $ret = 0;
+        $filelist = [];
         $ret_list = array();
     
         switch ($type) {
@@ -67,7 +68,7 @@ class WrapperGenerator
                 $blog_root = $this->fs->realpath($path);
                 $inst_url = SystemConfig::instance()->installRoot()->url();
                 $blog_url = $this->findBlogRoot($blog_root);
-                $config_data = pathconfig_php_string($inst_root, $inst_url, $blog_url);
+                $config_data = pathconfig_php_string($inst_root);
                 $ret = $this->fs->write_file($current."pathconfig.php", $config_data);
                 if (! $ret) {
                     $ret_list[] = $current."pathconfig.php";

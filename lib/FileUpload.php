@@ -94,6 +94,7 @@ class FileUpload extends LnBlogObject
     # An integer representing the upload status.
 
     function status() {
+        $ret = FILEUPLOAD_NO_ERROR;
 
         if ($this->error == FILEUPLOAD_NOT_INITIALIZED) {
             return $this->error;
@@ -179,6 +180,7 @@ class FileUpload extends LnBlogObject
     # A string containing the appropriate message.
 
     function errorMessage($err=false) {
+        $ret = '';
         if (!$err) {
             $err = $this->status();
         }

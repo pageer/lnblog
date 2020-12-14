@@ -60,14 +60,17 @@ class System
         ],
     ];
 
+    public $group_ini;
+    public $sys_ini;
+
     // NOTE: Public for unit testing purposes (which is not great...)
     static public $static_instance;
 
     public function __construct() {
-        $this->userdata = defined("USER_DATA_PATH") ? USER_DATA_PATH : "";
+        $userdata = defined("USER_DATA_PATH") ? USER_DATA_PATH : "";
 
-        $groups_ini_path = Path::mk($this->userdata, "groups.ini");
-        $sys_ini_path = Path::mk($this->userdata, "system.ini");
+        $groups_ini_path = Path::mk($userdata, "groups.ini");
+        $sys_ini_path = Path::mk($userdata, "system.ini");
 
         $group_ini_defaults = INIParser::fromArray(self::$default_group_ini, $groups_ini_path);
         $this->group_ini = new INIParser($groups_ini_path);

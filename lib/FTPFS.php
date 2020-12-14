@@ -42,9 +42,9 @@ class FTPFS extends FS
     public $ftp_root = '';
 
     public function __construct($host=false, $user=false, $pass=false) {
-        $this->default_mode = FS_DEFAULT_MODE;
-        $this->script_mode = FS_SCRIPT_MODE;
-        $this->directory_mode = FS_DIRECTORY_MODE;
+        $this->default_mode = defined('FS_DEFAULT_MODE') ? FS_DEFAULT_MODE : 0644;
+        $this->script_mode = defined('FS_SCRIPT_MODE') ? FS_SCRIPT_MODE : 0755;
+        $this->directory_mode = defined('FS_DIRECTORY_MODE') ? FS_DIRECTORY_MODE : 0755;
 
         if ($host) $this->host = $host;
         elseif (defined("FTPFS_HOST")) $this->host = FTPFS_HOST;
@@ -114,7 +114,7 @@ class FTPFS extends FS
     }
 
     public function reconnect($password=false) {
-        if (!$password) $password = FTPFS_PASSWORD;
+        if (!$password && defined('FTPFS_PASSWORD')) $password = FTPFS_PASSWORD;
         if ($this->connected() ) ftp_close($this->connection);
 
         $colon_pos = strpos(":", $this->host);
@@ -128,7 +128,7 @@ class FTPFS extends FS
         }
 
         if ($this->connection !== false) {
-            $this->status = ftp_login($this->connection, $this->username, $pass);
+            $this->status = ftp_login($this->connection, $this->username, $password);
         } else $this->status = false;
         return $this->status;
     }
@@ -207,7 +207,7 @@ class FTPFS extends FS
     public function chmod($path, $mode) {
         if (! $this->connected() ) return false;
         $path = $this->localpathToFSPath($path);
-        if (function_exists(ftp_chmod)) {
+        if (function_exists('ftp_chmod')) {
             $ret = ftp_chmod($this->connection, $mode, $path);
         } else {
             $ret = ftp_site($this->connection, "CHMOD $mode $path");

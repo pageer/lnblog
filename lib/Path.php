@@ -25,7 +25,7 @@ class Path
         return $p->getPath();
     }
 
-    public function isWindows() {
+    public static function isWindows() {
         return self::$sep === self::WINDOWS_SEP;
     }
 

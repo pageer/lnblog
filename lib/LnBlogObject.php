@@ -25,6 +25,7 @@
  */
 class LnBlogObject
 {
+    protected $exclude_fields = [];
 
     /* Method: createEvent
      * Creates an event for the current class.

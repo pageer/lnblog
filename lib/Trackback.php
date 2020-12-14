@@ -54,8 +54,10 @@ class Trackback extends LnBlogObject implements Reply
     public $ip;
     public $file;
 
-    public $exclude_fields = array('fs', 'parent', 'url_resolver', 'http_client');
+    public $exclude_fields = array('fs', 'parent', 'url_resolver', 'http_client', 'control_bar');
     public $parent = null;
+    public $control_bar = [];
+
 
     protected $fs;
     protected $http_client;

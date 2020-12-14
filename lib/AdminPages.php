@@ -188,7 +188,7 @@ class AdminPages extends BasePages
                     SystemConfig::instance()->writeConfig();
                     $status = spf_("Blog %s successfully registered.", $blog->blogid);
                 } catch (FileWriteFailed $e) {
-                    $status = spf_("Registration error: exited with code %s", $ret);
+                    $status = spf_("Registration error: exited with error: %s", $e->getMessage());
                 }
             }
             $tpl->set("REGISTER_STATUS", $status);
@@ -976,14 +976,14 @@ class AdminPages extends BasePages
                 if ($ret) {
                     $fs->copy(Path::mk($install_root, 'userdata', '.htaccess'), Path::mk($userdata, '.htaccess'));
                 } else {
-                    $error = _("Unable to create directory %s", $userdata);
+                    $error = spf_("Unable to create directory %s", $userdata);
                 }
             }
 
             if (is_dir($config->userData()->path())) {
                 $ret = $fs->write_file(Path::mk($config->userData()->path(), FS_PLUGIN_CONFIG), $content);
                 if (!$ret) {
-                    $error = _("Unable to create directory %s/%s", $userdata, FS_PLUGIN_CONFIG);
+                    $error = spf_("Unable to create directory %s/%s", $userdata, FS_PLUGIN_CONFIG);
                 }
             }
 
@@ -1043,11 +1043,11 @@ class AdminPages extends BasePages
         }
 
         if (!filter_var($install_root_url, FILTER_VALIDATE_URL)) {
-            throw new Exception(sfp_("The URL '%s' is not valid", $install_root_url));
+            throw new Exception(spf_("The URL '%s' is not valid", $install_root_url));
         }
 
         if (!filter_var($userdata_url, FILTER_VALIDATE_URL)) {
-            throw new Exception(sfp_("The URL '%s' is not valid", $userdata_url));
+            throw new Exception(spf_("The URL '%s' is not valid", $userdata_url));
         }
     }
 

@@ -150,6 +150,7 @@ class PHPTemplate extends LnBlogObject
     # Returns:
     # An array of path strings
     public function getSearchPath() {
+        $inst_root = SystemConfig::instance()->installRoot()->path();
         if ($this->search_paths) {
             return $this->search_paths;
         } else {
@@ -162,11 +163,11 @@ class PHPTemplate extends LnBlogObject
                 if (defined('USER_DATA_PATH')) {
                     $ret[] = Path::mk(USER_DATA_PATH, 'themes', THEME_NAME, 'templates');
                 }
-                $ret[] = Path::mk(INSTALL_ROOT, 'themes', THEME_NAME, 'templates');
+                $ret[] = Path::mk($inst_root, 'themes', THEME_NAME, 'templates');
             } elseif (defined('BLOG_ROOT')) {
                 $ret[] = Path::mk(BLOG_ROOT, 'templates');
             }
-            $ret[] = Path::mk(INSTALL_ROOT, 'themes', 'default', 'templates');
+            $ret[] = Path::mk($inst_root, 'themes', 'default', 'templates');
             return $ret;
         }
     }

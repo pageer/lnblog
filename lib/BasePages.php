@@ -28,6 +28,7 @@ abstract class BasePages
 
     protected $fs;
     protected $globals;
+    protected $logger;
 
     abstract protected function getActionMap();
     abstract protected function defaultAction();
@@ -104,7 +105,10 @@ abstract class BasePages
 
             define("PLUGIN_DO_OUTPUT", true);
             $plugin_name = preg_replace('[^A-Za-z0-9_\-]', '', $_GET['plugin']);
-            $paths = array(@BLOG_ROOT, USER_DATA_PATH, INSTALL_ROOT);
+            $paths = array(USER_DATA_PATH, INSTALL_ROOT);
+            if (defined('BLOG_ROOT')) {
+                array_unshift($paths, BLOG_ROOT);
+            }
             foreach ($paths as $path) {
                 $plugin = Path::mk($path, 'plugins', "$plugin_name.php");
                 if ($this->fs->file_exists($plugin)) {
@@ -170,7 +174,7 @@ abstract class BasePages
         }
     }
 
-    protected function getStylePath($name) {
+    protected function stylePath($name) {
         return $this->getThemeAssetPath("styles", $name);
     }
 

@@ -72,6 +72,8 @@ abstract class Plugin extends LnBlogObject
     */
     public $member_list = array();
 
+    public $no_event;
+
     /* Constructor:
     Insert initialization code into the constructor.  You MUST OVERRIDE
     the constructor for your concrete subclass (i.e. you must have an
