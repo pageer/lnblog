@@ -1,5 +1,6 @@
 <?php
 
-class EntryRenameFailed extends Exception {
+class EntryRenameFailed extends Exception
+{
 
 }

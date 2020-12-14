@@ -2,14 +2,18 @@
 # Class: LnBlogXMLConfig
 # A dummy class for use with the <SimpleXMLWriter> class.  This is used simply
 # to create blank objects that XML elements can be inserted into.
-class LnBlogXMLConfig extends LnBlogObject { }
+class LnBlogXMLConfig extends LnBlogObject
+{
+ 
+}
 
 # Class: XMLINI
 # An simple XML configuration file scheme that mimics the behavior of the
 # INIParser class.  The main difference is, obviously, the storage format.
 # This class uses XML instead of an INI file, thus removing the single-line
 # data value limit, among other things.
-class XMLINI {
+class XMLINI
+{
 
     private $fs;
     private $filename;

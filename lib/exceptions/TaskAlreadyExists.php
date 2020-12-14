@@ -1,5 +1,6 @@
 <?php
 
-class TaskAlreadyExists extends Exception {
+class TaskAlreadyExists extends Exception
+{
 
 }

@@ -29,7 +29,8 @@ use LnBlog\User\LoginLimiter;
 # Inherits:
 # <LnBlogObject>
 
-class User extends LnBlogObject {
+class User extends LnBlogObject
+{
     const USER_PROFILE_FILE = "user.xml";
     const RESET_RATE_LIMIT = 60;
     const RESET_TOKEN_EXPIRATION = 84600;
@@ -142,7 +143,7 @@ class User extends LnBlogObject {
             $tpl->set("USER_EMAIL", $this->email);
         }
         if ($this->default_group) {
-            $tpl->set("DEFAULT_GROUP",$this->defaultGroup());
+            $tpl->set("DEFAULT_GROUP", $this->defaultGroup());
         }
         $tpl->set("GROUPS", $this->groups());
         if (strpos($this->homepage, "://") === false &&
@@ -152,7 +153,7 @@ class User extends LnBlogObject {
         if ($this->homepage) {
             $tpl->set("USER_HOMEPAGE", $this->homepage);
         }
-        $tpl->set("USER_DISPLAY_NAME", $this->displayName() );
+        $tpl->set("USER_DISPLAY_NAME", $this->displayName());
         $tpl->set("PROFILE_LINK", $this->getProfileUrl());
     }
 
@@ -309,8 +310,10 @@ class User extends LnBlogObject {
             # Prevent password change from logging out on cookie-only config.
             if ( $this->username == COOKIE($this->config('CURRENT_USER')) ) {
                 $expire_time = $this->config('LOGIN_EXPIRE_TIME');
-                $this->setCookie($this->config('PW_HASH'), $this->passwd,
-                    ($expire_time ? time() + $expire_time : false));
+                $this->setCookie(
+                    $this->config('PW_HASH'), $this->passwd,
+                    ($expire_time ? time() + $expire_time : false)
+                );
             }
         }
     }
@@ -601,10 +604,14 @@ class User extends LnBlogObject {
             $this->email    = $ini->value("userdata", "email", "");
             $this->homepage = $ini->value("userdata", "homepage", "");
             $this->default_group =
-                $ini->value('userdata','default_group',
-                            System::instance()->sys_ini->value('security',
-                                                    'NewUserDefaultGroup',
-                                                    ''));
+                $ini->value(
+                    'userdata', 'default_group',
+                    System::instance()->sys_ini->value(
+                        'security',
+                        'NewUserDefaultGroup',
+                        ''
+                    )
+                );
             $this->custom = $ini->getSection("customdata");
         }
         $_SESSION["user-".$this->username] = serialize($this);

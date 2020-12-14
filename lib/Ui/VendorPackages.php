@@ -4,7 +4,8 @@ namespace LnBlog\Ui;
 
 use Page;
 
-class VendorPackages {
+class VendorPackages
+{
     private $available_packages = [];
     private $requested_packages = [];
 

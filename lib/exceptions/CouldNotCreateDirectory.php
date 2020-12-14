@@ -1,5 +1,6 @@
 <?php
 
-class CouldNotCreateDirectory extends Exception {
+class CouldNotCreateDirectory extends Exception
+{
 
 }

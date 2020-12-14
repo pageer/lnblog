@@ -10,7 +10,8 @@
 # it is very convenient and doesn't cause any design problems for the time
 # being.
 
-class System {
+class System
+{
 
     private static $default_group_ini = [
         'administrators' => [
@@ -108,13 +109,13 @@ class System {
     # An array of theme names.
     public function getThemeList() {
         $fs = NewFS();
-        $dir = $fs->scan_directory(Path::mk(INSTALL_ROOT,"themes"), true);
-        if (is_dir(Path::mk(USER_DATA_PATH,"themes"))) {
-            $user_dir = $fs->scan_directory(Path::mk(USER_DATA_PATH,"themes"), true);
+        $dir = $fs->scan_directory(Path::mk(INSTALL_ROOT, "themes"), true);
+        if (is_dir(Path::mk(USER_DATA_PATH, "themes"))) {
+            $user_dir = $fs->scan_directory(Path::mk(USER_DATA_PATH, "themes"), true);
             if ($user_dir) $dir = array_merge($dir, $user_dir);
         }
-        if (defined("BLOG_ROOT") && is_dir(Path::mk(BLOG_ROOT,"themes"))) {
-            $blog_dir = $fs->scan_directory(Path::mk(BLOG_ROOT,"themes"), true);
+        if (defined("BLOG_ROOT") && is_dir(Path::mk(BLOG_ROOT, "themes"))) {
+            $blog_dir = $fs->scan_directory(Path::mk(BLOG_ROOT, "themes"), true);
             if ($blog_dir) $dir = array_merge($dir, $blog_dir);
         }
         $dir = array_unique($dir);
@@ -276,7 +277,7 @@ class System {
     # at least one existing user in the administrators group, false otherwise.
 
     public function hasAdministrator() {
-        $has_admin = file_exists(Path::mk(USER_DATA_PATH,ADMIN_USER,"passwd.php"));
+        $has_admin = file_exists(Path::mk(USER_DATA_PATH, ADMIN_USER, "passwd.php"));
         if (! $has_admin) {
             $users = $this->getUserList();
             foreach ($users as $u) {
@@ -329,7 +330,7 @@ class System {
         }
 
         if (is_a($parm, 'blog')) {
-            if ( in_array($usr->username(), $parm->writers() ) ) {
+            if ( in_array($usr->username(), $parm->writers()) ) {
                 $ret = true;
             }
         } else {
@@ -355,7 +356,7 @@ class System {
     # Method: canDelete
     # Like <canAddTo>, except determines if the user can delete the object.
     public function canDelete($parm, $usr=false) {
-        return $this->canModify($parm,$usr);
+        return $this->canModify($parm, $usr);
     }
 }
 

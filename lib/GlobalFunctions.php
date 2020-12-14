@@ -3,7 +3,8 @@
 # Class: GlobalFunctions
 # A wrapper class for global functions in the PHP standard library.
 # This exists mostly to facilitate unit testing.
-class GlobalFunctions {
+class GlobalFunctions
+{
     public function setcookie($name, $value = "", $expires = 0, $path = '', $domain = '', $secure = false, $http_only = false) {
         setcookie($name, $value, $expires, $path, $domain, $secure, $http_only);
     }

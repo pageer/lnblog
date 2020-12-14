@@ -1,5 +1,6 @@
 <?php
 
-class EntryWriteFailed extends Exception {
+class EntryWriteFailed extends Exception
+{
 
 }

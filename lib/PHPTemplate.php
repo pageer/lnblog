@@ -28,7 +28,8 @@
 # Ihnerits:
 # <LnBlogObject>
 
-class PHPTemplate extends LnBlogObject {
+class PHPTemplate extends LnBlogObject
+{
 
     const ESC_HTML = 'htmlspecialchars';
     const ESC_URL = 'urlencode';

@@ -1,5 +1,6 @@
 <?php
 
-class WebmentionInvalidReceive extends Exception {
+class WebmentionInvalidReceive extends Exception
+{
 
 }

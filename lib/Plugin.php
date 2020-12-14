@@ -26,9 +26,13 @@
  * <LnBlogObject>
  */
 
-class PluginSettings { }
+class PluginSettings
+{
+ 
+}
 
-abstract class Plugin extends LnBlogObject{
+abstract class Plugin extends LnBlogObject
+{
 
     /*  Property: plugin_desc
     A short description of the plugin. */
@@ -105,7 +109,7 @@ abstract class Plugin extends LnBlogObject{
         $this->addOption(
             'no_event',
             _('No event handlers - do output when plugin is created'),
-            System::instance()->sys_ini->value("plugins","EventDefaultOff", 0),
+            System::instance()->sys_ini->value("plugins", "EventDefaultOff", 0),
             'checkbox'
         );
     }
@@ -114,7 +118,7 @@ abstract class Plugin extends LnBlogObject{
     # Register a handler to do output in the case that "no event" is turned
     # off.
     public function registerNoEventOutputHandler($target, $function_name) {
-        $system_default = System::instance()->sys_ini->value("plugins","EventForceOff", 0);
+        $system_default = System::instance()->sys_ini->value("plugins", "EventForceOff", 0);
         if (!$this->no_event && !$system_default) {
             $this->registerEventHandler($target, "OnOutput", $function_name);
         }
@@ -124,7 +128,7 @@ abstract class Plugin extends LnBlogObject{
     # Register a handler to do output in the case that "no event" is turned
     # off.
     public function registerNoEventOutputCompleteHandler($target, $function_name) {
-        $system_default = System::instance()->sys_ini->value("plugins","EventForceOff", 0);
+        $system_default = System::instance()->sys_ini->value("plugins", "EventForceOff", 0);
         if (!$this->no_event && !$system_default) {
             $this->registerEventHandler($target, "OutputComplete", $function_name);
         }

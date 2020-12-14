@@ -1,6 +1,7 @@
 <?php
 
-class Path {
+class Path
+{
 
     const WINDOWS_SEP = '\\';
     const UNIX_SEP = '/';
@@ -31,11 +32,11 @@ class Path {
     public function isAbsolute($path) {
         switch($this->dirsep) {
             case self::WINDOWS_SEP:
-                $c1 = ord(strtoupper(substr($path,0,1)));
-                $c2 = substr($path,1,1);
+                $c1 = ord(strtoupper(substr($path, 0, 1)));
+                $c2 = substr($path, 1, 1);
                 return ( $c1 >= ord("A") && $c1 <= ord("Z") && $c2 == ':');
             case self::UNIX_SEP:
-                return substr($path,0,1) == self::UNIX_SEP;
+                return substr($path, 0, 1) == self::UNIX_SEP;
         }
     }
 
@@ -61,9 +62,12 @@ class Path {
 
         for ($i = count($components) - 1; $i > 0; $i--) {
             switch ($components[$i]) {
-                case ''   : break;
-                case '.'  : break;
-                case '..' : $i--; break;
+                case ''   : 
+                    break;
+                case '.'  : 
+                    break;
+                case '..' : $i--; 
+                    break;
                 default   : $ret = $this->dirsep.$components[$i].$ret;
             }
         }
@@ -79,7 +83,7 @@ class Path {
 
     public function urlSlashes($striproot=false) {
         $path = $this->getPath();
-        if ($striproot && strpos($path,$striproot) === 0) {
+        if ($striproot && strpos($path, $striproot) === 0) {
             $path = substr($path, strlen($striproot));
         }
 

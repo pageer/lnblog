@@ -1,5 +1,6 @@
 <?php
 
-class TaskUpdateFailed extends Exception {
+class TaskUpdateFailed extends Exception
+{
 
 }

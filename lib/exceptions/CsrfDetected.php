@@ -1,5 +1,6 @@
 <?php
 
-class CsrfDetected extends Exception {
+class CsrfDetected extends Exception
+{
 
 }

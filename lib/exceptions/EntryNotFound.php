@@ -1,5 +1,6 @@
 <?php
 
-class EntryNotFound extends Exception {
+class EntryNotFound extends Exception
+{
 
 }

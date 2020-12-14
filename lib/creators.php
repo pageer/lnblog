@@ -89,8 +89,7 @@ function NewEntry($param = false, $fs = null) {
             $entid = $param;
             if (basename($entid) == ENTRY_COMMENT_DIR)
                 $entid = dirname($entid);
-        }
-        elseif (strpos($param, BLOG_ENTRY_PATH) !== false ||
+        } elseif (strpos($param, BLOG_ENTRY_PATH) !== false ||
                 strpos($param, BLOG_DRAFT_PATH) !== false) {
             $entid = $param;
             $dir_base = basename($entid);

@@ -10,7 +10,8 @@ use GlobalFunctions;
 use Path;
 use User;
 
-class LoginLimiter {
+class LoginLimiter
+{
 
     const ATTEMPT_LIMIT = 5;
     const TIME_LIMIT = 300;
@@ -67,9 +68,11 @@ class LoginLimiter {
         $content = $this->fs->read_file($log_file);
         $logins = json_decode($content, true) ?: [];
 
-        $this->user_auth_logs = array_map(function ($item) {
+        $this->user_auth_logs = array_map(
+            function ($item) {
             return AuthLog::deserialize($item);
-        }, $logins);
+            }, $logins
+        );
 
         return $this->user_auth_logs;
     }

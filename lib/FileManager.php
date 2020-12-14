@@ -2,7 +2,8 @@
 
 # Class: FileManager
 # Manage the files attached to an object.
-class FileManager {
+class FileManager
+{
 
     private $parent;
     private $fs;

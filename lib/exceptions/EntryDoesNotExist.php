@@ -1,5 +1,6 @@
 <?php
 
-class EntryDoesNotExist extends Exception {
+class EntryDoesNotExist extends Exception
+{
 
 }

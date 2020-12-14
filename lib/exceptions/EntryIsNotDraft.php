@@ -1,5 +1,6 @@
 <?php
 
-class EntryIsNotDraft extends Exception {
+class EntryIsNotDraft extends Exception
+{
 
 }

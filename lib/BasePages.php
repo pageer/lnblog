@@ -20,7 +20,8 @@
 
 use Psr\Log\LoggerInterface;
 
-abstract class BasePages {
+abstract class BasePages
+{
 
     const CSRF_TOKEN = 'xrf_tok';
     const TOKEN_POST_FIELD = 'xrf-token';
@@ -229,7 +230,7 @@ abstract class BasePages {
     # blog - The blog to populate.
     protected function blogGetPostData(Blog $blog) {
         $blog->name = POST("blogname");
-        $blog->writers(POST("writelist") );
+        $blog->writers(POST("writelist"));
         $blog->description = POST("desc");
         $blog->image = POST("image");
         $blog->theme = POST("theme");
@@ -251,7 +252,7 @@ abstract class BasePages {
     # ent - the BlogEntry or Article with which to populate the template.
     protected function blogSetTemplate(PHPTemplate $tpl, Blog $blog) {
         $tpl->set("BLOG_NAME", $blog->name);
-        $tpl->set("BLOG_WRITERS", implode(",", $blog->writers() ) );
+        $tpl->set("BLOG_WRITERS", implode(",", $blog->writers()));
         $tpl->set("BLOG_DESC", $blog->description);
         $tpl->set("BLOG_IMAGE", $blog->image);
         $tpl->set("BLOG_THEME", $blog->theme);

@@ -36,7 +36,8 @@
  * a regular function.
  */
 
-class EventRegister {
+class EventRegister
+{
 
     public $event_list;
 
@@ -108,7 +109,7 @@ class EventRegister {
     function addEvent($raising_class, $name) {
         $rclass = strtolower($raising_class);
         $ename = strtolower($name);
-        if ($this->isEvent($rclass,$ename)) return false;
+        if ($this->isEvent($rclass, $ename)) return false;
         if (! isset($this->event_list[$rclass])) {
             $this->event_list[$rclass] = array();
         }
@@ -143,7 +144,7 @@ class EventRegister {
         } else {
             $cclass = strtolower($catching_class);
         }
-        if (! $this->isEvent($rclass,$ename)) $this->addEvent($rclass, $ename);
+        if (! $this->isEvent($rclass, $ename)) $this->addEvent($rclass, $ename);
         if (! isset($this->event_list[$rclass][$ename][$cclass])) {
             $this->event_list[$rclass][$ename][$cclass] = array();
             $this->event_list[$rclass][$ename][$cclass]['static'] = array();
@@ -183,7 +184,7 @@ class EventRegister {
 
         $rcls = strtolower($raisecls);
         $ename = strtolower($event);
-        if (! $this->isEvent($rcls,$ename)) return false;
+        if (! $this->isEvent($rcls, $ename)) return false;
 
         $keys = array_keys($this->event_list[$rcls][$ename]);
 
@@ -219,7 +220,7 @@ class EventRegister {
 
             foreach ($this->event_list[$rcls][$ename][$classname]['static'] as $hnd) {
                 $methods = get_class_methods($classname);
-                $ret = array_search(strtolower($hnd),$methods);
+                $ret = array_search(strtolower($hnd), $methods);
                 if ($ret !== false && $ret !== null) {
                     call_user_func(array($classname, $hnd), $param, $data);
                 } else {
@@ -248,8 +249,10 @@ class EventRegister {
 
     function activateEvent(&$raiser, $event, $params=false) {
         if (!$params) $params = array();
-        return $this->activateEventFull($raiser,
-                     strtolower(get_class($raiser)), $event, $params);
+        return $this->activateEventFull(
+            $raiser,
+            strtolower(get_class($raiser)), $event, $params
+        );
     }
 
     public function clearAll() {

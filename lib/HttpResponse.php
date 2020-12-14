@@ -1,6 +1,7 @@
 <?php
 
-class HttpResponse {
+class HttpResponse
+{
     const RESPONSE_CODE_NOT_FOUND = 599;
 
     private $response_text = '';

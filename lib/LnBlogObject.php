@@ -23,7 +23,8 @@
  * register, and fire events.  It also has contains other general-purpose
  * methods, such as simple XML serialization.
  */
-class LnBlogObject {
+class LnBlogObject
+{
 
     /* Method: createEvent
      * Creates an event for the current class.
@@ -92,8 +93,10 @@ class LnBlogObject {
      * True on success, false on failure.
      */
     public function registerEventHandler($type, $name, $func) {
-        return EventRegister::instance()->addHandler($type, $name,
-                                           $this, $func);
+        return EventRegister::instance()->addHandler(
+            $type, $name,
+            $this, $func
+        );
     }
 
     /* Method: registerStaticEventHandler
@@ -113,8 +116,10 @@ class LnBlogObject {
      * <registerEventHandler>
      */
     public function registerStaticEventHandler($type, $name, $func) {
-        return EventRegister::instance()->addHandler($type, $name,
-                                           get_class($this), $func, true);
+        return EventRegister::instance()->addHandler(
+            $type, $name,
+            get_class($this), $func, true
+        );
     }
 
     /* Method: serializeXML

@@ -25,7 +25,8 @@ concrete subclasses for native filesystem and FTP access.  Maybe one day
 there will be some other useful method for filesystem access....
 */
 
-abstract class FS {
+abstract class FS
+{
 
     public $default_mode;
     public $directory_mode;

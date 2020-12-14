@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<ruleset name="LnBlog Standard" namespace="LnBLog\CS\Standard">
+    <description>Project coding standard</description>
+    <file>./lib</file>
+
+    <rule ref="Zend">
+        <exclude name="Generic.Functions.OpeningFunctionBraceBsdAllman" />
+        <!-- TODO: Try to stard eliminating these exclusions -->
+        <exclude name="Zend.NamingConventions.ValidVariableName" />
+        <exclude name="Generic.Files.LineLength" />
+        <exclude name="Squiz.Functions.GlobalFunction" />
+    </rule>
+
+    <rule ref="Generic.Functions.OpeningFunctionBraceKernighanRitchie" />
+</ruleset>

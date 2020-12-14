@@ -7,7 +7,8 @@ use \EntryNotFound;
 use \Pingback;
 use \Trackback;
 
-class EntryFactory {
+class EntryFactory
+{
     public function __construct() {
 
     }

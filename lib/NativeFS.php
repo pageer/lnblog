@@ -24,7 +24,8 @@ This is a wrapper around the native filesystem access functions, with some
 syntactic sugar thrown in.
 */
 
-class NativeFS extends FS {
+class NativeFS extends FS
+{
 
     public function __construct() {
         $this->default_mode = defined("FS_DEFAULT_MODE") ? FS_DEFAULT_MODE : 0000;
@@ -33,10 +34,15 @@ class NativeFS extends FS {
     }
 
 
-    public function __destruct() {}
+    public function __destruct() {
+    }
 
-    public function localpathToFSPath($path) { return $path; }
-    public function FSPathToLocalpath($path) { return $path; }
+    public function localpathToFSPath($path) {
+ return $path; 
+    }
+    public function FSPathToLocalpath($path) {
+ return $path; 
+    }
 
     public function chdir($dir) {
         return chdir($dir);
@@ -109,9 +115,15 @@ class NativeFS extends FS {
         return chmod($path, $mode);
     }
 
-    public function copy($src, $dest)   { return copy($src, $dest); }
-    public function rename($src, $dest) { return rename($src, $dest); }
-    public function delete($src)        { return unlink($src); }
+    public function copy($src, $dest) {
+ return copy($src, $dest); 
+    }
+    public function rename($src, $dest) {
+ return rename($src, $dest); 
+    }
+    public function delete($src) {
+ return unlink($src); 
+    }
 
     public function write_file($path, $contents) {
         $mask = $this->isScript($path) ? $this->script_mode : $this->default_mode;

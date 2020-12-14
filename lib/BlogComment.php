@@ -42,7 +42,8 @@ OnOutput       - Fired before output is generated.
 OutputComplete - Fired after output has finished being generated.
 POSTRetrieved  - Fired after data has been retreived from an HTTP POST.
 */
-class BlogComment extends Entry implements Reply {
+class BlogComment extends Entry implements Reply
+{
 
     public $postid;
     public $name;
@@ -82,7 +83,7 @@ class BlogComment extends Entry implements Reply {
 
         if ( file_exists($this->file) ) {
             $this->readFileData();
-        } elseif ( file_exists( $this->getFilename($path) ) ) {
+        } elseif ( file_exists($this->getFilename($path)) ) {
             $this->file = $this->getFilename($path);
             $this->readFileData();
         } else {
@@ -281,7 +282,7 @@ class BlogComment extends Entry implements Reply {
         $ent = NewEntry($entid);
         $ret = substr($cmtid, 7);
         $ret .= COMMENT_PATH_SUFFIX;
-        $ret = Path::mk($ent->localpath(),ENTRY_COMMENT_DIR,$ret);
+        $ret = Path::mk($ent->localpath(), ENTRY_COMMENT_DIR, $ret);
         $ret = realpath($ret);
         return $ret;
     }
@@ -368,8 +369,10 @@ class BlogComment extends Entry implements Reply {
         #   .'\');">'._("Delete").'</a>';
 
         $this->control_bar[] =
-            ahref($this->uri("delete"), _("Delete"),
-                  array('class'=>'deletelink')); #, 'id'=>$this->globalID()));
+            ahref(
+                $this->uri("delete"), _("Delete"),
+                array('class'=>'deletelink')
+            ); #, 'id'=>$this->globalID()));
 
         ob_start();
         $this->raiseEvent("OnOutput");
@@ -401,8 +404,8 @@ class BlogComment extends Entry implements Reply {
 
         $t->set("URL", $this->url);
         $t->set("NAME", $this->name);
-        $t->set("DATE", $this->prettyDate($this->post_ts) );
-        $t->set("EDITDATE", $this->prettyDate() );
+        $t->set("DATE", $this->prettyDate($this->post_ts));
+        $t->set("EDITDATE", $this->prettyDate());
         if ($this->show_email || $usr->checkLogin()) {
             $t->set("SHOW_MAIL", true);
             $this->email = filter_var($this->email, FILTER_VALIDATE_EMAIL);
@@ -411,9 +414,9 @@ class BlogComment extends Entry implements Reply {
             $t->set("SHOW_MAIL", false);
             $t->set("EMAIL", "");
         }
-        $t->set("ANCHOR", $this->getAnchor() );
+        $t->set("ANCHOR", $this->getAnchor());
         $t->set("SHOW_CONTROLS", $show_edit_controls);
-        $t->set("BODY", $this->markup($this->data, COMMENT_NOFOLLOW) );
+        $t->set("BODY", $this->markup($this->data, COMMENT_NOFOLLOW));
         $t->set("CONTROL_BAR", $this->control_bar);
 
         $ret .= $t->process();

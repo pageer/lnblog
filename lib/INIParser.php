@@ -21,7 +21,8 @@
 # Class: IniParser
 # This is a simple class to parse INI files.
 
-class INIParser {
+class INIParser
+{
 
     public $filename;
     public $current_section;
@@ -74,7 +75,7 @@ class INIParser {
             $line = trim($line);
             #if ($black_magic) $line = stripslashes($line);
 
-            if ( preg_match("/^\[.+\]$/",$line) ) {
+            if ( preg_match("/^\[.+\]$/", $line) ) {
 
                 $sec_name = str_replace(array("[", "]"), "", $line);
 

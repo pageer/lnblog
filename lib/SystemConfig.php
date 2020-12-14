@@ -1,6 +1,7 @@
 <?php
 
-class SystemConfig {
+class SystemConfig
+{
     const DEFAULT_USERDATA_NAME = 'userdata';
     const PATH_CONFIG_NAME = 'pathconfig.php';
 

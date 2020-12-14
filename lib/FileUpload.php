@@ -32,7 +32,8 @@
 # OnMove       - Fired before moving the uploaded file to its destination.
 # MoveComplete - Fired after the file is successfully moved.
 
-class FileUpload extends LnBlogObject {
+class FileUpload extends LnBlogObject
+{
 
     public $field = '';
     public $destdir = '';
@@ -184,9 +185,11 @@ class FileUpload extends LnBlogObject {
         switch ($err) {
             case FILEUPLOAD_NO_ERROR:
                 $resolver = new UrlResolver(SystemConfig::instance(), $this->fs);
-                $ret = spf_("File '<a href=\"%s\">%s</a>' successfully uploaded.",
-                            $resolver->absoluteLocalpathToUri(Path::mk($this->destdir, $this->destname)),
-                            $this->destname);
+                $ret = spf_(
+                    "File '<a href=\"%s\">%s</a>' successfully uploaded.",
+                    $resolver->absoluteLocalpathToUri(Path::mk($this->destdir, $this->destname)),
+                    $this->destname
+                );
                 break;
             case FILEUPLOAD_NO_FILE:
                 $ret = _("No file was uploaded.");

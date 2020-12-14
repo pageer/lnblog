@@ -4,7 +4,8 @@ use LnBlog\Model\EntryFactory;
 use LnBlog\Model\Reply;
 use LnBlog\Tasks\TaskManager;
 
-class WebPages extends BasePages {
+class WebPages extends BasePages
+{
 
     protected $blog;
     protected $user;
@@ -124,8 +125,10 @@ class WebPages extends BasePages {
             if ($this->fs->is_dir($blog_root)) {
                 SystemConfig::instance()->registerBlog(basename($blog_root), new UrlPath($blog_root, $blog_url));
                 SystemConfig::instance()->writeConfig();
-                $ret = $this->fs->write_file(Path::mk(BLOG_ROOT,"pathconfig.php"),
-                                  pathconfig_php_string($inst_root, $inst_url, $blog_url));
+                $ret = $this->fs->write_file(
+                    Path::mk(BLOG_ROOT, "pathconfig.php"),
+                    pathconfig_php_string($inst_root, $inst_url, $blog_url)
+                );
                 if (!$ret) {
                     $tpl->set("UPDATE_MESSAGE", _("Error updating blog paths."));
                 } else {
@@ -210,7 +213,7 @@ class WebPages extends BasePages {
 
         $tpl = $this->createTemplate(CONFIRM_TEMPLATE);
         $tpl->set("CONFIRM_TITLE", $is_art ? _("Remove article?") : _("Remove entry?"));
-        $tpl->set("CONFIRM_MESSAGE",$message);
+        $tpl->set("CONFIRM_MESSAGE", $message);
         #$tpl->set("CONFIRM_PAGE", current_file() );
         $tpl->set("CONFIRM_PAGE", '');
         $tpl->set("OK_ID", $conf_id);
@@ -267,7 +270,7 @@ class WebPages extends BasePages {
             $this->getPage()->addScript("sitemap.js");
         }
 
-        $tpl->set("FORM_ACTION", make_uri(false,false,false));
+        $tpl->set("FORM_ACTION", make_uri(false, false, false));
         if (isset($_GET["list"])) {
             $tpl->set("PAGE_TITLE", _("Edit Link List"));
         } else {
@@ -287,8 +290,10 @@ class WebPages extends BasePages {
 
             if (! $ret) {
                 $tpl->set("EDIT_ERROR", _("Cannot create file"));
-                $tpl->set("ERROR_MESSAGE",
-                          spf_("Unable to create file %s.", $file));
+                $tpl->set(
+                    "ERROR_MESSAGE",
+                    spf_("Unable to create file %s.", $file)
+                );
                 $tpl->set("FILE_TEXT", htmlentities($data));
             }
 
@@ -309,8 +314,12 @@ class WebPages extends BasePages {
 
         if (GET('map')) {
             $tpl->set("SITEMAP_MODE");
-            $tpl->set("FORM_MESSAGE", spf_('This page will help you create a site map to display in the navigation bar at the top of your blog.  This file is stored under the name %s in the root directory of your weblog for a personal sitemap or in the %s installation directory for the system default.  This file in simply a series of <abbr title="Hypertext Markup Language">HTML</abbr> links, each on it\'s own line, which the template will process into a list.  If you require a more complicated menu bar, you will have to create a custom template.',
-                                           basename(SITEMAP_FILE), PACKAGE_NAME));
+            $tpl->set(
+                "FORM_MESSAGE", spf_(
+                    'This page will help you create a site map to display in the navigation bar at the top of your blog.  This file is stored under the name %s in the root directory of your weblog for a personal sitemap or in the %s installation directory for the system default.  This file in simply a series of <abbr title="Hypertext Markup Language">HTML</abbr> links, each on it\'s own line, which the template will process into a list.  If you require a more complicated menu bar, you will have to create a custom template.',
+                    basename(SITEMAP_FILE), PACKAGE_NAME
+                )
+            );
             $tpl->set("PAGE_TITLE", _("Create site map"));
         } else {
             $resolver = new UrlResolver();
@@ -365,22 +374,22 @@ class WebPages extends BasePages {
         $tpl = $this->createTemplate("login_create_tpl.php");
         $tpl->set("FORM_TITLE", $form_title);
         $tpl->set("FORM_ACTION", current_file());
-        $tpl->set("FULLNAME_VALUE", htmlentities($usr->name()) );
-        $tpl->set("EMAIL_VALUE", htmlentities($usr->email()) );
-        $tpl->set("HOMEPAGE_VALUE", htmlentities($usr->homepage()) );
-        $tpl->set("PROFILEPAGE_VALUE", htmlentities($usr->profileUrl()) );
+        $tpl->set("FULLNAME_VALUE", htmlentities($usr->name()));
+        $tpl->set("EMAIL_VALUE", htmlentities($usr->email()));
+        $tpl->set("HOMEPAGE_VALUE", htmlentities($usr->homepage()));
+        $tpl->set("PROFILEPAGE_VALUE", htmlentities($usr->profileUrl()));
 
         $this->blog_qs = ($this->blog->isBlog() ? "blog=".$this->blog->blogid."&amp;" : "");
 
         $tpl->set("UPLOAD_LINK", $this->blog->uri("upload", ['profile' => $usr->username()]));
         $edit_link_data = ["file"=>"profile.htm", 'profile'=>$usr->username()];
         $tpl->set("PROFILE_EDIT_LINK", $this->blog->uri("editfile", $edit_link_data));
-        $tpl->set("PROFILE_EDIT_DESC", _("Edit extra profile data") );
-        $tpl->set("UPLOAD_DESC", _("Upload file to profile") );
+        $tpl->set("PROFILE_EDIT_DESC", _("Edit extra profile data"));
+        $tpl->set("UPLOAD_DESC", _("Upload file to profile"));
 
         # Populate the form with custom profile fields.
-        $priv_path = Path::mk(USER_DATA_PATH,$usr->username(),CUSTOM_PROFILE);
-        $cust_path = Path::mk(USER_DATA_PATH,CUSTOM_PROFILE);
+        $priv_path = Path::mk(USER_DATA_PATH, $usr->username(), CUSTOM_PROFILE);
+        $cust_path = Path::mk(USER_DATA_PATH, CUSTOM_PROFILE);
         $cust_ini = NewINIParser($priv_path);
         $cust_ini->merge(NewINIParser($cust_path));
 
@@ -580,7 +589,7 @@ class WebPages extends BasePages {
                 echo json_encode($response);
                 return false;
             } else {
-                $tpl->set("PREVIEW_DATA", $ent->get($this) );
+                $tpl->set("PREVIEW_DATA", $ent->get($this));
             }
         } else {
             $this->getPage()->redirect($ent->permalink());
@@ -713,7 +722,7 @@ class WebPages extends BasePages {
         sort($blog->tag_list);
         $tpl->set("BLOG_TAGS", $blog->tag_list);
 
-        $tpl->set("FORM_ACTION", make_uri(false,false,false) );
+        $tpl->set("FORM_ACTION", make_uri(false, false, false));
         $blog->exportVars($tpl);
 
         return $tpl;
@@ -754,10 +763,11 @@ class WebPages extends BasePages {
         foreach ($this->last_pingback_results as $res) {
             if ($res['response']['code']) {
                 $errors[] = spf_('URI: %s', $res['uri']).'<br />'.
-                            spf_("Error %d: %s<br />",
-                                 $res['response']['code'],
-                                 $res['response']['message']
-                             );
+                            spf_(
+                                "Error %d: %s<br />",
+                                $res['response']['code'],
+                                $res['response']['message']
+                            );
             }
         }
 
@@ -846,10 +856,12 @@ class WebPages extends BasePages {
                     header("HTTP/1.0 500 Server Error");
                 }
                 header("Content-Type: application/json");
-                echo json_encode(array(
+                echo json_encode(
+                    array(
                     'success' => $success,
                     'messages' => $messages,
-                ));
+                    )
+                );
                 return false;
             }
 
@@ -866,7 +878,7 @@ class WebPages extends BasePages {
             $size = str_replace("M", "000000", $size);
             $tpl->set("MAX_SIZE", $size);
             $tpl->set("FILE", $file_name);
-            $tpl->set("TARGET_URL", $resolver->localpathToUri($target, $this->blog) );
+            $tpl->set("TARGET_URL", $resolver->localpathToUri($target, $this->blog));
             $tpl->set("BLOG_ATTACHMENTS", $blog_files);
             $tpl->set("ENTRY_ATTACHMENTS", $entry_files);
 
@@ -1008,8 +1020,10 @@ class WebPages extends BasePages {
     protected function get_archive_objects(&$blog, $type) {
         $ret = array();
         if (isset($_GET['year']) && isset($_GET['month'])) {
-            $ents = $blog->getMonth(sanitize(GET('year'), '/\D/'),
-                                    sanitize(GET('month'), '/\D/'));
+            $ents = $blog->getMonth(
+                sanitize(GET('year'), '/\D/'),
+                sanitize(GET('month'), '/\D/')
+            );
         } elseif (isset($_GET['year'])) {
             $ents = $blog->getYear(sanitize(GET('year'), '/\D/'));
         } else {
@@ -1093,8 +1107,9 @@ class WebPages extends BasePages {
         $tpl->set('FORM_ACTION', make_uri(false, false, false));
 
         $tpl->set('LIST_TITLE', $this->get_title($main_obj, GET('type')));
-        $tpl->set('LIST_HEADER',
-                spf_("View reply type:").
+        $tpl->set(
+            'LIST_HEADER',
+            spf_("View reply type:").
                 ' <a href="'.make_uri(false, array('type'=>'all'), false).'">'.
                 _("All Replies").'</a> | '.
                 '<a href="'.make_uri(false, array('type'=>'comment'), false).'">'.
@@ -1102,7 +1117,8 @@ class WebPages extends BasePages {
                 '<a href="'.make_uri(false, array('type'=>'trackback'), false).'">'.
                 _("TrackBacks").'</a> | '.
                 '<a href="'.make_uri(false, array('type'=>'pingback'), false).'">'.
-                _("Pingbacks").'</a>');
+            _("Pingbacks").'</a>'
+        );
         $tpl->set('FORM_FOOTER', '<input type="submit" value="'._('Delete').'" />');
         $ITEM_LIST = array();
 
@@ -1131,7 +1147,7 @@ class WebPages extends BasePages {
         };
 
         $tpl = $this->createTemplate('confirm_tpl.php');
-        $tpl->set("CONFIRM_PAGE", make_uri(false, false, false) );
+        $tpl->set("CONFIRM_PAGE", make_uri(false, false, false));
         $tpl->set("OK_ID", 'conf');
         $tpl->set("OK_LABEL", _("Yes"));
         $tpl->set("CANCEL_ID", _("Cancel"));
@@ -1207,7 +1223,7 @@ class WebPages extends BasePages {
         }
 
         $tpl->set("CONFIRM_TITLE", $title);
-        $tpl->set("CONFIRM_MESSAGE",$message);
+        $tpl->set("CONFIRM_MESSAGE", $message);
         $tpl->set("PASS_DATA", $anchors);
 
         return $tpl->process();
@@ -1400,14 +1416,14 @@ class WebPages extends BasePages {
 
         # Failing that, try the directory names.
         } elseif ( preg_match('/^\d\d$/', $monthdir) &&
-                   preg_match('/^\d\d\d\d$/',$yeardir) ) {
+                   preg_match('/^\d\d\d\d$/', $yeardir) ) {
             $month = $monthdir;
             $year = $yeardir;
 
         # If THAT fails, then there must not be a month, so try just the year.
         } elseif ( sanitize(GET('year'), '/\D/') ) {
             $year = sanitize(GET('year'), '/\D/');
-        } elseif ( preg_match('/^\d\d\d\d$/',$monthdir) ) {
+        } elseif ( preg_match('/^\d\d\d\d$/', $monthdir) ) {
             $year = $monthdir;
 
         # If we still don't have a year, show the base archives.
@@ -1415,12 +1431,12 @@ class WebPages extends BasePages {
             $year = false;
         }
 
-        $day = isset($_GET['day']) ? sprintf("%02d", GET("day") ) : false;
+        $day = isset($_GET['day']) ? sprintf("%02d", GET("day")) : false;
 
         if ($year && $month && $day) {
             $body = $this->show_day_archives($this->blog, $year, $month, $day);
             if (is_array($body)) {
-                $this->getPage()->redirect( $body[1] );
+                $this->getPage()->redirect($body[1]);
                 exit;
             }
         } elseif ($year && $month) {
@@ -1554,8 +1570,10 @@ class WebPages extends BasePages {
 
         # Allow a query string to get just the comment form, not the actual comments.
         if (! GET('post')) {
-            $title = spf_('Comments on <a href="%s">%s</a>',
-                          $ent->permalink(), htmlspecialchars($ent->subject));
+            $title = spf_(
+                'Comments on <a href="%s">%s</a>',
+                $ent->permalink(), htmlspecialchars($ent->subject)
+            );
             $cmts = $ent->getComments();
             $content = $this->showReplies($ent, $usr, $cmts, $title);
             # Extra styles to add.  Build the list as we go to keep from including more
@@ -1581,14 +1599,20 @@ class WebPages extends BasePages {
         $this->getPage()->addScript(lang_js());
         $this->getPage()->addStylesheet("reply.css");
         $this->getPage()->addScript("entry.js");
-        $title = spf_('Pingbacks on <a href="%s">%s</a>',
-                      $ent->permalink(), $ent->subject);
+        $title = spf_(
+            'Pingbacks on <a href="%s">%s</a>',
+            $ent->permalink(), $ent->subject
+        );
         $pbs = $ent->getPingbacks();
         $body = $this->showReplies($ent, $usr, $pbs, $title);
         if (! $body) $body = '<p>'.
-            spf_('There are no pingbacks for %s',
-                 sprintf('<a href="%s">\'%s\'</a>',
-                         $ent->permalink(), $ent->subject)).'</p>';
+            spf_(
+                'There are no pingbacks for %s',
+                sprintf(
+                    '<a href="%s">\'%s\'</a>',
+                    $ent->permalink(), $ent->subject
+                )
+            ).'</p>';
         return $body;
     }
 
@@ -1600,14 +1624,20 @@ class WebPages extends BasePages {
         $this->getPage()->addScript(lang_js());
         $this->getPage()->addStylesheet("reply.css");
         $this->getPage()->addScript("entry.js");
-        $title = spf_('Trackbacks on <a href="%s">%s</a>',
-                      $ent->permalink(), $ent->subject);
+        $title = spf_(
+            'Trackbacks on <a href="%s">%s</a>',
+            $ent->permalink(), $ent->subject
+        );
         $tbs = $ent->getTrackbacks();
         $body = $this->showReplies($ent, $usr, $tbs, $title);
         if (! $body) {
-            $body = '<p>'.spf_('There are no trackbacks for %s',
-                               sprintf('<a href="%s">\'%s\'</a>',
-                                       $ent->permalink(), $ent->subject)).'</p>';
+            $body = '<p>'.spf_(
+                'There are no trackbacks for %s',
+                sprintf(
+                    '<a href="%s">\'%s\'</a>',
+                    $ent->permalink(), $ent->subject
+                )
+            ).'</p>';
         }
         return $body;
     }
@@ -1638,31 +1668,39 @@ class WebPages extends BasePages {
                 if ( ! trim(POST('target_url')) || ! POST('url') ) {
                     $tpl->set("ERROR_MESSAGE", _("You must supply an entry URL and a target URL."));
                 } else {
-                    $ret = $tb->send( trim(POST('target_url')) );
+                    $ret = $tb->send(trim(POST('target_url')));
                     if ($ret['error'] == '0') {
                         $refresh_time = 5;
-                        $tpl->set("ERROR_MESSAGE",
-                                  spf_("Trackback ping succeded.  You will be returned to the entry in %d seconds.", $refresh_time));
+                        $tpl->set(
+                            "ERROR_MESSAGE",
+                            spf_("Trackback ping succeded.  You will be returned to the entry in %d seconds.", $refresh_time)
+                        );
                         $this->getPage()->refresh($ent->permalink(), $refresh_time);
                     } else {
-                        $tpl->set("ERROR_MESSAGE",
-                                  spf_('Error %s: %s', $ret['error'], $ret['message']).
+                        $tpl->set(
+                            "ERROR_MESSAGE",
+                            spf_('Error %s: %s', $ret['error'], $ret['message']).
                                   '<br /><textarea rows="20" cols="20">'.
-                                  $ret['response'].'</textarea>');
+                            $ret['response'].'</textarea>'
+                        );
                     }
                 }
             }
 
-            $tpl->set("TB_URL", $tb->url );
+            $tpl->set("TB_URL", $tb->url);
             $tpl->set("TB_TITLE", $tb->title);
-            $tpl->set("TB_EXCERPT", $tb->data );
+            $tpl->set("TB_EXCERPT", $tb->data);
             $tpl->set("TB_BLOG", $tb->blog);
             $tpl->set("TARGET_URL", trim(POST('target_url')));
 
         } else {
-            $tpl->set("ERROR_MESSAGE",
-                      spf_("User %s cannot send trackback pings from this entry.",
-                           $usr->username()));
+            $tpl->set(
+                "ERROR_MESSAGE",
+                spf_(
+                    "User %s cannot send trackback pings from this entry.",
+                    $usr->username()
+                )
+            );
         }
 
 
@@ -1812,8 +1850,10 @@ class WebPages extends BasePages {
                 }
                 $tpl = $this->createTemplate(LIST_TEMPLATE);
                 $tpl->set("LIST_TITLE", _("Entries filed under: ").implode(", ", $tag_list));
-                $tpl->set("LIST_FOOTER", '<a href="?show=all&amp;tag='.$tags.'">'.
-                                            _("Display all entries at once").'</a>');
+                $tpl->set(
+                    "LIST_FOOTER", '<a href="?show=all&amp;tag='.$tags.'">'.
+                    _("Display all entries at once").'</a>'
+                );
                 $tpl->set("LINK_LIST", $links);
                 $body = $tpl->process();
             }
@@ -2123,8 +2163,10 @@ class WebPages extends BasePages {
                 $comm_tpl->set("COMMENT_NAME", POST('username'));
                 $comm_tpl->set("COMMENT_EMAIL", POST('email'));
                 $comm_tpl->set("COMMENT_SHOWEMAIL", POST('showemail'));
-                $comm_tpl->set("COMMENT_FORM_MESSAGE", $err ? $err :
-                               _("Error: unable to add commtent please try again."));
+                $comm_tpl->set(
+                    "COMMENT_FORM_MESSAGE", $err ? $err :
+                    _("Error: unable to add commtent please try again.")
+                );
             }
         }
 
@@ -2165,13 +2207,15 @@ class WebPages extends BasePages {
 
                 $typename = '';
 
-                $tpl->set("FORM_HEADER", "<p>".
+                $tpl->set(
+                    "FORM_HEADER", "<p>".
                           spf_("Delete marked %s", get_class($replies[0])).' '.
                           '<input type="submit" value="'._("Delete").'" />'.
                           '<input type="button" value="'._("Select all").
                           '" onclick="mark_type(\''.$reply_type.'\')" />'.
                           '<input type="hidden" name="replycount" value="'.
-                          count($reply_text).'" />'."</p>\n");
+                    count($reply_text).'" />'."</p>\n"
+                );
 
                 $blog = $ent->getParent();
                 $qs = array('blog'=>$blog->blogid);
@@ -2196,13 +2240,16 @@ class WebPages extends BasePages {
         # Get an array of each kind of reply.
         $pingbacks = $ent->getReplyArray(
             array('path'=>ENTRY_PINGBACK_DIR, 'ext'=>PINGBACK_PATH_SUFFIX,
-                  'creator'=>'NewPingback', 'sort_asc'=>true));
+            'creator'=>'NewPingback', 'sort_asc'=>true)
+        );
         $trackbacks = $ent->getReplyArray(
             array('path'=>ENTRY_TRACKBACK_DIR, 'ext'=>TRACKBACK_PATH_SUFFIX,
-                  'creator'=>'NewTrackback', 'sort_asc'=>true));
+            'creator'=>'NewTrackback', 'sort_asc'=>true)
+        );
         $comments = $ent->getReplyArray(
             array('path'=>ENTRY_COMMENT_DIR, 'ext'=>COMMENT_PATH_SUFFIX,
-                  'creator'=>'NewBlogComment', 'sort_asc'=>true));
+            'creator'=>'NewBlogComment', 'sort_asc'=>true)
+        );
 
         # Merge the arrays and sort entries based on the ping_date and/or timestamp.
         $replies = array_merge($pingbacks, $trackbacks, $comments);
@@ -2235,12 +2282,16 @@ class WebPages extends BasePages {
             $tpl = NewTemplate(LIST_TEMPLATE, $page);
 
             if (System::instance()->canModify($reply, $usr)) {
-                $tpl->set("FORM_HEADER",
-                          spf_("<p>Delete marked replies %s</p>",
-                          '<input type="submit" value="'._("Delete").'" />'.
-                          '<input type="button" value="'._("Select all").'" onclick="mark_all();" />'.
-                          '<input type="hidden" name="replycount" value="'.
-                          count($reply_text).'" />'));
+                $tpl->set(
+                    "FORM_HEADER",
+                    spf_(
+                        "<p>Delete marked replies %s</p>",
+                        '<input type="submit" value="'._("Delete").'" />'.
+                            '<input type="button" value="'._("Select all").'" onclick="mark_all();" />'.
+                            '<input type="hidden" name="replycount" value="'.
+                        count($reply_text).'" />'
+                    )
+                );
 
                 $blog = $ent->getParent();
                 $qs = array('blog'=>$blog->blogid);
@@ -2253,8 +2304,12 @@ class WebPages extends BasePages {
             $tpl->set("ITEM_CLASS", 'reply');
             $tpl->set("LIST_CLASS", 'replylist');
             $tpl->set("ORDERED");
-            $tpl->set("LIST_TITLE", spf_('Replies on <a href="%s">%s</a>',
-                      $ent->permalink(), $ent->subject));
+            $tpl->set(
+                "LIST_TITLE", spf_(
+                    'Replies on <a href="%s">%s</a>',
+                    $ent->permalink(), $ent->subject
+                )
+            );
             $tpl->set("ITEM_LIST", $reply_text);
             $ret = $tpl->process();
         }

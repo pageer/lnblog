@@ -37,7 +37,8 @@ use LnBlog\Model\Reply;
 # OnOutput        - Fired when starting to process for display.
 # OutputComplete  - Fired when output is sent to the client.
 
-class Pingback extends Trackback implements Reply {
+class Pingback extends Trackback implements Reply
+{
 
     public $target = '';
     public $source = '';
@@ -91,8 +92,10 @@ class Pingback extends Trackback implements Reply {
         $this->ping_date = date("Y-m-d H:i:s T", $ts);
         $this->timestamp = time();
         $this->ip = get_ip();
-        $this->file = Path::mk($ent->localpath(), ENTRY_PINGBACK_DIR,
-                             $ts.PINGBACK_PATH_SUFFIX);
+        $this->file = Path::mk(
+            $ent->localpath(), ENTRY_PINGBACK_DIR,
+            $ts.PINGBACK_PATH_SUFFIX
+        );
         $dir = Path::mk($ent->localpath(), ENTRY_PINGBACK_DIR);
 
         if (! $this->source) return false;
@@ -150,7 +153,7 @@ class Pingback extends Trackback implements Reply {
         $ent = NewEntry();
         $ret = substr($anchor, 8);
         $ret .= PINGBACK_PATH_SUFFIX;
-        $ret = Path::mk($ent->localpath(),ENTRY_PINGBACK_DIR,$ret);
+        $ret = Path::mk($ent->localpath(), ENTRY_PINGBACK_DIR, $ret);
         $ret = $this->fs->realpath($ret);
         return $ret;
     }
@@ -211,7 +214,7 @@ class Pingback extends Trackback implements Reply {
             '<a href="'.$del_link.'" class="deletelink">'._("Delete").'</a>';
 
         $this->raiseEvent("OnOutput");
-        $tpl->set("SHOW_EDIT_CONTROLS", System::instance()->canModify($this->getParent(), $u) && $u->checkLogin() );
+        $tpl->set("SHOW_EDIT_CONTROLS", System::instance()->canModify($this->getParent(), $u) && $u->checkLogin());
         $tpl->set("PB_SOURCE", $this->source);
         $tpl->set("PB_TARGET", $this->target);
         $tpl->set("CONTROL_BAR", $this->control_bar);

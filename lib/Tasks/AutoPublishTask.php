@@ -12,7 +12,8 @@ use Exception;
 use InvalidArgumentException;
 use RuntimeException;
 
-class AutoPublishTask implements Task {
+class AutoPublishTask implements Task
+{
     private $entry;
     private $blog;
     private $publisher;
@@ -86,11 +87,13 @@ class AutoPublishTask implements Task {
             }
             $this->has_executed = true;
         } catch (Exception $e) {
-            $this->logger->error("Error publishing entry", [
+            $this->logger->error(
+                "Error publishing entry", [
                 'exception' => $e,
                 'draftid' => $this->entry->entryID(),
                 'blog' => $this->blog->blogid,
-            ]);
+                ]
+            );
         }
     }
 

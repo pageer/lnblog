@@ -2,7 +2,8 @@
 
 # Class: AttachedFile
 # Represents a file attached to an object, such as an uploaded picture.
-class AttachedFile {
+class AttachedFile
+{
     private $base_path;
     private $name;
 

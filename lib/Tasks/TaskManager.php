@@ -8,7 +8,8 @@ use Psr\Log\LoggerInterface;
 
 # Class: TaskManager
 # Manages the task queue and runs scheduled tasks.
-class TaskManager {
+class TaskManager
+{
     private $repository;
     private $logger;
 
@@ -42,9 +43,11 @@ class TaskManager {
     public function getByName($class_name) {
         $tasks = $this->repository->getAll();
 
-        $result = array_filter($tasks, function ($task) use ($class_name) {
+        $result = array_filter(
+            $tasks, function ($task) use ($class_name) {
             return get_class($task) === $class_name;
-        });
+            }
+        );
 
         return $result;
     }

@@ -1,5 +1,6 @@
 <?php
 
-class FileNotFound extends Exception {
+class FileNotFound extends Exception
+{
 
 }

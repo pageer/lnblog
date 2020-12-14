@@ -409,7 +409,7 @@ function make_uri($base=false, $query_string=false, $no_get=true,
         $port = SERVER("SERVER_PORT");
         if ($port == 80 || $port == "") $port = "";
         else $port = ":".$port;
-        if (substr($base,0,1) != '/') $base = '/'.$base;
+        if (substr($base, 0, 1) != '/') $base = '/'.$base;
         $base = $protocol."://".$host.$port.$base;
     }
 

@@ -3,7 +3,8 @@
 # A class for parsing the XML produced by the <SimpleXMLWriter> class and 
 # creating or populating an object based on it.
 
-class SimpleXMLReader {
+class SimpleXMLReader
+{
     
     public $file = '';
     public $domtree = false;

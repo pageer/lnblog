@@ -85,7 +85,7 @@ define("FILEUPLOAD_NO_FILE", 1);
 # Constant:FILEUPLOAD_FILE_EMPTY
 # The file was created on the server, but it is empty.
 define("FILEUPLOAD_FILE_EMPTY", 2);
-# Constant:	FILEUPLOAD_SERVER_TOO_BIG
+# Constant:    FILEUPLOAD_SERVER_TOO_BIG
 # The uploaded file is too big for the server.
 define("FILEUPLOAD_SERVER_TOO_BIG", 3);
 # Constant: FILEUPLOAD_FORM_TOO_BIG

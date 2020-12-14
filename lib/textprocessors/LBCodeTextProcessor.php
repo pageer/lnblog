@@ -1,5 +1,6 @@
 <?php
-class LBCodeTextProcessor extends TextProcessor {
+class LBCodeTextProcessor extends TextProcessor
+{
     public $filter_id = MARKUP_BBCODE;
     public $filter_name = 'LBCode';
     public $strip = false;
@@ -20,10 +21,14 @@ class LBCodeTextProcessor extends TextProcessor {
 
     protected function toHTML() {
         if ($this->entry) {
-            $this->formatted = preg_replace_callback("/\[img(-?\w+)?=([^\]\:]+)\]/",
-                                                     array($this, 'fixURI'), $this->formatted);
-            $this->formatted = preg_replace_callback("/\[url=([^\:@\]]+)\]/",
-                                                     array($this, 'fixURI'), $this->formatted);
+            $this->formatted = preg_replace_callback(
+                "/\[img(-?\w+)?=([^\]\:]+)\]/",
+                array($this, 'fixURI'), $this->formatted
+            );
+            $this->formatted = preg_replace_callback(
+                "/\[url=([^\:@\]]+)\]/",
+                array($this, 'fixURI'), $this->formatted
+            );
         }
         $this->formatted = $this->sanitizeText($this->formatted);
 

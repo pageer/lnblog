@@ -1,5 +1,6 @@
 <?php
 
-class TargetPathExists extends Exception {
+class TargetPathExists extends Exception
+{
 
 }

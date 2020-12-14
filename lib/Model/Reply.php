@@ -2,7 +2,8 @@
 
 namespace LnBlog\Model;
 
-interface Reply {
+interface Reply
+{
     public function getAnchor();
     public function globalID();
 }

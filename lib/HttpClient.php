@@ -6,7 +6,8 @@
  *
  * @codeCoverageIgore
  */
-class HttpClient {
+class HttpClient
+{
     # Method: fetchUrl
     # Fetch the content of  a URL.
     #

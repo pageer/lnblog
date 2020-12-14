@@ -47,7 +47,8 @@ use LnBlog\Tasks\TaskManager;
 use LnBlog\Tasks\TaskRepository;
 use Psr\Log\LoggerInterface;
 
-class Blog extends LnBlogObject implements AttachmentContainer {
+class Blog extends LnBlogObject implements AttachmentContainer
+{
 
     public $blogid = '';
     public $name = '';
@@ -201,7 +202,9 @@ class Blog extends LnBlogObject implements AttachmentContainer {
                $this->fs->file_exists(Path::mk($this->home_path, 'blogdata.txt'));
     }
 
-    public function getParent() { return false; }
+    public function getParent() {
+ return false; 
+    }
 
     /*
     Method: writers
@@ -246,9 +249,9 @@ class Blog extends LnBlogObject implements AttachmentContainer {
             }
         }
 
-        $this->sw_version = $ini->value('system','SoftwareVersion','0.7pre');
-        $this->last_upgrade = $ini->value('system','LastUpgrade','');
-        $this->url_method = $ini->value('system','URLMethod','wrapper');
+        $this->sw_version = $ini->value('system', 'SoftwareVersion', '0.7pre');
+        $this->last_upgrade = $ini->value('system', 'LastUpgrade', '');
+        $this->url_method = $ini->value('system', 'URLMethod', 'wrapper');
     }
 
     /*
@@ -274,9 +277,9 @@ class Blog extends LnBlogObject implements AttachmentContainer {
             }
         }
 
-        $ini->setValue('system','SoftwareVersion',$this->sw_version);
-        $ini->setValue('system','LastUpgrade',$this->last_upgrade);
-        $ini->setValue('system','URLMethod',$this->url_method);
+        $ini->setValue('system', 'SoftwareVersion', $this->sw_version);
+        $ini->setValue('system', 'LastUpgrade', $this->last_upgrade);
+        $ini->setValue('system', 'URLMethod', $this->url_method);
 
         $ret = $ini->writeFile();
         return $ret;
@@ -297,8 +300,10 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     */
     public function getDay($year, $month, $day) {
         $fmtday = sprintf("%02d", $day);
-        $month_dir = Path::mk(BLOG_ROOT,BLOG_ENTRY_PATH,
-                            $year,sprintf("%02d", $month));
+        $month_dir = Path::mk(
+            BLOG_ROOT, BLOG_ENTRY_PATH,
+            $year, sprintf("%02d", $month)
+        );
         $day_list = $this->fs->scan_directory($month_dir, true);
         rsort($day_list);
 
@@ -327,15 +332,17 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     */
     public function getDayCount($year, $month, $day) {
         $fmtday = sprintf("%02d", $day);
-        $month_dir = Path::mk(BLOG_ROOT,BLOG_ENTRY_PATH,
-                            $year,sprintf("%02d", $month));
+        $month_dir = Path::mk(
+            BLOG_ROOT, BLOG_ENTRY_PATH,
+            $year, sprintf("%02d", $month)
+        );
         #$day_list = glob($month_dir.PATH_DELIM.$fmtday."*");
         $day_list = $this->fs->scan_directory($month_dir, true);
         $ent = NewBlogEntry();
         $ret = 0;
         foreach ($day_list as $dy) {
             if ( substr($dy, 0, 2) == $fmtday &&
-                 $ent->isEntry(Path::mk($month_dir,$dy)) ) {
+                 $ent->isEntry(Path::mk($month_dir, $dy)) ) {
                 $ret++;
             }
         }
@@ -359,7 +366,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
     */
     public function getMonth($year, $month) {
         $ent = NewBlogEntry();
-        $curr_dir = Path::mk($this->home_path,BLOG_ENTRY_PATH,$year,$month);
+        $curr_dir = Path::mk($this->home_path, BLOG_ENTRY_PATH, $year, $month);
 
         $ent_list = array();
         $dir_list = $this->fs->scan_directory($curr_dir, true);
@@ -394,10 +401,12 @@ class Blog extends LnBlogObject implements AttachmentContainer {
         $ent = NewBlogEntry();
         $curr_dir = $this->fs->getcwd();
         if ($year) {
-            $curr_dir = Path::mk($this->home_path,BLOG_ENTRY_PATH,$year);
+            $curr_dir = Path::mk($this->home_path, BLOG_ENTRY_PATH, $year);
         } elseif (sanitize(GET("year"), "/\D/")) {
-            $curr_dir = Path::mk($this->home_path,BLOG_ENTRY_PATH,
-                               sanitize(GET("year"), "/\D/"));
+            $curr_dir = Path::mk(
+                $this->home_path, BLOG_ENTRY_PATH,
+                sanitize(GET("year"), "/\D/")
+            );
         }
         $ent_list = array();
         $dir_list = $this->fs->scan_directory($curr_dir, true);
@@ -700,7 +709,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
             $month_list = $this->fs->scan_directory(Path::mk($ent_dir, $year), true);
             rsort($month_list);
             foreach ($month_list as $month) {
-                $path = Path::mk($ent_dir,$year, $month);
+                $path = Path::mk($ent_dir, $year, $month);
                 $ents = $this->fs->scan_directory($path, true);
                 rsort($ents);
                 foreach ($ents as $e) {
@@ -747,8 +756,8 @@ class Blog extends LnBlogObject implements AttachmentContainer {
         $art_list = $this->fs->scan_directory($art_path);
         $ret = array();
         foreach ($art_list as $dir) {
-            if ($art->isEntry(Path::mk($art_path,$dir)) ) {
-                $ret[] = NewEntry(Path::mk($art_path,$dir));
+            if ($art->isEntry(Path::mk($art_path, $dir)) ) {
+                $ret[] = NewEntry(Path::mk($art_path, $dir));
             }
         }
         usort($ret, array($this, '_sort_by_date'));
@@ -990,7 +999,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
         $tpl->set("BLOG_IMAGE", $this->image);
         $tpl->set("BLOG_MAX_ENTRIES", $this->max_entries);
         $tpl->set("BLOG_BASE_DIR", $this->home_path);
-        $tpl->set("BLOG_URL", $this->getURL() );
+        $tpl->set("BLOG_URL", $this->getURL());
         $tpl->set("BLOG_URL_ROOTREL", $this->getURL(false));
         $tpl->set("BLOG_ALLOW_ENC", $this->allow_enclosure);
         $tpl->set("BLOG_GATHER_REPLIES", $this->gather_replies);
@@ -1239,7 +1248,7 @@ class Blog extends LnBlogObject implements AttachmentContainer {
         $ret = true;
         foreach ($dir_list as $dir) {
             $path = Path::mk($start_dir, $dir);
-            $ret = $ret && $this->fs->chmod($path, $this->fs->directoryMode() );
+            $ret = $ret && $this->fs->chmod($path, $this->fs->directoryMode());
             $ret = $ret && $this->fixDirectoryPermissions($path);
         }
         return $ret;
@@ -1352,8 +1361,10 @@ class Blog extends LnBlogObject implements AttachmentContainer {
             if (! is_dir($p)) {
                 $this->fs->mkdir_rec($p->get());
             }
-            $p = Path::get($this->home_path, BLOG_DELETED_PATH,
-                     BLOG_CONFIG_PATH."-".date(ENTRY_PATH_FORMAT_LONG));
+            $p = Path::get(
+                $this->home_path, BLOG_DELETED_PATH,
+                BLOG_CONFIG_PATH."-".date(ENTRY_PATH_FORMAT_LONG)
+            );
             $ret = $this->fs->rename(Path::get($this->home_path, BLOG_CONFIG_PATH), $p);
         } else {
             $ret = $this->fs->rmdir_rec($this->home_path);

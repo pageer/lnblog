@@ -3,7 +3,8 @@
 # Class: SocialWebServer
 # Server implementation for receiving social web notifications, e.g.
 # Pingbacks and Webmentions.
-class SocialWebServer {
+class SocialWebServer
+{
     private $mapper;
     private $http_client;
 

@@ -32,7 +32,8 @@ operations for writing.  This implies three complications:
  3) We must somehow correlate the local path to the FTP path.
 */
 
-class FTPFS extends FS {
+class FTPFS extends FS
+{
 
     public $host = '';
     public $username = '';
@@ -56,8 +57,10 @@ class FTPFS extends FS {
 
         $colon_pos = strpos(":", $this->host);
         if ($colon_pos > 0) {
-            $this->connection = ftp_connect(substr($this->host, 0, $colon_pos),
-                                            substr($this->host, $colon_pos+1));
+            $this->connection = ftp_connect(
+                substr($this->host, 0, $colon_pos),
+                substr($this->host, $colon_pos+1)
+            );
         } else {
             $this->connection = ftp_connect($this->host);
         }
@@ -87,7 +90,7 @@ class FTPFS extends FS {
         # Check if $path is relative.
         if ($char1 != '/' && $char2 != ':') $path = getcwd().PATH_DELIM.$path;
         # Since $path should be absolute now, strip the leading FTP_ROOT part.
-        $ret = substr($path, strlen($this->ftp_root) );
+        $ret = substr($path, strlen($this->ftp_root));
         # Convert native path delimiters to '/'
         if (PATH_DELIM != '/') $ret = str_replace(PATH_DELIM, '/', $ret);
         # If we end up with a relative path, add a leading '/'
@@ -116,8 +119,10 @@ class FTPFS extends FS {
 
         $colon_pos = strpos(":", $this->host);
         if ($colon_pos > 0) {
-            $this->connection = ftp_connect(substr($this->host, 0, $colon_pos),
-                                            substr($this->host, $colon_pos+1));
+            $this->connection = ftp_connect(
+                substr($this->host, 0, $colon_pos),
+                substr($this->host, $colon_pos+1)
+            );
         } else {
             $this->connection = ftp_connect($this->host);
         }

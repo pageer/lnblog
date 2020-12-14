@@ -1,5 +1,6 @@
 <?php
-class AutoMarkupTextProcessor extends TextProcessor {
+class AutoMarkupTextProcessor extends TextProcessor
+{
 
     public $filter_id = MARKUP_NONE;
     public $filter_name = 'Auto-markup';

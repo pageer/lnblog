@@ -1,5 +1,6 @@
 <?php
-class HTMLTextProcessor extends TextProcessor {
+class HTMLTextProcessor extends TextProcessor
+{
     public $filter_id = MARKUP_HTML;
     public $filter_name = 'HTML';
 
@@ -9,10 +10,14 @@ class HTMLTextProcessor extends TextProcessor {
     }
 
     protected function fixAllUrls($text) {
-        $ret = preg_replace_callback("/(src)=['\"]([^\:]+)['\"]/U",
-                                     array($this, 'fixURI'), $text);
-        $ret = preg_replace_callback("/(href)=['\"]([^\:@]+)['\"]/U",
-                                     array($this, 'fixURI'), $ret);
+        $ret = preg_replace_callback(
+            "/(src)=['\"]([^\:]+)['\"]/U",
+            array($this, 'fixURI'), $text
+        );
+        $ret = preg_replace_callback(
+            "/(href)=['\"]([^\:@]+)['\"]/U",
+            array($this, 'fixURI'), $ret
+        );
         return $ret;
     }
 

@@ -1,5 +1,6 @@
 <?php
 
-class TaskInvalid extends Exception {
+class TaskInvalid extends Exception
+{
 
 }

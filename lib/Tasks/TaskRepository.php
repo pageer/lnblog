@@ -12,7 +12,8 @@ use DateTimeInterface;
 
 # Class: TaskRepository
 # Handles persistence of the task queue to and from disk.
-class TaskRepository {
+class TaskRepository
+{
 
     const QUEUE_FILE = 'pending-tasks.json';
 
@@ -69,9 +70,11 @@ class TaskRepository {
 
         $current_queue = $this->getTaskQueue();
         
-        $new_queue = array_filter($current_queue, function ($item) use ($serialized_data) {
+        $new_queue = array_filter(
+            $current_queue, function ($item) use ($serialized_data) {
             return $item != $serialized_data;
-        });
+            }
+        );
 
         if (count($current_queue) !== count($new_queue)) {
             $this->writeTaskQueue($new_queue);

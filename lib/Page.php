@@ -34,7 +34,8 @@ InitComplete   - Fired after object initialization is complete.
 OnOutput       - Fired when processing for HTML output starts.
 OutputComplete - Fired after the HTML output has been performed.
 */
-class Page extends LnBlogObject {
+class Page extends LnBlogObject
+{
 
     /*
     Property: display_object
@@ -315,8 +316,8 @@ class Page extends LnBlogObject {
         $head->set("PAGE_TITLE", $this->title);
         $head->set("METADATA", $this->metatags);
         $head->set("RSSFEEDS", $this->rssfeeds);
-        $head->set("STYLESHEETS",$this->stylesheets);
-        $head->set("SCRIPTS",$this->scripts);
+        $head->set("STYLESHEETS", $this->stylesheets);
+        $head->set("SCRIPTS", $this->scripts);
         $head->set("LINKS", $this->links);
         
         if ($blog && is_a($blog, 'Blog')) {

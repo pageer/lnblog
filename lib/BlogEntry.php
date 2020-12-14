@@ -39,7 +39,8 @@ OutputComplete - Fired after output has finished being generated.
 POSTRetrieved  - Fired after data has been retrieved from an HTTP POST.
 */
 
-class BlogEntry extends Entry implements AttachmentContainer {
+class BlogEntry extends Entry implements AttachmentContainer
+{
 
     const AUTO_PUBLISH_FILE = 'publish.txt';
 
@@ -72,11 +73,13 @@ class BlogEntry extends Entry implements AttachmentContainer {
         $this->raiseEvent("OnInit");
 
         if ($path !== null) {
-            $this->getFile($path, ENTRY_DEFAULT_FILE,
-                           array('entry', 'draft'),
-                           array(BLOG_ENTRY_PATH, BLOG_DRAFT_PATH),
-                           array('/^\d{4}\/\d{2}\/\d{2}_\d{4}\d?\d?$/',
-                                 '/^\d{2}_\d{4}\d?\d?$/'));
+            $this->getFile(
+                $path, ENTRY_DEFAULT_FILE,
+                array('entry', 'draft'),
+                array(BLOG_ENTRY_PATH, BLOG_DRAFT_PATH),
+                array('/^\d{4}\/\d{2}\/\d{2}_\d{4}\d?\d?$/',
+                '/^\d{2}_\d{4}\d?\d?$/')
+            );
 
             if ( $this->fs->file_exists($this->file) ) {
                 $this->readFileData();
@@ -173,7 +176,7 @@ class BlogEntry extends Entry implements AttachmentContainer {
             # reconstruct the full path.
             if (is_array($id_re)) {
                 $has_match = 0;
-                foreach($id_re as $re) {
+                foreach ($id_re as $re) {
                     $has_match = preg_match($re, $entrypath);
                     if ($has_match) break;
                 }
@@ -183,23 +186,23 @@ class BlogEntry extends Entry implements AttachmentContainer {
 
                 # If we can pass a short ID, it's assumed that we can find the
                 # current blog from the environment (query string, config.php, etc.)
-                $entrypath = str_replace("/", PATH_DELIM, $entrypath );
+                $entrypath = str_replace("/", PATH_DELIM, $entrypath);
 
                 if (is_array($subdir)) {
                     foreach ($subdir as $s) {
-                        $f = Path::mk($blog->home_path,$s,$entrypath,$revision);
+                        $f = Path::mk($blog->home_path, $s, $entrypath, $revision);
                         if ($this->fs->file_exists($f)) $this->file = $f;
                     }
                     if (! $this->file) {
-                        $this->file = Path::mk($blog->home_path,$subdir[0],$entrypath,$revision);
+                        $this->file = Path::mk($blog->home_path, $subdir[0], $entrypath, $revision);
                     }
-                } else $this->file = Path::mk($blog->home_path,$subdir,$entrypath,$revision);
+                } else $this->file = Path::mk($blog->home_path, $subdir, $entrypath, $revision);
 
 
             } else {
                 # If we don't have a short entry ID, assume it's a global ID.
                 $entrypath = $this->getPathFromGlobalId($entrypath);
-                $this->file = Path::mk($entrypath,$revision);
+                $this->file = Path::mk($entrypath, $revision);
             }
 
             if (! $this->fs->file_exists($this->file)) {
@@ -228,7 +231,7 @@ class BlogEntry extends Entry implements AttachmentContainer {
     # property if that does exist.
     public function tryOldFileName() {
         $tmpfile = dirname($this->file);
-        $tmpfile = Path::mk($tmpfile,"current.htm");
+        $tmpfile = Path::mk($tmpfile, "current.htm");
         if ($this->fs->file_exists($tmpfile)) {
             $this->file = $tmpfile;
         }
@@ -723,9 +726,9 @@ class BlogEntry extends Entry implements AttachmentContainer {
         $blog = $this->getParent();
 
         $tmp->set("SUBJECT", $this->subject);
-        $tmp->set("POSTDATE", $this->prettyDate($this->post_ts) );
+        $tmp->set("POSTDATE", $this->prettyDate($this->post_ts));
         $tmp->set("POST_TIMESTAMP", $this->post_ts);
-        $tmp->set("EDITDATE", $this->prettyDate($this->timestamp) );
+        $tmp->set("EDITDATE", $this->prettyDate($this->timestamp));
         $tmp->set("EDIT_TIMESTAMP", $this->timestamp);
         $tmp->set("ABSTRACT", $this->getSummary());
         $tmp->set("TAGS", $this->tags());
@@ -736,13 +739,13 @@ class BlogEntry extends Entry implements AttachmentContainer {
         }
         $tmp->set("TAG_URLS", $tagurls);
 
-        $tmp->set("BODY", $this->markup() );
+        $tmp->set("BODY", $this->markup());
         $tmp->set("ENCLOSURE", $this->enclosure);
         $tmp->set("ENCLOSURE_DATA", $this->getEnclosure());
         $tmp->set("ALLOW_COMMENTS", $this->allow_comment);
         $tmp->set("ALLOW_TRACKBACKS", $this->allow_tb);
         $tmp->set("ALLOW_PINGBACKS", $this->allow_pingback);
-        $tmp->set("PERMALINK", $this->permalink() );
+        $tmp->set("PERMALINK", $this->permalink());
         $tmp->set("PING_LINK", $this->uri("send_tb"));
         $tmp->set("TRACKBACK_LINK", $this->uri("get_tb"));
         $tmp->set("UPLOAD_LINK", $this->uri("upload"));
@@ -750,11 +753,11 @@ class BlogEntry extends Entry implements AttachmentContainer {
         $tmp->set("DELETE_LINK", $this->uri("delete"));
         $tmp->set("MANAGE_REPLY_LINK", $this->uri("manage_reply"));
         $tmp->set("TAG_LINK", $blog->uri('tags'));
-        $tmp->set("COMMENTCOUNT", $this->getCommentCount() );
+        $tmp->set("COMMENTCOUNT", $this->getCommentCount());
         $tmp->set("COMMENT_LINK", $this->uri("comment"));
-        $tmp->set("TRACKBACKCOUNT", $this->getTrackbackCount() );
+        $tmp->set("TRACKBACKCOUNT", $this->getTrackbackCount());
         $tmp->set("SHOW_TRACKBACK_LINK", $this->uri("trackback"));
-        $tmp->set("PINGBACKCOUNT", $this->getPingbackCount() );
+        $tmp->set("PINGBACKCOUNT", $this->getPingbackCount());
         $tmp->set("PINGBACK_LINK", $this->uri('pingback'));
         $tmp->set("SHOW_CONTROLS", $show_edit_controls);
         $tmp->set("USE_ABSTRACT", $blog->front_page_abstract);
@@ -767,7 +770,7 @@ class BlogEntry extends Entry implements AttachmentContainer {
         if (PluginManager::instance()->pluginLoaded("RSS2FeedGenerator")) {
             $gen = new RSS2FeedGenerator();
             if ($gen->comment_file) {
-                $feed_uri = $this->url_resolver->localpathToUri(Path::mk($this->localpath(),$gen->comment_file), $this->getParent());
+                $feed_uri = $this->url_resolver->localpathToUri(Path::mk($this->localpath(), $gen->comment_file), $this->getParent());
                 $tmp->set("COMMENT_RSS_ENABLED");
                 $tmp->set("COMMENT_FEED_LINK", $feed_uri);
             }

@@ -20,7 +20,8 @@
 
 # Class: Entry
 # An abstract class representing entries of all types in the blog database.
-abstract class Entry extends LnBlogObject{
+abstract class Entry extends LnBlogObject
+{
 
     /* An ID for the object that is unique across the class (not used). */
     public $id = '';
@@ -99,7 +100,8 @@ abstract class Entry extends LnBlogObject{
     Returns:
     A string representing a path to the object or false on failure.
     */
-    protected function localpath() {}
+    protected function localpath() {
+    }
 
     /*
     Method: title
@@ -222,7 +224,7 @@ abstract class Entry extends LnBlogObject{
 
         $data = explode("\n", $data);
         if (strlen($data[0]) > $numchars) {
-            return wordwrap($data[0],$numchars);
+            return wordwrap($data[0], $numchars);
         } else {
             return $data[0];
         }

@@ -1,4 +1,5 @@
 <?php
 
-class FileWriteFailed extends Exception {
+class FileWriteFailed extends Exception
+{
 }

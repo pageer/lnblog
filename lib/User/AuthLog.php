@@ -6,7 +6,8 @@ use DateTime;
 use JsonSerializable;
 use User;
 
-class AuthLog implements JsonSerializable {
+class AuthLog implements JsonSerializable
+{
     const STATUS_SUCCESS = 'success';
     const STATUS_FAILURE = 'failure';
 

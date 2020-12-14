@@ -1,5 +1,6 @@
 <?php
 
-class TaskNotUnique extends Exception {
+class TaskNotUnique extends Exception
+{
 
 }

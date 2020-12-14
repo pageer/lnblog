@@ -2,7 +2,8 @@
 
 namespace LnBlog\Ui;
 
-class ClientPackage {
+class ClientPackage
+{
     private $name;
     private $js = [];
     private $css = [];

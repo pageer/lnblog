@@ -41,7 +41,8 @@ use LnBlog\Model\Reply;
 # OnOutput        - Fired when starting to process for display.
 # OutputComplete  - Fired when output is sent to the client.
 
-class Trackback extends LnBlogObject implements Reply {
+class Trackback extends LnBlogObject implements Reply
+{
 
     # The only required element is the URL
 
@@ -97,7 +98,8 @@ class Trackback extends LnBlogObject implements Reply {
         return $no_escape ? $ret : htmlspecialchars($ret);
     }
 
-    function description() { }
+    function description() { 
+    }
 
     # Method: getParent
     # Gets a copy of the parent object.
@@ -197,9 +199,11 @@ class Trackback extends LnBlogObject implements Reply {
         $start_tag_pos = strpos($response, "<error>");
         $end_tag_pos = strpos($response, "</error>");
         if ($start_tag_pos && $end_tag_pos) {
-            $ret_code = substr($response,
-                               $start_tag_pos + strlen("<error>"),
-                               $end_tag_pos - ($start_tag_pos + strlen("<error>")) );
+            $ret_code = substr(
+                $response,
+                $start_tag_pos + strlen("<error>"),
+                $end_tag_pos - ($start_tag_pos + strlen("<error>")) 
+            );
         } else {
             $ret_code = 1;
         }
@@ -207,9 +211,11 @@ class Trackback extends LnBlogObject implements Reply {
         $start_tag_pos = strpos($response, "<message>");
         $end_tag_pos = strpos($response, "</message>");
         if ($start_tag_pos && $end_tag_pos) {
-            $ret_msg = substr($response,
-                              $start_tag_pos + strlen("<message>"),
-                              $end_tag_pos - ($start_tag_pos + strlen("<message>")) );
+            $ret_msg = substr(
+                $response,
+                $start_tag_pos + strlen("<message>"),
+                $end_tag_pos - ($start_tag_pos + strlen("<message>")) 
+            );
         } elseif ($ret_code != 0) {
             $ret_msg = _('Malformed response');
         } else {
@@ -241,8 +247,10 @@ class Trackback extends LnBlogObject implements Reply {
         } else {
             $ts = time();
             $this->ping_date = date("Y-m-d H:i:s T", $ts);
-            $path = Path::mk($parent->localpath(), ENTRY_TRACKBACK_DIR,
-                           $ts.TRACKBACK_PATH_SUFFIX);
+            $path = Path::mk(
+                $parent->localpath(), ENTRY_TRACKBACK_DIR,
+                $ts.TRACKBACK_PATH_SUFFIX
+            );
             $ret = $this->writeFileData($path);
             if (! $ret) $error = _("Unable to save ping data.");
         }
@@ -335,7 +343,7 @@ class Trackback extends LnBlogObject implements Reply {
     # True on success, false on failure.
 
     function writeFileData($path) {
-        if (! $this->fs->is_dir( dirname($path) ) ) {
+        if (! $this->fs->is_dir(dirname($path)) ) {
             $this->fs->mkdir_rec(dirname($path));
         }
         $this->file = $path;
@@ -366,7 +374,7 @@ class Trackback extends LnBlogObject implements Reply {
             #'onclick="return window.confirm(\'Delete '.$anchor.'?\');">'
 
         $this->raiseEvent("OnOutput");
-        $tpl->set("SHOW_EDIT_CONTROLS", System::instance()->canModify($this->getParent(), $u) && $u->checkLogin() );
+        $tpl->set("SHOW_EDIT_CONTROLS", System::instance()->canModify($this->getParent(), $u) && $u->checkLogin());
         $tpl->set("TB_URL", $this->url);
         $tpl->set("CONTROL_BAR", $this->control_bar);
         $tpl->set("TB_PERMALINK", $this->permalink());
@@ -440,7 +448,7 @@ class Trackback extends LnBlogObject implements Reply {
         $ent = NewEntry($entid);
         $ret = substr($tbid, 9);
         $ret .= TRACKBACK_PATH_SUFFIX;
-        $ret = Path::mk($ent->localpath(),ENTRY_TRACKBACK_DIR,$ret);
+        $ret = Path::mk($ent->localpath(), ENTRY_TRACKBACK_DIR, $ret);
         $ret = realpath($ret);
         return $ret;
     }

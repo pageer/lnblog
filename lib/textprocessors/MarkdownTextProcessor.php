@@ -1,5 +1,6 @@
 <?php
-class MarkdownTextProcessor extends HTMLTextProcessor {
+class MarkdownTextProcessor extends HTMLTextProcessor
+{
     public $filter_id = MARKUP_MARKDOWN;
     public $filter_name = 'Markdown';
 

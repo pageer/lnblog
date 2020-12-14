@@ -2,7 +2,8 @@
 
 # Class: TextProcessor
 # Base class for text processors 
-abstract class TextProcessor {
+abstract class TextProcessor
+{
     private static $available_filters = array(
         'AutoMarkupTextProcessor',
         'HTMLTextProcessor',

@@ -1,5 +1,6 @@
 <?php
 
-class EntryIsNotPublished extends Exception {
+class EntryIsNotPublished extends Exception
+{
 
 }

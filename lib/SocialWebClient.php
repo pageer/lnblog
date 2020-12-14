@@ -8,7 +8,8 @@ require_once __DIR__.'/../vendor/phpxmlrpc/phpxmlrpc/lib/xmlrpc_wrappers.inc';
 Class: SocialWebClient
 A client for sending social web notifications, e.g. pingbacks and webmentions
 */
-class SocialWebClient {
+class SocialWebClient
+{
     const SUPPORTS_NONE = 0;
     const SUPPORTS_PINGBACK = 1;
     const SUPPORTS_WEBMENTION = 2;

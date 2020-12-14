@@ -1,5 +1,6 @@
 <?php
 
-class FileIsProtected extends Exception {
+class FileIsProtected extends Exception
+{
 
 }

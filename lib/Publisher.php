@@ -5,7 +5,8 @@ use LnBlog\Tasks\TaskManager;
 
 # Class: Publisher
 # Handles publication of blog entries, including updates and deletions.
-class Publisher {
+class Publisher
+{
 
     private $fs;
     private $blog;
@@ -268,7 +269,7 @@ class Publisher {
             $entry->setSticky($entry->is_sticky);
         }
 
-        if ($entry->isPublished()){
+        if ($entry->isPublished()) {
             $this->blog->updateTagList($entry->tags());
             $this->sendPingbacks($entry);
             $this->raiseEvent($entry, $event_class, 'UpdateComplete');
@@ -301,9 +302,9 @@ class Publisher {
 
         $this->deletePermalinkFile($entry);
 
-        $this->deleteEntry($entry , $time);
+        $this->deleteEntry($entry, $time);
 
-        if ($entry->isPublished()){
+        if ($entry->isPublished()) {
             $this->raiseEvent($entry, $event_class, 'DeleteComplete');
         }
     }

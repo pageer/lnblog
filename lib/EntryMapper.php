@@ -1,6 +1,7 @@
 <?php
 
-class EntryMapper {
+class EntryMapper
+{
     private $fs = null;
     private $resolver = null;
 

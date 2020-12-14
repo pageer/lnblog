@@ -5,7 +5,8 @@ namespace LnBlog\Tasks;
 use DateTime;
 use Psr\Log\LoggerInterface;
 
-interface Task {
+interface Task
+{
 
     # Method: runAfterTime
     # Sets or gets the time after which the task should run.

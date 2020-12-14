@@ -1,5 +1,6 @@
 <?php
 
-class EntryAlreadyExists extends Exception {
+class EntryAlreadyExists extends Exception
+{
 
 }

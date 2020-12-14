@@ -1,6 +1,7 @@
 <?php
 
-class UrlResolver {
+class UrlResolver
+{
 
     private $config;
     private $fs;

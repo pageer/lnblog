@@ -18,7 +18,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-class AdminPages extends BasePages {
+class AdminPages extends BasePages
+{
 
     protected function getActionMap() {
         return array(
@@ -148,13 +149,17 @@ class AdminPages extends BasePages {
             $b = NewBlog(POST('upgrade'));
             $file_list = $b->upgradeWrappers();
             if (empty($file_list)) {
-                $status = spf_("Upgrade of %s completed successfully.",
-                               $b->blogid);
+                $status = spf_(
+                    "Upgrade of %s completed successfully.",
+                    $b->blogid
+                );
             } elseif ($file_list === false) {
                 $status = spf_("Error: %s does not seem to exist.", $b->blogid);
             } else {
-                $status = spf_("Error: The following file could not be written - %s.",
-                               implode("<br />", $file_list));
+                $status = spf_(
+                    "Error: The following file could not be written - %s.",
+                    implode("<br />", $file_list)
+                );
             }
             $tpl->set("UPGRADE_STATUS", $status);
 
@@ -215,8 +220,10 @@ class AdminPages extends BasePages {
 
             } else {
                 //-- Check whether this is safe...
-                $this->show_confirm_page(_("Confirm blog deletion"), spf_("Really delete blog '%s'?", POST('delete')), current_file(),
-                                  'delete_btn', _('Yes'), 'cancel_btn', _('No'), 'delete', POST('delete'));
+                $this->show_confirm_page(
+                    _("Confirm blog deletion"), spf_("Really delete blog '%s'?", POST('delete')), current_file(),
+                    'delete_btn', _('Yes'), 'cancel_btn', _('No'), 'delete', POST('delete')
+                );
             }
         } elseif ( POST('fixperm') && POST('fixperm_btn') ) {
             $fixperm_path = trim(POST('fixperm'));
@@ -285,9 +292,9 @@ class AdminPages extends BasePages {
         $tpl->set("PWD", $password);
         if ( strstr(POST('referer'), 'action=login') !== false ||
              strstr(POST('referer'), 'action=logout') !== false ) {
-            $tpl->set("REF", '?action=index' );
+            $tpl->set("REF", '?action=index');
         } else {
-            $tpl->set("REF", SERVER("HTTP_REFERER") );
+            $tpl->set("REF", SERVER("HTTP_REFERER"));
         }
 
         if ( POST($user_name) && POST($password) ) {
@@ -296,10 +303,10 @@ class AdminPages extends BasePages {
             if (POST("referer")) {
                 if ( strstr(POST('referer'), 'login.php') !== false ||
                      strstr(POST('referer'), 'logout.php') !== false ) {
-                    $tpl->set("REF", 'index.php' );
+                    $tpl->set("REF", 'index.php');
                     $redir_url = 'index.php';
                 } else {
-                    $tpl->set("REF", POST("referer") );
+                    $tpl->set("REF", POST("referer"));
                     $redir_url = POST("referer");
                 }
             }
@@ -513,7 +520,7 @@ class AdminPages extends BasePages {
         $tpl->set("EMAIL", $email);
         $tpl->set("HOMEPAGE", $homepage);
 
-        $cust_path = Path::mk(USER_DATA_PATH,CUSTOM_PROFILE);
+        $cust_path = Path::mk(USER_DATA_PATH, CUSTOM_PROFILE);
         $cust_ini = NewINIParser($cust_path);
         $section = $cust_ini->getSection(CUSTOM_PROFILE_SECTION);
         $tpl->set("CUSTOM_FIELDS", $section);
@@ -523,10 +530,12 @@ class AdminPages extends BasePages {
 
         if ($post_complete) {
             if ( POST($confirm) != POST('passwd') ) {
-                $tpl->set("FORM_MESSAGE",
+                $tpl->set(
+                    "FORM_MESSAGE",
                     "<span style=\"color: red\">".
                     _("The passwords you entered do not match.").
-                    "</span>");
+                    "</span>"
+                );
                 $this->populate_fields($tpl);
             } else {
                 $usr = NewUser();
@@ -547,13 +556,17 @@ class AdminPages extends BasePages {
                         $ret = $ret && $this->attemptLogin($usr, POST('passwd'));
                     }
                     if (!$ret) {
-                        $tpl->set("FORM_MESSAGE",
-                                  _("Error: Failed to make this user an administrator."));
+                        $tpl->set(
+                            "FORM_MESSAGE",
+                            _("Error: Failed to make this user an administrator.")
+                        );
                         $this->populate_fields($tpl);
                     }
                 } else {
-                    $tpl->set("FORM_MESSAGE",
-                              _("Error: Failed to save user information."));
+                    $tpl->set(
+                        "FORM_MESSAGE",
+                        _("Error: Failed to save user information.")
+                    );
                     $this->populate_fields($tpl);
                 }
 
@@ -564,18 +577,24 @@ class AdminPages extends BasePages {
             }
         } elseif ($partial_post) {
             # Let's do them in reverse, so that the most logical message appears.
-            if (! POST($confirm)) $tpl->set("FORM_MESSAGE",
-                    '<span style="color: red">'.
+            if (! POST($confirm)) $tpl->set(
+                "FORM_MESSAGE",
+                '<span style="color: red">'.
                     _("You must confirm your password.").
-                    '</span>');
-            if (! POST('passwd')) $tpl->set("FORM_MESSAGE",
-                    '<span style="color: red">'.
+                '</span>'
+            );
+            if (! POST('passwd')) $tpl->set(
+                "FORM_MESSAGE",
+                '<span style="color: red">'.
                     _("You must enter a password.").
-                    '</span>');
-            if (! POST('user')) $tpl->set("FORM_MESSAGE",
-                    '<span style="color: red">'.
+                '</span>'
+            );
+            if (! POST('user')) $tpl->set(
+                "FORM_MESSAGE",
+                '<span style="color: red">'.
                     _("You must enter a username.").
-                    '</span>');
+                '</span>'
+            );
             $this->populate_fields($tpl);
         }
 
@@ -645,8 +664,8 @@ class AdminPages extends BasePages {
             else $file = USER_DATA_PATH.PATH_DELIM."plugins.xml";
 
             $parser = NewConfigFile($file);
-            $parser->setValue("Plugin_Manager", "exclude_list", implode(",",$disabled));
-            $parser->setValue("Plugin_Manager", "load_first", implode(",",$lfirst));
+            $parser->setValue("Plugin_Manager", "exclude_list", implode(",", $disabled));
+            $parser->setValue("Plugin_Manager", "load_first", implode(",", $lfirst));
             $ret = $parser->writeFile();
 
             if (! $ret) {
@@ -723,7 +742,7 @@ class AdminPages extends BasePages {
             ob_end_clean();
             $body .= is_string($ret) ? $ret : $buff;
             if ($blg->isBlog() ) $url = $blg->uri('pluginconfig');
-            else $url = current_uri(true,'');
+            else $url = current_uri(true, '');
 
             $body .= '<p><a href="'.$url.'">'._("Back to plugin list").'</a></p>';
         } else {
@@ -733,7 +752,7 @@ class AdminPages extends BasePages {
             $body .= '<table><tr><th>Plugin</th><th>Version</th><th>Description</th></tr>';
             foreach ($plug_list as $plug) {
                 $p = new $plug;
-                $url = make_uri(false,array("plugin"=>$plug),false);
+                $url = make_uri(false, array("plugin"=>$plug), false);
                 $body .= '<tr><td><a href="'.$url.'">'.$plug.'</a></td>';
                 $body .= '<td style="text-align: center">'.$p->plugin_version.'</td><td>'.$p->plugin_desc.'</td></tr>';
             }
@@ -758,8 +777,8 @@ class AdminPages extends BasePages {
         Page::instance()->setDisplayObject($usr);
         $usr->exportVars($tpl);
 
-        $priv_path = Path::mk(USER_DATA_PATH,$usr->username(),"profile.ini");
-        $cust_path = Path::mk(USER_DATA_PATH,"profile.ini");
+        $priv_path = Path::mk(USER_DATA_PATH, $usr->username(), "profile.ini");
+        $cust_path = Path::mk(USER_DATA_PATH, "profile.ini");
         $cust_ini = NewINIParser($priv_path);
         $cust_ini->merge(NewINIParser($cust_path));
 
@@ -767,7 +786,7 @@ class AdminPages extends BasePages {
         $tpl->set("CUSTOM_VALUES", $usr->custom);
 
         $ret = $tpl->process();
-        $user_file = Path::mk(USER_DATA_PATH,$uid,"profile.htm");
+        $user_file = Path::mk(USER_DATA_PATH, $uid, "profile.htm");
 
         if ($this->fs->file_exists($user_file)) {
             $ret .= implode("\n", file($user_file));
@@ -873,13 +892,13 @@ class AdminPages extends BasePages {
     }
 
     protected function template_set_post_data(&$tpl) {
-        if (POST("use_ftp") == "ftpfs") $tpl->set("USE_FTP", POST("use_ftp") );
-        $tpl->set("USER", POST("ftp_user") );
-        $tpl->set("PASS", POST("ftp_pwd") );
-        $tpl->set("CONF", POST("ftp_conf") );
-        $tpl->set("HOST", POST("ftp_host") );
-        $tpl->set("ROOT", POST("ftp_root") );
-        $tpl->set("PREF", POST("ftp_prefix") );
+        if (POST("use_ftp") == "ftpfs") $tpl->set("USE_FTP", POST("use_ftp"));
+        $tpl->set("USER", POST("ftp_user"));
+        $tpl->set("PASS", POST("ftp_pwd"));
+        $tpl->set("CONF", POST("ftp_conf"));
+        $tpl->set("HOST", POST("ftp_host"));
+        $tpl->set("ROOT", POST("ftp_root"));
+        $tpl->set("PREF", POST("ftp_prefix"));
         $tpl->set("HOSTTYPE", POST("hosttype"));
         $tpl->set("PERMDIR", POST('permdir'));
         $tpl->set("PERMSCRIPT", POST('permscript'));

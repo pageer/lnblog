@@ -1,6 +1,7 @@
 <?php
 
-class UrlPath {
+class UrlPath
+{
     private $path;
     private $url;
 

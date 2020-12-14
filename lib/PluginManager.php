@@ -22,7 +22,8 @@
  * A class to load and manage plugins.
  */
 
-class PluginManager {
+class PluginManager
+{
 
     protected static $registry = array();
 
@@ -185,7 +186,7 @@ class PluginManager {
                 $dir_list = array();
                 while ( false !== ($ent = readdir($dirhand)) ) {
                     if (is_file($dir.PATH_DELIM.$ent) && 
-                        strtolower(substr($ent, strrpos($ent,"."))) == ".php") {
+                        strtolower(substr($ent, strrpos($ent, "."))) == ".php") {
                         $file_list[] = $ent;
                     }
     
@@ -244,12 +245,12 @@ class PluginManager {
      */
     function testFile($plug) {
         $paths = array(
-            Path::mk(INSTALL_ROOT,'plugins',$plug),
-            Path::mk(USER_DATA_PATH,'plugins',$plug),
+            Path::mk(INSTALL_ROOT, 'plugins', $plug),
+            Path::mk(USER_DATA_PATH, 'plugins', $plug),
         );
         $blog = NewBlog();
         if ($blog->isBlog()) {
-            $paths[] = Path::mk($blog->home_path,'plugins',$plug);
+            $paths[] = Path::mk($blog->home_path, 'plugins', $plug);
         }
         foreach ($paths as $path) {
             if (file_exists($path)) {

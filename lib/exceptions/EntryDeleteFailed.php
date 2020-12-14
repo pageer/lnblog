@@ -1,5 +1,6 @@
 <?php
 
-class EntryDeleteFailed extends Exception {
+class EntryDeleteFailed extends Exception
+{
 
 }
