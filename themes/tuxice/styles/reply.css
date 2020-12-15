@@ -1,39 +1,39 @@
 /* Styles for comments. */
 
 #entrycomments {
-	margin-top: 1%;
+    margin-top: 1%;
 }
 
 .comment h3,
 replies.ul {
-	padding: 0px;
-	margin: 0px;
+    padding: 0px;
+    margin: 0px;
 }
 
 ul.footer,
 ul.admin {
-	font-size: 80%;
+    font-size: 80%;
 }
 
 ul.footer li,
 ul.admin li {
-	list-style-type: none;
+    list-style-type: none;
 }
 
 
 ul.admin li {
-	display: inline;
-	margin-right: 1em;
+    display: inline;
+    margin-right: 1em;
 }
 
 /* TrackBack styles */
 replies.ol {
-	background: white;
-	border: 1px solid black;
+    background: white;
+    border: 1px solid black;
 }
 
 @media print {
-	.fullcomment {
-		page-break-inside: avoid;
-	}
+    .fullcomment {
+        page-break-inside: avoid;
+    }
 }

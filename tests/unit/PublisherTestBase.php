@@ -3,7 +3,8 @@
 use LnBlog\Tasks\TaskManager;
 use Prophecy\Argument;
 
-abstract class PublisherTestBase extends PHPUnit\Framework\TestCase {
+abstract class PublisherTestBase extends PHPUnit\Framework\TestCase
+{
 
     protected function setUp(): void {
         $_FILES = array();
@@ -191,7 +192,8 @@ abstract class PublisherTestBase extends PHPUnit\Framework\TestCase {
     }
 }
 
-class TestablePublisher extends Publisher {
+class TestablePublisher extends Publisher
+{
     private $client = null;
 
     public function setHttpClient($client) {
@@ -203,7 +205,8 @@ class TestablePublisher extends Publisher {
     }
 }
 
-class PublisherEventTestingStub {
+class PublisherEventTestingStub
+{
     public $has_been_called = false;
     public $call_count = 0;
     public $event_object = null;

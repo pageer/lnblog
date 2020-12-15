@@ -9,43 +9,43 @@ html, body { height: 100%; }  /* Use the whole page. */
 
 /* Banner placement - top of the page, all the way across. */
 #banner {
-	width: 100%;
-	border: 1px solid black;
-	background-color: #6b85b0;  /* A grayish-blue. */
-	background-repeat: no-repeat;
-	margin: 0;
-	padding: 0;
-	float: left;
-	clear: both;
+    width: 100%;
+    border: 1px solid black;
+    background-color: #6b85b0;  /* A grayish-blue. */
+    background-repeat: no-repeat;
+    margin: 0;
+    padding: 0;
+    float: left;
+    clear: both;
 }
 
 /* Menubar - right underneath the banner, same width. */
 #menubar {
-	width: 100%;
-	border: 1px solid black;
-	background: #cdcdcd; /* A darker gray. */
-	border-top: none;
-	margin: 0;
-	padding: 0;
-	float: left;
-	clear: both;
+    width: 100%;
+    border: 1px solid black;
+    background: #cdcdcd; /* A darker gray. */
+    border-top: none;
+    margin: 0;
+    padding: 0;
+    float: left;
+    clear: both;
 }
 
 /* Page content area - left side of page, with margins. */
 #pagecontent {
-	margin: 1% 1% 1% 1%;
-	width: 65%;
-	float: left;
-	position: relative;
+    margin: 1% 1% 1% 1%;
+    width: 65%;
+    float: left;
+    position: relative;
 }
 
 /* Sidebar - Right side, with space between it and content area. */
 #sidebar {
-	float: right;
-	width: 30%;
-	margin-top: 2%;
-	border: 1px solid black;
-	background-color: #f4f4f4; /* A light-gray. */
+    float: right;
+    width: 30%;
+    margin-top: 2%;
+    border: 1px solid black;
+    background-color: #f4f4f4; /* A light-gray. */
 }
 
 
@@ -54,123 +54,123 @@ html, body { height: 100%; }  /* Use the whole page. */
 /* Headings in the menubar.  Normally, this is just the "site map" label 
    at the beginning. */
 #menubar h1, #menubar h2 {
-	font-size: 100%;
-	float: left;
-	clear: left;
-	margin: 0;
+    font-size: 100%;
+    float: left;
+    clear: left;
+    margin: 0;
 }
 
 #menubar ul {
-	float: left;
-	padding-left: 2em;
-	margin: 0;
+    float: left;
+    padding-left: 2em;
+    margin: 0;
 }
 
 #menubar ul li {
-	list-style-type: none;
-	display: inline;
-	margin-left: 1em;
-	margin-right: 1em;
+    list-style-type: none;
+    display: inline;
+    margin-left: 1em;
+    margin-right: 1em;
 }
 
 #menubar > .location > li{
-	margin: 0;
+    margin: 0;
 }
 #menubar > .location > li:before {
-	content: "\00BB \0020";
+    content: "\00BB \0020";
 }
 
 #menubar > .location > li:first-child:before {
-	content: "";
+    content: "";
 }
 /***** Sidebar styles *****/
 
 #sidebar h1, 
 #sidebar h2, 
 #sidebar h4 {
-	font-size: 100%;
-	margin-right: 1em;
-	margin-left: 1em;
+    font-size: 100%;
+    margin-right: 1em;
+    margin-left: 1em;
 }
 
 #sidebar h3, 
 #sidebar .panelheader {
-	margin-top: 0;
-	margin-bottom: 0;
-	width: 95%;
-	padding-left: 5%;
-	color: white;
-	background-color: #6b85b0;
+    margin-top: 0;
+    margin-bottom: 0;
+    width: 95%;
+    padding-left: 5%;
+    color: white;
+    background-color: #6b85b0;
 }
 
 #sidebar h3 a, 
 #sidebar .panelheader a {
-	color: white;
-	display: block;
-	width: 100%;
+    color: white;
+    display: block;
+    width: 100%;
 }
 
 #sidebar h3 a:visited, 
 #sidebar .panelheader a:visited {
-	color: white;
+    color: white;
 }
 
 #sidebar ul, 
 #sidebar .panel {
-	margin: 0;
-	padding-left: 0;
-	margin-top: 1em;
-	margin-bottom: 1em;
+    margin: 0;
+    padding-left: 0;
+    margin-top: 1em;
+    margin-bottom: 1em;
 }
 
 #sidebar .panel {
-	padding-left: 8%;
-	padding-right: 8%;
-	width: 92%;
+    padding-left: 8%;
+    padding-right: 8%;
+    width: 92%;
 }
 
 #sidebar ul li {
-	list-style-type: none;
-	width: 100%;
-	margin: 0;
-	padding: 0;
-	padding-left: 8%;
-	width: 92%;
+    list-style-type: none;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    padding-left: 8%;
+    width: 92%;
 } 
 
 #sidebar > ul > li a:hover, 
 #sidebar > ul > li:hover {
-	background-color: white;
+    background-color: white;
 }
 
 #sidebar .imglist a:hover {
-	background-color: #f4f4f4;  /* Match the normal background. */
+    background-color: #f4f4f4;  /* Match the normal background. */
 }
 
 #sidebar img {
-	text-align: center;
-	vertical-align: middle;
-	margin: 0;
-	padding: 0;
-	border: 0;
+    text-align: center;
+    vertical-align: middle;
+    margin: 0;
+    padding: 0;
+    border: 0;
 }
 
 .description {
-	font-size: 80%;
+    font-size: 80%;
 }
 
 #blogroll ul li ul li {
-	list-style-type: square;
-	list-style-position: inside;
+    list-style-type: square;
+    list-style-position: inside;
 }
 
 #blogroll > ul,
 #blogroll > ul > li {
-	margin: 0;
+    margin: 0;
 }
 
 #sidebar .login-link {
-	margin-left: 5%;
+    margin-left: 5%;
 }
 
 /***** Banner styles *****/
@@ -178,45 +178,45 @@ html, body { height: 100%; }  /* Use the whole page. */
 #banner h1,
 #banner h2,
 #banner h3 {
-	text-align: center;
-	vertical-align: middle;
-	color: white;
+    text-align: center;
+    vertical-align: middle;
+    color: white;
 }
 
 #banner a:link,
 #banner a:visited {
-	color: white;
+    color: white;
 }
 
 .bannerpanel,
 .menupanel {
-	float: right;
-	width: 20em;
+    float: right;
+    width: 20em;
 }
 
 #banner .bannerpanel form,
 #banner .bannerpanel fieldset {
-	width: 100%;
+    width: 100%;
 }
 /***** Link styles *****/
 
 /* Base link style: blue text, no underline.
    Visited links: red text, no underline.
-	Hovering on links: add underline. 
+    Hovering on links: add underline. 
 */
 a:link {
-	color: blue;
-	text-decoration: none;
+    color: blue;
+    text-decoration: none;
 }
 
 a:visited {
-	color: #8B008B;
-	text-decoration: none;
+    color: #8B008B;
+    text-decoration: none;
 }
 
 a:hover {
-	text-decoration: underline;
-	color: red;
+    text-decoration: underline;
+    color: red;
 }
 
 /*
@@ -228,23 +228,23 @@ background image.  Let this be replaced with the underline on hover.
 .blogentrybody a:visited,
 .articlebody a:link,
 .articlebody a:visited {
-	background-image: url(../images/underline.png);
-	background-position: bottom left;
-	background-repeat: repeat-x;
+    background-image: url(../images/underline.png);
+    background-position: bottom left;
+    background-repeat: repeat-x;
 }
 */
 /*
 #pagecontent a:hover {
-	background-image: none;
+    background-image: none;
 }
 */
 
 a.anchor:link {
-	color: white;
+    color: white;
 }
 
 a.anchor:hover {
-	color: gray;
+    color: gray;
 }
 
 .pager .link {
@@ -269,7 +269,7 @@ input[type='checkbox']:focus,
 input[type='text']:focus,
 input[type='radio']:focus,
 textarea:focus {
-	background-color: #ffffe1;
+    background-color: #ffffe1;
 }
 
 /***** Font styles *****/
@@ -353,26 +353,26 @@ q { font-style: italic; }
 
 @media print {
 
-	/* Styles for the page content area. */
+    /* Styles for the page content area. */
 
-	#pagecontent {
-		margin: 1% 1% 1% 1%;
-		width: 100%;
-	}
+    #pagecontent {
+        margin: 1% 1% 1% 1%;
+        width: 100%;
+    }
 
-	a:link, a:visited {
-		text-decoration: underline;
-		background-image: none;
-	}
+    a:link, a:visited {
+        text-decoration: underline;
+        background-image: none;
+    }
 
-	/* Don't show the banner, sidebar, menubar, or commit submit form
-	   when printing the page. */
-	#banner, 
-	#menubar, 
-	#sidebar, 
-	#commentsubmit,
+    /* Don't show the banner, sidebar, menubar, or commit submit form
+       when printing the page. */
+    #banner, 
+    #menubar, 
+    #sidebar, 
+    #commentsubmit,
    .pager {
-		display: none;
-	}
+        display: none;
+    }
 
 }

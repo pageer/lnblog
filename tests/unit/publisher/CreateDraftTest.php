@@ -2,7 +2,8 @@
 
 use Prophecy\Argument;
 
-class CreateDraftTest extends PublisherTestBase {
+class CreateDraftTest extends PublisherTestBase
+{
 
     public function testCreateDraft_WhenBlogHasCustomDefaults_AppliesDefaultsToEntry() {
         $entry = $this->getTestEntry();
@@ -115,16 +116,20 @@ class CreateDraftTest extends PublisherTestBase {
         $fs->is_dir('./drafts')->willReturn(true);
         $fs->is_dir('./drafts/02_1234')->willReturn(false);
         $fs->file_exists(Argument::any())->willReturn(false);
-        $fs->mkdir_rec('./drafts/02_1234')->will(function($args) use ($fs) {
+        $fs->mkdir_rec('./drafts/02_1234')->will(
+            function($args) use ($fs) {
             $fs->is_dir('./drafts')->willReturn(true);
             $fs->is_dir('./drafts/02_1234')->willReturn(true);
             return true;
-        });
-        $fs->write_file('./drafts/02_1234/entry.xml', Argument::any())->will(function($args) use ($fs, $entry) {
+            }
+        );
+        $fs->write_file('./drafts/02_1234/entry.xml', Argument::any())->will(
+            function($args) use ($fs, $entry) {
             $fs->file_exists('./drafts/02_1234/entry.xml')->willReturn(true);
             $fs->realpath(Argument::any())->willReturnArgument(0);
             return true;
-        });
+            }
+        );
         $this->task_manager->findByKey(Argument::any())->willReturn(null);
 
         $task_check = function ($arg) {
@@ -198,11 +203,13 @@ class CreateDraftTest extends PublisherTestBase {
         $fs->file_exists(Argument::any())->willReturn(false);
 
         $fs->mkdir_rec('./drafts/02_1234')->willReturn(true)->shouldBeCalled();
-        $fs->write_file('./drafts/02_1234/entry.xml', Argument::any())->will(function($args) use ($fs) {
+        $fs->write_file('./drafts/02_1234/entry.xml', Argument::any())->will(
+            function($args) use ($fs) {
             $fs->file_exists('./drafts/02_1234/entry.xml')->willReturn(true);
             $fs->realpath('./drafts/02_1234/entry.xml')->willReturn('./drafts/02_1234/entry.xml');
             return true;
-        });
+            }
+        );
 
         $entry = new BlogEntry(null, $this->fs->reveal());
         $entry->body = "This is some text";

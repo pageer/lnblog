@@ -34,4 +34,4 @@
             <button><?php p_('Reset Password')?></button>
         </div>
     </form>
-<?php endif ?>
+<?php endif; 

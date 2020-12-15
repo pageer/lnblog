@@ -6,7 +6,8 @@ use LnBlog\Tasks\TaskManager;
 use LnBlog\Tasks\TaskRepository;
 use Prophecy\Argument;
 
-class TaskManagerTest extends \PHPUnit\Framework\TestCase {
+class TaskManagerTest extends \PHPUnit\Framework\TestCase
+{
 
     private $repo;
 

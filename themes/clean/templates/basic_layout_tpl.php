@@ -2,7 +2,8 @@
 
 $this->extends('basic_layout_tpl.php');
 
-$this->block('basiclayout.banner', function ($vars) {
+$this->block(
+    'basiclayout.banner', function ($vars) {
     extract($vars, EXTR_OVERWRITE); 
     ?>
     <body>
@@ -18,9 +19,11 @@ $this->block('basiclayout.banner', function ($vars) {
         $this->showBlock('basiclayout.menubar');
         ?>
     </div><?php
-});
+    }
+);
 
-$this->block('basiclayout.sidebar', function ($vars) {
+$this->block(
+    'basiclayout.sidebar', function ($vars) {
     extract($vars, EXTR_OVERWRITE); 
     ?>
         <!-- A sidebar -->
@@ -36,9 +39,11 @@ $this->block('basiclayout.sidebar', function ($vars) {
         EventRegister::instance()->activateEventFull($tmp=false, "sidebar", "OutputComplete");
         ?>
     </div><?php
-});
+    }
+);
 
-$this->block('main', function ($vars) {
+$this->block(
+    'main', function ($vars) {
     extract($vars, EXTR_OVERWRITE); 
     ?>
     <body>
@@ -50,4 +55,5 @@ $this->block('main', function ($vars) {
     ?>
     </div>
     </body><?php
-});
+    }
+);

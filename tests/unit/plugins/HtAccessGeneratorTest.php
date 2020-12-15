@@ -2,7 +2,8 @@
 
 require_once __DIR__ . "/../../../plugins/htaccess_generator.php";
 
-class HtAccessGeneratorTest extends \PHPUnit\Framework\TestCase {
+class HtAccessGeneratorTest extends \PHPUnit\Framework\TestCase
+{
 
     public function testCreateFile_WhenNoBlogHtaccess_CreatesNewFile() {
         $expected_content = implode("\n", $this->getLnBlogSection());
@@ -47,10 +48,12 @@ class HtAccessGeneratorTest extends \PHPUnit\Framework\TestCase {
                 '# END LnBlog section',
             ]
         );
-        $expected_content = implode("\n", array_merge(
-            $this->getExistingFileSection(),
-            $this->getLnBlogSection()
-        ));
+        $expected_content = implode(
+            "\n", array_merge(
+                $this->getExistingFileSection(),
+                $this->getLnBlogSection()
+            )
+        );
         $fs = $this->prophet->prophesize(FS::class);
         $fs->file_exists('./.htaccess')->willReturn(true);
         $fs->file('./.htaccess')->willReturn($existing_file);
@@ -69,11 +72,13 @@ class HtAccessGeneratorTest extends \PHPUnit\Framework\TestCase {
             '# END LnBlog section',
             '# The end',
         ];
-        $expected_content = implode("\n", array_merge(
-            ['# This is a .htaccess file',],
-            $this->getLnBlogSection(),
-            ['# The end']
-        ));
+        $expected_content = implode(
+            "\n", array_merge(
+                ['# This is a .htaccess file',],
+                $this->getLnBlogSection(),
+                ['# The end']
+            )
+        );
         $fs = $this->prophet->prophesize(FS::class);
         $fs->file_exists('./.htaccess')->willReturn(true);
         $fs->file('./.htaccess')->willReturn($existing_file);
@@ -89,10 +94,12 @@ class HtAccessGeneratorTest extends \PHPUnit\Framework\TestCase {
         $parent_file = [
             '# This is a .htaccess file',
         ];
-        $expected_content = implode("\n", array_merge(
-            ['# This is a .htaccess file',],
-            $this->getLnBlogSection()
-        ));
+        $expected_content = implode(
+            "\n", array_merge(
+                ['# This is a .htaccess file',],
+                $this->getLnBlogSection()
+            )
+        );
         $fs = $this->prophet->prophesize(FS::class);
         $fs->file_exists('./foo/.htaccess')->willReturn(false);
         $fs->file_exists('./.htaccess')->willReturn(true);
@@ -165,14 +172,16 @@ class HtAccessGeneratorTest extends \PHPUnit\Framework\TestCase {
 
     private function createBlogInstance() {
         $blog = $this->prophet->prophesize(Blog::class);
-        $blog->getManagedFiles()->willReturn([
+        $blog->getManagedFiles()->willReturn(
+            [
             'index.php',
             'pathconfig.php',
             'blogdata.ini',
             'ip_ban.txt',
             're_ban.txt',
             'plugins.xml',
-        ]);
+            ]
+        );
         $blog_instance = $blog->reveal();
         $blog_instance->home_path = '.';
         return $blog_instance;

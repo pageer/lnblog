@@ -2,23 +2,23 @@
 
 .blogentry,
 .article {
-	border-bottom: thin dotted black;
-	padding-bottom: 5px;
-	margin-bottom: 15px;
+    border-bottom: thin dotted black;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
 }
 
 .article {
-	margin-bottom: 1%;
+    margin-bottom: 1%;
 }
 
 .article .body {
-	padding: 1%;
+    padding: 1%;
 }
 
 .blogentry .header, 
 .blogentry .footer, 
 .blogentry .body {
-	clear: both;
+    clear: both;
 }
 
 .blogentry .header, 
@@ -27,92 +27,92 @@
 .article .header h2, 
 .article .header ul, 
 .article .footer ul{
-	margin: 0px;
-	padding: 0px;
+    margin: 0px;
+    padding: 0px;
 }
 
 .blogentry .header {
-	margin-bottom: 5px;
+    margin-bottom: 5px;
 }
 
 .blogentry .header h2 {
-	margin: 0 0 5px 0;
+    margin: 0 0 5px 0;
 }
 
 .blogentry .footer {
-	margin-top: 5px;
+    margin-top: 5px;
 }
 
 .blogentry .body {
-	border: 1px dotted black;
-	background-color: white;
-	padding: 5px;
+    border: 1px dotted black;
+    background-color: white;
+    padding: 5px;
 }
 
 /* Keeps large images withing the paragraph so they don't spill out 
    of the box for this post. */
 /*
 .blogentry .body p {
-	clear: both;
+    clear: both;
 }
 */
 
 .blogentry .body img {
-	display: block;
-	margin: 1em auto;
+    display: block;
+    margin: 1em auto;
 }
 
 .article .body {
-	border: 1px dotted black;
-	background-color: white;
+    border: 1px dotted black;
+    background-color: white;
 }
 
 .footer .replies {
-	font-size: 100%;
+    font-size: 100%;
 }
 
 .footer .replies li {
-	display: inline;
-	margin-right: 1em;
+    display: inline;
+    margin-right: 1em;
 }
 
 .footer .postadmin,
 .postdata {
-	font-size: 80%;
+    font-size: 80%;
 }
 
 .blogentry .footer li,
 .blogentry .header li,
 .article   .footer li,
 .article   .header li{
-	list-style-type: none;
+    list-style-type: none;
 }
 
 .blogadmin, ul.postadmin li,
 .controlbar li {
-	display: inline;
-	padding-right: 1%;
+    display: inline;
+    padding-right: 1%;
 }
 
 .blogentry  div.blogentrybody {
-	padding: 1%;
+    padding: 1%;
 }
 
 .blogentry div.blogentrybody p {
-	text-indent: 1em;
+    text-indent: 1em;
 }
 
 .blogadmin, .bloguserurl {
-	display: inline;
+    display: inline;
 }
 
 @media print {
 #commentsubmit {
-		display: none;
+        display: none;
 }
 
-	.blogentry,
-	.article {
-		page-break-inside: avoid;
+    .blogentry,
+    .article {
+        page-break-inside: avoid;
 }
 }

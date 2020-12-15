@@ -13,8 +13,8 @@
 <li><?php p_('Homepage');?>: <a href="<?php echo $USER_HOMEPAGE; ?>"><?php echo $USER_HOMEPAGE; ?></a></li>
 <?php } ?>
 <?php foreach ($CUSTOM_FIELDS as $key=>$val) { 
-	if (! empty($CUSTOM_VALUES[$key])) { ?>
+    if (! empty($CUSTOM_VALUES[$key])) { ?>
 <li><?php echo $val; ?>: <?php echo $CUSTOM_VALUES[$key];?></li>
-<?php	} 
+    <?php	} 
 } ?>
 </ul>

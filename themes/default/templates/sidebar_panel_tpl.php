@@ -20,18 +20,18 @@
 #                 body of the panel is a DIV tag.
 
 if (! function_exists('sidebar_panel_show_item')) {
-	function sidebar_panel_show_item(&$item) {
-		if (is_array($item)) {
-			$ret = "<li";
-			foreach ($item as $key=>$val) {
-				if ($key != 'description') $ret .= " $key=\"$val\"";
-			}
-			$ret .= ">".$item['description']."</li>\n";
-		} else {
-			$ret = "<li>$item</li>\n";
-		}
-		return $ret;
-	}
+    function sidebar_panel_show_item(&$item) {
+        if (is_array($item)) {
+            $ret = "<li";
+            foreach ($item as $key=>$val) {
+                if ($key != 'description') $ret .= " $key=\"$val\"";
+            }
+            $ret .= ">".$item['description']."</li>\n";
+        } else {
+            $ret = "<li>$item</li>\n";
+        }
+        return $ret;
+    }
 }
 
 if (isset($PANEL_ID)) $id_markup = ' id="'.$PANEL_ID.'"';
@@ -41,28 +41,28 @@ if (isset($PANEL_CLASS)) $class_markup = ' class="'.$PANEL_CLASS.'"';
 else $class_markup = '';
 
 if (isset($PANEL_TITLE)) {
-	if (isset($TITLE_LINK)) {
-		echo "<h3><a href=\"$TITLE_LINK\">$PANEL_TITLE</a></h3>\n";
-	} else {
-		echo "<h3>$PANEL_TITLE</h3>\n";
-	}
+    if (isset($TITLE_LINK)) {
+        echo "<h3><a href=\"$TITLE_LINK\">$PANEL_TITLE</a></h3>\n";
+    } else {
+        echo "<h3>$PANEL_TITLE</h3>\n";
+    }
 }
 
 if (isset($PANEL_LIST)) {
-	echo "<ul".$id_markup.$class_markup.">\n";
-	foreach ($PANEL_LIST as $item) {
-		echo sidebar_panel_show_item($item);
-	}
-	echo "</ul>\n";
+    echo "<ul".$id_markup.$class_markup.">\n";
+    foreach ($PANEL_LIST as $item) {
+        echo sidebar_panel_show_item($item);
+    }
+    echo "</ul>\n";
 } elseif (isset($PANEL_NUMLIST)) {
-	echo "<ol".$id_markup.$class_markup.">\n";
-	foreach ($PANEL_NUMLIST as $item) {
-		echo sidebar_panel_show_item($item);
-	}
-	echo "</ol>\n";
+    echo "<ol".$id_markup.$class_markup.">\n";
+    foreach ($PANEL_NUMLIST as $item) {
+        echo sidebar_panel_show_item($item);
+    }
+    echo "</ol>\n";
 } else {
-	echo "<div".$id_markup.$class_markup.">\n";
-	echo $PANEL_CONTENT;
-	echo "</div>\n";
+    echo "<div".$id_markup.$class_markup.">\n";
+    echo $PANEL_CONTENT;
+    echo "</div>\n";
 }
-?>
+

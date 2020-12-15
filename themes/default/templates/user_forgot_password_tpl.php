@@ -30,4 +30,4 @@
     </form>
 <?php else: ?>
     <div><?php echo $MESSAGE?></div>
-<?php endif ?>
+<?php endif; 

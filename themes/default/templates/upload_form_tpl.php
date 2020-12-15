@@ -7,7 +7,7 @@
 <?php endif; ?>
 
 <fieldset>
-	<form id="fileupload" enctype="multipart/form-data" action="<?php echo $TARGET; ?>" method="post">
+    <form id="fileupload" enctype="multipart/form-data" action="<?php echo $TARGET; ?>" method="post">
         <?php $this->outputCsrfField() ?>
         <div  class="upload_field">
             <div>
@@ -20,7 +20,7 @@
             <span><input type="submit" name="submit" id="submit" value="<?php p_('Upload');?>" /></span>
             <span><input type="reset" name="clear" id="clear" value="<?php p_('Clear');?>" /></span>
         </div>
-	</form>
+    </form>
     <div id="filedrop" class="dropzone"></div>
     <div style="margin-top: 20px">
         <?php if ($ENTRY_ATTACHMENTS): ?>

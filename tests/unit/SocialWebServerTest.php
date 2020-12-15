@@ -2,7 +2,8 @@
 
 use Prophecy\Argument;
 
-class SocialWebServerTest extends \PHPUnit\Framework\TestCase {
+class SocialWebServerTest extends \PHPUnit\Framework\TestCase
+{
     public function testAddWebmention_WhenMentionIsValid_SavesMention() {
         $source = 'http://www.example.com/test1';
         $target = 'http://www.mysite.com/test2';

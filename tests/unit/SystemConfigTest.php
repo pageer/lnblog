@@ -2,7 +2,8 @@
 
 use Prophecy\Argument;
 
-class SystemConfigTest extends \PHPUnit\Framework\TestCase {
+class SystemConfigTest extends \PHPUnit\Framework\TestCase
+{
     public function testGetBlogs_ReturnsRegistry() {
         $urlpath = new UrlPath('place/foobar/', 'https://foobar.example.com/');
         $config = $this->createSystemConfig();

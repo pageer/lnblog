@@ -1,31 +1,31 @@
 /* Site-map menu bar styles. */
 
 #menubar {
-	width: 99%;
-	padding-left: 1%;
-	border-top: none;
-	padding-bottom: 1%;
-	border-bottom: medium dashed white;
+    width: 99%;
+    padding-left: 1%;
+    border-top: none;
+    padding-bottom: 1%;
+    border-bottom: medium dashed white;
 }
 
 #menubar h1, #menubar h2 {
-	font-size: 100%;
-	display: inline;
+    font-size: 100%;
+    display: inline;
 }
 
 #menubar ul {
-	display: inline;
+    display: inline;
 }
 
 #menubar ul li {
-	list-style-type: none;
-	display: inline;
-	margin-left: 1em;
-	margin-right: 1em;
+    list-style-type: none;
+    display: inline;
+    margin-left: 1em;
+    margin-right: 1em;
 }
 
 @media print {
-	#menubar {
-		display: none;
-	}
+    #menubar {
+        display: none;
+    }
 }

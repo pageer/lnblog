@@ -4,35 +4,35 @@ menu bar, and sidebar.  It does not include the blog entries, comments, forums, 
 */
 
 html, body { 
-	height: 100%; 
-	background-color: black;
-	color: white;
-	font-family: monospace;
+    height: 100%; 
+    background-color: black;
+    color: white;
+    font-family: monospace;
 }
 
 /* Styles for the page content area. */
 
 #pagecontent {
-	margin: 1% 1% 1% 1%;
-	width: 64%;
-	float: left;
+    margin: 1% 1% 1% 1%;
+    width: 64%;
+    float: left;
 }
 
 a:link {
-	color: white;
+    color: white;
 }
 
 a:visited {
-	color: white;
+    color: white;
 }
 
 a:hover {
-	color: red;
-	background-color: white;
+    color: red;
+    background-color: white;
 }
 
 input:focus, textarea:focus {
-	background-color: #ffffe1;
+    background-color: #ffffe1;
 }
 
 q { font-style: italic; }
@@ -40,125 +40,125 @@ q { font-style: italic; }
 /* Sidebar styles. */
 
 #sidebar {
-	border: thin solid black;
-	margin-top: 2%;
-	float: right;
-	clear: right;
-	width: 30%;
-	border-left: thin solid white;
+    border: thin solid black;
+    margin-top: 2%;
+    float: right;
+    clear: right;
+    width: 30%;
+    border-left: thin solid white;
 }
 
 #sidebar h1, #sidebar h2, #sidebar h4 {
-	font-size: 100%;
-	margin-right: 1em;
-	margin-left: 1em;
+    font-size: 100%;
+    margin-right: 1em;
+    margin-left: 1em;
 }
 
 #sidebar h3, #sidebar .panelheader {
-	margin-top: 0px;
-	margin-bottom: 0px;
-	width: 95%;
-	padding-left: 5%;
-	color: black;
-	background-color: white;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    width: 95%;
+    padding-left: 5%;
+    color: black;
+    background-color: white;
 }
 
 #sidebar h3 a, #sidebar .panelheader a {
-	display: block;
-	color: black;
-	width: 100%;
+    display: block;
+    color: black;
+    width: 100%;
 }
 
 #sidebar .panelheader a:hover {
-	color: red;
+    color: red;
 }
 
 #sidebar ul, #sidebar .panel {
-	margin: 0px;
-	padding-left: 0px;
-	margin-top: 1em;
-	margin-bottom: 1em;
+    margin: 0px;
+    padding-left: 0px;
+    margin-top: 1em;
+    margin-bottom: 1em;
 }
 
 #sidebar .panel {
-	padding-left: 8%;
-	width: 92%;
+    padding-left: 8%;
+    width: 92%;
 }
 
 #sidebar ul li {
-	list-style-type: none;
-	width: 100%;
-	margin: 0px;
-	padding: 0px;
-	padding-left: 8%;
-	width: 92%;
+    list-style-type: none;
+    width: 100%;
+    margin: 0px;
+    padding: 0px;
+    padding-left: 8%;
+    width: 92%;
 } 
 
 #sidebar ul li a:hover {
-	background-color: white;
-	color: red;
+    background-color: white;
+    color: red;
 }
 /*
 #sidebar ul li a {
-	display: block;
-	padding-left: 8%;
-	width: 92%;
+    display: block;
+    padding-left: 8%;
+    width: 92%;
 }
 */
 #sidebar img {
-	text-align: center;
-	vertical-align: middle;
-	margin: 1% 0 1% 5%;
-	border: 0px;
+    text-align: center;
+    vertical-align: middle;
+    margin: 1% 0 1% 5%;
+    border: 0px;
 }
 
 /* Site-map menu bar styles. */
 
 #menubar {
-	width: 99%;
-	padding-left: 1%;
-	border-top: none;
-	padding-bottom: 1%;
-	border-bottom: medium dashed white;
+    width: 99%;
+    padding-left: 1%;
+    border-top: none;
+    padding-bottom: 1%;
+    border-bottom: medium dashed white;
 }
 
 #menubar h1, #menubar h2 {
-	font-size: 100%;
-	display: inline;
+    font-size: 100%;
+    display: inline;
 }
 
 #menubar ul {
-	display: inline;
+    display: inline;
 }
 
 #menubar ul li {
-	list-style-type: none;
-	display: inline;
-	margin-left: 1em;
-	margin-right: 1em;
+    list-style-type: none;
+    display: inline;
+    margin-left: 1em;
+    margin-right: 1em;
 }
 
 /* Site banner styles. */
 
 #banner {
-	width: 99%;
-	padding-left: 1%;
+    width: 99%;
+    padding-left: 1%;
 }
 
 #banner h1 {
-	text-align: left;
-	vertical-align: middle;
-	color: white;
+    text-align: left;
+    vertical-align: middle;
+    color: white;
 }
 
 #banner a:link, #banner a:visited {
-	color: white;
-	text-decoration: none;
+    color: white;
+    text-decoration: none;
 }
 
 #banner a:hover {
-	text-decoration: underline;
-	background-color: black;
+    text-decoration: underline;
+    background-color: black;
 }
 
 /***** Responsive layout stuff *****/
@@ -242,22 +242,22 @@ q { font-style: italic; }
 
 @media print {
 
-	/* Styles for the page content area. */
+    /* Styles for the page content area. */
 
-	#pagecontent {
-		margin: 1% 1% 1% 1%;
-		width: 100%;
-	}
+    #pagecontent {
+        margin: 1% 1% 1% 1%;
+        width: 100%;
+    }
 
-	#sidebar,
-	#banner,
-	#menubar {
-		display: none;
-	}
+    #sidebar,
+    #banner,
+    #menubar {
+        display: none;
+    }
 
-	a:link, a:visited {
-		color: black;
-		text-decoration: underline;
-	}
+    a:link, a:visited {
+        color: black;
+        text-decoration: underline;
+    }
 
 }

@@ -1,34 +1,34 @@
 /* Site banner styles. */
 
 #banner {
-	width: 100%;
-	border: 1px solid black;
-	background-color: #6b85b0;
-	background-repeat: no-repeat;
+    width: 100%;
+    border: 1px solid black;
+    background-color: #6b85b0;
+    background-repeat: no-repeat;
 }
 
 #banner h1,
 #banner h2,
 #banner h3 {
-	text-align: center;
-	vertical-align: middle;
-	color: white;
+    text-align: center;
+    vertical-align: middle;
+    color: white;
 }
 
 #banner a:link,
 #banner a:visited {
-	color: white;
-	text-decoration: none;
+    color: white;
+    text-decoration: none;
 }
 
 #banner a:hover {
-	text-decoration: underline;
+    text-decoration: underline;
 }
 
 @media print {
 
-	#banner {
-		display: none;
-	}
+    #banner {
+        display: none;
+    }
 
 }

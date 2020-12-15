@@ -1,62 +1,62 @@
 /* Styles for comments. */
 
 #entrycomments {
-	margin-top: 1%;
+    margin-top: 1%;
 }
 
 .commentlist {
-	list-style-type: none;
-	padding-left: 0;
+    list-style-type: none;
+    padding-left: 0;
 }
 
 .fullcomment {
-	border-bottom: thin dotted black;
-	margin-top: 2%;
+    border-bottom: thin dotted black;
+    margin-top: 2%;
 }
 
 .comment .header h3 {
-	padding: 0px;
-	margin: 0px;
+    padding: 0px;
+    margin: 0px;
 }
 
 .comment .footer {
-	font-size: 80%;
+    font-size: 80%;
 }
 
 .comment .footer ul {
-	padding: 0px;
-	margin: 0px;
+    padding: 0px;
+    margin: 0px;
 }
 
 .comment .footer li {
-	list-style-type: none;
+    list-style-type: none;
 }
 
 .commentdata {
-	padding: 1%;
+    padding: 1%;
 }
 
 .comment .footer li.commenturl, 
 div.comment .footer li.commentname {
-	display: inline;
-	margin-right: 1%;
+    display: inline;
+    margin-right: 1%;
 }
 
 .commentname li[class~='user'] {
-	font-weight: bold;
+    font-weight: bold;
 }
 
 /* TrackBack styles. */
 .tblist {
-	background: black;
+    background: black;
 }
 
 @media print {
-	.fullcomment {
-		page-break-inside: avoid;
-	}
+    .fullcomment {
+        page-break-inside: avoid;
+    }
 
-	#commentsubmit {
-		display: none;
-	}
+    #commentsubmit {
+        display: none;
+    }
 }

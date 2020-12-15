@@ -1,6 +1,7 @@
 <?php
 
-class BlogTest extends PHPUnit\Framework\TestCase {
+class BlogTest extends PHPUnit\Framework\TestCase
+{
     
     public function testAutoPingbackEnabled_WhenSettingIsAll_ReturnTrue() {
         $this->blog->auto_pingback = 'all';

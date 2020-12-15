@@ -2,38 +2,38 @@
 
 
 #entrycomments {
-	margin-top: 1%;
+    margin-top: 1%;
 }
 
 
 .fullcomment {
-	border-bottom: thin dotted black;
+    border-bottom: thin dotted black;
 }
 
 .commentheader h3, .commentfooter ul {
-	padding: 0px;
-	margin: 0px;
+    padding: 0px;
+    margin: 0px;
 }
 
 .commentfooter {
-	font-size: 80%;
+    font-size: 80%;
 }
 
 .commentfooter li {
-	list-style-type: none;
+    list-style-type: none;
 }
 
 .commentdata {
-	padding: 1%;
+    padding: 1%;
 }
 
 .commentfooter li.commenturl, .commentfooter li.commentname {
-	display: inline;
-	margin-right: 1%;
+    display: inline;
+    margin-right: 1%;
 }
 
 @media print {
-	.fullcomment {
-		page-break-inside: avoid;
-	}
+    .fullcomment {
+        page-break-inside: avoid;
+    }
 }

@@ -2,6 +2,10 @@
 <ruleset name="LnBlog Standard" namespace="LnBLog\CS\Standard">
     <description>Project coding standard</description>
     <file>./lib</file>
+    <file>./tests</file>
+    <file>./themes</file>
+    <file>./blogconfig.php</file>
+    <file>./index.php</file>
 
     <rule ref="Zend">
         <exclude name="Generic.Functions.OpeningFunctionBraceBsdAllman" />
@@ -12,4 +16,8 @@
     </rule>
 
     <rule ref="Generic.Functions.OpeningFunctionBraceKernighanRitchie" />
+    <rule ref="Squiz.PHP.NonExecutableCode" />
+    <rule ref="Squiz.Classes.SelfMemberReference" />
+    <rule ref="Squiz.Scope.StaticThisUsage" />
+    <rule ref="Squiz.Operators.ValidLogicalOperators" />
 </ruleset>

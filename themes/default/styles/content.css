@@ -14,8 +14,8 @@ add another style later in the file to over-ride the one here.
 /* Define the border style and padding for the outer div. */
 .blogentry,
 .article {
-	border-bottom: 1px dotted black;
-	margin-bottom: 2%;
+    border-bottom: 1px dotted black;
+    margin-bottom: 2%;
 }
 
 /* Remove margins and padding for the headings and lists in the header
@@ -28,8 +28,8 @@ add another style later in the file to over-ride the one here.
 .articlefooter ul,
 .commentheader h3,
 .commentfooter ul {
-	margin: 0px;
-	padding: 0px;
+    margin: 0px;
+    padding: 0px;
 }
 
 /* Use a reduced font size for the footer.  Also, add a bottom margin to
@@ -38,8 +38,8 @@ add another style later in the file to over-ride the one here.
 .blogentryfooter,
 .articlefooter,
 .commentfooter {
-	margin-bottom: 3%;
-	clear: both;
+    margin-bottom: 3%;
+    clear: both;
 }
 
 /* The lists in entry objects are semantic, not visual, so we don't want any
@@ -49,12 +49,12 @@ add another style later in the file to over-ride the one here.
 .blogentryfooter li,
 .articlefooter li,
 .articleheader li {
-	list-style-type: none;
+    list-style-type: none;
 }
 
 /* For comments, the list is semantic, so we don't want any indent. */
 .commentlist {
-	padding-left: 0;
+    padding-left: 0;
 }
 
 /* Again with the semantic lists.  For many of these, such as user names, URLs,
@@ -66,62 +66,62 @@ li.bloguserurl,
 li.commenturl,
 ul.postadmin li,
 div.commentfooter li.commentname{
-	display: inline;
-	margin-right: 1%;
+    display: inline;
+    margin-right: 1%;
 }
 
 .blogentryfooter,
 .articlefooter,
 .commentfooter {
-	font-size: 80%;
+    font-size: 80%;
 }
 
 .commentdata,
 .blogentry div.blogentrybody,
 .article div.articlebody {
-	padding: 1%;
+    padding: 1%;
 }
 
 .blogentrybody p {
-	text-indent: 1em;
-	clear: both;
+    text-indent: 1em;
+    clear: both;
 }
 
 .blogentrybody img {
-	display: block;
-	margin: 1em auto;
+    display: block;
+    margin: 1em auto;
 }
 
 #entrycomments {
-	margin-top: 1%;
+    margin-top: 1%;
 }
 
 .tblist {
-	background: #f4f4f4;
-	border: 1px solid black;
+    background: #f4f4f4;
+    border: 1px solid black;
 }
 
 .commentname li[class~='user'] {
-	font-weight: bold;
+    font-weight: bold;
 }
 
 @media print {
-	
-	#pagecontent {
-		margin: 1% 1% 1% 1%;
-		width: 100%;
-	}
-	
-	/* When printing, hide the comment submit form. */
-	#commentsubmit {
-		display: none;
-	}
-	
-	/* Try to avoid page breaks within the entries. */
-	.blogentry,
-	.article,
-	.fullcomment {
-		page-break-inside: avoid;
-	}
-	
+    
+    #pagecontent {
+        margin: 1% 1% 1% 1%;
+        width: 100%;
+    }
+    
+    /* When printing, hide the comment submit form. */
+    #commentsubmit {
+        display: none;
+    }
+    
+    /* Try to avoid page breaks within the entries. */
+    .blogentry,
+    .article,
+    .fullcomment {
+        page-break-inside: avoid;
+    }
+    
 }

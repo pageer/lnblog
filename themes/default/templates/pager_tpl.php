@@ -5,7 +5,8 @@
 # that supports it.  It provides forward and backward navigation with
 # a given page size.
 
-$this->block('pager.previous', function ($vars) {
+$this->block(
+    'pager.previous', function ($vars) {
     extract($vars, EXTR_OVERWRITE);
     if ($PAGE > $START_PAGE): 
         $new_offset = $PAGE - $INCREMENT;
@@ -14,9 +15,11 @@ $this->block('pager.previous', function ($vars) {
             &laquo; <?php p_("Newer entries")?>
         </a><?php
     endif;
-});
+    }
+);
 
-$this->block('pager.next', function ($vars) {
+$this->block(
+    'pager.next', function ($vars) {
     extract($vars, EXTR_OVERWRITE);
     if ($MORE_ENTRIES): 
         $PAGE = $PAGE ?: $START_PAGE;
@@ -26,9 +29,11 @@ $this->block('pager.next', function ($vars) {
             <?php p_("Older entries")?> &raquo;
         </a><?php
     endif;
-});
+    }
+);
 
-$this->block('pager.basic', function ($vars) {
+$this->block(
+    'pager.basic', function ($vars) {
     extract($vars, EXTR_OVERWRITE);
     if ($PAGE > $START_PAGE || $MORE_ENTRIES): ?>
         <div class="pager">
@@ -37,8 +42,11 @@ $this->block('pager.basic', function ($vars) {
         </div>
     <?php
     endif;
-});
+    }
+);
 
-$this->block('main', function ($vars) {
+$this->block(
+    'main', function ($vars) {
     $this->showBlock('pager.basic');
-});
+    }
+);

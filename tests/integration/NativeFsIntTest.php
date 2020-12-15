@@ -1,5 +1,6 @@
 <?php
-class NativeFsIntTest extends \PHPUnit\Framework\TestCase {
+class NativeFsIntTest extends \PHPUnit\Framework\TestCase
+{
     function setUp(): void {
         $this->init_dir = getcwd();
         if (! is_dir("temp")) {
@@ -40,8 +41,10 @@ class NativeFsIntTest extends \PHPUnit\Framework\TestCase {
 
         $fs->mkdir("temp/foo");
         $this->assertTrue(is_dir("temp/foo"));
-        $this->assertEquals($this->getOctalPermString("temp/foo"),
-                               (int)decoct($fs->directory_mode));
+        $this->assertEquals(
+            $this->getOctalPermString("temp/foo"),
+            (int)decoct($fs->directory_mode)
+        );
 
         $fs->mkdir("temp/bar", 0666);
         $this->assertTrue(is_dir("temp/bar"));
@@ -71,14 +74,22 @@ class NativeFsIntTest extends \PHPUnit\Framework\TestCase {
         $this->assertTrue(is_dir("temp/foo/bar"));
         $this->assertTrue(is_dir("temp/foo/baz"));
         $this->assertTrue(is_dir("temp/foo/baz/bizz"));
-        $this->assertEquals($this->getOctalPermString("temp/foo"),
-                               (int)decoct($fs->directory_mode));
-        $this->assertEquals($this->getOctalPermString("temp/foo/bar"),
-                               (int)decoct($fs->directory_mode));
-        $this->assertEquals($this->getOctalPermString("temp/foo/baz"),
-                               (int)decoct(0755));
-        $this->assertEquals($this->getOctalPermString("temp/foo/baz/bizz"),
-                               (int)decoct(0755));
+        $this->assertEquals(
+            $this->getOctalPermString("temp/foo"),
+            (int)decoct($fs->directory_mode)
+        );
+        $this->assertEquals(
+            $this->getOctalPermString("temp/foo/bar"),
+            (int)decoct($fs->directory_mode)
+        );
+        $this->assertEquals(
+            $this->getOctalPermString("temp/foo/baz"),
+            (int)decoct(0755)
+        );
+        $this->assertEquals(
+            $this->getOctalPermString("temp/foo/baz/bizz"),
+            (int)decoct(0755)
+        );
     }
 
     /**
@@ -98,10 +109,14 @@ class NativeFsIntTest extends \PHPUnit\Framework\TestCase {
         $this->assertFalse($fs->isScript("temp/writefile.txt"));
         $this->assertTrue($fs->isScript("temp/writefile.php"));
 
-        $this->assertEquals($this->getOctalPermString("temp/writefile.txt"),
-                               (int)decoct($fs->default_mode));
-        $this->assertEquals($this->getOctalPermString("temp/writefile.php"),
-                               (int)decoct($fs->script_mode));
+        $this->assertEquals(
+            $this->getOctalPermString("temp/writefile.txt"),
+            (int)decoct($fs->default_mode)
+        );
+        $this->assertEquals(
+            $this->getOctalPermString("temp/writefile.php"),
+            (int)decoct($fs->script_mode)
+        );
 
     }
 
@@ -112,7 +127,7 @@ class NativeFsIntTest extends \PHPUnit\Framework\TestCase {
         $fs = new NativeFS();
         $fname = "temp/chmodtest.tmp";
         $fh = fopen($fname, "w+");
-        fwrite($fh,"test");
+        fwrite($fh, "test");
         fclose($fh);
         $ret = $fs->chmod($fname, 0777);
         $this->assertTrue($ret);

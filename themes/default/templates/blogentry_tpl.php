@@ -3,21 +3,26 @@
 # Contains the markup and display logic for fuill blog entries, including
 # replies.  Most of the tricky stuff here is for conditional display.
 
-$this->block('blogentry.header', function ($vars) {
+$this->block(
+    'blogentry.header', function ($vars) {
     extract($vars, EXTR_OVERWRITE); ?>
     <h2 class="header"><?php echo $SUBJECT?></h2>
     <?php
-});
+    }
+);
 
-$this->block('blogentry.body', function ($vars) {
+$this->block(
+    'blogentry.body', function ($vars) {
     extract($vars, EXTR_OVERWRITE); ?>
     <div class="body">
     <?php echo $BODY?>
     </div>
     <?php
-});
+    }
+);
 
-$this->block('blogentry.footer', function ($vars) {
+$this->block(
+    'blogentry.footer', function ($vars) {
     extract($vars, EXTR_OVERWRITE); ?>
     <div class="footer">
         <?php
@@ -27,9 +32,11 @@ $this->block('blogentry.footer', function ($vars) {
         ?>
     </div>
     <?php
-});
+    }
+);
 
-$this->block('blogentry.enclosure', function ($vars) {
+$this->block(
+    'blogentry.enclosure', function ($vars) {
     extract($vars, EXTR_OVERWRITE);
     # If there is an enclosure/podcast URL for this entry, this block will display a
     # link to it with the file name, type, and size.
@@ -53,9 +60,11 @@ $this->block('blogentry.enclosure', function ($vars) {
             );?>
         </p><?php
     endif;
-});
+    }
+);
 
-$this->block('blogentry.postdata', function ($vars) {
+$this->block(
+    'blogentry.postdata', function ($vars) {
     extract($vars, EXTR_OVERWRITE); ?>
     <ul class="postdata">
         <?php $this->showBlock('blogentry.tags'); ?>
@@ -79,9 +88,11 @@ $this->block('blogentry.postdata', function ($vars) {
         <?php endif; ?>
     </ul>
     <?php
-});
+    }
+);
 
-$this->block('blogentry.tags', function ($vars) {
+$this->block(
+    'blogentry.tags', function ($vars) {
     extract($vars, EXTR_OVERWRITE);
 
     if (! empty($TAGS)): ?>
@@ -95,9 +106,11 @@ $this->block('blogentry.tags', function ($vars) {
         ?>
         </li>
     <?php endif;
-});
+    }
+);
 
-$this->block('blogentry.controlbar', function ($vars) {
+$this->block(
+    'blogentry.controlbar', function ($vars) {
     extract($vars, EXTR_OVERWRITE);
     if ($SHOW_CONTROLS): ?>
         <ul class="controlbar">
@@ -117,32 +130,42 @@ $this->block('blogentry.controlbar', function ($vars) {
                 <a href="<?php echo $MANAGE_REPLY_LINK; ?>"><?php p_("Manage replies"); ?></a>
             </li>
         </ul>
-<?php endif;
-});
+    <?php endif;
+    }
+);
 
-$this->block('blogentry.commentrules', function ($vars) {
+$this->block(
+    'blogentry.commentrules', function ($vars) {
     extract($vars, EXTR_OVERWRITE); ?>
     <p class="comment-desc">
         <?php
         if ($ALLOW_COMMENTS):
-            pf_('You can reply to this entry by <a href="%s">leaving a comment</a> below.  ',
-                $COMMENT_LINK);
+            pf_(
+                'You can reply to this entry by <a href="%s">leaving a comment</a> below.  ',
+                $COMMENT_LINK
+            );
         endif;
         if ($ALLOW_TRACKBACKS):
-            pf_('You can <a href="%s">send TrackBack pings to this <acronym title="Uniform Resource Locator">URL</acronym></a>.  ',
-                $TRACKBACK_LINK);
+            pf_(
+                'You can <a href="%s">send TrackBack pings to this <acronym title="Uniform Resource Locator">URL</acronym></a>.  ',
+                $TRACKBACK_LINK
+            );
         endif;
         if ($ALLOW_PINGBACKS):
             pf_('This entry accepts Pingbacks from other blogs.  ');
         endif;
         if ($COMMENT_RSS_ENABLED):
-            pf_('You can follow comments on this entry by subscribing to the <a href="%s">RSS feed</a>.',
-                $COMMENT_FEED_LINK);
+            pf_(
+                'You can follow comments on this entry by subscribing to the <a href="%s">RSS feed</a>.',
+                $COMMENT_FEED_LINK
+            );
         endif; ?>
     </p><?php
-});
+    }
+);
 
-$this->block('blogentry.localpingback', function ($vars) {
+$this->block(
+    'blogentry.localpingback', function ($vars) {
     extract($vars, EXTR_OVERWRITE);
     if (! empty($LOCAL_PINGBACKS)): ?>
     <h4><?php p_("Related entries");?></h4>
@@ -152,9 +175,11 @@ $this->block('blogentry.localpingback', function ($vars) {
         <?php endforeach ?>
     </ul>
     <?php endif;
-});
+    }
+);
 
-$this->block('blogentry.trackback', function ($vars) {
+$this->block(
+    'blogentry.trackback', function ($vars) {
     extract($vars, EXTR_OVERWRITE);
     if (! empty($TRACKBACKS)): ?>
     <h3>
@@ -171,9 +196,11 @@ $this->block('blogentry.trackback', function ($vars) {
         ?>
     </ul>
     <?php endif;
-});
+    }
+);
 
-$this->block('blogentry.pingback', function ($vars) {
+$this->block(
+    'blogentry.pingback', function ($vars) {
     extract($vars, EXTR_OVERWRITE);
     if (! empty($PINGBACKS)): ?>
     <h3><?php p_("Pingbacks");?>
@@ -189,9 +216,11 @@ $this->block('blogentry.pingback', function ($vars) {
         ?>
     </ul>
     <?php endif;
-});
+    }
+);
 
-$this->block('blogentry.comment', function ($vars) {
+$this->block(
+    'blogentry.comment', function ($vars) {
     extract($vars, EXTR_OVERWRITE);
     if (! empty($COMMENTS)): ?>
     <h3><?php p_("Comments");?>
@@ -203,9 +232,11 @@ $this->block('blogentry.comment', function ($vars) {
         endforeach; ?>
     </ul>
     <?php endif;
-});
+    }
+);
 
-$this->block('main', function ($vars) { ?>
+$this->block(
+    'main', function ($vars) { ?>
     <div class="blogentry">
         <?php
         $this->showBlock('blogentry.header');
@@ -219,4 +250,5 @@ $this->block('main', function ($vars) { ?>
         ?>
     </div>
     <?php
-});
+    }
+);

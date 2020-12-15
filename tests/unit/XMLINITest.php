@@ -1,7 +1,8 @@
 <?php
 use Prophecy\Argument;
 
-class XMLINITest extends PHPUnit\Framework\TestCase {
+class XMLINITest extends PHPUnit\Framework\TestCase
+{
 
     public function testWriteFileWithSimpleSettingWritesSimpleXmlNode() {
         $this->config->setValue('foo', 'bar', 'baz');

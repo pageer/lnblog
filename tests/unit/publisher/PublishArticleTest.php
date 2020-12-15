@@ -6,7 +6,8 @@ require_once __DIR__.'/../../../vendor/phpxmlrpc/phpxmlrpc/lib/xmlrpc_wrappers.i
 
 use Prophecy\Argument;
 
-class PublishArticleTest extends PublisherTestBase {
+class PublishArticleTest extends PublisherTestBase
+{
 
     public function testPublishArticle_WhenTargetDirAlreadyExists_Throws() {
         $entry = $this->getTestDraftEntry();
@@ -51,11 +52,13 @@ class PublishArticleTest extends PublisherTestBase {
         $fs->is_dir('./content/some_stuff')->willReturn(false);
         $fs->write_file('./content/some_stuff/entry.xml', Argument::any())->willReturn(true);
 
-        $fs->rename('./drafts/02_1234', './content/some_stuff')->will(function($args) use ($fs) {
+        $fs->rename('./drafts/02_1234', './content/some_stuff')->will(
+            function($args) use ($fs) {
             $fs->file_exists('./content/some_stuff/entry.xml')->willReturn(true);
             $fs->realpath('./content/some_stuff/entry.xml')->willReturn('./content/some_stuff/entry.xml');
             return true;
-        })->shouldBeCalled();
+            }
+        )->shouldBeCalled();
 
         $this->publisher->publishArticle($entry, $this->getTestTime());
     }
@@ -84,11 +87,13 @@ class PublishArticleTest extends PublisherTestBase {
         $this->user->username()->willReturn('billybob');
         $fs->is_dir('./content')->willReturn(true);
         $fs->is_dir('./content/some_stuff')->willReturn(false);
-        $fs->rename('./drafts/02_1234', './content/some_stuff')->will(function($args) use ($fs) {
+        $fs->rename('./drafts/02_1234', './content/some_stuff')->will(
+            function($args) use ($fs) {
             $fs->file_exists('./content/some_stuff/entry.xml')->willReturn(true);
             $fs->realpath('./content/some_stuff/entry.xml')->willReturn('./content/some_stuff/entry.xml');
             return true;
-        });
+            }
+        );
         $fs->write_file('./content/some_stuff/entry.xml', Argument::any())->willReturn(true);
 
         $this->publisher->publishArticle($entry, $this->getTestTime());
@@ -133,7 +138,8 @@ class PublishArticleTest extends PublisherTestBase {
 
         try {
             $this->publisher->publishArticle($entry, $this->getTestTime());
-        } catch (Exception $e) {}
+        } catch (Exception $e) {
+        }
 
         $this->assertFalse($event_stub->has_been_called);
     }
@@ -171,11 +177,13 @@ class PublishArticleTest extends PublisherTestBase {
         $fs->is_dir('./content/whatever_thing')->willReturn(false);
         $fs->file_exists('./content/whatever_thing/sticky.txt')->willReturn(false);
 
-        $fs->rename('./drafts/02_1234', './content/whatever_thing')->will(function($args) use ($fs) {
+        $fs->rename('./drafts/02_1234', './content/whatever_thing')->will(
+            function($args) use ($fs) {
             $fs->file_exists('./content/whatever_thing/entry.xml')->willReturn(true);
             $fs->realpath('./content/whatever_thing/entry.xml')->willReturn('./content/whatever_thing/entry.xml');
             return true;
-        })->shouldBeCalled();
+            }
+        )->shouldBeCalled();
         $fs->write_file('./content/whatever_thing/entry.xml', Argument::any())->willReturn(true)->shouldBeCalled();
 
         $this->publisher->publishArticle($entry, $this->getTestTime());
@@ -320,11 +328,13 @@ class PublishArticleTest extends PublisherTestBase {
         $fs->is_dir('./content')->willReturn(true);
         $fs->is_dir('./content/some_stuff')->willReturn(false);
         $fs->file_exists('./content/some_stuff/')->willReturn(false);
-        $fs->rename('./drafts/02_1234', './content/some_stuff')->will(function($args) use ($fs) {
+        $fs->rename('./drafts/02_1234', './content/some_stuff')->will(
+            function($args) use ($fs) {
             $fs->file_exists('./content/some_stuff/entry.xml')->willReturn(true);
             $fs->realpath('./content/some_stuff/entry.xml')->willReturn('./content/some_stuff/entry.xml');
             return true;
-        });
+            }
+        );
         $this->fs->write_file('./content/some_stuff/entry.xml', Argument::any())->willReturn(true);
         return $entry;
     } 
@@ -340,11 +350,13 @@ class PublishArticleTest extends PublisherTestBase {
         $fs->realpath('./drafts/02_1234/entry.xml')->willReturn('./drafts/02_1234/entry.xml');
         $fs->file_exists("./drafts/02_1234/publish.txt")->willReturn(false);
         $fs->file_exists('./content/some_stuff/sticky.txt')->willReturn(false);
-        $fs->rename(Argument::any(), Argument::any())->will(function($args) use ($fs) {
+        $fs->rename(Argument::any(), Argument::any())->will(
+            function($args) use ($fs) {
             $fs->file_exists('./content/some_stuff/entry.xml')->willReturn(true);
             $fs->realpath('./content/some_stuff/entry.xml')->willReturn('./content/some_stuff/entry.xml');
             return true;
-        });
+            }
+        );
         $fs->write_file('./content/some_stuff/entry.xml', Argument::any())->willReturn(true);
         return $entry;
     }

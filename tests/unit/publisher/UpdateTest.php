@@ -7,7 +7,8 @@ require_once __DIR__.'/../../../vendor/phpxmlrpc/phpxmlrpc/lib/xmlrpc_wrappers.i
 use LnBlog\Tasks\AutoPublishTask;
 use Prophecy\Argument;
 
-class UpdateTest extends PublisherTestBase {
+class UpdateTest extends PublisherTestBase
+{
 
     public function testUpdate_WhenEntryDoesNotExist_Throws() {
         $entry = new BlogEntry("", $this->fs->reveal());

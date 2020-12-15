@@ -299,6 +299,7 @@ abstract class Plugin extends LnBlogObject
 
     public function cachepath($obj) {
         if (method_exists($obj, "isBlog") && $obj->isBlog())
+            /** @var Blog $obj */
             return Path::mk($obj->home_path, "cache", get_class($this)."_output.cache");
             else return false;
     }

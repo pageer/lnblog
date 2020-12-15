@@ -24,9 +24,14 @@ $xml_lang = str_replace("_", "-", LANGUAGE); ?>
 <title><?php echo $PAGE_TITLE; ?></title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 <?php foreach ($METADATA as $meta) { ?>
-<meta <?php if ($meta["http-equiv"]) { ?>http-equiv="<?php echo $meta["http-equiv"]; ?>"<?php } 
-?> <?php if ($meta["name"]) { ?>name="<?php echo $meta["name"]; ?>"<?php } ?> content="<?php echo $meta["content"]; ?>" />
-<?php } ?>
+    <meta <?php if ($meta["http-equiv"]): ?>
+        http-equiv="<?php echo $meta["http-equiv"]; ?>"
+   <?php endif ?>
+    <?php if ($meta["name"]): ?>
+        name="<?php echo $meta["name"]; ?>"
+    <?php endif ?> 
+    content="<?php echo $meta["content"]; ?>" />
+<?php endforeach; ?>
 <?php foreach ($LINKS as $link) { ?>
 <link <?php foreach ($link as $attrib=>$val) echo $attrib.'="'.$val.'" ';?>/>
 <?php } ?>
@@ -35,35 +40,35 @@ $xml_lang = str_replace("_", "-", LANGUAGE); ?>
 <?php } ?>
 <?php 
 foreach ($STYLESHEETS as $css) {
-	if (isset($css['link'])) {
-		$link = !empty($css['external']) ? $css['link'] : getlink($css['link'], LINK_STYLESHEET); 
-		if ($link) { ?>
+    if (isset($css['link'])) {
+        $link = !empty($css['external']) ? $css['link'] : getlink($css['link'], LINK_STYLESHEET); 
+        if ($link) { ?>
 <link rel="stylesheet" type="text/css" href="<?php echo $link; ?>" />
 <?php 
-		}
-	} elseif (isset($css['text'])) {
+        }
+    } elseif (isset($css['text'])) {
 ?>
 <style type="text/css">
 <?php echo $css['text']; ?>
 </style>
 <?php
-	}
+    }
 }
 
 foreach ($SCRIPTS as $js) {
-	if (isset($js['href'])) {
-		$link = !empty($js['external']) ? $js["href"] : getlink($js["href"], LINK_SCRIPT);
-		if ($link) { ?>
+    if (isset($js['href'])) {
+        $link = !empty($js['external']) ? $js["href"] : getlink($js["href"], LINK_SCRIPT);
+        if ($link) { ?>
 <script type="<?php echo $js["type"]; ?>" src="<?php echo $link; ?>"></script>
 <?php 
-		}
-	} elseif (isset($js['text'])) {
+        }
+    } elseif (isset($js['text'])) {
 ?>
 <script type="<?php echo $js["type"]; ?>">
 <?php echo $js["text"]; ?>
 </script>
 <?php
-	}
+    }
 } 
 ?>
 </head>

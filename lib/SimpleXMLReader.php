@@ -76,7 +76,7 @@ class SimpleXMLReader
                 if ($this->getOption('assoc_arrays')) {
                     $ret[$a['tag']] = $a['text'];
                 } else {
-                    $ret[] = SimpleXMLReader::getVal($a);
+                    $ret[] = self::getVal($a);
                 }
             }
         }
@@ -120,7 +120,7 @@ class SimpleXMLReader
         } elseif (isset($obj->$tag) && is_string($obj->$tag)) {
             $obj->$tag = (string)$node['text'];
         } else {
-            $obj->$tag = SimpleXMLReader::getVal($node);
+            $obj->$tag = self::getVal($node);
         }
     }
 
@@ -134,7 +134,7 @@ class SimpleXMLReader
                        $child['attributes']['TYPE'] == 'array' ) {
                 @$obj->$tag = array();
             } else {
-                SimpleXMLReader::setVal($obj, $child);
+                self::setVal($obj, $child);
             }
         }
     }

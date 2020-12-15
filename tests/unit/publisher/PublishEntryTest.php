@@ -2,7 +2,8 @@
 
 use Prophecy\Argument;
 
-class PublishEntryTest extends PublisherTestBase {
+class PublishEntryTest extends PublisherTestBase
+{
 
     public function testPublishEntry_WhenEntryDoesNotExists_SaveAsDraftAndMovesDirectory() {
         $fs = $this->fs;
@@ -15,15 +16,19 @@ class PublishEntryTest extends PublisherTestBase {
         $fs->is_dir(Argument::any())->willReturn(false);
 
         $fs->mkdir_rec('./drafts/02_1234')->willReturn(true)->shouldBeCalled();
-        $fs->write_file('./drafts/02_1234/entry.xml', Argument::any())->shouldBeCalled()->will(function($args) use ($fs) {
+        $fs->write_file('./drafts/02_1234/entry.xml', Argument::any())->shouldBeCalled()->will(
+            function($args) use ($fs) {
             $fs->file_exists('./drafts/02_1234/entry.xml')->willReturn(true);
             return true;
-        });
-        $fs->rename('./drafts/02_1234', './entries/2017/01/02_1234')->will(function($args) use ($fs) {
+            }
+        );
+        $fs->rename('./drafts/02_1234', './entries/2017/01/02_1234')->will(
+            function($args) use ($fs) {
             $fs->write_file('./entries/2017/01/02_1234/entry.xml', Argument::any())->willReturn(true)->shouldBeCalled();
             $fs->file_exists('./entries/2017/01/02_1234/entry.xml')->willReturn(true);
             return true;
-        })->shouldBeCalled();
+            }
+        )->shouldBeCalled();
 
         $this->publisher->publishEntry($entry, $this->getTestTime());
     }
@@ -42,17 +47,21 @@ class PublishEntryTest extends PublisherTestBase {
         $fs->is_dir(Argument::any())->willReturn(false);
 
         $fs->mkdir_rec('./drafts/02_1234')->willReturn(true)->shouldBeCalled();
-        $fs->write_file('./drafts/02_1234/entry.xml', Argument::any())->shouldBeCalled()->will(function($args) use ($fs) {
+        $fs->write_file('./drafts/02_1234/entry.xml', Argument::any())->shouldBeCalled()->will(
+            function($args) use ($fs) {
             $new_path = './drafts/02_1234/entry.xml';
             $fs->file_exists($new_path)->willReturn(true);
             $fs->realpath($new_path)->willReturn($new_path);
             return true;
-        });
-        $fs->rename('./drafts/02_1234', './entries/2017/01/02_1234')->will(function($args) use ($fs) {
+            }
+        );
+        $fs->rename('./drafts/02_1234', './entries/2017/01/02_1234')->will(
+            function($args) use ($fs) {
             $fs->write_file('./entries/2017/01/02_1234/entry.xml', Argument::any())->willReturn(true);
             $fs->file_exists('./entries/2017/01/02_1234/entry.xml')->willReturn(true);
             return true;
-        });
+            }
+        );
 
         $this->publisher->publishEntry($entry, $this->getTestTime());
 
@@ -70,11 +79,13 @@ class PublishEntryTest extends PublisherTestBase {
         $fs->is_dir(Argument::any())->willReturn(true);
         $fs->is_dir('./entries/2017/01/02_123400')->willReturn(false);
 
-        $fs->rename('./drafts/02_1234', './entries/2017/01/02_123400')->will(function($args) use ($fs) {
+        $fs->rename('./drafts/02_1234', './entries/2017/01/02_123400')->will(
+            function($args) use ($fs) {
             $fs->write_file('./entries/2017/01/02_123400/entry.xml', Argument::any())->willReturn(true)->shouldBeCalled();
             $fs->file_exists('./entries/2017/01/02_123400/entry.xml')->willReturn(true);
             return true;
-        })->shouldBeCalled();
+            }
+        )->shouldBeCalled();
 
         $this->publisher->publishEntry($entry, $this->getTestTime());
     }
@@ -253,13 +264,15 @@ class PublishEntryTest extends PublisherTestBase {
         $fs->realpath($entry->file)->willReturn($entry->file);
         $fs->is_dir(Argument::any())->willReturn(true);
         $fs->is_dir('./entries/2017/01/02_1234')->willReturn(false);
-        $fs->rename(Argument::any(), Argument::any())->will(function($args) use ($fs) {
+        $fs->rename(Argument::any(), Argument::any())->will(
+            function($args) use ($fs) {
             $fs->write_file(Argument::any(), Argument::any())->willReturn(true)->shouldBeCalled();
             $published_path = './entries/2017/01/02_1234/entry.xml';
             $fs->file_exists($published_path)->willReturn(true);
             $fs->realpath($published_path)->willReturn($published_path);
             return true;
-        })->shouldBeCalled();
+            }
+        )->shouldBeCalled();
         return $entry;
     }
 }

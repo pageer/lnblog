@@ -33,12 +33,9 @@ if (! empty($_POST)) {
     $c->setDebug(1);
     $r = $c->send($f);
     $v = $r->value();
-    if (!$r->faultCode())
-    {
+    if (!$r->faultCode()) {
         echo "It worked?";
-    }
-    else
-    {
+    } else {
         echo "Fault: ";
         echo "Code: " . htmlentities($r->faultCode())
             . " Reason '" .htmlentities($r->faultString())."'<BR>";

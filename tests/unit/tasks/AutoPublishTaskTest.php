@@ -4,7 +4,8 @@ use LnBlog\Tasks\AutoPublishTask;
 use Psr\Log\LoggerInterface;
 use Prophecy\Argument;
 
-class AutoPublishTaskTest extends \PHPUnit\Framework\TestCase {
+class AutoPublishTaskTest extends \PHPUnit\Framework\TestCase
+{
 
     private $publisher;
     private $logger;

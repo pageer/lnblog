@@ -3,9 +3,9 @@
 <?php 
 # Include a link to the parent entry if there are no comments on it.
 if (! empty($PARENT_TITLE)) {
-	pf_('Add your comments on <a href="%s">%s</a>', $PARENT_URL, $PARENT_TITLE);
+    pf_('Add your comments on <a href="%s">%s</a>', $PARENT_URL, $PARENT_TITLE);
 } else { 
-	p_("Add your comments");
+    p_("Add your comments");
 } ?>
 &nbsp;<a href="#postcommentform" name="postcommentform" class="anchor">#</a>
 </h3>
@@ -13,9 +13,9 @@ if (! empty($PARENT_TITLE)) {
 <?php
 # Set the message to display on the form.  If not given, use the default.
 if (isset($COMMENT_FORM_MESSAGE)) {
-	echo $COMMENT_FORM_MESSAGE;
+    echo $COMMENT_FORM_MESSAGE;
 } else {
-	p_("A comment body is required.  No HTML code allowed.  URLs starting with http:// or ftp:// will be automatically converted to hyperlinks."); 
+    p_("A comment body is required.  No HTML code allowed.  URLs starting with http:// or ftp:// will be automatically converted to hyperlinks."); 
 }?>
 </p>
 <?php

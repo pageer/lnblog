@@ -4,7 +4,7 @@
 <?php if ( isset($ERROR_MESSAGE) ) { ?>
 <p><?php echo $ERROR_MESSAGE;?></p>
 <?php } ?>
-<form method="post" id="tbconfirm" action="<?php echo make_uri(false,false,false); ?>">
+<form method="post" id="tbconfirm" action="<?php echo make_uri(false, false, false); ?>">
 <?php $this->outputCsrfField() ?>
 <div>
 <label for="target_url"><?php p_('Target Trackback <abbr title="Uniform Resource Locator">URL</abbr>');?></label>

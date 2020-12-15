@@ -15,26 +15,26 @@
 <?php echo $BODY; ?>
 </div>
 <div class="footer">
-	<ul>
-		<li class="articledate"><?php pf_("Published %s", $POSTDATE); ?></li>
+    <ul>
+        <li class="articledate"><?php pf_("Published %s", $POSTDATE); ?></li>
 <?php if ($EDITDATE != $POSTDATE) { /* Add an edit date, if applicable. */?>
-		<li class="articledate"><?php pf_("Updated %s", $EDITDATE); ?></li>
+        <li class="articledate"><?php pf_("Updated %s", $EDITDATE); ?></li>
 <?php } ?>
 <?php if (! isset($NO_USER_PROFILE)) { /* Display profile link or not */ ?>
-		<li class="bloguser"><?php pf_("By %s", '<a href="'.$PROFILE_LINK.'">'.$USER_DISPLAY_NAME.'</a>');?></li>
+        <li class="bloguser"><?php pf_("By %s", '<a href="'.$PROFILE_LINK.'">'.$USER_DISPLAY_NAME.'</a>');?></li>
 <?php } elseif ( isset($USER_EMAIL) ) { ?>
-		<li><?php pf_("By %s", '<a href=\"mailto: '.$USER_EMAIL.'">'.$USER_DISPLAY_NAME.'</a>'); ?></li>
+        <li><?php pf_("By %s", '<a href=\"mailto: '.$USER_EMAIL.'">'.$USER_DISPLAY_NAME.'</a>'); ?></li>
 <?php } else { ?>
-		<li><?php pf_("By %s", $USER_DISPLAY_NAME); ?></li>
+        <li><?php pf_("By %s", $USER_DISPLAY_NAME); ?></li>
 <?php } /* End user profile block */ ?>
 <?php if (! empty($TAGS)) { ?>
-	<li><?php p_("Tags");?>: <?php 
-		$out = "";
-		foreach ($TAGS as $key=>$tag) 
-			$out .= ($out=="" ? "" : ", ").
-			        '<a href="'.$TAG_LINK.'?tag='.urlencode($tag).'">'.
-			        htmlspecialchars($tag).'</a>'; 
-		echo $out;
+    <li><?php p_("Tags");?>: <?php 
+        $out = "";
+        foreach ($TAGS as $key=>$tag) 
+            $out .= ($out=="" ? "" : ", ").
+                    '<a href="'.$TAG_LINK.'?tag='.urlencode($tag).'">'.
+                    htmlspecialchars($tag).'</a>'; 
+        echo $out;
 ?></li>
 </ul>
 <?php	}

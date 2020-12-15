@@ -1,39 +1,39 @@
 /* Site-map menu bar styles. */
 
 #menubar {
-	width: 100%;
-	background: #f4f4f4;
-	border-bottom: 1px solid black;
-	margin: 0;
-	padding: 0;
+    width: 100%;
+    background: #f4f4f4;
+    border-bottom: 1px solid black;
+    margin: 0;
+    padding: 0;
 }
 
 #menubar img {
-	border: 0;
-	position: absolute;
-	right: 1px;
-	top: 1px;
+    border: 0;
+    position: absolute;
+    right: 1px;
+    top: 1px;
 }
 
 #menubar h1, #menubar h2 {
-	font-size: 100%;
-	display: inline;
+    font-size: 100%;
+    display: inline;
 }
 
 #menubar ul {
-	display: inline;
-	padding-left: 2em;
+    display: inline;
+    padding-left: 2em;
 }
 
 #menubar ul li {
-	list-style-type: none;
-	display: inline;
-	margin-left: 1em;
-	margin-right: 1em;
+    list-style-type: none;
+    display: inline;
+    margin-left: 1em;
+    margin-right: 1em;
 }
 
 @media print {
-	#menubar {
-		display: none;
-	}
+    #menubar {
+        display: none;
+    }
 }

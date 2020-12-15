@@ -2,7 +2,8 @@
 
 use Prophecy\Argument;
 
-class WebPagesTest extends \PHPUnit\Framework\TestCase {
+class WebPagesTest extends \PHPUnit\Framework\TestCase
+{
 
     public function testEditEntry_WhenEmptyPostAndNotLoggedIn_Shows403Error() {
         $this->entry->isEntry()->willReturn(true);
@@ -207,12 +208,14 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->webpage->entryedit();
         $output = ob_get_clean();
 
-        $expectedResponse = json_encode([
+        $expectedResponse = json_encode(
+            [
             'id'=>'asdf', 
             'exists' => true,
             'isDraft' => false,
             'content'=> 'This%20is%20some%20markup'
-        ]);
+            ]
+        );
         $this->assertEquals($expectedResponse, $output);
     }
 
@@ -268,9 +271,11 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->sys_ini->value("entryconfig", 'AllowInitUpload', 1)->willReturn(1);
         $this->page->refresh(Argument::any(), Argument::any())->willReturn(null);
         $this->page->addPackage(Argument::any())->willReturn(null);
-        $this->publisher->publishEntry(Argument::any())->will(function($args) use ($ping_data) {
+        $this->publisher->publishEntry(Argument::any())->will(
+            function($args) use ($ping_data) {
             EventRegister::instance()->activateEventFull(null, 'BlogEntry', 'PingbackComplete', $ping_data);
-        });
+            }
+        );
 
         $this->page->display(Argument::containingString("This is an error"), Argument::any())->shouldBeCalled();
 
@@ -298,9 +303,11 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->sys_ini->value("entryconfig", 'AllowInitUpload', 1)->willReturn(1);
         $this->page->refresh(Argument::any(), Argument::any())->willReturn(null);
         $this->page->addPackage(Argument::any())->willReturn(null);
-        $this->publisher->publishEntry(Argument::any())->will(function($args) use ($ping_data) {
+        $this->publisher->publishEntry(Argument::any())->will(
+            function($args) use ($ping_data) {
             EventRegister::instance()->activateEventFull(null, 'BlogEntry', 'PingbackComplete', $ping_data);
-        });
+            }
+        );
 
         $this->page->display(Argument::containingString("It worked"), Argument::any())->shouldNotBeCalled();
 
@@ -320,9 +327,11 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->system->canModify($this->entry, $this->user)->willReturn(true);
         $this->page->refresh(Argument::any(), Argument::any())->willReturn(null);
         $this->page->addPackage(Argument::any())->willReturn(null);
-        $this->publisher->publishEntry(Argument::any())->will(function($args) {
+        $this->publisher->publishEntry(Argument::any())->will(
+            function($args) {
             EventRegister::instance()->activateEventFull(null, 'BlogEntry', 'UploadError', array("Error moving uploaded file"));
-        });
+            }
+        );
 
         $this->page->display(Argument::containingString("upload error"), Argument::any())->shouldBeCalled();
         $this->page->display(Argument::containingString("Error moving uploaded file"), Argument::any())->shouldBeCalled();
@@ -342,9 +351,11 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
         $this->system->canModify($this->entry, $this->user)->willReturn(true);
         $this->page->refresh(Argument::any(), Argument::any())->willReturn(null);
         $this->page->addPackage(Argument::any())->willReturn(null);
-        $this->publisher->publishEntry(Argument::any())->will(function($args) {
+        $this->publisher->publishEntry(Argument::any())->will(
+            function($args) {
             EventRegister::instance()->activateEventFull(null, 'BlogEntry', 'UploadSuccess');
-        });
+            }
+        );
 
         $this->page->display(Argument::containingString("upload errors"), Argument::any())->shouldNotBeCalled();
 
@@ -767,7 +778,8 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase {
     }
 }
 
-class TestableWebPages extends WebPages {
+class TestableWebPages extends WebPages
+{
     public $test_entry = null;
     public $test_page = null;
     public $test_publisher = null;

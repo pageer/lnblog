@@ -5,7 +5,7 @@
 .article {
     border: 1px solid #d4d4d4;
     border-radius: 5px;
-	margin-bottom: 2%;
+    margin-bottom: 2%;
     box-shadow: 2px 2px 2px rgba(212,212, 212, 0.2);
 }
 
@@ -16,8 +16,8 @@
 .article   .header h2,
 .article   .header ul,
 .article   .footer ul {
-	margin: 0;
-	padding: 0;
+    margin: 0;
+    padding: 0;
 }
 
 .blogentry .header,
@@ -49,12 +49,12 @@
 
 /* Reduce footer size, add a bottom margin to separate posts on the main page,
    and clear the footer so that floated images don't spill past the bottom
-	of the entry. */
+    of the entry. */
 .article .footer,
 .blogentry .footer {
-	font-size: 80%;
+    font-size: 80%;
     background-color: #f7f7f7;
-	clear: both;
+    clear: both;
 }
 
 /* Lists are semantic in the headers and footers, not visual.  Therefore, 
@@ -62,20 +62,20 @@
 .blogentry .footer li,
 .article   .header li,
 .article   .footer li {
-	list-style-type: none;
+    list-style-type: none;
 }
 
 /* Admin stuff is all inline - we don't need a new line for each action or for
    each piece of user info.  However, we do need a little margin to separate 
-	them. */
+    them. */
 ul.inline li,
 .postadmin li,
 .postdata .blogdate,
 .postdata .bloguser, 
 .postdata .bloguserurl,
 .controlbar li {
-	display: inline;
-	padding-right: 1%;
+    display: inline;
+    padding-right: 1%;
 }
 
 .postdata .bloguser:before {
@@ -91,16 +91,16 @@ ul.inline li,
    page or othe relements. */
 .blogentry .body,
 .article   .body {
-	padding: 8px;
+    padding: 8px;
 }
 
 /* Display images as block elements so that they are seperated from the text
    by default.  Also, add a little margin around them.  This is especially 
-	helpful when the image is floated left or right, as it keeps the text from
-	running into the edge. */
+    helpful when the image is floated left or right, as it keeps the text from
+    running into the edge. */
 .blogentry .body img {
-	display: block;
-	margin: 1em auto;
+    display: block;
+    margin: 1em auto;
     max-width: 100%; /* Don't overflow the container on big images */
 }
 

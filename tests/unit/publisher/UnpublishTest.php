@@ -2,7 +2,8 @@
 
 use Prophecy\Argument;
 
-class UnpublishTest extends PublisherTestBase {
+class UnpublishTest extends PublisherTestBase
+{
 
     public function testUnpublish_WhenNoConflictingDraft_MoveEntryToDraftWithPostTimestamp() {
         $entry = new BlogEntry(null, $this->fs->reveal());
@@ -100,7 +101,8 @@ class UnpublishTest extends PublisherTestBase {
 
         try {
             $this->publisher->unpublish($entry);
-        } catch (Exception $e) {}
+        } catch (Exception $e) {
+        }
 
         $this->assertFalse($event_stub->has_been_called);
     }
@@ -122,7 +124,8 @@ class UnpublishTest extends PublisherTestBase {
 
         try {
             $this->publisher->unpublish($entry);
-        } catch (Exception $e) {}
+        } catch (Exception $e) {
+        }
 
         $this->assertFalse($event_stub->has_been_called);
     }

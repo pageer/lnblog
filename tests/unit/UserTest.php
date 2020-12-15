@@ -4,7 +4,8 @@ use Prophecy\Argument;
 use LnBlog\User\AuthLog;
 use LnBlog\User\LoginLimiter;
 
-class UserTest extends \PHPUnit\Framework\TestCase {
+class UserTest extends \PHPUnit\Framework\TestCase
+{
     private $prophet;
     private $fs;
     private $globals;
@@ -354,9 +355,11 @@ class UserTest extends \PHPUnit\Framework\TestCase {
         $this->globals = $this->prophet->prophesize(GlobalFunctions::class);
         $this->loginLimiter = $this->prophet->prophesize(LoginLimiter::class);
 
-        $this->globals->setcookie(Argument::cetera())->will(function ($args) {
+        $this->globals->setcookie(Argument::cetera())->will(
+            function ($args) {
             $_COOKIE[$args[0]] = $args[1];
-        });
+            }
+        );
         $this->globals->time()->willReturn(12345678);
     }
 
@@ -388,19 +391,25 @@ class UserTest extends \PHPUnit\Framework\TestCase {
     private function configureMocksToReadAndWritePwreset($username) {
         $content = null;
         $file_path = Path::mk('userdata', $username, 'pwreset.php');
-        $this->fs->write_file($file_path, Argument::any())->will(function($args) use (&$content) {
+        $this->fs->write_file($file_path, Argument::any())->will(
+            function($args) use (&$content) {
             // The pwreset.php is a PHP file, so we can get the contents
             // by stripping the php header and eval'ing it.
             $string_data = trim(str_replace('<?php', '', $args[1]));
             $content = eval($string_data);
             return true;
-        });
-        $this->fs->file_exists($file_path)->willReturn(function ($args) use (&$content) {
+            }
+        );
+        $this->fs->file_exists($file_path)->willReturn(
+            function ($args) use (&$content) {
             return $content !== null;
-        });
-        $this->globals->include($file_path)->will(function ($args) use (&$content) {
+            }
+        );
+        $this->globals->include($file_path)->will(
+            function ($args) use (&$content) {
             return $content;
-        });
+            }
+        );
     }
 
     private function setUpUserExists($username) {
@@ -418,14 +427,18 @@ class UserTest extends \PHPUnit\Framework\TestCase {
         ];
         SystemConfig::instance()->userData(new UrlPath('userdata', ''));
         $configs = array_merge($defaults, $configs);
-        $this->globals->defined(Argument::any())->will(function ($args) use ($configs) {
+        $this->globals->defined(Argument::any())->will(
+            function ($args) use ($configs) {
             return isset($configs[$args[0]]);
-        });
-        $this->globals->constant(Argument::any())->will(function ($args) use ($configs) {
+            }
+        );
+        $this->globals->constant(Argument::any())->will(
+            function ($args) use ($configs) {
             if (isset($configs[$args[0]])) {
                 return $configs[$args[0]];
             }
             return constant($args[0]);
-        });
+            }
+        );
     }
 }

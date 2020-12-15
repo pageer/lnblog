@@ -66,9 +66,9 @@ echo isset($_POST['entid'])?$_POST['entid']:'';?>" /></div>
 function entrystruct($text) {
     $arr = array();
     $arr['title'] = new xmlrpcval(date("r"), 'string');
-    $cats = array(new xmlrpcval('Test category','string'), 
-                  new xmlrpcval('Post-fu','string')); 
-    $arr['categories'] = new xmlrpcval($cats,'array');
+    $cats = array(new xmlrpcval('Test category', 'string'), 
+                  new xmlrpcval('Post-fu', 'string')); 
+    $arr['categories'] = new xmlrpcval($cats, 'array');
     $arr['description'] = new xmlrpcval($text, 'string');
     return new xmlrpcval($arr, 'struct');
 }

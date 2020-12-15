@@ -33,17 +33,17 @@
 
 class RSS2Entry {
 
-    var $link;
-    var $title;
-    var $description;
-    var $author;
-    var $category;
-    var $pub_date;
-    var $comments;
-    var $comment_rss;
-    var $comment_count;
-    var $enclosure;
-    var $guid;
+    public $link;
+    public $title;
+    public $description;
+    public $author;
+    public $category;
+    public $pub_date;
+    public $comments;
+    public $comment_rss;
+    public $comment_count;
+    public $enclosure;
+    public $guid;
 
     function __construct($link="", $title="", $desc="", $comm="", $guid="",
                        $auth="", $cat="", $pdate="", $cmtrss="", $cmtcount="",
@@ -114,12 +114,12 @@ class RSS2Entry {
 
 class RSS2 {
 
-    var $url;
-    var $title;
-    var $description;
-    var $image;
-    var $entrylist;
-    var $link_stylesheet;
+    public $url;
+    public $title;
+    public $description;
+    public $image;
+    public $entrylist;
+    public $link_stylesheet;
 
     function __construct() {
         $this->url = "";
@@ -174,6 +174,7 @@ class RSS2 {
 class RSS2FeedGenerator extends Plugin {
 
     public $guid_is_permalink;
+    public $comment_file = '';
 
     public function __construct() {
         $this->plugin_desc = _("Create RSS 2.0 feeds for comments and blog entries.");

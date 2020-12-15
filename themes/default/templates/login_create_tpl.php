@@ -4,12 +4,18 @@
 <?php } ?>
 <form method="post" action="<?php echo $FORM_ACTION; ?>">
 <?php $this->outputCsrfField() ?>
-<?php if (isset($UNAME)) { ?>
+<?php if (isset($UNAME)): ?>
 <div>
 <label for="<?php echo $UNAME; ?>"><?php p_('Username'); ?></label>
-<input type="text" id="<?php echo $UNAME; ?>" name="<?php echo $UNAME; ?>" <?php if (isset($UNAME_VALUE)) { echo 'value="'.$UNAME_VALUE.'" '; } if (isset($DISABLE_UNAME)) { echo 'readonly="readonly" style="background-color: #E0E0E0;"'; } ?> />
+<input type="text" id="<?php echo $UNAME; ?>" name="<?php echo $UNAME; ?>" 
+<?php if (isset($UNAME_VALUE)):
+    echo 'value="'.$UNAME_VALUE.'" '; 
+endif;
+if (isset($DISABLE_UNAME)):
+    echo 'readonly="readonly" style="background-color: #E0E0E0;"'; 
+endif; ?> />
 </div>
-<?php } ?>
+<?php endif; ?>
 <div>
 <label for="passwd"><?php p_('Password'); ?></label>
 <input type="password" id="passwd" name="passwd" <?php if (isset($PWD_VALUE)) echo 'value="'.$PWD_VALUE.'" '; ?>/>

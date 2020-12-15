@@ -2,7 +2,8 @@
 
 use Prophecy\Argument;
 
-class FileManagerTest extends \PHPUnit\Framework\TestCase {
+class FileManagerTest extends \PHPUnit\Framework\TestCase
+{
 
     public function testGetAll_WhenEntryContainsJpegs_ReturnsOnlyAttachedFiles() {
         $entry = $this->createBlogEntry(['test.jpg']);
@@ -17,17 +18,20 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase {
 
     public function testGetAll_WhenBlogContainsJpegs_ReturnsOnlyAttachedFiles() {
         $blog = $this->prophet->prophesize('Blog');
-        $blog->getManagedFiles()->willReturn([
+        $blog->getManagedFiles()->willReturn(
+            [
             'index.php',
             'pathconfig.php',
             'blogdata.ini',
             'ip_ban.txt',
             're_ban.txt',
             'plugins.xml',
-        ]);
+            ]
+        );
         $mock_blog = $blog->reveal();
         $mock_blog->home_path = './blog';
-        $this->fs->scandir('./blog')->willReturn([
+        $this->fs->scandir('./blog')->willReturn(
+            [
             '.',
             '..',
             'index.php',
@@ -42,7 +46,8 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase {
             'drafts',
             'entries',
             'feeds',
-        ]);
+            ]
+        );
         $this->fs->is_file('./blog/index.php')->willReturn(true);
         $this->fs->is_file('./blog/pathconfig.php')->willReturn(true);
         $this->fs->is_file('./blog/blogdata.ini')->willReturn(true);
@@ -198,13 +203,15 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase {
     }
 
     private function setUpEntryFileListing($path, $extra_files) {
-        $files = array_merge([
+        $files = array_merge(
+            [
             '.',
             '..',
             'index.php',
             'entry.xml',
             'comments',
-        ], $extra_files);
+            ], $extra_files
+        );
         $this->fs->scandir($path)->willReturn($files);
         $path = rtrim($path, '/');
         $this->fs->is_file("$path/index.php")->willReturn(true);

@@ -5,41 +5,41 @@ so you should use this only for changes that are particular to the calendar.
 */
 
 #calendar.panel {
-	padding: 0;
-	width: 100%;
+    padding: 0;
+    width: 100%;
 }
 
 #calendar table {
-	margin: 1% auto;
-	font-size: 80%;
-	width: 94%;
-	text-align: center;
+    margin: 1% auto;
+    font-size: 80%;
+    width: 94%;
+    text-align: center;
 }
 
 /* Underline dates that are links so that they stand out. */
 table.calendar td a {
-	text-decoration: underline;
+    text-decoration: underline;
 }
 
 /* Make the date the mouse is over white. */
 table.calendar td:hover {
-	background-color: white;
+    background-color: white;
 }
 
 p.calendar {
-	margin-top: 0.5em;
-	margin-bottom: 0.5em;
-	text-align: center;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    text-align: center;
 }
 
 .llink {
-	font-size: 80%;
-	margin-right: 3%;
+    font-size: 80%;
+    margin-right: 3%;
 }
 
 .rlink {
-	font-size: 80%;
-	margin-left: 3%;
+    font-size: 80%;
+    margin-left: 3%;
 }
 
 /* Set the color in which the current date should be highlighted. */

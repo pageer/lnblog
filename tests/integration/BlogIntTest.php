@@ -1,6 +1,7 @@
 <?php
 
-class BlogIntTest extends \PHPUnit\Framework\TestCase {
+class BlogIntTest extends \PHPUnit\Framework\TestCase
+{
 
     function testInsertDelete() {
 

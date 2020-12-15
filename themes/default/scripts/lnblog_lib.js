@@ -6,63 +6,64 @@
 // mechanism.
 var lnblog = {
 
-	addEvent : function (obj, type, fn){
-		if (obj.addEventListener){
-			obj.addEventListener(type, fn, false);
-		} else if (obj.attachEvent) {
-			obj.attachEvent("on"+type, fn);
-		} else {
-			obj["on"+type] = obj["e"+type+fn];
-		}
-	},
-	
-	getJSONObject: function (json) {
-		return eval(json);
-	},
-	
-	insertAtCursor: function (myField, myValue) {
-		//IE support
-		if (document.selection) {
-			myField.focus();
-			sel = document.selection.createRange();
-			sel.text = myValue;
-		}
-		//MOZILLA/NETSCAPE support
-		else if (myField.selectionStart || myField.selectionStart == '0') {
-			var startPos = myField.selectionStart;
-			var endPos = myField.selectionEnd;
-			myField.value = myField.value.substring(0, startPos) + 
-				myValue +
-				myField.value.substring(endPos, myField.value.length);
-		} else {
-			myField.value += myValue;
-		}
-		myField.focus();
-	},
+    addEvent : function (obj, type, fn){
+        if (obj.addEventListener){
+            obj.addEventListener(type, fn, false);
+        } else if (obj.attachEvent) {
+            obj.attachEvent("on"+type, fn);
+        } else {
+            obj["on"+type] = obj["e"+type+fn];
+        }
+    },
+    
+    getJSONObject: function (json) {
+        return eval(json);
+    },
+    
+    insertAtCursor: function (myField, myValue) {
+        //IE support
+        if (document.selection) {
+            myField.focus();
+            sel = document.selection.createRange();
+            sel.text = myValue;
+        }
+        //MOZILLA/NETSCAPE support
+        else if (myField.selectionStart || myField.selectionStart == '0') {
+            var startPos = myField.selectionStart;
+            var endPos = myField.selectionEnd;
+            myField.value = myField.value.substring(0, startPos) + 
+                myValue +
+                myField.value.substring(endPos, myField.value.length);
+        } else {
+            myField.value += myValue;
+        }
+        myField.focus();
+    },
 
-	getSelection: function (myField) {
-		var ret = false;
-		//IE support
-		if (document.selection) {
-			myField.focus();
-			sel = document.selection.createRange();
-			ret = sel.text;
-		}
-		//MOZILLA/NETSCAPE support
-		else if (myField.selectionStart || myField.selectionStart == '0') {
-			var startPos = myField.selectionStart;
-			var endPos = myField.selectionEnd;
-			ret = myField.value.substring(startPos, endPos);
-		} else {
-			ret = false;
-		}
-		return ret;
-	},
-	
+    getSelection: function (myField) {
+        var ret = false;
+        //IE support
+        if (document.selection) {
+            myField.focus();
+            sel = document.selection.createRange();
+            ret = sel.text;
+        }
+        //MOZILLA/NETSCAPE support
+        else if (myField.selectionStart || myField.selectionStart == '0') {
+            var startPos = myField.selectionStart;
+            var endPos = myField.selectionEnd;
+            ret = myField.value.substring(startPos, endPos);
+        } else {
+            ret = false;
+        }
+        return ret;
+    },
+    
 };
 
-lnblog.addEvent(window, 'load', function() {
-	if (typeof strings != 'undefined') {
+lnblog.addEvent(
+    window, 'load', function() {
+    if (typeof strings != 'undefined') {
         strings.get = function (string_id) {
             ret = this[string_id];
             for (var i = 1; i < arguments.length; i++) {
@@ -71,17 +72,24 @@ lnblog.addEvent(window, 'load', function() {
             return ret;
         };
     }
-});
+    }
+);
 
-$(document).ready(function () {
-    $('#responsive-menu a').on('click', function () {
+$(document).ready(
+    function () {
+    $('#responsive-menu a').on(
+        'click', function () {
         $('#sidebar').toggleClass('visible', true);
         $('#responsive-close').toggleClass('visible', true);
         $('#responsive-menu').toggleClass('hide', true);
-    });
-    $('#responsive-close a').on('click', function () {
+        }
+    );
+    $('#responsive-close a').on(
+        'click', function () {
         $('#sidebar').toggleClass('visible', false);
         $('#responsive-close').toggleClass('visible', false);
         $('#responsive-menu').toggleClass('hide', false);
-    });
-});
+        }
+    );
+    }
+);

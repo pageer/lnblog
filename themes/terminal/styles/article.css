@@ -1,44 +1,44 @@
 /* Styles for blog entries. */
 
 .article {
-	margin-bottom: 1%;
+    margin-bottom: 1%;
 }
 
 .articleheader h2 {
-	margin: 0px;
-	padding: 0px;
+    margin: 0px;
+    padding: 0px;
 }
 
 .articlefooter {
-	font-size: 80%;
+    font-size: 80%;
 }
 
 .articlefooter ul, .articleheader ul {
-	margin: 0px;
-	padding: 0px;
+    margin: 0px;
+    padding: 0px;
 }
 
 .articlefooter li, .articleheader li {
-	list-style-type: none;
+    list-style-type: none;
 }
 
 .blogadmin {
-	display: inline;
-	margin-right: 1%;
+    display: inline;
+    margin-right: 1%;
 }
 
 .article  div.articlebody {
-	padding: 1%;
+    padding: 1%;
 }
 
 @media screen {
 
-	#commentsubmit {
-		display: none;
-	}
+    #commentsubmit {
+        display: none;
+    }
 
-	.article {
-		page-break-inside: avoid;
-	}
+    .article {
+        page-break-inside: avoid;
+    }
 
 }

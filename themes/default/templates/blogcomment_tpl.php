@@ -8,7 +8,8 @@
 ?>
 
 <?php
-$this->block('blogcomment.subject', function ($vars) {
+$this->block(
+    'blogcomment.subject', function ($vars) {
     extract($vars, EXTR_OVERWRITE);
     if (isset($SUBJECT)): ?>
         <h3 class="comment header">
@@ -19,18 +20,22 @@ $this->block('blogcomment.subject', function ($vars) {
     <?php else: ?>
         <a id="<?php echo $ANCHOR ?>" href="#<?php echo $ANCHOR ?>"></a>
     <?php endif;
-});
+    }
+);
 
-$this->block('blogcomment.content', function ($vars) {
+$this->block(
+    'blogcomment.content', function ($vars) {
     extract($vars, EXTR_OVERWRITE);
     ?>
         <div class="comment data">
             <?php echo $BODY ?>
         </div>
     <?php
-});
+    }
+);
 
-$this->block('blogcomment.footer', function ($vars) {
+$this->block(
+    'blogcomment.footer', function ($vars) {
     extract($vars, EXTR_OVERWRITE);
     ?>
     <ul class="comment footer">
@@ -38,9 +43,11 @@ $this->block('blogcomment.footer', function ($vars) {
         <?php $this->showBlock('blogcomment.footer.controlbar'); ?>
     </ul>
     <?php
-});
+    }
+);
 
-$this->block('blogcomment.footer.postinfo', function ($vars) {
+$this->block(
+    'blogcomment.footer.postinfo', function ($vars) {
     extract($vars, EXTR_OVERWRITE);
     $name = $this->showBlock('blogcomment.footer.username');
     $link = $this->showBlock('blogcomment.footer.usernamelink');
@@ -55,14 +62,18 @@ $this->block('blogcomment.footer.postinfo', function ($vars) {
     }
     $show_url = $this->showBlock('blogcomment.footer.userurl');
     pf_("Posted by %s %s at %s", $show_name, $show_url, $DATE);
-});
+    }
+);
 
-$this->block('blogcomment.footer.username', function ($vars) {
+$this->block(
+    'blogcomment.footer.username', function ($vars) {
     extract($vars, EXTR_OVERWRITE);
     return isset($USER_ID) ? $USER_DISPLAY_NAME : $NAME;
-});
+    }
+);
 
-$this->block('blogcomment.footer.usernamelink', function ($vars) {
+$this->block(
+    'blogcomment.footer.usernamelink', function ($vars) {
     extract($vars, EXTR_OVERWRITE);
 
     $link = '';
@@ -78,9 +89,11 @@ $this->block('blogcomment.footer.usernamelink', function ($vars) {
         }
     }
     return $link;
-});
+    }
+);
 
-$this->block('blogcomment.footer.userurl', function ($vars) {
+$this->block(
+    'blogcomment.footer.userurl', function ($vars) {
     extract($vars, EXTR_OVERWRITE);
 
     $show_url = '';
@@ -90,9 +103,11 @@ $this->block('blogcomment.footer.userurl', function ($vars) {
         $show_url = "(<a href=\"$URL\">$URL</a>)";
     }
     return $show_url;
-});
+    }
+);
 
-$this->block('blogcomment.footer.controlbar', function ($vars) {
+$this->block(
+    'blogcomment.footer.controlbar', function ($vars) {
     extract($vars, EXTR_OVERWRITE);
     # Show the administrative links.
     if ($SHOW_CONTROLS): ?>
@@ -105,10 +120,13 @@ $this->block('blogcomment.footer.controlbar', function ($vars) {
         </li>
     <?php
     endif;
-});
+    }
+);
 
-$this->block('main', function ($vars) {
+$this->block(
+    'main', function ($vars) {
     $this->showBlock('blogcomment.subject');
     $this->showBlock('blogcomment.content');
     $this->showBlock('blogcomment.footer');
-});
+    }
+);

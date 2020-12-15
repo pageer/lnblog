@@ -10,10 +10,10 @@
     }
 </style>
 <h2><?php p_("Plugin Loading Configuration"); ?></h2>
-<?php if (isset($UPDATE_MESSAGE)) { ?>
+<?php if (isset($UPDATE_MESSAGE)): ?>
 <p><strong><?php echo $UPDATE_MESSAGE; ?></strong></p>
-<?php } ?>
-<form method="post" action="<?php echo current_file();?>">
+<?php endif; ?>
+<form method="post" action="<?php echo current_file() ?>">
 <?php $this->outputCsrfField() ?>
 <table id="plugin-loading-list">
     <thead>
@@ -42,7 +42,9 @@
         <td>
             <input type="checkbox" name="<?php echo $file."_en"?>"
                 id="<?php echo $file."_en";?>"
-                <?php if ($val["enabled"]) { ?>checked="checked"<?php } ?> />
+                <?php if ($val["enabled"]): ?>
+                    checked="checked"
+                <?php endif; ?> />
         </td>
     </tr>
     <?php endforeach; ?>

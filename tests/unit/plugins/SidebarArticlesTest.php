@@ -2,7 +2,8 @@
 
 require_once __DIR__ . "/../../../plugins/sidebar_articles.php";
 
-class SidebarArticlesTest extends \PHPUnit\Framework\TestCase {
+class SidebarArticlesTest extends \PHPUnit\Framework\TestCase
+{
 
     private $blog;
     private $user;
@@ -127,10 +128,12 @@ class SidebarArticlesTest extends \PHPUnit\Framework\TestCase {
         $list = [
             ['link' => './content/test1', 'title' => 'Test1'],
         ];
-        $file_content = implode("\n", [
+        $file_content = implode(
+            "\n", [
             '<a href="http://foo.com">Foo</a>',
             '<a href="http://bar.com">Bar</a>',
-        ]);
+            ]
+        );
         $this->blog->isBlog()->willReturn(true);
         $this->blog->uri('articles')->willReturn('./content/');
         $this->blog->uri('editfile', ['file' => 'links.htm'])->willReturn('?editfile=links.htm');
@@ -274,9 +277,11 @@ class SidebarArticlesTest extends \PHPUnit\Framework\TestCase {
 
     private function htmlToLines($output) {
         $lines = explode("\n", trim($output));
-        return array_map(function ($line) {
+        return array_map(
+            function ($line) {
             return trim($line);
-        }, $lines);
+            }, $lines
+        );
     }
 
     private function createArticle($path, $sticky_title = '') {

@@ -4,7 +4,8 @@ use LnBlog\Tasks\AutoPublishTask;
 use LnBlog\Tasks\Task;
 use LnBlog\Tasks\TaskRepository;
 
-class TaskRepositoryTest extends \PHPUnit\Framework\TestCase {
+class TaskRepositoryTest extends \PHPUnit\Framework\TestCase
+{
 
     private $fs;
     private $prophet;
@@ -14,13 +15,15 @@ class TaskRepositoryTest extends \PHPUnit\Framework\TestCase {
         $task = $this->createTestTask($run_at, ['test' => 123]);
         $this->fs->file_exists('./userdata/pending-tasks.json')->willReturn(false);
 
-        $expected_data = json_encode([
+        $expected_data = json_encode(
+            [
             [
                 'class' => get_class($task),
                 'runAt' => $run_at->format(DateTimeInterface::ATOM),
                 'data' => ['test' => 123],
             ],
-        ]);
+            ]
+        );
         $this->fs->write_file('./userdata/pending-tasks.json', $expected_data)
              ->willReturn(true)
              ->shouldBeCalled();
@@ -82,13 +85,15 @@ class TaskRepositoryTest extends \PHPUnit\Framework\TestCase {
         $this->configureForCurrentQueue([]);
         $task = $this->createTestTask($run_at, ['test' => 123]);
 
-        $expected_data = json_encode([
+        $expected_data = json_encode(
+            [
             [
                 'class' => get_class($task),
                 'runAt' => $run_at->format(DateTimeInterface::ATOM),
                 'data' => ['test' => 123],
             ]
-        ]);
+            ]
+        );
         $this->fs->write_file('./userdata/pending-tasks.json', $expected_data)
              ->willReturn(false)
              ->shouldBeCalled();
@@ -116,13 +121,15 @@ class TaskRepositoryTest extends \PHPUnit\Framework\TestCase {
         ];
         $this->configureForCurrentQueue($current_queue);
 
-        $expected_data = json_encode([
+        $expected_data = json_encode(
+            [
             [
                 'class' => 'SomeClass',
                 'runAt' => '2006-07-08T18:19:00+04:00',
                 'data' => null,
             ],
-        ]);
+            ]
+        );
         $this->fs->write_file('./userdata/pending-tasks.json', $expected_data)
              ->willReturn(true)
              ->shouldBeCalled();
@@ -163,13 +170,15 @@ class TaskRepositoryTest extends \PHPUnit\Framework\TestCase {
         ];
         $this->configureForCurrentQueue($current_queue);
 
-        $expected_data = json_encode([
+        $expected_data = json_encode(
+            [
             [
                 'class' => 'SomeClass',
                 'runAt' => '2006-07-08T18:19:00+04:00',
                 'data' => null,
             ],
-        ]);
+            ]
+        );
         $this->fs->write_file('./userdata/pending-tasks.json', $expected_data)
              ->willReturn(false)
              ->shouldBeCalled();

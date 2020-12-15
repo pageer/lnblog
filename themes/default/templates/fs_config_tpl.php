@@ -23,22 +23,22 @@
 <div class="inputbox">
 <label for="installroot"><?php pf_("%s root directory", PACKAGE_NAME); ?></label>
 <br>
-<input type="text" name="installroot" id="installroot" <?php if (isset($INSTALL_ROOT)) { echo 'value="'.$INSTALL_ROOT.'"'; } ?> />
+<input type="text" name="installroot" id="installroot" <?php echo isset($INSTALL_ROOT) ? 'value="'.$INSTALL_ROOT.'"' : ''?> />
 </div>
 <div class="inputbox">
 <label for="installrooturl"><?php pf_("%s URL", PACKAGE_NAME); ?></label>
 <br>
-<input type="text" name="installrooturl" id="installrooturl" <?php if (isset($INSTALL_ROOT_URL)) { echo 'value="'.$INSTALL_ROOT_URL.'"'; } ?> />
+<input type="text" name="installrooturl" id="installrooturl" <?php echo isset($INSTALL_ROOT_URL) ?  'value="'.$INSTALL_ROOT_URL.'"' : '' ?> />
 </div>
 <div class="inputbox">
 <label for="userdata"><?php p_("Userdata directory"); ?></label>
 <br>
-<input type="text" name="userdata" id="userdata" <?php if (isset($USERDATA)) { echo 'value="'.$USERDATA.'"'; } ?> />
+<input type="text" name="userdata" id="userdata" <?php if echo isset($USERDATA) ? 'value="'.$USERDATA.'"' : '' ?> />
 </div>
 <div class="inputbox">
 <label for="userdata"><?php p_("Userdata URL"); ?></label>
 <br>
-<input type="text" name="userdataurl" id="userdataurl" <?php if (isset($USERDATA_URL)) { echo 'value="'.$USERDATA_URL.'"'; } ?> />
+<input type="text" name="userdataurl" id="userdataurl" <?php echo isset($USERDATA_URL) ? 'value="'.$USERDATA_URL.'"' : '' ?> />
 </div>
 </fieldset>
 <div>

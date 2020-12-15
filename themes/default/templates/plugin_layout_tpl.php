@@ -12,4 +12,4 @@
 <div class="panel">
 <?php echo $PLUGIN_MARKUP;?>
 </div>
-<?php } ?>
+<?php } 

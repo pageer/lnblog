@@ -57,7 +57,7 @@ class SimpleXMLWriter
             if (! is_numeric($key)) $currtag = $key;
             else $currtag = $newtag;
             if (is_array($val)) {
-                $ret .= SimpleXMLWriter::serializeArray($val, $currtag);
+                $ret .= self::serializeArray($val, $currtag);
             } else {
                 $ret .= "<$currtag>".htmlspecialchars($val)."</$currtag>\n";
             }
@@ -76,7 +76,7 @@ class SimpleXMLWriter
                 } elseif (is_int($value)) {
                     $ret .= "<$field type=\"int\">$value</$field>\n";
                 } elseif (is_array($value)) {
-                    $ret .= SimpleXMLWriter::serializeArray($value, $field);
+                    $ret .= self::serializeArray($value, $field);
                 } elseif (in_array($field, $this->cdata_list)) {
                     $ret .="<$field><![CDATA[$value]]></$field>\n";
                 } else {

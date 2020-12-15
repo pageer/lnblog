@@ -6,7 +6,8 @@ require_once __DIR__.'/../../../vendor/phpxmlrpc/phpxmlrpc/lib/xmlrpc_wrappers.i
 
 use Prophecy\Argument;
 
-class SocialWebNotificationTest extends PublisherTestBase {
+class SocialWebNotificationTest extends PublisherTestBase
+{
 
     public function testPublishEntry_WhenTextHasLinksAndSendPingbacks_SendsPingbacks() {
         $entry = $this->setUpDraftEntryForSuccessfulNotification("http://www.example.com/test");
@@ -210,13 +211,15 @@ class SocialWebNotificationTest extends PublisherTestBase {
         $fs->realpath($entry->file)->willReturn($entry->file);
         $fs->is_dir(Argument::any())->willReturn(true);
         $fs->is_dir('./entries/2017/01/02_1234')->willReturn(false);
-        $fs->rename(Argument::any(), Argument::any())->will(function($args) use ($fs) {
+        $fs->rename(Argument::any(), Argument::any())->will(
+            function($args) use ($fs) {
             $fs->write_file(Argument::any(), Argument::any())->willReturn(true)->shouldBeCalled();
             $published_path = './entries/2017/01/02_1234/entry.xml';
             $fs->file_exists($published_path)->willReturn(true);
             $fs->realpath($published_path)->willReturn($published_path);
             return true;
-        })->shouldBeCalled();
+            }
+        )->shouldBeCalled();
         return $entry;
     }
 

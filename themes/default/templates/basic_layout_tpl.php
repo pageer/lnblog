@@ -18,7 +18,8 @@
 # The plugin_name string in the example above represents the name of the plugin
 # class.  This is the same name that appears in the plugin configuration dialog.
 
-$this->block('basiclayout.banner', function ($vars) {
+$this->block(
+    'basiclayout.banner', function ($vars) {
     extract($vars, EXTR_OVERWRITE); 
     ?>
     <body>
@@ -51,9 +52,11 @@ $this->block('basiclayout.banner', function ($vars) {
         EventRegister::instance()->activateEventFull($tmp=false, "banner", "OutputComplete");
         ?>
     </div><?php
-});
+    }
+);
 
-$this->block('basiclayout.menubar', function ($vars) {
+$this->block(
+    'basiclayout.menubar', function ($vars) {
     extract($vars, EXTR_OVERWRITE); 
     ?>
     <!-- A menu/navigation bar -->
@@ -64,18 +67,22 @@ $this->block('basiclayout.menubar', function ($vars) {
     EventRegister::instance()->activateEventFull($tmp=false, "menubar", "OutputComplete");
     ?>
     </div><?php
-});
+    }
+);
 
-$this->block('basiclayout.content', function ($vars) {
+$this->block(
+    'basiclayout.content', function ($vars) {
     extract($vars, EXTR_OVERWRITE); 
     ?>
     <!-- Main page content -->
     <div id="pagecontent">
         <?php echo $PAGE_CONTENT; ?>
     </div><?php
-});
+    }
+);
 
-$this->block('basiclayout.sidebar', function ($vars) {
+$this->block(
+    'basiclayout.sidebar', function ($vars) {
     extract($vars, EXTR_OVERWRITE); 
     ?>
         <!-- A sidebar -->
@@ -92,9 +99,11 @@ $this->block('basiclayout.sidebar', function ($vars) {
         EventRegister::instance()->activateEventFull($tmp=false, "sidebar", "OutputComplete");
         ?>
     </div><?php
-});
+    }
+);
 
-$this->block('main', function ($vars) {
+$this->block(
+    'main', function ($vars) {
     extract($vars, EXTR_OVERWRITE); 
     ?>
     <body>
@@ -105,4 +114,5 @@ $this->block('main', function ($vars) {
         $this->showBlock('basiclayout.sidebar');
     ?>
     </body><?php
-});
+    }
+);

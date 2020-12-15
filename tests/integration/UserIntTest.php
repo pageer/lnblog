@@ -1,6 +1,7 @@
 <?php
 
-class UserIntTest extends \PHPUnit\Framework\TestCase {
+class UserIntTest extends \PHPUnit\Framework\TestCase
+{
     private $created_users = [];
 
     public function test_When_Reading_Old_Password_Login_Succeeds() {

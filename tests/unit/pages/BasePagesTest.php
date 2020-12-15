@@ -1,6 +1,7 @@
 <?php
 
-class TestPages extends BasePages {
+class TestPages extends BasePages
+{
     public $action_map = array();
     public $method_called = '';
     public $whitelist = [];
@@ -27,7 +28,8 @@ class TestPages extends BasePages {
     }
 }
 
-class OtherTestPages extends TestPages {
+class OtherTestPages extends TestPages
+{
     public static $last_action;
     
     public function __call($name, $args) {
@@ -35,7 +37,8 @@ class OtherTestPages extends TestPages {
     }
 }
 
-class BasePagesTest extends PHPUnit\Framework\TestCase {
+class BasePagesTest extends PHPUnit\Framework\TestCase
+{
     
     private $page;
     private $page_mock;

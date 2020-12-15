@@ -3,34 +3,34 @@
 */
 
 a {
-	text-decoration: none;
+    text-decoration: none;
 }
 
-a:link {	
-	color: blue;
+a:link {    
+    color: blue;
 }
 
 a:visited {
-	color: #8B008B;
+    color: #8B008B;
 }
 
 a:hover {
-	text-decoration: underline;
-	color: red;
+    text-decoration: underline;
+    color: red;
 }
 
 q { 
-	font-style: italic; 
+    font-style: italic; 
 }
 
 
 
 @media print {
 
-	a:link,
-	a:visited {
-		color: black;
-		text-decoration: underline;
-	}
+    a:link,
+    a:visited {
+        color: black;
+        text-decoration: underline;
+    }
 
 }

@@ -1,42 +1,42 @@
 /* Styles for blog entries. */
 
 .article {
-	border-bottom: thin dotted black;
-	margin-bottom: 1%;
+    border-bottom: thin dotted black;
+    margin-bottom: 1%;
 }
 
 .articleheader h2, .articleheader ul, .articlefooter ul {
-	margin: 0px;
-	padding: 0px;
+    margin: 0px;
+    padding: 0px;
 }
 
 .articlefooter {
-	font-size: 80%;
+    font-size: 80%;
 }
 
 .articlefooter li, .articleheader li {
-	list-style-type: none;
+    list-style-type: none;
 }
 
 .blogadmin {
-	display: inline;
+    display: inline;
 }
 
 .article  .articlebody {
-	padding: 1%;
+    padding: 1%;
 }
 
 .articlebody {
-	border: 1px dotted black;
-	background-color: white;
+    border: 1px dotted black;
+    background-color: white;
 }
 
 @media print {
-	#commentsubmit {
-		display: none;
-	}
+    #commentsubmit {
+        display: none;
+    }
 
-	.article {
-		page-break-inside: avoid;
-	}
+    .article {
+        page-break-inside: avoid;
+    }
 }

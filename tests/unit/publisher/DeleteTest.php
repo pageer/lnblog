@@ -1,7 +1,8 @@
 <?php
 use Prophecy\Argument;
 
-class DeleteTest extends PublisherTestBase {
+class DeleteTest extends PublisherTestBase
+{
 
     public function testDelete_WhenEntryDoesNotExist_Throws() {
         $entry =  new BlogEntry(null, $this->fs->reveal());
@@ -53,14 +54,16 @@ class DeleteTest extends PublisherTestBase {
         $this->fs->read_file($link_path)->willReturn($path);
         $this->fs->read_file($old_link_path1)->willReturn($path);
         $this->fs->read_file($old_link_path2)->willReturn($other_path);
-        $this->fs->scandir('./entries/2017/03')->willReturn(array(
+        $this->fs->scandir('./entries/2017/03')->willReturn(
+            array(
             '.',
             '..',
             'Old_Stuff.php',
             'Other_Stuff.php',
             'Some_Stuff.php',
             '02_1234',
-        ));
+            )
+        );
 
         $this->fs->delete($link_path)->shouldBeCalled();
         $this->fs->delete($old_link_path1)->shouldBeCalled();

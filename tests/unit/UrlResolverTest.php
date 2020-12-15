@@ -2,7 +2,8 @@
 
 use Prophecy\Argument;
 
-class UrlResolverTest extends \PHPUnit\Framework\TestCase {
+class UrlResolverTest extends \PHPUnit\Framework\TestCase
+{
 
     private $blogs;
     private $userdata;

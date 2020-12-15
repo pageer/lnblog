@@ -1,4 +1,5 @@
 <?php
+
 # File: blogconfig.php
 # Holds basic configuration constants that are required by all pages.
 # Some of these constants can be over-ridden in either the
@@ -132,7 +133,7 @@ define("FS_PLUGIN_CONFIG", "fsconfig.php");
 
 # Check for the file's existence first, because it turns out this is
 # actually faster when the file doesn't exist.
-$USER_CONFIG_PATH = Path::mk(INSTALL_ROOT,USER_DATA,"userconfig.php");
+$USER_CONFIG_PATH = Path::mk(INSTALL_ROOT, USER_DATA, "userconfig.php");
 if (file_exists($USER_CONFIG_PATH)) {
     include $USER_CONFIG_PATH;
 }
@@ -429,14 +430,14 @@ define("FILE_UPLOAD_TARGET_DIRECTORIES", "files");
 
 # Constant: LOGIN_IP_LOCK
 # Lock logins to the current IP address, so that the user will be
-# logged out if the IP changes.  If false, then logins will be 
+# logged out if the IP changes.  If false, then logins will be
 # locked to the user agent instead.
 #
 # *Default* is false.
 @define("LOGIN_IP_LOCK", false);
 
 # Constant: FORCE_HTTPS_LOGIN
-# Force all logins to go through HTTPS.  Non-https attempts will 
+# Force all logins to go through HTTPS.  Non-https attempts will
 # be redirected and/or rejected.
 #
 # Note that this is not yet fully implemented.
