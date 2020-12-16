@@ -73,7 +73,7 @@ function SERVER($key, $val="") {
 function COOKIE($key, $val="") {
     if ($val) return $_COOKIE[$key] = $val;
     elseif (isset($_COOKIE[$key])) {
-        else return $_COOKIE[$key];
+        return $_COOKIE[$key];
     } else return false;
 }
 
@@ -89,7 +89,7 @@ function COOKIE($key, $val="") {
 function POST($key, $val="") {
     if ($val) return $_POST[$key] = $val;
     elseif (isset($_POST[$key])) {
-        else return $_POST[$key];
+        return $_POST[$key];
     } else return false;
 }
 
@@ -105,7 +105,7 @@ function POST($key, $val="") {
 function GET($key, $val="") {
     if ($val) return $_GET[$key] = $val;
     elseif (isset($_GET[$key])) {
-        else return $_GET[$key];
+        return $_GET[$key];
     } else return false;
 }
 
