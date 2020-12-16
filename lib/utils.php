@@ -73,7 +73,6 @@ function SERVER($key, $val="") {
 function COOKIE($key, $val="") {
     if ($val) return $_COOKIE[$key] = $val;
     elseif (isset($_COOKIE[$key])) {
-        if (function_exists('magic_quotes_gpc') && get_magic_quotes_gpc()) return stripslashes($_COOKIE[$key]);
         else return $_COOKIE[$key];
     } else return false;
 }
@@ -90,7 +89,6 @@ function COOKIE($key, $val="") {
 function POST($key, $val="") {
     if ($val) return $_POST[$key] = $val;
     elseif (isset($_POST[$key])) {
-        if (function_exists('magic_quotes_gpc') && get_magic_quotes_gpc()) return stripslashes($_POST[$key]);
         else return $_POST[$key];
     } else return false;
 }
@@ -107,7 +105,6 @@ function POST($key, $val="") {
 function GET($key, $val="") {
     if ($val) return $_GET[$key] = $val;
     elseif (isset($_GET[$key])) {
-        if (function_exists('magic_quotes_gpc') && get_magic_quotes_gpc()) return stripslashes($_GET[$key]);
         else return $_GET[$key];
     } else return false;
 }
