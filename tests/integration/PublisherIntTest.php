@@ -26,7 +26,7 @@ class PublisherIntTest extends \PHPUnit\Framework\TestCase
     public function testCreateDraftEntry($publisher) {
         $entry = new BlogEntry();
         $entry->subject = "Some Stuff";
-        $entry->body = "This is some stuff, I guess.";
+        $entry->data = "This is some stuff, I guess.";
 
         $entry_path = self::TESTPATH . "/drafts/02_0345";
         $publisher->createDraft($entry, new DateTime("2017-01-02 03:45:00"));
@@ -34,7 +34,7 @@ class PublisherIntTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue(file_exists($entry_path."/entry.xml"));
         $this->assertEquals("Some Stuff", $draft->subject);
-        $this->assertEquals("This is some stuff, I guess.", $draft->body);
+        $this->assertEquals("This is some stuff, I guess.", $draft->data);
         $this->assertEquals("testuser", $draft->uid);
 
         return $publisher;
@@ -55,7 +55,7 @@ class PublisherIntTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue(file_exists(self::TESTPATH."/entries/2017/03/some-stuff.php"));
         $this->assertFalse(file_exists($draft_path."/entry.xml"));
         $this->assertEquals("Some Stuff", $published_entry->subject);
-        $this->assertEquals("This is some stuff, I guess.", $published_entry->body);
+        $this->assertEquals("This is some stuff, I guess.", $published_entry->data);
         $this->assertEquals("testuser", $published_entry->uid);
 
         return array($publisher, $entry);
@@ -76,7 +76,7 @@ class PublisherIntTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(file_exists(self::TESTPATH."/entries/2017/03/some-stuff.php"));
         $this->assertTrue(file_exists($draft_path."/entry.xml"));
         $this->assertEquals("Some Stuff", $draft->subject);
-        $this->assertEquals("This is some stuff, I guess.", $draft->body);
+        $this->assertEquals("This is some stuff, I guess.", $draft->data);
         $this->assertEquals("testuser", $draft->uid);
 
         return array($publisher, $draft);
@@ -101,7 +101,7 @@ class PublisherIntTest extends \PHPUnit\Framework\TestCase
     public function testPublishEntryFromNothing_CreatesFileAndPermalink($publisher) {
         $entry = new BlogEntry();
         $entry->subject = "Some Published Stuff";
-        $entry->body = "This is some published stuff.";
+        $entry->data = "This is some published stuff.";
 
         $entry_path = self::TESTPATH . "/entries/2017/02/03_0345";
         $publisher->publishEntry($entry, new DateTime("2017-02-03 03:45:00"));
@@ -110,7 +110,7 @@ class PublisherIntTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue(file_exists($entry_path."/entry.xml"));
         $this->assertTrue(file_exists(self::TESTPATH."/entries/2017/02/some-published-stuff.php"));
         $this->assertEquals("Some Published Stuff", $published_entry->subject);
-        $this->assertEquals("This is some published stuff.", $published_entry->body);
+        $this->assertEquals("This is some published stuff.", $published_entry->data);
         $this->assertEquals("testuser", $published_entry->uid);
 
         return array($publisher, $published_entry);
@@ -124,14 +124,14 @@ class PublisherIntTest extends \PHPUnit\Framework\TestCase
         $entry_path = self::TESTPATH . "/entries/2017/02/03_0345";
 
         $entry->subject = "I Have a Thing";
-        $entry->body = "Do some stuff.";
+        $entry->data = "Do some stuff.";
         $publisher->update($entry);
         $updated_entry = new BlogEntry($entry_path, NewFS());
 
         $this->assertTrue(file_exists(self::TESTPATH."/entries/2017/02/i-have-a-thing.php"));
         $this->assertTrue(file_exists(self::TESTPATH."/entries/2017/02/some-published-stuff.php"));
         $this->assertEquals("I Have a Thing", $updated_entry->subject);
-        $this->assertEquals("Do some stuff.", $updated_entry->body);
+        $this->assertEquals("Do some stuff.", $updated_entry->data);
 
         return array($publisher, $updated_entry);
     }
@@ -155,7 +155,7 @@ class PublisherIntTest extends \PHPUnit\Framework\TestCase
     public function testPublishArticle_CreatesFile($publisher) {
         $entry = new BlogEntry();
         $entry->subject = "Some Published Stuff";
-        $entry->body = "This is some published stuff.";
+        $entry->data = "This is some published stuff.";
 
         $entry_path = self::TESTPATH . "/content/some_published_stuff";
         $publisher->publishArticle($entry, new DateTime("2017-02-03 03:45:00"));
@@ -163,7 +163,7 @@ class PublisherIntTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue(file_exists($entry_path."/entry.xml"));
         $this->assertEquals("Some Published Stuff", $published_entry->subject);
-        $this->assertEquals("This is some published stuff.", $published_entry->body);
+        $this->assertEquals("This is some published stuff.", $published_entry->data);
         $this->assertEquals("testuser", $published_entry->uid);
 
         return array($publisher, $published_entry);
@@ -183,7 +183,7 @@ class PublisherIntTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(file_exists($article_path."/entry.xml"));
         $this->assertTrue(file_exists($draft_path."/entry.xml"));
         $this->assertEquals("Some Published Stuff", $draft->subject);
-        $this->assertEquals("This is some published stuff.", $draft->body);
+        $this->assertEquals("This is some published stuff.", $draft->data);
     }
 
     /**
@@ -192,7 +192,7 @@ class PublisherIntTest extends \PHPUnit\Framework\TestCase
     public function testPublishArticleFromDraft_UsesArticlePath($publisher) {
         $entry = new BlogEntry();
         $entry->subject = "Some Published Stuff";
-        $entry->body = "This is some published stuff.";
+        $entry->data = "This is some published stuff.";
         $entry->article_path = "some_path";
         $article_path = self::TESTPATH . "/content/some_path";
 

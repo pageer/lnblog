@@ -13,14 +13,17 @@
 # This is free for public use and is probably much faster than your server anyway, so it will be the right
 # choice for most people.
 
-class TinyMCEEditor extends Plugin {
+class TinyMCEEditor extends Plugin
+{
+    public $theme;
 
     protected $file_extensions = array('htm', 'html');
 
     public function __construct() {
         $this->plugin_desc = _("Use TinyMCE for the post editor and file editor.");
         $this->plugin_version = "0.3.0";
-        $this->addOption("theme", _("TinyMCE theme to use"), "advanced", "select",
+        $this->addOption(
+            "theme", _("TinyMCE theme to use"), "advanced", "select",
             array("basic" => _("Basic"), "advanced" => _("Advanced"))
         );
         parent::__construct();

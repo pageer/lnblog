@@ -8,25 +8,41 @@
 # This plugin also provides LINK elements in the page HEAD for the RSS feeds.
 # This also applies to both entry feeds and per-entry comment feeds.
 
-class News extends Plugin {
+class News extends Plugin
+{
+    public $header;
+    public $std_icons;
+    public $feed_url;
+    public $feed_link_text;
+    public $extra_markup;
 
     function __construct($do_output=0) {
         $this->plugin_desc = _("List the RSS feeds for the current page.");
         $this->plugin_version = "0.3.1";
-        $this->addOption("header",
+        $this->addOption(
+            "header",
             _("Sidebar section heading"),
-            _("News Feeds"));
-        $this->addOption("std_icons", _("Use standard RSS icons for feeds"),
-            true, "checkbox");
-        $this->addOption("feed_url",
-                         _("External URL for main feed (e.g. through FeedBurner)"),
-                         '', 'text');
-        $this->addOption("feed_link_text",
-                         _("External feed link text"),
-                         'Subscribe to RSS feed', 'text');
-        $this->addOption("extra_markup",
-                         _("Extra HTML markup (e.g. for FeedBurner widgets)"),
-                         '', 'textarea');
+            _("News Feeds")
+        );
+        $this->addOption(
+            "std_icons", _("Use standard RSS icons for feeds"),
+            true, "checkbox"
+        );
+        $this->addOption(
+            "feed_url",
+            _("External URL for main feed (e.g. through FeedBurner)"),
+            '', 'text'
+        );
+        $this->addOption(
+            "feed_link_text",
+            _("External feed link text"),
+            'Subscribe to RSS feed', 'text'
+        );
+        $this->addOption(
+            "extra_markup",
+            _("Extra HTML markup (e.g. for FeedBurner widgets)"),
+            '', 'textarea'
+        );
 
         $this->addNoEventOption();
 
@@ -51,18 +67,22 @@ class News extends Plugin {
         $show_rss2 = PluginManager::instance()->pluginLoaded('RSS2FeedGenerator');
 
         $rss1_file = PluginManager::instance()->plugin_config->value(
-            "rss1feedgenerator", "feed_file", "news.rdf");
+            "rss1feedgenerator", "feed_file", "news.rdf"
+        );
         $rss2_file = PluginManager::instance()->plugin_config->value(
-            "rss2feedgenerator", "feed_file", "news.xml");
-        $blog_feeds = BLOG_ROOT.PATH_DELIM.BLOG_FEED_PATH.PATH_DELIM;
+            "rss2feedgenerator", "feed_file", "news.xml"
+        );
+        $blog_feeds = $blg->home_path.PATH_DELIM.BLOG_FEED_PATH.PATH_DELIM;
         $blog_feeds_url = $blg->uri('base').BLOG_FEED_PATH."/";
 
         $rss1_comments = PluginManager::instance()->plugin_config->value(
-            "rss1feedgenerator", "comment_file", "comments.rdf");
+            "rss1feedgenerator", "comment_file", "comments.rdf"
+        );
         $rss2_comments = PluginManager::instance()->plugin_config->value(
-            "rss2feedgenerator", "comment_file", "comments.xml");
+            "rss2feedgenerator", "comment_file", "comments.xml"
+        );
         $entry_feeds = $ent->isEntry() ?
-                       Path::mk($ent->localpath(),ENTRY_COMMENT_DIR) :
+                       Path::mk($ent->localpath(), ENTRY_COMMENT_DIR) :
                        '';
         $entry_feeds_url = $ent->commentlink();
 
@@ -80,22 +100,22 @@ class News extends Plugin {
         # Elements are path, url, RSS version, and "is comment feed".
         if (! $this->feed_url) {
             if ($show_rss2) {
-                $feeds[] = array(Path::mk($blog_feeds,$rss2_file),
+                $feeds[] = array(Path::mk($blog_feeds, $rss2_file),
                                         $blog_feeds_url.$rss2_file, 2, false);
             }
             if ($show_rss1) {
-                $feeds[] = array(Path::mk($blog_feeds,$rss1_file),
+                $feeds[] = array(Path::mk($blog_feeds, $rss1_file),
                                         $blog_feeds_url.$rss1_file, 1, false);
             }
         } else {
             $feeds[] = array(false, $this->feed_url, 0, false);
         }
         if ($show_rss2) {
-            $feeds[] = array(Path::mk($entry_feeds,$rss2_comments),
+            $feeds[] = array(Path::mk($entry_feeds, $rss2_comments),
                                     $entry_feeds_url.$rss2_comments, 2, true);
         }
         if ($show_rss1) {
-            $feeds[] = array(Path::mk($entry_feeds,$rss1_comments),
+            $feeds[] = array(Path::mk($entry_feeds, $rss1_comments),
                                     $entry_feeds_url.$rss2_comments, 1, true);
         }
 
@@ -125,6 +145,7 @@ class News extends Plugin {
     }  # End function
 
     function get_link_title($ver, $is_comment) {
+        $title = '';
         if ($ver == 1 && $is_comment) $title = _("RSS 1.0 comment feed - links only");
         elseif ($ver == 2 && $is_comment) $title = _("RSS 2.0 comment feed - full comments");
         elseif ($ver == 1 && ! $is_comment) $title = _("RSS 1.0 blog entry feed - links only");
@@ -133,6 +154,7 @@ class News extends Plugin {
     }
 
     function get_link_text($ver, $is_comment) {
+        $text = '';
         if ($this->std_icons) {
             if ($ver == 1 && $is_comment) $text = _("Comment headlines");
             elseif ($ver == 2 && $is_comment) $text = _("Comment text");
@@ -145,6 +167,7 @@ class News extends Plugin {
     }
 
     function get_link_icon($ver, $is_comment) {
+        $icon = '';
         if ($this->std_icons) {
             if ($ver == 1) $icon = getlink("rdf_feed.png", LINK_IMAGE);
             elseif ($ver == 2) $icon = getlink("xml_feed.png", LINK_IMAGE);
@@ -158,14 +181,18 @@ class News extends Plugin {
     }
 
     function link_markup($href, $feed_type, $img, $title, $text=false) {
+        $type = '';
         switch($feed_type) {
             case 'xml':
             case 'rss':
-                $type = 'applicaiton/rss+xml'; break;
+                $type = 'applicaiton/rss+xml'; 
+                break;
             case 'rdf':
-                $type = 'applicaiton/xml'; break;
+                $type = 'applicaiton/xml'; 
+                break;
             case 'atom':
-                $type = 'applicaiton/atom+xml'; break;
+                $type = 'applicaiton/atom+xml'; 
+                break;
         }
         $link = '<a href="'.$href.'" type="'.$type.'">'.
                 ($text ? $text." " : '').
@@ -184,32 +211,40 @@ class News extends Plugin {
 
         $param = Page::instance();
         $rss1_file = PluginManager::instance()->plugin_config->value(
-            "rss1feedgenerator", "feed_file", "news.rdf");
+            "rss1feedgenerator", "feed_file", "news.rdf"
+        );
         $rss1_comments = PluginManager::instance()->plugin_config->value(
-            "rss1feedgenerator", "comment_file", "comments.rdf");
+            "rss1feedgenerator", "comment_file", "comments.rdf"
+        );
         $rss2_file = PluginManager::instance()->plugin_config->value(
-            "rss2feedgenerator", "feed_file", "news.xml");
+            "rss2feedgenerator", "feed_file", "news.xml"
+        );
         $rss2_comments = PluginManager::instance()->plugin_config->value(
-            "rss2feedgenerator", "comment_file", "comments.xml");
+            "rss2feedgenerator", "comment_file", "comments.xml"
+        );
 
         $obj_type = strtolower(get_class($param->display_object));
         if ($obj_type == 'blogentry' || $obj_type == 'article') {
             # RSS 2 comments
-            $base_path = Path::mk($param->display_object->localpath(),ENTRY_COMMENT_DIR);
+            $base_path = Path::mk($param->display_object->localpath(), ENTRY_COMMENT_DIR);
             $rss2_comments_file = Path::mk($base_path, $rss2_comments);
             $rss1_comments_file = Path::mk($base_path, $rss1_comments);
 
             if ($show_rss2 && file_exists($rss2_comments_file) ) {
-                $param->addRSSFeed($param->display_object->uri('base').
+                $param->addRSSFeed(
+                    $param->display_object->uri('base').
                                    ENTRY_COMMENT_DIR."/".$rss2_comments,
-                                   "application/rss+xml", _("Comments - RSS 2.0"));
+                    "application/rss+xml", _("Comments - RSS 2.0")
+                );
             }
 
             # RSS 1 comments
             if ($show_rss1 && file_exists($rss1_comments_file) ) {
-                $param->addRSSFeed($param->display_object->uri('base').
+                $param->addRSSFeed(
+                    $param->display_object->uri('base').
                                    ENTRY_COMMENT_DIR."/".$rss1_comments,
-                                   "application/xml", _("Comments - RSS 1.0"));
+                    "application/xml", _("Comments - RSS 1.0")
+                );
             }
         }
 
@@ -225,19 +260,27 @@ class News extends Plugin {
 
             if (! $this->feed_url) {
                 # RSS2 entries
-                if ($show_rss2 && file_exists($obj->home_path.PATH_DELIM.
-                                BLOG_FEED_PATH.PATH_DELIM.$rss2_file) ) {
-                    $param->addRSSFeed($obj->getURL().
+                if ($show_rss2 && file_exists(
+                    $obj->home_path.PATH_DELIM.
+                    BLOG_FEED_PATH.PATH_DELIM.$rss2_file
+                ) ) {
+                    $param->addRSSFeed(
+                        $obj->getURL().
                                     BLOG_FEED_PATH."/".$rss2_file,
-                                    "application/rss+xml", _("Entries - RSS 2.0"));
+                        "application/rss+xml", _("Entries - RSS 2.0")
+                    );
                 }
 
                 # RSS1 entries
-                if ($show_rss1 && file_exists($obj->home_path.PATH_DELIM.
-                                BLOG_FEED_PATH.PATH_DELIM.$rss1_file) ) {
-                    $param->addRSSFeed($obj->getURL().
+                if ($show_rss1 && file_exists(
+                    $obj->home_path.PATH_DELIM.
+                    BLOG_FEED_PATH.PATH_DELIM.$rss1_file
+                ) ) {
+                    $param->addRSSFeed(
+                        $obj->getURL().
                                     BLOG_FEED_PATH."/".$rss1_file,
-                                    "application/xml", _("Entries - RSS 1.0"));
+                        "application/xml", _("Entries - RSS 1.0")
+                    );
                 }
             } else {
                 $param->addRSSFeed($this->feed_url, "application/rss+xml", _("RSS feed"));

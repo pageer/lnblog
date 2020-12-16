@@ -4,6 +4,18 @@ use Prophecy\Argument;
 
 class WebPagesTest extends \PHPUnit\Framework\TestCase
 {
+    protected $prophet;
+    protected $entry;
+    protected $blog;
+    protected $user;
+    protected $page;
+    protected $webpage;
+    protected $system;
+    protected $publisher;
+    protected $sys_ini;
+    protected $social_server;
+    protected $global_functions;
+    protected $mapper;
 
     public function testEditEntry_WhenEmptyPostAndNotLoggedIn_Shows403Error() {
         $this->entry->isEntry()->willReturn(true);
@@ -784,6 +796,7 @@ class TestableWebPages extends WebPages
     public $test_page = null;
     public $test_publisher = null;
     public $test_global_functions = null;
+    public $test_social_server = null;
     public $users = [];
 
     protected function getUserByName($username) {

@@ -6,7 +6,7 @@ use Prophecy\Argument;
 
 class AutoPublishTaskTest extends \PHPUnit\Framework\TestCase
 {
-
+    private $prophet;
     private $publisher;
     private $logger;
     private $mapper;

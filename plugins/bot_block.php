@@ -11,7 +11,17 @@
 # transparent to the user, as it is done in JavaScript.  In most cases,
 # this is effectively a test of whether the client knows how to execute JavaScript.
 # However, there is also an accessibility option
-class BotBlock extends Plugin {
+class BotBlock extends Plugin
+{
+    public $block_links;
+    public $accessible;
+
+    private $rand1;
+    private $rand2;
+    private $operator;
+    private $salt;
+    private $tok;
+
     function __construct() {
 
         $this->plugin_version = "0.2.1";
@@ -21,18 +31,22 @@ class BotBlock extends Plugin {
         # When enabled, this will cause the plugin to reject any comments that contian
         # HTML link code.  URLs will still be linkified via auto-code, but since HTML is
         # not allowed in comments, and that contain HTML links will be rejected.
-        $this->addOption('block_links',
-                         _('Block comments with HTML links in them.'),
-                         true, "checkbox");
+        $this->addOption(
+            'block_links',
+            _('Block comments with HTML links in them.'),
+            true, "checkbox"
+        );
 
         # Option: Include text CAPTCHA without JavaScript
         # When this is enabled, an automatic CAPTCHA as described above will be made
         # accessible.  That is, the math problem will be displayed to the user if
         # JavaScript is disabled.  Otherwise, the user will just see a message that
         # JavaScript is required to post comments.
-        $this->addOption('accessible',
-                         _('Include text CAPTCHA for user agents without JavaScript'),
-                         true, 'checkbox');
+        $this->addOption(
+            'accessible',
+            _('Include text CAPTCHA for user agents without JavaScript'),
+            true, 'checkbox'
+        );
 
         parent::__construct();
 
@@ -46,12 +60,15 @@ class BotBlock extends Plugin {
         $this->salt = phpversion().(isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'localhost');
         $tmp = $this->rand1;
         switch ($this->operator) {
-            case 1: $tmp += $this->rand2; break;
-            case 2: $tmp -= $this->rand2; break;
-            case 3: $tmp *= $this->rand2; break;
+            case 1: $tmp += $this->rand2; 
+                break;
+            case 2: $tmp -= $this->rand2; 
+                break;
+            case 3: $tmp *= $this->rand2; 
+                break;
         }
 
-        $this->tok = md5( $tmp.$this->salt );
+        $this->tok = md5($tmp.$this->salt);
 
         $this->registerEventHandler("blogcomment", "OnInsert", "checkICToken");
         $this->registerEventHandler("commentform", "FormBegin", "addICForm");

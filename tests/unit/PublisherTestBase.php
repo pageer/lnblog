@@ -5,6 +5,17 @@ use Prophecy\Argument;
 
 abstract class PublisherTestBase extends PHPUnit\Framework\TestCase
 {
+    protected $prophet;
+    protected $blog;
+    protected $user;
+    protected $fs;
+    protected $task_manager;
+    protected $resolver;
+    protected $system;
+    protected $sys_ini;
+    protected $wrappers;
+    protected $http_client;
+    protected $publisher;
 
     protected function setUp(): void {
         $_FILES = array();
@@ -14,7 +25,7 @@ abstract class PublisherTestBase extends PHPUnit\Framework\TestCase
         $this->prophet = new \Prophecy\Prophet();
 
         $this->blog = $this->prophet->prophesize(Blog::class);
-        $this->blog->home_path = '.';
+        $this->blog->home_path = '.';  /** @phpstan-ignore-line */
 
         $this->user = $this->prophet->prophesize(User::class);
         $this->fs = $this->prophet->prophesize(FS::class);

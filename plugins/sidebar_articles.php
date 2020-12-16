@@ -7,7 +7,13 @@
 # done by simply editing the specified file.  The format is plain HTML, with
 # one link tag per line, same as the other "list of links" files.
 
-class Articles extends Plugin {
+class Articles extends Plugin
+{
+    public $header;
+    public $static_link;
+    public $showall_text;
+    public $custom_links;
+
     private $blog;
     private $user;
     private $fs;

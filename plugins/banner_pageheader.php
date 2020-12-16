@@ -6,7 +6,9 @@
 # It can show the blog name as a heading link in the banner and optionally
 # show the blog description as a lesser heading.
 
-class PageHeader extends Plugin {
+class PageHeader extends Plugin
+{
+    public $show_desc;
 
     public function __construct($do_output=0) {
 

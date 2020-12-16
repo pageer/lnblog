@@ -2,7 +2,10 @@
 # Plugin: PrivateBlog
 # Allows you to make a blog private, i.e. so that it can only be accessed
 # by a predefined list of users.
-class PrivateBlog extends Plugin {
+class PrivateBlog extends Plugin
+{
+    public $userlist;
+
     function __construct() {
         $this->plugin_desc = _("Makes a blog private so that only certain users can access it.");
         $this->plugin_version = "0.1.1";
@@ -18,7 +21,7 @@ class PrivateBlog extends Plugin {
             ! $this->userlist ||
             current_file() == "login.php") return false;
         if (! $usr->checkLogin()) $param->redirect($blog->uri('login'));
-        $users = explode(",",$this->userlist);
+        $users = explode(",", $this->userlist);
         foreach ($users as $item) {
             if ($usr->username() == trim($item)) return true;
         }

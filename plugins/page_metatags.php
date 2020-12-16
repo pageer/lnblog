@@ -4,27 +4,31 @@
 # and generator values.  There is also an option to include a list of keywords
 # for use by search engines.
 
-class MetaData extends Plugin {
+class MetaData extends Plugin
+{
+    public $meta_keywords;
 
-	function __construct() {
-		$this->plugin_desc = _("Add some META tags to the page.");
-		$this->plugin_version = "0.2.0";
-		$this->addOption('meta_keywords', _("Keywords for search engines"),
-		                 "", "text");
-		parent::__construct();
-	}
+    function __construct() {
+        $this->plugin_desc = _("Add some META tags to the page.");
+        $this->plugin_version = "0.2.0";
+        $this->addOption(
+            'meta_keywords', _("Keywords for search engines"),
+            "", "text"
+        );
+        parent::__construct();
+    }
 
-	function addMetaTags(&$page) {
-		if (! is_object($page->display_object) ||
-			  strtolower(get_class($page->display_object)) != "blog") {
-			return false;
-		}
-		$page->addMeta($page->display_object->description, "description");
-		$page->addMeta($this->meta_keywords, "keywords");
-		$usr = NewUser($page->display_object->owner);
-		$page->addMeta($usr->displayName(), "author");
-		$page->addMeta(PACKAGE_NAME." ".PACKAGE_VERSION, "generator");
-	}
+    function addMetaTags(&$page) {
+        if (! is_object($page->display_object) ||
+              strtolower(get_class($page->display_object)) != "blog") {
+            return false;
+        }
+        $page->addMeta($page->display_object->description, "description");
+        $page->addMeta($this->meta_keywords, "keywords");
+        $usr = NewUser($page->display_object->owner);
+        $page->addMeta($usr->displayName(), "author");
+        $page->addMeta(PACKAGE_NAME." ".PACKAGE_VERSION, "generator");
+    }
 }
 
 $meta = new MetaData();

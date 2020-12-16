@@ -13,7 +13,12 @@
 
 if (! class_exists("Blogroll")):  # Start massive if statement to prevent multiple definition
 
-class Blogroll extends Plugin {
+class Blogroll extends Plugin
+{
+    public $file;
+    public $caption;
+    public $page_title;
+    private $link_only;
 
     function __construct($do_output=false) {
         $this->plugin_version = "0.1.1";
@@ -31,16 +36,20 @@ class Blogroll extends Plugin {
 
         # Option: Caption
         # This is the caption for the sidebar panel that will hold the blogroll.
-        $this->addOption("caption",
-                         _("Caption for blogroll sidebar panel"),
-                         _("Blogroll"));
+        $this->addOption(
+            "caption",
+            _("Caption for blogroll sidebar panel"),
+            _("Blogroll")
+        );
 
         # Option: Heading when viewing page
         # This is the heading that is displayed at the top of the page when the
         # blog roll is viewed as a full page, rather than just a sidebar panel.
-        $this->addOption("page_title",
-                         _("Heading when viewing the full page"),
-                         _("Other blogs of interest"));
+        $this->addOption(
+            "page_title",
+            _("Heading when viewing the full page"),
+            _("Other blogs of interest")
+        );
 
         # Option: No event handlers
         # Enable this to suppress the event handlers used for output.  This means that
@@ -132,10 +141,14 @@ class Blogroll extends Plugin {
         $tpl = NewTemplate("sidebar_panel_tpl.php");
         if ($this->caption) {
             if ($blog->isBlog()) {
-                $tpl->set('TITLE_LINK',
-                          $blog->uri('plugin', [
+                $tpl->set(
+                    'TITLE_LINK',
+                    $blog->uri(
+                        'plugin', [
                                      'plugin' => str_replace(".php", '', basename(__FILE__)),
-                                     'show'=>'yes']));
+                        'show'=>'yes']
+                    )
+                );
             }
             $tpl->set('PANEL_TITLE', $this->caption);
         }

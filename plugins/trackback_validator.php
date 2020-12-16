@@ -21,18 +21,25 @@
 # The paper is available at
 # <http://seclab.cs.rice.edu/proj/trackback/papers/taking-trackback-back.pdf>
 
-class TrackbackValidator extends Plugin {
+class TrackbackValidator extends Plugin
+{
+    public $allow_self;
+    public $base_uri;
 
     function __construct() {
         $this->plugin_desc = _('Allow only TrackBacks that link to your URL in the page body.');
         $this->plugin_version = '0.1.0';
 
-        $this->addOption('allow_self',
-                         _('Allow TrackBacks from your own blog'),
-                         true, 'checkbox');
-        $this->addOption('base_uri',
-                         _('Allow pings from pages that link to anything under the entry, not just the permalink.'),
-                         true, 'checkbox');
+        $this->addOption(
+            'allow_self',
+            _('Allow TrackBacks from your own blog'),
+            true, 'checkbox'
+        );
+        $this->addOption(
+            'base_uri',
+            _('Allow pings from pages that link to anything under the entry, not just the permalink.'),
+            true, 'checkbox'
+        );
         parent::__construct();
 
         $this->registerEventHandler("trackback", "POSTRetreived", "check_for_link");

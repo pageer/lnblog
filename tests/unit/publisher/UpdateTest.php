@@ -12,7 +12,7 @@ class UpdateTest extends PublisherTestBase
 
     public function testUpdate_WhenEntryDoesNotExist_Throws() {
         $entry = new BlogEntry("", $this->fs->reveal());
-        $entry->body = "This is some text";
+        $entry->data = "This is some text";
         $this->fs->file_exists(Argument::any())->willReturn(false);
 
         $this->expectException(EntryDoesNotExist::class);
@@ -24,7 +24,7 @@ class UpdateTest extends PublisherTestBase
         $path = './drafts/02_1234/entry.xml';
         $entry = new BlogEntry("", $this->fs->reveal());
         $entry->file = $path;
-        $entry->body = "This is some text";
+        $entry->data = "This is some text";
         $this->fs->file_exists($path)->willReturn(true);
         $this->fs->realpath(Argument::any())->willReturnArgument(0);
         $this->fs->file_exists("./drafts/02_1234/publish.txt")->willReturn(false);
@@ -40,7 +40,7 @@ class UpdateTest extends PublisherTestBase
         $path = './drafts/02_1234/entry.xml';
         $entry = new BlogEntry("", $this->fs->reveal());
         $entry->file = $path;
-        $entry->body = "This is some text";
+        $entry->data = "This is some text";
         $this->fs->file_exists($path)->willReturn(true);
         $this->fs->realpath(Argument::any())->willReturnArgument(0);
         $this->fs->write_file($path, Argument::containingString('This is some text'))->willReturn(true);
@@ -55,7 +55,7 @@ class UpdateTest extends PublisherTestBase
         $path = './drafts/02_1234/entry.xml';
         $entry = new BlogEntry("", $this->fs->reveal());
         $entry->file = $path;
-        $entry->body = "This is some text";
+        $entry->data = "This is some text";
         $this->fs->file_exists($path)->willReturn(true);
         $this->fs->realpath(Argument::any())->willReturnArgument(0);
         $this->fs->write_file($path, Argument::containingString('This is some text'))->willReturn(false);

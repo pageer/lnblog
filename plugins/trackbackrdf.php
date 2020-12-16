@@ -4,7 +4,8 @@
 # your blog entries.  This code will allow blogging software that supports auto-detecting
 # TrackBack URLs to automatically send TrackBacks to your entries.  Note that the code
 # will only be inserted for entries that have TrackBacks enabled.
-class TrackbackRDF extends Plugin {
+class TrackbackRDF extends Plugin
+{
 
     function __construct() {
         $this->plugin_desc = _("Add TrackBack auto-discovery RDF to entry pages.");

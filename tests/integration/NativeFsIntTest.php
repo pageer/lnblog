@@ -1,6 +1,8 @@
 <?php
 class NativeFsIntTest extends \PHPUnit\Framework\TestCase
 {
+    private $init_dir;
+
     function setUp(): void {
         $this->init_dir = getcwd();
         if (! is_dir("temp")) {

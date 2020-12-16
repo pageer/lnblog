@@ -118,16 +118,16 @@ class CreateDraftTest extends PublisherTestBase
         $fs->file_exists(Argument::any())->willReturn(false);
         $fs->mkdir_rec('./drafts/02_1234')->will(
             function($args) use ($fs) {
-            $fs->is_dir('./drafts')->willReturn(true);
-            $fs->is_dir('./drafts/02_1234')->willReturn(true);
-            return true;
+                $fs->is_dir('./drafts')->willReturn(true);
+                $fs->is_dir('./drafts/02_1234')->willReturn(true);
+                return true;
             }
         );
         $fs->write_file('./drafts/02_1234/entry.xml', Argument::any())->will(
-            function($args) use ($fs, $entry) {
-            $fs->file_exists('./drafts/02_1234/entry.xml')->willReturn(true);
-            $fs->realpath(Argument::any())->willReturnArgument(0);
-            return true;
+            function($args) use ($fs) {
+                $fs->file_exists('./drafts/02_1234/entry.xml')->willReturn(true);
+                $fs->realpath(Argument::any())->willReturnArgument(0);
+                return true;
             }
         );
         $this->task_manager->findByKey(Argument::any())->willReturn(null);
@@ -192,7 +192,7 @@ class CreateDraftTest extends PublisherTestBase
 
     private function getTestEntry() {
         $entry = new BlogEntry("", $this->fs->reveal());
-        $entry->body = "This is some text";
+        $entry->data = "This is some text";
         return $entry;
     }
 
@@ -212,7 +212,7 @@ class CreateDraftTest extends PublisherTestBase
         );
 
         $entry = new BlogEntry(null, $this->fs->reveal());
-        $entry->body = "This is some text";
+        $entry->data = "This is some text";
         return $entry;
     }
 

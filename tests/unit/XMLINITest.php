@@ -1,8 +1,12 @@
 <?php
+
 use Prophecy\Argument;
 
 class XMLINITest extends PHPUnit\Framework\TestCase
 {
+    private $prophet;
+    private $config;
+    private $fs;
 
     public function testWriteFileWithSimpleSettingWritesSimpleXmlNode() {
         $this->config->setValue('foo', 'bar', 'baz');
@@ -45,7 +49,7 @@ class XMLINITest extends PHPUnit\Framework\TestCase
         $this->fs->file_exists('foo.xml')->willReturn(true);
         $config = new XMLINI('foo.xml', $this->fs->reveal());
 
-        $config->readFile('foo.xml');
+        $config->readFile();
         $value = $config->value('foo', 'bar');
 
         $this->assertEquals('baz', $value);
@@ -63,7 +67,7 @@ class XMLINITest extends PHPUnit\Framework\TestCase
         $this->fs->file_exists('foo.xml')->willReturn(true);
         $config = new XMLINI('foo.xml', $this->fs->reveal());
 
-        $config->readFile('foo.xml');
+        $config->readFile();
         $baz = $config->setValue('foo', 'bar', 'baz');
         $fuzz = $config->setValue('foo', 'fizz', 'fuzz');
 

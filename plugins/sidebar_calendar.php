@@ -13,14 +13,19 @@ if (isset($_GET['month']) && isset($_GET['plugin']) && defined('PLUGIN_DO_OUTPUT
 # when it first loads and then again when the plugins are loaded.
 if (! class_exists("SidebarCalendar")):  # Start massive if statement
 
-class SidebarCalendar extends Plugin {
+class SidebarCalendar extends Plugin
+{
+    public $caption;
+    public $show_all;
 
     function __construct($do_output=0) {
         $this->plugin_desc = _("Provides a link calendar for the sidebar.");
         $this->plugin_version = "0.1.2";
         $this->addOption("caption", _("Title for calendar"), _("Calendar"));
-        $this->addOption("show_all", _("Include link to show all entries"),
-                         false, "checkbox");
+        $this->addOption(
+            "show_all", _("Include link to show all entries"),
+            false, "checkbox"
+        );
 
         $this->addNoEventOption();
 
@@ -44,12 +49,18 @@ class SidebarCalendar extends Plugin {
         $day = GET("day") ? GET('day') : 1;
         if ($year && $month) {
             $days = date("t", strtotime($year."-".$month."-01"));
-        } elseif (preg_match("/.*".BLOG_ENTRY_PATH."\/(\d{4})\/(\d{2})\/.*/",
-                              current_uri() )) {
-            $year = preg_replace("/.*".BLOG_ENTRY_PATH."\/(\d{4})\/(\d{2})\/.*/",
-                                 "$1", current_uri() );
-            $month = preg_replace("/.*".BLOG_ENTRY_PATH."\/(\d{4})\/(\d{2})\/.*/",
-                                  "$2", current_uri() );
+        } elseif (preg_match(
+            "/.*".BLOG_ENTRY_PATH."\/(\d{4})\/(\d{2})\/.*/",
+            current_uri() 
+        )) {
+            $year = preg_replace(
+                "/.*".BLOG_ENTRY_PATH."\/(\d{4})\/(\d{2})\/.*/",
+                "$1", current_uri() 
+            );
+            $month = preg_replace(
+                "/.*".BLOG_ENTRY_PATH."\/(\d{4})\/(\d{2})\/.*/",
+                "$2", current_uri() 
+            );
             $days = date("t", strtotime($year."-".$month."-01"));
         } else {
             $year = date("Y");
@@ -104,9 +115,9 @@ class SidebarCalendar extends Plugin {
 
         # Now fill out the calendar with the ending and starting days of the
         # previous and next months.
-        $last_day = date('w', mktime(0,0,0, $month, $num_days, $year) + 86400);
-        $tmp_month = date('m', mktime(0,0,0, $month, $num_days, $year) + 86400);
-        $tmp_year = date('Y', mktime(0,0,0, $month, $num_days, $year) + 86400);
+        $last_day = date('w', mktime(0, 0, 0, $month, $num_days, $year) + 86400);
+        $tmp_month = date('m', mktime(0, 0, 0, $month, $num_days, $year) + 86400);
+        $tmp_year = date('Y', mktime(0, 0, 0, $month, $num_days, $year) + 86400);
         for ($i = 1; $i <= 7 - $last_day; $i++) {
             $days[] = array('day'=>$i, 'month'=>$tmp_month, 'year'=>$tmp_year,
                             'count'=>$blog->getDayCount($tmp_year, $tmp_month, $i),
@@ -171,9 +182,11 @@ class SidebarCalendar extends Plugin {
         $content .= '<p class="calendar">'."\n";
 
         $content .= '<a class="calendar-nav-link" href="'.
-                    $this->self_uri( array('blog'=>$blog->blogid,
+                    $this->self_uri(
+                        array('blog'=>$blog->blogid,
                                            'month'=>($month > 1 ? $month-1 : 12),
-                                           'year'=>($month > 1 ? $year : $year-1))).
+                        'year'=>($month > 1 ? $year : $year-1))
+                    ).
                     '">&lt;&lt;</a> ';
 
         $months = $blog->getMonthList($year);
@@ -192,9 +205,11 @@ class SidebarCalendar extends Plugin {
         }
 
         $content .= ' <a class="calendar-nav-link" href="'.
-                    $this->self_uri(array('blog'=>$blog->blogid,
+                    $this->self_uri(
+                        array('blog'=>$blog->blogid,
                                           'month'=>($month < 12 ? $month+1 : 1),
-                                          'year'=>($month < 12 ? $year : $year+1))).
+                        'year'=>($month < 12 ? $year : $year+1))
+                    ).
                     '">&gt;&gt;</a>';
 
         $content .= "</p>\n";
@@ -231,10 +246,10 @@ class SidebarCalendar extends Plugin {
 
     function show_page() {
         # Disable IE's page caching to avoid screwing up the request.
-        header( "Expires",  "Mon, 26 Jul 1997 05:00:00 GMT" );
-        header( "Last-Modified", gmdate( "D, d M Y H:i:s" )." GMT" );
-        header( "Cache-Control", "no-cache, must-revalidate" );
-        header( "Pragma", "no-cache" );
+        header("Expires", "Mon, 26 Jul 1997 05:00:00 GMT");
+        header("Last-Modified", gmdate("D, d M Y H:i:s")." GMT");
+        header("Cache-Control", "no-cache, must-revalidate");
+        header("Pragma", "no-cache");
 
         $this->put_calendar(true);
     }
@@ -300,4 +315,4 @@ if ($do_output) {
         $sbc = new SidebarCalendar();
     }
 }
-?>
+

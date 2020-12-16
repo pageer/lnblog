@@ -6,7 +6,8 @@
 # in the blog.  There are also options to set the names of the feed files, if
 # you so desire.
 
-class RSS1Entry {
+class RSS1Entry
+{
 
     var $link;
     var $title;
@@ -36,7 +37,8 @@ class RSS1Entry {
 
 # Class for generating RDF Site Summary output.
 
-class RSS1 {
+class RSS1
+{
 
     var $url;
     var $site;
@@ -102,17 +104,27 @@ class RSS1 {
 
 }
 
-class RSS1FeedGenerator extends Plugin {
+class RSS1FeedGenerator extends Plugin
+{
+    public $feed_file;
+    public $comment_file;
+    public $topic_feeds;
 
     function __construct() {
         $this->plugin_desc = _("Create RSS 1.0 feeds for comments and blog entries.");
         $this->plugin_version = "0.2.0";
-        $this->addOption("feed_file", _("The file name for the blog RSS feed"),
-                         "news.rdf", "text");
-        $this->addOption("comment_file", _("The file name for comment RSS feeds"),
-                         "comments.rdf", "text");
-        $this->addOption("topic_feeds", _("Generate feeds for each topic"),
-                         true, 'checkbox');
+        $this->addOption(
+            "feed_file", _("The file name for the blog RSS feed"),
+            "news.rdf", "text"
+        );
+        $this->addOption(
+            "comment_file", _("The file name for comment RSS feeds"),
+            "comments.rdf", "text"
+        );
+        $this->addOption(
+            "topic_feeds", _("Generate feeds for each topic"),
+            true, 'checkbox'
+        );
         parent::__construct();
     }
 
@@ -179,9 +191,9 @@ class RSS1FeedGenerator extends Plugin {
         foreach ($entry->tags() as $tag) {
 
             $feed = new RSS1();
-            $topic = preg_replace('/\W/','',$tag);
+            $topic = preg_replace('/\W/', '', $tag);
             $file = $topic.'_'.$this->feed_file;
-            $path = Path::mk($blog->home_path,BLOG_FEED_PATH,$file);
+            $path = Path::mk($blog->home_path, BLOG_FEED_PATH, $file);
             $feed_url = $resolver->localpathToUri($path, $blog);
 
             $feed->url = $feed_url;

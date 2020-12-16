@@ -9,6 +9,7 @@ class UserLimitTest extends PHPUnit\Framework\TestCase
     private $prophet;
     private $fs;
     private $globals;
+    private $tz;
 
     public function testGetLoginAttempts_WhenFileHasLogs_ReturnObjectArray() {
         $this->setUpFileToReturn(

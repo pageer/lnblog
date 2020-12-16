@@ -2,6 +2,9 @@
 
 class BlogTest extends PHPUnit\Framework\TestCase
 {
+    private $prophet;
+    private $blog;
+    private $fs;
     
     public function testAutoPingbackEnabled_WhenSettingIsAll_ReturnTrue() {
         $this->blog->auto_pingback = 'all';

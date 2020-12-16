@@ -9,16 +9,23 @@
 #
 # No e-mail is sent for comments posted by the entry owner.
 
-class ReplyNotifier extends Plugin {
+class ReplyNotifier extends Plugin
+{
 
     function __construct() {
         $this->plugin_desc = _("Sends an e-mail notification when a comment, TrackBack, or Pingback is submitted.");
-        $this->addOption("notify_comment", _("Send notification for comments"),
-                         true, "checkbox");
-        $this->addOption("notify_trackback", _("Send notification for TrackBacks"),
-                         true, "checkbox");
-        $this->addOption("notify_pingback", _("Send notification for Pingbacks"),
-                         true, "checkbox");
+        $this->addOption(
+            "notify_comment", _("Send notification for comments"),
+            true, "checkbox"
+        );
+        $this->addOption(
+            "notify_trackback", _("Send notification for TrackBacks"),
+            true, "checkbox"
+        );
+        $this->addOption(
+            "notify_pingback", _("Send notification for Pingbacks"),
+            true, "checkbox"
+        );
         $this->plugin_version = "0.1.1";
         parent::__construct();
     }
@@ -29,8 +36,10 @@ class ReplyNotifier extends Plugin {
         $owner_reply = ($u->username() == $curr_user->username());
 
         if ($u->email() && !$owner_reply) {
-            @mail($u->email(), $subject, $data,
-                  "From: LnBlog comment notifier <".EMAIL_FROM_ADDRESS.">");
+            @mail(
+                $u->email(), $subject, $data,
+                "From: LnBlog comment notifier <".EMAIL_FROM_ADDRESS.">"
+            );
         }
     }
 

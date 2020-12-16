@@ -35,7 +35,13 @@ $do_page_output = (isset($_GET["show"]) && $_GET["show"] == "sb_search_results")
 # when it first loads and then again when the plugins are loaded.
 if (! class_exists("SidebarSearch")):  # Start massive if statement
 
-class SidebarSearch extends Plugin {
+class SidebarSearch extends Plugin
+{
+    public $caption;
+    public $label;
+    public $label_in_box;
+    public $search_provider;
+    public $show_in;
 
     public function __construct($do_output=0) {
         $this->plugin_desc = _("Search for terms in blog entries.");
@@ -43,26 +49,29 @@ class SidebarSearch extends Plugin {
         $this->addOption("caption", _("Caption for search panel"), _("Search"));
         $this->addOption("label", _("Search field label"), _('Search this weblog'));
         $this->addOption("label_in_box", _("Put label inside box (HTML5 only)"), false, "checkbox");
-        $this->addOption("search_provider", _("Search engine"), "native", "select",
-                         array(
+        $this->addOption(
+            "search_provider", _("Search engine"), "native", "select",
+            array(
                             'native' => 'Built-in search',
                             'google' => 'Google',
                             'bing' => 'Bing',
-                        ));
-        $this->addOption("show_in",
-                         _("Show search box in what part of page"),
-                         "sidebar", "select",
-                         array("sidebar"=>_("Sidebar"),
+            )
+        );
+        $this->addOption(
+            "show_in",
+            _("Show search box in what part of page"),
+            "sidebar", "select",
+            array("sidebar"=>_("Sidebar"),
                                "banner"=>_("Banner"),
                                "menubar"=>_("Menubar"))
-                        );
+        );
 
         $this->addNoEventOption();
 
         parent::__construct();
 
         if ( ! ($this->no_event ||
-                System::instance()->sys_ini->value("plugins","EventForceOff", 0)) ) {
+                System::instance()->sys_ini->value("plugins", "EventForceOff", 0)) ) {
             switch ($this->show_in) {
                 case "banner":
                     $this->registerEventHandler("banner", "OnOutput", "sidebar_panel");
@@ -86,8 +95,10 @@ class SidebarSearch extends Plugin {
         $tooltip = _("Search for posts containing a space-separated list of words. If the search sting is enclosed in forward slashes, it will be treated as a regular expression.");
 
         switch ($this->show_in) {
-            case "banner": $class = "bannerpanel"; break;
-            case "menubar": $class = "menupanel"; break;
+            case "banner": $class = "bannerpanel"; 
+                break;
+            case "menubar": $class = "menupanel"; 
+                break;
             default: $class = "panel";
         }
 
@@ -199,12 +210,16 @@ class SidebarSearch extends Plugin {
             $tpl->set("LIST_TITLE", _("No search results found."));
             $tpl->set("ITEM_LIST", array(_("No posts matched")));
         } elseif (trim(GET("sb_search_terms"))) {
-            $tpl->set("LIST_TITLE",
-                      spf_('Search results for "%s"', GET("sb_search_terms")));
+            $tpl->set(
+                "LIST_TITLE",
+                spf_('Search results for "%s"', GET("sb_search_terms"))
+            );
             $tpl->set("LINK_LIST", $LINK_LIST);
         } else {
-            $tpl->set("LIST_TITLE",
-                      spf_('No search terms'));
+            $tpl->set(
+                "LIST_TITLE",
+                spf_('No search terms')
+            );
             $tpl->set("LINK_LIST", $LINK_LIST);
         }
 

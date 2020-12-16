@@ -8,28 +8,49 @@
 # the default behavior is to display older entries in that case, with a different entry
 # header.  There is also an option to show a link to the front page.
 
-class Recent extends Plugin {
+class Recent extends Plugin
+{
+    public $old_header;
+    public $recent_header;
+    public $num_entries;
+    public $only_recent;
+    public $show_main;
+    public $enable_cache;
+
+    private $cache_base_path;
 
     function __construct($do_output=0) {
 
         $this->plugin_desc = _("Show some of the more recent posts in the sidebar.");
         $this->plugin_version = "0.3.0";
-        $this->addOption("old_header",
+        $this->addOption(
+            "old_header",
             _("Header for main blog page (entries not on main page)"),
-            _("Older Entries"));
-        $this->addOption("recent_header",
+            _("Older Entries")
+        );
+        $this->addOption(
+            "recent_header",
             _("Header for other pages (newest entries)"),
-            _("Recent Entries"));
-        $this->addOption("num_entries",
-            _("Number of entries to show"), "Blog default", "text");
-        $this->addOption("only_recent",
+            _("Recent Entries")
+        );
+        $this->addOption(
+            "num_entries",
+            _("Number of entries to show"), "Blog default", "text"
+        );
+        $this->addOption(
+            "only_recent",
             _("Show the most recent entries on the front page (same links as entry pages)"),
-              false, "checkbox");
-        $this->addOption("show_main",
-            _("Show link to main blog page"), true, "checkbox");
-        $this->addOption("enable_cache",
+            false, "checkbox"
+        );
+        $this->addOption(
+            "show_main",
+            _("Show link to main blog page"), true, "checkbox"
+        );
+        $this->addOption(
+            "enable_cache",
             _("Enable plugin output caching"),
-              true, "checkbox");
+            true, "checkbox"
+        );
         $this->addNoEventOption();
 
         parent::__construct();

@@ -44,7 +44,7 @@ class SimpleXMLWriter
         $this->cdata_list = array_merge($this->cdata_list, $list);
     }
 
-    public function serializeArray($arr, $tag) {
+    static public function serializeArray($arr, $tag) {
 
         $ret = "<$tag type=\"array\">\n";
 
@@ -93,7 +93,7 @@ class SimpleXMLWriter
         if (is_object($this->object)) {
             $ret .= $this->serializeObject($this->object);
         } elseif (is_array($this->object)) {
-            $ret .= $this->serializeArray($this->object, "array");
+            $ret .= self::serializeArray($this->object, "array");
         } else {
             $ret .= "<item>".$this->object."</item>\n";
         }

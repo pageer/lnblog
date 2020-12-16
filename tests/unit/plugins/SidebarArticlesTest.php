@@ -4,7 +4,7 @@ require_once __DIR__ . "/../../../plugins/sidebar_articles.php";
 
 class SidebarArticlesTest extends \PHPUnit\Framework\TestCase
 {
-
+    private $prophet;
     private $blog;
     private $user;
     private $fs;

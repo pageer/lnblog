@@ -17,7 +17,10 @@
 # indication will be an error message displayed when someone attempts to post
 # a comment or trackback.
 
-class ContentBan extends Plugin {
+class ContentBan extends Plugin
+{
+    public $ban_list;
+    public $user_exempt;
 
     function __construct() {
         $this->plugin_desc = _("Allows you to ban comments or trackbacks that match certain regular expressions.");
@@ -26,15 +29,19 @@ class ContentBan extends Plugin {
         # Option: Ban list file
         # This is the name of the file used to store the list of banned expressions.
         # The format is Perl-compatible regular epxressions, one per line.
-        $this->addOption("ban_list", _("File to store list of banned regular expressions (one RE per line)."),
-            "re_ban.txt", "text");
+        $this->addOption(
+            "ban_list", _("File to store list of banned regular expressions (one RE per line)."),
+            "re_ban.txt", "text"
+        );
 
         # Option: Do not ban logged-in
         # WHen this is enabled, users who have an account and are logged in will
         # not be subject to having comments with banned content blocked.
-        $this->addOption("user_exempt",
-                         _("Do not apply ban to logged-in users."),
-                         false, "checkbox");
+        $this->addOption(
+            "user_exempt",
+            _("Do not apply ban to logged-in users."),
+            false, "checkbox"
+        );
         parent::__construct();
 
         $this->registerEventHandler("blogcomment", "OnInsert", "clearData");
@@ -108,8 +115,10 @@ class ContentBan extends Plugin {
             _("Blog RegEx blacklist").'</a></li>';
         if ($usr->isAdministrator()) {
             echo '<li><a href="'.
-                make_uri(INSTALL_ROOT_URL.'index.php',
-                         array('action' => 'editfile', 'target' => 'userdata', 'file'=>$banfile)).'">'.
+                make_uri(
+                    INSTALL_ROOT_URL.'index.php',
+                    array('action' => 'editfile', 'target' => 'userdata', 'file'=>$banfile)
+                ).'">'.
                 _("Global RegEx blacklist").'</a></li>';
         }
     }

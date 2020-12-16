@@ -2,5 +2,9 @@ parameters:
     level: 3
     paths:
         - lib
+        - plugins
+        - tests
+        - blogconfig.php
+        - index.php
     bootstrapFiles:
         - blogconfig.php

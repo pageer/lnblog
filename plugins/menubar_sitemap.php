@@ -24,9 +24,13 @@
 # both, then the auto-generated links will be shown first and the custom ones
 # will be second.
 
-class SiteMap extends Plugin {
+class SiteMap extends Plugin
+{
 
-    var $link_file;
+    public $link_file;
+    public $auto_map;
+    public $list_header;
+    public $no_markup;
 
     function __construct($do_output=0) {
 
@@ -34,15 +38,23 @@ class SiteMap extends Plugin {
         $this->plugin_version = "0.3.1";
         $this->list_header = _("Site Map");
         $this->no_markup = false;
-        $this->addOption("auto_map", _("Automatically list all blogs in sitemap"),
-                         true, "checkbox");
-        $this->addOption("link_file", _("Name of link-list file"),
-                         "sitemap.htm", "text");
-        $this->addOption("list_header", _("Heading at start of menubar"),
-                         _("Site Map"), "text");
-        $this->addOption("no_markup",
+        $this->addOption(
+            "auto_map", _("Automatically list all blogs in sitemap"),
+            true, "checkbox"
+        );
+        $this->addOption(
+            "link_file", _("Name of link-list file"),
+            "sitemap.htm", "text"
+        );
+        $this->addOption(
+            "list_header", _("Heading at start of menubar"),
+            _("Site Map"), "text"
+        );
+        $this->addOption(
+            "no_markup",
             _("Use unmodified file contents as menubar (no auto-generated HTML)"),
-            false, "checkbox");
+            false, "checkbox"
+        );
 
         $this->addNoEventOption();
 
@@ -58,10 +70,10 @@ class SiteMap extends Plugin {
     function get_map_file() {
         $blog = NewBlog();
         if ( $blog->isBlog() &&
-             file_exists(BLOG_ROOT.PATH_DELIM.$this->link_file) ) {
-            $map_file = BLOG_ROOT.PATH_DELIM.$this->link_file;
-        } elseif (is_file(Path::mk(USER_DATA_PATH,$this->link_file))) {
-            $map_file = Path::mk(USER_DATA_PATH,$this->link_file);
+             file_exists($blog->home_path.PATH_DELIM.$this->link_file) ) {
+            $map_file = $blog->home_path.PATH_DELIM.$this->link_file;
+        } elseif (is_file(Path::mk(USER_DATA_PATH, $this->link_file))) {
+            $map_file = Path::mk(USER_DATA_PATH, $this->link_file);
         } else {
             $map_file = '';
         }

@@ -4,11 +4,13 @@
 # It includes a configurable title and HTML text input as well as an option to display
 # a picture.
 
-class AuthorBio extends Plugin {
+class AuthorBio extends Plugin
+{
 
     public $title;
     public $picture_url;
     public $bio;
+    public $markup_type;
 
     public function __construct($do_output=false) {
         $this->plugin_version = '0.1.2';
@@ -59,7 +61,9 @@ class AuthorBio extends Plugin {
     public function styles() {
         ob_start();
         // Hack for IDE syntax highlighting
-        if (0) { ?><style type="text/css"><?php } ?>
+        if (0) {
+            ?><style type="text/css"><?php 
+        } ?>
         .bio_picture img {
             border: 1px solid black;
             box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, .5);
@@ -69,7 +73,9 @@ class AuthorBio extends Plugin {
         .bio_content {
             margin-top: 1em;
         }
-        <?php if (0) { ?></style><?php }
+        <?php if (0) { 
+            ?></style><?php 
+        }
         $ret = ob_get_clean();
         return $ret;
     }

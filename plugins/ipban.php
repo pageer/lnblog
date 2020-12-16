@@ -23,7 +23,11 @@
 # The other method is by directly editing the files using the sidebar links.
 # This is the method required if you want to ban ranges of IP addresses.
 
-class IPBan extends Plugin {
+class IPBan extends Plugin
+{
+    public $ban_list;
+    public $admin_local;
+    public $ban_del;
 
     public function __construct() {
         $this->plugin_desc = _("Allows you to ban IP addresses from adding comments or trackbacks.");
@@ -97,7 +101,7 @@ class IPBan extends Plugin {
                     spf_("Delete %s and ban IP address %s from submitting comments or trackbacks to this blog?", $cmt->getAnchor(), $cmt->ip).
                     '\');">'._("Delete &amp; Ban IP").'</a>) ';
                 $cb_link_glob = ' (<a href="'.
-                    make_uri($cmt->uri("delete"),array('banip'=>$cmt->ip, 'global'=>'yes')).'" '.
+                    make_uri($cmt->uri("delete"), array('banip'=>$cmt->ip, 'global'=>'yes')).'" '.
                     'onclick="this.href = this.href + \'&amp;conf=yes\'; return window.confirm(\''.
                     spf_("Delete %s and ban IP address %s from submitting comments or trackbacks to this entire site?", $cmt->getAnchor(), $cmt->ip).
                     '\');">'._("Delete &amp; Ban Globally").'</a>)';
@@ -108,9 +112,9 @@ class IPBan extends Plugin {
                     spf_("Ban IP address %s from submitting comments or trackbacks to this blog?", $cmt->ip).
                     '\');">'._("Ban IP").'</a>) ';
                 $cb_link_glob = ' (<a href="'.
-                    make_uri(false,array('banip'=>$cmt->ip, 'global'=>'yes')).
+                    make_uri(false, array('banip'=>$cmt->ip, 'global'=>'yes')).
                     'onclick="return window.confirm(\''.
-                    spf_("Ban IP address %s from submitting comments or trackbacks to this entire site?",   $cmt->ip).
+                    spf_("Ban IP address %s from submitting comments or trackbacks to this entire site?", $cmt->ip).
                     '\');">'._("Global Ban").'</a>)';
             }
 
@@ -191,14 +195,18 @@ class IPBan extends Plugin {
     function sidebarLink($param) {
         $blg = NewBlog();
         $usr = NewUser();
-        $banfile = PluginManager::instance()->plugin_config->value("ipban",
-                                         "ban_list", "ip_ban.txt");
+        $banfile = PluginManager::instance()->plugin_config->value(
+            "ipban",
+            "ban_list", "ip_ban.txt"
+        );
         echo '<li><a href="'.$blg->uri('editfile', array("file" => $banfile)).'">'.
             _("Blog IP blacklist").'</a></li>';
         if ($usr->isAdministrator()) {
             echo '<li><a href="'.
-                make_uri(INSTALL_ROOT_URL.'index.php',
-                         array('action' => 'editfile', 'target' => 'userdata', 'file'=>$banfile)).
+                make_uri(
+                    INSTALL_ROOT_URL.'index.php',
+                    array('action' => 'editfile', 'target' => 'userdata', 'file'=>$banfile)
+                ).
                 '">'._("Global IP blacklist").'</a></li>';
         }
     }

@@ -355,11 +355,13 @@ class UserTest extends \PHPUnit\Framework\TestCase
         $this->globals = $this->prophet->prophesize(GlobalFunctions::class);
         $this->loginLimiter = $this->prophet->prophesize(LoginLimiter::class);
 
+        /** @phpstan-ignore-next-line */
         $this->globals->setcookie(Argument::cetera())->will(
             function ($args) {
-            $_COOKIE[$args[0]] = $args[1];
+                $_COOKIE[$args[0]] = $args[1];
             }
         );
+        /** @phpstan-ignore-next-line */
         $this->globals->time()->willReturn(12345678);
     }
 
@@ -393,21 +395,21 @@ class UserTest extends \PHPUnit\Framework\TestCase
         $file_path = Path::mk('userdata', $username, 'pwreset.php');
         $this->fs->write_file($file_path, Argument::any())->will(
             function($args) use (&$content) {
-            // The pwreset.php is a PHP file, so we can get the contents
-            // by stripping the php header and eval'ing it.
-            $string_data = trim(str_replace('<?php', '', $args[1]));
-            $content = eval($string_data);
-            return true;
+                // The pwreset.php is a PHP file, so we can get the contents
+                // by stripping the php header and eval'ing it.
+                $string_data = trim(str_replace('<?php', '', $args[1]));
+                $content = eval($string_data);
+                return true;
             }
         );
         $this->fs->file_exists($file_path)->willReturn(
             function ($args) use (&$content) {
-            return $content !== null;
+                return $content !== null;
             }
         );
         $this->globals->include($file_path)->will(
             function ($args) use (&$content) {
-            return $content;
+                return $content;
             }
         );
     }
@@ -429,15 +431,15 @@ class UserTest extends \PHPUnit\Framework\TestCase
         $configs = array_merge($defaults, $configs);
         $this->globals->defined(Argument::any())->will(
             function ($args) use ($configs) {
-            return isset($configs[$args[0]]);
+                return isset($configs[$args[0]]);
             }
         );
         $this->globals->constant(Argument::any())->will(
             function ($args) use ($configs) {
-            if (isset($configs[$args[0]])) {
-                return $configs[$args[0]];
-            }
-            return constant($args[0]);
+                if (isset($configs[$args[0]])) {
+                    return $configs[$args[0]];
+                }
+                return constant($args[0]);
             }
         );
     }

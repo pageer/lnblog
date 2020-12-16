@@ -3,18 +3,20 @@
 # This plugin createa a breadcrumb trail in the page header.  It will display the
 # path components to an entry or article, with links to each listing page.
 
-class Breadcrumbs extends Plugin {
+class Breadcrumbs extends Plugin
+{
 
     public $link_file;
+    public $list_header;
 
     public function __construct($do_output=0) {
 
         $this->plugin_desc = _('Show a "bread-crumb" trail indicating the user\'s current location in the blog.');
         $this->plugin_version = "0.1.1";
-        $this->addOption("list_header", _("Heading at start of trail"),
-                         _("Location"), "text");
-        $this->addOption("item_sep", _("Separator for location components (HTML)"),
-                         _("&lt;&lt;"), "text");
+        $this->addOption(
+            "list_header", _("Heading at start of trail"),
+            _("Location"), "text"
+        );
 
         $this->addNoEventOption();
 
@@ -59,7 +61,7 @@ class Breadcrumbs extends Plugin {
                 $year = $tok;
                 $ret .= $this->list_wrap($blog->uri('listyear', ['year' => $tok]), $tok);
             } elseif (is_numeric($tok) && strlen($tok) == 2 && isset($year)) {
-                $month = fmtdate("%B", mktime(0,0,0,$tok,1,2000));
+                $month = fmtdate("%B", mktime(0, 0, 0, $tok, 1, 2000));
                 $ret .= $this->list_wrap($blog->uri('listmonth', ['year' => $year, 'month' => $tok]), $month);
             } elseif ($tok == ENTRY_PINGBACK_DIR) {
                 $ret .= $this->list_wrap($ent->uri('pingback'), _("Pingbacks"));

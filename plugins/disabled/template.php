@@ -30,7 +30,9 @@
 
 # Class: MyPlugin
 # As mentioned above, you class should extend the <Plugin> base class.
-class MyPlugin extends Plugin {
+class MyPlugin extends Plugin
+{
+    public $myname;
 
     # Method: __construct
     # Make sure that you provide a constructor for your class.
@@ -67,10 +69,12 @@ class MyPlugin extends Plugin {
         # select controls.  It is an array of the form value=>description.
         # This is not given in the example, as it only applies to option
         # and select controls.
-        $this->addOption("myname",
+        $this->addOption(
+            "myname",
             _("The name to display"),
             _("Bob Smith"),
-            "text");
+            "text"
+        );
 
         # Section: getConfig()
         # Lastly, we load the stored configuration for this plugin.
@@ -157,4 +161,4 @@ class MyPlugin extends Plugin {
 $plug = new MyPlugin();
 $plug->registerEventHandler("blogentry", "OnOutput", "myOutput");
 $plug->registerStaticEventHandler("page", "OnOutput", "myStaticOutput");
-?>
+

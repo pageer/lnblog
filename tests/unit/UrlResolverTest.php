@@ -4,10 +4,12 @@ use Prophecy\Argument;
 
 class UrlResolverTest extends \PHPUnit\Framework\TestCase
 {
-
+    private $prophet;
     private $blogs;
     private $userdata;
     private $install;
+    private $fs;
+    private $config;
 
     /**
      * @dataProvider localpathToUriProvider
@@ -390,7 +392,7 @@ class UrlResolverTest extends \PHPUnit\Framework\TestCase
             'blog login' => ['login', 'blog', [], 'https://foobar.mysite.com/?action=login'],
             'blog logout' => ['logout', 'blog', [], 'https://foobar.mysite.com/?action=logout'],
             'blog editfile' => ['editfile', 'blog', ['file' => 'foo.txt'], 'https://foobar.mysite.com/?action=editfile&file=foo.txt'],
-            'blog editfile' => ['editfile', 'blog', ['file' => 'foo.txt', 'map' => 'yes', 'list' => 'yes', 'richedit' => 'false'], 'https://foobar.mysite.com/?action=editfile&file=foo.txt&map=yes&list=yes&richedit=false'],
+            'blog editfile complex' => ['editfile', 'blog', ['file' => 'foo.txt', 'map' => 'yes', 'list' => 'yes', 'richedit' => 'false'], 'https://foobar.mysite.com/?action=editfile&file=foo.txt&map=yes&list=yes&richedit=false'],
             'blog edituser' => ['edituser', 'blog', [], 'https://foobar.mysite.com/?action=useredit'],
             'blog plugins' => ['pluginconfig', 'blog', [], 'https://foobar.mysite.com/?action=plugins'],
             'blog pluginload' => ['pluginload', 'blog', [], 'https://foobar.mysite.com/?action=pluginload'],

@@ -2,15 +2,19 @@
 # Plugin: LnBlogAd
 # A simple advertising banner.  This just displays a little icon and link
 # that tells people you're using LnBlog.
-class LnBlogAd extends Plugin {
+class LnBlogAd extends Plugin
+{
+    public $use_footer;
 
     function __construct($do_output=0) {
         $this->plugin_desc = _("Shameless link whoring.  Put a link to LnBlog on the page.");
         $this->plugin_version = "0.2.1";
         $this->use_footer = false;
-        $this->addOption("use_footer",
+        $this->addOption(
+            "use_footer",
             _("Put the advertising in the footer, not the sidebar"),
-            false, "checkbox");
+            false, "checkbox"
+        );
 
         $this->addNoEventOption();
 
@@ -37,11 +41,15 @@ class LnBlogAd extends Plugin {
     function footer_output() {
         $blg = NewBlog();
         if ($blg->isBlog()) {
-            $message = spf_("%1\s is powered by %2\s", $blg->name,
-                            '<a href="'.PACKAGE_URL.'">'.PACKAGE_NAME.'</a>');
+            $message = spf_(
+                "%1\s is powered by %2\s", $blg->name,
+                '<a href="'.PACKAGE_URL.'">'.PACKAGE_NAME.'</a>'
+            );
         } else {
-            $message = spf_("Powered by %2\s",
-                            '<a href="'.PACKAGE_URL.'">'.PACKAGE_NAME.'</a>');
+            $message = spf_(
+                "Powered by %2\s",
+                '<a href="'.PACKAGE_URL.'">'.PACKAGE_NAME.'</a>'
+            );
         }
         echo $message;
     }

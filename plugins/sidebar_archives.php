@@ -7,14 +7,19 @@
 # sidebar panel with a link for each month for which there are entries, up
 # to a configurable maximum.
 
-class Archives extends Plugin {
+class Archives extends Plugin
+{
+    public $max_months;
+    public $title;
 
     function __construct($do_output=0) {
-        $this->plugin_name = _("List the months of archives for a blog.");
+        $this->plugin_desc = _("List the months of archives for a blog.");
         $this->plugin_version = "0.2.1";
         $this->addOption("max_months", _("Number of months to show"), 6, "text");
-        $this->addOption("title", _("Sidebar section title"),
-                         _("Archives"), "text");
+        $this->addOption(
+            "title", _("Sidebar section title"),
+            _("Archives"), "text"
+        );
         $this->addNoEventOption();
 
         parent::__construct();
@@ -39,7 +44,7 @@ class Archives extends Plugin {
 <h3>
     <a href="<?php echo $root.BLOG_ENTRY_PATH ?>/"><?php echo $this->title ?></a>
 </h3>
-<?php endif; ?>
+        <?php endif; ?>
 <ul>
 <?php
         foreach ($month_list as $month):

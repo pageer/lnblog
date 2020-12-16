@@ -2,8 +2,10 @@
 
 require_once __DIR__ . "/../../../plugins/htaccess_generator.php";
 
-class HtAccessGeneratorTest extends \PHPUnit\Framework\TestCase
+class HTAccessGeneratorTest extends \PHPUnit\Framework\TestCase
 {
+    private $prophet;
+    private $fs;
 
     public function testCreateFile_WhenNoBlogHtaccess_CreatesNewFile() {
         $expected_content = implode("\n", $this->getLnBlogSection());
@@ -13,7 +15,7 @@ class HtAccessGeneratorTest extends \PHPUnit\Framework\TestCase
 
         $fs->write_file('./.htaccess', $expected_content)->shouldBeCalled();
 
-        $generator = new HtAccessGenerator($fs->reveal());
+        $generator = new HTAccessGenerator($fs->reveal());
         $generator->create_file($blog_instance);
     }
 
@@ -28,7 +30,7 @@ class HtAccessGeneratorTest extends \PHPUnit\Framework\TestCase
 
         $fs->write_file('./.htaccess', $expected_content)->shouldBeCalled();
 
-        $generator = new HtAccessGenerator($fs->reveal());
+        $generator = new HTAccessGenerator($fs->reveal());
         $generator->create_file($blog_instance);
     }
 
@@ -61,7 +63,7 @@ class HtAccessGeneratorTest extends \PHPUnit\Framework\TestCase
 
         $fs->write_file('./.htaccess', $expected_content)->shouldBeCalled();
 
-        $generator = new HtAccessGenerator($fs->reveal());
+        $generator = new HTAccessGenerator($fs->reveal());
         $generator->create_file($blog_instance);
     }
 
@@ -86,7 +88,7 @@ class HtAccessGeneratorTest extends \PHPUnit\Framework\TestCase
 
         $fs->write_file('./.htaccess', $expected_content)->shouldBeCalled();
 
-        $generator = new HtAccessGenerator($fs->reveal());
+        $generator = new HTAccessGenerator($fs->reveal());
         $generator->create_file($blog_instance);
     }
 
@@ -109,7 +111,7 @@ class HtAccessGeneratorTest extends \PHPUnit\Framework\TestCase
 
         $fs->write_file('./foo/.htaccess', $expected_content)->shouldBeCalled();
 
-        $generator = new HtAccessGenerator($fs->reveal());
+        $generator = new HTAccessGenerator($fs->reveal());
         $generator->copy_parent = true;
         $generator->create_file($blog_instance);
     }

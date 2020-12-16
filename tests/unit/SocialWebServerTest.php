@@ -4,6 +4,11 @@ use Prophecy\Argument;
 
 class SocialWebServerTest extends \PHPUnit\Framework\TestCase
 {
+    private $prophet;
+    private $entry;
+    private $mapper;
+    private $http_client;
+
     public function testAddWebmention_WhenMentionIsValid_SavesMention() {
         $source = 'http://www.example.com/test1';
         $target = 'http://www.mysite.com/test2';

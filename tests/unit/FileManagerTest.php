@@ -4,6 +4,8 @@ use Prophecy\Argument;
 
 class FileManagerTest extends \PHPUnit\Framework\TestCase
 {
+    private $prophet;
+    private $fs;
 
     public function testGetAll_WhenEntryContainsJpegs_ReturnsOnlyAttachedFiles() {
         $entry = $this->createBlogEntry(['test.jpg']);

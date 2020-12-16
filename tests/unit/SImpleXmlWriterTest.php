@@ -2,7 +2,6 @@
 class SimpleXmlWriterTest extends PHPUnit\Framework\TestCase
 {
     function testConstructor() {
-        $this->fizz = array();
         $a = array('foo');
         $s = new SimpleXMLWriter($a);
         $this->assertSame($s->object, $a);
@@ -94,7 +93,7 @@ class SimpleXmlWriterTest extends PHPUnit\Framework\TestCase
         
         $s->object = array('foo','type'=>'bar','baz');
         $val = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n".
-               $s->serializeArray($s->object, "array");
+               SimpleXMLWriter::serializeArray($s->object, "array");
         $ret = $s->serialize();
         $this->assertEquals($ret, $val);
     }

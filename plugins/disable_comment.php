@@ -18,7 +18,12 @@
 # overrides that setting when enabled.  Note that this also means that if you later turn
 # off this plugin, comments will be re-enabled on those entries.
 
-class DisableComments extends Plugin {
+class DisableComments extends Plugin
+{
+    public $no_comment;
+    public $no_trackback;
+    public $no_pingback;
+    public $close_old;
 
     function __construct() {
         $this->plugin_desc = _("Allows you to globally disable comments, trackbacks, or pingbacks for an entire blog.");
@@ -28,28 +33,36 @@ class DisableComments extends Plugin {
         # Determine who is allowed to post comments.  The default is to use the
         # per-entry setting.  You can also choose to allow only logged in users
         # or just to disable comments on everything.
-        $this->addOption("no_comment", _("Allow comments"),
-                         "default", "radio",
-                         array("default" =>_("Use per-entry setting"),
+        $this->addOption(
+            "no_comment", _("Allow comments"),
+            "default", "radio",
+            array("default" =>_("Use per-entry setting"),
                                "loggedin"=>_("Logged in users only"),
-                               "disable" =>_("Disable all comments")));
+            "disable" =>_("Disable all comments"))
+        );
 
         # Option: Disable trackbacks
         # Turn this on to disallow trackbacks on all entries.
-        $this->addOption("no_trackback", _("Disable trackbacks for all entries"),
-                         false, "checkbox");
+        $this->addOption(
+            "no_trackback", _("Disable trackbacks for all entries"),
+            false, "checkbox"
+        );
 
         # Option: Disable pingbacks
         # Turn this on to completely disable pingbacks.
-        $this->addOption("no_pingback", _("Disable pingbacks for all entries"),
-                         false, "checkbox");
+        $this->addOption(
+            "no_pingback", _("Disable pingbacks for all entries"),
+            false, "checkbox"
+        );
 
         # Option: Close after X days
         # Use this to disable comments on entries that are more than X days old.
         # Comments will still be allowed on newer entries.
-        $this->addOption("close_old",
-                _("Close all replies on entries older than this many days"),
-                "", "text");
+        $this->addOption(
+            "close_old",
+            _("Close all replies on entries older than this many days"),
+            "", "text"
+        );
         parent::__construct();
 
         $this->registerEventHandler("blogentry", "InitComplete", "disable");

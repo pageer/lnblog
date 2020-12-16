@@ -4,6 +4,7 @@
     <file>./lib</file>
     <file>./tests</file>
     <file>./themes</file>
+    <file>./plugins</file>
     <file>./blogconfig.php</file>
     <file>./index.php</file>
 

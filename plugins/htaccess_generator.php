@@ -7,7 +7,9 @@
 # with rewrite rules to redirect attempts to directly access data files or 
 # other incorrect URLs.
 
-class HTAccessGenerator extends Plugin {
+class HTAccessGenerator extends Plugin
+{
+    public $copy_parent;
 
     const LNBLOG_START_MARKER = '# START LnBlog section';
     const LNBLOG_END_MARKER = '# END LnBlog section';

@@ -8,7 +8,7 @@ use Prophecy\Argument;
 
 class TaskManagerTest extends \PHPUnit\Framework\TestCase
 {
-
+    private $prophet;
     private $repo;
 
     public function testGetAll_DelegatesToRepository() {

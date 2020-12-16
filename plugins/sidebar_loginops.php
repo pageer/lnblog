@@ -4,7 +4,8 @@
 # This includes the links to create entries, manage plugins, etc.  You would
 # pretty much never want to disable this.
 
-class LoginOps extends Plugin {
+class LoginOps extends Plugin
+{
 
     function __construct($do_output=0) {
         $this->plugin_desc = _("Adds a control panel to the sidebar.");
@@ -48,15 +49,15 @@ class LoginOps extends Plugin {
     <li><a href="<?php echo $blg->uri('addentry'); ?>"><?php p_("New post"); ?></a></li>
     <?php endif; ?>
 
-    <?php if (System::instance()->canModify($blg,$usr)): ?>
+    <?php if (System::instance()->canModify($blg, $usr)): ?>
     <li><a href="<?php echo $blg->uri('listdrafts');?>"><?php p_("Drafts");?></a></li>
     <?php endif; ?>
 
-    <?php if (System::instance()->canModify($blg,$usr)): ?>
+    <?php if (System::instance()->canModify($blg, $usr)): ?>
     <li><a href="<?php echo $blg->uri('manage_reply');?>"><?php p_("Manage replies");?></a></li>
     <?php endif; ?>
 
-    <?php if (System::instance()->canModify($blg,$usr)): ?>
+    <?php if (System::instance()->canModify($blg, $usr)): ?>
     <li><a href="<?php echo $blg->uri('upload'); ?>"><?php p_("Upload file for blog"); ?></a></li>
     <li><a href="<?php echo $blg->uri('edit'); ?>"><?php p_("Edit weblog settings"); ?></a></li>
     <?php endif; ?>
@@ -74,7 +75,7 @@ class LoginOps extends Plugin {
     <?php endif; ?>
 </ul>
 <?php endif; ?>
-<?php if (System::instance()->canModify($blg,$usr)): ?>
+<?php if (System::instance()->canModify($blg, $usr)): ?>
 <h3>Plugin Configuration</h3>
 <ul>
     <li><a href="<?php echo $blg->uri('pluginconfig');?>"><?php p_("Configure plugins"); ?></a></li>

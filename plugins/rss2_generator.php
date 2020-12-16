@@ -31,7 +31,8 @@
 # optional, but they can make the feed file somewhat nicer looking if it is viewed in a web
 # browser.
 
-class RSS2Entry {
+class RSS2Entry
+{
 
     public $link;
     public $title;
@@ -87,7 +88,7 @@ class RSS2Entry {
                 $ret .= "<category>".htmlspecialchars($this->category)."</category>\n";
             }
         }
-        if($this->comment_count) {
+        if ($this->comment_count) {
             $ret .= "<slash:comments>".$this->comment_count."</slash:comments>\n";
         }
         if ($this->comments) {
@@ -112,7 +113,8 @@ class RSS2Entry {
 
 }
 
-class RSS2 {
+class RSS2
+{
 
     public $url;
     public $title;
@@ -120,6 +122,7 @@ class RSS2 {
     public $image;
     public $entrylist;
     public $link_stylesheet;
+    public $link_xslsheet;
 
     function __construct() {
         $this->url = "";
@@ -171,8 +174,13 @@ class RSS2 {
 
 }
 
-class RSS2FeedGenerator extends Plugin {
-
+class RSS2FeedGenerator extends Plugin
+{
+    public $feed_style;
+    public $feed_xsl;
+    public $feed_file;
+    public $topic_feeds;
+    public $cat_suffix;
     public $guid_is_permalink;
     public $comment_file = '';
 
@@ -183,19 +191,31 @@ class RSS2FeedGenerator extends Plugin {
         #$this->addOption("guid_is_permalink",
         #                 _("Use entry permalink as globally unique identifier"),
         #                 true, "checkbox");
-        $this->addOption("feed_style", _("CSS style sheet for RSS feeds"),
-                         "", "text");
-        $this->addOption("feed_xsl", _("XSLT style sheet for RSS feeds"),
-                         "", "text");
-        $this->addOption("feed_file", _("File name for blog RSS 2 feed"),
-                         "news.xml", "text");
-        $this->addOption("comment_file", _("File name for comment RSS 2 feeds"),
-                         "comments.xml", "text");
-        $this->addOption("topic_feeds", _("Generate feeds for each topic"),
-                         true, 'checkbox');
-        $this->addOption("cat_suffix",
-                         _("Suffix to append to category for top feed files"),
-                         "_news.xml", "text");
+        $this->addOption(
+            "feed_style", _("CSS style sheet for RSS feeds"),
+            "", "text"
+        );
+        $this->addOption(
+            "feed_xsl", _("XSLT style sheet for RSS feeds"),
+            "", "text"
+        );
+        $this->addOption(
+            "feed_file", _("File name for blog RSS 2 feed"),
+            "news.xml", "text"
+        );
+        $this->addOption(
+            "comment_file", _("File name for comment RSS 2 feeds"),
+            "comments.xml", "text"
+        );
+        $this->addOption(
+            "topic_feeds", _("Generate feeds for each topic"),
+            true, 'checkbox'
+        );
+        $this->addOption(
+            "cat_suffix",
+            _("Suffix to append to category for top feed files"),
+            "_news.xml", "text"
+        );
         parent::__construct();
         #if (! defined("RSS2GENERATOR_GUID_IS_PERMALINK"))
         #   define("RSS2GENERATOR_GUID_IS_PERMALINK", $this->guid_is_permalink);
@@ -225,10 +245,12 @@ class RSS2FeedGenerator extends Plugin {
 
         $comm_list = $parent->getCommentArray();
         foreach ($comm_list as $ent)
-            $feed->entrylist[] = new RSS2Entry($ent->permalink(),
+            $feed->entrylist[] = new RSS2Entry(
+                $ent->permalink(),
                 $ent->subject,
                 $ent->markup($ent->data),
-                "", $ent->permalink());
+                "", $ent->permalink()
+            );
 
         $ret = $feed->writeFile($path);
         return $ret;
@@ -270,14 +292,16 @@ class RSS2FeedGenerator extends Plugin {
             # If there's an enclosure, but we can't get it's data, then it might
             # be a file uploaded with the entry, so set an upload event listener.
 
-            $feed->entrylist[] = new RSS2Entry($ent->permalink(),
+            $feed->entrylist[] = new RSS2Entry(
+                $ent->permalink(),
                 $ent->subject,
                 $ent->markup($ent->data),
                 $ent->commentlink(),
                 $ent->uri('base'),
                 $author_data, $ent->tags(), "",
                 $cmt_count ? $ent->commentlink().$this->comment_file : "",
-                $cmt_count, $ent->getEnclosure());
+                $cmt_count, $ent->getEnclosure()
+            );
         }
 
         $ret = $feed->writeFile($path);
@@ -299,7 +323,7 @@ class RSS2FeedGenerator extends Plugin {
             $feed->link_stylesheet = $this->feed_style;
             $feed->link_xslsheet = $this->feed_xsl;
             $topic = preg_replace('/\W/', '', $tag);
-            $path = Path::mk($blog->home_path,BLOG_FEED_PATH,$topic.$this->cat_suffix);
+            $path = Path::mk($blog->home_path, BLOG_FEED_PATH, $topic.$this->cat_suffix);
             $feed_url = $resolver->localpathToUri($path, $blog);
 
             $feed->url = $feed_url;
@@ -320,14 +344,16 @@ class RSS2FeedGenerator extends Plugin {
                 $author_data = $usr->email();
                 if ( $author_data ) $author_data .= " (".$usr->displayName().")";
                 $cmt_count = $ent->getCommentCount();
-                                $feed->entrylist[] = new RSS2Entry($ent->permalink(),
-                        $ent->subject,
-                        $ent->markup($ent->data),
-                        $ent->commentlink(),
-                        $ent->uri('base'),
-                        $author_data, "", "",
-                        $cmt_count ? $ent->commentlink().$this->comment_file : "",
-                        $cmt_count, $ent->getEnclosure() );
+                                $feed->entrylist[] = new RSS2Entry(
+                                    $ent->permalink(),
+                                    $ent->subject,
+                                    $ent->markup($ent->data),
+                                    $ent->commentlink(),
+                                    $ent->uri('base'),
+                                    $author_data, "", "",
+                                    $cmt_count ? $ent->commentlink().$this->comment_file : "",
+                                    $cmt_count, $ent->getEnclosure() 
+                                );
             }
 
             $ret = $feed->writeFile($path);
