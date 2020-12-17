@@ -7,6 +7,8 @@
     <file>./plugins</file>
     <file>./blogconfig.php</file>
     <file>./index.php</file>
+    <file>./cli.php</file>
+    <file>./xmlrpc.php</file>
 
     <rule ref="Zend">
         <exclude name="Generic.Functions.OpeningFunctionBraceBsdAllman" />

@@ -6,5 +6,9 @@ parameters:
         - tests
         - blogconfig.php
         - index.php
+        - cli.php
+        - xmlrpc.php
     bootstrapFiles:
         - blogconfig.php
+    scanFiles:
+        - vendor/phpxmlrpc/phpxmlrpc/lib/xmlrpc.inc

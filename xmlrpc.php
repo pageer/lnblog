@@ -288,7 +288,7 @@ function blogger_newPost($params) {
         } else {
             $publisher->createDraft($ent);
         }
-        return new xmlrpcresp( new xmlrpcval($ent->globalID()) );
+        return new xmlrpcresp(new xmlrpcval($ent->globalID()));
     } catch (Exception $e) {
         return new xmlrpcresp(0, $xmlrpcerruser+2, "Entry add failed");
     }
@@ -360,7 +360,7 @@ function blogger_editPost($params) {
         } else {
             $publisher->update($ent);
         }
-        return new xmlrpcresp( new xmlrpcval(true, 'boolean') );
+        return new xmlrpcresp(new xmlrpcval(true, 'boolean'));
     } catch (Exception $e) {
         return new xmlrpcresp(0, $xmlrpcerruser+2, "Entry update failed");
     }
@@ -403,7 +403,7 @@ function blogger_deletePost($params) {
 
     try {
         $publisher->delete($ent);
-        return new xmlrpcresp( new xmlrpcval(true, 'boolean') );
+        return new xmlrpcresp(new xmlrpcval(true, 'boolean'));
     } catch (Exception $e) {
         return new xmlrpcresp(0, $xmlrpcerruser+2, "Entry update failed");
     }
@@ -440,14 +440,15 @@ function blogger_getUsersBlogs($params) {
         $resp_arr = array();
         foreach ($blogs as $blg) {
             $resp_arr[] = new xmlrpcval(
-                          array("url"=> new xmlrpcval($blg->getURL()),
+                array("url"=> new xmlrpcval($blg->getURL()),
                                 "blogName"=>new xmlrpcval($blg->name),
                                 "blogid"=>new xmlrpcval($blg->blogid)),
-                                      "struct");
+                "struct"
+            );
         }
         $ret = new xmlrpcresp(new xmlrpcval($resp_arr, "array"));
     } else {
-        $ret = new xmlrpcresp(0,$xmlrpcerruser+4, "This user has no blogs");
+        $ret = new xmlrpcresp(0, $xmlrpcerruser+4, "This user has no blogs");
     }
     return $ret;
 }
@@ -522,13 +523,14 @@ function blogger_getUserInfo($params) {
     }
 
     $user_arr = new xmlrpcval(
-                    array('nickname'=>new xmlrpcval($nickname, 'string'),
+        array('nickname'=>new xmlrpcval($nickname, 'string'),
                           'userid'=>new xmlrpcval($uid, 'string'),
                           'url'=>new xmlrpcval($usr->homepage(), 'string'),
                           'email'=>new xmlrpcval($usr->email(), 'string'),
                           'lastname'=>new xmlrpcval($lname, 'string'),
                           'firstname'=>new xmlrpcval($fname, 'string')),
-                    'struct');
+        'struct'
+    );
     return new xmlrpcresp($user_arr);
 }
 
@@ -545,8 +547,10 @@ function blogger_getUserInfo($params) {
 
 function blogger_getTemplate($params) {
     global $xmlrpcerruser;
-    return new xmlrpcresp(0, $xmlrpcerruser+1,
-                          "Method blogger.getTemplate not implemented.");
+    return new xmlrpcresp(
+        0, $xmlrpcerruser+1,
+        "Method blogger.getTemplate not implemented."
+    );
 }
 
 # Method: blogger.setTemplate
@@ -562,8 +566,10 @@ function blogger_getTemplate($params) {
 
 function blogger_setTemplate($params) {
     global $xmlrpcerruser;
-    return new xmlrpcresp(0, $xmlrpcerruser+1,
-                          "Method blogger.setTemplate not implemented.");
+    return new xmlrpcresp(
+        0, $xmlrpcerruser+1,
+        "Method blogger.setTemplate not implemented."
+    );
 }
 
 /*
@@ -680,7 +686,7 @@ function metaWeblog_newPost($params) {
         } else {
             $publisher->createDraft($ent);
         }
-        return new xmlrpcresp( new xmlrpcval($ent->globalID()) );
+        return new xmlrpcresp(new xmlrpcval($ent->globalID()));
     } catch (Exception $e) {
         return new xmlrpcresp(0, $xmlrpcerruser+2, "Entry add failed");
     }
@@ -737,7 +743,7 @@ function metaWeblog_editPost($params) {
                 break;
                 case 'description':
                 $ent->data = $list['value']->scalarval();
-                break;
+                    break;
             case 'categories':
                 $tag_arr = array();
                 $size = $list['value']->arraysize();
@@ -758,7 +764,7 @@ function metaWeblog_editPost($params) {
             $publisher->update($ent);
         }
 
-        return new xmlrpcresp( new xmlrpcval(true,'boolean') );
+        return new xmlrpcresp(new xmlrpcval(true, 'boolean'));
     } catch (Exception $e) {
         return new xmlrpcresp(0, $xmlrpcerruser+2, "Entry edit failed");
     }
@@ -856,7 +862,7 @@ function metaWeblog_newMediaObject($params) {
     if (! empty($ent)) {
         $postpath = $ent->scalarval();
         $entry = NewEntry($postpath);
-        if ($entry->isEntry() && System::instance()->canModify($entry,$usr)) {
+        if ($entry->isEntry() && System::instance()->canModify($entry, $usr)) {
             $path = Path::mk($entry->localpath(), $name->scalarval());
         } else {
             return new xmlrpcresp(0, $xmlrpcerruser+3, "Invalid login - cannot add files to this entry");
@@ -909,7 +915,7 @@ function metaWeblog_getCategories($params) {
 
     if ($blog->isBlog()) {
         $arr = array();
-        $base_feed_path = Path::mk($blog->home_path,BLOG_FEED_PATH);
+        $base_feed_path = Path::mk($blog->home_path, BLOG_FEED_PATH);
         $base_feed_uri = $blog->uri('base').BLOG_FEED_PATH.'/';
         foreach ($blog->tag_list as $tag) {
             $cat = array();
@@ -1038,7 +1044,7 @@ function mt_getRecentPostTitles($params) {
         $arr = array();
         foreach ($entries as $ent) {
             $post = array();
-            $post['dateCreated'] = new xmlrpcval(fmdate(ENTRY_DATE_FORMAT, $ent->post_ts), 'dateTime.iso8601');
+            $post['dateCreated'] = new xmlrpcval(fmtdate(ENTRY_DATE_FORMAT, $ent->post_ts), 'dateTime.iso8601');
             $post['userid'] = new xmlrpcval($ent->uid, 'string');
             $post['postid'] = new xmlrpcval($ent->globalID(), 'string');
             $post['title'] = new xmlrpcval($ent->subject, 'string');
@@ -1252,7 +1258,7 @@ function mt_getTrackbackPings($params) {
         $s['pingIP'] = new xmlrpcval($tb->ip, 'string');
         $ret[] = new xmlrpcval($s, 'struct');
     }
-    return new xmlrpcresp(new xmlrpcval($ret,'array'));
+    return new xmlrpcresp(new xmlrpcval($ret, 'array'));
 }
 
 # Method: mt.publishPost
@@ -1296,4 +1302,4 @@ function authenticate_user($usr, $pwd, $check) {
 
 $server = new xmlrpc_server($function_map);
 
-?>
+
