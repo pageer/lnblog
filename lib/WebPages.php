@@ -454,7 +454,7 @@ class WebPages extends BasePages
         if (has_post() && !$email) {
             $error = spf_("No e-mail address is set for user %s! Unable to send reset code.", $username);
         } elseif (has_post() && $email != $confirm_email) {
-            $error = spf_('The account e-mail address for %1$s does not match %1$2', $username, $confirm_email);
+            $error = spf_('The account e-mail address for %1$s does not match %2$s', $username, $confirm_email);
         }
 
         if ($should_send_email) {

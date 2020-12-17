@@ -32,7 +32,7 @@ class UrlResolver
         $is_absolute = $path_obj->isAbsolute($path);
         if ($is_absolute) {
             $file = $this->fs->realpath($path);
-            if (substr($path, -1) == Path::$sep & substr($file, -1) != Path::$sep) {
+            if ($file && substr($path, -1) == Path::$sep & substr($file, -1) != Path::$sep) {
                 $file .= Path::$sep;
             }
         }
@@ -54,7 +54,7 @@ class UrlResolver
         foreach ($roots as $root) {
             if ($is_absolute) {
                 $real_root = $this->fs->realpath($root->path());
-                if (strpos($file, $real_root) === 0) {
+                if ($file && strpos($file, $real_root) === 0) {
                     $rel_path = str_replace($real_root, '', $file);
                     $url = $root->url() . $this->urlSlashes(ltrim($rel_path, Path::$sep));
                     return $url;

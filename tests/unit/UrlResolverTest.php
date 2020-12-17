@@ -165,7 +165,11 @@ class UrlResolverTest extends \PHPUnit\Framework\TestCase
         $blog->blogid = 'foobar';
 
         $this->setUpSystemUrlRegistry();
-        $this->fs->realpath(Argument::any())->willReturn(true, false);
+        $this->fs->realpath($path)->willReturn(false);
+        $items = array_merge($this->blogs, [$this->install, $this->userdata]);
+        foreach ($items as $item) {
+            $this->fs->realpath($item->path())->willReturn($item->path());
+        }
 
         $resolver = $this->createUrlResolver();
         $url = $resolver->localpathToUri($path, $use_blog ? $blog : null);
