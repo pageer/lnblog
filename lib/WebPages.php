@@ -52,7 +52,7 @@ class WebPages extends BasePages
             'forgot'       => 'forgotPassword',
             'reset'        => 'resetPassword',
             'showitem'     => 'showitem',
-            'showarticles' => 'showartiles',
+            'showarticles' => 'showarticles',
             'showarchive'  => 'showarchive',
         );
     }
