@@ -23,10 +23,10 @@ $xml_lang = str_replace("_", "-", LANGUAGE); ?>
 <head>
 <title><?php echo $PAGE_TITLE; ?></title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
-<?php foreach ($METADATA as $meta) { ?>
+<?php foreach ($METADATA as $meta): ?>
     <meta <?php if ($meta["http-equiv"]): ?>
         http-equiv="<?php echo $meta["http-equiv"]; ?>"
-   <?php endif ?>
+   <?php endif; ?>
     <?php if ($meta["name"]): ?>
         name="<?php echo $meta["name"]; ?>"
     <?php endif ?> 
