@@ -22,7 +22,7 @@ class Recent extends Plugin
     function __construct($do_output=0) {
 
         $this->plugin_desc = _("Show some of the more recent posts in the sidebar.");
-        $this->plugin_version = "0.3.0";
+        $this->plugin_version = "0.3.1";
         $this->addOption(
             "old_header",
             _("Header for main blog page (entries not on main page)"),
@@ -72,17 +72,18 @@ class Recent extends Plugin
 
     function buildOutput($blg, $is_index=false) {
 
-        if ( !($this->num_entries > 0) ) {
-            $this->num_entries = false;
+        $num_entries = filter_var($this->num_entries, FILTER_VALIDATE_INT, ['min_range' => 1]);
+        if (!$num_entries) {
+            $num_entries = $blg->max_entries;
         }
 
         # Show some of the more recent entries.  If we're on the "front page"
         # of the blog, then show the next set of entries.  Otherwise, show the
         # most recent entries.
         if ($is_index) {
-            $next_list = $blg->getNextMax($this->num_entries);
+            $next_list = $blg->getNextMax($num_entries);
         } else {
-            $next_list = $blg->getRecent($this->num_entries);
+            $next_list = $blg->getRecent($num_entries);
         }
 
         ob_start();
