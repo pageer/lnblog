@@ -2,6 +2,7 @@
 <ruleset name="LnBlog Standard" namespace="LnBLog\CS\Standard">
     <description>Project coding standard</description>
     <file>./lib</file>
+    <file>./pages</file>
     <file>./tests</file>
     <file>./themes</file>
     <file>./plugins</file>

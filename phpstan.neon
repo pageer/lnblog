@@ -2,6 +2,7 @@ parameters:
     level: 3
     paths:
         - lib
+        - pages
         - plugins
         - tests
         - blogconfig.php
