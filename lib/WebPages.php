@@ -158,7 +158,6 @@ class WebPages extends BasePages
             $global_id = $entry->globalID() . $type . GET('delete');
             $responses = [$global_id];
         }
-        var_dump($responses);
         $result = $this->handleDeletes($responses);
 
         if ($result === true) {
@@ -966,7 +965,7 @@ class WebPages extends BasePages
         return $ret;
     }
 
-    protected function getPostedResponses(array $responses, User $user) {
+    protected function getPostedResponses(array $responses, User $user): array {
         $result = [
             'allowed' => [],
             'denied' => [],
@@ -1147,7 +1146,7 @@ class WebPages extends BasePages
         $tpl->set("CANCEL_LABEL", _("Cancel"));
         $tpl->set("PASS_DATA_ID", "replies[]");
 
-        $anchors = '';
+        $anchors = [];
 
         if ( count($replies['allowed']) <= 0 ) {
             # No permission to delete anything, so bail out.
@@ -1161,7 +1160,7 @@ class WebPages extends BasePages
             $bad_list = '';
 
             foreach ($replies['allowed'] as $resp) {
-                $anchors .= ($anchors == '' ? '' : ',').$resp->globalID();
+                $anchors[] = $resp->globalID();
                 $good_list .= $get_list_text($resp);
             }
 
@@ -1189,7 +1188,7 @@ class WebPages extends BasePages
             if ( count($ret) > 0) {
                 $list = '';
                 foreach ($ret as $obj) {
-                    $anchors .= ($anchors == '' ? '' : ',').$obj->globalID();
+                    $anchors[] = $obj->globalID();
                     $list .= $get_list_text($obj);
                 }
                 $title = _("Error deleting responses");
@@ -1206,7 +1205,7 @@ class WebPages extends BasePages
             # Last is the case where we have all good responses, but no confirmation.
             $list = '';
             foreach ($replies['allowed'] as $resp) {
-                $anchors .= ($anchors == '' ? '' : ',').$resp->globalID();
+                $anchors[] = $resp->globalID();
                 $list .= $get_list_text($resp);
             }
 
