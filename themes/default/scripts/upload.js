@@ -1,8 +1,7 @@
 /*globals strings, lnblog, lbcode_editor, AJAX_URL */
 /*jshint regexp: false */
 Dropzone.autoDiscover = false;
-$(document).ready(
-    function () {
+var initializeUpload = function () {
 
     var addLink = function ($input) {
        var ext = $input.val().replace(/^(.*)(\..+)$/, "$2"),
@@ -70,18 +69,18 @@ $(document).ready(
            $.post(url, data)
             .done(
                 function() {
-                var $list = $node.closest('.attachment-list');
-                $node.remove();
-                if ($list.children().length === 0) {
-                    var link_name = $list.hasClass('entry-attachments') ? 'entry-attachments' : 'blog-attachments';
-                    $list.hide();
-                    $list.parent().find('[name="' + link_name + '"]').hide();
-                }
+                    var $list = $node.closest('.attachment-list');
+                    $node.remove();
+                    if ($list.children().length === 0) {
+                        var link_name = $list.hasClass('entry-attachments') ? 'entry-attachments' : 'blog-attachments';
+                        $list.hide();
+                        $list.parent().find('[name="' + link_name + '"]').hide();
+                    }
                 }
             )
             .fail(
                 function() {
-                alert("Error removing file '" + file_name + "'.");
+                    alert("Error removing file '" + file_name + "'.");
                 }
             );
        }
@@ -90,24 +89,25 @@ $(document).ready(
     };
 
     $('.attachment-list-toggle').on(
-        'click', function() {
-        var $this = $(this);
-        var type = $this.attr('name');
-        $this.parent().find('.' + type).toggle();
-        return false;
+        'click', 
+        function() {
+            var $this = $(this);
+            var type = $this.attr('name');
+            $this.parent().find('.' + type).toggle();
+            return false;
         }
     );
     $('.attachment-list').toggle(false);
 
     var createRemoveLinks = function () {
        $('.attachment .remove-link').remove();
-    $('.attachment').each(
-        function() {
-        var $link = $('<a href="#" class="remove-link" title="' + strings.editor_removeLink + '">&times;</a>');
-        $link.on('click', removeUpload);
-        $(this).append($link);
-        }
-    );
+        $('.attachment').each(
+            function() {
+                var $link = $('<a href="#" class="remove-link" title="' + strings.editor_removeLink + '">&times;</a>');
+                $link.on('click', removeUpload);
+                $(this).append($link);
+            }
+        );
     };
 
     var uploadUrl = function (files) {
@@ -159,16 +159,17 @@ $(document).ready(
 
     $("#filedrop").dropzone(
         {
-        url: uploadUrl,
-        paramName: 'upload',
-        params: parameterData,
-        addRemoveLinks: true,
-        dictDefaultMessage: strings.upload_droponeText,
-        init: function () {
-           this.on("success", uploadSuccess);
-           $('#fileupload').hide();
-        }
+            url: uploadUrl,
+            paramName: 'upload',
+            params: parameterData,
+            addRemoveLinks: true,
+            dictDefaultMessage: strings.upload_droponeText,
+            init: function () {
+               this.on("success", uploadSuccess);
+               $('#fileupload').hide();
+            }
         }
     );
-    } 
-);
+};
+
+$(document).ready(initializeUpload);
