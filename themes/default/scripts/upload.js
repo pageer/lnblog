@@ -47,26 +47,41 @@ var initializeUpload = function () {
        return false;
     };
 
+    var generateUrl = function (action, use_entry) {
+        var base = window.AJAX_URL || '';
+        var url = base + '?action=' + action;
+        var entryid = '';
+        if (use_entry) {
+            var full_path = window.location.href.replace(/\?.*/, '');
+            entryid = full_path.replace(base, '');
+            url += '&entry=' + entryid;
+        }
+        var query_params = window.location.search.substr(1).split('&');
+
+        for (var i = 0; i < query_params.length; i++) {
+            var pieces = query_params[i].split('=');
+            if (pieces[0] === 'draft') {
+                url += '&draft=' + pieces[1];
+            }
+        }
+
+        return url;
+    };
+
+    var generateData = function (data) {
+        data['xrf-token'] = $('input[name="xrf-token"]').val();
+        return data;
+    }
+
     var removeUpload = function() {
-       var $node = $(this).closest('.attachment');
-       var file_name = $node.data('file');
-       var should_remove = confirm("Really delete file '" + file_name + "'?");
-       var url = (window.AJAX_URL || '') + '?action=removefile';
+        var $node = $(this).closest('.attachment');
+        var file_name = $node.data('file');
+        var should_remove = confirm("Really delete file '" + file_name + "'?");
+        var data = generateData({'file': file_name});
+        var url = generateUrl('removefile');
 
-       var query_params = window.location.search.substr(1).split('&');
-       var data = {
-           'file': file_name,
-           'xrf-token': $('input[name="xrf-token"]').val()
-       }
-       for (var i = 0; i < query_params.length; i++) {
-           var pieces = query_params[i].split('=');
-           if (pieces[0] === 'draft') {
-               url += '&draft=' + pieces[1];
-           }
-       }
-
-       if (should_remove) {
-           $.post(url, data)
+        if (should_remove) {
+            $.post(url, data)
             .done(
                 function() {
                     var $list = $node.closest('.attachment-list');
@@ -83,9 +98,58 @@ var initializeUpload = function () {
                     alert("Error removing file '" + file_name + "'.");
                 }
             );
-       }
+        }
 
-       return false;
+        return false;
+    };
+
+    var resizeUpload = function () {
+        var $self = $(this).closest('.attachment');
+        var file_name = $self.data('file');
+        var data = generateData({'file': file_name, 'mode': $(this).val()});
+        var url = generateUrl('scaleimage', true);
+
+        $self.find('.scale-link, .scale-select').hide();
+        $self
+            .find('.status-label')
+            .html('<span class="loading"></span>' + strings.upload_scaleStatusProgress)
+            .show();
+
+        $.post(url, data)
+            .done(
+                function (response) {
+                    var result = JSON.parse(response);
+                    if (result.success) {
+                        $self.find('.status-label').addClass('success').text(strings.upload_scaleStatusSuccess).show();
+                        var $thumb_node = $self.clone();
+                        $thumb_node
+                            .data('file', result.file)
+                            .text(result.file);
+                        $self.after($thumb_node);
+                    } else {
+                        $self.find('.status-label').addClass('failure').text(strings.upload_scaleStatusError + result.error);
+                    }
+                    setTimeout(
+                        function () {
+                            $self.find('.status-label').fadeOut(400, function () {
+                                $self.find('.scale-link').fadeIn(400, setAttachmentControls);
+                            });
+                        },
+                        3000
+                    );
+                }
+            )
+            .fail(
+                function (response) {
+                    var result = JSON.parse(response);
+                    $self.find('.status-label').addClass('failure').text(strings.upload_imageStatusError);
+                    setTimeout(
+                        function () {
+                            $self.find('.scale-link .scale-select, .status-label').toggle();
+                        }, 3000
+                    );
+                }
+            );
     };
 
     $('.attachment-list-toggle').on(
@@ -99,13 +163,44 @@ var initializeUpload = function () {
     );
     $('.attachment-list').toggle(false);
 
-    var createRemoveLinks = function () {
-       $('.attachment .remove-link').remove();
+    var setAttachmentControls = function () {
+        $('.attachment .remove-link, .scale-link, .scale-select, .status-label').remove();
         $('.attachment').each(
             function() {
                 var $link = $('<a href="#" class="remove-link" title="' + strings.editor_removeLink + '">&times;</a>');
                 $link.on('click', removeUpload);
                 $(this).append($link);
+
+                var file_name = $(this).data('file') || '';
+                var is_supported_image = file_name.toLowerCase().match(/.+.(jpg|jpeg|png)/);
+                var is_scaled_version = file_name.match(/.+-(thumb|small|med|large).(jpg|png)/);
+                if (is_supported_image && !is_scaled_version) {
+                    var $scale_link = $(
+                        '<a href="#" class="scale-link" title="' + strings.upload_scalerLink + '"></a>'
+                    );
+                    $scale_link.on(
+                        'click', function () {
+                            $scaler_box.toggle();
+                            return false;
+                        }
+                    );
+                    var $scaler_box = $(
+                        '<select class="scale-select">' + 
+                        '<option>' + strings.upload_scalePlaceholderLabel + '</option>' +
+                        '<option value="thumb">' + strings.upload_scaleThumbLabel + '</option>' +
+                        '<option value="small">' + strings.upload_scaleSmallLabel + '</option>' +
+                        '<option value="med">' + strings.upload_scaleMediumLabel + '</option>' +
+                        '<option value="large">' + strings.upload_scaleLargeLabel + '</option>' +
+                        '</select>'
+                    );
+                    $scaler_box.on('change', resizeUpload);
+                    $scaler_box.hide();
+                    var $status_label = $('<span class="status-label"></span>');
+                    $status_label.hide()
+                    $(this).append($scale_link);
+                    $(this).append($scaler_box);
+                    $(this).append($status_label);
+                }
             }
         );
     };
@@ -151,11 +246,11 @@ var initializeUpload = function () {
        } else {
            $('.blog-attachments').append($new_file);
        }
-       createRemoveLinks();
+       setAttachmentControls();
        return true;
     };
 
-    createRemoveLinks();
+    setAttachmentControls();
 
     $("#filedrop").dropzone(
         {

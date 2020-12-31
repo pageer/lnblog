@@ -351,18 +351,8 @@ class BlogEntry extends Entry implements AttachmentContainer
             $ret = array();
             $ret['url'] = $this->url_resolver->localpathToUri($path, $this->getParent());
             $ret['length'] = $this->fs->filesize($path);
-            if (extension_loaded("fileinfo")) {
-                $mh = finfo_open(FILEINFO_MIME|FILEINFO_PRESERVE_ATIME);
-                $ret['type'] = finfo_file($mh, $path);
-            } elseif (function_exists('mime_content_type')) {
-                $ret['type'] = mime_content_type($path);
-            } else {
-                # No fileinfo, no mime_magic, so revert to file extension matching.
-                # This is a dirty and incomplete method, but I suppose it's better
-                # than nothing.  Though only marginally.
-                require_once __DIR__.'/stupid_mime.php';
-                $ret['type'] = stupid_mime_get_type($path);
-            }
+            $globals = new GlobalFunctions();
+            $ret['type'] = $globals->getMimeType($path);
 
         } elseif (strpos($this->enclosure, 'url')    !== false &&
                   strpos($this->enclosure, 'length') !== false &&

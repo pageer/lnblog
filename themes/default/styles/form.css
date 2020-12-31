@@ -224,3 +224,32 @@ form.centered input {
 .attachment-list {
     margin-top: 2px;
 }
+
+.attachment-list .attachment {
+    min-height: 22px;
+}
+
+.attachment-list .scale-link {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background-image: url(../images/images.png);
+    margin-right: 8px;
+    margin-left: 8px;
+}
+
+.attachment-list .loading {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background-image: url(../images/ajax-loader.gif);
+    margin-right: 4px;
+}
+
+.attachment-list .success {
+    color: green;
+}
+
+.attachment-list .failure {
+    color: red;
+}

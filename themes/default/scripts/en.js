@@ -22,5 +22,14 @@ var strings = {
 
     editor_tagBoxPlaceholder: "Tags for this entry",
 
-    upload_droponeText: "Drag-and-drop files or click here to upload"
+    upload_droponeText: "Drag-and-drop files or click here to upload",
+    upload_scalerLink: "Scale down image",
+    upload_scalePlaceholderLabel: "Select a size",
+    upload_scaleThumbLabel: "Thumbnail (128x128)",
+    upload_scaleSmallLabel: "Small (640x480)",
+    upload_scaleMediumLabel: "Medium (800x600)",
+    upload_scaleLargeLabel: "Large (1024x768)",
+    upload_scaleStatusProgress: "Scaling image...",
+    upload_scaleStatusSuccess: "Image created!",
+    upload_scaleStatusError: "Error: "
 };

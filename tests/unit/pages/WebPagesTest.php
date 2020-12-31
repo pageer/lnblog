@@ -1,5 +1,7 @@
 <?php
 
+use LnBlog\Attachments\ImageScaler;
+use LnBlog\Model\EntryFactory;
 use Prophecy\Argument;
 
 class WebPagesTest extends \PHPUnit\Framework\TestCase
@@ -16,6 +18,9 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase
     protected $social_server;
     protected $global_functions;
     protected $mapper;
+    protected $factory;
+    protected $scaler;
+    protected $resolver;
 
     public function testEditEntry_WhenEmptyPostAndNotLoggedIn_Shows403Error() {
         $this->entry->isEntry()->willReturn(true);
@@ -691,6 +696,53 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase
         $this->webpage->resetPassword();
     }
 
+    public function testScaleImage_WhenMissingPostData_ReturnsError() {
+        $_POST = [];
+
+        ob_start();
+        $this->webpage->scaleimage();
+        $output = ob_get_clean();
+
+        $result = json_decode($output, true);
+        $this->assertFalse($result['success']);
+        $this->assertEquals($result['error'], 'Missing required parameters');
+    }
+
+    public function testScaleImage_WhenWrongPermissions_ReturnsError() {
+        $_POST = [
+            'file' => 'test.png',
+            'mode' => 'med',
+        ];
+        $this->system->canModify(Argument::any(), Argument::any())->willReturn(false);
+
+        ob_start();
+        $this->webpage->scaleimage();
+        $output = ob_get_clean();
+
+        $result = json_decode($output, true);
+        $this->assertFalse($result['success']);
+        $this->assertEquals($result['error'], 'Could not find source file');
+    }
+
+    public function testScaleImage_WhenScaleSucceeds_ReturnsFileAndUrl() {
+        $_POST = [
+            'file' => 'test.png',
+            'mode' => 'med',
+        ];
+        $this->system->canModify(Argument::any(), Argument::any())->willReturn(true);
+        $this->resolver->localpathToUri('test-med.png', $this->blog, Argument::any())->willReturn('https://example.com/test-med.png');
+        $this->scaler->scaleImage('test.png', 'med')->willReturn('test-med.png');
+
+        ob_start();
+        $this->webpage->scaleimage();
+        $output = ob_get_clean();
+
+        $result = json_decode($output, true);
+        $this->assertTrue($result['success']);
+        $this->assertEquals($result['file'], 'test-med.png');
+        $this->assertEquals($result['url'], 'https://example.com/test-med.png');
+    }
+
     protected function setUp(): void {
         EventRegister::instance()->clearAll();
         $_POST = [];
@@ -710,9 +762,18 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase
         $this->mapper = $this->prophet->prophesize(EntryMapper::class);
         $this->social_server = $this->prophet->prophesize(SocialWebServer::class);
         $this->global_functions = $this->prophet->prophesize(GlobalFunctions::class);
+        $this->factory = $this->prophet->prophesize(EntryFactory::class);
+        $this->scaler = $this->prophet->prophesize(ImageScaler::class);
+        $this->resolver = $this->prophet->prophesize(UrlResolver::class);
         $this->page = $this->prophet->prophesize(Page::class);
 
-        $this->webpage = new TestableWebPages($this->blog->reveal(), $this->user->reveal());
+        $this->webpage = new TestableWebPages(
+            $this->blog->reveal(),
+            $this->user->reveal(),
+            $this->factory->reveal(),
+            $this->scaler->reveal(),
+            $this->resolver->reveal()
+        );
 
         $this->webpage->test_page = $this->page->reveal();
         $this->webpage->test_entry = $this->entry->reveal();

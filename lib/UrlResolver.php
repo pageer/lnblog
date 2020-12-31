@@ -184,6 +184,9 @@ class UrlResolver
             case 'upload':
                 $query = empty($params['profile']) ? '' : '&profile=' . $params['profile'];
                 return $blog_root . '?action=upload' . $query;
+            case 'scaleimage':
+                $query = empty($params['profile']) ? '' : '&profile=' . $params['profile'];
+                return $blog_root . '?action=scaleimage' . $query;
             case 'edit':
                 return $blog_root . '?action=edit';
             case 'manage_reply':
@@ -260,6 +263,8 @@ class UrlResolver
                 return $this->localpathToUri($url, $entry->getParent());
             case 'upload':
                 return $this->localpathToUri($base_dir, $entry->getParent()) . '/?action=upload';
+            case 'scaleimage':
+                return $this->localpathToUri($base_dir, $entry->getParent()) . '/?action=scaleimage';
             case 'edit':
                 return $this->localpathToUri($base_dir, $entry->getParent()) . '/?action=editentry';
             case 'editDraft':

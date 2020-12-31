@@ -252,6 +252,8 @@ function stupid_mime_get_type($filename) {
                 break;
             case 'pmw': $type = 'application/x-perfmon'; 
                 break;
+            case 'png': $type = 'image/png';
+                break;
             case 'pnm': $type = 'image/x-portable-anymap'; 
                 break;
             case 'pot,': $type = 'application/vnd.ms-powerpoint'; 

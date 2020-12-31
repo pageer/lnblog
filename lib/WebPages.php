@@ -1,5 +1,6 @@
 <?php
 
+use LnBlog\Attachments\ImageScaler;
 use LnBlog\Model\EntryFactory;
 use LnBlog\Model\Reply;
 use LnBlog\Tasks\TaskManager;
@@ -12,15 +13,25 @@ class WebPages extends BasePages
     protected $publisher;
     protected $task_manager;
     protected $factory;
+    protected $resolver;
+    protected $scaler;
 
     private $last_pingback_results = array();
     private $last_upload_error = array();
 
-    public function __construct(Blog $blog = null, User $user = null, EntryFactory $factory = null) {
+    public function __construct(
+        Blog $blog = null,
+        User $user = null,
+        EntryFactory $factory = null,
+        ImageScaler $scaler = null,
+        UrlResolver $resolver = null
+    ) {
         parent::__construct();
         $this->user = $user ?: NewUser();
         $this->blog = $blog ?: NewBlog();
         $this->factory = $factory ?: new EntryFactory();
+        $this->scaler = $scaler ?: new ImageScaler($this->fs, $this->globals);
+        $this->resolver = $resolver ?: new UrlResolver();
         $this->getPage()->setDisplayObject($this->blog);
 
         EventRegister::instance()->addHandler('BlogEntry', 'PingbackComplete', $this, 'handlePingbackComplete');
@@ -38,6 +49,7 @@ class WebPages extends BasePages
             'login'        => [AdminPages::class, 'bloglogin'],
             'logout'       => [AdminPages::class, 'bloglogout'],
             'upload'       => 'fileupload',
+            'scaleimage'   => 'scaleimage',
             'removefile'   => 'removefile',
             'useredit'     => 'editlogin',
             'plugins'      => [AdminPages::class, 'pluginsetup'],
@@ -317,10 +329,9 @@ class WebPages extends BasePages
             );
             $tpl->set("PAGE_TITLE", _("Create site map"));
         } else {
-            $resolver = new UrlResolver();
             $tpl->set("FILE_PATH", $file);
             $tpl->set("FILE_SIZE", file_exists($file)?filesize($file):0);
-            $tpl->set("FILE_URL", $resolver->localpathToUri($file, $this->blog));
+            $tpl->set("FILE_URL", $this->resolver->localpathToUri($file, $this->blog));
             $tpl->set("FILE", $file);
         }
 
@@ -862,15 +873,13 @@ class WebPages extends BasePages
                 ($query_string?"&amp;":"?")."profile=".$_GET["profile"] :
                 "";
 
-            $resolver = new UrlResolver();
-
             $tpl->set("TARGET", current_file().$query_string);
             $size = ini_get("upload_max_filesize");
             $size = str_replace("K", "000", $size);
             $size = str_replace("M", "000000", $size);
             $tpl->set("MAX_SIZE", $size);
             $tpl->set("FILE", $file_name);
-            $tpl->set("TARGET_URL", $resolver->localpathToUri($target, $this->blog));
+            $tpl->set("TARGET_URL", $this->resolver->localpathToUri($target, $this->blog));
             $tpl->set("BLOG_ATTACHMENTS", $blog_files);
             $tpl->set("ENTRY_ATTACHMENTS", $entry_files);
 
@@ -928,6 +937,66 @@ class WebPages extends BasePages
         } catch (Exception $e) {
             $this->getPage()->error(500, "Could not delete file '$file_name'");
         }
+    }
+
+    public function scaleimage() {
+        # Check that the user is logged in.
+        if (! $this->user->checkLogin()) {
+            $this->getPage()->error(403);
+        }
+
+        $source = POST('file');
+        $mode = POST('mode');
+
+        if (!$source || !$mode) {
+            echo json_encode(
+                [
+                    'success' => false,
+                    'error' => _('Missing required parameters'),
+                ]
+            );
+            return false;
+        }
+
+        $ent = $this->getEntry();
+        $target = '';
+        if ( isset($_GET["profile"]) &&
+             ($_GET["profile"] == $this->user->username() || $this->user->isAdministrator()) ) {
+            $target = Path::mk(USER_DATA_PATH, $this->user->username());
+        } elseif ($ent->isEntry() && System::instance()->canModify($ent, $this->user)) {
+            $target = $ent->localpath();
+        } elseif (System::instance()->canModify($this->blog, $this->user)) {
+            $target = $this->blog->home_path;
+        } else {
+            echo json_encode(
+                [
+                    'success' => false,
+                    'error' => _('Could not find source file'),
+                ]
+            );
+            return false;
+        }
+
+        try {
+            $target = Path::mk($target, $source);
+            $result = $this->scaler->scaleImage($target, $mode);
+            echo json_encode(
+                [
+                    'success' => true,
+                    'file' => basename($result),
+                    'url' => $this->resolver->localpathToUri($result, $this->blog, $ent)
+                ]
+            );
+        } catch (Exception $e) {
+            echo json_encode(
+                [
+                    'success' => false,
+                    'error' => $e->getMessage(),
+                ]
+            );
+        }
+
+        return false;
     }
 
     public function managereplies() {
