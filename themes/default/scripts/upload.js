@@ -131,9 +131,12 @@ var initializeUpload = function () {
                     }
                     setTimeout(
                         function () {
-                            $self.find('.status-label').fadeOut(400, function () {
-                                $self.find('.scale-link').fadeIn(400, setAttachmentControls);
-                            });
+                            $self.find('.status-label').fadeOut(
+                                400, 
+                                function () {
+                                    $self.find('.scale-link').fadeIn(400, setAttachmentControls);
+                                }
+                            );
                         },
                         3000
                     );
