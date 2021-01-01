@@ -16,10 +16,6 @@ var lnblog = {
         }
     },
     
-    getJSONObject: function (json) {
-        return eval(json);
-    },
-    
     insertAtCursor: function (myField, myValue) {
         //IE support
         if (document.selection) {

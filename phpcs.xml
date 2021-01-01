@@ -10,6 +10,8 @@
     <file>./index.php</file>
     <file>./cli.php</file>
     <file>./xmlrpc.php</file>
+    <exclude-pattern>*.js</exclude-pattern>
+    <exclude-pattern>*.css</exclude-pattern>
 
     <rule ref="Zend">
         <exclude name="Generic.Functions.OpeningFunctionBraceBsdAllman" />

@@ -490,7 +490,7 @@ $(document).ready(
         placeholderText: strings.editor_tagBoxPlaceholder,
         showAutocompleteOnFocus: true
         }
-    )
+    );
     $('#tag_list').hide();
     }
 );

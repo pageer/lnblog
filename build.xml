@@ -7,6 +7,20 @@
     <property name="outputDir" value="${buildDir}/LnBlog-${version}" />
     <property name="clientOutputDir" value="${outputDir}/third-party" />
 
+    <!-- For some reason, using forward-slashes for command paths doesn't
+         work on Windows with PHP 8. -->
+    <if>
+        <os family="windows" />
+        <then>
+            <property name="vendorDir" value="vendor\bin\" />
+            <property name="nodeDir" value="node_modules\.bin\" />
+        </then>
+        <else>
+            <property name="vendorDir" value="vendor/bin/" />
+            <property name="nodeDir" value="node_modules/.bin/" />
+        </else>
+    </if>
+
     <target name="messages">
         <echo msg="Updating translation files..." />
         <apply executable="xgettext" parallel="true" dir="${srcDir}">
@@ -27,12 +41,13 @@
     </target>
 
     <target name="checks">
-        <exec command="vendor/bin/phpcs" dir="${srcDir}" passthru="true" checkreturn="true" />
-        <exec command="vendor/bin/phpstan analyze" dir="${srcDir}" passthru="true" checkreturn="true" />
+        <exec command="${vendorDir}phpcs" dir="${srcDir}" passthru="true" checkreturn="true" />
+        <exec command="${vendorDir}phpstan analyze" dir="${srcDir}" passthru="true" checkreturn="true" />
+        <exec command="${nodeDir}jshint themes" dir="${srcDir}" passthru="true" checkreturn="true" />
     </target>
 
     <target name="tests">
-        <exec command="vendor/bin/phpunit" dir="${srcDir}" passthru="true" checkreturn="true" />
+        <exec command="${vendorDir}phpunit" dir="${srcDir}" passthru="true" checkreturn="true" />
     </target>
 
     <target name="prepare">

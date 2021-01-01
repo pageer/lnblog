@@ -71,7 +71,7 @@ var initializeUpload = function () {
     var generateData = function (data) {
         data['xrf-token'] = $('input[name="xrf-token"]').val();
         return data;
-    }
+    };
 
     var removeUpload = function() {
         var $node = $(this).closest('.attachment');
@@ -118,7 +118,13 @@ var initializeUpload = function () {
         $.post(url, data)
             .done(
                 function (response) {
-                    var result = JSON.parse(response);
+                    var result = {};
+                    try {
+                        result = JSON.parse(response);
+                    } catch (err) {
+                        result.success = false;
+                        result.error = response;
+                    }
                     if (result.success) {
                         $self.find('.status-label').addClass('success').text(strings.upload_scaleStatusSuccess).show();
                         var $thumb_node = $self.clone();
@@ -199,7 +205,7 @@ var initializeUpload = function () {
                     $scaler_box.on('change', resizeUpload);
                     $scaler_box.hide();
                     var $status_label = $('<span class="status-label"></span>');
-                    $status_label.hide()
+                    $status_label.hide();
                     $(this).append($scale_link);
                     $(this).append($scaler_box);
                     $(this).append($status_label);
@@ -225,8 +231,8 @@ var initializeUpload = function () {
                    result[parts[0]] = unescape(value);
                }
            }
-           result['subject'] = result['subject'] || '-';
-           result['body'] = result['body'] || '-';
+           result.subject = result.subject || '-';
+           result.body = result.body || '-';
            return result;
        }
        return {
