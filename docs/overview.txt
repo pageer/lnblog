@@ -7,12 +7,19 @@ database or other server software - data is stored in text and XML
 files.  
 
 In terms of functionality, LnBlog includes support for all the basic features you would expect
-from a blogging system: comments, TrackBacks, Pingbacks, RSS feeds, file uploads, etc.
-A single LnBlog installation allows you to create multiple independent weblogs with multiple user accounts.
-This feature is ideal for managing multiple sub-sites on the same web site.
+from a blogging system: 
+
+1) - Blog posts and pages
+2) - Save drafts and schedule them for publication
+3) - Post replies (comments, Trackbacks, Webmentions, Pingbacks)
+4) - RSS feeds for entries and comments
+5) - File uploads and simple thumbnail generator
+6) - Multiple editing modes, including Markdown and WYSIWYG editor.
+7) - Multiple user accounts
+8) - Multiple blogs
 
 One the main design goals of LnBlog is flexibility.  To this end, it includes a theme system
-and a plugin system to allow user extensions.  The theme system is powerful, allowing you
+and a plugin system to allow user extensions.  The theme system  allows you
 to change virtually every element on a page, yet flexible enough that you can 
 override one file for one blog without having to change or copy anything else.  Various
 page elements, such as the sidebar, are provided by plugins and can be removed or
@@ -20,18 +27,19 @@ re-arranged from the plugin management page.
 
 Section: Requirements
 
-LnBlog requires PHP 5.6 or greater and the ability to write files
+LnBlog requires PHP 7.0 or greater and the ability to write files
 to the web server.  (Previous versions of LnBlog supported writing files by using an FTP
 connection to the local host, but this is a legacy feature intended to work
 around poorly-configured shared hosting providers that ran in safe-mode.  It is now deprecated.)
 
 You can use any web server or operating system.  LnBlog is tested on Apache running on Windows 
 and Linux, but should work on anything that will run a supported version of PHP.  You don't 
-need any database or other special server and no non-standard PHP extensions are required.
+need any database or other special server setup.
 
 If you want to use LnBlog in a language other than English, then the PHP gettext and iconv 
 extensions are highly recommended, but not strictly required.  The CURL extension is also 
-recommended for Pingback and TrackBacks, but this is not strictly required either.
+recommended for Pingback and TrackBacks, but this is not strictly required either.  
+The gd extension is needed for thumbnail generation.
 
 
 Section: Installation
@@ -44,12 +52,13 @@ distribution ZIP file and follow these steps.
 2) - Upload the LnBlog directory to your web server.
 3) - Point your web browser to the LnBlog directory on your web server.  This will start the setup 
      process.
-4) - Set or confirm the document root path for your server and the optional subdomain information.  
-     Note that the subdomain portion is only required if you intend this LnBlog installation
-     to manage blogs located on different subdomains.
+4) - Set or confirm the installation and userdata paths and URLs.
 5) - Create a user account.  This initial user will be a system administrator.  You will be logged 
      in automatically after creation.
-6) - Start creating new users and weblogs.
+6) - Create a new weblog.  In addition to the normal metadata, you will be
+     prompted to enter an identifier for the blog (usually the last part of
+     the path) as well as the full path and URL where the blog will be
+     located.  Make sure these work with your server configuration.
 
 For users who wish to install LnBlog from source, the procedure is similar, except that instead of
 using the distribution ZIP archive, you would do the following.
@@ -60,6 +69,9 @@ using the distribution ZIP archive, you would do the following.
 2) - Change to the LnBlog clone directory and run "composer install --no-dev".  If you want to
      build the documentation or distribution archives, you will need to run simply "composer install"
      to get the development dependencies.
+4) - Run "npm install" to install JavaScript dependencies.
+5) - Run "vendor/bin/phing -Dversion='latest' build".  This will create a "build/LnBlog-latest" directory,
+     which is equivalent to extracting the ZIP archive above.
 3) - Continue with the instructions above starting at step 3.
 
 Section: Upgrading
@@ -68,8 +80,8 @@ Upgrading LnBlog is normally pretty simple.  Assuming your LnBlog installation i
 "LnBlog", then you would do the following to perform a clean upgrade.
 
 1) - Perform a full backup of all your data!  This is not required, but strongly recommended.  
-     The upgrade process *should* be non-destructive, but there is no warranty - if it breaks,
-     you get to keep both pieces.
+     The upgrade process *should* be non-destructive, but there is no warranty 
+     (if it breaks, you get to keep both pieces).
 2) - Rename your old LnBlog directory on the server to LnBlog-old.
 3) - Upload the new version into a folder named LnBlog.
 4) - Copy the contents of your LnBlog-old/userdata folder into LnBlog/userdata, overwriting 

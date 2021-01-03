@@ -1,13 +1,18 @@
 Document: LBCode Markup
 
 Section: Markup Types
-LnBlog allows you to write your blog entries and articles in any of three formats.  The simplest is 
+LnBlog allows you to write your blog entries and articles in any of four formats.  The simplest is 
 auto-markup, which automatically inserts HTML code for line breaks, paragraph breaks, and converts
 text URLs into hyperlinks.  The most complex is, of course, raw HTML code.  In this format, LnBlog 
-will not do anything to your text at all and will simply output it as HTML code.  The default format
-is called LBCode and is a dialect of the BBCode-style markup used by many popular web forum systems.
-The name LBCode is used to distinguish it from the markup used by other systems, because LnBlog 
-makes absolutely no attempt to be compatible with other software in this regard.
+will not do anything to your text at all and will simply output it as HTML code.  Between those 
+extrmemes, LnBlog also supports standard Markdown and a custom format called LBCode, which is a 
+dialect of the BBCode-style markup used by many popular web forum systems.
+(The name LBCode is used to distinguish it from the markup used by other systems, because LnBlog 
+makes absolutely no attempt to be compatible with other software in this regard.)o
+
+In a standard installation, the default is to have the TinyMCE plugin enabled, which will force
+the markup type to HTML, because that's what TinyMCE outputs.  The rest of this document describes
+the workings of LBCode, as HTML and Markdown are extensively documented elsewhere.
 
 Section: Tag Chart
 Most LBCode constructs map directly so some HTML code.  The following table summarizes the available

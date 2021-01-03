@@ -56,6 +56,7 @@ commands from the console:
 git clone https://github.com/pageer/lnblog.git
 cd lnblog
 composer install --dev
+npm install
 vendor/bin/phing -Dversion='latest' build
 ```
 
@@ -86,6 +87,12 @@ in its place (i.e., give it the same name the old version had).  If your `userda
 is contained inside the LnBlog directory, you should move it from the old version to the new one.
 (Note: it is now recommended to keep your `userdata` directory alongside the code direcory,
 not inside it.)
+
+Depending on the contents of the updated version, you may also need to upgrade your 
+blog data.  To do this, go to the main LnBlog site administration page, select your
+blog from the "upgrade blog" drop-down, and click "Upgrade".  This will recreate 
+the wrapper script files and perform any updates to the format of the data files.
+Repeat this for each of your blogs.
 
 License
 =======

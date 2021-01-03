@@ -1,0 +1,187 @@
+Title: LnBlog Theme System
+
+Section:Understanding the LnBlog Theme System
+
+Last update: 2005-Jun-30</p>
+
+This document describes the theme and template system used by LnBlog. It
+is a custom theme system based in part on the template system described in the article
+Beyond the Template Engine <http://www.sitepoint.com/print/beyond-template-engine></a>
+It includes images, style sheets, and client-side scripts for each
+theme, as well as a path mechanism for determining which file to use.</p>
+
+Section: Overview
+
+The basic operation of the
+LnBlog theme system is quite simle, although tracking how files
+interact to form a final web page can be somewhat
+complicated. The
+general principle is that each page is made up of a series of embedded
+templates with references to external images, scripts, and style
+sheets. The exact files to use to build the page are
+determined by a path search, where the first existent file found is the
+one used. This allows us to create minimal themes, creating
+and modifying only the files we want to change and letting the others
+filter down to the defaults. It also allows users selectively
+over-ride parts of a theme for an individual weblog without changing
+the system-wide theme.
+
+A separate template is
+generally used for each part of the page. For instance, there
+is a template for a blog entry, a template for a comment, one for the
+sidebar, one for the main page layout, and so forth.
+Sometimes the same template, populated with different data, is used
+several times on the same page. The multiple blog entries on
+the front page of a weblog is a good example of this.
+
+Section: Template Mechanics
+
+The templates used by LnBlog
+are simple PHP scripts. There's no special syntax or
+processing engine - all the hard work is done by PHP itself.
+The template class simply uses PHP's include() facility in conjunction
+with variable extraction andoutput buffering to add data to the
+template scripts and save the resulting text into a variable.
+This variable can then be included into another template or written to
+the browser.
+
+This design implies that
+templates are fully scriptable. You can add conditional
+display, looping, variable formatting, and pretty much anything else
+that you can do in PHP. Of course, it's usually best to keep
+any complicated login in the
+back-end code, but it's nice to have this kind of flexibility in case
+you need it.
+
+This also means that you need a working konwledge of PHP to modify some of the templates. However, as the SitePoint article <http://www.sitepoint.com/print/beyond-template-engine>
+points out, PHP's syntax isn't significantly more complicated than that
+of true template engines like Smarty. Simpler syntax might be
+marginally easier for non-technical users, but if you don't do too much
+fancy stuff in the templates, they should be able to figure out the
+PHP. 
+
+Section: Theme Structure
+
+A theme is simply a directory
+with a particular layout. The directory should be named after
+the theme and should contain four subdirectories: templates, scripts,
+styles, and images. The contents of these directories should
+be fairly obvious. They hold the PHP templates, any
+client-side scripts (e.g. JavaScript files), style sheets, and any
+images used by the theme. 
+
+
+Sectino: Resolving File Paths
+
+In order to make themes somewhat fail-safe, LnBlog uses a path
+mechanism to include files in a page. This is used to
+over-ride files in a theme on a per-weblog basis, or to fall back to a
+default file if one is missing from the current theme. In
+fact, all themes other than the default are missing quite a few
+files. They simply include copies of the files that differ
+and let the theming system fall back to the defaults for the
+rest.
+
+LnBlog checks for files in the following order:
+
+1) - Current weblog directory
+2) - Current theme directory
+3) - Default theme directory
+
+Note that it will check in the
+same subdirectories as used in the theme directory layout.
+So, for example, if you want to change an image for a particular
+weblog, you would create an "images" directory and copy the new image
+into it. Likewise, if you created a new theme and did not
+want to change the appearance of blog entries from the default theme,
+you would simply not create templates or style sheets for the blog entries in your theme.
+
+Templates are actually PHP files. LnBlog uses a custom search path
+to determine which file to use. However, for other types of
+files, this will not work. Therefore, LnBlog includes a PHP
+function called "getlink()", which returns a URL to the selected file, suitable for
+using as an "href" or "src" attribute in an HTML tag. 
+
+The "getlink()"
+function takes as parameters the name of the desired file and an
+optional constant for the type of the file. The valid type
+constants, which determine which driectories to check for the file, are LINK_IMAGE, LINK_SCRIPT, and LINK_STYLESHEET.
+If you do not specify a file type, then "getlink()" will try to guess the file type from the extension. For uncommon file extensions, this may very well fail.
+
+Section: Examlpes
+
+Adding an image to the banner for a single weblog:
+
+Let's say you want to change the banner for just a single
+weblog. Perhaps you want to add a picture to it. You can
+easily add this without disturbing any other weblog managed by LnBlog.
+
+To do this, you would go to the
+root directory of the weblog and create the three new directories
+templates, styles, and images.
+You would then copy the include_banner.php file from your theme
+template directory into the new templates directory, copy the banner.css file from the theme styles directory into the new
+styles directory, and copy the desired image to the new images directory. If you have a UNIX
+command prompt available, the commands would look something like this:
+--- Code
+mkdir myblog/templates<br />
+mkdir myblog/styles<br />
+mkdir myblog/images<br />
+cp lnblog/themes/default/templates/include_banner.php myblog/templates/<br />
+cp lnblog/themes/default/styles/banner.css myblog/styles/<br />
+cp someimage.jpg myblog/images/<br />
+---
+
+You would then modify the HTML in your copy of include_banner.php to add the image. You would use a line like this:
+--- Code
+<img src="<?php echo getlink("someimages.jpg"); ?>;" alt="some image" />
+---
+
+The
+PHP block uses the getlink() utility function to auto-detect the path
+to someimage.jpg so that you don't have to worry about the exact
+URL. You can then modify the CSS file to suit your needs.
+Note that if you don't want to change the CSS, you can just skip
+copying the style sheet.
+
+*Note:* As of version 0.4.0, the banner, sidebar, and
+menubar (or sitemap) are all implemented in plugins, so if you wanted
+to change one of these, then the plugins would be the place to
+start. However, there are still templates for these, although
+they pretty much just raise plugin events.
+
+Creating a new theme:
+
+Creating a system-wide theme in LnBlog is quite easy. If you
+want to change substantial parts of any of the default themes, then
+creating a new one is the recommended way to do it, as you won't have
+to worry abou conflicts when you upgrade.
+
+Creating a new theme is as easy as creating a new directory named for the theme in your LnBlog themes directory. If
+you're creating an entirely new theme, then create four new directories
+inside templates, styles, scripts, and images. If you're
+creating a theme derived from another theme other than "default", say
+"tuxice," then you need to make copies of all the files for this
+theme. In that case, the easiest way is to just copy the entire
+theme directory to a new name.
+
+Now comes the hard part: identifying which files you want to
+change. You're on your own for this. All you have to do is
+make a file of the same name in the same location in your theme file
+structure and put whatever you like in it. However, as a general
+rule, you theme should not include copies of files that you don't
+change from the default theme. If a particular file does not
+exist in your theme directory, then LnBlog will try to use the one
+included in the default theme, which makes it easier to include future bug fixes into your theme. 
+
+Once you've changed all the files you care to, you can modify your blog settings and choose your new theme from the list.
+
+Section: Include Chains
+As previously mentioned, LnBlog uses a series of templates nested inside each other to build
+a page. One consequence of this is that if you want to make any
+significant changes to the layout of a page, you may need to change several files. The most important template files are probably the following:
+
+article_tpl.php - Controls the display of articles.
+blogentry_tpl.php - Controls the display of blog entries.
+blogcomment_tpl.php - Controls the display of comments.
+trackback_tpl.php - Controls the display of TrackBack entries.

@@ -44,11 +44,9 @@ Section: Load order
 
 As previously noted, load order is important for plugins that add segments to 
 the page, such as sidebar plugins.  To change this order, go to the plugin
-loading configuration page and change the numbers in the load order column to
-reflect your desired order.  Note that these numbers are relative to each other
-and will be normalized when the list is saved, so they do not need to be 
-continuous, i.e. missing or doubled numbers are not necessarily an error.
-Entering a non-numeric value will be interpreted as an unspecified load order.
+loading configuration page and use drag-and-drop to sort the files to
+reflect your desired order.  Don't forget to submit the form to make your 
+changes take effect.
 
 Section: Writing plugins
 
