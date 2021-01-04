@@ -250,8 +250,8 @@ class UrlResolver
                 $url = sprintf("%s$sep%s{$sep}index.php", $base_dir, ENTRY_COMMENT_DIR);
                 return $this->localpathToUri($url, $entry->getParent());
             case 'send_tb':
-                $url = sprintf("%s$sep%s$sep?action=ping", $base_dir, ENTRY_TRACKBACK_DIR);
-                return $this->localpathToUri($url, $entry->getParent());
+                $url = sprintf("%s$sep%s$sep", $base_dir, ENTRY_TRACKBACK_DIR);
+                return $this->localpathToUri($url, $entry->getParent()) . '?action=ping';
             case 'get_tb':
                 $url = sprintf("%s$sep%s{$sep}index.php", $base_dir, ENTRY_TRACKBACK_DIR);
                 return $this->localpathToUri($url, $entry->getParent());
