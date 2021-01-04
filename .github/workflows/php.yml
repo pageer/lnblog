@@ -17,16 +17,22 @@ jobs:
     - name: Validate composer.json and composer.lock
       run: composer validate
 
-    - name: Install dependencies
+    - name: Checking JavaScript dependencies
+      run: npm audit
+
+    - name: Install PHP dependencies
       run: composer install --prefer-dist --no-progress --no-suggest
+
+    - name: Install JavaScript dependencies
+      run: npm install
 
     - name: Run style checker
       run: vendor/bin/phpcs
 
-    - name: Run code analysis
+    - name: Run PHP code analysis
       run: vendor/bin/phpstan analyze
 
-    - name: JavaScript code analysis
+    - name: Run JavaScript code analysis
       run: node_modules/.bin/jshint themes/
 
     - name: Run test suite
