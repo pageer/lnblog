@@ -45,6 +45,7 @@ class User extends LnBlogObject
     public $default_group = '';
     public $custom = array();
 
+    private $login_forced = false;
     private $set_cookies = true;
     private $fs = null;
     private $globals = null;
@@ -488,6 +489,18 @@ class User extends LnBlogObject
         }
     }
 
+    # Method: forceLoggedIn
+    # Force the account to be in a logged-in state.
+    #
+    # This should *only* be used in contexts where the normal login process doesn't apply,
+    # such as running from the command-line.
+    #
+    # Parameters:
+    # status - Boolean indicating if the user should be logged in.
+    public function forceLoggedIn(bool $status) {
+        $this->login_forced = $status;
+    }
+
     # Method: checkLogin
     # Checks tokens to determine if the user is logged in.
     #
@@ -501,6 +514,11 @@ class User extends LnBlogObject
         # not logged in.
         if (!$this->username) {
             return false;
+        }
+
+        # This is for command-line usage, where the session/cookie stuff doesn't apply.
+        if ($this->login_forced) {
+            return true;
         }
 
         $current_user = $this->config('CURRENT_USER');

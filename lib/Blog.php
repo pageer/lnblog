@@ -1020,7 +1020,7 @@ class Blog extends LnBlogObject implements AttachmentContainer
     installation directory.
 
     Returns:
-    True on success, false on failure.
+    An array of failed files or false if the upgrade fails completely.
     */
     public function upgradeWrappers () {
         $this->raiseEvent("OnUpgrade");

@@ -272,6 +272,22 @@ class UserTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($check_login);
     }
 
+    public function testCheckLogin_WhenLoginStatusForced_ReturnsTrue() {
+        $this->setConstantReturns(['AUTH_USE_SESSION' => true, 'LOGIN_IP_LOCK' => true]);
+        $this->loginLimiter->canLogIn(Argument::any())->willReturn(true);
+
+        $user = $this->createUser('bob', '12345', $new_format = true);
+        $forced_login_undefined = $user->checkLogin();
+        $user->forceLoggedIn(true);
+        $forced_login_on = $user->checkLogin();
+        $user->forceLoggedIn(false);
+        $forced_login_off = $user->checkLogin();
+
+        $this->assertFalse($forced_login_undefined);
+        $this->assertTrue($forced_login_on);
+        $this->assertFalse($forced_login_off);
+    }
+
     public function testCreateAndVerifyPasswordReset_WhenTokenCreated_ShouldVerify() {
         $this->setConstantReturns();
         $this->globals->time()->willReturn(12345, 12346);
@@ -346,7 +362,6 @@ class UserTest extends \PHPUnit\Framework\TestCase
         $user = $this->createUserWithoutDataRead('bob', '12345');
         $token1 = $user->createPasswordReset();
         $user->invalidatePasswordReset($token1);
-
     }
 
     protected function setUp(): void {
