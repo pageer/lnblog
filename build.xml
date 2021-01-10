@@ -23,7 +23,10 @@
 
     <target name="messages">
         <echo msg="Updating translation files..." />
-        <apply executable="xgettext" parallel="true" dir="${srcDir}">
+        <delete file="${srcDir}/po/messages.pot" />
+        <touch file="${srcDir}/po/messages.pot" />
+        <apply executable="xgettext" parallel="false" dir="${srcDir}">
+            <arg value="--join-existing" />
             <arg value="-LPHP" />
             <arg value="--keyword=_:1" />
             <arg value="--keyword=p_:1" />
@@ -73,16 +76,25 @@
 		<exec command="naturaldocs doc_project" dir="." />
 	</target>
 	
-    <target name="build" depends="prepare,messages">
+    <target name="build" depends="prepare">
         <echo msg="Copying files to build directory..." />
         <exec command="git clone . ${outputDir}" dir="." />
+
+        <phingcall target="messages">
+            <property name="srcDir" value="${outputDir}" />
+        </phingcall>
 		
 		<echo msg="Installing dependencies with Composer..." />
         <exec command="composer install --no-dev --no-interaction" dir="${outputDir}" />
 
         <echo msg="Installing JavaScript sependencies with NPM..." />
         <exec command="npm install" dir="${outputDir}" />
+        
+        <phingcall target="clientbuild" />
+    </target>
 
+    <target name="clientbuild">
+        <echo msg="Copyign from ${outputDir} to ${clientOutputDir}" />
         <mkdir dir="${clientOutputDir}/" />
         <copy file="${outputDir}/node_modules/jquery/dist/jquery.min.js" 
              todir="${clientOutputDir}/scripts/" />
@@ -120,17 +132,15 @@
                 <include name="**/*.min.css" />
             </fileset>
         </copy>
+    </target>
 
-        <copy todir="${outputDir}/themes/default/scripts">
-            <fileset dir="${clientOutputDir}/scripts">
-                <include name="**" />
-            </fileset>
-        </copy>
-        <copy todir="${outputDir}/themes/default/styles">
-            <fileset dir="${clientOutputDir}/styles">
-                <include name="**" />
-            </fileset>
-        </copy>
+    <!-- This target is intended for testing purposes. -->
+    <!-- It builds the third-party client scripts in the current directory. -->
+    <target name="client-local">
+        <phingcall target="clientbuild">
+            <property name="outputDir" value="${srcDir}" />
+            <property name="clientOutputDir" value="${srcDir}/third-party" />
+        </phingcall>
     </target>
 
     <target name="distclean" depends="build">

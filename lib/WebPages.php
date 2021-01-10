@@ -474,7 +474,7 @@ class WebPages extends BasePages
                 $error = _("Too many reset attempts.  Please wait a few minutes and try again.");
             }
             if ($reset_token) {
-                $email_body = spf_("Hi! A password reset for your LnBlog user account %1\$s. If you did not request this, please disregard this message.\r\n\r\nTo reset your password, visit the link below:\r\n%2\$s", $username, $this->blog->getURL() . "?action=reset&user=$username&token=$reset_token");
+                $email_body = spf_("Hi! A password reset for your LnBlog user account %1\$s. If you did not request this, please disregard this message.\n\nTo reset your password, visit the link below:\n%2\$s", $username, $this->blog->getURL() . "?action=reset&user=$username&token=$reset_token");
                 $mail_result = $this->getGlobalFunctions()->mail(
                     $email,
                     _("LnBlog account password reset"),

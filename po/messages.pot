@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-15 21:01-0400\n"
+"POT-Creation-Date: 2021-01-10 13:31-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,153 +17,315 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: blogconfig.php:275
+#: .\blogconfig.php:234
 #, php-format
 msgid "%s: a simple and (hopefully) elegant weblog"
 msgstr ""
 
-#: blogconfig.php:279
+#: .\blogconfig.php:238
 msgid ""
 "Copyright &copy; 2005 &ndash; 2014, Peter A. Geer <pageer@skepticats.com>"
 msgstr ""
 
-#: blogconfig.php:494
+#: .\blogconfig.php:460
 msgid "administrator"
 msgstr ""
 
-#: blogconfig.php:690
+#: .\blogconfig.php:656
 msgid "Anonymous Reader"
 msgstr ""
 
-#: blogconfig.php:696
+#: .\blogconfig.php:662
 msgid "No Subject"
 msgstr ""
 
-#: lib/AdminPages.php:123 plugins/sidebar_loginlink.php:63
+#: .\cli.php:46
+#, php-format
+msgid "Upgrading blog %1$s at %2$s..."
+msgstr ""
+
+#: .\cli.php:49
+msgid "success!"
+msgstr ""
+
+#: .\cli.php:51
+msgid "FAILURE!"
+msgstr ""
+
+#: .\cli.php:52
+msgid "Failed to upgrade the following files:"
+msgstr ""
+
+#: .\lib\AdminPages.php:126
 #, php-format
 msgid "%s Administration"
 msgstr ""
 
-#: lib/AdminPages.php:148
+#: .\lib\AdminPages.php:153
 #, php-format
 msgid "Upgrade of %s completed successfully."
 msgstr ""
 
-#: lib/AdminPages.php:151
+#: .\lib\AdminPages.php:157
 #, php-format
 msgid "Error: %s does not seem to exist."
 msgstr ""
 
-#: lib/AdminPages.php:153
+#: .\lib\AdminPages.php:160
 #, php-format
 msgid "Error: The following file could not be written - %s."
 msgstr ""
 
-#: lib/AdminPages.php:162 lib/AdminPages.php:178
+#: .\lib\AdminPages.php:182 .\lib\AdminPages.php:202
 #, php-format
 msgid "The path '%s' is not an LnBlog weblog."
 msgstr ""
 
-#: lib/AdminPages.php:165
+#: .\lib\AdminPages.php:189
 #, php-format
 msgid "Blog %s successfully registered."
 msgstr ""
 
-#: lib/AdminPages.php:166
+#: .\lib\AdminPages.php:191
 #, php-format
-msgid "Registration error: exited with code %s"
+msgid "Registration error: exited with error: %s"
 msgstr ""
 
-#: lib/AdminPages.php:183
+#: .\lib\AdminPages.php:214
 #, php-format
 msgid "Blog %s successfully deleted."
 msgstr ""
 
-#: lib/AdminPages.php:185
+#: .\lib\AdminPages.php:216
 #, php-format
 msgid "Delete error: exited with code %s"
 msgstr ""
 
-#: lib/AdminPages.php:192
+#: .\lib\AdminPages.php:224
 msgid "Confirm blog deletion"
 msgstr ""
 
-#: lib/AdminPages.php:192
+#: .\lib\AdminPages.php:224
 #, php-format
 msgid "Really delete blog '%s'?"
 msgstr ""
 
-#: lib/AdminPages.php:193 lib/AdminPages.php:321 lib/WebPages.php:157
-#: lib/WebPages.php:290 lib/WebPages.php:1252
+#: .\lib\AdminPages.php:225 .\lib\AdminPages.php:349 .\lib\WebPages.php:227
+#: .\lib\WebPages.php:1213
 msgid "Yes"
 msgstr ""
 
-#: lib/AdminPages.php:193 lib/AdminPages.php:323 lib/WebPages.php:292
+#: .\lib\AdminPages.php:225 .\lib\AdminPages.php:351 .\lib\WebPages.php:229
 msgid "No"
 msgstr ""
 
-#: lib/AdminPages.php:202
+#: .\lib\AdminPages.php:232
 msgid "Permission update completed successfully."
 msgstr ""
 
-#: lib/AdminPages.php:203
+#: .\lib\AdminPages.php:233
 #, php-format
 msgid "Error: Update exited with status %s."
 msgstr ""
 
-#: lib/AdminPages.php:213
+#: .\lib\AdminPages.php:242
 #, php-format
 msgid "User %s does not exist."
 msgstr ""
 
-#: lib/AdminPages.php:245
+#: .\lib\AdminPages.php:274
 #, php-format
 msgid "%s - Login"
 msgstr ""
 
-#: lib/AdminPages.php:246
+#: .\lib\AdminPages.php:275
 #, php-format
 msgid "%s Login"
 msgstr ""
 
-#: lib/AdminPages.php:250 plugins/sidebar_loginops.php:38
+#: .\lib\AdminPages.php:279 .\plugins\sidebar_loginops.php:40
 msgid "System Administration"
 msgstr ""
 
-#: lib/AdminPages.php:251
+#: .\lib\AdminPages.php:280
 msgid "System Administration Login"
 msgstr ""
 
-#: lib/AdminPages.php:287
+#: .\lib\AdminPages.php:315
 msgid "Only the administrator account can log into the administrative pages."
 msgstr ""
 
-#: lib/AdminPages.php:292
+#: .\lib\AdminPages.php:320
 msgid "Error logging in.  Please check your username and password."
 msgstr ""
 
-#: lib/AdminPages.php:317
+#: .\lib\AdminPages.php:345
 msgid "Logout"
 msgstr ""
 
-#: lib/AdminPages.php:318
+#: .\lib\AdminPages.php:346
 msgid "Do you really want to log out?"
 msgstr ""
 
-#: lib/AdminPages.php:335
+#: .\lib\AdminPages.php:362
 #, php-format
 msgid "%s - Logout"
 msgstr ""
 
-#: lib/AdminPages.php:336
+#: .\lib\AdminPages.php:363
 msgid "Administration - Logout"
 msgstr ""
 
-#: lib/AdminPages.php:381
+#: .\lib\AdminPages.php:425
 msgid "Create new weblog"
 msgstr ""
 
-#: lib/AdminPages.php:394
+#: .\lib\AdminPages.php:453
+msgid ""
+"Error creating blog.  This could be a problem with the file permissions on "
+"your server.  Please refer to the <a href=\"http://www.skepticats.com/LnBlog/"
+"documentation/\">documentation</a> for more information."
+msgstr ""
+
+#: .\lib\AdminPages.php:459
+msgid "Create new blog"
+msgstr ""
+
+#: .\lib\AdminPages.php:487 .\lib\AdminPages.php:488
+msgid "Create New Login"
+msgstr ""
+
+#: .\lib\AdminPages.php:491
+msgid "Create Administrator Login"
+msgstr ""
+
+#: .\lib\AdminPages.php:492
+msgid "Create Aministration Login"
+msgstr ""
+
+#: .\lib\AdminPages.php:536 .\lib\WebPages.php:413
+msgid "The passwords you entered do not match."
+msgstr ""
+
+#: .\lib\AdminPages.php:561
+msgid "Error: Failed to make this user an administrator."
+msgstr ""
+
+#: .\lib\AdminPages.php:568
+msgid "Error: Failed to save user information."
+msgstr ""
+
+#: .\lib\AdminPages.php:583
+msgid "You must confirm your password."
+msgstr ""
+
+#: .\lib\AdminPages.php:589
+msgid "You must enter a password."
+msgstr ""
+
+#: .\lib\AdminPages.php:595
+msgid "You must enter a username."
+msgstr ""
+
+#: .\lib\AdminPages.php:672
+#, php-format
+msgid "Error updating file %s"
+msgstr ""
+
+#: .\lib\AdminPages.php:684
+msgid "Unspecified"
+msgstr ""
+
+#: .\lib\AdminPages.php:700
+#, php-format
+msgid "%s Plugin Loading Configuration"
+msgstr ""
+
+#: .\lib\AdminPages.php:735 .\lib\AdminPages.php:751
+msgid "Plugin Configuration"
+msgstr ""
+
+#: .\lib\AdminPages.php:736 .\themes\default\templates\comment_form_tpl.php:38
+#: .\themes\default\templates\comment_form_tpl.php:39
+#: .\themes\default\templates\user_info_tpl.php:7
+msgid "Name"
+msgstr ""
+
+#: .\lib\AdminPages.php:737
+msgid "Version"
+msgstr ""
+
+#: .\lib\AdminPages.php:738 .\themes\default\templates\blog_modify_tpl.php:66
+msgid "Description"
+msgstr ""
+
+#: .\lib\AdminPages.php:747
+msgid "Back to plugin list"
+msgstr ""
+
+#: .\lib\AdminPages.php:761
+#, php-format
+msgid "%s Plugin Configuration"
+msgstr ""
+
+#: .\lib\AdminPages.php:795 .\themes\default\templates\user_info_tpl.php:1
+msgid "User Information"
+msgstr ""
+
+#: .\lib\AdminPages.php:885
+msgid "NativeFS test results:"
+msgstr ""
+
+#: .\lib\AdminPages.php:886
+#, php-format
+msgid "Create new files: %s"
+msgstr ""
+
+#: .\lib\AdminPages.php:887
+#, php-format
+msgid "Delete files: %s"
+msgstr ""
+
+#: .\lib\AdminPages.php:888
+#, php-format
+msgid "File owner: %s"
+msgstr ""
+
+#: .\lib\AdminPages.php:889
+#, php-format
+msgid "File group: %s"
+msgstr ""
+
+#: .\lib\AdminPages.php:934
+#, php-format
+msgid "%s Configuration"
+msgstr ""
+
+#: .\lib\AdminPages.php:979
+#, php-format
+msgid "Unable to create directory %s"
+msgstr ""
+
+#: .\lib\AdminPages.php:986
+#, php-format
+msgid "Unable to create directory %s/%s"
+msgstr ""
+
+#: .\lib\AdminPages.php:993
+msgid "Error: "
+msgstr ""
+
+#: .\lib\AdminPages.php:1014
+#, php-format
+msgid "Blog ID '%s' is already registered"
+msgstr ""
+
+#: .\lib\AdminPages.php:1018
+#, php-format
+msgid "The URL '%s' is not a valid URL"
+msgstr ""
+
+#: .\lib\AdminPages.php:1022
 #, php-format
 msgid ""
 "The blog path you specified is the same as your %s installation path.  This "
@@ -171,381 +333,261 @@ msgid ""
 "different path for your blog."
 msgstr ""
 
-#: lib/AdminPages.php:403
-msgid ""
-"Blog create but not registered.  This means the system will not list it on "
-"the admin pages.  Please try registering this blog by hand from the "
-"administration page."
-msgstr ""
-
-#: lib/AdminPages.php:406
-msgid ""
-"Error creating blog.  This could be a problem with the file permissions on "
-"your server.  Please refer to the <a href=\"http://www.skepticats.com/LnBlog/"
-"documentation/\">documentation</a> for more information."
-msgstr ""
-
-#: lib/AdminPages.php:412
-msgid "Create new blog"
-msgstr ""
-
-#: lib/AdminPages.php:440 lib/AdminPages.php:441
-msgid "Create New Login"
-msgstr ""
-
-#: lib/AdminPages.php:444
-msgid "Create Administrator Login"
-msgstr ""
-
-#: lib/AdminPages.php:445
-msgid "Create Aministration Login"
-msgstr ""
-
-#: lib/AdminPages.php:488 lib/WebPages.php:471
-msgid "The passwords you entered do not match."
-msgstr ""
-
-#: lib/AdminPages.php:512
-msgid "Error: Failed to make this user an administrator."
-msgstr ""
-
-#: lib/AdminPages.php:517
-msgid "Error: Failed to save user information."
-msgstr ""
-
-#: lib/AdminPages.php:530
-msgid "You must confirm your password."
-msgstr ""
-
-#: lib/AdminPages.php:534
-msgid "You must enter a password."
-msgstr ""
-
-#: lib/AdminPages.php:538
-msgid "You must enter a username."
-msgstr ""
-
-#: lib/AdminPages.php:615
-#, php-format
-msgid "Error updating file %s"
-msgstr ""
-
-#: lib/AdminPages.php:627
-msgid "Unspecified"
-msgstr ""
-
-#: lib/AdminPages.php:642
-#, php-format
-msgid "%s Plugin Loading Configuration"
-msgstr ""
-
-#: lib/AdminPages.php:678 lib/AdminPages.php:694
-msgid "Plugin Configuration"
-msgstr ""
-
-#: lib/AdminPages.php:679 themes/default/templates/comment_form_tpl.php:37
-#: themes/default/templates/comment_form_tpl.php:38
-#: themes/default/templates/user_info_tpl.php:7
-msgid "Name"
-msgstr ""
-
-#: lib/AdminPages.php:680
-msgid "Version"
-msgstr ""
-
-#: lib/AdminPages.php:681 themes/default/templates/blog_modify_tpl.php:42
-msgid "Description"
-msgstr ""
-
-#: lib/AdminPages.php:690
-msgid "Back to plugin list"
-msgstr ""
-
-#: lib/AdminPages.php:704
-#, php-format
-msgid "%s Plugin Configuration"
-msgstr ""
-
-#: lib/AdminPages.php:734 themes/default/templates/user_info_tpl.php:1
-msgid "User Information"
-msgstr ""
-
-#: lib/AdminPages.php:824
-msgid "NativeFS test results:"
-msgstr ""
-
-#: lib/AdminPages.php:825
-#, php-format
-msgid "Create new files: %s"
-msgstr ""
-
-#: lib/AdminPages.php:826
-#, php-format
-msgid "Delete files: %s"
-msgstr ""
-
-#: lib/AdminPages.php:827
-#, php-format
-msgid "File owner: %s"
-msgstr ""
-
-#: lib/AdminPages.php:828
-#, php-format
-msgid "File group: %s"
-msgstr ""
-
-#: lib/AdminPages.php:898
-msgid "No document root set."
-msgstr ""
-
-#: lib/AdminPages.php:901
-msgid "Invalid file writing mode."
-msgstr ""
-
-#: lib/AdminPages.php:906
-msgid "Invalid permissions specified."
-msgstr ""
-
-#: lib/AdminPages.php:912
-msgid "Missing FTP username."
-msgstr ""
-
-#: lib/AdminPages.php:913
-msgid "Missing FTP password."
-msgstr ""
-
-#: lib/AdminPages.php:914
-msgid "Missing FTP password confirmation."
-msgstr ""
-
-#: lib/AdminPages.php:915
-msgid "Missing FTP hostname."
-msgstr ""
-
-#: lib/AdminPages.php:917
-msgid "FTP passwords do not match."
-msgstr ""
-
-#: lib/AdminPages.php:964
-#, php-format
-msgid "%s Configuration"
-msgstr ""
-
-#: lib/AdminPages.php:1016
+#: .\lib\AdminPages.php:1026
 #, php-format
 msgid ""
-"Error: Could not create fsconfig.php file.  Make sure that the directory %s "
-"exists on the server and is writable to the web server user."
+"The blog path you specified is the same as your %s userdata path.  This is "
+"not supported."
 msgstr ""
 
-#: lib/AdminPages.php:1021
-msgid "Unexpected error: missing data?"
+#: .\lib\AdminPages.php:1032
+#, php-format
+msgid "The blog path '%s' is already registered."
 msgstr ""
 
-#: lib/BasePages.php:119 xmlrpc.php:1297
+#: .\lib\AdminPages.php:1035
+#, php-format
+msgid "The blog URL '%s' is already registered."
+msgstr ""
+
+#: .\lib\AdminPages.php:1042
+#, php-format
+msgid "The path '%s' is not a valid %s installation"
+msgstr ""
+
+#: .\lib\AdminPages.php:1046 .\lib\AdminPages.php:1050
+#, php-format
+msgid "The URL '%s' is not valid"
+msgstr ""
+
+#: .\lib\Attachments\ImageScaler.php:58
+#, php-format
+msgid "Invalid mode %s"
+msgstr ""
+
+#: .\lib\Attachments\ImageScaler.php:65
+msgid "Failed to scale image"
+msgstr ""
+
+#: .\lib\Attachments\ImageScaler.php:73
+#, php-format
+msgid "File %s does not exist"
+msgstr ""
+
+#: .\lib\Attachments\ImageScaler.php:77 .\lib\Attachments\ImageScaler.php:88
+#: .\lib\Attachments\ImageScaler.php:136
+#, php-format
+msgid "File has unsupported MIME type %s"
+msgstr ""
+
+#: .\lib\Attachments\ImageScaler.php:92
+msgid "Failed to create image from file"
+msgstr ""
+
+#: .\lib\Attachments\ImageScaler.php:102
+msgid "Could not determine image size"
+msgstr ""
+
+#: .\lib\Attachments\ImageScaler.php:109
+msgid "Image is already smaller than target size"
+msgstr ""
+
+#: .\lib\Attachments\ImageScaler.php:124
+msgid "Target file already exists"
+msgstr ""
+
+#: .\lib\Attachments\ImageScaler.php:140
+msgid "Failed to write scaled image"
+msgstr ""
+
+#: .\lib\BasePages.php:134 .\xmlrpc.php:1294
 msgid "LnBlog account locked"
 msgstr ""
 
-#: lib/BlogComment.php:366 lib/Pingback.php:206 lib/Trackback.php:355
-#: lib/WebPages.php:1231 lib/WebPages.php:1618 pages/pagelib.php:248
-#: pages/pagelib.php:317 themes/default/templates/article_tpl.php:45
-#: themes/default/templates/blogentry_summary_tpl.php:43
-#: themes/default/templates/blogentry_tpl.php:114
-#: themes/default/templates/blog_admin_tpl.php:69
-#: themes/tuxice/templates/blogentry_summary_tpl.php:36
-#: themes/tuxice/templates/blogentry_tpl.php:51
+#: .\lib\BlogComment.php:374 .\lib\Pingback.php:216 .\lib\Trackback.php:374
+#: .\lib\WebPages.php:1183 .\lib\WebPages.php:1564 .\lib\WebPages.php:2275
+#: .\lib\WebPages.php:2351 .\themes\default\templates\article_tpl.php:45
+#: .\themes\default\templates\blogentry_summary_tpl.php:43
+#: .\themes\default\templates\blogentry_tpl.php:127
+#: .\themes\default\templates\blog_admin_tpl.php:120
+#: .\themes\tuxice\templates\blogentry_summary_tpl.php:36
+#: .\themes\tuxice\templates\blogentry_tpl.php:51
 msgid "Delete"
 msgstr ""
 
-#: lib/FileUpload.php:186
+#: .\lib\FileUpload.php:191
 #, php-format
 msgid "File '<a href=\"%s\">%s</a>' successfully uploaded."
 msgstr ""
 
-#: lib/FileUpload.php:191
+#: .\lib\FileUpload.php:197
 msgid "No file was uploaded."
 msgstr ""
 
-#: lib/FileUpload.php:194
+#: .\lib\FileUpload.php:200
 msgid "File empty."
 msgstr ""
 
-#: lib/FileUpload.php:197
+#: .\lib\FileUpload.php:203
 msgid "File too big - rejected by server."
 msgstr ""
 
-#: lib/FileUpload.php:200
+#: .\lib\FileUpload.php:206
 msgid "File too big - rejected by browser."
 msgstr ""
 
-#: lib/FileUpload.php:203
+#: .\lib\FileUpload.php:209
 msgid "File only partially uploaded."
 msgstr ""
 
-#: lib/FileUpload.php:206
+#: .\lib\FileUpload.php:212
 msgid "Not a valid file upload."
 msgstr ""
 
-#: lib/FileUpload.php:209
+#: .\lib\FileUpload.php:215
 msgid "File name error - possible name truncation."
 msgstr ""
 
-#: lib/FileUpload.php:212
+#: .\lib\FileUpload.php:218
 msgid "Not a valid file upload - filename error."
 msgstr ""
 
-#: lib/FileUpload.php:215
+#: .\lib\FileUpload.php:221
 msgid "Invalid field name - upload not initialized."
 msgstr ""
 
-#: lib/Plugin.php:107
+#: .\lib\Model\EntryFactory.php:24
+#, php-format
+msgid "Reply ID %s does not exist"
+msgstr ""
+
+#: .\lib\Plugin.php:113
 msgid "No event handlers - do output when plugin is created"
 msgstr ""
 
-#: lib/Publisher.php:511
+#: .\lib\Publisher.php:514
 msgid "Error moving uploaded file"
 msgstr ""
 
-#: lib/Trackback.php:205
+#: .\lib\SystemConfig.php:98
+#, php-format
+msgid "Could not write %s"
+msgstr ""
+
+#: .\lib\Trackback.php:222
 msgid "Malformed response"
 msgstr ""
 
-#: lib/Trackback.php:229
+#: .\lib\Trackback.php:246
 msgid "No URL in ping."
 msgstr ""
 
-#: lib/Trackback.php:231 lib/WebPages.php:1879
+#: .\lib\Trackback.php:248 .\lib\WebPages.php:1855
 msgid "This entry does not accept trackbacks."
 msgstr ""
 
-#: lib/Trackback.php:238
+#: .\lib\Trackback.php:257
 msgid "Unable to save ping data."
 msgstr ""
 
-#: lib/WebPages.php:128
-msgid "Error updating blog paths."
+#: .\lib\WebPages.php:144
+#, php-format
+msgid "Error updating blog paths - %s."
 msgstr ""
 
-#: lib/WebPages.php:138
+#: .\lib\WebPages.php:147
+#, php-format
+msgid "The given blog path '%s' is not a directory."
+msgstr ""
+
+#: .\lib\WebPages.php:153
 #, php-format
 msgid "Update paths for %s"
 msgstr ""
 
-#: lib/WebPages.php:141
+#: .\lib\WebPages.php:156
 #, php-format
 msgid "Update blog paths - %s"
 msgstr ""
 
-#: lib/WebPages.php:158 lib/WebPages.php:159 lib/WebPages.php:254
-#: lib/WebPages.php:1253 lib/WebPages.php:1254
-msgid "Cancel"
+#: .\lib\WebPages.php:179
+msgid "Delete replies"
 msgstr ""
 
-#: lib/WebPages.php:168 lib/WebPages.php:1263
-msgid "Permission denied"
-msgstr ""
-
-#: lib/WebPages.php:169 lib/WebPages.php:1264
-msgid "You do not have permission to delete any of the selected responses."
-msgstr ""
-
-#: lib/WebPages.php:175 lib/WebPages.php:229 lib/WebPages.php:1270
-#: lib/WebPages.php:1326
-msgid "Delete responses"
-msgstr ""
-
-#: lib/WebPages.php:188 lib/WebPages.php:1283
-msgid "Delete the following responses?"
-msgstr ""
-
-#: lib/WebPages.php:190 lib/WebPages.php:1285
-msgid ""
-"The following responses will <strong>not</strong> be deleted because you do "
-"not have sufficient permissions."
-msgstr ""
-
-#: lib/WebPages.php:210 lib/WebPages.php:1305
-msgid "Error deleting responses"
-msgstr ""
-
-#: lib/WebPages.php:211 lib/WebPages.php:1306
-msgid "Unable to delete the following responses.  Do you want to try again?"
-msgstr ""
-
-#: lib/WebPages.php:230 lib/WebPages.php:1327
-msgid "Do you want to delete the following responses?"
-msgstr ""
-
-#: lib/WebPages.php:253
+#: .\lib\WebPages.php:191
 msgid "OK"
 msgstr ""
 
-#: lib/WebPages.php:255
+#: .\lib\WebPages.php:192 .\lib\WebPages.php:1214 .\lib\WebPages.php:1215
+msgid "Cancel"
+msgstr ""
+
+#: .\lib\WebPages.php:193
 #, php-format
 msgid "Do you really want to delete '%s'?"
 msgstr ""
 
-#: lib/WebPages.php:264
+#: .\lib\WebPages.php:201
 #, php-format
 msgid "Error: Unable to delete '%s'.  Try again?"
 msgstr ""
 
-#: lib/WebPages.php:269
+#: .\lib\WebPages.php:206
 msgid "Error: user "
 msgstr ""
 
-#: lib/WebPages.php:280 lib/WebPages.php:704
+#: .\lib\WebPages.php:217 .\lib\WebPages.php:639
 msgid "Access to this page is restricted to logged-in users."
 msgstr ""
 
-#: lib/WebPages.php:285
+#: .\lib\WebPages.php:222
 msgid "Remove article?"
 msgstr ""
 
-#: lib/WebPages.php:285
+#: .\lib\WebPages.php:222
 msgid "Remove entry?"
 msgstr ""
 
-#: lib/WebPages.php:296
+#: .\lib\WebPages.php:233
 #, php-format
 msgid "%s - Delete entry"
 msgstr ""
 
-#: lib/WebPages.php:297
+#: .\lib\WebPages.php:234
 #, php-format
 msgid "%s - Delete article"
 msgstr ""
 
-#: lib/WebPages.php:313
+#: .\lib\WebPages.php:250
 msgid "You do not have permission to edit this file."
 msgstr ""
 
-#: lib/WebPages.php:343
+#: .\lib\WebPages.php:282
 msgid "Edit Link List"
 msgstr ""
 
-#: lib/WebPages.php:345
+#: .\lib\WebPages.php:284
 msgid "Edit Text File"
 msgstr ""
 
-#: lib/WebPages.php:361
+#: .\lib\WebPages.php:299
 msgid "Cannot create file"
 msgstr ""
 
-#: lib/WebPages.php:363
+#: .\lib\WebPages.php:302
 #, php-format
 msgid "Unable to create file %s."
 msgstr ""
 
-#: lib/WebPages.php:374
+#: .\lib\WebPages.php:314
 msgid "Create new file"
 msgstr ""
 
-#: lib/WebPages.php:375
+#: .\lib\WebPages.php:315
 msgid "The selected file does not exist.  It will be created."
 msgstr ""
 
-#: lib/WebPages.php:384
+#: .\lib\WebPages.php:326
 #, php-format
 msgid ""
 "This page will help you create a site map to display in the navigation bar "
@@ -557,1767 +599,1791 @@ msgid ""
 "complicated menu bar, you will have to create a custom template."
 msgstr ""
 
-#: lib/WebPages.php:386
+#: .\lib\WebPages.php:330
 msgid "Create site map"
 msgstr ""
 
-#: lib/WebPages.php:400
+#: .\lib\WebPages.php:344
 msgid "Edit file"
 msgstr ""
 
-#: lib/WebPages.php:423
+#: .\lib\WebPages.php:367
 msgid "Change User Information"
 msgstr ""
 
-#: lib/WebPages.php:424
+#: .\lib\WebPages.php:368
 #, php-format
 msgid "New Login for %s"
 msgstr ""
 
-#: lib/WebPages.php:427
+#: .\lib\WebPages.php:371
 msgid "Change Administrator Login"
 msgstr ""
 
-#: lib/WebPages.php:428
+#: .\lib\WebPages.php:372
 msgid "System Aministration Login"
 msgstr ""
 
-#: lib/WebPages.php:432
+#: .\lib\WebPages.php:376
 #, php-format
 msgid "Modify User - %s"
 msgstr ""
 
-#: lib/WebPages.php:449
+#: .\lib\WebPages.php:391
 msgid "Edit extra profile data"
 msgstr ""
 
-#: lib/WebPages.php:450
+#: .\lib\WebPages.php:392
 msgid "Upload file to profile"
 msgstr ""
 
-#: lib/WebPages.php:525
+#: .\lib\WebPages.php:465
 #, php-format
 msgid "No e-mail address is set for user %s! Unable to send reset code."
 msgstr ""
 
-#: lib/WebPages.php:527
-msgid "The account e-mail address for %1$s does not match %1$2"
+#: .\lib\WebPages.php:467
+#, php-format
+msgid "The account e-mail address for %1$s does not match %2$s"
 msgstr ""
 
-#: lib/WebPages.php:535
+#: .\lib\WebPages.php:474
 msgid "Too many reset attempts.  Please wait a few minutes and try again."
 msgstr ""
 
-#: lib/WebPages.php:538
+#: .\lib\WebPages.php:477
 #, php-format
 msgid ""
 "Hi! A password reset for your LnBlog user account %1$s. If you did not "
-"request this, please disregard this message.\r\n"
-"\r\n"
-"To reset your password, visit the link below:\r\n"
+"request this, please disregard this message.\n"
+"\n"
+"To reset your password, visit the link below:\n"
 "%2$s"
 msgstr ""
 
-#: lib/WebPages.php:541
+#: .\lib\WebPages.php:480
 msgid "LnBlog account password reset"
 msgstr ""
 
-#: lib/WebPages.php:544
+#: .\lib\WebPages.php:483
 #, php-format
 msgid "From: LnBlog Account Management <%s>"
 msgstr ""
 
-#: lib/WebPages.php:549
+#: .\lib\WebPages.php:488
 #, php-format
 msgid "A password reset link has been sent to %s."
 msgstr ""
 
-#: lib/WebPages.php:551
+#: .\lib\WebPages.php:490
 msgid "Unable to send e-mail! Make sure your server is correctly configured."
 msgstr ""
 
-#: lib/WebPages.php:588
+#: .\lib\WebPages.php:527
 msgid "Invalid password reset data!"
 msgstr ""
 
-#: lib/WebPages.php:590
+#: .\lib\WebPages.php:529
 msgid "Incorrect e-mail for this user."
 msgstr ""
 
-#: lib/WebPages.php:592
+#: .\lib\WebPages.php:531
 msgid "Passwords do not match."
 msgstr ""
 
-#: lib/WebPages.php:626
+#: .\lib\WebPages.php:564
 #, php-format
 msgid ""
 "You will be redirected to <a href=\"%s\">the new entry</a> in %d seconds."
 msgstr ""
 
-#: lib/WebPages.php:671
+#: .\lib\WebPages.php:606
 msgid "error: entry contains no data."
 msgstr ""
 
-#: lib/WebPages.php:675 lib/WebPages.php:684
+#: .\lib\WebPages.php:610 .\lib\WebPages.php:619
 #, php-format
 msgid "permission denied: user %s cannot update this entry."
 msgstr ""
 
-#: lib/WebPages.php:698
+#: .\lib\WebPages.php:633
 #, php-format
 msgid "The draft entry %s does not exist"
 msgstr ""
 
-#: lib/WebPages.php:736
+#: .\lib\WebPages.php:670
 msgid "New Article"
 msgstr ""
 
-#: lib/WebPages.php:736
+#: .\lib\WebPages.php:670
 msgid "New Entry"
 msgstr ""
 
-#: lib/WebPages.php:834
+#: .\lib\WebPages.php:768
 #, php-format
 msgid "URI: %s"
 msgstr ""
 
-#: lib/WebPages.php:835
+#: .\lib\WebPages.php:770
 #, php-format
 msgid "Error %d: %s<br />"
 msgstr ""
 
-#: lib/WebPages.php:843
+#: .\lib\WebPages.php:778
 msgid "Failed to send the following pingbacks:"
 msgstr ""
 
-#: lib/WebPages.php:852
+#: .\lib\WebPages.php:787
 msgid "File upload errors:"
 msgstr ""
 
-#: lib/WebPages.php:912
+#: .\lib\WebPages.php:846
 #, php-format
 msgid ""
 "Select files to upload to the above location.  The file size limit is %s."
 msgstr ""
 
-#: lib/WebPages.php:955
+#: .\lib\WebPages.php:891
 msgid "You do not have permission to upload files to this entry."
 msgstr ""
 
-#: lib/WebPages.php:957
+#: .\lib\WebPages.php:893
 msgid "You do not have permission to upload files to this weblog."
 msgstr ""
 
-#: lib/WebPages.php:964 themes/default/templates/blogentry_summary_tpl.php:41
-#: themes/default/templates/blogentry_tpl.php:108
-#: themes/tuxice/templates/blogentry_summary_tpl.php:34
-#: themes/tuxice/templates/blogentry_tpl.php:49
+#: .\lib\WebPages.php:900
+#: .\themes\default\templates\blogentry_summary_tpl.php:41
+#: .\themes\default\templates\blogentry_tpl.php:121
+#: .\themes\tuxice\templates\blogentry_summary_tpl.php:34
+#: .\themes\tuxice\templates\blogentry_tpl.php:49
 msgid "Upload file"
 msgstr ""
 
-#: lib/WebPages.php:1033 lib/WebPages.php:1390 lib/WebPages.php:1433
-#: lib/WebPages.php:1468 plugins/sidebar_loginops.php:55
-#: themes/default/templates/article_tpl.php:46
-#: themes/default/templates/blogentry_summary_tpl.php:44
-#: themes/default/templates/blogentry_tpl.php:117
-#: themes/tuxice/templates/blogentry_summary_tpl.php:37
-#: themes/tuxice/templates/blogentry_tpl.php:52
+#: .\lib\WebPages.php:955
+msgid "Missing required parameters"
+msgstr ""
+
+#: .\lib\WebPages.php:974
+msgid "Could not find source file"
+msgstr ""
+
+#: .\lib\WebPages.php:1027 .\lib\WebPages.php:1344 .\lib\WebPages.php:1387
+#: .\lib\WebPages.php:1422 .\plugins\sidebar_loginops.php:57
+#: .\themes\default\templates\article_tpl.php:46
+#: .\themes\default\templates\blogentry_summary_tpl.php:44
+#: .\themes\default\templates\blogentry_tpl.php:130
+#: .\themes\tuxice\templates\blogentry_summary_tpl.php:37
+#: .\themes\tuxice\templates\blogentry_tpl.php:52
 msgid "Manage replies"
 msgstr ""
 
-#: lib/WebPages.php:1191
+#: .\lib\WebPages.php:1141
 #, php-format
 msgid "Comments on entries for %s"
 msgstr ""
 
-#: lib/WebPages.php:1192
+#: .\lib\WebPages.php:1142
 #, php-format
 msgid "All comments on '%s'"
 msgstr ""
 
-#: lib/WebPages.php:1195
+#: .\lib\WebPages.php:1145
 #, php-format
 msgid "TrackBacks on entries for %s"
 msgstr ""
 
-#: lib/WebPages.php:1196
+#: .\lib\WebPages.php:1146
 #, php-format
 msgid "All TrackBacks for '%s'"
 msgstr ""
 
-#: lib/WebPages.php:1199
+#: .\lib\WebPages.php:1149
 #, php-format
 msgid "Pingbacks on entries for %s"
 msgstr ""
 
-#: lib/WebPages.php:1200
+#: .\lib\WebPages.php:1150
 #, php-format
 msgid "All Pingbacks for '%s'"
 msgstr ""
 
-#: lib/WebPages.php:1203
+#: .\lib\WebPages.php:1153
 #, php-format
 msgid "Replies on entries for %s"
 msgstr ""
 
-#: lib/WebPages.php:1204
+#: .\lib\WebPages.php:1154
 #, php-format
 msgid "All replies for '%s'"
 msgstr ""
 
-#: lib/WebPages.php:1222
+#: .\lib\WebPages.php:1173
 msgid "View reply type:"
 msgstr ""
 
-#: lib/WebPages.php:1224
+#: .\lib\WebPages.php:1175
 msgid "All Replies"
 msgstr ""
 
-#: lib/WebPages.php:1226 plugins/menubar_breadcrumbs.php:69
-#: themes/default/templates/blogentry_tpl.php:197
-#: themes/tuxice/templates/blogentry_tpl.php:98
+#: .\lib\WebPages.php:1177 .\plugins\menubar_breadcrumbs.php:71
+#: .\themes\default\templates\blogentry_tpl.php:226
+#: .\themes\tuxice\templates\blogentry_tpl.php:102
 msgid "Comments"
 msgstr ""
 
-#: lib/WebPages.php:1228 plugins/menubar_breadcrumbs.php:67
-#: themes/default/templates/blogentry_tpl.php:161
-#: themes/tuxice/templates/blogentry_tpl.php:82
+#: .\lib\WebPages.php:1179 .\plugins\menubar_breadcrumbs.php:69
+#: .\themes\default\templates\blogentry_tpl.php:186
+#: .\themes\tuxice\templates\blogentry_tpl.php:82
 msgid "TrackBacks"
 msgstr ""
 
-#: lib/WebPages.php:1230 plugins/menubar_breadcrumbs.php:65
-#: themes/default/templates/blogentry_tpl.php:179
-#: themes/tuxice/templates/blogentry_tpl.php:90
+#: .\lib\WebPages.php:1181 .\plugins\menubar_breadcrumbs.php:67
+#: .\themes\default\templates\blogentry_tpl.php:206
+#: .\themes\tuxice\templates\blogentry_tpl.php:92
 msgid "Pingbacks"
 msgstr ""
 
-#: lib/WebPages.php:1344
+#: .\lib\WebPages.php:1222
+msgid "Permission denied"
+msgstr ""
+
+#: .\lib\WebPages.php:1223
+msgid "You do not have permission to delete any of the selected responses."
+msgstr ""
+
+#: .\lib\WebPages.php:1227 .\lib\WebPages.php:1281
+msgid "Delete responses"
+msgstr ""
+
+#: .\lib\WebPages.php:1240
+msgid "Delete the following responses?"
+msgstr ""
+
+#: .\lib\WebPages.php:1242
+msgid ""
+"The following responses will <strong>not</strong> be deleted because you do "
+"not have sufficient permissions."
+msgstr ""
+
+#: .\lib\WebPages.php:1263
+msgid "Error deleting responses"
+msgstr ""
+
+#: .\lib\WebPages.php:1264
+msgid "Unable to delete the following responses.  Do you want to try again?"
+msgstr ""
+
+#: .\lib\WebPages.php:1282
+msgid "Do you want to delete the following responses?"
+msgstr ""
+
+#: .\lib\WebPages.php:1298
 #, php-format
 msgid "All entries for %s."
 msgstr ""
 
-#: lib/WebPages.php:1348
+#: .\lib\WebPages.php:1302
 #, php-format
 msgid "Archive of %s"
 msgstr ""
 
-#: lib/WebPages.php:1375
+#: .\lib\WebPages.php:1329
 msgid "Show year list"
 msgstr ""
 
-#: lib/WebPages.php:1383 lib/WebPages.php:1416
+#: .\lib\WebPages.php:1337 .\lib\WebPages.php:1370
 msgid "Show month list"
 msgstr ""
 
-#: lib/WebPages.php:1394
+#: .\lib\WebPages.php:1348
 msgid "There are no entries for this blog."
 msgstr ""
 
-#: lib/WebPages.php:1426
+#: .\lib\WebPages.php:1380
 msgid "Show entry list"
 msgstr ""
 
-#: lib/WebPages.php:1436
+#: .\lib\WebPages.php:1390
 msgid "Back to main archives"
 msgstr ""
 
-#: lib/WebPages.php:1440
+#: .\lib\WebPages.php:1394
 msgid "There are no entries for this year."
 msgstr ""
 
-#: lib/WebPages.php:1465
+#: .\lib\WebPages.php:1419
 msgid "Show all entries at once"
 msgstr ""
 
-#: lib/WebPages.php:1470
+#: .\lib\WebPages.php:1424
 #, php-format
 msgid "Back to archive of %s"
 msgstr ""
 
-#: lib/WebPages.php:1474
+#: .\lib\WebPages.php:1428
 msgid "There are no entries for this month."
 msgstr ""
 
-#: lib/WebPages.php:1492
+#: .\lib\WebPages.php:1446
 #, php-format
 msgid "No entry found for %d-%d-%d"
 msgstr ""
 
-#: lib/WebPages.php:1508
+#: .\lib\WebPages.php:1462
 #, php-format
 msgid "Archives for %s"
 msgstr ""
 
-#: lib/WebPages.php:1581
+#: .\lib\WebPages.php:1527
 #, php-format
 msgid "%s articles"
 msgstr ""
 
-#: lib/WebPages.php:1620
+#: .\lib\WebPages.php:1566
 msgid "Created"
 msgstr ""
 
-#: lib/WebPages.php:1622
+#: .\lib\WebPages.php:1568
 msgid "Last edit"
 msgstr ""
 
-#: lib/WebPages.php:1625
+#: .\lib\WebPages.php:1571
 msgid "Set to auto-publish at"
 msgstr ""
 
-#: lib/WebPages.php:1646
+#: .\lib\WebPages.php:1592
 #, php-format
 msgid "%s - Drafts"
 msgstr ""
 
-#: lib/WebPages.php:1649
+#: .\lib\WebPages.php:1595
 #, php-format
 msgid "Drafts for %s"
 msgstr ""
 
-#: lib/WebPages.php:1693
+#: .\lib\WebPages.php:1635
+#, php-format
+msgid "Comments on <a href=\"%s\">%s</a>"
+msgstr ""
+
+#: .\lib\WebPages.php:1644
 msgid "Comments are closed on this entry."
 msgstr ""
 
-#: lib/WebPages.php:1714
+#: .\lib\WebPages.php:1664
+#, php-format
+msgid "Pingbacks on <a href=\"%s\">%s</a>"
+msgstr ""
+
+#: .\lib\WebPages.php:1671
 #, php-format
 msgid "There are no pingbacks for %s"
 msgstr ""
 
-#: lib/WebPages.php:1730
+#: .\lib\WebPages.php:1689
+#, php-format
+msgid "Trackbacks on <a href=\"%s\">%s</a>"
+msgstr ""
+
+#: .\lib\WebPages.php:1696
 #, php-format
 msgid "There are no trackbacks for %s"
 msgstr ""
 
-#: lib/WebPages.php:1762
+#: .\lib\WebPages.php:1730
 msgid "You must supply an entry URL and a target URL."
 msgstr ""
 
-#: lib/WebPages.php:1768
+#: .\lib\WebPages.php:1737
 #, php-format
 msgid ""
 "Trackback ping succeded.  You will be returned to the entry in %d seconds."
 msgstr ""
 
-#: lib/WebPages.php:1772
+#: .\lib\WebPages.php:1743
 #, php-format
 msgid "Error %s: %s"
 msgstr ""
 
-#: lib/WebPages.php:1787
+#: .\lib\WebPages.php:1761
 #, php-format
 msgid "User %s cannot send trackback pings from this entry."
 msgstr ""
 
-#: lib/WebPages.php:1792
+#: .\lib\WebPages.php:1768
 msgid "Send Trackback Ping"
 msgstr ""
 
-#: lib/WebPages.php:1924
+#: .\lib\WebPages.php:1890
 msgid "Topics for this weblog"
 msgstr ""
 
-#: lib/WebPages.php:1947
+#: .\lib\WebPages.php:1913
 msgid "Entries filed under: "
 msgstr ""
 
-#: lib/WebPages.php:1949
+#: .\lib\WebPages.php:1916
 msgid "Display all entries at once"
 msgstr ""
 
-#: lib/WebPages.php:1953
+#: .\lib\WebPages.php:1921
 msgid "Topic Search"
 msgstr ""
 
-#: lib/WebPages.php:1986
+#: .\lib\WebPages.php:1957
 msgid "Error: unable to update blog."
 msgstr ""
 
-#: lib/WebPages.php:1995
+#: .\lib\WebPages.php:1966
 #, php-format
 msgid "Update %s"
 msgstr ""
 
-#: lib/WebPages.php:1998
+#: .\lib\WebPages.php:1969
 #, php-format
 msgid "Update blog - %s"
 msgstr ""
 
-#: lib/WebPages.php:2146
+#: .\lib\WebPages.php:2111
 msgid "There are no entries for this weblog."
 msgstr ""
 
-#: pages/pagelib.php:58
+#: .\lib\WebPages.php:2194
 msgid ""
 "Error: line breaks are only allowed in the comment body.  What are you, a "
 "spam bot?"
 msgstr ""
 
-#: pages/pagelib.php:63
+#: .\lib\WebPages.php:2199
 msgid "Error: you must include something in the comment body."
 msgstr ""
 
-#: pages/pagelib.php:92
+#: .\lib\WebPages.php:2229
 msgid "Error: unable to add commtent please try again."
 msgstr ""
 
-#: pages/pagelib.php:147
-#, php-format
-msgid "Comments on <a href=\"%s\">%s</a>"
-msgstr ""
-
-#: pages/pagelib.php:159
-#, php-format
-msgid "Trackbacks on <a href=\"%s\">%s</a>"
-msgstr ""
-
-#: pages/pagelib.php:182
-#, php-format
-msgid "Pingbacks on <a href=\"%s\">%s</a>"
-msgstr ""
-
-#: pages/pagelib.php:247
+#: .\lib\WebPages.php:2274
 #, php-format
 msgid "Delete marked %s"
 msgstr ""
 
-#: pages/pagelib.php:249 pages/pagelib.php:318
+#: .\lib\WebPages.php:2276 .\lib\WebPages.php:2352
 msgid "Select all"
 msgstr ""
 
-#: pages/pagelib.php:316
+#: .\lib\WebPages.php:2350
 #, php-format
 msgid "<p>Delete marked replies %s</p>"
 msgstr ""
 
-#: pages/pagelib.php:333
+#: .\lib\WebPages.php:2371
 #, php-format
 msgid "Replies on <a href=\"%s\">%s</a>"
 msgstr ""
 
-#: plugins/author_bio.php:15
+#: .\plugins\author_bio.php:17
 msgid "Display information about the author in the sidebar."
 msgstr ""
 
-#: plugins/author_bio.php:19
+#: .\plugins\author_bio.php:21
 msgid "Sidebar box title"
 msgstr ""
 
-#: plugins/author_bio.php:19
+#: .\plugins\author_bio.php:21
 msgid "About Me"
 msgstr ""
 
-#: plugins/author_bio.php:28
+#: .\plugins\author_bio.php:30
 msgid "URL of your profile photo"
 msgstr ""
 
-#: plugins/author_bio.php:33
+#: .\plugins\author_bio.php:35
 msgid "Bio to display"
 msgstr ""
 
-#: plugins/banner_pageheader.php:13
+#: .\plugins\banner_pageheader.php:15
 msgid "Output a banner for the page."
 msgstr ""
 
-#: plugins/banner_pageheader.php:18
+#: .\plugins\banner_pageheader.php:20
 msgid "Show description"
 msgstr ""
 
-#: plugins/blogroll.php:20
+#: .\plugins\blogroll.php:25
 msgid "Creates a blogroll from an OPML file."
 msgstr ""
 
-#: plugins/blogroll.php:30
+#: .\plugins\blogroll.php:35
 msgid "Blog roll file (in OPML format)"
 msgstr ""
 
-#: plugins/blogroll.php:35
+#: .\plugins\blogroll.php:41
 msgid "Caption for blogroll sidebar panel"
 msgstr ""
 
-#: plugins/blogroll.php:36
+#: .\plugins\blogroll.php:42
 msgid "Blogroll"
 msgstr ""
 
-#: plugins/blogroll.php:42 plugins/sidebar_tags.php:20
+#: .\plugins\blogroll.php:50 .\plugins\sidebar_tags.php:23
 msgid "Heading when viewing the full page"
 msgstr ""
 
-#: plugins/blogroll.php:43
+#: .\plugins\blogroll.php:51
 msgid "Other blogs of interest"
 msgstr ""
 
-#: plugins/blogroll.php:162 plugins/sidebar_tags.php:137
+#: .\plugins\blogroll.php:175 .\plugins\sidebar_tags.php:144
 msgid "Blogroll - "
 msgstr ""
 
-#: plugins/bot_block.php:18
+#: .\plugins\bot_block.php:28
 msgid "Attempts to block spambots from posting comments."
 msgstr ""
 
-#: plugins/bot_block.php:25
+#: .\plugins\bot_block.php:36
 msgid "Block comments with HTML links in them."
 msgstr ""
 
-#: plugins/bot_block.php:34
+#: .\plugins\bot_block.php:47
 msgid "Include text CAPTCHA for user agents without JavaScript"
 msgstr ""
 
-#: plugins/bot_block.php:106
+#: .\plugins\bot_block.php:123
 #, php-format
 msgid "Enter the %s of %s and %s."
 msgstr ""
 
-#: plugins/bot_block.php:109
+#: .\plugins\bot_block.php:126
 msgid "Sorry, but you must have JavaScript enabled to post comments."
 msgstr ""
 
-#: plugins/content_ban.php:23
+#: .\plugins\content_ban.php:26
 msgid ""
 "Allows you to ban comments or trackbacks that match certain regular "
 "expressions."
 msgstr ""
 
-#: plugins/content_ban.php:29
+#: .\plugins\content_ban.php:33
 msgid "File to store list of banned regular expressions (one RE per line)."
 msgstr ""
 
-#: plugins/content_ban.php:36
+#: .\plugins\content_ban.php:42
 msgid "Do not apply ban to logged-in users."
 msgstr ""
 
-#: plugins/content_ban.php:108
+#: .\plugins\content_ban.php:115
 msgid "Blog RegEx blacklist"
 msgstr ""
 
-#: plugins/content_ban.php:113
+#: .\plugins\content_ban.php:122
 msgid "Global RegEx blacklist"
 msgstr ""
 
-#: plugins/disabled/template.php:71
+#: .\plugins\disabled\template.php:74
 msgid "The name to display"
 msgstr ""
 
-#: plugins/disabled/template.php:72
+#: .\plugins\disabled\template.php:75
 msgid "Bob Smith"
 msgstr ""
 
-#: plugins/disable_comment.php:24
+#: .\plugins\disable_comment.php:29
 msgid ""
 "Allows you to globally disable comments, trackbacks, or pingbacks for an "
 "entire blog."
 msgstr ""
 
-#: plugins/disable_comment.php:31
-#: themes/default/templates/entry_edit_tpl.php:145
+#: .\plugins\disable_comment.php:37
+#: .\themes\default\templates\entry_edit_tpl.php:146
 msgid "Allow comments"
 msgstr ""
 
-#: plugins/disable_comment.php:33
+#: .\plugins\disable_comment.php:39
 msgid "Use per-entry setting"
 msgstr ""
 
-#: plugins/disable_comment.php:34
+#: .\plugins\disable_comment.php:40
 msgid "Logged in users only"
 msgstr ""
 
-#: plugins/disable_comment.php:35
+#: .\plugins\disable_comment.php:41
 msgid "Disable all comments"
 msgstr ""
 
-#: plugins/disable_comment.php:39
+#: .\plugins\disable_comment.php:47
 msgid "Disable trackbacks for all entries"
 msgstr ""
 
-#: plugins/disable_comment.php:44
+#: .\plugins\disable_comment.php:54
 msgid "Disable pingbacks for all entries"
 msgstr ""
 
-#: plugins/disable_comment.php:51
+#: .\plugins\disable_comment.php:63
 msgid "Close all replies on entries older than this many days"
 msgstr ""
 
-#: plugins/htaccess_generator.php:18
+#: .\plugins\htaccess_generator.php:20
 msgid ""
 "Adds an .htaccess file to blogs that blocks access to system-managed files.  "
 "Enabling this globally is recommended if you're running Apache."
 msgstr ""
 
-#: plugins/htaccess_generator.php:22
+#: .\plugins\htaccess_generator.php:24
 msgid "Copy of parent directory's .htaccess (if current does not have one)."
 msgstr ""
 
-#: plugins/ipban.php:29
+#: .\plugins\ipban.php:33
 msgid "Allows you to ban IP addresses from adding comments or trackbacks."
 msgstr ""
 
-#: plugins/ipban.php:36
+#: .\plugins\ipban.php:40
 msgid "File to store list of banned IPs."
 msgstr ""
 
-#: plugins/ipban.php:40
+#: .\plugins\ipban.php:44
 msgid "Show per-blog ban link when administrator"
 msgstr ""
 
-#: plugins/ipban.php:45
+#: .\plugins\ipban.php:49
 msgid "Ban link both bans IP and deletes"
 msgstr ""
 
-#: plugins/ipban.php:91
+#: .\plugins\ipban.php:96
 #, php-format
 msgid "IP: %s"
 msgstr ""
 
-#: plugins/ipban.php:96
+#: .\plugins\ipban.php:101
 #, php-format
 msgid ""
 "Delete %s and ban IP address %s from submitting comments or trackbacks to "
 "this blog?"
 msgstr ""
 
-#: plugins/ipban.php:97
+#: .\plugins\ipban.php:102
 msgid "Delete &amp; Ban IP"
 msgstr ""
 
-#: plugins/ipban.php:101
+#: .\plugins\ipban.php:106
 #, php-format
 msgid ""
 "Delete %s and ban IP address %s from submitting comments or trackbacks to "
 "this entire site?"
 msgstr ""
 
-#: plugins/ipban.php:102
+#: .\plugins\ipban.php:107
 msgid "Delete &amp; Ban Globally"
 msgstr ""
 
-#: plugins/ipban.php:107
+#: .\plugins\ipban.php:112
 #, php-format
 msgid "Ban IP address %s from submitting comments or trackbacks to this blog?"
 msgstr ""
 
-#: plugins/ipban.php:108
+#: .\plugins\ipban.php:113
 msgid "Ban IP"
 msgstr ""
 
-#: plugins/ipban.php:112
+#: .\plugins\ipban.php:117
 #, php-format
 msgid ""
 "Ban IP address %s from submitting comments or trackbacks to this entire site?"
 msgstr ""
 
-#: plugins/ipban.php:113
+#: .\plugins\ipban.php:118
 msgid "Global Ban"
 msgstr ""
 
-#: plugins/ipban.php:117
+#: .\plugins\ipban.php:122
 msgid " (Banned)"
 msgstr ""
 
-#: plugins/ipban.php:196
+#: .\plugins\ipban.php:203
 msgid "Blog IP blacklist"
 msgstr ""
 
-#: plugins/ipban.php:201
+#: .\plugins\ipban.php:210
 msgid "Global IP blacklist"
 msgstr ""
 
-#: plugins/menubar_breadcrumbs.php:12
+#: .\plugins\menubar_breadcrumbs.php:14
 msgid ""
 "Show a \"bread-crumb\" trail indicating the user's current location in the "
 "blog."
 msgstr ""
 
-#: plugins/menubar_breadcrumbs.php:14
+#: .\plugins\menubar_breadcrumbs.php:17
 msgid "Heading at start of trail"
 msgstr ""
 
-#: plugins/menubar_breadcrumbs.php:15
+#: .\plugins\menubar_breadcrumbs.php:18
 msgid "Location"
 msgstr ""
 
-#: plugins/menubar_breadcrumbs.php:16
-msgid "Separator for location components (HTML)"
-msgstr ""
-
-#: plugins/menubar_breadcrumbs.php:17
-msgid "&lt;&lt;"
-msgstr ""
-
-#: plugins/menubar_breadcrumbs.php:55 plugins/sidebar_archives.php:17
-#: plugins/sidebar_calendar.php:220
+#: .\plugins\menubar_breadcrumbs.php:57 .\plugins\sidebar_archives.php:21
+#: .\plugins\sidebar_calendar.php:221
 msgid "Archives"
 msgstr ""
 
-#: plugins/menubar_breadcrumbs.php:57 plugins/sidebar_articles.php:30
-#: plugins/sidebar_articles.php:36
+#: .\plugins\menubar_breadcrumbs.php:59 .\plugins\sidebar_articles.php:36
+#: .\plugins\sidebar_articles.php:42
 msgid "Articles"
 msgstr ""
 
-#: plugins/menubar_breadcrumbs.php:77
+#: .\plugins\menubar_breadcrumbs.php:79
 msgid "Search results"
 msgstr ""
 
-#: plugins/menubar_breadcrumbs.php:84
-#: themes/default/templates/article_tpl.php:31
+#: .\plugins\menubar_breadcrumbs.php:86
+#: .\themes\default\templates\article_tpl.php:31
 msgid "Tags"
 msgstr ""
 
-#: plugins/menubar_sitemap.php:33
+#: .\plugins\menubar_sitemap.php:37
 msgid "Show a sitemap in the menubar"
 msgstr ""
 
-#: plugins/menubar_sitemap.php:35 plugins/menubar_sitemap.php:42
+#: .\plugins\menubar_sitemap.php:39 .\plugins\menubar_sitemap.php:51
 msgid "Site Map"
 msgstr ""
 
-#: plugins/menubar_sitemap.php:37
+#: .\plugins\menubar_sitemap.php:42
 msgid "Automatically list all blogs in sitemap"
 msgstr ""
 
-#: plugins/menubar_sitemap.php:39
+#: .\plugins\menubar_sitemap.php:46
 msgid "Name of link-list file"
 msgstr ""
 
-#: plugins/menubar_sitemap.php:41
+#: .\plugins\menubar_sitemap.php:50
 msgid "Heading at start of menubar"
 msgstr ""
 
-#: plugins/menubar_sitemap.php:44
+#: .\plugins\menubar_sitemap.php:55
 msgid "Use unmodified file contents as menubar (no auto-generated HTML)"
 msgstr ""
 
-#: plugins/menubar_sitemap.php:105
+#: .\plugins\menubar_sitemap.php:117
 msgid "Site home page"
 msgstr ""
 
-#: plugins/menubar_sitemap.php:105
+#: .\plugins\menubar_sitemap.php:117
 msgid "Home"
 msgstr ""
 
-#: plugins/menubar_sitemap.php:117
+#: .\plugins\menubar_sitemap.php:129
 msgid "Edit custom sitemap"
 msgstr ""
 
-#: plugins/page_metatags.php:10
+#: .\plugins\page_metatags.php:12
 msgid "Add some META tags to the page."
 msgstr ""
 
-#: plugins/page_metatags.php:12
+#: .\plugins\page_metatags.php:15
 msgid "Keywords for search engines"
 msgstr ""
 
-#: plugins/private_blog.php:7
+#: .\plugins\private_blog.php:10
 msgid "Makes a blog private so that only certain users can access it."
 msgstr ""
 
-#: plugins/private_blog.php:9
+#: .\plugins\private_blog.php:12
 msgid "Allowed user names (comma separated)"
 msgstr ""
 
-#: plugins/reply_notifier.php:15
+#: .\plugins\reply_notifier.php:16
 msgid ""
 "Sends an e-mail notification when a comment, TrackBack, or Pingback is "
 "submitted."
 msgstr ""
 
-#: plugins/reply_notifier.php:16
+#: .\plugins\reply_notifier.php:18
 msgid "Send notification for comments"
 msgstr ""
 
-#: plugins/reply_notifier.php:18
+#: .\plugins\reply_notifier.php:22
 msgid "Send notification for TrackBacks"
 msgstr ""
 
-#: plugins/reply_notifier.php:20
+#: .\plugins\reply_notifier.php:26
 msgid "Send notification for Pingbacks"
 msgstr ""
 
-#: plugins/reply_notifier.php:55
+#: .\plugins\reply_notifier.php:64
 #, php-format
 msgid "Comment on %s"
 msgstr ""
 
-#: plugins/reply_notifier.php:56
+#: .\plugins\reply_notifier.php:65
 msgid "A new reader comment has been posted.\n"
 msgstr ""
 
-#: plugins/reply_notifier.php:57
+#: .\plugins\reply_notifier.php:66
 #, php-format
 msgid ""
 "The URL for this comment is: %s\n"
 "\n"
 msgstr ""
 
-#: plugins/reply_notifier.php:58
+#: .\plugins\reply_notifier.php:67
 #, php-format
 msgid "Name: %s\n"
 msgstr ""
 
-#: plugins/reply_notifier.php:59
+#: .\plugins\reply_notifier.php:68
 #, php-format
 msgid "E-mail: %s\n"
 msgstr ""
 
-#: plugins/reply_notifier.php:60 plugins/reply_notifier.php:80
+#: .\plugins\reply_notifier.php:69 .\plugins\reply_notifier.php:89
 #, php-format
 msgid "URL: %s\n"
 msgstr ""
 
-#: plugins/reply_notifier.php:61 plugins/reply_notifier.php:78
-#: plugins/reply_notifier.php:105
+#: .\plugins\reply_notifier.php:70 .\plugins\reply_notifier.php:87
+#: .\plugins\reply_notifier.php:114
 #, php-format
 msgid "IP address: %s\n"
 msgstr ""
 
-#: plugins/reply_notifier.php:62
+#: .\plugins\reply_notifier.php:71
 #, php-format
 msgid ""
 "Subject: %s\n"
 "\n"
 msgstr ""
 
-#: plugins/reply_notifier.php:74
+#: .\plugins\reply_notifier.php:83
 #, php-format
 msgid "Trackback on %s"
 msgstr ""
 
-#: plugins/reply_notifier.php:75
+#: .\plugins\reply_notifier.php:84
 msgid "A new TrackBack ping has been received.\n"
 msgstr ""
 
-#: plugins/reply_notifier.php:76 plugins/reply_notifier.php:103
+#: .\plugins\reply_notifier.php:85 .\plugins\reply_notifier.php:112
 #, php-format
 msgid ""
 "The URL for this ping is: %s\n"
 "\n"
 msgstr ""
 
-#: plugins/reply_notifier.php:77 plugins/reply_notifier.php:104
+#: .\plugins\reply_notifier.php:86 .\plugins\reply_notifier.php:113
 #, php-format
 msgid "Date received: %s\n"
 msgstr ""
 
-#: plugins/reply_notifier.php:79
+#: .\plugins\reply_notifier.php:88
 #, php-format
 msgid "Blog: %s\n"
 msgstr ""
 
-#: plugins/reply_notifier.php:81 plugins/reply_notifier.php:108
+#: .\plugins\reply_notifier.php:90 .\plugins\reply_notifier.php:117
 #, php-format
 msgid ""
 "Title: %s\n"
 "\n"
 msgstr ""
 
-#: plugins/reply_notifier.php:101
+#: .\plugins\reply_notifier.php:110
 #, php-format
 msgid "Pingback on %s"
 msgstr ""
 
-#: plugins/reply_notifier.php:102
+#: .\plugins\reply_notifier.php:111
 msgid "A new Pingback ping has been received.\n"
 msgstr ""
 
-#: plugins/reply_notifier.php:106
+#: .\plugins\reply_notifier.php:115
 #, php-format
 msgid "Source URL: %s\n"
 msgstr ""
 
-#: plugins/reply_notifier.php:107
+#: .\plugins\reply_notifier.php:116
 #, php-format
 msgid "Target URL: %s\n"
 msgstr ""
 
-#: plugins/rss1_generator.php:108
+#: .\plugins\rss1_generator.php:114
 msgid "Create RSS 1.0 feeds for comments and blog entries."
 msgstr ""
 
-#: plugins/rss1_generator.php:110
+#: .\plugins\rss1_generator.php:117
 msgid "The file name for the blog RSS feed"
 msgstr ""
 
-#: plugins/rss1_generator.php:112
+#: .\plugins\rss1_generator.php:121
 msgid "The file name for comment RSS feeds"
 msgstr ""
 
-#: plugins/rss1_generator.php:114 plugins/rss2_generator.php:193
+#: .\plugins\rss1_generator.php:125 .\plugins\rss2_generator.php:211
 msgid "Generate feeds for each topic"
 msgstr ""
 
-#: plugins/rss1_generator.php:188
+#: .\plugins\rss1_generator.php:201
 #, php-format
 msgid "%s - %s"
 msgstr ""
 
-#: plugins/rss2_generator.php:179
+#: .\plugins\rss2_generator.php:188
 msgid "Create RSS 2.0 feeds for comments and blog entries."
 msgstr ""
 
-#: plugins/rss2_generator.php:185
+#: .\plugins\rss2_generator.php:195
 msgid "CSS style sheet for RSS feeds"
 msgstr ""
 
-#: plugins/rss2_generator.php:187
+#: .\plugins\rss2_generator.php:199
 msgid "XSLT style sheet for RSS feeds"
 msgstr ""
 
-#: plugins/rss2_generator.php:189
+#: .\plugins\rss2_generator.php:203
 msgid "File name for blog RSS 2 feed"
 msgstr ""
 
-#: plugins/rss2_generator.php:191
+#: .\plugins\rss2_generator.php:207
 msgid "File name for comment RSS 2 feeds"
 msgstr ""
 
-#: plugins/rss2_generator.php:196
+#: .\plugins\rss2_generator.php:216
 msgid "Suffix to append to category for top feed files"
 msgstr ""
 
-#: plugins/sidebar_archives.php:13
+#: .\plugins\sidebar_archives.php:16
 msgid "List the months of archives for a blog."
 msgstr ""
 
-#: plugins/sidebar_archives.php:15
+#: .\plugins\sidebar_archives.php:18
 msgid "Number of months to show"
 msgstr ""
 
-#: plugins/sidebar_archives.php:16
+#: .\plugins\sidebar_archives.php:20
 msgid "Sidebar section title"
 msgstr ""
 
-#: plugins/sidebar_archives.php:53
+#: .\plugins\sidebar_archives.php:58
 msgid "Show all entries"
 msgstr ""
 
-#: plugins/sidebar_articles.php:28
+#: .\plugins\sidebar_articles.php:34
 msgid "List the articles for a blog."
 msgstr ""
 
-#: plugins/sidebar_articles.php:35 plugins/sidebar_news.php:17
-#: plugins/sidebar_tags.php:18
+#: .\plugins\sidebar_articles.php:41 .\plugins\sidebar_news.php:24
+#: .\plugins\sidebar_tags.php:20
 msgid "Sidebar section heading"
 msgstr ""
 
-#: plugins/sidebar_articles.php:41
+#: .\plugins\sidebar_articles.php:47
 msgid "Show link to list of static articles"
 msgstr ""
 
-#: plugins/sidebar_articles.php:47
+#: .\plugins\sidebar_articles.php:53
 msgid "Text for link to all static articles"
 msgstr ""
 
-#: plugins/sidebar_articles.php:48
+#: .\plugins\sidebar_articles.php:54
 msgid "All static pages"
 msgstr ""
 
-#: plugins/sidebar_articles.php:53
+#: .\plugins\sidebar_articles.php:59
 msgid "File where additional links to display are stored"
 msgstr ""
 
-#: plugins/sidebar_articles.php:122
+#: .\plugins\sidebar_articles.php:128
 msgid "Add custom links"
 msgstr ""
 
-#: plugins/sidebar_calendar.php:19
+#: .\plugins\sidebar_calendar.php:22
 msgid "Provides a link calendar for the sidebar."
 msgstr ""
 
-#: plugins/sidebar_calendar.php:21
+#: .\plugins\sidebar_calendar.php:24
 msgid "Title for calendar"
 msgstr ""
 
-#: plugins/sidebar_calendar.php:21
+#: .\plugins\sidebar_calendar.php:24
 msgid "Calendar"
 msgstr ""
 
-#: plugins/sidebar_calendar.php:22
+#: .\plugins\sidebar_calendar.php:26
 msgid "Include link to show all entries"
 msgstr ""
 
-#: plugins/sidebar_calendar.php:224
+#: .\plugins\sidebar_calendar.php:225
 msgid "Show all"
 msgstr ""
 
-#: plugins/sidebar_loginlink.php:9
-msgid "Adds login panel to the sidebar."
-msgstr ""
-
-#: plugins/sidebar_loginlink.php:14
-msgid "Use a login form, instead of a link to the login page"
-msgstr ""
-
-#: plugins/sidebar_loginlink.php:17
-msgid "Show link to administration pages"
-msgstr ""
-
-#: plugins/sidebar_loginlink.php:41 plugins/sidebar_loginlink.php:52
-msgid "Login"
-msgstr ""
-
-#: plugins/sidebar_loginlink.php:45
-#: themes/default/templates/login_create_tpl.php:8
-#: themes/default/templates/login_tpl.php:7
-msgid "Username"
-msgstr ""
-
-#: plugins/sidebar_loginlink.php:49
-#: themes/default/templates/login_create_tpl.php:13
-#: themes/default/templates/login_tpl.php:11
-msgid "Password"
-msgstr ""
-
-#: plugins/sidebar_loginlink.php:58
-msgid "User Login"
-msgstr ""
-
-#: plugins/sidebar_loginops.php:10
+#: .\plugins\sidebar_loginops.php:11
 msgid "Adds a control panel to the sidebar."
 msgstr ""
 
-#: plugins/sidebar_loginops.php:40
+#: .\plugins\sidebar_loginops.php:42
 msgid "Back to main menu"
 msgstr ""
 
-#: plugins/sidebar_loginops.php:44
+#: .\plugins\sidebar_loginops.php:46
 msgid "Weblog Administration"
 msgstr ""
 
-#: plugins/sidebar_loginops.php:47
+#: .\plugins\sidebar_loginops.php:49
 msgid "New post"
 msgstr ""
 
-#: plugins/sidebar_loginops.php:51
+#: .\plugins\sidebar_loginops.php:53
 msgid "Drafts"
 msgstr ""
 
-#: plugins/sidebar_loginops.php:59
+#: .\plugins\sidebar_loginops.php:61
 msgid "Upload file for blog"
 msgstr ""
 
-#: plugins/sidebar_loginops.php:60
+#: .\plugins\sidebar_loginops.php:62
 msgid "Edit weblog settings"
 msgstr ""
 
-#: plugins/sidebar_loginops.php:63
+#: .\plugins\sidebar_loginops.php:65
 msgid "Edit User Information"
 msgstr ""
 
-#: plugins/sidebar_loginops.php:66
+#: .\plugins\sidebar_loginops.php:68
 msgid "Site administration"
 msgstr ""
 
-#: plugins/sidebar_loginops.php:69
+#: .\plugins\sidebar_loginops.php:71
 #, php-format
 msgid "Logout %s"
 msgstr ""
 
-#: plugins/sidebar_loginops.php:72
+#: .\plugins\sidebar_loginops.php:74
 #, php-format
 msgid "Blog is at version %s.  Update required."
 msgstr ""
 
-#: plugins/sidebar_loginops.php:79
+#: .\plugins\sidebar_loginops.php:81
 msgid "Configure plugins"
 msgstr ""
 
-#: plugins/sidebar_loginops.php:80
+#: .\plugins\sidebar_loginops.php:82
 msgid "Plugin loading"
 msgstr ""
 
-#: plugins/sidebar_news.php:14
+#: .\plugins\sidebar_loginops.php:100
+msgid "User Login"
+msgstr ""
+
+#: .\plugins\sidebar_news.php:20
 msgid "List the RSS feeds for the current page."
 msgstr ""
 
-#: plugins/sidebar_news.php:18
+#: .\plugins\sidebar_news.php:25
 msgid "News Feeds"
 msgstr ""
 
-#: plugins/sidebar_news.php:19
+#: .\plugins\sidebar_news.php:28
 msgid "Use standard RSS icons for feeds"
 msgstr ""
 
-#: plugins/sidebar_news.php:22
+#: .\plugins\sidebar_news.php:33
 msgid "External URL for main feed (e.g. through FeedBurner)"
 msgstr ""
 
-#: plugins/sidebar_news.php:25
+#: .\plugins\sidebar_news.php:38
 msgid "External feed link text"
 msgstr ""
 
-#: plugins/sidebar_news.php:28
+#: .\plugins\sidebar_news.php:43
 msgid "Extra HTML markup (e.g. for FeedBurner widgets)"
 msgstr ""
 
-#: plugins/sidebar_news.php:92
+#: .\plugins\sidebar_news.php:129
 msgid "Subscribe to updates with an RSS reader"
 msgstr ""
 
-#: plugins/sidebar_news.php:111
+#: .\plugins\sidebar_news.php:149
 msgid "RSS 1.0 comment feed - links only"
 msgstr ""
 
-#: plugins/sidebar_news.php:112
+#: .\plugins\sidebar_news.php:150
 msgid "RSS 2.0 comment feed - full comments"
 msgstr ""
 
-#: plugins/sidebar_news.php:113
+#: .\plugins\sidebar_news.php:151
 msgid "RSS 1.0 blog entry feed - links only"
 msgstr ""
 
-#: plugins/sidebar_news.php:114
+#: .\plugins\sidebar_news.php:152
 msgid "RSS 2.0 blog entry feed - full text"
 msgstr ""
 
-#: plugins/sidebar_news.php:120
+#: .\plugins\sidebar_news.php:159
 msgid "Comment headlines"
 msgstr ""
 
-#: plugins/sidebar_news.php:121
+#: .\plugins\sidebar_news.php:160
 msgid "Comment text"
 msgstr ""
 
-#: plugins/sidebar_news.php:122
+#: .\plugins\sidebar_news.php:161
 msgid "Entry headlines"
 msgstr ""
 
-#: plugins/sidebar_news.php:123
+#: .\plugins\sidebar_news.php:162
 msgid "Entry text"
 msgstr ""
 
-#: plugins/sidebar_news.php:185
+#: .\plugins\sidebar_news.php:237
 msgid "Comments - RSS 2.0"
 msgstr ""
 
-#: plugins/sidebar_news.php:192
+#: .\plugins\sidebar_news.php:246
 msgid "Comments - RSS 1.0"
 msgstr ""
 
-#: plugins/sidebar_news.php:212
+#: .\plugins\sidebar_news.php:270
 msgid "Entries - RSS 2.0"
 msgstr ""
 
-#: plugins/sidebar_news.php:220
+#: .\plugins\sidebar_news.php:282
 msgid "Entries - RSS 1.0"
 msgstr ""
 
-#: plugins/sidebar_news.php:223
+#: .\plugins\sidebar_news.php:286
 msgid "RSS feed"
 msgstr ""
 
-#: plugins/sidebar_poweredby.php:8
+#: .\plugins\sidebar_poweredby.php:10
 msgid "Shameless link whoring.  Put a link to LnBlog on the page."
 msgstr ""
 
-#: plugins/sidebar_poweredby.php:12
+#: .\plugins\sidebar_poweredby.php:15
 msgid "Put the advertising in the footer, not the sidebar"
 msgstr ""
 
-#: plugins/sidebar_poweredby.php:32
+#: .\plugins\sidebar_poweredby.php:36
 #, php-format
 msgid "Powered by %s"
 msgstr ""
 
-#: plugins/sidebar_poweredby.php:40
+#: .\plugins\sidebar_poweredby.php:45
 msgid "%1\\s is powered by %2\\s"
 msgstr ""
 
-#: plugins/sidebar_poweredby.php:43
+#: .\plugins\sidebar_poweredby.php:50
 msgid "Powered by %2\\s"
 msgstr ""
 
-#: plugins/sidebar_recent.php:15
+#: .\plugins\sidebar_recent.php:24
 msgid "Show some of the more recent posts in the sidebar."
 msgstr ""
 
-#: plugins/sidebar_recent.php:18
+#: .\plugins\sidebar_recent.php:28
 msgid "Header for main blog page (entries not on main page)"
 msgstr ""
 
-#: plugins/sidebar_recent.php:19
+#: .\plugins\sidebar_recent.php:29
 msgid "Older Entries"
 msgstr ""
 
-#: plugins/sidebar_recent.php:21
+#: .\plugins\sidebar_recent.php:33
 msgid "Header for other pages (newest entries)"
 msgstr ""
 
-#: plugins/sidebar_recent.php:22
+#: .\plugins\sidebar_recent.php:34
 msgid "Recent Entries"
 msgstr ""
 
-#: plugins/sidebar_recent.php:24
+#: .\plugins\sidebar_recent.php:38
 msgid "Number of entries to show"
 msgstr ""
 
-#: plugins/sidebar_recent.php:26
+#: .\plugins\sidebar_recent.php:42
 msgid ""
 "Show the most recent entries on the front page (same links as entry pages)"
 msgstr ""
 
-#: plugins/sidebar_recent.php:29
+#: .\plugins\sidebar_recent.php:47
 msgid "Show link to main blog page"
 msgstr ""
 
-#: plugins/sidebar_recent.php:31
+#: .\plugins\sidebar_recent.php:51
 msgid "Enable plugin output caching"
 msgstr ""
 
-#: plugins/sidebar_recent.php:88
+#: .\plugins\sidebar_recent.php:110
 msgid "Show home page"
 msgstr ""
 
-#: plugins/sidebar_search.php:41
+#: .\plugins\sidebar_search.php:47
 msgid "Search for terms in blog entries."
 msgstr ""
 
-#: plugins/sidebar_search.php:43
+#: .\plugins\sidebar_search.php:49
 msgid "Caption for search panel"
 msgstr ""
 
-#: plugins/sidebar_search.php:43 plugins/sidebar_search.php:142
+#: .\plugins\sidebar_search.php:49 .\plugins\sidebar_search.php:153
 msgid "Search"
 msgstr ""
 
-#: plugins/sidebar_search.php:44
+#: .\plugins\sidebar_search.php:50
 msgid "Search field label"
 msgstr ""
 
-#: plugins/sidebar_search.php:44
+#: .\plugins\sidebar_search.php:50
 msgid "Search this weblog"
 msgstr ""
 
-#: plugins/sidebar_search.php:45
+#: .\plugins\sidebar_search.php:51
 msgid "Put label inside box (HTML5 only)"
 msgstr ""
 
-#: plugins/sidebar_search.php:46
+#: .\plugins\sidebar_search.php:53
 msgid "Search engine"
 msgstr ""
 
-#: plugins/sidebar_search.php:53
+#: .\plugins\sidebar_search.php:62
 msgid "Show search box in what part of page"
 msgstr ""
 
-#: plugins/sidebar_search.php:55 themes/default/templates/css_editor_tpl.php:57
+#: .\plugins\sidebar_search.php:64
+#: .\themes\default\templates\css_editor_tpl.php:58
 msgid "Sidebar"
 msgstr ""
 
-#: plugins/sidebar_search.php:56
+#: .\plugins\sidebar_search.php:65
 msgid "Banner"
 msgstr ""
 
-#: plugins/sidebar_search.php:57
+#: .\plugins\sidebar_search.php:66
 msgid "Menubar"
 msgstr ""
 
-#: plugins/sidebar_search.php:86
+#: .\plugins\sidebar_search.php:95
 msgid ""
 "Search for posts containing a space-separated list of words. If the search "
 "sting is enclosed in forward slashes, it will be treated as a regular "
 "expression."
 msgstr ""
 
-#: plugins/sidebar_search.php:199
+#: .\plugins\sidebar_search.php:210
 msgid "No search results found."
 msgstr ""
 
-#: plugins/sidebar_search.php:200
+#: .\plugins\sidebar_search.php:211
 msgid "No posts matched"
 msgstr ""
 
-#: plugins/sidebar_search.php:203
+#: .\plugins\sidebar_search.php:215
 #, php-format
 msgid "Search results for \"%s\""
 msgstr ""
 
-#: plugins/sidebar_search.php:207
+#: .\plugins\sidebar_search.php:221
 msgid "No search terms"
 msgstr ""
 
-#: plugins/sidebar_search.php:213
+#: .\plugins\sidebar_search.php:228
 #, php-format
 msgid "Search results -  %s"
 msgstr ""
 
-#: plugins/sidebar_tags.php:16
+#: .\plugins\sidebar_tags.php:18
 msgid "Provides a list of links to view post for each tag used in the blog."
 msgstr ""
 
-#: plugins/sidebar_tags.php:18
-#: themes/default/templates/blogentry_summary_tpl.php:16
-#: themes/default/templates/blogentry_tpl.php:88
-#: themes/tuxice/templates/blogentry_summary_tpl.php:17
-#: themes/tuxice/templates/blogentry_tpl.php:16
+#: .\plugins\sidebar_tags.php:20
+#: .\themes\default\templates\blogentry_summary_tpl.php:16
+#: .\themes\default\templates\blogentry_tpl.php:99
+#: .\themes\tuxice\templates\blogentry_summary_tpl.php:17
+#: .\themes\tuxice\templates\blogentry_tpl.php:16
 msgid "Topics"
 msgstr ""
 
-#: plugins/sidebar_tags.php:21
+#: .\plugins\sidebar_tags.php:24
 msgid "Tags for this blog"
 msgstr ""
 
-#: plugins/sidebar_tags.php:22
+#: .\plugins\sidebar_tags.php:26
 msgid "Show RSS feeds"
 msgstr ""
 
-#: plugins/sidebar_tags.php:79 plugins/sidebar_tags.php:80
+#: .\plugins\sidebar_tags.php:86 .\plugins\sidebar_tags.php:87
 msgid "RSS 1.0 feed"
 msgstr ""
 
-#: plugins/sidebar_tags.php:84 plugins/sidebar_tags.php:85
+#: .\plugins\sidebar_tags.php:91 .\plugins\sidebar_tags.php:92
 msgid "RSS 2.0 feed"
 msgstr ""
 
-#: plugins/tinymce.php:21
+#: .\plugins\tinymce.php:23
 msgid "Use TinyMCE for the post editor and file editor."
 msgstr ""
 
-#: plugins/tinymce.php:23
+#: .\plugins\tinymce.php:26
 msgid "TinyMCE theme to use"
 msgstr ""
 
-#: plugins/tinymce.php:24
+#: .\plugins\tinymce.php:27
 msgid "Basic"
 msgstr ""
 
-#: plugins/tinymce.php:24
+#: .\plugins\tinymce.php:27
 msgid "Advanced"
 msgstr ""
 
-#: plugins/tinymce.php:26
-msgid "URL to TinyMCE"
-msgstr ""
-
-#: plugins/tinymce.php:124
+#: .\plugins\tinymce.php:98
 msgid "Toggle HTML Editor"
 msgstr ""
 
-#: plugins/trackbackrdf.php:10
+#: .\plugins\trackbackrdf.php:11
 msgid "Add TrackBack auto-discovery RDF to entry pages."
 msgstr ""
 
-#: plugins/trackback_validator.php:27
+#: .\plugins\trackback_validator.php:30
 msgid "Allow only TrackBacks that link to your URL in the page body."
 msgstr ""
 
-#: plugins/trackback_validator.php:31
+#: .\plugins\trackback_validator.php:35
 msgid "Allow TrackBacks from your own blog"
 msgstr ""
 
-#: plugins/trackback_validator.php:34
+#: .\plugins\trackback_validator.php:40
 msgid ""
 "Allow pings from pages that link to anything under the entry, not just the "
 "permalink."
 msgstr ""
 
-#: themes/clean/templates/basic_layout_tpl.php:30
-#: themes/default/templates/basic_layout_tpl.php:85
+#: .\themes\clean\templates\basic_layout_tpl.php:33
+#: .\themes\default\templates\basic_layout_tpl.php:92
 msgid "Close menu"
 msgstr ""
 
-#: themes/clean/templates/blogcomment_tpl.php:11
-#: themes/tuxice/templates/blogcomment_tpl.php:8
+#: .\themes\clean\templates\blogcomment_tpl.php:12
+#: .\themes\tuxice\templates\blogcomment_tpl.php:8
 #, php-format
 msgid "Comment posted %s"
 msgstr ""
 
-#: themes/clean/templates/blogcomment_tpl.php:36
-#: themes/default/templates/article_tpl.php:24
-#: themes/default/templates/article_tpl.php:26
-#: themes/default/templates/article_tpl.php:28
-#: themes/default/templates/blogentry_summary_tpl.php:33
-#: themes/default/templates/blogentry_tpl.php:72
-#: themes/tuxice/templates/article_tpl.php:15
-#: themes/tuxice/templates/article_tpl.php:20
-#: themes/tuxice/templates/blogcomment_tpl.php:11
+#: .\themes\clean\templates\blogcomment_tpl.php:38
+#: .\themes\default\templates\article_tpl.php:24
+#: .\themes\default\templates\article_tpl.php:26
+#: .\themes\default\templates\article_tpl.php:28
+#: .\themes\default\templates\blogentry_summary_tpl.php:33
+#: .\themes\default\templates\blogentry_tpl.php:81
+#: .\themes\tuxice\templates\article_tpl.php:15
+#: .\themes\tuxice\templates\article_tpl.php:20
+#: .\themes\tuxice\templates\blogcomment_tpl.php:11
 #, php-format
 msgid "By %s"
 msgstr ""
 
-#: themes/default/templates/about_tpl.php:3
+#: .\themes\default\templates\about_tpl.php:3
 msgid "Installed Version"
 msgstr ""
 
-#: themes/default/templates/about_tpl.php:30
+#: .\themes\default\templates\about_tpl.php:30
 msgid "Ackowledgements"
 msgstr ""
 
-#: themes/default/templates/about_tpl.php:31
+#: .\themes\default\templates\about_tpl.php:32
 #, php-format
 msgid "XML-RPC for PHP (%s) by Edd Dumbill &copy; 1999-2002"
 msgstr ""
 
-#: themes/default/templates/article_tpl.php:19
-#: themes/tuxice/templates/article_tpl.php:10
+#: .\themes\default\templates\article_tpl.php:19
+#: .\themes\tuxice\templates\article_tpl.php:10
 #, php-format
 msgid "Published %s"
 msgstr ""
 
-#: themes/default/templates/article_tpl.php:21
+#: .\themes\default\templates\article_tpl.php:21
 #, php-format
 msgid "Updated %s"
 msgstr ""
 
-#: themes/default/templates/article_tpl.php:43
-#: themes/tuxice/templates/article_tpl.php:28
+#: .\themes\default\templates\article_tpl.php:43
+#: .\themes\tuxice\templates\article_tpl.php:28
 msgid "Upload File"
 msgstr ""
 
-#: themes/default/templates/article_tpl.php:44
-#: themes/default/templates/blogentry_summary_tpl.php:42
-#: themes/default/templates/blogentry_tpl.php:111
-#: themes/default/templates/blog_admin_tpl.php:21
-#: themes/tuxice/templates/article_tpl.php:31
-#: themes/tuxice/templates/blogentry_summary_tpl.php:35
-#: themes/tuxice/templates/blogentry_tpl.php:50
+#: .\themes\default\templates\article_tpl.php:44
+#: .\themes\default\templates\blogentry_summary_tpl.php:42
+#: .\themes\default\templates\blogentry_tpl.php:124
+#: .\themes\default\templates\blog_admin_tpl.php:58
+#: .\themes\tuxice\templates\article_tpl.php:31
+#: .\themes\tuxice\templates\blogentry_summary_tpl.php:35
+#: .\themes\tuxice\templates\blogentry_tpl.php:50
 msgid "Edit"
 msgstr ""
 
-#: themes/default/templates/article_tpl.php:54
-#: themes/default/templates/blogentry_summary_tpl.php:48
-#: themes/tuxice/templates/article_tpl.php:35
-#: themes/tuxice/templates/blogentry_summary_tpl.php:55
+#: .\themes\default\templates\article_tpl.php:54
+#: .\themes\default\templates\blogentry_summary_tpl.php:48
+#: .\themes\tuxice\templates\article_tpl.php:35
+#: .\themes\tuxice\templates\blogentry_summary_tpl.php:55
 msgid "TrackBack <abbr title=\"Uniform Resource Locator\">URL</abbr>"
 msgstr ""
 
-#: themes/default/templates/article_tpl.php:57
-#: themes/tuxice/templates/article_tpl.php:38
+#: .\themes\default\templates\article_tpl.php:57
+#: .\themes\tuxice\templates\article_tpl.php:38
 msgid "View/post comments"
 msgstr ""
 
-#: themes/default/templates/article_tpl.php:59
-#: themes/default/templates/comment_form_tpl.php:61
-#: themes/tuxice/templates/article_tpl.php:40
+#: .\themes\default\templates\article_tpl.php:59
+#: .\themes\default\templates\comment_form_tpl.php:62
+#: .\themes\tuxice\templates\article_tpl.php:40
 msgid "Post comment"
 msgstr ""
 
-#: themes/default/templates/article_tpl.php:62
-#: themes/default/templates/blogentry_summary_tpl.php:56
-#: themes/tuxice/templates/article_tpl.php:43
-#: themes/tuxice/templates/blogentry_summary_tpl.php:49
+#: .\themes\default\templates\article_tpl.php:62
+#: .\themes\default\templates\blogentry_summary_tpl.php:56
+#: .\themes\tuxice\templates\article_tpl.php:43
+#: .\themes\tuxice\templates\blogentry_summary_tpl.php:49
 msgid "View TrackBacks"
 msgstr ""
 
-#: themes/default/templates/article_tpl.php:65
-#: themes/default/templates/blogentry_summary_tpl.php:59
-#: themes/tuxice/templates/article_tpl.php:46
-#: themes/tuxice/templates/blogentry_summary_tpl.php:52
+#: .\themes\default\templates\article_tpl.php:65
+#: .\themes\default\templates\blogentry_summary_tpl.php:59
+#: .\themes\tuxice\templates\article_tpl.php:46
+#: .\themes\tuxice\templates\blogentry_summary_tpl.php:52
 msgid "View Pingbacks"
 msgstr ""
 
-#: themes/default/templates/blogcomment_tpl.php:57
+#: .\themes\default\templates\blogcomment_tpl.php:64
 #, php-format
 msgid "Posted by %s %s at %s"
 msgstr ""
 
-#: themes/default/templates/blogentry_summary_tpl.php:23
-#: themes/default/templates/blogentry_tpl.php:62
+#: .\themes\default\templates\blogentry_summary_tpl.php:23
+#: .\themes\default\templates\blogentry_tpl.php:71
 #, php-format
 msgid "Posted %s"
 msgstr ""
 
-#: themes/default/templates/blogentry_summary_tpl.php:40
-#: themes/default/templates/blogentry_tpl.php:105
-#: themes/tuxice/templates/blogentry_summary_tpl.php:33
-#: themes/tuxice/templates/blogentry_tpl.php:48
+#: .\themes\default\templates\blogentry_summary_tpl.php:40
+#: .\themes\default\templates\blogentry_tpl.php:118
+#: .\themes\tuxice\templates\blogentry_summary_tpl.php:33
+#: .\themes\tuxice\templates\blogentry_tpl.php:48
 msgid "Send TrackBack Ping"
 msgstr ""
 
-#: themes/default/templates/blogentry_summary_tpl.php:51
-#: themes/tuxice/templates/blogentry_summary_tpl.php:44
+#: .\themes\default\templates\blogentry_summary_tpl.php:51
+#: .\themes\tuxice\templates\blogentry_summary_tpl.php:44
 msgid "View reader comments"
 msgstr ""
 
-#: themes/default/templates/blogentry_summary_tpl.php:53
-#: themes/tuxice/templates/blogentry_summary_tpl.php:46
+#: .\themes\default\templates\blogentry_summary_tpl.php:53
+#: .\themes\tuxice\templates\blogentry_summary_tpl.php:46
 msgid "Post a comment"
 msgstr ""
 
-#: themes/default/templates/blogentry_tpl.php:41
-#: themes/tuxice/templates/blogentry_tpl.php:39
+#: .\themes\default\templates\blogentry_tpl.php:48
+#: .\themes\tuxice\templates\blogentry_tpl.php:39
 msgid "Download this podcast"
 msgstr ""
 
-#: themes/default/templates/blogentry_tpl.php:42
-#: themes/tuxice/templates/blogentry_tpl.php:41
+#: .\themes\default\templates\blogentry_tpl.php:49
+#: .\themes\tuxice\templates\blogentry_tpl.php:41
 msgid "Download attached file"
 msgstr ""
 
-#: themes/default/templates/blogentry_tpl.php:50
-#: themes/tuxice/templates/blogentry_tpl.php:43
+#: .\themes\default\templates\blogentry_tpl.php:57
+#: .\themes\tuxice\templates\blogentry_tpl.php:43
 #, php-format
 msgid "(Type: %s, size: %d bytes)"
 msgstr ""
 
-#: themes/default/templates/blogentry_tpl.php:128
-#: themes/tuxice/templates/blogentry_tpl.php:59
+#: .\themes\default\templates\blogentry_tpl.php:144
+#: .\themes\tuxice\templates\blogentry_tpl.php:59
 #, php-format
 msgid ""
 "You can reply to this entry by <a href=\"%s\">leaving a comment</a> below.  "
 msgstr ""
 
-#: themes/default/templates/blogentry_tpl.php:132
-#: themes/tuxice/templates/blogentry_tpl.php:62
+#: .\themes\default\templates\blogentry_tpl.php:150
+#: .\themes\tuxice\templates\blogentry_tpl.php:62
 #, php-format
 msgid ""
 "You can <a href=\"%s\">send TrackBack pings to this <acronym title=\"Uniform "
 "Resource Locator\">URL</acronym></a>.  "
 msgstr ""
 
-#: themes/default/templates/blogentry_tpl.php:136
+#: .\themes\default\templates\blogentry_tpl.php:155
 msgid "This entry accepts Pingbacks from other blogs.  "
 msgstr ""
 
-#: themes/default/templates/blogentry_tpl.php:139
-#: themes/tuxice/templates/blogentry_tpl.php:68
+#: .\themes\default\templates\blogentry_tpl.php:159
+#: .\themes\tuxice\templates\blogentry_tpl.php:68
 #, php-format
 msgid ""
 "You can follow comments on this entry by subscribing to the <a href=\"%s"
 "\">RSS feed</a>."
 msgstr ""
 
-#: themes/default/templates/blogentry_tpl.php:148
-#: themes/tuxice/templates/blogentry_tpl.php:73
+#: .\themes\default\templates\blogentry_tpl.php:171
+#: .\themes\tuxice\templates\blogentry_tpl.php:73
 msgid "Related entries"
 msgstr ""
 
-#: themes/default/templates/blogentry_tpl.php:163
-#: themes/tuxice/templates/blogentry_tpl.php:83
+#: .\themes\default\templates\blogentry_tpl.php:188
+#: .\themes\tuxice\templates\blogentry_tpl.php:83
 msgid "TrackBack page"
 msgstr ""
 
-#: themes/default/templates/blogentry_tpl.php:181
-#: themes/tuxice/templates/blogentry_tpl.php:91
+#: .\themes\default\templates\blogentry_tpl.php:208
+#: .\themes\tuxice\templates\blogentry_tpl.php:93
 msgid "PingBack page"
 msgstr ""
 
-#: themes/default/templates/blogentry_tpl.php:198
-#: themes/tuxice/templates/blogentry_tpl.php:99
+#: .\themes\default\templates\blogentry_tpl.php:227
+#: .\themes\tuxice\templates\blogentry_tpl.php:103
 msgid "Comment page"
 msgstr ""
 
-#: themes/default/templates/blog_admin_tpl.php:5
+#: .\themes\default\templates\blog_admin_tpl.php:41
 #, php-format
 msgid "%s System Administration"
 msgstr ""
 
-#: themes/default/templates/blog_admin_tpl.php:7
+#: .\themes\default\templates\blog_admin_tpl.php:44
 msgid "Add Features"
 msgstr ""
 
-#: themes/default/templates/blog_admin_tpl.php:9
+#: .\themes\default\templates\blog_admin_tpl.php:46
 msgid "Configure site-wide plugins"
 msgstr ""
 
-#: themes/default/templates/blog_admin_tpl.php:10
+#: .\themes\default\templates\blog_admin_tpl.php:47
 msgid "Configure enabled plugins and load order"
 msgstr ""
 
-#: themes/default/templates/blog_admin_tpl.php:11
+#: .\themes\default\templates\blog_admin_tpl.php:48
 msgid "Edit system.ini file"
 msgstr ""
 
-#: themes/default/templates/blog_admin_tpl.php:12
+#: .\themes\default\templates\blog_admin_tpl.php:49
 msgid "Edit groups.ini file"
 msgstr ""
 
-#: themes/default/templates/blog_admin_tpl.php:13
+#: .\themes\default\templates\blog_admin_tpl.php:50
 msgid "Modify site-wide menubar"
 msgstr ""
 
-#: themes/default/templates/blog_admin_tpl.php:14
+#: .\themes\default\templates\blog_admin_tpl.php:51
 msgid "Add new user"
 msgstr ""
 
-#: themes/default/templates/blog_admin_tpl.php:24
+#: .\themes\default\templates\blog_admin_tpl.php:61
 msgid "Add new blog"
 msgstr ""
 
-#: themes/default/templates/blog_admin_tpl.php:27
+#: .\themes\default\templates\blog_admin_tpl.php:64
 msgid "Upgrade Functions"
 msgstr ""
 
-#: themes/default/templates/blog_admin_tpl.php:30
+#: .\themes\default\templates\blog_admin_tpl.php:67
 msgid "Upgrade blog to current version"
 msgstr ""
 
-#: themes/default/templates/blog_admin_tpl.php:36
+#: .\themes\default\templates\blog_admin_tpl.php:73
 msgid "Upgrade"
 msgstr ""
 
-#: themes/default/templates/blog_admin_tpl.php:38
-#: themes/default/templates/blog_admin_tpl.php:58
+#: .\themes\default\templates\blog_admin_tpl.php:75
+#: .\themes\default\templates\blog_admin_tpl.php:109
 #, php-format
 msgid "Upgrade Status: %s"
 msgstr ""
 
-#: themes/default/templates/blog_admin_tpl.php:42
+#: .\themes\default\templates\blog_admin_tpl.php:79
 msgid "Register a blog with the system"
 msgstr ""
 
-#: themes/default/templates/blog_admin_tpl.php:44
+#: .\themes\default\templates\blog_admin_tpl.php:80
+msgid "Toggle"
+msgstr ""
+
+#: .\themes\default\templates\blog_admin_tpl.php:83
+#: .\themes\default\templates\blog_modify_tpl.php:33
+msgid "Blog ID"
+msgstr ""
+
+#: .\themes\default\templates\blog_admin_tpl.php:87
+#: .\themes\default\templates\blog_modify_tpl.php:38
+msgid "Blog path"
+msgstr ""
+
+#: .\themes\default\templates\blog_admin_tpl.php:91
+#: .\themes\default\templates\blog_modify_tpl.php:43
+msgid "Blog URL"
+msgstr ""
+
+#: .\themes\default\templates\blog_admin_tpl.php:94
 msgid "Register"
 msgstr ""
 
-#: themes/default/templates/blog_admin_tpl.php:46
+#: .\themes\default\templates\blog_admin_tpl.php:96
 #, php-format
 msgid "Registration Status: %s"
 msgstr ""
 
-#: themes/default/templates/blog_admin_tpl.php:50
+#: .\themes\default\templates\blog_admin_tpl.php:101
 msgid "Fix directory permissions on blog"
 msgstr ""
 
-#: themes/default/templates/blog_admin_tpl.php:56
+#: .\themes\default\templates\blog_admin_tpl.php:107
 msgid "Fix Perms"
 msgstr ""
 
-#: themes/default/templates/blog_admin_tpl.php:63
+#: .\themes\default\templates\blog_admin_tpl.php:114
 msgid "Delete blog"
 msgstr ""
 
-#: themes/default/templates/blog_admin_tpl.php:71
+#: .\themes\default\templates\blog_admin_tpl.php:122
 #, php-format
 msgid "Delete Status: %s"
 msgstr ""
 
-#: themes/default/templates/blog_admin_tpl.php:77
+#: .\themes\default\templates\blog_admin_tpl.php:128
 msgid "Log out"
 msgstr ""
 
-#: themes/default/templates/blog_modify_tpl.php:18
-#, php-format
+#: .\themes\default\templates\blog_modify_tpl.php:32
+msgid "The unique internal identifier for the blog."
+msgstr ""
+
+#: .\themes\default\templates\blog_modify_tpl.php:37
+msgid "The absolute path on the server where your blog will be created."
+msgstr ""
+
+#: .\themes\default\templates\blog_modify_tpl.php:42
 msgid ""
-"The path on the server where your blog will be created.  Enter an absolute "
-"path or a path relative to the server's document root.  To make the document "
-"root a blog, enter %s.  To make a subdomain a blog, enter the subdomain name."
+"The URL of the blog directory (this may depend on your server configuration)."
 msgstr ""
 
-#: themes/default/templates/blog_modify_tpl.php:19
-msgid "Blog path"
-msgstr ""
-
-#: themes/default/templates/blog_modify_tpl.php:24
+#: .\themes\default\templates\blog_modify_tpl.php:48
 msgid "The username of whoever will own this blog."
 msgstr ""
 
-#: themes/default/templates/blog_modify_tpl.php:26
+#: .\themes\default\templates\blog_modify_tpl.php:50
 msgid "Blog owner"
 msgstr ""
 
-#: themes/default/templates/blog_modify_tpl.php:31
+#: .\themes\default\templates\blog_modify_tpl.php:55
 msgid ""
 "A list of other usernames who can create posts on this blog.  Multiple "
 "usernames are separated by commas."
 msgstr ""
 
-#: themes/default/templates/blog_modify_tpl.php:32
+#: .\themes\default\templates\blog_modify_tpl.php:56
 msgid "Additional allowed writers"
 msgstr ""
 
-#: themes/default/templates/blog_modify_tpl.php:36
+#: .\themes\default\templates\blog_modify_tpl.php:60
 msgid "The name of this blog.  This will be displayed as the blog title."
 msgstr ""
 
-#: themes/default/templates/blog_modify_tpl.php:37
-#: themes/default/templates/send_trackback_tpl.php:21
+#: .\themes\default\templates\blog_modify_tpl.php:61
+#: .\themes\default\templates\send_trackback_tpl.php:22
 msgid "Blog name"
 msgstr ""
 
-#: themes/default/templates/blog_modify_tpl.php:41
+#: .\themes\default\templates\blog_modify_tpl.php:65
 msgid "A short description of the blog."
 msgstr ""
 
-#: themes/default/templates/blog_modify_tpl.php:46
+#: .\themes\default\templates\blog_modify_tpl.php:70
 msgid ""
 "The theme that determines how your pages look.  You can change this at any "
 "time.  You can also do per-blog modifications of the templates and style "
 "sheets to customize your blog."
 msgstr ""
 
-#: themes/default/templates/blog_modify_tpl.php:47
+#: .\themes\default\templates\blog_modify_tpl.php:71
 msgid "Theme"
 msgstr ""
 
-#: themes/default/templates/blog_modify_tpl.php:59
+#: .\themes\default\templates\blog_modify_tpl.php:83
 msgid "Number of entries on the main blog page."
 msgstr ""
 
-#: themes/default/templates/blog_modify_tpl.php:60
+#: .\themes\default\templates\blog_modify_tpl.php:84
 msgid "Maximum number of entries on front page"
 msgstr ""
 
-#: themes/default/templates/blog_modify_tpl.php:64
+#: .\themes\default\templates\blog_modify_tpl.php:88
 msgid "Number of entries to keep in the RSS feeds."
 msgstr ""
 
-#: themes/default/templates/blog_modify_tpl.php:65
+#: .\themes\default\templates\blog_modify_tpl.php:89
 msgid "Maximum number of entries in RSS feeds"
 msgstr ""
 
-#: themes/default/templates/blog_modify_tpl.php:69
+#: .\themes\default\templates\blog_modify_tpl.php:93
 msgid "Show only summaries on front page"
 msgstr ""
 
-#: themes/default/templates/blog_modify_tpl.php:74
+#: .\themes\default\templates\blog_modify_tpl.php:98
 msgid "Article to show as front page"
 msgstr ""
 
-#: themes/default/templates/blog_modify_tpl.php:78
+#: .\themes\default\templates\blog_modify_tpl.php:102
 msgid "Default settings for blog entries"
 msgstr ""
 
-#: themes/default/templates/blog_modify_tpl.php:80
+#: .\themes\default\templates\blog_modify_tpl.php:104
 msgid ""
 "Determines when Pingbacks should be sent by default for new posts.  You can "
 "manually override this on the entry edit screen."
 msgstr ""
 
-#: themes/default/templates/blog_modify_tpl.php:82
+#: .\themes\default\templates\blog_modify_tpl.php:106
 msgid "Send Pingbacks by default when posting entries"
 msgstr ""
 
-#: themes/default/templates/blog_modify_tpl.php:86
+#: .\themes\default\templates\blog_modify_tpl.php:110
 msgid "Allow enclosures in entries (for Podcasting)"
 msgstr ""
 
-#: themes/default/templates/blog_modify_tpl.php:91
-#: themes/default/templates/entry_edit_tpl.php:131
+#: .\themes\default\templates\blog_modify_tpl.php:115
+#: .\themes\default\templates\entry_edit_tpl.php:132
 msgid ""
 "Set the markup type for this entry.  Auto-markup is plain text with "
 "clickable URLs, LBcode is a dialect of the BBcode markup popular on web "
 "forums, and HTML is raw HTML code."
 msgstr ""
 
-#: themes/default/templates/blog_modify_tpl.php:92
-#: themes/default/templates/entry_edit_tpl.php:132
+#: .\themes\default\templates\blog_modify_tpl.php:116
+#: .\themes\default\templates\entry_edit_tpl.php:133
 msgid "Markup type"
 msgstr ""
 
-#: themes/default/templates/blog_modify_tpl.php:111
-#: themes/default/templates/blog_path_tpl.php:28
-#: themes/default/templates/fs_config_tpl.php:31
-#: themes/default/templates/login_create_tpl.php:49
-#: themes/default/templates/login_tpl.php:15
-#: themes/default/templates/plugin_load_config_tpl.php:20
+#: .\themes\default\templates\blog_modify_tpl.php:135
+#: .\themes\default\templates\blog_path_tpl.php:22
+#: .\themes\default\templates\fs_config_tpl.php:45
+#: .\themes\default\templates\login_create_tpl.php:56
+#: .\themes\default\templates\login_tpl.php:16
+#: .\themes\default\templates\plugin_load_config_tpl.php:54
 msgid "Submit"
 msgstr ""
 
-#: themes/default/templates/blog_modify_tpl.php:112
-#: themes/default/templates/blog_path_tpl.php:29
-#: themes/default/templates/comment_form_tpl.php:62
-#: themes/default/templates/file_edit_tpl.php:35
-#: themes/default/templates/fs_config_tpl.php:32
-#: themes/default/templates/login_create_tpl.php:50
-#: themes/default/templates/login_tpl.php:16
-#: themes/default/templates/upload_form_tpl.php:20
+#: .\themes\default\templates\blog_modify_tpl.php:136
+#: .\themes\default\templates\comment_form_tpl.php:63
+#: .\themes\default\templates\file_edit_tpl.php:35
+#: .\themes\default\templates\fs_config_tpl.php:46
+#: .\themes\default\templates\login_create_tpl.php:57
+#: .\themes\default\templates\login_tpl.php:17
+#: .\themes\default\templates\upload_form_tpl.php:21
 msgid "Clear"
 msgstr ""
 
-#: themes/default/templates/blog_path_tpl.php:6
+#: .\themes\default\templates\blog_path_tpl.php:6
 msgid "Paths and URLs"
 msgstr ""
 
-#: themes/default/templates/blog_path_tpl.php:7
+#: .\themes\default\templates\blog_path_tpl.php:7
 msgid ""
 "Use this page to adjust the path and URL for the LnBlog installation.  Use "
 "this is you want to make a blog use a different version of LnBlog, if you "
@@ -2325,692 +2391,703 @@ msgid ""
 "did the initial setup on a different server."
 msgstr ""
 
-#: themes/default/templates/blog_path_tpl.php:15
-msgid "Blog root URL"
+#: .\themes\default\templates\blog_path_tpl.php:14
+msgid "Blog root path"
 msgstr ""
 
-#: themes/default/templates/blog_path_tpl.php:20
-msgid "LnBlog installation root"
+#: .\themes\default\templates\blog_path_tpl.php:18
+msgid "URL for this blog"
 msgstr ""
 
-#: themes/default/templates/blog_path_tpl.php:24
-msgid "LnBlog installation URL"
+#: .\themes\default\templates\blog_path_tpl.php:23
+#: .\themes\default\templates\plugin_load_config_tpl.php:55
+#: .\themes\default\templates\send_trackback_tpl.php:33
+msgid "Reset"
 msgstr ""
 
-#: themes/default/templates/comment_form_tpl.php:6
+#: .\themes\default\templates\comment_form_tpl.php:6
 #, php-format
 msgid "Add your comments on <a href=\"%s\">%s</a>"
 msgstr ""
 
-#: themes/default/templates/comment_form_tpl.php:8
+#: .\themes\default\templates\comment_form_tpl.php:8
 msgid "Add your comments"
 msgstr ""
 
-#: themes/default/templates/comment_form_tpl.php:18
+#: .\themes\default\templates\comment_form_tpl.php:18
 msgid ""
 "A comment body is required.  No HTML code allowed.  URLs starting with "
 "http:// or ftp:// will be automatically converted to hyperlinks."
 msgstr ""
 
-#: themes/default/templates/comment_form_tpl.php:27
-#: themes/default/templates/comment_form_tpl.php:28
+#: .\themes\default\templates\comment_form_tpl.php:28
+#: .\themes\default\templates\comment_form_tpl.php:29
 msgid "Subject"
 msgstr ""
 
-#: themes/default/templates/comment_form_tpl.php:32
+#: .\themes\default\templates\comment_form_tpl.php:33
 msgid "Comment body"
 msgstr ""
 
-#: themes/default/templates/comment_form_tpl.php:42
-#: themes/default/templates/login_create_tpl.php:29
-#: themes/default/templates/user_info_tpl.php:13
+#: .\themes\default\templates\comment_form_tpl.php:43
+#: .\themes\default\templates\login_create_tpl.php:36
+#: .\themes\default\templates\user_info_tpl.php:13
 msgid "Homepage"
 msgstr ""
 
-#: themes/default/templates/comment_form_tpl.php:43
+#: .\themes\default\templates\comment_form_tpl.php:44
 msgid "URL"
 msgstr ""
 
-#: themes/default/templates/comment_form_tpl.php:47
-#: themes/default/templates/login_create_tpl.php:25
+#: .\themes\default\templates\comment_form_tpl.php:48
+#: .\themes\default\templates\login_create_tpl.php:32
 msgid "E-Mail"
 msgstr ""
 
-#: themes/default/templates/comment_form_tpl.php:48
-#: themes/default/templates/user_info_tpl.php:10
+#: .\themes\default\templates\comment_form_tpl.php:49
+#: .\themes\default\templates\user_info_tpl.php:10
 msgid "E-mail"
 msgstr ""
 
-#: themes/default/templates/comment_form_tpl.php:52
+#: .\themes\default\templates\comment_form_tpl.php:53
 msgid "Display my e-mail address"
 msgstr ""
 
-#: themes/default/templates/comment_form_tpl.php:53
+#: .\themes\default\templates\comment_form_tpl.php:54
 msgid "Display e-mail address"
 msgstr ""
 
-#: themes/default/templates/comment_form_tpl.php:57
-#: themes/default/templates/comment_form_tpl.php:58
+#: .\themes\default\templates\comment_form_tpl.php:58
+#: .\themes\default\templates\comment_form_tpl.php:59
 msgid "Remember me"
 msgstr ""
 
-#: themes/default/templates/css_editor_tpl.php:3
+#: .\themes\default\templates\css_editor_tpl.php:4
 msgid "Page Banner"
 msgstr ""
 
-#: themes/default/templates/css_editor_tpl.php:6
+#: .\themes\default\templates\css_editor_tpl.php:7
 msgid "Banner background"
 msgstr ""
 
-#: themes/default/templates/css_editor_tpl.php:7
-#: themes/default/templates/css_editor_tpl.php:69
+#: .\themes\default\templates\css_editor_tpl.php:8
+#: .\themes\default\templates\css_editor_tpl.php:70
 msgid "Background color"
 msgstr ""
 
-#: themes/default/templates/css_editor_tpl.php:9
+#: .\themes\default\templates\css_editor_tpl.php:10
 msgid "Background image URL"
 msgstr ""
 
-#: themes/default/templates/css_editor_tpl.php:13
+#: .\themes\default\templates\css_editor_tpl.php:14
 msgid "Banner size"
 msgstr ""
 
-#: themes/default/templates/css_editor_tpl.php:14
+#: .\themes\default\templates\css_editor_tpl.php:15
 msgid ""
 "If you set a background image, these should normally be set to its "
 "dimensions."
 msgstr ""
 
-#: themes/default/templates/css_editor_tpl.php:15
+#: .\themes\default\templates\css_editor_tpl.php:16
 msgid "Maximum width"
 msgstr ""
 
-#: themes/default/templates/css_editor_tpl.php:17
+#: .\themes\default\templates\css_editor_tpl.php:18
 msgid "Maximum height"
 msgstr ""
 
-#: themes/default/templates/css_editor_tpl.php:21
+#: .\themes\default\templates\css_editor_tpl.php:22
 msgid "Title Font"
 msgstr ""
 
-#: themes/default/templates/css_editor_tpl.php:22
-#: themes/default/templates/css_editor_tpl.php:37
-#: themes/default/templates/css_editor_tpl.php:65
+#: .\themes\default\templates\css_editor_tpl.php:23
+#: .\themes\default\templates\css_editor_tpl.php:38
+#: .\themes\default\templates\css_editor_tpl.php:66
 msgid "Font"
 msgstr ""
 
-#: themes/default/templates/css_editor_tpl.php:24
-#: themes/default/templates/css_editor_tpl.php:39
-#: themes/default/templates/css_editor_tpl.php:67
+#: .\themes\default\templates\css_editor_tpl.php:25
+#: .\themes\default\templates\css_editor_tpl.php:40
+#: .\themes\default\templates\css_editor_tpl.php:68
 msgid "Font family"
 msgstr ""
 
-#: themes/default/templates/css_editor_tpl.php:26
-#: themes/default/templates/css_editor_tpl.php:41
+#: .\themes\default\templates\css_editor_tpl.php:27
+#: .\themes\default\templates\css_editor_tpl.php:42
 msgid "Text color"
 msgstr ""
 
-#: themes/default/templates/css_editor_tpl.php:28
+#: .\themes\default\templates\css_editor_tpl.php:29
 msgid "Text alignment"
 msgstr ""
 
-#: themes/default/templates/css_editor_tpl.php:30
-#: themes/default/templates/css_editor_tpl.php:44
-#: themes/default/templates/css_editor_tpl.php:61
-#: themes/default/templates/js_editor.php:28
+#: .\themes\default\templates\css_editor_tpl.php:31
+#: .\themes\default\templates\css_editor_tpl.php:45
+#: .\themes\default\templates\css_editor_tpl.php:62
+#: .\themes\default\templates\js_editor.php:28
 msgid "Left"
 msgstr ""
 
-#: themes/default/templates/css_editor_tpl.php:31
-#: themes/default/templates/css_editor_tpl.php:45
-#: themes/default/templates/js_editor.php:27
+#: .\themes\default\templates\css_editor_tpl.php:32
+#: .\themes\default\templates\css_editor_tpl.php:46
+#: .\themes\default\templates\js_editor.php:27
 msgid "Center"
 msgstr ""
 
-#: themes/default/templates/css_editor_tpl.php:32
-#: themes/default/templates/css_editor_tpl.php:46
-#: themes/default/templates/css_editor_tpl.php:60
-#: themes/default/templates/js_editor.php:29
+#: .\themes\default\templates\css_editor_tpl.php:33
+#: .\themes\default\templates\css_editor_tpl.php:47
+#: .\themes\default\templates\css_editor_tpl.php:61
+#: .\themes\default\templates\js_editor.php:29
 msgid "Right"
 msgstr ""
 
-#: themes/default/templates/css_editor_tpl.php:36
+#: .\themes\default\templates\css_editor_tpl.php:37
 msgid "Description Font"
 msgstr ""
 
-#: themes/default/templates/css_editor_tpl.php:49
-#: themes/default/templates/css_editor_tpl.php:73
+#: .\themes\default\templates\css_editor_tpl.php:50
+#: .\themes\default\templates\css_editor_tpl.php:74
 msgid "Show underlines for hyperlinks"
 msgstr ""
 
-#: themes/default/templates/css_editor_tpl.php:51
-#: themes/default/templates/css_editor_tpl.php:75
+#: .\themes\default\templates\css_editor_tpl.php:52
+#: .\themes\default\templates\css_editor_tpl.php:76
 msgid "Always"
 msgstr ""
 
-#: themes/default/templates/css_editor_tpl.php:52
-#: themes/default/templates/css_editor_tpl.php:76
+#: .\themes\default\templates\css_editor_tpl.php:53
+#: .\themes\default\templates\css_editor_tpl.php:77
 msgid "Never"
 msgstr ""
 
-#: themes/default/templates/css_editor_tpl.php:53
-#: themes/default/templates/css_editor_tpl.php:77
+#: .\themes\default\templates\css_editor_tpl.php:54
+#: .\themes\default\templates\css_editor_tpl.php:78
 msgid "On hover"
 msgstr ""
 
-#: themes/default/templates/css_editor_tpl.php:58
+#: .\themes\default\templates\css_editor_tpl.php:59
 msgid "Sidebar position"
 msgstr ""
 
-#: themes/default/templates/css_editor_tpl.php:64
+#: .\themes\default\templates\css_editor_tpl.php:65
 msgid "Section Heading"
 msgstr ""
 
-#: themes/default/templates/css_editor_tpl.php:71
+#: .\themes\default\templates\css_editor_tpl.php:72
 msgid "Font color"
 msgstr ""
 
-#: themes/default/templates/css_editor_tpl.php:80
+#: .\themes\default\templates\css_editor_tpl.php:81
 msgid "Section body background color"
 msgstr ""
 
-#: themes/default/templates/css_editor_tpl.php:82
+#: .\themes\default\templates\css_editor_tpl.php:83
 msgid "Section body font color"
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:12
+#: .\themes\default\templates\entry_edit_tpl.php:12
 msgid "Close Preview"
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:28
+#: .\themes\default\templates\entry_edit_tpl.php:29
 msgid "Title or subject line for this entry"
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:31
+#: .\themes\default\templates\entry_edit_tpl.php:32
 msgid "Entry title or subject"
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:37
+#: .\themes\default\templates\entry_edit_tpl.php:38
 msgid "Comma-separated list of tagss"
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:40
+#: .\themes\default\templates\entry_edit_tpl.php:41
 msgid "Tags for this entry (comma-separated list)"
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:42
+#: .\themes\default\templates\entry_edit_tpl.php:43
 msgid "Add tag"
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:43
+#: .\themes\default\templates\entry_edit_tpl.php:44
 msgid "Add tag:"
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:52
+#: .\themes\default\templates\entry_edit_tpl.php:53
 msgid "An abstract or summary paragraph for this entry"
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:53
+#: .\themes\default\templates\entry_edit_tpl.php:54
 msgid "Abstract"
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:75
+#: .\themes\default\templates\entry_edit_tpl.php:76
 msgid "Save"
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:77
+#: .\themes\default\templates\entry_edit_tpl.php:78
 msgid "Publish"
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:78
+#: .\themes\default\templates\entry_edit_tpl.php:79
 msgid "Save Draft"
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:80
+#: .\themes\default\templates\entry_edit_tpl.php:81
 msgid "Preview"
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:85
+#: .\themes\default\templates\entry_edit_tpl.php:86
 msgid "Entry settings"
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:91
+#: .\themes\default\templates\entry_edit_tpl.php:92
 msgid "Publish this as an article instead of a regular blog entry"
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:93
+#: .\themes\default\templates\entry_edit_tpl.php:94
 msgid "Publish as article"
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:95
+#: .\themes\default\templates\entry_edit_tpl.php:96
 msgid "The last part of the URL path for this article"
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:96
+#: .\themes\default\templates\entry_edit_tpl.php:97
 msgid "Article path"
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:102
+#: .\themes\default\templates\entry_edit_tpl.php:103
 msgid "Show a link to this in the articles panel of the sidebar"
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:104
+#: .\themes\default\templates\entry_edit_tpl.php:105
 msgid "Show in sidebar"
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:111
+#: .\themes\default\templates\entry_edit_tpl.php:112
 msgid "Auto-publish this entry at this date"
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:116
+#: .\themes\default\templates\entry_edit_tpl.php:117
 msgid "Auto-publish"
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:123
+#: .\themes\default\templates\entry_edit_tpl.php:124
 msgid ""
 "Enter the URL of the MP3 or other media file for this post.  If you are "
 "uploading the file to this post, you can enter just the filename."
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:125
+#: .\themes\default\templates\entry_edit_tpl.php:126
 msgid "Enclosure/Podcast"
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:126
-#: themes/default/templates/file_edit_tpl.php:10
+#: .\themes\default\templates\entry_edit_tpl.php:127
+#: .\themes\default\templates\file_edit_tpl.php:10
 msgid "File URL"
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:143
+#: .\themes\default\templates\entry_edit_tpl.php:144
 msgid "Allow readers to post comments on this entry"
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:149
+#: .\themes\default\templates\entry_edit_tpl.php:150
 msgid "Allow this entry to receive TrackBack pings from other blogs"
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:151
+#: .\themes\default\templates\entry_edit_tpl.php:152
 msgid "Allow TrackBacks"
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:155
+#: .\themes\default\templates\entry_edit_tpl.php:156
 msgid "Allow this entry to receive Pingback pings from other blogs"
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:157
+#: .\themes\default\templates\entry_edit_tpl.php:158
 msgid "Allow Pingbacks"
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:161
+#: .\themes\default\templates\entry_edit_tpl.php:162
 #, php-format
 msgid ""
 "If this box is checked, then after the entry is published, %s will attempt "
 "to send Pingback pings to any URLs in the body of the post."
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:163
+#: .\themes\default\templates\entry_edit_tpl.php:164
 msgid "Send Pingbacks after posting"
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:172
-#: themes/default/templates/upload_form_tpl.php:26
+#: .\themes\default\templates\entry_edit_tpl.php:173
+#: .\themes\default\templates\upload_form_tpl.php:27
 msgid "Entry attachments"
 msgstr ""
 
-#: themes/default/templates/entry_edit_tpl.php:183
-#: themes/default/templates/upload_form_tpl.php:36
+#: .\themes\default\templates\entry_edit_tpl.php:184
+#: .\themes\default\templates\upload_form_tpl.php:37
 msgid "Blog attachments"
 msgstr ""
 
-#: themes/default/templates/file_edit_tpl.php:13
+#: .\themes\default\templates\file_edit_tpl.php:13
 msgid "Local path"
 msgstr ""
 
-#: themes/default/templates/file_edit_tpl.php:16
+#: .\themes\default\templates\file_edit_tpl.php:16
 msgid "File size"
 msgstr ""
 
-#: themes/default/templates/file_edit_tpl.php:19
+#: .\themes\default\templates\file_edit_tpl.php:19
 msgid ""
 "<strong>Note:</strong> You must have Javascript enabled to use the edit "
 "boxes."
 msgstr ""
 
-#: themes/default/templates/file_edit_tpl.php:22
+#: .\themes\default\templates\file_edit_tpl.php:22
 msgid "Regular text"
 msgstr ""
 
-#: themes/default/templates/file_edit_tpl.php:26
+#: .\themes\default\templates\file_edit_tpl.php:26
 msgid "Hover text (\"tooltip\" text)"
 msgstr ""
 
-#: themes/default/templates/file_edit_tpl.php:30
+#: .\themes\default\templates\file_edit_tpl.php:30
 msgid "Link <abbr title=\"Unirofm Resource Locator\">URL</abbr>"
 msgstr ""
 
-#: themes/default/templates/file_edit_tpl.php:34
+#: .\themes\default\templates\file_edit_tpl.php:34
 msgid "Add link"
 msgstr ""
 
-#: themes/default/templates/file_edit_tpl.php:41
+#: .\themes\default\templates\file_edit_tpl.php:42
 msgid "Save File"
 msgstr ""
 
-#: themes/default/templates/file_edit_tpl.php:41
+#: .\themes\default\templates\file_edit_tpl.php:42
 msgid "Reset Changes"
 msgstr ""
 
-#: themes/default/templates/fs_config_tpl.php:6
+#: .\themes\default\templates\fs_config_tpl.php:15
 msgid "Path Information"
 msgstr ""
 
-#: themes/default/templates/fs_config_tpl.php:7
+#: .\themes\default\templates\fs_config_tpl.php:16
 msgid "Document Root"
 msgstr ""
 
-#: themes/default/templates/fs_config_tpl.php:8
+#: .\themes\default\templates\fs_config_tpl.php:18
 #, php-format
 msgid ""
-"To compute <abbr title=\"Uniform Resource Locator\">URL</abbr>s, %s needs to "
-"know the full path to your document root on the web server."
+"To compute <abbr title=\"Uniform Resource Locator\">URL</abbr>s, %1$s needs "
+"to know the full path and URL to itself and the directory where user "
+"information (profiles, configuration, etc.) will be stored.  These will be "
+"stored in the %2$s file in the %1$s directory.  If you need to change the "
+"paths or URLs in the future, you should edit that file.  You can also rename "
+"the file and visit this page again to re-create it."
 msgstr ""
 
-#: themes/default/templates/fs_config_tpl.php:11
-msgid "Web document root directory"
-msgstr ""
-
-#: themes/default/templates/fs_config_tpl.php:14
-msgid "Subdomain root and main domain (optional)"
-msgstr ""
-
-#: themes/default/templates/fs_config_tpl.php:16
-#, php-format
+#: .\themes\default\templates\fs_config_tpl.php:21
 msgid ""
-"If your host does not support subdomains, or if you do not plan to use them "
-"with %s, then skip this section."
+"The correct paths will depend on your server configuration.  When in doubt, "
+"leave the defaults."
 msgstr ""
 
-#: themes/default/templates/fs_config_tpl.php:19
+#: .\themes\default\templates\fs_config_tpl.php:24
 #, php-format
-msgid ""
-"If you plan to put blogs on subdomains, %s also needs to know your domain "
-"name and your subdomain root directory.  Normally, your host will create a "
-"directory for each subdomain you have, and the subdomain root is the "
-"directory in which those directories are stored.  For examlpe, if you have "
-"subdomains 'bob.example.com' and 'jeff.example.com', which are stored in the "
-"directories /home/whatever/www/bob and /home/whatever/www/jeff, then your "
-"subdomain root would be /home/whatever/www."
+msgid "%s root directory"
 msgstr ""
 
-#: themes/default/templates/fs_config_tpl.php:22
-msgid "Subdomain root directory"
+#: .\themes\default\templates\fs_config_tpl.php:29
+#, php-format
+msgid "%s URL"
 msgstr ""
 
-#: themes/default/templates/fs_config_tpl.php:26
-msgid "Domain name (e.g. mydomain.com)"
+#: .\themes\default\templates\fs_config_tpl.php:34
+msgid "Userdata directory"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:3
+#: .\themes\default\templates\fs_config_tpl.php:39
+msgid "Userdata URL"
+msgstr ""
+
+#: .\themes\default\templates\js_editor.php:3
 msgid "LBCode"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:5
+#: .\themes\default\templates\js_editor.php:5
 msgid "Bold"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:5
+#: .\themes\default\templates\js_editor.php:5
 msgid "Bold text"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:5
+#: .\themes\default\templates\js_editor.php:5
 msgid "B"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:6
+#: .\themes\default\templates\js_editor.php:6
 msgid "Italic"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:6
+#: .\themes\default\templates\js_editor.php:6
 msgid "Italicized text"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:6
+#: .\themes\default\templates\js_editor.php:6
 msgid "I"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:7
+#: .\themes\default\templates\js_editor.php:7
 msgid "Underline"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:7
+#: .\themes\default\templates\js_editor.php:7
 msgid "Enter text to underline"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:7
+#: .\themes\default\templates\js_editor.php:7
 msgid "U"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:8
+#: .\themes\default\templates\js_editor.php:8
 msgid "Abbreviation"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:8
+#: .\themes\default\templates\js_editor.php:8
 msgid "Full phrase for abbreviation"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:8
+#: .\themes\default\templates\js_editor.php:8
 msgid "abbr"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:9
+#: .\themes\default\templates\js_editor.php:9
 msgid "Acronym"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:9
+#: .\themes\default\templates\js_editor.php:9
 msgid "Acronym/abbreviation"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:9
+#: .\themes\default\templates\js_editor.php:9
 msgid "Full phrase for acronym"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:9
+#: .\themes\default\templates\js_editor.php:9
 msgid "ac"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:10
+#: .\themes\default\templates\js_editor.php:10
 msgid "Hyperlink"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:10
+#: .\themes\default\templates\js_editor.php:10
 msgid "Link text"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:10
+#: .\themes\default\templates\js_editor.php:10
 msgid "Link URL"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:10
+#: .\themes\default\templates\js_editor.php:10
 msgid "link"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:11
+#: .\themes\default\templates\js_editor.php:11
 msgid "Code"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:11
+#: .\themes\default\templates\js_editor.php:11
 msgid "Text to mark as code"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:11
+#: .\themes\default\templates\js_editor.php:11
 msgid "code"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:12
+#: .\themes\default\templates\js_editor.php:12
 msgid "Colored text"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:12
+#: .\themes\default\templates\js_editor.php:12
 msgid "Color as a name, hex code, or rgb value"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:13
+#: .\themes\default\templates\js_editor.php:13
 msgid "color"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:16
+#: .\themes\default\templates\js_editor.php:16
 msgid "Custom"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:17
+#: .\themes\default\templates\js_editor.php:17
 msgid "Red"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:18
+#: .\themes\default\templates\js_editor.php:18
 msgid "Blue"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:19
+#: .\themes\default\templates\js_editor.php:19
 msgid "Yellow"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:20
+#: .\themes\default\templates\js_editor.php:20
 msgid "Green"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:21
+#: .\themes\default\templates\js_editor.php:21
 msgid "Purple"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:23
+#: .\themes\default\templates\js_editor.php:23
 msgid "Image"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:23
+#: .\themes\default\templates\js_editor.php:23
 msgid "Enter the image title"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:23
+#: .\themes\default\templates\js_editor.php:23
 msgid "Enter the image URL"
 msgstr ""
 
-#: themes/default/templates/js_editor.php:24
+#: .\themes\default\templates\js_editor.php:24
 msgid "image"
 msgstr ""
 
-#: themes/default/templates/login_create_tpl.php:17
+#: .\themes\default\templates\login_create_tpl.php:9
+#: .\themes\default\templates\login_tpl.php:8
+msgid "Username"
+msgstr ""
+
+#: .\themes\default\templates\login_create_tpl.php:20
+#: .\themes\default\templates\login_tpl.php:12
+msgid "Password"
+msgstr ""
+
+#: .\themes\default\templates\login_create_tpl.php:24
 msgid "Confirm"
 msgstr ""
 
-#: themes/default/templates/login_create_tpl.php:21
+#: .\themes\default\templates\login_create_tpl.php:28
 msgid "Real name"
 msgstr ""
 
-#: themes/default/templates/login_create_tpl.php:33
+#: .\themes\default\templates\login_create_tpl.php:40
 msgid "Custom profile URL (optional)"
 msgstr ""
 
-#: themes/default/templates/login_tpl.php:20
+#: .\themes\default\templates\login_tpl.php:21
 msgid "Forgot password?"
 msgstr ""
 
-#: themes/default/templates/manage_replies_tpl.php:1
-#, php-format
-msgid "Manage replies - %s"
-msgstr ""
-
-#: themes/default/templates/pager_tpl.php:14
+#: .\themes\default\templates\pager_tpl.php:15
 msgid "Newer entries"
 msgstr ""
 
-#: themes/default/templates/pager_tpl.php:26
+#: .\themes\default\templates\pager_tpl.php:29
 msgid "Older entries"
 msgstr ""
 
-#: themes/default/templates/pingback_tpl.php:4
+#: .\themes\default\templates\pingback_tpl.php:4
 msgid "Pingback"
 msgstr ""
 
-#: themes/default/templates/plugin_load_config_tpl.php:1
+#: .\themes\default\templates\plugin_load_config_tpl.php:12
 msgid "Plugin Loading Configuration"
 msgstr ""
 
-#: themes/default/templates/plugin_load_config_tpl.php:21
-#: themes/default/templates/send_trackback_tpl.php:32
-msgid "Reset"
+#: .\themes\default\templates\plugin_load_config_tpl.php:21
+msgid "Plugin File"
 msgstr ""
 
-#: themes/default/templates/send_trackback_tpl.php:1
+#: .\themes\default\templates\plugin_load_config_tpl.php:22
+msgid "Load Order"
+msgstr ""
+
+#: .\themes\default\templates\plugin_load_config_tpl.php:23
+msgid "Enabled"
+msgstr ""
+
+#: .\themes\default\templates\plugin_load_config_tpl.php:31
+msgid "Drag and drop to change load order"
+msgstr ""
+
+#: .\themes\default\templates\send_trackback_tpl.php:1
 msgid "TrackBack Entry"
 msgstr ""
 
-#: themes/default/templates/send_trackback_tpl.php:3
+#: .\themes\default\templates\send_trackback_tpl.php:3
 msgid "Trackback Ping Content"
 msgstr ""
 
-#: themes/default/templates/send_trackback_tpl.php:9
+#: .\themes\default\templates\send_trackback_tpl.php:10
 msgid "Target Trackback <abbr title=\"Uniform Resource Locator\">URL</abbr>"
 msgstr ""
 
-#: themes/default/templates/send_trackback_tpl.php:13
+#: .\themes\default\templates\send_trackback_tpl.php:14
 msgid "Entry <abbr title=\"Uniform Resource Locator\">URL</abbr>"
 msgstr ""
 
-#: themes/default/templates/send_trackback_tpl.php:17
+#: .\themes\default\templates\send_trackback_tpl.php:18
 msgid "Title"
 msgstr ""
 
-#: themes/default/templates/send_trackback_tpl.php:25
+#: .\themes\default\templates\send_trackback_tpl.php:26
 msgid "Entry Excerpt"
 msgstr ""
 
-#: themes/default/templates/send_trackback_tpl.php:31
+#: .\themes\default\templates\send_trackback_tpl.php:32
 msgid "Send"
 msgstr ""
 
-#: themes/default/templates/upload_form_tpl.php:1
+#: .\themes\default\templates\upload_form_tpl.php:1
 msgid "File Upload"
 msgstr ""
 
-#: themes/default/templates/upload_form_tpl.php:3
+#: .\themes\default\templates\upload_form_tpl.php:3
 #, php-format
 msgid "Upload file to: <a href=\"%s\">%s</a>"
 msgstr ""
 
-#: themes/default/templates/upload_form_tpl.php:14
+#: .\themes\default\templates\upload_form_tpl.php:15
 msgid "Select file"
 msgstr ""
 
-#: themes/default/templates/upload_form_tpl.php:19
+#: .\themes\default\templates\upload_form_tpl.php:20
 msgid "Upload"
 msgstr ""
 
-#: themes/default/templates/user_forgot_password_tpl.php:13
+#: .\themes\default\templates\user_forgot_password_tpl.php:14
 msgid "Username:"
 msgstr ""
 
-#: themes/default/templates/user_forgot_password_tpl.php:21
+#: .\themes\default\templates\user_forgot_password_tpl.php:22
 msgid "Confirm user e-mail:"
 msgstr ""
 
-#: themes/default/templates/user_forgot_password_tpl.php:27
+#: .\themes\default\templates\user_forgot_password_tpl.php:28
 msgid "Send Code"
 msgstr ""
 
-#: themes/default/templates/user_info_tpl.php:4
+#: .\themes\default\templates\user_info_tpl.php:4
 msgid "User ID"
 msgstr ""
 
-#: themes/default/templates/user_lockout_tpl.php:11
+#: .\themes\default\templates\user_lockout_tpl.php:12
 msgid ""
 "There have been too many failed login attempts.  This account is now locked."
 msgstr ""
 
-#: themes/default/templates/user_lockout_tpl.php:16
+#: .\themes\default\templates\user_lockout_tpl.php:19
 msgid "This account is locked.  Please try again later."
 msgstr ""
 
-#: themes/default/templates/user_lockout_tpl.php:21
+#: .\themes\default\templates\user_lockout_tpl.php:26
 #, php-format
 msgid ""
 "Your LnBlog account %s has been locked out due to too many login attempts.\n"
@@ -3018,50 +3095,50 @@ msgid ""
 "You will be able to log in again in %d minutes."
 msgstr ""
 
-#: themes/default/templates/user_reset_password_tpl.php:9
+#: .\themes\default\templates\user_reset_password_tpl.php:10
 msgid "Confirm e-mail:"
 msgstr ""
 
-#: themes/default/templates/user_reset_password_tpl.php:16
+#: .\themes\default\templates\user_reset_password_tpl.php:17
 msgid "New password:"
 msgstr ""
 
-#: themes/default/templates/user_reset_password_tpl.php:23
+#: .\themes\default\templates\user_reset_password_tpl.php:24
 msgid "Confirm password:"
 msgstr ""
 
-#: themes/default/templates/user_reset_password_tpl.php:33
+#: .\themes\default\templates\user_reset_password_tpl.php:34
 msgid "Reset Password"
 msgstr ""
 
-#: themes/tuxice/templates/article_tpl.php:12
+#: .\themes\tuxice\templates\article_tpl.php:12
 #, php-format
 msgid "Last updated %s"
 msgstr ""
 
-#: themes/tuxice/templates/article_tpl.php:18
+#: .\themes\tuxice\templates\article_tpl.php:18
 #, php-format
 msgid "By <a href=\"mailto:%s\">%s</a>"
 msgstr ""
 
-#: themes/tuxice/templates/blogcomment_tpl.php:14
-#: themes/tuxice/templates/blogcomment_tpl.php:16
+#: .\themes\tuxice\templates\blogcomment_tpl.php:14
+#: .\themes\tuxice\templates\blogcomment_tpl.php:16
 #, php-format
 msgid "By <a href=\"mailto:%s\"><strong>%s</strong></a>"
 msgstr ""
 
-#: themes/tuxice/templates/blogcomment_tpl.php:18
-#: themes/tuxice/templates/blogcomment_tpl.php:20
+#: .\themes\tuxice\templates\blogcomment_tpl.php:18
+#: .\themes\tuxice\templates\blogcomment_tpl.php:20
 #, php-format
 msgid "By <strong>%s</strong>"
 msgstr ""
 
-#: themes/tuxice/templates/blogentry_summary_tpl.php:14
-#: themes/tuxice/templates/blogentry_tpl.php:14
+#: .\themes\tuxice\templates\blogentry_summary_tpl.php:14
+#: .\themes\tuxice\templates\blogentry_tpl.php:14
 #, php-format
 msgid "Posted %1$s by %2$s"
 msgstr ""
 
-#: themes/tuxice/templates/blogentry_tpl.php:65
+#: .\themes\tuxice\templates\blogentry_tpl.php:65
 msgid "This entry accepts Pingbacks from other blogs."
 msgstr ""
