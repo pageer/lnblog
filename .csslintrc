@@ -1,0 +1,9 @@
+{
+    "ignore": [
+        "ids", "overqualified-elements", "order-alphabetical"
+    ],
+    "warnings": [
+    ],
+    "errors": [
+    ]
+}

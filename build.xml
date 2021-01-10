@@ -44,6 +44,14 @@
     </target>
 
     <target name="checks">
+        <apply executable="php" parallel="false" dir="${srcDir}" checkreturn="true">
+            <arg value="-l" />
+            <fileset dir=".">
+                <include name="*.php" />
+                <include name="**/*.php" />
+                <exclude name="vendor/" />
+            </fileset>
+        </apply>
         <exec command="${vendorDir}phpcs" dir="${srcDir}" passthru="true" checkreturn="true" />
         <exec command="${vendorDir}phpstan analyze" dir="${srcDir}" passthru="true" checkreturn="true" />
         <exec command="${nodeDir}jshint themes" dir="${srcDir}" passthru="true" checkreturn="true" />

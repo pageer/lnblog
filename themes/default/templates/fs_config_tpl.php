@@ -33,7 +33,7 @@
 <div class="inputbox">
 <label for="userdata"><?php p_("Userdata directory"); ?></label>
 <br>
-<input type="text" name="userdata" id="userdata" <?php if echo isset($USERDATA) ? 'value="'.$USERDATA.'"' : '' ?> />
+<input type="text" name="userdata" id="userdata" <?php echo isset($USERDATA) ? 'value="'.$USERDATA.'"' : '' ?> />
 </div>
 <div class="inputbox">
 <label for="userdata"><?php p_("Userdata URL"); ?></label>

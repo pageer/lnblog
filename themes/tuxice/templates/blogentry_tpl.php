@@ -30,7 +30,7 @@
 <?php
 # If there is an enclosure/podcast URL for this entry, this block will display a 
 # link to it with the file name, type, and size.
-if (! empty($ENCLOSURE_DATA) ) { ?>
+if (! empty($ENCLOSURE_DATA) ): ?>
 <p>
 <?php 
 # If the enclosure is an audio file, then refer to it as a podcast.
@@ -42,8 +42,8 @@ if ( strpos($ENCLOSURE_DATA['type'], "audio") !== false ||
 }?>: <a href="<?php echo $ENCLOSURE_DATA['url'];?>"><?php echo basename($ENCLOSURE_DATA['url']);?></a> 
 <?php pf_("(Type: %s, size: %d bytes)", $ENCLOSURE_DATA['type'], $ENCLOSURE_DATA['length']);?>
 </p>
-<?php } /* End enclosure block */ ?>
-<?php if ($SHOW_CONTROLS) { ?>
+<?php endif; ?>
+<?php if ($SHOW_CONTROLS): ?>
 <ul class="controlbar">
     <li><a href="<?php echo $PING_LINK; ?>"><?php p_("Send TrackBack Ping"); ?></a></li>
     <li><a href="<?php echo $UPLOAD_LINK; ?>"><?php p_("Upload file"); ?></a></li>
@@ -51,7 +51,7 @@ if ( strpos($ENCLOSURE_DATA['type'], "audio") !== false ||
     <li><a href="<?php echo $DELETE_LINK; ?>"><?php p_("Delete"); ?></a></li>
     <li><a href="<?php echo $MANAGE_REPLY_LINK; ?>"><?php p_("Manage replies"); ?></a></li>
 </ul>
-<?php } /* End control link block */ ?>
+<?php endif; ?>
 </div>
 <p>
 <?php 
@@ -69,24 +69,24 @@ if ($COMMENT_RSS_ENABLED) {
 }
 ?>
 </p>
-<?php if (! empty($LOCAL_PINGBACKS)) { ?>
+<?php if (! empty($LOCAL_PINGBACKS)): ?>
 <h4><?php p_("Related entries");?></h4>
 <ul>
 <?php foreach ($LOCAL_PINGBACKS as $p): ?>
     <li><?php echo $p->get($this->pages, $SHOW_CONTROLS) ?></li>
 <?php endforeach ?>
 </ul>
-<?php } /* End local pingback block */ 
+<?php endif;
 
-if ( ! empty($TRACKBACKS) ) { ?>
+if ( ! empty($TRACKBACKS) ): ?>
 <h3><?php p_("TrackBacks");?> 
 <a href="<?php echo $SHOW_TRACKBACK_LINK; ?>" title="<?php p_("TrackBack page");?>">#</a></h3>
 <ul class="trackbacks replies">
 <?php foreach ($TRACKBACKS as $p):
     echo $p->get($this->pages, $SHOW_CONTROLS); 
-endif; ?>
+endforeach; ?>
 </ul>
-<?php } /* End TrackBack block */
+<?php endif;
 
 if ( ! empty($PINGBACKS) ) { ?>
 <h3><?php p_("Pingbacks");?> 

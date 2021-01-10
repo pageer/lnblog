@@ -55,8 +55,8 @@ q { font-style: italic; }
 }
 
 #sidebar h3, #sidebar .panelheader {
-    margin-top: 0px;
-    margin-bottom: 0px;
+    margin-top: 0;
+    margin-bottom: 0;
     width: 95%;
     padding-left: 5%;
     color: black;
@@ -74,8 +74,8 @@ q { font-style: italic; }
 }
 
 #sidebar ul, #sidebar .panel {
-    margin: 0px;
-    padding-left: 0px;
+    margin: 0;
+    padding-left: 0;
     margin-top: 1em;
     margin-bottom: 1em;
 }
@@ -88,8 +88,8 @@ q { font-style: italic; }
 #sidebar ul li {
     list-style-type: none;
     width: 100%;
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
     padding-left: 8%;
     width: 92%;
 } 
@@ -109,7 +109,7 @@ q { font-style: italic; }
     text-align: center;
     vertical-align: middle;
     margin: 1% 0 1% 5%;
-    border: 0px;
+    border: 0;
 }
 
 /* Site-map menu bar styles. */

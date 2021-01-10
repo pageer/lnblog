@@ -15,8 +15,8 @@
 }
 
 .commentheader h3 {
-    padding: 0px;
-    margin: 0px;
+    padding: 0;
+    margin: 0;
 }
 
 .commentfooter {
@@ -24,8 +24,8 @@
 }
 
 .commentfooter ul {
-    padding: 0px;
-    margin: 0px;
+    padding: 0;
+    margin: 0;
 }
 
 .commentfooter li {

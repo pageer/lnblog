@@ -15,14 +15,14 @@
 }
 
 .blogcomment .header h3 {
-    padding: 0px;
-    margin: 0px;
+    padding: 0;
+    margin: 0;
 }
 
 .blogcomment .footer {
     font-size: 80%;
-    padding: 0px;
-    margin: 0px;
+    padding: 0;
+    margin: 0;
 }
 
 .blogcomment .footer li {
