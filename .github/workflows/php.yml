@@ -20,20 +20,14 @@ jobs:
     - name: Checking JavaScript dependencies
       run: npm audit
 
-    - name: Install PHP dependencies
+    - name: Installing PHP dependencies
       run: composer install --prefer-dist --no-progress --no-suggest
 
-    - name: Install JavaScript dependencies
+    - name: Installing JavaScript dependencies
       run: npm install
 
-    - name: Run style checker
-      run: vendor/bin/phpcs
+    - name: Running quality checks
+      run: vendor/bin/phing checks
 
-    - name: Run PHP code analysis
-      run: vendor/bin/phpstan analyze
-
-    - name: Run JavaScript code analysis
-      run: node_modules/.bin/jshint themes/
-
-    - name: Run test suite
+    - name: Running test suite
       run: vendor/bin/phpunit
