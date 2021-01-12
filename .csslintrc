@@ -1,6 +1,10 @@
 {
     "ignore": [
-        "ids", "overqualified-elements", "order-alphabetical"
+        "ids",
+        "overqualified-elements",
+        "order-alphabetical",
+        "qualified-headings",
+        "box-model"
     ],
     "warnings": [
     ],
