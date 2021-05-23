@@ -243,7 +243,8 @@ class WordPressImporter implements Importer
     private function importComments(BlogEntry $entry, SimpleXMLElement $entry_xml): void {
         $comments_xml = $entry_xml->xpath('./wp:comment');
         foreach ($comments_xml as $xml) {
-            $is_comment = (string) $xml->xpath('./wp:comment_type')[0] == 'comment';
+            $comment_type = (string) $xml->xpath('./wp:comment_type')[0];
+            $is_comment = $comment_type == 'comment';
             $pubdate = (string) $xml->xpath('./wp:comment_date')[0];
             $pub_ts = strtotime($pubdate);
 
@@ -265,7 +266,6 @@ class WordPressImporter implements Importer
                 $comment->post_ts = $pub_ts;
                 $comment->timestamp = $pub_ts;
                 try {
-                    if (!$entry->isEntry()) throw new \Exception("SHIT");
                     $this->publisher->publishReply($comment, $entry);
                     $this->report->addComment($comment);
                 } catch (\Exception $e) {

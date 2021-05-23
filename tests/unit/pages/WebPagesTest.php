@@ -513,6 +513,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase
             'bob@bob.com',
             Argument::any(),
             Argument::containingString('http://yourdomain.com/?action=reset&user=bob&token=testtoken'),
+            Argument::any(),
             Argument::any()
         )->willReturn(true)->shouldBeCalled();
         $this->page->display(
@@ -536,6 +537,7 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase
             'bob@bob.com',
             Argument::any(),
             Argument::containingString('http://yourdomain.com/?action=reset&user=bob&token=testtoken'),
+            Argument::any(),
             Argument::any()
         )->willReturn(false);
 
@@ -772,7 +774,9 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase
             $this->user->reveal(),
             $this->factory->reveal(),
             $this->scaler->reveal(),
-            $this->resolver->reveal()
+            $this->resolver->reveal(),
+            null,
+            $this->global_functions->reveal()
         );
 
         $this->webpage->test_page = $this->page->reveal();

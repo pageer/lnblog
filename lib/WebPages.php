@@ -4,6 +4,7 @@ use LnBlog\Attachments\ImageScaler;
 use LnBlog\Model\EntryFactory;
 use LnBlog\Model\Reply;
 use LnBlog\Tasks\TaskManager;
+use Psr\Log\LoggerInterface;
 
 class WebPages extends BasePages
 {
@@ -24,9 +25,12 @@ class WebPages extends BasePages
         User $user = null,
         EntryFactory $factory = null,
         ImageScaler $scaler = null,
-        UrlResolver $resolver = null
+        UrlResolver $resolver = null,
+        FS $fs = null,
+        GlobalFunctions $globals = null,
+        LoggerInterface $logger = null
     ) {
-        parent::__construct();
+        parent::__construct($fs, $globals, $logger);
         $this->user = $user ?: NewUser();
         $this->blog = $blog ?: NewBlog();
         $this->factory = $factory ?: new EntryFactory();

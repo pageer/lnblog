@@ -25,6 +25,7 @@ class PublishArticleTest extends PublisherTestBase
         $entry = new BlogEntry(null, $this->fs->reveal());
         $entry = $this->setUpTestArticleForSuccessfulDraftSave();
         $entry->article_path = 'some_stuff';
+        $this->fs->file_exists('./drafts/02_1234')->willReturn(false);
 
         $this->fs->write_file('./drafts/02_1234/entry.xml', Argument::any())->willReturn(true)->shouldBeCalled();
 
@@ -36,6 +37,7 @@ class PublishArticleTest extends PublisherTestBase
         $entry->article_path = 'some_stuff';
         $event_stub = $this->setUpForMultipleUploadSuccess();
         $this->fs->write_file('./drafts/02_1234/entry.xml', Argument::any())->willReturn(true);
+        $this->fs->file_exists('./drafts/02_1234')->willReturn(false);
 
         $this->publisher->publishArticle($entry, $this->getTestTime());
 

@@ -11,6 +11,7 @@ class PublishEntryTest extends PublisherTestBase
         $entry->subject = 'test';
         $fs->file_exists(Argument::containingString('test.php'))->willReturn(true);
         $fs->write_file(Argument::containingString('test.php'), Argument::any())->willReturn(true);
+        $fs->file_exists('./drafts/02_1234')->willReturn(false);
         $fs->file_exists('./drafts/02_1234/entry.xml')->willReturn(false);
         $this->fs->file_exists("./drafts/02_1234/publish.txt")->willReturn(false);
         $fs->is_dir(Argument::any())->willReturn(false);
@@ -39,6 +40,7 @@ class PublishEntryTest extends PublisherTestBase
         $entry->subject = 'test';
         $event_stub = $this->setUpForMultipleUploadSuccess();
         $path = './drafts/02_1234/entry.xml';
+        $fs->file_exists('./drafts/02_1234')->willReturn(false);
         $fs->file_exists(Argument::containingString('test.php'))->willReturn(true);
         $fs->write_file(Argument::containingString('test.php'), Argument::any())->willReturn(true);
         $fs->file_exists($path)->willReturn(false);

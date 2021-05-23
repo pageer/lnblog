@@ -75,8 +75,9 @@ class WordPressImporterTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(4, $import_report->entry_errors);
         $this->assertCount(1, $import_report->article_errors);
         $this->assertCount(1, $import_report->draft_errors);
-        $this->assertCount(1, $import_report->comment_errors);
-        $this->assertCount(1, $import_report->ping_errors);
+        // The entry publish throws, so we shouldn't even get to replies.
+        $this->assertCount(0, $import_report->comment_errors);
+        $this->assertCount(0, $import_report->ping_errors);
     }
 
     public function testImportAsNewBlog_WhenFailure_ReportsFailures() {
@@ -101,8 +102,8 @@ class WordPressImporterTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(4, $import_report->entry_errors);
         $this->assertCount(1, $import_report->article_errors);
         $this->assertCount(1, $import_report->draft_errors);
-        $this->assertCount(1, $import_report->comment_errors);
-        $this->assertCount(1, $import_report->ping_errors);
+        $this->assertCount(0, $import_report->comment_errors);
+        $this->assertCount(0, $import_report->ping_errors);
     }
 
     public function testImportAsNewBlog_WhenBlogCreationFailure_ThrowsReportsNoImports() {

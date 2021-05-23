@@ -220,14 +220,7 @@ class Publisher
         while ($this->fs->file_exists($path) && $tries < 100) {
             $path = $this->getEntryDraftPath($entry, $ts + (++$tries * 60), $draft_path);
         }
-        try {
         $this->createEntryDraftDirectory($path);
-        } catch (\Exception $e) {
-            var_dump($path, $entry);
-            throw $e;
-        }
-
-        //$this->applyBlogDefaults($entry);
 
         $entry->file = Path::mk($path, ENTRY_DEFAULT_FILE);
         $entry->uid = $this->user->username();
@@ -337,11 +330,6 @@ class Publisher
             $this->http_client = new HttpClient();
         }
         return $this->http_client;
-    }
-
-    private function applyBlogDefaults($entry) {
-        $entry->has_html = $this->blog->default_markup;
-        $entry->send_pingback = $this->blog->auto_pingback;
     }
 
     private function getArticleDirectoryPath($entry, $basepath) {

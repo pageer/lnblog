@@ -4,23 +4,6 @@ use Prophecy\Argument;
 
 class CreateDraftTest extends PublisherTestBase
 {
-
-    public function testCreateDraft_WhenBlogHasCustomDefaults_AppliesDefaultsToEntry() {
-        $entry = $this->getTestEntry();
-        $this->fs->is_dir('./drafts')->willReturn(true);
-        $this->fs->is_dir('./drafts/02_1234')->willReturn(false);
-        $this->fs->file_exists(Argument::any())->willReturn(false);
-        $this->fs->mkdir_rec('./drafts/02_1234')->willReturn(true);
-        $this->fs->write_file('./drafts/02_1234/entry.xml', Argument::containingString('This is some text'))->willReturn(true);
-        $this->blog->default_markup = MARKUP_NONE;
-        $this->blog->auto_pingback = false;
-
-        $this->publisher->createDraft($entry, $this->getTestTime());
-        
-        $this->assertEquals(MARKUP_NONE, $entry->has_html);
-        $this->assertFalse($entry->send_pingback);
-    }
-
     public function testCreateDraft_WhenEntryDoesNotExist_WritesEntryDataToFile() {
         $entry = $this->getTestEntry();
         $this->fs->is_dir('./drafts')->willReturn(true);
