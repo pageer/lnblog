@@ -18,6 +18,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+use LnBlog\Notifications\Notifier;
 use Psr\Log\LoggerInterface;
 
 abstract class BasePages
@@ -29,6 +30,7 @@ abstract class BasePages
     protected $fs;
     protected $globals;
     protected $logger;
+    protected $notifier;
 
     abstract protected function getActionMap();
     abstract protected function defaultAction();
@@ -37,6 +39,7 @@ abstract class BasePages
         $this->fs = $fs ?: NewFS();
         $this->globals = $globals ?: new GlobalFunctions();
         $this->logger = $logger ?: NewLogger();
+        $this->notifier = new Notifier($this->globals);
     }
 
     public function routeRequestWithDefault($default_action) {
@@ -129,7 +132,7 @@ abstract class BasePages
             return $user->login($password);
         } catch (UserAccountLocked $locked_out) {
             $template->set('MODE', 'email');
-            $this->globals->mail(
+            $this->notifier->sendEmail(
                 $user->email(), 
                 _("LnBlog account locked"),
                 $template->process(),

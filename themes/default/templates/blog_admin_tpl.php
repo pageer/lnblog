@@ -58,6 +58,7 @@ $(document).ready(function () {
 <input type="submit" name="edituser" id="edituser" value="<?php p_("Edit")?>" />
 </li>
 <?php if (isset($SHOW_NEW)): ?>
+<li><a href="?action=import"><?php p_("Import blog") ?></a></li>
 <li><a href="?action=newblog"><?php p_("Add new blog") ?></a></li>
 <?php endif ?>
 </ul>

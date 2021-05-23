@@ -173,9 +173,9 @@ class BlogComment extends Entry implements Reply
     Returns:
     True on success, false on failure.
     */
-    public function insert($entry) {
+    public function insert($entry, DateTime $datetime = null) {
 
-        $curr_ts = time();
+        $curr_ts = $datetime ? $datetime->getTimestamp() : time();
         $usr = NewUser();
         if (!$this->uid) $this->uid = $usr->username();
 

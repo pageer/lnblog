@@ -1,5 +1,6 @@
 <?php
 
+use LnBlog\Model\Reply;
 use LnBlog\Tasks\AutoPublishTask;
 use LnBlog\Tasks\TaskManager;
 
@@ -46,6 +47,13 @@ class Publisher
         return $this->keepHistory;
     }
 
+    /* Method: setUser
+       Set the user to publish as.
+    */
+    public function setUser(User $user) {
+        $this->user = $user;
+    }
+
     /* Method publishEntry
        Publish the entry as a normal blog entry.
 
@@ -79,7 +87,7 @@ class Publisher
         }
 
         if ( $this->fs->is_dir($dir_path) ) {
-            throw new TargetPathExists();
+            throw new TargetPathExists(spf_("Path already exists: %s", $dir_path));
         }
 
         $this->raiseEvent($entry, 'BlogEntry', 'OnInsert');
@@ -206,9 +214,20 @@ class Publisher
         }
 
         $path = $this->getEntryDraftPath($entry, $ts, $draft_path);
+        $tries = 0;
+        // HACK: If a draft for this timestamp already exists, add a minute
+        // and try again.  Need a better way to do this.
+        while ($this->fs->file_exists($path) && $tries < 100) {
+            $path = $this->getEntryDraftPath($entry, $ts + (++$tries * 60), $draft_path);
+        }
+        try {
         $this->createEntryDraftDirectory($path);
+        } catch (\Exception $e) {
+            var_dump($path, $entry);
+            throw $e;
+        }
 
-        $this->applyBlogDefaults($entry);
+        //$this->applyBlogDefaults($entry);
 
         $entry->file = Path::mk($path, ENTRY_DEFAULT_FILE);
         $entry->uid = $this->user->username();
@@ -307,6 +326,10 @@ class Publisher
         if ($entry->isPublished()) {
             $this->raiseEvent($entry, $event_class, 'DeleteComplete');
         }
+    }
+
+    public function publishReply(Reply $reply, BlogEntry $entry, \DateTime $datetime = null) {
+        return $entry->addReply($reply, $datetime);
     }
 
     protected function getHttpClient() {

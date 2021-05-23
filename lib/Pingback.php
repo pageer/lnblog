@@ -88,9 +88,10 @@ class Pingback extends Trackback implements Reply
     #
     # Parameters:
     # ent - The entry into which to insert this pingback.
-    public function insert($ent) {
+    # datetime - The optional datetime at which to insert the reply (default to now)
+    public function insert($ent, DateTime $datetime = null) {
         $this->raiseEvent("OnInsert");
-        $ts = time();
+        $ts = $datetime ? $datetime->getTimestamp() : time();
         $this->ping_date = date("Y-m-d H:i:s T", $ts);
         $this->timestamp = time();
         $this->ip = get_ip();

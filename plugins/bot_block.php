@@ -110,6 +110,9 @@ window.addEventListener('load', addIt, false);
     }
 
     function checkICToken(&$cmt) {
+        if (self::globalContext() !== self::CONTEXT_WEB) {
+            return;
+        }
         $tok = md5($_POST['link'].$this->salt);
         if ($tok != $_POST['ictok']) {
             $cmt->data = '';

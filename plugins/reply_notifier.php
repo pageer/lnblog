@@ -1,5 +1,7 @@
 <?php
 
+use LnBlog\Notifications\Notifier;
+
 # Plugin: ReplyNotifier
 # Sends e-mail notification when a reply is posted to an entry or article.
 #
@@ -11,8 +13,11 @@
 
 class ReplyNotifier extends Plugin
 {
+    private $notifier;
 
-    function __construct() {
+    function __construct(Notifier $notifier = null) {
+        $this->notifier = $notifier ?: new Notifier();
+
         $this->plugin_desc = _("Sends an e-mail notification when a comment, TrackBack, or Pingback is submitted.");
         $this->addOption(
             "notify_comment", _("Send notification for comments"),
@@ -36,8 +41,10 @@ class ReplyNotifier extends Plugin
         $owner_reply = ($u->username() == $curr_user->username());
 
         if ($u->email() && !$owner_reply) {
-            @mail(
-                $u->email(), $subject, $data,
+            $this->notifier->sendEmail(
+                $u->email(),
+                $subject,
+                $data,
                 "From: LnBlog comment notifier <".EMAIL_FROM_ADDRESS.">"
             );
         }

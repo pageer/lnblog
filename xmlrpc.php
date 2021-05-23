@@ -12,6 +12,7 @@ require_once __DIR__.'/vendor/phpxmlrpc/phpxmlrpc/lib/xmlrpcs.inc';
 require_once __DIR__.'/vendor/phpxmlrpc/phpxmlrpc/lib/xmlrpc_wrappers.inc';
 
 use LnBlog\Tasks\TaskManager;
+use LnBlog\Notifications\Notifier;
 
 $function_map = array(
     "blogger.newPost"       => array("function"=>"blogger_newPost"),
@@ -1289,7 +1290,8 @@ function authenticate_user($usr, $pwd, $check) {
         $template = NewTemplate("user_lockout_tpl.php");
         $template->set('USER', $usr);
         $template->set('MODE', 'email');
-        mail(
+        $notifier = new Notifier();
+        $notifier->sendEmail(
             $usr->email(),
             _("LnBlog account locked"),
             $template->process(),

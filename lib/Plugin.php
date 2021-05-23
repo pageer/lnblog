@@ -26,13 +26,11 @@
  * <LnBlogObject>
  */
 
-class PluginSettings
-{
- 
-}
-
 abstract class Plugin extends LnBlogObject
 {
+    const CONTEXT_WEB = 'web';
+    const CONTEXT_CLI = 'cli';
+    const CONTEXT_IMPORT = 'import';
 
     /*  Property: plugin_desc
     A short description of the plugin. */
@@ -73,6 +71,19 @@ abstract class Plugin extends LnBlogObject
     public $member_list = array();
 
     public $no_event;
+
+    private static $global_context = self::CONTEXT_WEB;
+
+    /* Method: globalContext
+    Get or set the context in which plugins will run.  The available options are in the CONTEXT_*
+    constants.  It is up to each plugin to decide how it should handle a specific context.
+     */
+    public static function globalContext(string $context = null): string {
+        if ($context !== null) {
+            self::$global_context = $context;
+        }
+        return self::$global_context;
+    }
 
     /* Constructor:
     Insert initialization code into the constructor.  You MUST OVERRIDE
@@ -157,7 +168,7 @@ abstract class Plugin extends LnBlogObject
         echo '<form method="post" ';
         echo 'action="'.current_uri(true).'" ';
         echo "id=\"plugin_config\">\n";
-        echo '<input type="hidden" name="' . 
+        echo '<input type="hidden" name="' .
             BasePages::TOKEN_POST_FIELD .
             '" value="' . $csrf_token . '" />';
 

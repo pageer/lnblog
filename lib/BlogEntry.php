@@ -1163,8 +1163,9 @@ class BlogEntry extends Entry implements AttachmentContainer
     #
     # Parameters:
     # reply - The reply object ot insert
-    public function addReply($reply) {
-        $result = $reply->insert($this);
+    # datetime - The optional datetime at which to insert the comment (default is now)
+    public function addReply($reply, DateTime $datetime = null) {
+        $result = $reply->insert($this, $datetime);
     }
 
     private function getPathFromGlobalId($globalid) {

@@ -475,7 +475,7 @@ class WebPages extends BasePages
             }
             if ($reset_token) {
                 $email_body = spf_("Hi! A password reset for your LnBlog user account %1\$s. If you did not request this, please disregard this message.\n\nTo reset your password, visit the link below:\n%2\$s", $username, $this->blog->getURL() . "?action=reset&user=$username&token=$reset_token");
-                $mail_result = $this->getGlobalFunctions()->mail(
+                $mail_result = $this->notifier->sendEmail(
                     $email,
                     _("LnBlog account password reset"),
                     $email_body,

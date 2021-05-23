@@ -18,12 +18,20 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+use LnBlog\Import\FileImportSource;
+use LnBlog\Import\ImporterFactory;
+use LnBlog\Import\WordPressImporter;
+use LnBlog\Storage\BlogRepository;
+use LnBlog\Tasks\TaskManager;
+
 class AdminPages extends BasePages
 {
+    protected $importer_factory;
 
     protected function getActionMap() {
         return array(
             'index' => 'index',
+            'import' => 'importblog',
             'login' => 'bloglogin',
             'logout' => 'bloglogout',
             'newblog' => 'newblog',
@@ -364,6 +372,95 @@ class AdminPages extends BasePages
         Page::instance()->display($body, $blog);
     }
 
+    public function importblog() {
+        $current_context = Plugin::globalContext();
+        $tpl = $this->createTemplate('blog_import_tpl.php');
+
+        if (has_post()) {
+            $error = '';
+            $tpl->set('DATA', $_POST);
+            try {
+                Plugin::globalContext(Plugin::CONTEXT_IMPORT);
+                $import_data = $this->getBlogImportData($_POST);
+                $importer = $this->getImporterFactory()->create(NewUser(), ImporterFactory::IMPORT_WORDPRESS);
+                $importer->setImportOptions(
+                    [
+                    WordPressImporter::IMPORT_USERS => $import_data['import_users'],
+                    ]
+                );
+
+                if ($import_data['is_new']) {
+                    $blog = $importer->importAsNewBlog(
+                        $import_data['blogid'],
+                        $import_data['urlpath'],
+                        $import_data['source']
+                    );
+                } else {
+                    $blog = $import_data['blog'];
+                    $importer->import(
+                        $blog,
+                        $import_data['source']
+                    );
+                }
+
+                $tpl = $this->createTemplate('blog_import_report_tpl.php');
+                $tpl->set('BLOG', $blog);
+                $tpl->set('REPORT', $importer->getImportReport());
+            } catch (Exception $e) {
+                $error = $e->getMessage();
+                $tpl->set('ERROR', $error);
+            }
+        }
+
+        Plugin::globalContext($current_context);
+        
+        $blogs = $this->getBlogRepository()->getAll();
+        $tpl->set('BLOGS', $blogs);
+        $this->populateBlogPathDefaults($tpl);
+
+        $body = $tpl->process();
+        Page::instance()->addPackage('jquery-ui');
+        Page::instance()->title = _('Import blog');
+        Page::instance()->addStylesheet("form.css");
+        Page::instance()->display($body);
+    }
+
+    private function getBlogImportData($post_data) {
+        $data = [];
+        $import_type = $post_data['import_option'] ?? '';
+
+        if ($import_type === 'new') {
+            $blogid = $post_data['new_blog_id'] ?? '';
+            $blogpath = $post_data['new_blog_path'] ?? '';
+            $blogurl = $post_data['new_blog_url'] ?? '';
+            $this->validateBlogRegistration($blogid, $blogpath, $blogurl);
+            $data['is_new'] = true;
+            $data['blogid'] = $blogid;
+            $data['urlpath'] = new UrlPath($blogpath, $blogurl);
+        } elseif ($import_type === 'existing') {
+            $blogid = $post_data['import_to'] ?? '';
+            if (empty(SystemConfig::instance()->blogRegistry()[$blogid])) {
+                throw new Exception(spf_('Blog ID %s does not exist', $blogid));
+            }
+            $data['is_new'] = false;
+            $data['blogid'] = $blogid;
+            $data['blog'] = NewBlog($blogid);
+        } else {
+            throw new InvalidFormat('No valid import option selected');
+        }
+
+        $data['import_users'] = !empty($post_data['import_users']);
+
+        $import_text = $post_data['import_text'] ?? '';
+        $source = new FileImportSource($this->fs);
+        $source->setText($import_text);
+        if (!$source->isValid()) {
+            throw new Exception(_('Invalid import data'));
+        }
+        $data['source'] = $source;
+
+        return $data;
+    }
 
     # Method: newblog
     # Used to create a new weblog.
@@ -1004,11 +1101,26 @@ class AdminPages extends BasePages
         Page::instance()->display($body);
     }
 
+    protected function getImporterFactory(): ImporterFactory {
+        if (!$this->importer_factory) {
+            $this->importer_factory = new ImporterFactory(
+                $this->fs,
+                new WrapperGenerator($this->fs),
+                new TaskManager()
+            );
+        }
+        return $this->importer_factory;
+    }
+
     private function validateBlogRegistration(string $blogid, string $path, string $url) {
         $realpath = $this->fs->realpath($path);
         $registry = SystemConfig::instance()->blogRegistry();
         $install_root = SystemConfig::instance()->installRoot();
         $userdata = SystemConfig::instance()->userData();
+
+        if (empty($blogid) || empty($path) || empty($url)) {
+            throw new Exception(_('Not all blog data was specified'));
+        }
 
         if (isset($registry[$blogid])) {
             throw new Exception(spf_("Blog ID '%s' is already registered", $blogid));
@@ -1062,5 +1174,9 @@ class AdminPages extends BasePages
         $default_url = preg_replace("|$lnblog_name/|i", '', SystemConfig::instance()->installRoot()->url());
         $tpl->set("DEFAULT_URL", $default_url);
         $tpl->set("PATH_SEP", Path::isWindows() ? '\\\\' : Path::$sep);
+    }
+
+    private function getBlogRepository(): BlogRepository {
+        return new BlogRepository();
     }
 }
