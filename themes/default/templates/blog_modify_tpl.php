@@ -7,6 +7,24 @@
 # themes directories to get a list of themes.  This really should be moved 
 # outside the template, but for the time being, just don't modify it.
 ?>
+<style>
+.form-row label {
+    display: block;
+}
+
+.form-row input {
+    max-width: 90%;
+}
+
+.tagit {
+    margin-top: 0;
+}
+
+.blog-defaults {
+    margin-top: 10px;
+}
+</style>
+
 <script type="application/javascript">
 $(document).ready(function () {
     var default_path = '<?php echo $DEFAULT_PATH?>';
@@ -18,6 +36,22 @@ $(document).ready(function () {
         $('#blogpath').val(path);
         $('#blogurl').val(default_url + $(this).val() + '/');
     });
+
+    <?php
+    $usernames = [];
+    foreach ($USER_LIST as $user) {
+        $usernames[] = $user->username();
+    }
+    ?>
+    var availableUsers = <?php echo json_encode($usernames)?>;
+
+    $('#writelist').tagit(
+        {
+        singleField: true,
+        availableTags: availableUsers,
+        showAutocompleteOnFocus: true
+        }
+    );
 });
 </script>
 <h2><?php echo $UPDATE_TITLE; ?></h2>
@@ -28,43 +62,49 @@ $(document).ready(function () {
 <form id="addblog" method="post" action="<?php echo $POST_PAGE; ?>">
     <?php $this->outputCsrfField() ?>
     <?php if (isset($SHOW_BLOG_PATH)): /* for new blogs */ ?>
-        <div>
+        <div class="form-row">
         <?php $msg = _("The unique internal identifier for the blog.");?>
             <label for="blogid" title="<?php echo $msg?>"><?php p_("Blog ID") ?></label>
             <input id="blogid" name="blogid"  title="<?php echo $msg?>" value="<?php echo $BLOG_ID?>" />
         </div>
-        <div>
+        <div class="form-row">
         <?php $msg = _("The absolute path on the server where your blog will be created.");?>
             <label for="blogpath" title="<?php echo $msg?>"><?php p_("Blog path") ?></label>
-            <input id="blogpath" name="blogpath"  title="<?php echo $msg?>" value="<?php echo $BLOG_PATH?>" />
+            <input id="blogpath" name="blogpath"  title="<?php echo $msg?>" size="50" value="<?php echo $BLOG_PATH?>" />
         </div>
-        <div>
+        <div class="form-row">
         <?php $msg = _("The URL of the blog directory (this may depend on your server configuration).");?>
             <label for="blogurl" title="<?php echo $msg?>"><?php p_("Blog URL") ?></label>
-            <input id="blogurl" name="blogurl"  title="<?php echo $msg?>" value="<?php echo $BLOG_URL?>" />
+            <input id="blogurl" name="blogurl"  title="<?php echo $msg?>" size="50" value="<?php echo $BLOG_URL?>" />
         </div>
     <?php endif ?>
     <?php if (isset($BLOG_OWNER)):?>
-        <?php $msg = _("The username of whoever will own this blog.");?>
-        <div>
+        <div class="form-row">
             <label for="owner" title="<?php echo $msg;?>"><?php p_("Blog owner"); ?></label>
-            <input id="owner" name="owner"  title="<?php echo $msg;?>" value="<?php echo $BLOG_OWNER; ?>" />
+            <select id="owner" name="owner"
+                title="<?php p_("The username of whoever will own this blog.")?>"
+            >
+                <?php foreach ($USER_LIST as $user): ?>
+                    <?php $selected = $BLOG_OWNER == $user->username() ? 'selected' : ''; ?>
+                    <option <?php echo $selected?>><?php echo $user->username()?></option>
+                <?php endforeach ?>
+            </select>
         </div>
     <?php endif ?>
-    <div>
+    <div class="form-row">
         <?php $msg = _("A list of other usernames who can create posts on this blog.  Multiple usernames are separated by commas.");?>
         <label for="writelist" title="<?php echo $msg;?>"><?php p_("Additional allowed writers"); ?></label>
-        <input id="writelist" name="writelist" title="<?php echo $msg;?>" value="<?php echo $BLOG_WRITERS; ?>" />
+        <input id="writelist" name="writelist" title="<?php echo $msg;?>" size="50" value="<?php echo $BLOG_WRITERS; ?>" />
     </div>
-    <div>
+    <div class="form-row">
         <?php $msg = _("The name of this blog.  This will be displayed as the blog title.");?>
         <label for="blogname" title="<?php echo $msg;?>"><?php p_("Blog name"); ?></label>
-        <input id="blogname" name="blogname" title="<?php echo $msg;?>" value="<?php echo $BLOG_NAME; ?>" />
+        <input id="blogname" name="blogname" title="<?php echo $msg;?>" size="50" value="<?php echo $BLOG_NAME; ?>" />
     </div>
-    <div>
+    <div class="form-row">
         <?php $msg = _("A short description of the blog.");?>
         <label for="desc" title="<?php echo $msg;?>"><?php p_("Description"); ?></label>
-        <input id="desc" name="desc" title="<?php echo $msg;?>" value="<?php echo $BLOG_DESC; ?>" />
+        <input id="desc" name="desc" title="<?php echo $msg;?>" size="50" value="<?php echo $BLOG_DESC; ?>" />
     </div>
     <div>
         <?php $msg = _("The theme that determines how your pages look.  You can change this at any time.  You can also do per-blog modifications of the templates and style sheets to customize your blog.");?>
@@ -94,11 +134,12 @@ $(document).ready(function () {
         <?php $checked = $BLOG_FRONT_PAGE_ABSTRACT ? 'checked="checked"' : ''; ?>
         <input id="use_abstract" name="use_abstract" type="checkbox" <?php echo $checked?> />
     </div>
-    <div>
+    <div class="form-row">
         <label for="main_entry"><?php p_("Article to show as front page");?></label>
-        <input id="main_entry" name="main_entry" type="input" size="20" value="<?php echo $BLOG_MAIN_ENTRY;?>" />
+        <input id="main_entry" name="main_entry" type="input" size="35" value="<?php echo $BLOG_MAIN_ENTRY;?>" 
+        placeholder="<?php p_('Root relative path, e.g. content/frontpage')?>" />
     </div>
-    <fieldset>
+    <fieldset class="blog-defaults">
         <legend style="font-weight: bold"><?php p_("Default settings for blog entries");?></legend>
         <div>
             <?php $msg = _("Determines when Pingbacks should be sent by default for new posts.  You can manually override this on the entry edit screen.");?>

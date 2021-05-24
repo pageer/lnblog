@@ -3,6 +3,7 @@
 use LnBlog\Attachments\ImageScaler;
 use LnBlog\Model\EntryFactory;
 use LnBlog\Model\Reply;
+use LnBlog\Storage\UserRepository;
 use LnBlog\Tasks\TaskManager;
 use Psr\Log\LoggerInterface;
 
@@ -1965,11 +1966,18 @@ class WebPages extends BasePages
         if ($usr->username() == ADMIN_USER) {
             $tpl->set("BLOG_OWNER", $blog->owner);
         }
+
         $this->blogSetTemplate($tpl, $blog);
         $tpl->set("POST_PAGE", current_file());
         $tpl->set("UPDATE_TITLE", sprintf(_("Update %s"), $blog->name));
 
+        $user_repo = new UserRepository();
+        $user_list = $user_repo->getAll();
+        $tpl->set('USER_LIST', $user_list);
+        $this->populateBlogPathDefaults($tpl);
+
         $body = $tpl->process();
+        $this->getPage()->addPackage('tag-it');
         $this->getPage()->title = spf_("Update blog - %s", $blog->name);
         $this->getPage()->addStylesheet("form.css");
         $this->getPage()->display($body, $blog);

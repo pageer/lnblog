@@ -22,6 +22,7 @@ use LnBlog\Import\FileImportSource;
 use LnBlog\Import\ImporterFactory;
 use LnBlog\Import\WordPressImporter;
 use LnBlog\Storage\BlogRepository;
+use LnBlog\Storage\UserRepository;
 use LnBlog\Tasks\TaskManager;
 
 class AdminPages extends BasePages
@@ -552,7 +553,12 @@ class AdminPages extends BasePages
             }
         }
 
+        $user_repo = new UserRepository();
+        $user_list = $user_repo->getAll();
+        $tpl->set('USER_LIST', $user_list);
+
         $body = $tpl->process();
+        Page::instance()->addPackage('tag-it');
         Page::instance()->title = _("Create new blog");
         Page::instance()->addStylesheet("form.css");
         Page::instance()->display($body);
@@ -1161,19 +1167,6 @@ class AdminPages extends BasePages
         if (!filter_var($userdata_url, FILTER_VALIDATE_URL)) {
             throw new Exception(spf_("The URL '%s' is not valid", $userdata_url));
         }
-    }
-
-    private function populateBlogPathDefaults(PHPTemplate $tpl) {
-        $inst_root = SystemConfig::instance()->installRoot()->path();
-        $default_path = dirname($inst_root);
-        if (Path::isWindows()) {
-            $default_path = str_replace('\\', '\\\\', $default_path);
-        }
-        $tpl->set("DEFAULT_PATH", $default_path);
-        $lnblog_name = basename($inst_root);
-        $default_url = preg_replace("|$lnblog_name/|i", '', SystemConfig::instance()->installRoot()->url());
-        $tpl->set("DEFAULT_URL", $default_url);
-        $tpl->set("PATH_SEP", Path::isWindows() ? '\\\\' : Path::$sep);
     }
 
     private function getBlogRepository(): BlogRepository {

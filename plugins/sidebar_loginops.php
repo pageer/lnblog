@@ -40,6 +40,7 @@ class LoginOps extends Plugin
 <h3><?php p_("System Administration");?></h3>
 <ul>
     <li><a href="<?php echo INSTALL_ROOT_URL;?>"><?php p_("Back to main menu");?></a></li>
+    <li><a href="?action=logout"><?php p_("Log out") ?></a></li>
 </ul>
 <?php else: ?>
 

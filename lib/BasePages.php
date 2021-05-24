@@ -273,6 +273,19 @@ abstract class BasePages
         $tpl->set("BLOG_MAIN_ENTRY", $blog->front_page_entry);
     }
 
+    protected function populateBlogPathDefaults(PHPTemplate $tpl) {
+        $inst_root = SystemConfig::instance()->installRoot()->path();
+        $default_path = dirname($inst_root);
+        if (Path::isWindows()) {
+            $default_path = str_replace('\\', '\\\\', $default_path);
+        }
+        $tpl->set("DEFAULT_PATH", $default_path);
+        $lnblog_name = basename($inst_root);
+        $default_url = preg_replace("|$lnblog_name/|i", '', SystemConfig::instance()->installRoot()->url());
+        $tpl->set("DEFAULT_URL", $default_url);
+        $tpl->set("PATH_SEP", Path::isWindows() ? '\\\\' : Path::$sep);
+    }
+
     private function shouldBlockOnMissingOrigin() {
         if ($this->globals->defined("BLOCK_ON_MISSING_ORIGIN")) {
             return $this->globals->constant("BLOCK_ON_MISSING_ORIGIN");

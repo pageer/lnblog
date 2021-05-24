@@ -2,6 +2,7 @@
 
 namespace LnBlog\Storage;
 
+use System;
 use User;
 
 class UserRepository
@@ -17,5 +18,10 @@ class UserRepository
 
     public function saveUser(User $user) {
         $user->save();
+    }
+
+    public function getAll(): array {
+        # TODO: Move the actual logic here.
+        return System::instance()->getUserList();
     }
 }
