@@ -9,13 +9,13 @@
   "private": false,
   "dependencies": {
     "csslint": "^1.0.5",
-    "dropzone": "^5.5.1",
-    "jquery": "^3.5.1",
+    "dropzone": "^5.9.2",
+    "jquery": "^3.6.0",
     "jquery-datetime-picker": "^2.5.11",
-    "jquery-form": "^4.2.2",
+    "jquery-form": "^4.3.0",
     "jquery-ui-dist": "^1.12.1",
     "jshint": "^2.12.0",
     "tag-it": "^2.0.0",
-    "tinymce": "^5.6.2"
+    "tinymce": "^5.8.1"
   }
 }
