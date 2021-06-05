@@ -57,7 +57,7 @@ class WordPressImporterTest extends \PHPUnit\Framework\TestCase
     }
 
     public function testImport_WhenFailure_ReportsFailures() {
-
+        $this->publisher->useBlogDefaults(false)->shouldBeCalled();
         $this->publisher->publishEntry(Argument::any(), Argument::any())->willThrow(new Exception('entry error'));
         $this->publisher->publishArticle(Argument::any(), Argument::any())->willThrow(new Exception('article error'));
         $this->publisher->createDraft(Argument::any(), Argument::any())->willThrow(new Exception('draft exception'));
@@ -81,7 +81,7 @@ class WordPressImporterTest extends \PHPUnit\Framework\TestCase
     }
 
     public function testImportAsNewBlog_WhenFailure_ReportsFailures() {
-
+        $this->publisher->useBlogDefaults(false)->shouldBeCalled();
         $this->publisher->publishEntry(Argument::any(), Argument::any())->willThrow(new Exception('entry error'));
         $this->publisher->publishArticle(Argument::any(), Argument::any())->willThrow(new Exception('article error'));
         $this->publisher->createDraft(Argument::any(), Argument::any())->willThrow(new Exception('draft exception'));
@@ -107,7 +107,6 @@ class WordPressImporterTest extends \PHPUnit\Framework\TestCase
     }
 
     public function testImportAsNewBlog_WhenBlogCreationFailure_ThrowsReportsNoImports() {
-
         $this->publisher->publishEntry(Argument::any(), Argument::any())->willThrow(new Exception('entry error'));
         $this->publisher->publishArticle(Argument::any(), Argument::any())->willThrow(new Exception('article error'));
         $this->publisher->createDraft(Argument::any(), Argument::any())->willThrow(new Exception('draft exception'));
@@ -304,6 +303,7 @@ class WordPressImporterTest extends \PHPUnit\Framework\TestCase
             return in_array($args[0], $existing_users);
         };
 
+        $this->publisher->useBlogDefaults(false)->shouldBeCalled();
         $this->publisher->publishEntry(Argument::any(), Argument::any())->will($post_validation);
         $this->publisher->publishArticle(Argument::any(), Argument::any())->will($page_validation);
         $this->publisher->createDraft(Argument::any(), Argument::any())->will($draft_validation);
