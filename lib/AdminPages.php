@@ -1146,7 +1146,9 @@ class AdminPages extends BasePages
 
         foreach ($registry as $blogid => $urlpath) {
             $blog_path = $this->fs->realpath($urlpath->path());
-            if ($realpath == $blog_path) {
+            # If the directory exists, use the real path, otherwise, just take what we're passed.
+            $passed_path = $realpath ?: $path;
+            if ($passed_path == $blog_path) {
                 throw new Exception(spf_("The blog path '%s' is already registered.", $path));
             }
             if ($url == $urlpath->url()) {
