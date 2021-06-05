@@ -16,6 +16,7 @@ class Publisher
     private $task_manager;
     private $http_client;
     private $keepHistory;
+    private $use_blog_defaults = true;
 
     public function __construct(
         Blog $blog,
@@ -45,6 +46,13 @@ class Publisher
             $this->keepHistory = $val;
         }
         return $this->keepHistory;
+    }
+
+    public function useBlogDefaults($use_defaults = null) {
+        if ($use_defaults !== null) {
+            $this->use_blog_defaults = $use_defaults;
+        }
+        return $this->use_blog_defaults;
     }
 
     /* Method: setUser
@@ -222,6 +230,10 @@ class Publisher
         }
         $this->createEntryDraftDirectory($path);
 
+        if ($this->use_blog_defaults) {
+            $this->applyBlogDefaults($entry);
+        }
+
         $entry->file = Path::mk($path, ENTRY_DEFAULT_FILE);
         $entry->uid = $this->user->username();
         $entry->setDates($ts);
@@ -330,6 +342,11 @@ class Publisher
             $this->http_client = new HttpClient();
         }
         return $this->http_client;
+    }
+
+    private function applyBlogDefaults($entry) {
+        $entry->has_html = $this->blog->default_markup;
+        $entry->send_pingback = $this->blog->auto_pingback;
     }
 
     private function getArticleDirectoryPath($entry, $basepath) {

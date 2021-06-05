@@ -244,7 +244,7 @@ abstract class BasePages
         $blog->max_entries = POST("maxent");
         $blog->max_rss = POST("maxrss");
         $blog->allow_enclosure = POST("allow_enc")?1:0;
-        $blog->default_markup = POST("blogmarkup");
+        $blog->default_markup = POST("input_mode");
         $blog->auto_pingback = POST('pingback')?1:0;
         $blog->gather_replies = POST('replies')?1:0;
         $blog->front_page_abstract = POST('use_abstract')?1:0;

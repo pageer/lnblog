@@ -122,6 +122,7 @@ class WordPressImporter implements Importer
         $this->blog = new Blog();
         $this->blog->blogid = $blogid;
         $this->blog->home_path = $paths->path();
+        $this->blog->default_markup = class_exists('TinyMCEEditor') ? MARKUP_HTML : MARKUP_BBCODE;
         $import_xml = $source->getAsXml();
         SystemConfig::instance()->registerBlog($blogid, $paths);
         $this->importBlogData($import_xml);
@@ -144,6 +145,7 @@ class WordPressImporter implements Importer
         if (!$this->publisher) {
             $this->publisher = new Publisher($blog, $user, $this->fs, $this->wrappers, $this->task_manager);
         }
+        $this->publisher->useBlogDefaults(false);
         return $this->publisher;
     }
 
