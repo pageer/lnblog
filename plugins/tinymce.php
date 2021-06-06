@@ -131,6 +131,15 @@ class TinyMCEEditor extends Plugin
             }
         };
 
+        // This will be called by the editor page to force a sync of editor
+        // content to the textarea.  This prevents desyncing issues when 
+        // switching between markup modes.
+        var editor_commit_current = function() {
+            if (tinymce.activeEditor) {
+                tinymce.triggerSave();
+            }
+        };
+
         jQuery(document).ready(function() {
             try {
                 initialize_tinymce();

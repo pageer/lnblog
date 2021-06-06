@@ -381,13 +381,13 @@ $(document).ready(
     
     $('.checktoggle[data-for]').on(
         'change', function() {
-        var $this = $(this),
-            checked = $this.is(':checked'),
-            for_id = $this.attr('data-for');
-        $('#' + for_id).toggle(checked);
-        if (checked) {
-            $(for_id).focus();
-        }
+            var $this = $(this),
+                checked = $this.is(':checked'),
+                for_id = $this.attr('data-for');
+            $('#' + for_id).toggle(checked);
+            if (checked) {
+                $(for_id).focus();
+            }
         }
     );
     
@@ -401,9 +401,9 @@ $(document).ready(
     
     $('.entry_preview .preview-close').on(
         'click.preview', function (e) {
-        e.preventDefault();
-        $('.entry_preview').hide();
-        $('#postform').show();
+            e.preventDefault();
+            $('.entry_preview').hide();
+            $('#postform').show();
         }
     );
     
@@ -416,62 +416,67 @@ $(document).ready(
     
     $('#postform').submit(
         function () {
-           if ($('#preview').attr('rel') == 'clicked') {
-               var form_url = $('#postform').attr('action');
-               form_url += (form_url.indexOf('?') >= 0) ? '&' : '?';
-               form_url += 'preview=yes&ajax=1';
-            
-               var has_files = false;
-            $("#postform input[type='file']").each(
-                function () {
-                         if ($(this).val()) {
-                             has_files = true;
-                         }
-                     }
-            );
-            
-               if (has_files) {
-                   var ret = window.confirm(strings.editor_submitWithFiles);
-                   if (ret) {
-                       form_url += '&save=draft';
-                   } else {
-                       return false;
-                   }
-               }
+            // Make sure the WYSIWYG editor syncs to the text area.
+            if (typeof(editor_commit_current) == 'function') {
+                editor_commit_current();
+            }
 
-               var options = {
-                   target: '.entry_preview',
-                   url: form_url,
-                   dataType: 'json',
-                   success: function (response, statusText, xhr, $form) {
-                       $('.entry_preview')
-                           .find('.preview-text').html(unescape(response.content)).end()
-                           .find('.preview-overlay').remove();
-                       if (response.id.match(/draft/)) {
-                           var form_url = $('#postform').attr('action');
-                           form_url += form_url.match(/draft=/) ? '' : '&draft='+response.id;
-                           form_url += form_url.match(/preview=1/) ? '' : '&preview=yes';
-                           form_url += form_url.match(/ajax=1/) ? '' : 'ajax=1';
-                           $('#postform').attr('action', form_url);
-                       }
-                   }
-               };
+            if ($('#preview').attr('rel') == 'clicked') {
+                var form_url = $('#postform').attr('action');
+                form_url += (form_url.indexOf('?') >= 0) ? '&' : '?';
+                form_url += 'preview=yes&ajax=1';
+             
+                var has_files = false;
+                $("#postform input[type='file']").each(
+                    function () {
+                        if ($(this).val()) {
+                            has_files = true;
+                        }
+                    }
+                );
+             
+                if (has_files) {
+                    var ret = window.confirm(strings.editor_submitWithFiles);
+                    if (ret) {
+                        form_url += '&save=draft';
+                    } else {
+                        return false;
+                    }
+                }
+
+                var options = {
+                    target: '.entry_preview',
+                    url: form_url,
+                    dataType: 'json',
+                    success: function (response, statusText, xhr, $form) {
+                        $('.entry_preview')
+                            .find('.preview-text').html(unescape(response.content)).end()
+                            .find('.preview-overlay').remove();
+                        if (response.id.match(/draft/)) {
+                            var form_url = $('#postform').attr('action');
+                            form_url += form_url.match(/draft=/) ? '' : '&draft='+response.id;
+                            form_url += form_url.match(/preview=1/) ? '' : '&preview=yes';
+                            form_url += form_url.match(/ajax=1/) ? '' : 'ajax=1';
+                            $('#postform').attr('action', form_url);
+                        }
+                    }
+                };
             
-               var markup = '<div class="preview-overlay"><div class="label"><img src="'+
-                   window.INSTALL_ROOT+'/themes/default/images/ajax-loader.gif"> Loading...</div></div>';
-               $('.entry_preview').show().prepend(markup);
-            
-               $('#postform').hide().ajaxSubmit(options);
-               return false;
-           } else {
-               // Clear out the stored post data because it's being saved now.
-               if (typeof localStorage != 'undefined') {
-                   localStorage.removeItem(auto_save_key);
-               }
-           }
-           // Make the submission not prompt to leave the page.
-           current_text_content = original_text_content;
-           return true;
+                var markup = '<div class="preview-overlay"><div class="label"><img src="'+
+                    window.INSTALL_ROOT+'/themes/default/images/ajax-loader.gif"> Loading...</div></div>';
+                $('.entry_preview').show().prepend(markup);
+             
+                $('#postform').hide().ajaxSubmit(options);
+                return false;
+            } else {
+                // Clear out the stored post data because it's being saved now.
+                if (typeof localStorage != 'undefined') {
+                    localStorage.removeItem(auto_save_key);
+                }
+            }
+            // Make the submission not prompt to leave the page.
+            current_text_content = original_text_content;
+            return true;
         }
     );
 
@@ -492,5 +497,5 @@ $(document).ready(
         }
     );
     $('#tag_list').hide();
-    }
+}
 );
