@@ -30,7 +30,9 @@
 <div class="footer">
 <?php if ($SHOW_CONTROLS) { ?>
 <ul class="controlbar">
+    <?php if (!empty($ALLOW_TRACKBACKS)):?>
     <li><a href="<?php echo $PING_LINK; ?>"><?php p_("Send TrackBack Ping");?></a></li>
+    <?php endif ?>
     <li><a href="<?php echo $UPLOAD_LINK; ?>"><?php p_('Upload file');?></a></li>
     <li><a href="<?php echo $EDIT_LINK; ?>"><?php p_('Edit');?></a></li>
     <li><a href="<?php echo $DELETE_LINK; ?>"><?php p_('Delete');?></a></li>
