@@ -9,7 +9,7 @@
 <?php endif; ?>
 
 <div class="entry_preview" <?php echo !empty($PREVIEW_DATA) ? 'style="display:block"' : ''?>>
-    <a href="#" class="preview-close">[<?php p_('Close Preview')?>]</a>
+    <a href="#" class="preview-close" title="<?php p_('Close Preview')?>">&times;</a>
     <div class="preview-text"><?php echo @$PREVIEW_DATA?></div>
 </div>
 

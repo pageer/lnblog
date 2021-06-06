@@ -176,6 +176,12 @@ div.entry_tags select {
 .entry_preview .preview-close {
     position: absolute;
     right: 5px;
+    font-weight: bold;
+    font-size: 200%;
+}
+
+.entry_preview .preview-close:hover {
+    text-decoration: none;
 }
 
 .entry_preview .preview-overlay {
