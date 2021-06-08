@@ -164,7 +164,7 @@ abstract class Plugin extends LnBlogObject
     public function showConfig($page, $csrf_token) {
         if (! $this->member_list) return false;
 
-        echo "<fieldset>\n";
+        echo "<fieldset class=\"plugin-form\">\n";
         echo '<form method="post" ';
         echo 'action="'.current_uri(true).'" ';
         echo "id=\"plugin_config\">\n";
@@ -173,25 +173,29 @@ abstract class Plugin extends LnBlogObject
             '" value="' . $csrf_token . '" />';
 
         foreach ($this->member_list as $mem=>$config) {
-            if (! isset($config["control"])) $config["control"] = "text";
+            if (! isset($config["control"])) {
+                $config["control"] = "text";
+            }
             if ($config["control"] == "checkbox") {
                 echo '<div>';
-                echo '<label for="'.$mem.'">'.$config["description"].'</label>';
                 echo '<input name="'.$mem.'" id="'.$mem.'" type="checkbox"';
                 if ($this->$mem) echo 'checked="checked" ';
-                echo " /></div>\n";
+                echo " />";
+                echo '<label for="'.$mem.'">'.$config["description"].'</label>';
+                echo "</div>\n";
             } elseif ($config["control"] == "radio") {
-                echo '<fieldset style="margin: 1%; padding: 1%">';
+                echo '<fieldset class="radio-buttons">';
                 echo '<legend>'.$config["description"].'</legend>';
                 foreach ($config["options"] as $val=>$desc) {
-                    echo '<label for="'.$val.'">'.$desc.'</label>';
+                    echo '<label for="'.$val.'">';
                     echo '<input name="'.$mem.'" id="'.$mem.'" type="radio" value="'.$val.'"';
                     if ($this->$mem == $val) echo 'checked="checked"';
-                    echo ' /><br />';
+                    echo ' />'.$desc.'</label>';
+                    echo '<br />';
                 }
                 echo "</fieldset>\n";
             } elseif ($config["control"] == "select") {
-                echo '<div>';
+                echo '<div class="select-box">';
                 echo '<label for="'.$mem.'">'.$config["description"]."</label>\n";
                 echo '<select name="'.$mem.'" id="'.$mem."\">\n";
                 foreach ($config["options"] as $val=>$desc) {
@@ -201,21 +205,20 @@ abstract class Plugin extends LnBlogObject
                 }
                 echo "</select>\n</div>\n";
             } elseif ($config["control"] == "file") {
-                echo '<div>';
+                echo '<div class="file-box">';
                 echo '<label for="'.$mem.'">'.$config['description']."</label>\n";
                 echo '<input name="'.$mem.'" id="'.$mem.'" type="text" value="'.$this->$mem.'" />';
                 echo '<input name="'.$mem.'_upload" id="'.$mem.'_upload" type="file" />';
                 echo "</div>\n";
             } elseif ($config["control"] == "textarea") {
-                echo '<div>';
+                echo '<div class="textarea-box">';
                 echo '<label for="'.$mem.'">'.$config["description"].'</label>';
                 echo '<textarea name="'.$mem.'" id="'.$mem.'" rows="10" cols="50">'.$this->$mem.'</textarea>';
                 echo "</div>\n";
-
             } else {
-                echo '<div>';
+                echo '<div class="input-box">';
                 echo '<label for="'.$mem.'">'.$config["description"].'</label>';
-                echo '<input name="'.$mem.'" id="'.$mem.'" type="text" value="'.$this->$mem.'"';
+                echo '<input name="'.$mem.'" id="'.$mem.'" type="'.$config['control'].'" value="'.$this->$mem.'"';
                 echo " /></div>\n";
             }
         }
@@ -223,7 +226,6 @@ abstract class Plugin extends LnBlogObject
         echo "<div>\n";
         echo '<input type="hidden" name="plugin" id="plugin" value="'.get_class($this).'" />';
         echo '<input type="submit" value="Submit" />';
-        echo '<input type="reset" value="Clear" />'."\n";
         echo "</div>\n";
         echo "</form>\n";
         echo "</fieldset>\n";

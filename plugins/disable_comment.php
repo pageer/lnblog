@@ -61,7 +61,7 @@ class DisableComments extends Plugin
         $this->addOption(
             "close_old",
             _("Close all replies on entries older than this many days"),
-            "", "text"
+            "", "number"
         );
         parent::__construct();
 

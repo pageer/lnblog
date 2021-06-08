@@ -861,6 +861,7 @@ class AdminPages extends BasePages
             }
             $body .= '</table>';
         }
+        Page::instance()->addStylesheet("form.css");
         Page::instance()->title = spf_("%s Plugin Configuration", PACKAGE_NAME);
         Page::instance()->display($body);
     }

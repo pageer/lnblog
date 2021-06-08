@@ -223,6 +223,58 @@ form.centered input {
     display: none;
 }
 
+/* This is used by the sitemap editor form */
+.formbox label {
+    display: inline-block;
+    min-width: 30%;
+    text-align: right;
+}
+
+.formbox .buttons {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.formbox input[type="text"] {
+    min-width: 40%;
+}
+
+/* Blog paths form */
+.path-form label {
+    display: block;
+}
+
+.path-form input[type="text"] {
+    width: 60%;
+}
+
+/* Plugin settings form */
+.plugin-form .radio-buttons {
+    margin: 1%;
+    padding: 1%;
+}
+
+.plugin-form .select-box label,
+.plugin-form .input-box label {
+    display: block;
+}
+
+/* Comment form */
+.comment-form .subject input,
+.comment-form .subject label,
+.comment-form .comment-metadata input,
+.comment-form .comment-metadata label {
+    display: block;
+}
+
+.comment-form .comment-metadata input {
+    width: 40%;
+}
+
+.comment-form .comment-metadata.subject input {
+    width: 70%;
+}
+
 .attachment-list-toggle {
     display: block;
 }

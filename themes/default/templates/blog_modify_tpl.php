@@ -122,12 +122,12 @@ $(document).ready(function () {
     <div>
         <?php $msg = _("Number of entries on the main blog page.");?>
         <label for="maxent" title="<?php echo $msg;?>"><?php p_("Maximum number of entries on front page"); ?></label>
-        <input id="maxent" name="maxent" size="3" title="<?php echo $msg?>" value="<?php echo $BLOG_MAX?>" />
+        <input id="maxent" type="number" min="0" max="999" name="maxent" title="<?php echo $msg?>" value="<?php echo $BLOG_MAX?>" />
     </div>
     <div>
         <?php $msg = _("Number of entries to keep in the RSS feeds.");?>
         <label for="maxrss" title="<?php echo $msg;?>"><?php p_("Maximum number of entries in RSS feeds"); ?></label>
-        <input id="maxrss" name="maxrss" size="3" title="<?php echo $msg?>" value="<?php echo $BLOG_RSS_MAX?>" />
+        <input id="maxrss" type="number" min="0" max="999" name="maxrss" title="<?php echo $msg?>" value="<?php echo $BLOG_RSS_MAX?>" />
     </div>
     <div>
         <label for="use_abstract"><?php p_("Show only summaries on front page");?></label>

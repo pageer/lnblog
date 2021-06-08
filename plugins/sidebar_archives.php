@@ -15,7 +15,7 @@ class Archives extends Plugin
     function __construct($do_output=0) {
         $this->plugin_desc = _("List the months of archives for a blog.");
         $this->plugin_version = "0.2.1";
-        $this->addOption("max_months", _("Number of months to show"), 6, "text");
+        $this->addOption("max_months", _("Number of months to show"), 6, "number");
         $this->addOption(
             "title", _("Sidebar section title"),
             _("Archives"), "text"
