@@ -65,7 +65,7 @@ $(document).ready(function () {
 <h3><?php p_('Upgrade Functions') ?></h3>
 <ul>
     <li>
-        <a href="#" class="slide-toggle"><?php p_("Upgrade blog to current version") ?><a>
+        <a href="#" class="slide-toggle"><?php p_("Upgrade blog to current version") ?></a>
         <div class="slide-down">
             <select id="upgrade" name="upgrade">
                 <?php foreach ($BLOG_ID_LIST as $blog): ?>

@@ -33,7 +33,7 @@ the LnBlog webpage (recommended) or from source, i.e. the cloned Git repository.
 Installing from zip archive
 ---------------------------
 To install the [ZIP file distribution](https://www.skepticats.com/lnblog/content/download/),
- simply extract the ZIP archive and upload 
+simply extract the ZIP archive and upload 
 the resulting folder to the publicly accessible portion of your web server.
 After that, open a web browser go to the URL corresponding to that location.
 This will start the graphical configuration process.  You will be prompted to 
@@ -64,15 +64,16 @@ This will create the directory `build/LnBlog-latest/`, which contains the same f
 as the zip archive distribution described above.  You can copy that directory to 
 the web-accessible portion of your web server and follow the installation instructions above.
 
-Note that it is also possible to put the directory pulled from Git directly on your 
+It is also possible to put the directory pulled from Git directly on your 
 web server.  This makes it easy to pull updates to the code at will.  However, you will
-have to manually handle changes to third-party dependencies.  For PHP dependencies, this means
-you will have to run `composer install` to pull in updates.  For JavaScript dependencies,
-you should create a build as described above and recursively copy the contents of the 
-`build/third-party/` directory into the root LnBLog directory using something like this command:
+have to manually handle changes to third-party dependencies.  (Note: This works fine, but 
+is not recommended because you will need to install dev tools in your production environment.
+But if you're fine with that, then go for it.)  You can do this by running the following:
 
 ```
-cp -R build/third-party/ . 
+composer instal --dev
+npm install
+vendor/bin/phing client-local
 ```
 
 When pulling new changes, you may have to repeat these steps if any of the external 
@@ -86,18 +87,34 @@ then rename your old LnBLog directory to, e.g., LnBlog-old, and rename the new o
 in its place (i.e., give it the same name the old version had).  If your `userdata` directory
 is contained inside the LnBlog directory, you should move it from the old version to the new one.
 (Note: it is now recommended to keep your `userdata` directory alongside the code direcory,
-not inside it.)
+not inside it.)  You will also need to copy the `pathconfig.php` from your old directory to 
+the new one.  This file contains the canonical URLs and locations of your userdata and all your
+blogs.  The sequence of commands is roughly as follows:
+
+```
+cp LnBlog/pathconfig.php LnBlog-new/pathconfig.php
+mv LnBlog LnBlog-backup
+mv LnBlog-new LnBlog
+```
 
 Depending on the contents of the updated version, you may also need to upgrade your 
 blog data.  To do this, go to the main LnBlog site administration page, select your
 blog from the "upgrade blog" drop-down, and click "Upgrade".  This will recreate 
 the wrapper script files and perform any updates to the format of the data files.
-Repeat this for each of your blogs.
+Repeat this for each of your blogs.  You can also upgrade everything at once
+from the command line by running:
+
+```
+php cli.php --upgrade
+```
+
+**Important note:** It is always recommended to backup your blogs directories before upgrading.
+The upgrade process should be non-destructive, but it's better to be safe than sorry.
 
 License
 =======
 LnBlog: A flexible file-base weblog
-Copyright (C) 2005-2020 Peter A. Geer <pageer@skepticats.com>
+Copyright (C) 2005-2021 Peter A. Geer <pageer@skepticats.com>
 
 This program is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software 
