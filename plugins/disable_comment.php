@@ -45,7 +45,7 @@ class DisableComments extends Plugin
         # Turn this on to disallow trackbacks on all entries.
         $this->addOption(
             "no_trackback", _("Disable trackbacks for all entries"),
-            false, "checkbox"
+            true, "checkbox"
         );
 
         # Option: Disable pingbacks
