@@ -254,6 +254,8 @@ var initializeUpload = function () {
            $('.entry-attachments').show();
        } else {
            $('.blog-attachments').append($new_file);
+           $('a[name="blog-attachments"]').show();
+           $('.blog-attachments').show();
        }
        setAttachmentControls();
        return true;

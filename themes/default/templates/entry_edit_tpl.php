@@ -166,8 +166,6 @@
             </div>
 
             <div class="bottom-row">
-                <?php if ($ENTRY_ATTACHMENTS): ?>
-                <?php endif ?>
                 <a name="entry-attachments" href="#" class="attachment-list-toggle" <?php
                     echo empty($ENTRY_ATTACHMENTS) ? 'style="display: none"' : ''
                 ?>><?php p_("Entry attachments") ?></a>

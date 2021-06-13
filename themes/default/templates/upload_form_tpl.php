@@ -22,26 +22,26 @@
         </div>
     </form>
     <div id="filedrop" class="dropzone"></div>
-    <div style="margin-top: 20px">
-        <?php if ($ENTRY_ATTACHMENTS): ?>
-            <a name="entry-attachments" href="#" class="attachment-list-toggle"><?php p_("Entry attachments") ?></a>
-            <ul class="entry-attachments attachment-list">
-                <?php foreach ($ENTRY_ATTACHMENTS as $attachment): ?>
-                    <li class="attachment" data-file="<?php echo $this->escape($attachment->getName())?>">
-                        <?php echo $this->escape($attachment->getName()) ?>
-                    </li>
-                <?php endforeach ?>
-            </ul>
-        <?php endif ?>
-        <?php if ($BLOG_ATTACHMENTS): ?>
-            <a name="blog-attachments" href="#" class="attachment-list-toggle"><?php p_("Blog attachments") ?></a>
-            <ul class="blog-attachments attachment-list">
-                <?php foreach ($BLOG_ATTACHMENTS as $attachment): ?>
-                    <li class="attachment" data-file="<?php echo $this->escape($attachment->getName())?>">
-                        <?php echo $this->escape($attachment->getName()) ?>
-                    </li>
-                <?php endforeach ?>
-            </ul>
-        <?php endif ?>
+    <div class="file-list" style="margin-top: 20px">
+        <a name="entry-attachments" href="#" class="attachment-list-toggle"
+            <?php echo empty($ENTRY_ATTACHMENTS) ? 'style="display: none"' : ''?>
+        ><?php p_("Entry attachments") ?></a>
+        <ul class="entry-attachments attachment-list" <?php echo empty($ENTRY_ATTACHMENTS) ? 'style="display: none"' : ''?>>
+            <?php foreach ($ENTRY_ATTACHMENTS as $attachment): ?>
+                <li class="attachment" data-file="<?php echo $this->escape($attachment->getName())?>">
+                    <?php echo $this->escape($attachment->getName()) ?>
+                </li>
+            <?php endforeach ?>
+        </ul>
+        <a name="blog-attachments" href="#" class="attachment-list-toggle"
+            <?php echo empty($BLOG_ATTACHMENTS) ? 'style="display: none"' : ''?>
+        ><?php p_("Blog attachments") ?></a>
+        <ul class="blog-attachments attachment-list" <?php echo empty($BLOG_ATTACHMENTS) ? 'style="display: none"' : ''?>>
+            <?php foreach ($BLOG_ATTACHMENTS as $attachment): ?>
+                <li class="attachment" data-file="<?php echo $this->escape($attachment->getName())?>">
+                    <?php echo $this->escape($attachment->getName()) ?>
+                </li>
+            <?php endforeach ?>
+        </ul>
     </div>
 </fieldset>
