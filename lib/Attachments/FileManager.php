@@ -1,5 +1,14 @@
 <?php
 
+namespace LnBlog\Attachments;
+
+use Blog;
+use BlogEntry;
+use FileIsProtected;
+use FileNotFound;
+use Path;
+use RuntimeException;
+
 # Class: FileManager
 # Manage the files attached to an object.
 class FileManager

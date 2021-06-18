@@ -42,6 +42,8 @@
  * OnArticelError   - Fired before populating template when on an error.
  */
 
+use LnBlog\Attachments\AttachmentContainer;
+use LnBlog\Attachments\FileManager;
 use LnBlog\Tasks\AutoPublishTask;
 use LnBlog\Tasks\TaskManager;
 use LnBlog\Tasks\TaskRepository;

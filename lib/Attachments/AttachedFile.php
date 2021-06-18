@@ -1,5 +1,9 @@
 <?php
 
+namespace LnBlog\Attachments;
+
+use Path;
+
 # Class: AttachedFile
 # Represents a file attached to an object, such as an uploaded picture.
 class AttachedFile

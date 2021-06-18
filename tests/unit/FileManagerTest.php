@@ -2,6 +2,8 @@
 
 use Prophecy\Argument;
 
+use LnBlog\Attachments\FileManager;
+
 class FileManagerTest extends \PHPUnit\Framework\TestCase
 {
     private $prophet;

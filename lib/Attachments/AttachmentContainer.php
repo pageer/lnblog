@@ -1,5 +1,7 @@
 <?php
 
+namespace LnBlog\Attachments;
+
 interface AttachmentContainer
 {
     public function getAttachments();
