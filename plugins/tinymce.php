@@ -21,7 +21,7 @@ class TinyMCEEditor extends Plugin
 
     public function __construct() {
         $this->plugin_desc = _("Use TinyMCE for the post editor and file editor.");
-        $this->plugin_version = "0.3.0";
+        $this->plugin_version = "0.3.1";
         $this->addOption(
             "theme", _("TinyMCE theme to use"), "advanced", "select",
             array("basic" => _("Basic"), "advanced" => _("Advanced"))
@@ -30,6 +30,7 @@ class TinyMCEEditor extends Plugin
     }
 
     public function show_editor($selector = '') {
+        Page::instance()->addPackage('tinymce');
         ob_start();
         ?>
         // <script>
@@ -95,7 +96,7 @@ class TinyMCEEditor extends Plugin
                 tinymce.init(init);
                 $('#postform').addClass('rich-text');
 
-                var $toggle_button = $('<button><?php p_('Toggle HTML Editor')?></button>');
+                var $toggle_button = $('<button style="float:right"><?php p_('Toggle HTML Editor')?></button>');
                 $toggle_button.off('click').on('click', function (e) {
                     e.preventDefault();
                     if (tinymce.editors.length === 0) {

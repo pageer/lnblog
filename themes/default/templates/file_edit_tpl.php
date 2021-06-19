@@ -41,7 +41,6 @@
         <textarea id="output" name="output" rows="10"><?php echo $FILE_TEXT ?? ''?></textarea>
         <div>
             <input type="submit" value="<?php p_('Save File')?>" />
-            <input type="reset" value="<?php p_('Reset Changes')?>" />
             <input type="hidden" name="file" value="<?php echo $FILE?>" />
         </div>
     </form>

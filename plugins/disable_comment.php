@@ -27,7 +27,7 @@ class DisableComments extends Plugin
 
     function __construct() {
         $this->plugin_desc = _("Allows you to globally disable comments, trackbacks, or pingbacks for an entire blog.");
-        $this->plugin_version = "0.2.1";
+        $this->plugin_version = "0.2.2";
 
         # Option: Allow comments
         # Determine who is allowed to post comments.  The default is to use the

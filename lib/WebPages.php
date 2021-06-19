@@ -678,7 +678,6 @@ class WebPages extends BasePages
         $this->getPage()->addPackage('jquery-datetime-picker');
         $this->getPage()->addPackage('dropzone');
         $this->getPage()->addPackage('tag-it');
-        $this->getPage()->addPackage('tinymce');
         $this->getPage()->addStylesheet("form.css");
         $this->getPage()->addStylesheet("entry.css");
         $this->getPage()->addScript("editor.js");
@@ -900,6 +899,7 @@ class WebPages extends BasePages
             $body .= "</h3>";
         }
 
+        $this->getPage()->addPackage('jquery-ui');
         $this->getPage()->addPackage('dropzone');
         $this->getPage()->addStylesheet("form.css");
         $this->getPage()->title = _("Upload file");
