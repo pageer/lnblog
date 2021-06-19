@@ -37,7 +37,7 @@ class FileManager
     }
 
     public function attach($path, $new_name = '') {
-        $target_path = $this->getRepositoryPath();
+        $target_path = $this->parent->localpath();
         $file_name = basename($path);
 
         if ($new_name) {
@@ -55,7 +55,7 @@ class FileManager
 
     private function getFileList() {
         $files = [];
-        $base_path = $this->getRepositoryPath();
+        $base_path = $this->parent->localpath();
         $directory_content = $this->fs->scandir($base_path);
         if ($directory_content === false) {
             throw new RuntimeException("Directory read failed");
@@ -73,15 +73,6 @@ class FileManager
 
     private function getExcludedEntries() {
         return array_merge(['.', '..'], $this->parent->getManagedFiles());
-    }
-
-    private function getRepositoryPath() {
-        if ($this->parent instanceof BlogEntry) {
-            return $this->parent->localpath();
-        } elseif ($this->parent instanceof Blog) {
-            return $this->parent->home_path;
-        }
-        return '';
     }
 
     private function findFileByName($name) {

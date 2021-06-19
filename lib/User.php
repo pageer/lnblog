@@ -18,6 +18,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+use LnBlog\Attachments\AttachmentContainer;
+use LnBlog\Attachments\FileManager;
 use LnBlog\User\AuthLog;
 use LnBlog\User\LoginLimiter;
 
@@ -29,7 +31,7 @@ use LnBlog\User\LoginLimiter;
 # Inherits:
 # <LnBlogObject>
 
-class User extends LnBlogObject
+class User extends LnBlogObject implements AttachmentContainer
 {
     const USER_PROFILE_FILE = "user.xml";
     const RESET_RATE_LIMIT = 60;
@@ -50,6 +52,7 @@ class User extends LnBlogObject
     private $fs = null;
     private $globals = null;
     private $limiter = null;
+    private $file_manager = null;
 
     public static function get($usr=false, $pwd=false, FS $fs = null) {
         $s_usr = SESSION(CURRENT_USER);
@@ -78,14 +81,16 @@ class User extends LnBlogObject
         $uname=false,
         FS $fs = null,
         GlobalFunctions $globals = null,
-        LoginLimiter $limiter = null
+        LoginLimiter $limiter = null,
+        FileManager $file_manager = null
     ) {
         $this->username = $uname ? $uname : '';
         $this->fs = $fs ?: NewFS();
         $this->globals = $globals ?: new GlobalFunctions();
         $this->limiter = $limiter ?: new LoginLimiter($this, $this->fs, $this->globals);
+        $this->file_manager = $file_manager ?: new FileManager($this, $this->fs);
 
-        $this->exclude_fields = array('salt', 'passwd', 'username', 'set_cookies', 'fs', 'globals');
+        $this->exclude_fields = array('salt', 'passwd', 'username');
 
         $this->loadUserCredentials();
     }
@@ -569,6 +574,26 @@ class User extends LnBlogObject
     # Used primarily for testing, sets whether cookies actually get set.
     public function enableCookies($enabled) {
         $this->set_cookies = $enabled;
+    }
+
+    public function getAttachments() {
+        return $this->file_manager->getAll();
+    }
+
+    public function addAttachment($path, $name = '') {
+        $this->file_manager->attach($path, $name);
+    }
+
+    public function removeAttachment($name) {
+        $this->file_manager->remove($name);
+    }
+
+    public function getManagedFiles() {
+        return ['user.xml', 'passwd.php', 'profile.htm', 'logins.json'];
+    }
+
+    public function localpath() {
+        return $this->getPath('');
     }
 
     private function getPasswordResetTokens() {

@@ -33,6 +33,16 @@
                 </li>
             <?php endforeach ?>
         </ul>
+        <a name="profile-attachments" href="#" class="attachment-list-toggle"
+            <?php echo empty($PROFILE_ATTACHMENTS) ? 'style="display: none"' : ''?>
+        ><?php p_("Profile attachments") ?></a>
+        <ul class="profile-attachments attachment-list" <?php echo empty($ENTRY_ATTACHMENTS) ? 'style="display: none"' : ''?>>
+            <?php foreach ($PROFILE_ATTACHMENTS as $attachment): ?>
+                <li class="attachment" data-file="<?php echo $this->escape($attachment->getName())?>">
+                    <?php echo $this->escape($attachment->getName()) ?>
+                </li>
+            <?php endforeach ?>
+        </ul>
         <a name="blog-attachments" href="#" class="attachment-list-toggle"
             <?php echo empty($BLOG_ATTACHMENTS) ? 'style="display: none"' : ''?>
         ><?php p_("Blog attachments") ?></a>

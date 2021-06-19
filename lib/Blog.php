@@ -989,6 +989,10 @@ class Blog extends LnBlogObject implements AttachmentContainer
         ];
     }
 
+    public function localpath() {
+        return $this->home_path;
+    }
+
     /*
     Method: exportVars
     Export blog variables to a PHPTemplate class.
@@ -1407,5 +1411,4 @@ class Blog extends LnBlogObject implements AttachmentContainer
             return $this->writeBlogData();
         } else return false;
     }
-
 }

@@ -68,6 +68,11 @@ var initializeUpload = function () {
         return url;
     };
 
+    var getProfile = function () {
+        var profile = window.location.search.match(/profile=([^&]*)/);
+        return profile ? profile[1] : null;
+    };
+
     var generateData = function (data) {
         data['xrf-token'] = $('input[name="xrf-token"]').val();
         return data;
@@ -78,6 +83,10 @@ var initializeUpload = function () {
         var file_name = $node.data('file');
         var should_remove = confirm("Really delete file '" + file_name + "'?");
         var data = generateData({'file': file_name});
+        var profile = getProfile();
+        if (profile) {
+            data.profile = profile;
+        }
         var url = generateUrl('removefile');
 
         if (should_remove) {
@@ -87,7 +96,12 @@ var initializeUpload = function () {
                     var $list = $node.closest('.attachment-list');
                     $node.remove();
                     if ($list.children().length === 0) {
-                        var link_name = $list.hasClass('entry-attachments') ? 'entry-attachments' : 'blog-attachments';
+                        var link_name = 'blog-attachments';
+                        if ($list.hasClass('entry-attachments')) {
+                            link_name = 'entry-attachments';
+                        } else if ($list.hasClass('profile-attachments')) {
+                            link_name = 'profile-attachments';
+                        }
                         $list.hide();
                         $list.parent().find('[name="' + link_name + '"]').hide();
                     }
@@ -107,6 +121,10 @@ var initializeUpload = function () {
         var $self = $(this).closest('.attachment');
         var file_name = $self.data('file');
         var data = generateData({'file': file_name, 'mode': $(this).val()});
+        var profile = getProfile();
+        if (profile) {
+            data.profile = profile;
+        }
         var url = generateUrl('scaleimage', true);
 
         $self.find('.scale-link, .scale-select').hide();
@@ -252,6 +270,10 @@ var initializeUpload = function () {
            $('.entry-attachments').append($new_file);
            $('a[name="entry-attachments"]').show();
            $('.entry-attachments').show();
+       } else if (getProfile()) {
+           $('.profile-attachments').append($new_file);
+           $('a[name="profile-attachments"]').show();
+           $('.profile-attachments').show();
        } else {
            $('.blog-attachments').append($new_file);
            $('a[name="blog-attachments"]').show();

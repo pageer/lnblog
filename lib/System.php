@@ -304,10 +304,16 @@ class System
     # True if the user is the object's owner, false otherwise.
 
     public function isOwner($usrid, $obj) {
-        if (isset($obj->uid)) $owner = $obj->uid;
-        elseif (isset($obj->owner)) $owner = $obj->owner;
-        else $owner = false;
-        return ($usrid && $usrid == $owner);
+        if (isset($obj->uid)) {
+            $owner = $obj->uid;
+        } elseif (isset($obj->owner)) {
+            $owner = $obj->owner;
+        } elseif (isset($obj->username)) {
+            $owner = $obj->username;
+        } else {
+            $owner = null;
+        }
+        return ($usrid && $usrid === $owner);
     }
 
     # Method: canAddTo
@@ -325,7 +331,7 @@ class System
             $usr = NewUser();
         }
 
-        if ( $this->inGroup($usr->username(), 'administrators') ||
+        if ($usr->isAdministrator() ||
              $this->isOwner($usr->username(), $parm) ||
              ( method_exists($parm, 'getParent') &&
                $this->isOwner($usr->username(), $parm->getParent()) ) ) {
@@ -347,7 +353,7 @@ class System
     public function canModify($parm, $usr=false) {
         $ret = false;
         if (!$usr) $usr = NewUser();
-        if ( $this->inGroup($usr->username(), 'administrators') ||
+        if ($usr->isAdministrator() ||
              $this->isOwner($usr->username(), $parm) ||
              ( method_exists($parm, 'getParent') &&
                $this->isOwner($usr->username(), $parm->getParent()) ) ) {

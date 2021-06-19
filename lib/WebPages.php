@@ -805,11 +805,16 @@ class WebPages extends BasePages
 
         $blog_files = [];
         $entry_files = [];
+        $profile_files = [];
 
         $target = false;
-        if ( isset($_GET["profile"]) &&
-             ($_GET["profile"] == $this->user->username() || $this->user->isAdministrator()) ) {
+
+        $profile = GET('profile');
+        $user = $profile ? new User(GET("profile"), $this->fs, $this->globals) : null;
+
+        if ($profile && System::instance()->canModify($user, $this->user)) {
             $target = Path::mk(USER_DATA_PATH, $this->user->username());
+            $profile_files = $user->getAttachments();
         } elseif ($ent->isEntry() && System::instance()->canModify($ent, $this->user)) {
             $entry_data = array(
                 'entryId' => $ent->entryID(),
@@ -886,16 +891,13 @@ class WebPages extends BasePages
             $tpl->set("TARGET_URL", $this->resolver->localpathToUri($target, $this->blog));
             $tpl->set("BLOG_ATTACHMENTS", $blog_files);
             $tpl->set("ENTRY_ATTACHMENTS", $entry_files);
+            $tpl->set("PROFILE_ATTACHMENTS", $profile_files);
 
             $body = $tpl->process();
 
         } else {
             $body = "<h3>";
-            if ($ent->isEntry()) {
-                $body .= _("You do not have permission to upload files to this entry.");
-            } else {
-                $body .= _("You do not have permission to upload files to this weblog.");
-            }
+            $body .= _("You do not have permission to upload files to this location.");
             $body .= "</h3>";
         }
 
@@ -916,31 +918,34 @@ class WebPages extends BasePages
                 $f->status() != FILEUPLOAD_NOT_INITIALIZED &&
                 $f->size > 0;
             if ($upload_attempted) {
-                $errors[] = $f->errorMessage();
                 if ($f->completed()) {
                     $result = $result && $f->moveFile();
                 } else {
                     $result = false;
                 }
+                $errors[] = $f->errorMessage();
             }
         }
         return array("success" => $result, "messages" => $errors);
     }
 
     public function removefile() {
-        $entry_id = POST("entry");
+        if (! $this->user->checkLogin()) {
+            $this->getPage()->error(403);
+        }
+
+        $object = $this->getAttachmentObject();
+
         $file_name = POST("file");
 
-        $entry = NewEntry();
+        if (!System::instance()->canModify($object, $this->user)) {
+            $this->getPage()->error(403);
+        }
 
         try {
-            if ($entry->isEntry()) {
-                $entry->removeAttachment($file_name);
-            } else {
-                $this->blog->removeAttachment($file_name);
-            }
+            $object->removeAttachment($file_name);
         } catch (Exception $e) {
-            $this->getPage()->error(500, "Could not delete file '$file_name'");
+            $this->getPage()->error(500, "Could not delete file '$file_name'".$e->getMessage());
         }
     }
 
@@ -963,16 +968,10 @@ class WebPages extends BasePages
             return false;
         }
 
-        $ent = $this->getEntry();
-        $target = '';
-        if ( isset($_GET["profile"]) &&
-             ($_GET["profile"] == $this->user->username() || $this->user->isAdministrator()) ) {
-            $target = Path::mk(USER_DATA_PATH, $this->user->username());
-        } elseif ($ent->isEntry() && System::instance()->canModify($ent, $this->user)) {
-            $target = $ent->localpath();
-        } elseif (System::instance()->canModify($this->blog, $this->user)) {
-            $target = $this->blog->home_path;
-        } else {
+        $object = $this->getAttachmentObject();
+        $target = $object->localpath();
+
+        if (!System::instance()->canModify($object, $this->user)) {
             echo json_encode(
                 [
                     'success' => false,
@@ -989,7 +988,7 @@ class WebPages extends BasePages
                 [
                     'success' => true,
                     'file' => basename($result),
-                    'url' => $this->resolver->localpathToUri($result, $this->blog, $ent)
+                    'url' => $this->resolver->localpathToUri($result, $this->blog, $object instanceof BlogEntry ? $object : null),
                 ]
             );
         } catch (Exception $e) {
@@ -2394,5 +2393,25 @@ class WebPages extends BasePages
     private function replyBoxes(Reply $obj) {
         $id = $obj->globalID();
         return '<span><input type="checkbox" name="replies[]" value="'.$id.'" /></span>';
+    }
+
+    private function getAttachmentObject() {
+        $object = null;
+
+        $entry_id = POST("entry");
+        $profile = POST("profile");
+        $file_name = POST("file");
+
+        if ($entry_id) {
+            $object = NewEntry();
+            $object = $object->isEntry() ? $object : null;
+        } elseif ($profile) {
+            $object = new User($profile);
+            $object = $object->exists() ? $object : null;
+        } else {
+            $object = $this->blog;
+        }
+
+        return $object;
     }
 }

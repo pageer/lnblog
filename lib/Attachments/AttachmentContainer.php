@@ -8,4 +8,5 @@ interface AttachmentContainer
     public function addAttachment($path);
     public function removeAttachment($name);
     public function getManagedFiles();
+    public function localpath();
 }
