@@ -180,8 +180,8 @@
         </zip>
 		
 		<echo msg="Generating checksums..." />
-        <exec command="md5sum LnBlog-${version}.zip" dir="${buildDir}" output="LnBlog-${version}.md5" error="LnBlog-${version}.md5"/>
-        <exec command="sha1sum LnBlog-${version}.zip" dir="${buildDir}" output="LnBlog-${version}.sha1" error="LnBlog-${version}.sha1"/>
+        <exec command="md5sum LnBlog-${version}.zip" dir="${buildDir}" output="${buildDir}/LnBlog-${version}.md5"/>
+        <exec command="sha1sum LnBlog-${version}.zip" dir="${buildDir}" output="${buildDir}/LnBlog-${version}.sha1"/>
 		
 		<echo msg="Generating GPG signature..." />
         <exec command="gpg --output LnBlog-${version}.zip.sig --detach-sign LnBlog-${version}.zip" dir="${buildDir}" />
