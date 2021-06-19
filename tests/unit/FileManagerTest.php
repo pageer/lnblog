@@ -22,6 +22,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAll_WhenBlogContainsJpegs_ReturnsOnlyAttachedFiles() {
         $blog = $this->prophet->prophesize('Blog');
+        $blog->localpath()->willReturn('./blog');
         $blog->getManagedFiles()->willReturn(
             [
             'index.php',
@@ -32,8 +33,6 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
             'plugins.xml',
             ]
         );
-        $mock_blog = $blog->reveal();
-        $mock_blog->home_path = './blog';
         $this->fs->scandir('./blog')->willReturn(
             [
             '.',
@@ -65,7 +64,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $this->fs->is_file('./blog/entries')->willReturn(false);
         $this->fs->is_file('./blog/feeds')->willReturn(false);
 
-        $manager = $this->createFileManager($mock_blog);
+        $manager = $this->createFileManager($blog->reveal());
         $files = $manager->getAll();
 
         $this->assertEquals(1, count($files));
