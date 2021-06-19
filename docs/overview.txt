@@ -3,20 +3,12 @@ Document: Overview and Setup
 Section: Overview
 
 LnBlog is a web-based blogging system and "mini-CMS".  It is written in PHP and requires no
-database or other server software - data is stored in text and XML
-files.  
+database or other server software - data is stored in text and XML files.  
 
-In terms of functionality, LnBlog includes support for all the basic features you would expect
-from a blogging system: 
-
-1) - Blog posts and pages
-2) - Save drafts and schedule them for publication
-3) - Post replies (comments, Trackbacks, Webmentions, Pingbacks)
-4) - RSS feeds for entries and comments
-5) - File uploads and simple thumbnail generator
-6) - Multiple editing modes, including Markdown and WYSIWYG editor.
-7) - Multiple user accounts
-8) - Multiple blogs
+You can use a single LnBlog installation to create and manage multiple blogs with multiple
+users.  Each blog will have its own directory on your web server and can be configured to
+be editable by multiple users.  Each blog directory will store all the data for that blog,
+including posts, drafts, comments, and uploaded file.
 
 One the main design goals of LnBlog is flexibility.  To this end, it includes a theme system
 and a plugin system to allow user extensions.  The theme system  allows you
@@ -49,7 +41,7 @@ distribution ZIP file and follow these steps.
 
 1) - Unzip the LnBlog archive into a directory on your hard drive.  You should remove the version
      number from the directory name to make upgrades easier in the future.
-2) - Upload the LnBlog directory to your web server.
+2) - Upload the LnBlog directory to a web accessible location on your web server.
 3) - Point your web browser to the LnBlog directory on your web server.  This will start the setup 
      process.
 4) - Set or confirm the installation and userdata paths and URLs.
@@ -60,62 +52,37 @@ distribution ZIP file and follow these steps.
      the path) as well as the full path and URL where the blog will be
      located.  Make sure these work with your server configuration.
 
-For users who wish to install LnBlog from source, the procedure is similar, except that instead of
-using the distribution ZIP archive, you would do the following.
-
-1) - Clone the LnBlog Git repository using
-     "git clone https://github.com/pageer/lnblog.git /path/to/www", where "/path/to/www" is the
-     path to a web-accessible portion of your web server.
-2) - Change to the LnBlog clone directory and run "composer install --no-dev".  If you want to
-     build the documentation or distribution archives, you will need to run simply "composer install"
-     to get the development dependencies.
-4) - Run "npm install" to install JavaScript dependencies.
-5) - Run "vendor/bin/phing -Dversion='latest' build".  This will create a "build/LnBlog-latest" directory,
-     which is equivalent to extracting the ZIP archive above.
-3) - Continue with the instructions above starting at step 3.
+It is also possible to install LnBlog directly from "source", i.e. directly from a Git clone.
+This process is documented in the README.md file in the source repository.
 
 Section: Upgrading
 
 Upgrading LnBlog is normally pretty simple.  Assuming your LnBlog installation is in a folder named
 "LnBlog", then you would do the following to perform a clean upgrade.
 
-1) - Perform a full backup of all your data!  This is not required, but strongly recommended.  
-     The upgrade process *should* be non-destructive, but there is no warranty 
-     (if it breaks, you get to keep both pieces).
+1) - Perform a full backup of all your data by creating copies of your blog directories and
+     your userdata directory.  This is not required, but is strongly recommended.  
+     The upgrade process is designed be non-destructive, but it's better to be safe than sorry.
 2) - Rename your old LnBlog directory on the server to LnBlog-old.
-3) - Upload the new version into a folder named LnBlog.
-4) - Copy the contents of your LnBlog-old/userdata folder into LnBlog/userdata, overwriting 
-     any existing files.
-5) - Go to the LnBlog administration page and log in as an administrator.
-6) - In the "Upgrade Functions" section of the page, select your blog's path in the 
-     "upgrade to current version" drop-down box and click "Upgrade".
-7) - Repeat for each blog you created using LnBlog.
-
-All of your generated data should be in the userdata folder, so this will result in a clean installation
-of the new version with all your settings carried over.
-If for some reason the new version does not work as expected, this method will allow you to revert
-to the old version by simply deleting the new LnBlog folder and renaming LnBlog-old to LnBlog.
+3) - Upload the new version to a folder named LnBlog.
+4) - Copy the your LnBlog-old/pathconfig.php file into the new LnBlog directory.
+5) - Go to the LnBlog administration page and in the "Upgrade Functions" section of the page, 
+     use the "Upgrade blog to current version" tool to upgrade each of your blogs.  You can
+     also do this from the command line by running "php cli.php --upgrade".
 
 Note that the "upgrade to current version" step is not strictly required for every release - the release
 notes will normally mention if this is needed.  This step will upgrade your blog data files to the current 
-format.  Note that if a file format has changed, this will prevent you from downgrading, so it is important
+format.  This includes both generated scripts and the actual data files, if needed.  
+Note that if a file format has changed, this will prevent you from downgrading, so it is important
 to keep a backup of your blog data.
 
-Section: Alternative upgrade strategies
-
-To avoid the hassle of copying the userdata folder around, you can simply move the userdata folder up 
-one level so that it is in the same directory as the LnBlog folder.  LnBlog will detect this automatically
-and load the files from that location.  That way, you can just copy the new LnBlog directory to your
-server and not touch userdata.
-
-If you have installed from the Git source, instead of copying a new folder, you can run a
-"git pull origin master" from the LnBlog directory followed by a "composer install --no-dev" to
-pull in the latest code.
+If you have installed from the Git source, you may need to run some additional commands to update
+third-party dependencies.  See the README.md file in the source repository for detailed instructions.
 
 Section: License
 
 LnBlog: A simple file-based weblog focused on design elegance.
-Copyright (C) 2005 - 2020 Peter A. Geer <pageer@skepticats.com>
+Copyright (C) 2005 - 2021 Peter A. Geer <pageer@skepticats.com>
 
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation; either version 2 of the License, 

@@ -14,11 +14,12 @@ Section: Core Features
 - Add tags (topics) to entries.
 - Draft entries with scheduled publication.
 - WYSIWYG editing with TinyMCE.
-- Upload files to blogs, entries, and articles.
+- Upload files to blogs, entries, and articles, with support for scaling and thumbnailing images.
 - Supports notifications via Webmention, Pingback, and TrackBack.
 - Multiple user accounts.
 - Multiple weblogs per instance, with support for multiple subdomains.
 - Post in multiple formats (plain text, HTML, Markdown, or a dialect of BBCode).
+- Support for importing data from WordPress.
 - Support for Blogger 1.0 and MetaWeblog APIs.
 - Support for internationalization.
 - Support for themes.

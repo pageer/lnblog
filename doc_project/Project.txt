@@ -11,7 +11,7 @@
 Title: LnBlog Documentation
 Subtitle: User guide and API reference
 
-Copyright: © Peter A. Geer 2005 - 2017
+Copyright: © Peter A. Geer 2005 - 2021
 
 Timestamp: month day, year
 #    m     - Single digit month, when possible.  January is "1".
@@ -63,6 +63,8 @@ Source Folder: ..
 # ------------------------------------------------------------------------
 
 Ignore Source Folder: ..\vendor
+
+Ignore Source Folder: ..\node_modules
 
 Ignore Source Folder: ..\build
 

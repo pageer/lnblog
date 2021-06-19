@@ -30,11 +30,13 @@ as you like.  To do this, you must create a profile.ini file in your LnBlog/user
 file should have a single [profile fields] section and a list of field=description lines for each 
 custom field.  Here is an example:
 
-|[profile fields]
-|location=Location
-|bday=Birthday
-|lang=Favorite programming language
-|pubkey=<a href="whatever">GPG public key</a>
+--- Code
+[profile fields]
+location=Location
+bday=Birthday
+lang=Favorite programming language
+pubkey=<a href="whatever">GPG public key</a>
+---
 
 In addition, you can create a profile.ini file inside the profile directory of a particular
 user.  So, for example, if I want to have the above fields in my profile, but not foist
