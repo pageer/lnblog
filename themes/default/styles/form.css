@@ -275,6 +275,15 @@ form.centered input {
     width: 70%;
 }
 
+/* File upload list */
+
+.file-list {
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid gray;
+    border-radius: 5px;
+}
+
 .attachment-list-toggle {
     display: block;
 }
@@ -311,3 +320,5 @@ form.centered input {
 .attachment-list .failure {
     color: red;
 }
+
+/* Expanded post editor */

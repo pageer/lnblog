@@ -22,7 +22,7 @@
         </div>
     </form>
     <div id="filedrop" class="dropzone"></div>
-    <div class="file-list" style="margin-top: 20px">
+    <div class="file-list">
         <a name="entry-attachments" href="#" class="attachment-list-toggle"
             <?php echo empty($ENTRY_ATTACHMENTS) ? 'style="display: none"' : ''?>
         ><?php p_("Entry attachments") ?></a>

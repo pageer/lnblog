@@ -945,7 +945,7 @@ class WebPages extends BasePages
         try {
             $object->removeAttachment($file_name);
         } catch (Exception $e) {
-            $this->getPage()->error(500, "Could not delete file '$file_name'".$e->getMessage());
+            $this->getPage()->error(500, "Could not delete file '$file_name': " . $e->getMessage());
         }
     }
 
@@ -2398,16 +2398,16 @@ class WebPages extends BasePages
     private function getAttachmentObject() {
         $object = null;
 
-        $entry_id = POST("entry");
         $profile = POST("profile");
-        $file_name = POST("file");
+        $entry_file = POST("entryFile");
 
-        if ($entry_id) {
-            $object = NewEntry();
-            $object = $object->isEntry() ? $object : null;
-        } elseif ($profile) {
-            $object = new User($profile);
-            $object = $object->exists() ? $object : null;
+        $ent = NewEntry();
+        $usr = new User($profile);
+
+        if ($usr->exists()) {
+            $object = $usr;
+        } elseif ($ent->isEntry() && $entry_file) {
+            $object = $ent;
         } else {
             $object = $this->blog;
         }

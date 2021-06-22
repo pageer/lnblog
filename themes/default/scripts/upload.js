@@ -75,6 +75,10 @@ var initializeUpload = function () {
 
     var generateData = function (data) {
         data['xrf-token'] = $('input[name="xrf-token"]').val();
+        var profile = getProfile();
+        if (profile) {
+            data.profile = profile;
+        }
         return data;
     };
 
@@ -83,11 +87,10 @@ var initializeUpload = function () {
         var file_name = $node.data('file');
         var should_remove = confirm("Really delete file '" + file_name + "'?");
         var data = generateData({'file': file_name});
-        var profile = getProfile();
-        if (profile) {
-            data.profile = profile;
+        if ($node.closest('.entry-attachments').length > 0) {
+            data.entryFile = true;
         }
-        var url = generateUrl('removefile');
+        var url = generateUrl('removefile', true);
 
         if (should_remove) {
             $.post(url, data)
@@ -121,9 +124,8 @@ var initializeUpload = function () {
         var $self = $(this).closest('.attachment');
         var file_name = $self.data('file');
         var data = generateData({'file': file_name, 'mode': $(this).val()});
-        var profile = getProfile();
-        if (profile) {
-            data.profile = profile;
+        if ($self.closest('.entry-attachments').length > 0) {
+            data.entryFile = true;
         }
         var url = generateUrl('scaleimage', true);
 
@@ -184,17 +186,17 @@ var initializeUpload = function () {
         function() {
             var $this = $(this);
             var type = $this.attr('name');
-            $this.parent().find('.' + type).toggle();
+            $this.parent().find('.' + type).slideToggle();
             return false;
         }
     );
     $('.attachment-list').toggle(false);
 
     var setAttachmentControls = function () {
-        $('.attachment .remove-link, .scale-link, .scale-select, .status-label').remove();
+        $('.attachment .attachment-control').remove();
         $('.attachment').each(
             function() {
-                var $link = $('<a href="#" class="remove-link" title="' + strings.editor_removeLink + '">&times;</a>');
+                var $link = $('<a href="#" class="attachment-control remove-link" title="' + strings.editor_removeLink + '">&times;</a>');
                 $link.on('click', removeUpload);
                 $(this).append($link);
 
@@ -203,7 +205,7 @@ var initializeUpload = function () {
                 var is_scaled_version = file_name.match(/.+-(thumb|small|med|large).(jpg|png)/);
                 if (is_supported_image && !is_scaled_version) {
                     var $scale_link = $(
-                        '<a href="#" class="scale-link" title="' + strings.upload_scalerLink + '"></a>'
+                        '<a href="#" class="attachment-control scale-link" title="' + strings.upload_scalerLink + '"></a>'
                     );
                     $scale_link.on(
                         'click', function () {
@@ -212,7 +214,7 @@ var initializeUpload = function () {
                         }
                     );
                     var $scaler_box = $(
-                        '<select class="scale-select">' + 
+                        '<select class="scale-select attachment-control">' + 
                         '<option>' + strings.upload_scalePlaceholderLabel + '</option>' +
                         '<option value="thumb">' + strings.upload_scaleThumbLabel + '</option>' +
                         '<option value="small">' + strings.upload_scaleSmallLabel + '</option>' +
@@ -222,7 +224,7 @@ var initializeUpload = function () {
                     );
                     $scaler_box.on('change', resizeUpload);
                     $scaler_box.hide();
-                    var $status_label = $('<span class="status-label"></span>');
+                    var $status_label = $('<span class="status-label attachment-control"></span>');
                     $status_label.hide();
                     $(this).append($scale_link);
                     $(this).append($scaler_box);

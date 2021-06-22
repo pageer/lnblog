@@ -166,28 +166,30 @@
             </div>
 
             <div class="bottom-row">
-                <a name="entry-attachments" href="#" class="attachment-list-toggle" <?php
-                    echo empty($ENTRY_ATTACHMENTS) ? 'style="display: none"' : ''
-                ?>><?php p_("Entry attachments") ?></a>
-                <ul class="entry-attachments attachment-list" <?php
-                    echo empty($ENTRY_ATTACHMENTS) ? 'style="display: none"' : ''
-                ?>>
-                    <?php foreach ($ENTRY_ATTACHMENTS as $attachment): ?>
-                        <li class="attachment" data-file="<?php echo $this->escape($attachment->getName())?>">
-                            <?php echo $this->escape($attachment->getName()) ?>
-                        </li>
-                    <?php endforeach ?>
-                </ul>
-                <?php if ($BLOG_ATTACHMENTS): ?>
-                    <a name="blog-attachments" href="#" class="attachment-list-toggle"><?php p_("Blog attachments") ?></a>
-                    <ul class="blog-attachments attachment-list">
-                        <?php foreach ($BLOG_ATTACHMENTS as $attachment): ?>
+                <div class="file-list">
+                    <a name="entry-attachments" href="#" class="attachment-list-toggle" <?php
+                        echo empty($ENTRY_ATTACHMENTS) ? 'style="display: none"' : ''
+                    ?>><?php p_("Entry attachments") ?></a>
+                    <ul class="entry-attachments attachment-list" <?php
+                        echo empty($ENTRY_ATTACHMENTS) ? 'style="display: none"' : ''
+                    ?>>
+                        <?php foreach ($ENTRY_ATTACHMENTS as $attachment): ?>
                             <li class="attachment" data-file="<?php echo $this->escape($attachment->getName())?>">
                                 <?php echo $this->escape($attachment->getName()) ?>
                             </li>
                         <?php endforeach ?>
                     </ul>
-                <?php endif ?>
+                    <?php if ($BLOG_ATTACHMENTS): ?>
+                        <a name="blog-attachments" href="#" class="attachment-list-toggle"><?php p_("Blog attachments") ?></a>
+                        <ul class="blog-attachments attachment-list">
+                            <?php foreach ($BLOG_ATTACHMENTS as $attachment): ?>
+                                <li class="attachment" data-file="<?php echo $this->escape($attachment->getName())?>">
+                                    <?php echo $this->escape($attachment->getName()) ?>
+                                </li>
+                            <?php endforeach ?>
+                        </ul>
+                    <?php endif ?>
+                </div>
                 <?php if ($num_uploads = System::instance()->sys_ini->value("entryconfig", "AllowInitUpload", 1)): ?>
                 <div id="fileupload" class="upload_field">
                     <div>
