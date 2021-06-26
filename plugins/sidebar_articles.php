@@ -67,10 +67,15 @@ class Articles extends Plugin
 
         $this->registerNoEventOutputHandler("sidebar", "outputCache");
         $this->registerStandardInvalidators();
+        $this->registerEventHandler("blog", "OnInit", "updateManagedFiles");
 
         if ($do_output) {
             $this->buildOutput();
         }
+    }
+
+    public function updateManagedFiles($blog) {
+        $blog->addManagedFile($this->custom_links);
     }
 
     function buildOutput($parm=false) {

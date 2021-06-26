@@ -60,6 +60,13 @@ class IPBan extends Plugin
         $this->registerEventHandler("trackback", "POSTRetreived", "clearTBData");
         $this->registerEventHandler("loginops", "PluginOutput", "sidebarLink");
         $this->registerEventHandler("page", "OnOutput", "banIP");
+        $this->registerEventHandler("blog", "OnInit", "updateManagedFiles");
+    }
+
+    # Method: updateManagedFiles
+    # Tells the blog that the ban list is an internally managed file, not an attachment.
+    public function updateManagedFiles($blog) {
+        $blog->addManagedFile($this->ban_list);
     }
 
     # Write the ban list to disk.

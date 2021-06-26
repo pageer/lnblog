@@ -61,10 +61,15 @@ class SiteMap extends Plugin
         parent::__construct();
 
         $this->registerNoEventOutputHandler("menubar", "output");
+        $this->registerEventHandler("blog", "OnInit", "updateManagedFiles");
 
         if ($do_output) {
             $this->output();
         }
+    }
+
+    public function updateManagedFiles($blog) {
+        $blog->addManagedFile($this->link_file);
     }
 
     function get_map_file() {

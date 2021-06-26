@@ -25,8 +25,20 @@ class HTAccessGenerator extends Plugin
 
         parent::__construct();
         $this->fs = $fs ?: NewFS();
+
+        $this->registerEventHandler("blog", "UpgradeComplete", "create_file");
+        $this->registerEventHandler("blog", "InsertComplete", "create_file");
+        $this->registerEventHandler("blog", "OnInit", "updateManagedFiles");
     }
 
+    # Method: updateManagedFiles
+    # Tells the blog that the .htaccess file is an internally managed file, not an attachment.
+    public function updateManagedFiles($blog) {
+        $blog->addManagedFile('.htaccess');
+    }
+
+    # Method: create_file
+    # Create a .htaccess file for the blog
     public function create_file($blog) {
         # Include the .htaccess file from the document root, if there is one.
         # We do this because .htaccess files in lower directories completely
@@ -127,5 +139,3 @@ class HTAccessGenerator extends Plugin
 # NOTE: Currently this does not work when enabled on a per-blog basis.
 # It has to be enabled globally.
 $gen = new HTAccessGenerator();
-$gen->registerEventHandler("blog", "UpgradeComplete", "create_file");
-$gen->registerEventHandler("blog", "InsertComplete", "create_file");

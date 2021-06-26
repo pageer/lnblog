@@ -85,6 +85,14 @@ class Blog extends LnBlogObject implements AttachmentContainer
     # HACK: because the menubar is messed up and I'm too lazy to fix it properly.
     public $skip_root = false;
 
+    private $managed_file_list = [
+        'index.php',
+        'pathconfig.php',
+        'blogdata.txt', // Deprecated metadata file
+        'blogdata.ini',
+        'plugins.xml',
+    ];
+
     private $fs;
     private $filemanager;
     private $task_manager;
@@ -979,14 +987,11 @@ class Blog extends LnBlogObject implements AttachmentContainer
     #
     # Returns: An array of file names.
     public function getManagedFiles() {
-        return [
-            'index.php',
-            'pathconfig.php',
-            'blogdata.ini',
-            'ip_ban.txt',
-            're_ban.txt',
-            'plugins.xml',
-        ];
+        return $this->managed_file_list;
+    }
+
+    public function addManagedFile(string $filename) {
+        $this->managed_file_list[] = $filename;
     }
 
     public function localpath() {
