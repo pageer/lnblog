@@ -1,6 +1,7 @@
 <?php
 
 use LnBlog\Attachments\ImageScaler;
+use LnBlog\Forms\CommentForm;
 use LnBlog\Model\EntryFactory;
 use LnBlog\Model\Reply;
 use LnBlog\Storage\UserRepository;
@@ -9,7 +10,6 @@ use Psr\Log\LoggerInterface;
 
 class WebPages extends BasePages
 {
-
     protected $blog;
     protected $user;
     protected $publisher;
@@ -2172,77 +2172,18 @@ class WebPages extends BasePages
     private function handleComment(BasePages $page, &$ent, $use_comm_link=false) {
 
         Page::instance()->addStylesheet("form.css");
-        $comm_tpl = NewTemplate(COMMENT_FORM_TEMPLATE, $page);
-        # Set form information saved in cookies.
-        if (COOKIE('comment_url'))
-            $comm_tpl->set("COMMENT_URL", COOKIE('comment_url'));
-        if (COOKIE('comment_name'))
-            $comm_tpl->set("COMMENT_NAME", COOKIE('comment_name'));
-        if (COOKIE('comment_email'))
-            $comm_tpl->set("COMMENT_EMAIL", COOKIE('comment_email'));
-        if (COOKIE('comment_showemail'))
-            $comm_tpl->set("COMMENT_SHOWEMAIL", COOKIE('comment_showemail'));
-        $comm_tpl->set("FORM_TARGET", $ent->uri("basepage"));
-
-        if ($ent->getCommentCount() == 0) {
-            if ($use_comm_link) $comm_tpl->set("PARENT_TITLE", trim($ent->subject));
-            $comm_tpl->set("PARENT_URL", $ent->permalink());
-        }
+        $form = new CommentForm($ent, $this->user);
+        $form->setUseCommentLink($use_comm_link);
 
         if (has_post()) {
+            try {
+                $cmt = $form->process($_POST);
+            } catch (FormInvalid $e) {
 
-            $cmt = NewBlogComment();
-            $cmt->getPostData();
-
-            $err = false;
-            $ret = false;
-            if ($cmt->data) {
-                # Filter out some obviouisly invalid data
-                if ( strpos(POST('subject'), "\n") !== false ||
-                     strpos(POST('username'), "\n") !== false ||
-                     strpos(POST('email'), "\n") !== false ||
-                     strpos(POST('homepage'), "\n") !== false ) {
-                    $err = _("Error: line breaks are only allowed in the comment body.  What are you, a spam bot?");
-                } else {
-                    $ret = $cmt->insert($ent);
-                }
-            } else {
-                $err = _("Error: you must include something in the comment body.");
-            }
-
-            if ($ret && !$err) {
-                # If the "remember me" box is checked, save the info in cookies.
-                if (POST("remember")) {
-                    $path = "/";  # Do we want to do daomain cookies?
-                    $exp = time()+2592000;  # Expire cookies after one month.
-                    if (POST("username"))
-                        setcookie("comment_name", POST("username"), $exp, $path);
-                    if (POST("email"))
-                        setcookie("comment_email", POST("email"), $exp, $path);
-                    if (POST("homepage"))
-                        setcookie("comment_url", POST("homepage"), $exp, $path);
-                    if (POST("showemail"))
-                        setcookie("comment_showemail", POST("showemail"), $exp, $path);
-                }
-                # Redirect to prevent double-posts.
-                if ($use_comm_link) Page::instance()->redirect($ent->uri('comment'));
-                else Page::instance()->redirect($ent->permalink());
-            } else {
-                # Set the data back in the form, along with error messages.
-                $comm_tpl->set("COMMENT_DATA", POST('data'));
-                $comm_tpl->set("COMMENT_SUBJECT", POST('subject'));
-                $comm_tpl->set("COMMENT_URL", POST('homepage'));
-                $comm_tpl->set("COMMENT_NAME", POST('username'));
-                $comm_tpl->set("COMMENT_EMAIL", POST('email'));
-                $comm_tpl->set("COMMENT_SHOWEMAIL", POST('showemail'));
-                $comm_tpl->set(
-                    "COMMENT_FORM_MESSAGE", $err ? $err :
-                    _("Error: unable to add commtent please try again.")
-                );
             }
         }
 
-        return $comm_tpl->process();
+        return $form->render($this);
     }
 
     # Function: show_replies

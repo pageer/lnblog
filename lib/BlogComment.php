@@ -214,7 +214,7 @@ class BlogComment extends Entry implements Reply
     subject   - The subject of the post.
     data      - The post content.  This cannot be empty.
     */
-    public function getPostData() {
+    public function getPostData($form = null) {
         if (! has_post()) return false;
         $this->name = POST("username");
         $this->email = POST("email");

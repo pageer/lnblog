@@ -12,8 +12,11 @@ if (! empty($PARENT_TITLE)) {
 <p>
 <?php
 # Set the message to display on the form.  If not given, use the default.
-if (isset($COMMENT_FORM_MESSAGE)) {
-    echo $COMMENT_FORM_MESSAGE;
+if ($ERRORS || $FIELD_ERRORS) {
+    $all_errors = array_merge($ERRORS, $FIELD_ERRORS);
+    foreach ($all_errors as $error) {
+        echo $error;
+    }
 } else {
     p_("A comment body is required.  No HTML code allowed.  URLs starting with http:// or ftp:// will be automatically converted to hyperlinks."); 
 }?>
@@ -21,43 +24,90 @@ if (isset($COMMENT_FORM_MESSAGE)) {
 <?php
 EventRegister::instance()->activateEventFull($tmp=false, "commentform", "BeforeForm");?>
 <fieldset>
-<form id="commentform" class="comment-form" method="post" 
-      action="<?php echo $FORM_TARGET;?>" accept-charset="<?php echo DEFAULT_CHARSET;?>">
+    <form id="commentform" class="comment-form" method="<?php echo $METHOD?>" 
+      action="<?php echo $ACTION;?>" accept-charset="<?php echo DEFAULT_CHARSET;?>">
     <?php $this->outputCsrfField() ?>
     <?php EventRegister::instance()->activateEventFull($tmp=false, "commentform", "FormBegin");?>
     <div class="comment-metadata subject">
-        <label for="subject"><?php p_("Comment title"); ?></label>
-        <input title="<?php p_("Comment title");?>" id="subject" name="subject" accesskey="s" 
-               value="<?php echo $COMMENT_SUBJECT ?? ''?>" type="text" />
+        <?php 
+        echo $FIELDS['subject']->render(
+            $PAGE, [
+                'label' => _('Comment title'),
+                'sep_label' => true,
+                'title' => _('Comment title'),
+                'id' => 'subject',
+                'accesskey' => 's',
+            ]
+        ) ?>
     </div>
     <div class="body">
-        <label for="data"><?php p_('Comment body')?></label>
-        <textarea title="<?php p_("Comment body");?>" id="data" name="data" accesskey="b" rows="10" cols="20"><?php
-        echo $COMMENT_DATA ?? '';
-        ?></textarea>
+        <?php 
+        echo $FIELDS['data']->render(
+            $PAGE, [
+                'label' => _('Comment body'),
+                'sep_label' => true,
+                'title' => _('Comment body'),
+                'id' => 'data',
+                'accesskey' => 'b',
+                'rows' => 10,
+                'cols' => 20,
+            ]
+        ) ?>
     </div>
     <div class="comment-metadata name">
-        <label for="username"><?php p_("Name")?></label>
-        <input title="<?php p_("Name");?>" id="username" name="username" accesskey="n" type="text"
-               value="<?php echo $COMMENT_NAME ?? ''?>" />
+        <?php 
+        echo $FIELDS['username']->render(
+            $PAGE, [
+                'label' => _('Name'),
+                'sep_label' => true,
+                'title' => _('Name'),
+                'id' => 'username',
+                'accesskey' => 'n',
+            ]
+        ) ?>
     </div>
     <div class="comment-metadata homepage">
-        <label for="homepage"><?php p_("Homepage")?></label>
-        <input title="<?php p_("URL");?>" id="homepage" name="homepage" accesskey="h" type="text"
-               value="<?php echo $COMMENT_URL ?? ''?>" />
+        <?php 
+        echo $FIELDS['homepage']->render(
+            $PAGE, [
+                'label' => _('Homepage'),
+                'sep_label' => true,
+                'title' => _('URL'),
+                'id' => 'homepage',
+                'accesskey' => 'h',
+            ]
+        ) ?>
     </div>
     <div class="comment-metadata email">
-        <label for="email"><?php p_("E-Mail")?></label>
-        <input title="<?php p_("E-mail");?>" id="email" name="email" accesskey="e" type="text"
-               value="<?php echo $COMMENT_EMAIL ?? ''?>" />
+        <?php 
+        echo $FIELDS['email']->render(
+            $PAGE, [
+                'label' => _('E-Mail'),
+                'sep_label' => true,
+                'title' => _('E-Mail'),
+                'id' => 'email',
+                'accesskey' => 'e',
+            ]
+        ) ?>
     </div>
     <div class="comment-check show-email">
-        <input title="<?php p_("Display e-mail address");?>" id="showemail" name="showemail" type="checkbox" <?php 
-        if (isset($COMMENT_SHOWEMAIL)) echo "checked=\"checked\""; ?> />
+        <?php 
+        echo $FIELDS['showemail']->render(
+            $PAGE, [
+                'title' => _('Display e-mail address'),
+                'id' => 'showemail',
+            ]
+        ) ?>
         <label for="showemail"><?php p_("Display my e-mail address")?></label>
     </div>
     <div class="comment-check remember">
-        <input title="<?php p_("Remember me");?>" id="remember" name="remember" type="checkbox" checked="checked" />
+        <?php 
+        echo $FIELDS['remember']->render(
+            $PAGE, [
+                'title' => _('Remember me'),
+                'id' => 'remember',
+            ]
+        ) ?>
         <label for="remember"><?php p_("Remember me")?></label>
     </div>
     <div class="form_buttons">
