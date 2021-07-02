@@ -100,6 +100,7 @@ $this->block(
 $this->block(
     'import.blog.script', function ($vars) {
         extract($vars);
+        $use_existing = $FIELDS['import_option']->getValue() == 'existing';
         ?>
         <script type="application/javascript">
             $(document).ready(function () {
@@ -122,7 +123,7 @@ $this->block(
                 }
             });
 
-            var is_existing_tab_selected = <?php echo json_encode($HAS_PROCESSED)?>;
+            var is_existing_tab_selected = <?php echo json_encode($use_existing)?>;
             if (is_existing_tab_selected) {
                 $('#options-tab').tabs('option', 'active', 1);
             }
