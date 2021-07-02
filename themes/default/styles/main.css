@@ -126,12 +126,11 @@ html, body { height: 100%; }  /* Use the whole page. */
 #sidebar .panel {
     padding-left: 8%;
     padding-right: 8%;
-    width: 92%;
+    width: 84%;
 }
 
 #sidebar ul li {
     list-style-type: none;
-    width: 100%;
     margin: 0;
     padding: 0;
     padding-left: 8%;
