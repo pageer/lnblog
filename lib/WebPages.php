@@ -2179,7 +2179,7 @@ class WebPages extends BasePages
             try {
                 $cmt = $form->process($_POST);
             } catch (FormInvalid $e) {
-
+                // Nothing to do here.
             }
         }
 

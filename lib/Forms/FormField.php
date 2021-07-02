@@ -33,18 +33,32 @@ class FormField
     }
 
     # Method: setValidator
-    # Sets the validator function for the field.
+    # Sets the validator function for the field.  The validator should return an array of 
+    # error messages related to the field.  If there are no errors, then it should
+    # return an empty array.  Note that field-level validators do not
+    # account for cross-field dependencies.  That's what form-level validators are for.
+    #
+    # Validators should have the following signature:
+    # --- Code ---
+    # function (string $value): string[]
+    # ------------
     #
     # Parameters:
     # validator - (callable) A function that takes the raw field value and
-    #             returns an array of error messages.  It should return
-    #             empty on success.
+    #             returns an array of error messages.
     public function setValidator(callable $validator) {
         $this->validator = $validator;
     }
 
     # Method: setConverter
-    # Sets the converter function for the form value.
+    # Sets the converter function for the form value.  This is the function that the 
+    # raw value will be run through to get a "processed" value that will be returned
+    # by getValue().  The processed value can be anything you want.
+    #
+    # Converters should have the following signature:
+    # --- Code ---
+    # function (string $value): mixed
+    # ------------
     #
     # Parameters:
     # converter - (callable) A function that takes the raw form value as its
@@ -113,8 +127,16 @@ class FormField
             $this->renderer->setLabel($options['label']);
             unset($options['label']);
         }
+
         $this->renderer->setData('SEPARATE_LABEL', $options['sep_label'] ?? false);
         unset($options['sep_label']);
+
+        $this->renderer->setData('LABEL_AFTER', $options['label_after'] ?? false);
+        unset($options['label_after']);
+
+        $this->renderer->setData('SUPPRESS_ERRORS', $options['noerror'] ?? false);
+        unset($options['noerror']);
+
         $this->renderer->setAttributes($options);
     }
 }

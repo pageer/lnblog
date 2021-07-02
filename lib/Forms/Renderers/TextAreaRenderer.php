@@ -39,6 +39,10 @@ class TextAreaRenderer implements FieldRenderer
         $template->set('VALUE', $field->getRawValue());
         $template->set('LABEL', $this->label);
         $template->set('ATTRIBUTES', $this->attributes);
+        $template->set('ERRORS', $field->getErrors());
+        foreach ($this->data as $key => $value) {
+            $template->set($key, $value);
+        }
 
         return $template->process();
     }

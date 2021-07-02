@@ -17,6 +17,12 @@ class BlogRepository
         return $ret;
     }
 
+    public function get(string $blogid): Blog {
+        $paths = SystemConfig::instance()->blogRegistry();
+
+        return new Blog($paths[$blogid]->path());
+    }
+
     public function exists(Blog $blog): bool {
         return $blog->isBlog();
     }

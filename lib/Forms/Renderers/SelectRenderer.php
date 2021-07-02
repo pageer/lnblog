@@ -6,21 +6,27 @@ use BasePages;
 use LnBlog\Forms\FormField;
 use PHPTemplate;
 
-class InputRenderer implements FieldRenderer
+class SelectRenderer implements FieldRenderer
 {
-    const TEMPLATE = 'field_input_tpl.php';
+    const TEMPLATE = 'field_select_tpl.php';
 
     private $attributes = [];
     private $label = '';
-    private $type = '';
     private $data = [];
+    private $option_map = [];
+    private $default = '';
 
-    public function __construct(string $type = 'text') {
-        $this->type = $type;
+    public function __construct(array $options = [], string $default = '') {
+        $this->option_map = $options;
+        $this->default = $default;
     }
 
-    public function setType(string $type) {
-        $this->type = $type;
+    public function setDefault(string $default) {
+        $this->default = $default;
+    }
+
+    public function setOptions(array $options) {
+        $this->option_map = $options;
     }
 
     public function setAttributes(array $attrs) {
@@ -42,10 +48,11 @@ class InputRenderer implements FieldRenderer
     public function render(FormField $field, BasePages $pages_obj): string {
         $template = new PHPTemplate(self::TEMPLATE, $pages_obj);
         $template->set('NAME', $field->getName());
-        $template->set('TYPE', $this->type);
         $template->set('VALUE', $field->getRawValue());
         $template->set('LABEL', $this->label);
         $template->set('ATTRIBUTES', $this->attributes);
+        $template->set('OPTIONS', $this->option_map);
+        $template->set('DEFAULT', $this->default);
         $template->set('ERRORS', $field->getErrors());
         foreach ($this->data as $key => $value) {
             $template->set($key, $value);

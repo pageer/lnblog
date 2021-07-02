@@ -1,43 +1,49 @@
 <?php
 
 $this->block(
-    'field.textarea.tag', function ($vars) {
+    'field.select.tag', function ($vars) {
     extract($vars); ?>
-    <textarea name="<?php echo htmlspecialchars($NAME)?>"
-    <?php
-    foreach ($ATTRIBUTES as $attr => $value):
-        echo "$attr=\"" . htmlspecialchars($value) . '" ';
-    endforeach;
-    ?>
-    ><?php echo htmlspecialchars($VALUE)?></textarea>
+    <select name="<?php echo htmlspecialchars($NAME)?>" 
+        <?php
+        foreach ($ATTRIBUTES as $attr => $value):
+            echo "$attr=\"" . htmlspecialchars($value) . '" ';
+        endforeach;
+        ?>
+    />
+        <?php foreach ($OPTIONS as $value => $label):?>
+        <option value="<?php echo htmlspecialchars($value)?>">
+            <?php echo htmlspecialchars($label)?>
+        </option>
+        <?php endforeach ?>
+    </select>
     <?php
     }
 );
 
 $this->block(
-    'field.textarea.seplabel', function ($vars) {
+    'field.select.seplabel', function ($vars) {
     extract($vars); ?>
     <?php if ($LABEL_AFTER): ?>
-        <?php $this->showBlock('field.textarea.tag') ?>
+        <?php $this->showBlock('field.select.tag') ?>
     <?php endif ?>
     <label for="<?php echo $this->escape($ATTRIBUTES['id'])?>">
         <?php echo $this->escape($LABEL)?>
     </label>
     <?php if (!$LABEL_AFTER): ?>
-        <?php $this->showBlock('field.textarea.tag') ?>
+        <?php $this->showBlock('field.select.tag') ?>
     <?php endif ?>
     <?php
     }
 );
 
 $this->block(
-    'field.textarea.withlabel', function ($vars) {
+    'field.select.withlabel', function ($vars) {
     extract($vars); ?>
     <label>
         <?php if (!$LABEL_AFTER): ?>
             <span><?php echo $this->escape($LABEL)?></span>
         <?php endif ?>
-        <?php $this->showBlock('field.textarea.tag') ?>
+        <?php $this->showBlock('field.select.tag') ?>
         <?php if ($LABEL_AFTER): ?>
             <span><?php echo $this->escape($LABEL)?></span>
         <?php endif ?>
@@ -47,7 +53,7 @@ $this->block(
 );
 
 $this->block(
-    'field.textarea.errors', function ($vars) {
+    'field.select.errors', function ($vars) {
     extract($vars);
     foreach ($ERRORS as $error): ?>
         <span class="error"><?php echo $this->escape($error) ?></span>
@@ -61,15 +67,15 @@ $this->block(
         extract($vars);
         if ($LABEL) {
             if ($SEPARATE_LABEL) {
-                $this->showBlock('field.textarea.seplabel');
+                $this->showBlock('field.select.seplabel');
             } else {
-                $this->showBlock('field.textarea.withlabel');
+                $this->showBlock('field.select.withlabel');
             }
         } else {
-            $this->showBlock('field.textarea.tag');
+            $this->showBlock('field.select.tag');
         }
         if (!$SUPPRESS_ERRORS) {
-            $this->showBlock('field.textarea.errors');
+            $this->showBlock('field.select.errors');
         }
     }
 );

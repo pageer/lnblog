@@ -11,6 +11,7 @@ abstract class BaseForm
     const TEMPLATE = 'form_base_tpl.php';
 
     protected $is_validated = false;
+    protected $has_processed = false;
     protected $suppress_csrf_token = false;
     protected $fields = [];
     protected $errors = [];
@@ -50,6 +51,8 @@ abstract class BaseForm
             $field->setRawValue($data[$field->getName()] ?? '');
         }
 
+        $this->has_processed = true;
+
         $this->validate($data);
 
         if (!$this->is_validated) {
@@ -66,7 +69,7 @@ abstract class BaseForm
     }
 
     public function render(BasePages $pages_obj): string {
-        $template = new PHPTemplate(static::TEMPLATE, $pages_obj);
+        $template = $this->createTemplate($pages_obj);
         $template->set('PAGE', $pages_obj);
         $template->set('METHOD', $this->method);
         $template->set('ACTION', $this->action);
@@ -74,6 +77,7 @@ abstract class BaseForm
         $template->set('ROW_CLASS', $this->row_class);
         $template->set('FIELDS', $this->fields);
         $template->set('ERRORS', $this->errors);
+        $template->set('HAS_PROCESSED', $this->has_processed);
 
         $this->addTemplateData($template);
 
@@ -86,6 +90,10 @@ abstract class BaseForm
         $template->set('SUPPRESS_CSRF', $this->suppress_csrf_token);
 
         return $template->process();
+    }
+
+    protected function createTemplate(BasePages $pages_obj): PHPTemplate {
+        return new PHPTemplate(static::TEMPLATE, $pages_obj);
     }
 
     # Method: formValidation

@@ -8,25 +8,34 @@ $this->block(
         <div id="newblog-options" class="optionsbox">
             <p><?php p_('Import file as a new blog')?></p>
             <div>
-                <input type="text" id="new_blog_id" name="new_blog_id"
-                    placeholder="<?php p_('Blog ID')?>" 
-                    title="<?php p_('Blog ID')?>"
-                    size="20"
-                    value="<?php echo $DATA['new_blog_id'] ?? '' ?>" />
+                <?php echo $FIELDS['new_blog_id']->render(
+                    $PAGE, [
+                        'id' => 'new_blog_id',
+                        'placeholder' => _('Blog ID') ,
+                        'title' => _('Blog ID'),
+                        'size' => 20 
+                    ]
+                ); ?>
             </div>
             <div>
-                <input type="text" id="new_blog_path" name="new_blog_path"
-                    placeholder="<?php p_('Blog path')?>" 
-                    title="<?php p_('Blog path')?>"
-                    size="50"
-                    value="<?php echo $DATA['new_blog_path'] ?? '' ?>" />
+                <?php echo $FIELDS['new_blog_path']->render(
+                    $PAGE, [
+                        'id' => 'new_blog_path',
+                        'placeholder' => _('Blog path') ,
+                        'title' => _('Blog path'),
+                        'size' => 25 
+                    ]
+                ); ?>
             </div>
             <div>
-                <input type="text" id="new_blog_url" name="new_blog_url"
-                    placeholder="<?php p_('Blog URL')?>" 
-                    title="<?php p_('Blog URL')?>"
-                    size="50"
-                    value="<?php echo $DATA['new_blog_url'] ?? '' ?>" />
+                <?php echo $FIELDS['new_blog_url']->render(
+                    $PAGE, [
+                        'id' => 'new_blog_url',
+                        'placeholder' => _('Blog URL') ,
+                        'title' => _('Blog URL'),
+                        'size' => 50 
+                    ]
+                ); ?>
             </div>
         </div>
         <?php
@@ -38,20 +47,11 @@ $this->block(
         extract($vars, EXTR_OVERWRITE); ?>
         <div id="existingblog-options" class="optionsbox">
             <p><?php p_('Import file into an already existing blog')?></p>
-            <label>
-                <?php p_('Select blog')?>
-                <select name="import_to">
-                    <?php foreach ($BLOGS as $blog): ?>
-                    <option value="<?php echo $blog->blogid?>"
-                        <?php if ($blog->blogid == ($DATA['import_to'] ?? '')): ?>
-                        selected="selected"
-                        <?php endif ?>
-                    >
-                        <?php echo $blog->name?>
-                    </option>
-                    <?php endforeach ?>
-                </select>
-            </label>
+            <?php echo $FIELDS['import_to']->render(
+                $PAGE, [
+                    'label' => _('Select blog'),
+                ]
+            ); ?>
         </div>
         <?php
     }
@@ -100,11 +100,6 @@ $this->block(
 $this->block(
     'import.blog.script', function ($vars) {
         extract($vars);
-        $use_existing =
-            empty($DATA['new_blog_id']) && 
-            empty($DATA['new_blog_path']) &&
-            empty($DATA['new_blog_url']) &&
-            !empty($DATA);
         ?>
         <script type="application/javascript">
             $(document).ready(function () {
@@ -127,7 +122,7 @@ $this->block(
                 }
             });
 
-            var is_existing_tab_selected = <?php echo json_encode($use_existing)?>;
+            var is_existing_tab_selected = <?php echo json_encode($HAS_PROCESSED)?>;
             if (is_existing_tab_selected) {
                 $('#options-tab').tabs('option', 'active', 1);
             }
@@ -169,15 +164,23 @@ $this->block(
         extract($vars, EXTR_OVERWRITE); 
         $this->showBlock('import.blog.styles');
         ?>
-        <?php if (isset($ERROR)): ?>
+        <?php if (!empty($ERRORS)): ?>
             <h4><?php p_('Error!')?></h4>
-            <p class="error"><?php echo $ERROR?></p>
+            <p class="error">
+            <?php foreach ($ERRORS as $error):
+                echo $error . ' ';
+            endforeach; ?>
+            </p>
         <?php endif;?>
 
-        <form method="post">
+        <form method="<?php echo $METHOD?>">
             <?php $this->outputCsrfField() ?>
             <!-- Note: this depends on the order of the jQuery UI tabs -->
-            <input type="hidden" id="import-option" name="import_option" value="new" />
+            <?php echo $FIELDS['import_option']->render(
+                $PAGE, [
+                'id' => 'import-option',
+                ]
+            ); ?>
             <div id="options-tab">
                 <ul>
                     <li><a href="#newblog-options"><?php p_('Import as new blog')?></a></li>
@@ -189,12 +192,12 @@ $this->block(
                 ?>
             </div>
             <div>
-                <label>
-                <input type="checkbox" name="import_users" <?php
-                    echo (!isset($DATA) || !empty($DATA['import_users'])) ? 'checked' : '';
-                ?> />
-                    <?php p_('Import authors as new users')?>
-                </label>
+                <?php echo $FIELDS['import_users']->render(
+                    $PAGE, [
+                    'label' => _('Import authors as new users'),
+                    'label_after' => true,
+                    ]
+                ); ?>
                 <p>
                 <?php p_('The import will try to preserve author information.  If this is checked, it will create new user acccunts for any usernames that do not already exist in LnBlog.  Otherwise, any non-existent users will be converted to the owner.')
     ?>
@@ -203,9 +206,12 @@ $this->block(
             <div>
                 <h4><?php p_('Set import text')?></h4>
                 <p><?php p_('Drag-and-drop your import file onto the box below.  You can also copy-and-paste the contents of theimport file.')?></p>
-                <textarea id="import_text" name="import_text" 
-                          placeholder="<?php p_('Drag-and-drop or paste contents of import file...')?>"
-                ><?php echo $DATA['import_text'] ?? '' ?></textarea>
+                <?php echo $FIELDS['import_text']->render(
+                    $PAGE, [
+                    'id' => 'import_text',
+                    'placeholder' => _('Drag-and-drop or paste contents of import file...'),
+                    ]
+                ); ?>
             </div>
 
             <input type="submit" id="do-import" value="<?php p_('Start Import')?>" />
