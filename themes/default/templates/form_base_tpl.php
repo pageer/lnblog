@@ -1,25 +1,23 @@
 <form method="<?php echo $METHOD?>" action="<?php echo $ACTION?>"
 <?php
-if (!empty($SUPPRESS_CSRF)):
-    $this->outputCsrfField();
-endif;
-?>
-<?php
 foreach ($ATTRIBUTES as $attr => $value):
-    echo "$attr=\"" . htmlspecialchars($value) . '" ';
+    echo $this->escape($attr). "=\"" . $this->escape($value) . '" ';
 endforeach;
 ?>
 >
-    <div class="<?php $ROW_CLASS?>">
-        <?php
-        foreach ($FIELDS as $field):
-            $field->render();
-        endforeach;
-        ?>
-    </div>
+    <?php
+    if (!empty($SUPPRESS_CSRF)):
+        $this->outputCsrfField();
+    endif;
+    ?>
+    <?php foreach ($FIELDS as $field): ?>
+        <div class="<?php $ROW_CLASS?>">
+            <?php echo $field->render($PAGE)?>
+        </div>
+    <?php endforeach ?>
     <?php if ($SUBMIT_BUTTON):?>
         <div class="<?php $ROW_CLASS?>">
-            <input type="submit" value="<?php htmlspecialchars($SUBMIT_BUTTON)?>" />
+            <input type="submit" name="<?php $this->escape($SUBMIT_NAME)?>" value="<?php $this->escape($SUBMIT_BUTTON)?>" />
         </div>
     <?php endif ?>
 </form>

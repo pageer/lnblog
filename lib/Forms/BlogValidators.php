@@ -2,10 +2,31 @@
 
 namespace LnBlog\Forms;
 
+use Blog;
+use Path;
+use PHPTemplate;
+
 trait BlogValidators
 {
     protected $fs;
     protected $system_config;
+
+    protected function multiValidator(
+        array $validators,
+        bool $stop_after_failure = false
+    ): callable {
+        return function (string $value) use ($validators, $stop_after_failure) {
+            $errors = [];
+            foreach ($validators as $validator) {
+                $current_errors = $validator($value);
+                $errors = array_merge($errors, $current_errors);
+                if (!empty($current_errors) && $stop_after_failure) {
+                    break;
+                }
+            }
+            return $errors;
+        };
+    }
 
     protected function pathNotReserved(): callable {
         $registry = $this->system_config->blogRegistry();
@@ -100,5 +121,28 @@ trait BlogValidators
             }
             return [];
         };
+    }
+
+    protected function pathIsBlog(): callable {
+        return function (string $value): array {
+            $blog = new Blog($value);
+            if (!$blog->isBlog()) {
+                return [spf_("The path '%s' is not an LnBlog weblog", $value)];
+            }
+            return [];
+        };
+    }
+
+    protected function setCommonValidationData(PHPTemplate $template) {
+        $inst_root = $this->system_config->installRoot()->path();
+        $default_path = dirname($inst_root);
+        if (Path::isWindows()) {
+            $default_path = str_replace('\\', '\\\\', $default_path);
+        }
+        $template->set("DEFAULT_PATH", $default_path);
+        $lnblog_name = basename($inst_root);
+        $default_url = preg_replace("|$lnblog_name/|i", '', $this->system_config->installRoot()->url());
+        $template->set("DEFAULT_URL", $default_url);
+        $template->set("PATH_SEP", Path::isWindows() ? '\\\\' : Path::$sep);
     }
 }

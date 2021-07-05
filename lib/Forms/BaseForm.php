@@ -20,6 +20,7 @@ abstract class BaseForm
     protected $form_attributes = [];
     protected $row_class = '';
     protected $submit_button_text = 'Submit';
+    protected $submit_button_name = 'submit';
 
     # Method: validate
     # Checks that form input matches the defined validation rules
@@ -56,7 +57,7 @@ abstract class BaseForm
         $this->validate($data);
 
         if (!$this->is_validated) {
-            throw new FormInvalid();
+            throw new FormInvalid($this->getFirstError());
         }
 
         return $this->doAction();
@@ -86,10 +87,24 @@ abstract class BaseForm
             $this->submit_button_text = _('Submit');
         }
         $template->set('SUBMIT_BUTTON', $this->submit_button_text);
+        $template->set('SUBMIT_NAME', $this->submit_button_name);
 
         $template->set('SUPPRESS_CSRF', $this->suppress_csrf_token);
 
         return $template->process();
+    }
+
+    protected function getFirstError(): string {
+        foreach ($this->fields as $name => $field) {
+            $errors = $field->getErrors();
+            if (!empty($errors)) {
+                return $name . $errors[0];
+            }
+        }
+        if (!empty($this->errors)) {
+            return $this->errors[0];
+        }
+        return '';
     }
 
     protected function createTemplate(BasePages $pages_obj): PHPTemplate {

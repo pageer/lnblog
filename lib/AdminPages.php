@@ -19,6 +19,7 @@
 */
 
 use LnBlog\Forms\BlogImportForm;
+use LnBlog\Forms\BlogRegistrationForm;
 use LnBlog\Import\FileImportSource;
 use LnBlog\Import\ImporterFactory;
 use LnBlog\Import\WordPressImporter;
@@ -139,6 +140,10 @@ class AdminPages extends BasePages
         $tpl->set("SHOW_NEW");
         $tpl->set("FORM_ACTION", current_file());
 
+        $registrationForm = new BlogRegistrationForm($this->fs, SystemConfig::instance());
+        $tpl->set("REGISTER_FORM", $registrationForm);
+        $tpl->set("PAGE", $this);
+
         $this->populateBlogPathDefaults($tpl);
 
         # Check if there is at least one administrator.
@@ -174,35 +179,11 @@ class AdminPages extends BasePages
             $tpl->set("UPGRADE_STATUS", $status);
 
         } elseif ( POST('register') && POST('register_btn') ) {
-            $error_msg = '';
-            $blogid = POST('register');
-            $blogpath = POST('register_path');
-            $blogurl = POST('register_url');
-            $blog = NewBlog($blogpath);
-            $blog->blogid = $blogid;
-            $path = new UrlPath($blogpath, $blogurl);
-
             try {
-                $this->validateBlogRegistration($blogid, $blogpath, $blogurl);
-            } catch (Exception $e) {
-                $error_msg = $e->getMessage();
+                $registrationForm->process($_POST);
+            } catch (FormInvalid $e) {
+                // Nothing to do here - the form displays its own error.
             }
-
-            if (! $blog->isBlog()) {
-                $status = spf_("The path '%s' is not an LnBlog weblog.", POST('register'));
-            } elseif ($error_msg) {
-                $status = $error_msg;
-            } else {
-                try {
-                    SystemConfig::instance()->registerBlog($blogid, $path);
-                    SystemConfig::instance()->writeConfig();
-                    $status = spf_("Blog %s successfully registered.", $blog->blogid);
-                } catch (FileWriteFailed $e) {
-                    $status = spf_("Registration error: exited with error: %s", $e->getMessage());
-                }
-            }
-            $tpl->set("REGISTER_STATUS", $status);
-
         } elseif ( POST('delete') && POST('delete_btn') ) {
 
             if (POST('confirm_form') || GET('confirm')) {

@@ -85,13 +85,12 @@ class FormField
     }
 
     public function validate(): bool {
+        $this->is_validated = true;
         if ($this->validator) {
             $validate = $this->validator;
             $errors = $validate($this->getRawValue());
             $this->is_validated = empty($errors);
             $this->errors = $errors ?: [];
-        } else {
-            $this->is_validated = true;
         }
         return $this->is_validated;
     }
@@ -104,6 +103,12 @@ class FormField
         $this->raw_value = $value;
     }
 
+    # Method: getValue
+    # Gets the result of running the raw data through the converter.
+    # If no converter is defined, the raw value is returned.
+    #
+    # Returns:
+    # The result returned by the converter.  This could be any type.
     public function getValue() {
         if ($this->converter) {
             $convert = $this->converter;
@@ -116,13 +121,11 @@ class FormField
         if (!$this->renderer) {
             $this->renderer = new InputRenderer();
         }
-        if ($options !== null) {
-            $this->resolveAndSetOptions($options);
-        }
+        $this->resolveAndSetOptions($options);
         return $this->renderer->render($this, $pages_obj);
     }
 
-    protected function resolveAndSetOptions(array $options) {
+    protected function resolveAndSetOptions(array $options = null) {
         if (isset($options['label'])) {
             $this->renderer->setLabel($options['label']);
             unset($options['label']);
@@ -137,6 +140,8 @@ class FormField
         $this->renderer->setData('SUPPRESS_ERRORS', $options['noerror'] ?? false);
         unset($options['noerror']);
 
-        $this->renderer->setAttributes($options);
+        if ($options !== null) {
+            $this->renderer->setAttributes($options);
+        }
     }
 }

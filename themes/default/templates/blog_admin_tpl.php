@@ -23,26 +23,14 @@
 </style>
 <script type="application/javascript">
 $(document).ready(function () {
-    var default_path = '<?php echo $DEFAULT_PATH?>';
-    var default_url = '<?php echo $DEFAULT_URL?>';
-    var path_sep = '<?php echo $PATH_SEP?>';
-
     $('.slide-down').hide();
     $('.slide-toggle').on('click', function () {
         $(this).parent().find('.slide-down').slideToggle();
         return false;
     });
-
-    $('#register').on('change', function () {
-        var path = default_path + path_sep + $(this).val().replace('/', path_sep) + path_sep;
-        $('#register_path').val(path);
-        $('#register_url').val(default_url + $(this).val() + '/');
-    });
 });
 </script>
 <h1><?php pf_("%s System Administration", PACKAGE_NAME) ?></h1>
-<form method="post" action="<?php echo $FORM_ACTION ?>">
-<?php $this->outputCsrfField() ?>
 <h3><?php p_('Add Features') ?></h3>
 <ul>
     <?php if (isset($SHOW_NEW)): ?>
@@ -53,12 +41,15 @@ $(document).ready(function () {
     <li>
         <a href="#" class="slide-toggle">Edit existing user</a>
         <div class="slide-down">
-            <select id="username" name="username">
-                <?php foreach ($USER_ID_LIST as $uid): ?>
-                <option><?php echo $uid?></option>
-                <?php endforeach ?>
-            </select>
-            <input type="submit" name="edituser" id="edituser" value="<?php p_("Edit")?>" />
+            <form method="post" action="<?php echo $FORM_ACTION ?>">
+                <?php $this->outputCsrfField() ?>
+                <select id="username" name="username">
+                    <?php foreach ($USER_ID_LIST as $uid): ?>
+                    <option><?php echo $uid?></option>
+                    <?php endforeach ?>
+                </select>
+                <input type="submit" name="edituser" id="edituser" value="<?php p_("Edit")?>" />
+            </form>
         </div>
     </li>
 </ul>
@@ -67,12 +58,15 @@ $(document).ready(function () {
     <li>
         <a href="#" class="slide-toggle"><?php p_("Upgrade blog to current version") ?></a>
         <div class="slide-down">
-            <select id="upgrade" name="upgrade">
-                <?php foreach ($BLOG_ID_LIST as $blog): ?>
-                <option><?php echo $blog?></option>
-                <?php endforeach ?>
-            </select>
-            <input type="submit" id="upgrade_btn" name="upgrade_btn" value="<?php p_("Upgrade") ?>" />
+            <form method="post" action="<?php echo $FORM_ACTION ?>">
+                <?php $this->outputCsrfField() ?>
+                <select id="upgrade" name="upgrade">
+                    <?php foreach ($BLOG_ID_LIST as $blog): ?>
+                    <option><?php echo $blog?></option>
+                    <?php endforeach ?>
+                </select>
+                <input type="submit" id="upgrade_btn" name="upgrade_btn" value="<?php p_("Upgrade") ?>" />
+            </form>
         </div>
         <?php if (isset($UPGRADE_STATUS)): ?>
         <p><?php pf_("Upgrade Status: %s", "<strong>".$UPGRADE_STATUS."</strong>") ?></p>
@@ -80,34 +74,20 @@ $(document).ready(function () {
     </li>
     <li>
         <a id="toggle-reg" class="slide-toggle" href="#regbox"><?php p_("Register a blog with the system") ?></a>
-        <div id="regbox" class="registerbox slide-down">
-            <div>
-                <label for="register"><?php p_("Blog ID") ?></label>
-                <input type="text" id="register" name="register" />
-            </div>
-            <div>
-                <label for="register"><?php p_("Blog path") ?></label>
-                <input type="text" id="register_path" name="register_path" />
-            <div>
-            </div>
-                <label for="register"><?php p_("Blog URL") ?></label>
-                <input type="text" id="register_url" name="register_url" />
-            </div>
-            <input type="submit" id="register_btn" name="register_btn" value="<?php p_("Register") ?>" />
-        </div>
-        <?php if (isset($REGISTER_STATUS)) { ?>
-        <p><?php pf_("Registration Status: %s", "<strong>".$REGISTER_STATUS."</strong>") ?></p>
-        <?php } ?>
+        <?php echo $REGISTER_FORM->render($PAGE)?>
     </li>
     <li>
         <a href="#" class="slide-toggle"><?php p_("Fix directory permissions on blog") ?></a>
         <div class="slide-down">
-            <select id="fixperm" name="fixperm">
-                <?php foreach ($BLOG_ID_LIST as $blog): ?>
-                <option><?php echo $blog?></option>
-                <?php endforeach ?>
-            </select>
-            <input type="submit" id="fixperm_btn" name="fixperm_btn" value="<?php p_("Fix Perms") ?>" />
+            <form method="post" action="<?php echo $FORM_ACTION ?>">
+                <?php $this->outputCsrfField() ?>
+                <select id="fixperm" name="fixperm">
+                    <?php foreach ($BLOG_ID_LIST as $blog): ?>
+                    <option><?php echo $blog?></option>
+                    <?php endforeach ?>
+                </select>
+                <input type="submit" id="fixperm_btn" name="fixperm_btn" value="<?php p_("Fix Perms") ?>" />
+            </form>
         </div>
         <?php if (isset($FIXPERM_STATUS)): ?>
         <p><?php pf_("Upgrade Status: %s", "<strong>".$FIXPERM_STATUS."</strong>") ?></p>
@@ -116,12 +96,15 @@ $(document).ready(function () {
     <li>
         <a href="#" class="slide-toggle"><?php p_("Delete blog") ?></a>
         <div class="slide-down">
-            <select id="delete" name="delete">
-                <?php foreach ($BLOG_ID_LIST as $blog): ?>
-                <option><?php echo $blog?></option>
-                <?php endforeach ?>
-            </select>
-            <input type="submit" id="delete_btn" name="delete_btn" value="<?php p_("Delete") ?>" />
+            <form method="post" action="<?php echo $FORM_ACTION ?>">
+                <?php $this->outputCsrfField() ?>
+                <select id="delete" name="delete">
+                    <?php foreach ($BLOG_ID_LIST as $blog): ?>
+                    <option><?php echo $blog?></option>
+                    <?php endforeach ?>
+                </select>
+                <input type="submit" id="delete_btn" name="delete_btn" value="<?php p_("Delete") ?>" />
+            </form>
         </div>
         <?php if (isset($DELETE_STATUS)): ?>
         <p><?php pf_("Delete Status: %s", "<strong>".$DELETE_STATUS."</strong>") ?></p>
@@ -136,4 +119,3 @@ $(document).ready(function () {
     <li><a href="?action=editfile&target=userdata&file=groups.ini"><?php p_("Edit groups.ini file") ?></a></li>
     <li><a href="?action=editfile&map=yes&target=userdata&file=sitemap.htm&list=yes"><?php p_("Modify site-wide menubar") ?></a></li>
 </ul>
-</form>

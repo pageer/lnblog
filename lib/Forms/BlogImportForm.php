@@ -128,16 +128,7 @@ class BlogImportForm extends BaseForm
     }
 
     protected function addTemplateData(PHPTemplate $template) {
-        $inst_root = $this->system_config->installRoot()->path();
-        $default_path = dirname($inst_root);
-        if (Path::isWindows()) {
-            $default_path = str_replace('\\', '\\\\', $default_path);
-        }
-        $template->set("DEFAULT_PATH", $default_path);
-        $lnblog_name = basename($inst_root);
-        $default_url = preg_replace("|$lnblog_name/|i", '', $this->system_config->installRoot()->url());
-        $template->set("DEFAULT_URL", $default_url);
-        $template->set("PATH_SEP", Path::isWindows() ? '\\\\' : Path::$sep);
+        $this->setCommonValidationData($template);
 
         $template->set('REPORT', $this->import_report);
         $template->set('BLOG', $this->blog);
