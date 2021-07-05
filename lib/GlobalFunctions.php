@@ -78,7 +78,37 @@ class GlobalFunctions
         return imagepng($image, $to, $quality, $filters);
     }
 
-    public function getMimeTYpe(string $path): string {
+    public function imagecreatetruecolor(int $height, int $width) {
+        return imagecreatetruecolor($height, $width);
+    }
+
+    public function imagecopyresampled(
+        $dst_image,
+        $src_image,
+        int $dst_x,
+        int $dst_y,
+        int $src_x,
+        int $src_y,
+        int $dst_width,
+        int $dst_height,
+        int $src_width,
+        int $src_height
+    ): bool {
+        return imagecopyresampled(
+            $dst_image,
+            $src_image,
+            $dst_x,
+            $dst_y,
+            $src_x,
+            $src_y,
+            $dst_width,
+            $dst_height,
+            $src_width,
+            $src_height
+        );
+    }
+
+    public function getMimeType(string $path): string {
         if (extension_loaded("fileinfo")) {
             $mh = finfo_open(FILEINFO_MIME|FILEINFO_PRESERVE_ATIME);
             $ret = finfo_file($mh, $path);

@@ -3,7 +3,10 @@
     "description": "A simple file-based weblog",
     "license": "GPL-2.0-or-later",
     "autoload": {
-        "psr-4": {"LnBlog\\": "lib"}
+        "psr-4": {
+            "LnBlog\\": "lib",
+            "LnBlog\\Tests\\": "tests/unit"
+        }
     },
     "require": {
         "php": ">=7.0.0",

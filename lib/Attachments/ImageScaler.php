@@ -110,9 +110,28 @@ class ImageScaler
                 ImageScalingFailed::CODE_SCALE_NOT_NEEDED
             );
         }
-        $width = round($width * $scale_factor);
-        $height = round($height * $scale_factor);
-        return $this->globals->imagescale($res, $width, $height);
+        $dest_width = round($width * $scale_factor);
+        $dest_height = round($height * $scale_factor);
+        $image = $this->globals->imagecreatetruecolor($dest_width, $dest_height);
+        if ($image) {
+            $result = $this->globals->imagecopyresampled(
+                $image,
+                $res,
+                0,
+                0,
+                0,
+                0,
+                $dest_width,
+                $dest_height,
+                $width,
+                $height
+            );
+            if ($result) {
+                return $image;
+            }
+        }
+        return false;
+        //return $this->globals->imagescale($res, $dest_width, $dest_height);
     }
 
     private function getTargetName(string $source, string $mode): string {

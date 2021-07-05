@@ -1,13 +1,13 @@
 <?php
 
 use LnBlog\Attachments\ImageScaler;
+use LnBlog\Tests\LnBlogBaseTestCase;
 use Prophecy\Argument;
 
-class ImageScalerTest extends PHPUnit\Framework\TestCase
+class ImageScalerTest extends LnBlogBaseTestCase
 {
     private $fs;
     private $globals;
-    private $prophet;
     private $scaler;
 
     public function testScaleImage_WhenSourceIsMissing_Throws() {
@@ -60,6 +60,7 @@ class ImageScalerTest extends PHPUnit\Framework\TestCase
         $source = 'test-foo.jpg';
         $mode = ImageScaler::MODE_SMALL;
         $this->fs->file_exists($source)->willReturn(true);
+        $this->fs->file_exists('./test-foo-small.jpg')->willReturn(false);
         $this->globals->getMimeType($source)->willReturn('image/jpeg');
         $this->globals->imagecreatefromjpeg($source)->willReturn(false);
 
@@ -73,6 +74,7 @@ class ImageScalerTest extends PHPUnit\Framework\TestCase
         $source = 'test-foo.png';
         $mode = ImageScaler::MODE_SMALL;
         $this->fs->file_exists($source)->willReturn(true);
+        $this->fs->file_exists('./test-foo-small.png')->willReturn(false);
         $this->globals->getMimeType($source)->willReturn('image/png');
         $this->globals->imagecreatefrompng($source)->willReturn(true);
         $this->globals->imagesx(Argument::any())->willReturn(false);
@@ -88,11 +90,41 @@ class ImageScalerTest extends PHPUnit\Framework\TestCase
         $source = 'test-foo.png';
         $mode = ImageScaler::MODE_SMALL;
         $this->fs->file_exists($source)->willReturn(true);
+        $this->fs->file_exists('./test-foo-small.png')->willReturn(false);
         $this->globals->getMimeType($source)->willReturn('image/png');
         $this->globals->imagecreatefrompng($source)->willReturn(true);
         $this->globals->imagesx(Argument::any())->willReturn(3000);
         $this->globals->imagesy(Argument::any())->willReturn(2000);
-        $this->globals->imagescale(true, 640, 427)->willReturn(false);
+        $this->globals->imagecreatetruecolor(640, 427)->willReturn(true);
+        $this->globals->imagecopyresampled(
+            Argument::any(),
+            Argument::any(),
+            0,
+            0,
+            0,
+            0,
+            640,
+            427,
+            3000,
+            2000
+        )->willReturn(false);
+
+        $this->expectException(ImageScalingFailed::class);
+        $this->expectExceptionCode(ImageScalingFailed::CODE_SCALE_FAILED);
+
+        $this->scaler->scaleImage($source, $mode);
+    }
+
+    public function testScaleImage_WhenTargetCreationFails_Throws() {
+        $source = 'test-foo.png';
+        $mode = ImageScaler::MODE_SMALL;
+        $this->fs->file_exists($source)->willReturn(true);
+        $this->fs->file_exists('./test-foo-small.png')->willReturn(false);
+        $this->globals->getMimeType($source)->willReturn('image/png');
+        $this->globals->imagecreatefrompng($source)->willReturn(true);
+        $this->globals->imagesx(Argument::any())->willReturn(3000);
+        $this->globals->imagesy(Argument::any())->willReturn(2000);
+        $this->globals->imagecreatetruecolor(640, 427)->willReturn(false);
 
         $this->expectException(ImageScalingFailed::class);
         $this->expectExceptionCode(ImageScalingFailed::CODE_SCALE_FAILED);
@@ -108,7 +140,19 @@ class ImageScalerTest extends PHPUnit\Framework\TestCase
         $this->globals->imagecreatefrompng($source)->willReturn(true);
         $this->globals->imagesx(Argument::any())->willReturn(2000);
         $this->globals->imagesy(Argument::any())->willReturn(3000);
-        $this->globals->imagescale(true, 427, 640)->willReturn(true);
+        $this->globals->imagecreatetruecolor(427, 640)->willReturn(true);
+        $this->globals->imagecopyresampled(
+            Argument::any(),
+            Argument::any(),
+            0,
+            0,
+            0,
+            0,
+            427,
+            640,
+            2000,
+            3000
+        )->willReturn(true);
         $this->globals->imagepng(true, './test-foo-small.png')->willReturn(true);
         $this->fs->file_exists('./test-foo-small.png')->willReturn(false, true);
 
@@ -121,6 +165,7 @@ class ImageScalerTest extends PHPUnit\Framework\TestCase
         $source = 'test-foo.png';
         $mode = ImageScaler::MODE_SMALL;
         $this->fs->file_exists($source)->willReturn(true);
+        $this->fs->file_exists('./test-foo-small.png')->willReturn(false);
         $this->globals->getMimeType($source)->willReturn('image/png');
         $this->globals->imagecreatefrompng($source)->willReturn(true);
         $this->globals->imagesx(Argument::any())->willReturn(300);
@@ -140,7 +185,20 @@ class ImageScalerTest extends PHPUnit\Framework\TestCase
         $this->globals->imagecreatefrompng($source)->willReturn(true);
         $this->globals->imagesx(Argument::any())->willReturn(3000);
         $this->globals->imagesy(Argument::any())->willReturn(2000);
-        $this->globals->imagescale(true, 640, 427)->willReturn(true);
+        //$this->globals->imagescale(true, 640, 427)->willReturn(true);
+        $this->globals->imagecreatetruecolor(640, 427)->willReturn(true);
+        $this->globals->imagecopyresampled(
+            Argument::any(),
+            Argument::any(),
+            0,
+            0,
+            0,
+            0,
+            640, 
+            427,
+            3000,
+            2000
+        )->willReturn(true);
         $this->globals->imagepng(true, './test-foo-small.png')->willReturn(true);
         $this->fs->file_exists('./test-foo-small.png')->willReturn(false, true);
 
@@ -153,11 +211,25 @@ class ImageScalerTest extends PHPUnit\Framework\TestCase
         $source = './test-foo.jpg';
         $mode = ImageScaler::MODE_SMALL;
         $this->fs->file_exists($source)->willReturn(true);
+        $this->fs->file_exists('./test-foo-small.jpg')->willReturn(false);
         $this->globals->getMimeType($source)->willReturn('image/jpeg');
         $this->globals->imagecreatefromjpeg($source)->willReturn(true);
         $this->globals->imagesx(Argument::any())->willReturn(3000);
         $this->globals->imagesy(Argument::any())->willReturn(2000);
-        $this->globals->imagescale(true, 640, 427)->willReturn(true);
+        //$this->globals->imagescale(true, 640, 427)->willReturn(true);
+        $this->globals->imagecreatetruecolor(640, 427)->willReturn(true);
+        $this->globals->imagecopyresampled(
+            Argument::any(),
+            Argument::any(),
+            0,
+            0,
+            0,
+            0,
+            640, 
+            427,
+            3000,
+            2000
+        )->willReturn(true);
         $this->globals->imagejpeg(true, './test-foo-small.jpg')->willReturn(false);
 
         $this->expectException(ImageScalingFailed::class);
@@ -174,7 +246,20 @@ class ImageScalerTest extends PHPUnit\Framework\TestCase
         $this->globals->imagecreatefrompng($source)->willReturn(true);
         $this->globals->imagesx(Argument::any())->willReturn(3000);
         $this->globals->imagesy(Argument::any())->willReturn(2000);
-        $this->globals->imagescale(true, 640, 427)->willReturn(true);
+        //$this->globals->imagescale(true, 640, 427)->willReturn(true);
+        $this->globals->imagecreatetruecolor(640, 427)->willReturn(true);
+        $this->globals->imagecopyresampled(
+            Argument::any(),
+            Argument::any(),
+            0,
+            0,
+            0,
+            0,
+            640, 
+            427,
+            3000,
+            2000
+        )->willReturn(true);
         $this->globals->imagepng(true, './test-foo-small.png')->willReturn(false);
         $this->fs->file_exists('./test-foo-small.png')->willReturn(false, true);
 
@@ -186,8 +271,8 @@ class ImageScalerTest extends PHPUnit\Framework\TestCase
     }
 
     protected function setUp(): void {
+        parent::setUp();
         Path::$sep = '/';
-        $this->prophet = new \Prophecy\Prophet();
         $this->fs = $this->prophet->prophesize(FS::class);
         $this->globals = $this->prophet->prophesize(GlobalFunctions::class);
         $this->scaler = new ImageScaler($this->fs->reveal(), $this->globals->reveal());
