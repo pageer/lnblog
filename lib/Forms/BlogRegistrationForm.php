@@ -3,6 +3,7 @@
 namespace LnBlog\Forms;
 
 use Blog;
+use FileWriteFailed;
 use FS;
 use LnBlog\Forms\Renderers\InputRenderer;
 use PHPTemplate;
@@ -58,7 +59,7 @@ class BlogRegistrationForm extends BaseForm
                 "Blog %s successfully registered.",
                 $this->fields['register']->getValue()
             );
-        } catch (FileWriteException $e) {
+        } catch (FileWriteFailed $e) {
             $this->reg_status = spf_("Registration error: exited with error: %s", $e->getMessage());
         }
     }
