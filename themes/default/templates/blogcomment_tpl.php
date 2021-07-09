@@ -12,8 +12,8 @@ $this->block(
     'blogcomment.subject', function ($vars) {
     extract($vars, EXTR_OVERWRITE);
     if (isset($SUBJECT)): ?>
-        <h3 class="comment header">
-            <a id="<?php echo $ANCHOR ?>" href="#<?php echo $ANCHOR ?>">
+        <h3 class="comment header" id="<?php echo $ANCHOR ?>">
+            <a href="#<?php echo $ANCHOR ?>">
                 <?php echo $SUBJECT ?>
             </a>
         </h3>

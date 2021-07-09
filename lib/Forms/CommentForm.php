@@ -18,6 +18,7 @@ class CommentForm extends BaseForm
     const TEMPLATE = 'comment_form_tpl.php';
 
     private $use_comment_link = false;
+    private $anchor = 'commentsubmit';
 
     private $globals;
     private $parent;
@@ -52,12 +53,12 @@ class CommentForm extends BaseForm
             'homepage' => new FormField(
                 'homepage',
                 new InputRenderer('text'),
-                $this->filterValidate(FILTER_VALIDATE_URL)
+                $this->filterValidateOptional(FILTER_VALIDATE_URL)
             ),
             'email' => new FormField(
                 'email',
                 new InputRenderer('text'),
-                $this->filterValidate(FILTER_VALIDATE_EMAIL)
+                $this->filterValidateOptional(FILTER_VALIDATE_EMAIL)
             ),
             'showemail' => new FormField(
                 'showemail',
@@ -87,6 +88,7 @@ class CommentForm extends BaseForm
             }
             $template->set('PARENT_URL', $this->parent->permalink());
         }
+        $template->set('ANCHOR', $this->anchor);
         $field_errors = [];
         foreach ($this->fields as $field) {
             $field_errors = array_merge($field_errors, $field->getErrors());
@@ -122,9 +124,13 @@ class CommentForm extends BaseForm
             $this->globals->setcookie("comment_email", $this->fields["email"]->getValue(), $exp, $path);
             $this->globals->setcookie("comment_url", $this->fields["homepage"]->getValue(), $exp, $path);
             $this->globals->setcookie("comment_showemail", $this->fields["showemail"]->getRawValue(), $exp, $path);
-        }
 
-        $this->clear();
+            # Clear the non-remembered fields
+            $this->fields['subject']->setRawValue('');
+            $this->fields['data']->setRawValue('');
+        } else {
+            $this->clear();
+        }
 
         return $comment;
     }
@@ -160,11 +166,13 @@ class CommentForm extends BaseForm
         };
     }
 
-    private function filterValidate($filter): callable {
+    private function filterValidateOptional($filter): callable {
         return function (string $value) use ($filter) {
-            $result = \filter_var($value, $filter);
-            if (!$result) {
-                return [_('Invalid value')];
+            if ($value) {
+                $result = \filter_var($value, $filter);
+                if (!$result) {
+                    return [_('Invalid value')];
+                }
             }
             return [];
         };

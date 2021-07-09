@@ -29,6 +29,15 @@ class FormFieldTest extends LnBlogBaseTestCase
         $this->assertTrue($result);
     }
 
+    public function testValidate_WhenMinimalFieldsValid_ReturnsTrue() {
+        $data = ['data' => 'This is some text'];
+
+        $form = $this->getForm();
+        $result = $form->validate($data);
+
+        $this->assertTrue($result);
+    }
+
     /**
      * @dataProvider fieldValidationFailureProvider
      */
@@ -130,6 +139,24 @@ class FormFieldTest extends LnBlogBaseTestCase
         $this->assertStringNotContainsString($data['username'], $html);
         $this->assertStringNotContainsString($data['email'], $html);
         $this->assertStringNotContainsString('checked', $html);
+    }
+
+    public function testRender_WhenSuccessfulPostAndCookiesSet_ResetsSavedField() {
+        $data = $this->getValidData();
+        $this->entry->addReply(Argument::any(), null)->willReturnArgument(0);
+        $this->entry->uri('basepage')->willReturn('someurl');
+        $this->entry->getCommentCount()->willReturn(1);
+
+        $form = $this->getForm();
+        $result = $form->process($data);
+        $html = $form->render($this->pages->reveal());
+
+        $this->assertStringContainsString($data['homepage'], $html);
+        $this->assertStringContainsString($data['username'], $html);
+        $this->assertStringContainsString($data['email'], $html);
+        $this->assertStringContainsString('checked', $html);
+        $this->assertStringNotContainsString($data['subject'], $html);
+        $this->assertStringNotContainsString($data['data'], $html);
     }
 
     public function testRender_WhenPostFails_LeavesForm() {

@@ -24,7 +24,7 @@ if ($ERRORS) {
 EventRegister::instance()->activateEventFull($tmp=false, "commentform", "BeforeForm");?>
 <fieldset>
     <form id="commentform" class="comment-form" method="<?php echo $METHOD?>" 
-      action="<?php echo $ACTION;?>#commentsubmit" accept-charset="<?php echo DEFAULT_CHARSET;?>">
+      action="<?php echo $ACTION;?>#<?php echo $ANCHOR?>" accept-charset="<?php echo DEFAULT_CHARSET;?>">
     <?php $this->outputCsrfField() ?>
     <?php EventRegister::instance()->activateEventFull($tmp=false, "commentform", "FormBegin");?>
     <div class="comment-metadata subject">

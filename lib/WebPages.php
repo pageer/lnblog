@@ -2178,6 +2178,7 @@ class WebPages extends BasePages
         if (has_post()) {
             try {
                 $cmt = $form->process($_POST);
+                $this->getPage()->redirect($ent->uri('basepage').'#'.$cmt->getAnchor());
             } catch (FormInvalid $e) {
                 // Nothing to do here.
             }
