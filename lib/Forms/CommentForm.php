@@ -6,9 +6,11 @@ use BlogComment;
 use BlogEntry;
 use EventRegister;
 use FormInvalid;
+use GlobalFunctions;
 use LnBlog\Forms\Renderers\InputRenderer;
 use LnBlog\Forms\Renderers\TextAreaRenderer;
 use PHPTemplate;
+use Publisher;
 use User;
 
 class CommentForm extends BaseForm
@@ -16,44 +18,46 @@ class CommentForm extends BaseForm
     const TEMPLATE = 'comment_form_tpl.php';
 
     private $use_comment_link = false;
+
+    private $globals;
     private $parent;
     private $user;
 
-    public function __construct(BlogEntry $parent, User $user) {
+    public function __construct(
+        BlogEntry $parent,
+        User $user,
+        GlobalFunctions $globals
+    ) {
         $this->parent = $parent;
         $this->user = $user;
+        $this->globals = $globals;
         $this->action = $parent->uri('basepage');
 
         $this->fields = [
             'subject' => new FormField(
                 'subject',
                 new InputRenderer('text'),
-                $this->noNewlines(),
-                $this->filterVar(FILTER_SANITIZE_ENCODED)
+                $this->noNewlines()
             ),
             'data' => new FormField(
                 'data',
                 new TextAreaRenderer(),
                 $this->dataValid()
-                // No converter - we do that at display time.
             ),
             'username' => new FormField(
                 'username',
                 new InputRenderer('text'),
-                $this->noNewlines(),
-                $this->filterVar(FILTER_SANITIZE_ENCODED)
+                $this->noNewlines()
             ),
             'homepage' => new FormField(
                 'homepage',
                 new InputRenderer('text'),
-                $this->noNewlines(),
-                $this->filterVar(FILTER_SANITIZE_URL)
+                $this->filterValidate(FILTER_VALIDATE_URL)
             ),
             'email' => new FormField(
                 'email',
                 new InputRenderer('text'),
-                null,
-                $this->filterVar(FILTER_SANITIZE_EMAIL)
+                $this->filterValidate(FILTER_VALIDATE_EMAIL)
             ),
             'showemail' => new FormField(
                 'showemail',
@@ -68,6 +72,8 @@ class CommentForm extends BaseForm
                 $this->toBool()
             ),
         ];
+
+        $this->initializeFieldsFromCookie($_COOKIE);
     }
 
     public function setUseCommentLink(bool $use_link) {
@@ -101,21 +107,21 @@ class CommentForm extends BaseForm
 
         EventRegister::instance()->activateEvent($comment, 'POSTRetreived');
 
-        $result = $comment->insert($this->parent);
+        $result = $this->parent->addReply($comment);
         if (!$result) {
             $this->is_validated = false;
-            $this->errors[] = _("Error: unable to add commtent please try again.");
+            $this->errors[] = _("Error: unable to add comment please try again.");
             throw new FormInvalid();
         }
 
         # If the "remember me" box is checked, save the info in cookies.
         if ($this->fields["remember"]->getValue()) {
             $path = "/";  # Do we want to do domain cookies?
-            $exp = time() + 2592000;  # Expire cookies after one month.
-            setcookie("comment_name", $this->fields["username"]->getValue(), $exp, $path);
-            setcookie("comment_email", $this->fields["email"]->getValue(), $exp, $path);
-            setcookie("comment_url", $this->fields["homepage"]->getValue(), $exp, $path);
-            setcookie("comment_showemail", $this->fields["showemail"]->getValue(), $exp, $path);
+            $exp = $this->globals->time() + 2592000;  # Expire cookies after one month.
+            $this->globals->setcookie("comment_name", $this->fields["username"]->getValue(), $exp, $path);
+            $this->globals->setcookie("comment_email", $this->fields["email"]->getValue(), $exp, $path);
+            $this->globals->setcookie("comment_url", $this->fields["homepage"]->getValue(), $exp, $path);
+            $this->globals->setcookie("comment_showemail", $this->fields["showemail"]->getRawValue(), $exp, $path);
         }
 
         $this->clear();
@@ -123,11 +129,11 @@ class CommentForm extends BaseForm
         return $comment;
     }
 
-    private function intitializeFieldsFromCookie(PHPTemplate $comm_tpl) {
-        $this->fields['subject']->setRawValue($_COOKIE['comment_url'] ?? '');
-        $this->fields['username']->comm_tpl->set("COMMENT_NAME", $_COOKIE['comment_name'] ?? '');
-        $this->fields['email']->comm_tpl->set("COMMENT_EMAIL", $_COOKIE['comment_email'] ?? '');
-        $this->fields['showemail']->comm_tpl->set("COMMENT_SHOWEMAIL", $_COOKIE['comment_showemail' ?? '']);
+    private function initializeFieldsFromCookie(array $cookie) {
+        $this->fields['homepage']->setRawValue($cookie['comment_url'] ?? '');
+        $this->fields['username']->setRawValue($cookie['comment_name'] ?? '');
+        $this->fields['email']->setRawValue($cookie['comment_email'] ?? '');
+        $this->fields['showemail']->setRawValue($cookie['comment_showemail'] ?? '');
     }
 
     private function noNewlines(): callable {
@@ -140,12 +146,11 @@ class CommentForm extends BaseForm
     }
 
     private function dataValid(): callable {
-        $no_new_lines = $this->noNewlines();
-        return function (string $value) use ($no_new_lines) {
-            if (empty($value)) {
+        return function (string $value): array {
+            if (empty(trim($value))) {
                 return [_("Error: you must include something in the comment body.")];
             }
-            return $no_new_lines($value);
+            return [];
         };
     }
 
@@ -155,9 +160,13 @@ class CommentForm extends BaseForm
         };
     }
 
-    private function filterVar($filter): callable {
+    private function filterValidate($filter): callable {
         return function (string $value) use ($filter) {
-            return \filter_var($value, $filter);
+            $result = \filter_var($value, $filter);
+            if (!$result) {
+                return [_('Invalid value')];
+            }
+            return [];
         };
     }
 }

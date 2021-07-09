@@ -117,6 +117,21 @@ class FormField
         return $this->getRawValue();
     }
 
+    # Method: render
+    # Runs the field through its renderer and gets the (normally HTML) output.
+    # You may optionally pass a map of options to the renderer.  These will be
+    # passed as attributes to the renderer, with the exception of some special
+    # keys, which behave as follows.
+    #
+    # label       - (string) Sets the text of the for field (via setLabel())
+    # sep_label   - (bool) Indicates that the label should be separate from the
+    #               form element, i.e. the label tag should not contain the element.
+    #               This sets the SEPARATE_LABEL variable in the template.
+    # label_after - (bool) Indicates that the label should be displayed after the
+    #               field element (the default is before).
+    #               This sets the LABEL_AFTER variable in the template.
+    # noerrors    - (bool) Suppress the display of error fields in the template.
+    #               This sets the SUPPReSS_ERRORS variable in the template.
     public function render(BasePages $pages_obj, array $options = null): string {
         if (!$this->renderer) {
             $this->renderer = new InputRenderer();

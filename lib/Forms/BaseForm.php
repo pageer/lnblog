@@ -24,7 +24,11 @@ abstract class BaseForm
 
     # Method: validate
     # Checks that form input matches the defined validation rules
-    public function validate(array $data): bool {
+    public function validate(array $data = null): bool {
+        if ($data !== null) {
+            $this->setFieldData($data);
+        }
+
         $is_valid = true;
         foreach ($this->fields as $field) {
             $is_valid = $is_valid && $field->validate();
@@ -47,12 +51,7 @@ abstract class BaseForm
     # Returns:
     # The result of the form action, if any, or null.
     public function process(array $data) {
-        # Set te raw values for each field so that we can validate them.
-        foreach ($this->fields as $field) {
-            $field->setRawValue($data[$field->getName()] ?? '');
-        }
-
-        $this->has_processed = true;
+        $this->setFieldData($data);
 
         $this->validate($data);
 
@@ -63,6 +62,8 @@ abstract class BaseForm
         return $this->doAction();
     }
 
+    # Method: clear
+    # Clears the field values.
     public function clear() {
         foreach ($this->fields as $field) {
             $field->setRawValue('');
@@ -92,6 +93,14 @@ abstract class BaseForm
         $template->set('SUPPRESS_CSRF', $this->suppress_csrf_token);
 
         return $template->process();
+    }
+
+    protected function setFieldData(array $data) {
+        # Set the raw values for each field so that we can validate them.
+        foreach ($this->fields as $field) {
+            $field->setRawValue($data[$field->getName()] ?? '');
+        }
+        $this->has_processed = true;
     }
 
     protected function getFirstError(): string {

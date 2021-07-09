@@ -2172,7 +2172,7 @@ class WebPages extends BasePages
     private function handleComment(BasePages $page, &$ent, $use_comm_link=false) {
 
         Page::instance()->addStylesheet("form.css");
-        $form = new CommentForm($ent, $this->user);
+        $form = new CommentForm($ent, $this->user, $this->globals);
         $form->setUseCommentLink($use_comm_link);
 
         if (has_post()) {

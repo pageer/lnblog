@@ -12,11 +12,10 @@ if (! empty($PARENT_TITLE)) {
 <p>
 <?php
 # Set the message to display on the form.  If not given, use the default.
-if ($ERRORS || $FIELD_ERRORS) {
-    $all_errors = array_merge($ERRORS, $FIELD_ERRORS);
-    foreach ($all_errors as $error) {
-        echo $error;
-    }
+if ($ERRORS) {
+    foreach ($ERRORS as $error): ?>
+        <span class="error"><?php echo $error?></span><?php
+    endforeach;
 } else {
     p_("A comment body is required.  No HTML code allowed.  URLs starting with http:// or ftp:// will be automatically converted to hyperlinks."); 
 }?>
@@ -25,7 +24,7 @@ if ($ERRORS || $FIELD_ERRORS) {
 EventRegister::instance()->activateEventFull($tmp=false, "commentform", "BeforeForm");?>
 <fieldset>
     <form id="commentform" class="comment-form" method="<?php echo $METHOD?>" 
-      action="<?php echo $ACTION;?>" accept-charset="<?php echo DEFAULT_CHARSET;?>">
+      action="<?php echo $ACTION;?>#commentsubmit" accept-charset="<?php echo DEFAULT_CHARSET;?>">
     <?php $this->outputCsrfField() ?>
     <?php EventRegister::instance()->activateEventFull($tmp=false, "commentform", "FormBegin");?>
     <div class="comment-metadata subject">

@@ -46,6 +46,10 @@ form .settings .bottom-row {
     margin: 1%;
 }
 
+form .error {
+    color: red;
+}
+
 textarea {
     width: 100%;
 }
@@ -260,6 +264,10 @@ form.centered input {
 }
 
 /* Comment form */
+.comment-form {
+    margin-bottom: 20px;
+}
+
 .comment-form .subject input,
 .comment-form .subject label,
 .comment-form .comment-metadata input,
