@@ -13,7 +13,7 @@ use Prophecy\Argument;
 use Publisher;
 use User;
 
-class FormFieldTest extends LnBlogBaseTestCase
+class CommentFormTest extends LnBlogBaseTestCase
 {
     private $pages;
     private $entry;
