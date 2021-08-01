@@ -12,7 +12,7 @@ class Breadcrumbs extends Plugin
     public function __construct($do_output=0) {
 
         $this->plugin_desc = _('Show a "bread-crumb" trail indicating the user\'s current location in the blog.');
-        $this->plugin_version = "0.1.1";
+        $this->plugin_version = "0.2.0";
         $this->addOption(
             "list_header", _("Heading at start of trail"),
             _("Location"), "text"
@@ -34,25 +34,25 @@ class Breadcrumbs extends Plugin
     }
 
     public function output($parm=false) {
-
+        $blog_registry = SystemConfig::instance()->blogRegistry();
         $blog = NewBlog();
         $ent = NewEntry();
         if (! $blog->isBlog() ) {
             return false;
         }
 
+        $url = $blog_registry[$blog->blogid]->url();
+        $urlpath = trim(parse_url($url, PHP_URL_PATH), '/');
+
         $ret = '';
 
         $path = trim($_SERVER['PHP_SELF'], '/');
-        $path = str_replace('/', DIRECTORY_SEPARATOR, $path);
-        $pos = strpos($path, $blog->blogid);
-        if ($pos !== false) {
-            $path = substr($path, $pos+strlen($blog->blogid));
-        }
+        $path = str_replace($urlpath, '', $path);
+        $path = trim($path, '/');
 
-        $tok = strtok($path, DIRECTORY_SEPARATOR);
+        $pieces = explode('/', $path);
 
-        while ($tok !== false) {
+        foreach ($pieces as $tok) {
             if ($tok == BLOG_ENTRY_PATH) {
                 $ret .= $this->list_wrap($blog->uri('archives'), _("Archives"));
             } elseif ($tok == BLOG_ARTICLE_PATH) {
