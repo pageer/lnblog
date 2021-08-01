@@ -76,6 +76,7 @@ class UnpublishTest extends PublisherTestBase
         $this->fs->file_exists('./entries/2017/01/02_1234/entry.xml')->willReturn(true);
         $this->fs->realpath($entry->file)->willReturn($entry->file);
         $this->fs->file_exists('./entries/2017/01/Test_Entry.php')->willReturn(true);
+        $this->fs->is_dir('./entries/2017/01/Test_Entry.php')->willReturn(false);
         $this->fs->is_dir('./drafts/02_123400')->willReturn(false);
         $this->fs->rename('./entries/2017/01/02_1234', './drafts/02_123400')->willReturn(true);
 

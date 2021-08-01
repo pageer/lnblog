@@ -45,7 +45,6 @@ class WebPages extends BasePages
 
     protected function getActionMap() {
         return array(
-            'about'        => 'about',
             'newentry'     => 'newentry',
             'editentry'    => 'entryedit',
             'delentry'     => 'delentry',
@@ -66,6 +65,7 @@ class WebPages extends BasePages
             'blogpaths'    => 'blogpaths',
             'webmention'   => 'webmention',
             'drafts'       => 'showdrafts',
+            'queuepub'     => 'queuePublication',
             'forgot'       => 'forgotPassword',
             'reset'        => 'resetPassword',
             'showitem'     => 'showitem',
@@ -108,20 +108,6 @@ class WebPages extends BasePages
         } else {
             return null;
         }
-    }
-
-    public function about() {
-        $tpl = $this->createTemplate("about_tpl.php");
-
-        $tpl->set("NAME", PACKAGE_NAME);
-        $tpl->set("VERSION", PACKAGE_VERSION);
-        $tpl->set("URL", PACKAGE_URL);
-        $tpl->set("NAME", PACKAGE_NAME);
-        $tpl->set("DESCRIPTION", PACKAGE_DESCRIPTION);
-        $tpl->set("COPYRIGHT", PACKAGE_COPYRIGHT);
-
-        $content = $tpl->process();
-        $this->getPage()->display($content, $this->blog);
     }
 
     public function blogpaths() {
@@ -198,13 +184,20 @@ class WebPages extends BasePages
         $message = spf_("Do you really want to delete '%s'?", $ent->subject);
 
         if (POST($conf_id)) {
-            $err = false;
             if (System::instance()->canDelete($ent, $this->user) && $this->user->checkLogin()) {
+                $success = false;
                 try {
                     $this->getPublisher()->delete($ent);
+                    $success = true;
                 } catch (EntryDeleteFailed $error) {
                     $message = spf_("Error: Unable to delete '%s'.  Try again?", $ent->subject);
                 }
+
+                if (POST('ajax')) {
+                    echo json_encode(['success' => $success, 'message' => $message]);
+                    return false;
+                }
+
                 $url = $is_draft ?$this->blog->uri('listdrafts') : $this->blog->getURL();
                 $this->getPage()->redirect($url);
             } else {
@@ -763,7 +756,7 @@ class WebPages extends BasePages
         $tpl->set("BLOG_ATTACHMENTS", $this->blog->getAttachments());
     }
 
-    private function handlePingbackPings($ent) {
+    private function handlePingbackPings() {
         $errors = array();
         $err = '';
 
@@ -1556,25 +1549,28 @@ class WebPages extends BasePages
         $this->getPage()->display($content, $this->blog);
     }
 
-    protected function draft_item_markup(&$ent) {
-        $del_uri = $ent->uri('delete');
-        $edit_uri = $ent->uri('editDraft');
-        $title = $ent->subject ? $ent->subject : $ent->prettyDate();
-        $date = date("Y-m-d", $ent->post_ts);
-        $edit_date = date("Y-m-d", $ent->timestamp);
-        $pub_date = $ent->getAutoPublishDate();
-        $markup_template = 
-            '<a class="title" href="%1$s">%2$s</a>' .
-            '<a class="delete" href="%5$s" title="' . _("Delete") . '">&times;</a>' .
-            '<br />' .
-            '<span class="create date">' . _('Created') . ' %3$s</span>';
-        if ($date != $edit_date) {
-            $markup_template .= '<span class="edit date">' . _('Last edit') . ' %4$s</span>';
+    protected function partitionDrafts(array $drafts): array {
+        $results = [
+            'PUBLISH_QUEUE' => [],
+            'DRAFTS' => [],
+        ];
+
+        foreach ($drafts as $draft) {
+            $date = $draft->getAutoPublishDate();
+            if ($date) {
+                $results['PUBLISH_QUEUE'][] = $draft;
+            } else {
+                $results['DRAFTS'][] = $draft;
+            }
         }
-        if ($pub_date) {
-            $markup_template .= '<span class="pub date">' . _("Set to auto-publish at") . ' %6$s</span>';
-        }
-        return sprintf($markup_template, $edit_uri, $title, $date, $edit_date, $del_uri, $pub_date);
+
+        array_reverse($results['DRAFTS']);
+
+        usort($results['PUBLISH_QUEUE'], function ($a, $b) {
+            return $a->getAutoPublishDate() <=> $b->getAutoPublishDate();
+        });
+
+        return $results;
     }
 
     public function showdrafts() {
@@ -1583,8 +1579,6 @@ class WebPages extends BasePages
         } elseif (isset($_GET['action']) && $_GET['action'] == 'upload') {
             return $this->fileupload();
         }
-
-        $list_months = false;
 
         $usr = User::get();
         $this->getPage()->setDisplayObject($this->blog);
@@ -1595,24 +1589,53 @@ class WebPages extends BasePages
 
         $title = spf_("%s - Drafts", $this->blog->name);
 
-        $tpl = $this->createTemplate(LIST_TEMPLATE);
-        $tpl->set("LIST_TITLE", spf_("Drafts for %s", $this->blog->name));
+        $tpl = $this->createTemplate("draft_list_tpl.php");
 
         $drafts = $this->blog->getDrafts();
-        $linklist = array();
-        foreach ($drafts as $d) {
-            $linklist[] = $this->draft_item_markup($d);
-        }
-        $linklist = array_reverse($linklist);
-
-        $tpl->set("ITEM_LIST", $linklist);
-        $tpl->set("LIST_CLASS", "draft-list");
-        $tpl->set("ITEM_CLASS", "draft");
+        $template_data = $this->partitionDrafts($drafts);
+        $tpl->set('PUBLISH_QUEUE', $template_data['PUBLISH_QUEUE']);
+        $tpl->set('DRAFTS', $template_data['DRAFTS']);
         $body = $tpl->process();
 
         $this->getPage()->addStylesheet("drafts.css");
         $this->getPage()->title = $title;
         $this->getPage()->display($body, $this->blog);
+    }
+
+    public function queuePublication() {
+        $id = POST('draft');
+        $entry = $this->getEntry("drafts/$id");
+
+        $this->getPage()->setDisplayObject($entry);
+        $user = User::get();
+
+        if (! $user->checkLogin() || ! System::instance()->canModify($entry, $user)) {
+            $this->getPage()->error(403);
+        }
+
+        if (!$entry->isEntry()) {
+            $this->getPage()->error(404);
+        }
+
+        if (POST('autopublish') && !POST('autopublish_date')) {
+            $this->getPage()->error(400);
+        }
+
+        if (POST('autopublish')) {
+            $entry->autopublish = true;
+            $entry->autopublish_date = POST('autopublish_date');
+        } else {
+            $entry->autopublish = false;
+        }
+
+        try {
+            $this->getPublisher()->update($entry);
+            echo json_encode(['success' => true, 'message' => '']);
+        } catch (Exception $e) {
+            echo json_encode(['success' => true, 'message' => $e->getMessage()]);
+        }
+
+        return false;
     }
 
     # Function: showCommentPage
@@ -1998,8 +2021,6 @@ class WebPages extends BasePages
     private function persistEntry($ent, $is_art) {
         $res = array('errors' => '', 'warnings' => '');
 
-        $send_pingbacks = false;
-        $do_preview = $this->editIsPreview();
         $save_entry = $this->editIsSave($ent);
 
         try {
@@ -2007,17 +2028,15 @@ class WebPages extends BasePages
                 $this->getPublisher()->publishArticle($ent);
             } elseif ($this->editIsPost($ent)) {
                 $this->getPublisher()->publishEntry($ent);
-                $send_pingbacks = true;
             } elseif ($save_entry) {
                 $this->getPublisher()->update($ent);
-                $send_pingbacks = $ent->isPublished() && !$do_preview;
             }
         } catch (Exception $e) {
             $res['errors'] = $e->getMessage();
         }
 
         $res['errors'] .= $this->handleUploads();
-        $res['warnings'] = $this->handlePingbackPings($ent);
+        $res['warnings'] = $this->handlePingbackPings();
 
         return $res;
     }

@@ -489,7 +489,7 @@ class Publisher
         if (! $entry->isArticle()) {
             $subfile = $entry->permalink_name;
             $subfile = Path::mk(dirname(dirname($entry->file)), $subfile);
-            if ($this->fs->file_exists($subfile)) {
+            if ($this->fs->file_exists($subfile) && !$this->fs->is_dir($subfile)) {
                 $this->fs->delete($subfile);
             }
             $this->deleteStalePermalinkFiles($entry);

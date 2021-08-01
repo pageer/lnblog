@@ -116,13 +116,15 @@ class NativeFS extends FS
     }
 
     public function copy($src, $dest) {
- return copy($src, $dest); 
+        return copy($src, $dest); 
     }
+
     public function rename($src, $dest) {
- return rename($src, $dest); 
+        return rename($src, $dest); 
     }
+
     public function delete($src) {
- return unlink($src); 
+        return unlink($src); 
     }
 
     public function write_file($path, $contents) {

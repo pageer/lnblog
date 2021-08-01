@@ -19,7 +19,7 @@ class TestPages extends BasePages
         $this->method_called = 'defaultAction';
     }
     
-    protected function getPage() {
+    public function getPage() {
         return $this->page_mock;
     }
 

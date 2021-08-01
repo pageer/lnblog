@@ -15,10 +15,13 @@
 
     <rule ref="Zend">
         <exclude name="Generic.Functions.OpeningFunctionBraceBsdAllman" />
-        <!-- TODO: Try to stard eliminating these exclusions -->
+        <exclude name="PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket" />
+        <exclude name="PEAR.Functions.FunctionCallSignature.CloseBracketLine" />
+        <exclude name="Squiz.Functions.GlobalFunction.Found" />
+        <!-- TODO: Try to start eliminating these exclusions -->
         <exclude name="Zend.NamingConventions.ValidVariableName" />
         <exclude name="Generic.Files.LineLength" />
-        <exclude name="Squiz.Functions.GlobalFunction" />
+        <exclude name="Generic.Files.LineLength" />
     </rule>
 
     <rule ref="Generic.Functions.OpeningFunctionBraceKernighanRitchie" />

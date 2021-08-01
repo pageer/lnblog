@@ -77,6 +77,10 @@ abstract class BasePages
         return $_SESSION[self::CSRF_TOKEN];
     }
 
+    public function getPage() {
+        return Page::instance();
+    }
+
     protected function handleRequestRouting($action) {
         $action_map = $this->getActionMap();
         $action = $action ?: GET('action');
@@ -295,10 +299,6 @@ abstract class BasePages
 
     protected function createTemplate(string $template_name) {
         return new PHPTemplate($template_name, $this);
-    }
-
-    protected function getPage() {
-        return Page::instance();
     }
 
     private function dumpAssetFile($file, $default) {

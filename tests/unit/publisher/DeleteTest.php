@@ -24,6 +24,7 @@ class DeleteTest extends PublisherTestBase
         $this->fs->file_exists($path)->willReturn(true);
         $this->fs->realpath($path)->willReturn($path);
         $this->fs->file_exists($link_path)->willReturn(true);
+        $this->fs->is_dir($link_path)->willReturn(false);
 
         $this->fs->delete($link_path)->shouldBeCalled();
 
@@ -46,6 +47,9 @@ class DeleteTest extends PublisherTestBase
         $this->fs->file_exists($link_path)->willReturn(true);
         $this->fs->file_exists($old_link_path1)->willReturn(true);
         $this->fs->file_exists($old_link_path2)->willReturn(true);
+        $this->fs->is_dir($link_path)->willReturn(false);
+        $this->fs->is_dir($old_link_path1)->willReturn(false);
+        $this->fs->is_dir($old_link_path2)->willReturn(false);
         $this->fs->is_file($link_path)->willReturn(true);
         $this->fs->is_file($old_link_path1)->willReturn(true);
         $this->fs->is_file($old_link_path2)->willReturn(true);

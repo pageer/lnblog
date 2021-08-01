@@ -871,7 +871,7 @@ class TestableWebPages extends WebPages
         return parent::getUserByName($username);
     }
 
-    protected function getPage() {
+    public function getPage() {
         return $this->test_page ?: parent::getPage();
     }
 
