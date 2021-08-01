@@ -1564,7 +1564,9 @@ class WebPages extends BasePages
             }
         }
 
-        array_reverse($results['DRAFTS']);
+        usort($results['DRAFTS'], function ($a, $b) {
+            return $b->post_ts <=> $a->post_ts;
+        });
 
         usort($results['PUBLISH_QUEUE'], function ($a, $b) {
             return $a->getAutoPublishDate() <=> $b->getAutoPublishDate();
