@@ -12,7 +12,7 @@ class Breadcrumbs extends Plugin
     public function __construct($do_output=0) {
 
         $this->plugin_desc = _('Show a "bread-crumb" trail indicating the user\'s current location in the blog.');
-        $this->plugin_version = "0.2.0";
+        $this->plugin_version = "0.3.0";
         $this->addOption(
             "list_header", _("Heading at start of trail"),
             _("Location"), "text"
@@ -57,6 +57,8 @@ class Breadcrumbs extends Plugin
                 $ret .= $this->list_wrap($blog->uri('archives'), _("Archives"));
             } elseif ($tok == BLOG_ARTICLE_PATH) {
                 $ret .= $this->list_wrap($blog->uri('articles'), _("Articles"));
+            } elseif ($tok == BLOG_DRAFT_PATH) {
+                $ret .= $this->list_wrap($blog->uri('drafts'), _("Drafts"));
             } elseif (is_numeric($tok) && strlen($tok) == 4) {
                 $year = $tok;
                 $ret .= $this->list_wrap($blog->uri('listyear', ['year' => $tok]), $tok);
@@ -69,14 +71,10 @@ class Breadcrumbs extends Plugin
                 $ret .= $this->list_wrap($ent->uri('trackback'), _("TrackBacks"));
             } elseif ($tok == ENTRY_COMMENT_DIR) {
                 $ret .= $this->list_wrap($ent->uri('comment'), _("Comments"));
-            #} elseif ($tok == 'sidebar_search.php') {
-            #   $ret .= $this->list_wrap($ent->uri('comment'), _("Comments"));
             } elseif ($tok == 'index.php') {
                 # Do nothing - we don't show the wrapper scripts.
             } elseif ($ent && $ent->isEntry()) {
                 $ret .= $this->list_wrap($ent->uri('permalink'), $ent->subject);
-            } elseif ($tok == 'sidebar_search.php') {
-                $ret .= '<li>'._('Search results').'</li>';
             }
 
             $tok = strtok(DIRECTORY_SEPARATOR);
