@@ -56,6 +56,7 @@ class FileManager
 
     private function getFileList() {
         $files = [];
+        $path_obj = new Path();
         $base_path = $this->parent->localpath();
         $directory_content = $this->fs->scandir($base_path);
         if ($directory_content === false) {
@@ -66,6 +67,7 @@ class FileManager
         foreach ($directory_content as $item) {
             $path = Path::mk($base_path, $item);
             if (!in_array($item, $excluded) && $this->fs->is_file($path)) {
+                $path = $this->fs->realpath($path);
                 $url = $this->resolver->absoluteLocalpathToUri($path);
                 $files[] = new AttachedFile($base_path, $item, $url);
             }

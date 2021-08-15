@@ -71,6 +71,7 @@ class WebPages extends BasePages
             'showitem'     => 'showitem',
             'showarticles' => 'showarticles',
             'showarchive'  => 'showarchive',
+            'stringjs'     => 'javascriptStrings',
         );
     }
 
@@ -108,6 +109,18 @@ class WebPages extends BasePages
         } else {
             return null;
         }
+    }
+
+    # Method: javascriptStrings
+    # Serves up a script that sets an object containing UI text to be used in JavaScript.
+    # This exists so that we can run JavaScript strings through the same translation
+    # mechanism as back-end code.
+    public function javascriptStrings() {
+        $template = $this->createTemplate('ui_strings_tpl.php');
+        $content = $template->process();
+        header('Content-Type', 'text/javascript');
+        echo $content;
+        return false;
     }
 
     public function blogpaths() {
@@ -675,7 +688,7 @@ class WebPages extends BasePages
         $this->getPage()->addStylesheet("entry.css");
         $this->getPage()->addScript("editor.js");
         $this->getPage()->addScript("upload.js");
-        $this->getPage()->addScript(lang_js());
+        $this->getPage()->addScript("?action=stringjs");
         $this->getPage()->display($page_body, $this->blog);
     }
 
@@ -898,7 +911,7 @@ class WebPages extends BasePages
         $this->getPage()->addPackage('dropzone');
         $this->getPage()->addStylesheet("form.css");
         $this->getPage()->title = _("Upload file");
-        $this->getPage()->addScript(lang_js());
+        $this->getPage()->addScript("?action=stringjs");
         $this->getPage()->addScript('upload.js');
         $this->getPage()->display($body, $this->blog);
     }
@@ -1674,7 +1687,7 @@ class WebPages extends BasePages
         }
         $content .= $comm_output;
 
-        $this->getPage()->addScript(lang_js());
+        $this->getPage()->addScript("?action=stringjs");
         $this->getPage()->addScript("entry.js");
 
         return $content;
@@ -1686,7 +1699,7 @@ class WebPages extends BasePages
     protected function showPingbackPage(&$blg, &$ent, &$usr) {
 
         $this->getPage()->title = $ent->title() . " - " . $blg->title();
-        $this->getPage()->addScript(lang_js());
+        $this->getPage()->addScript("?action=stringjs");
         $this->getPage()->addStylesheet("reply.css");
         $this->getPage()->addScript("entry.js");
         $title = spf_(
@@ -1711,7 +1724,7 @@ class WebPages extends BasePages
     protected function showTrackbackPage(&$blg, &$ent, &$usr) {
 
         $this->getPage()->title = $ent->title() . " - " . $blg->title();
-        $this->getPage()->addScript(lang_js());
+        $this->getPage()->addScript("?action=stringjs");
         $this->getPage()->addStylesheet("reply.css");
         $this->getPage()->addScript("entry.js");
         $title = spf_(
@@ -1841,7 +1854,7 @@ class WebPages extends BasePages
             $this->getPage()->addHeader("Link", "<$webmention_url>; rel=\"webmention\"");
             $this->getPage()->addLink(['rel'=>'webmention', 'href' => $webmention_url]);
         }
-        $this->getPage()->addScript(lang_js());
+        $this->getPage()->addScript("?action=stringjs");
         $this->getPage()->addScript("entry.js");
         $this->getPage()->addStylesheet("reply.css");
         $this->getPage()->addStylesheet("entry.css");

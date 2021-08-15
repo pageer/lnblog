@@ -35,17 +35,6 @@ if (extension_loaded("gettext")) {
     }
 }
 
-# Function: lang_js
-# Gets a link to the JavaScript translation file for the configured language.
-# This should be linked into any page that generates text from JavaScript.
-# If the correct translation file does not exist, then use the English file.
-function lang_js($lang=false) {
-    if (! $lang) $lang = LANGUAGE;
-    $link = getlink("$lang.js", LINK_SCRIPT);
-    if ($link == "$lang.js") $link = getlink("en.js", LINK_SCRIPT);
-    return $link;
-}
-
 # Function: fmtdate
 # Print a formatted date.
 #

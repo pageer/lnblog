@@ -104,8 +104,9 @@ var initializeUpload = function () {
                     if (result.success) {
                         $self.find('.status-label').addClass('success').text(strings.upload_scaleStatusSuccess).show();
                         var $thumb_node = $self.clone();
-                        $thumb_node
-                            .data('file', result.file)
+                        $thumb_node.data('file', result.file);
+                        $thumb_node.find('.link')
+                            .attr('href', result.file)
                             .text(result.file);
                         $self.after($thumb_node);
                     } else {
@@ -264,26 +265,29 @@ var initializeUpload = function () {
     };
 
     var uploadSuccess = function (file, response, data) {
-       var entryData = window.entryData || {};
-       var $new_file = $('<li class="attachment"></li>')
-           .attr('data-file', file.name)
-           .text(file.name);
+        var entryData = window.entryData || {};
+        var $new_file = $('<li class="attachment"></li>')
+            .attr('data-file', file.name);
+        var $link = $('<a href="" class="link" target="_blank"></a>')
+            .attr('href', file.name)
+            .text(file.name);
+        $new_file.append($link);
 
-       if (entryData.entryId) {
-           $('.entry-attachments').append($new_file);
-           $('a[name="entry-attachments"]').show();
-           $('.entry-attachments').show();
-       } else if (getProfile()) {
-           $('.profile-attachments').append($new_file);
-           $('a[name="profile-attachments"]').show();
-           $('.profile-attachments').show();
-       } else {
-           $('.blog-attachments').append($new_file);
-           $('a[name="blog-attachments"]').show();
-           $('.blog-attachments').show();
-       }
-       setAttachmentControls();
-       return true;
+        if (entryData.entryId) {
+            $('.entry-attachments').append($new_file);
+            $('a[name="entry-attachments"]').show();
+            $('.entry-attachments').show();
+        } else if (getProfile()) {
+            $('.profile-attachments').append($new_file);
+            $('a[name="profile-attachments"]').show();
+            $('.profile-attachments').show();
+        } else {
+            $('.blog-attachments').append($new_file);
+            $('a[name="blog-attachments"]').show();
+            $('.blog-attachments').show();
+        }
+        setAttachmentControls();
+        return true;
     };
 
     setAttachmentControls();
