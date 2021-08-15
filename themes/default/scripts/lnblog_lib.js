@@ -6,6 +6,75 @@
 // mechanism.
 var lnblog = {
 
+    editor: {
+        getMarkupMode: function () {
+            // TODO: This should be injected by the text processors
+            var modes = [
+                'automarkup',
+                'lbcode',
+                'html',
+                'markdown'
+            ];
+
+            var current_mode = $('#input_mode').val();
+            return modes[parseInt(current_mode, 10)];
+        },
+        html: {
+            insertLinkHandler: function (link_name, link) {
+                var $body = $('#body');
+                var content = '<a href="' + link + '">' + link_name + '</a>';
+                lnblog.insertAtCursor($body[0], content);
+            },
+            insertImageHandler: function (link_name, link, full_link) {
+                var $body = $('#body');
+                var content = '<img src="' + link + '" alt="' + link_name +'" />';
+                if (full_link) {
+                    content = '<a href="' + full_link + '">' + content + '</a>';
+                }
+                lnblog.insertAtCursor($body[0], content);
+            }
+        },
+        lbcode: {
+            insertLinkHandler: function (link_name, link) {
+                var $body = $('#body');
+                var content = '[url=' + link + ']' + link_name + '[/url]';
+                lnblog.insertAtCursor($body[0], content);
+            },
+            insertImageHandler: function (link_name, link, full_link) {
+                var $body = $('#body');
+                var content = '[img=' + link + ']' + link_name + '[/img]';
+                if (full_link) {
+
+                    content = '[url=' + full_link + ']' + content + '[/url]';
+                }
+                lnblog.insertAtCursor($body[0], content);
+            }
+        },
+        markdown: {
+            insertLinkHandler: function (link_name, link) {
+                var $body = $('#body');
+                var content = '[' + link_name + '](' + link + ')';
+                lnblog.insertAtCursor($body[0], content);
+            },
+            insertImageHandler: function (link_name, link, full_link) {
+                var $body = $('#body');
+                var content = '![' + link_name + '](' + link + ')';
+                if (full_link) {
+
+                    content = '[' + content + '](' + full_link + ')';
+                }
+                lnblog.insertAtCursor($body[0], content);
+            }
+        },
+        automarkup: {
+            insertLinkHandler: function (link_name, link) {
+                var $body = $('#body');
+                lnblog.insertAtCursor($body[0], link);
+            },
+            insertImageHandler: undefined
+        }
+    },
+
     addEvent : function (obj, type, fn){
         if (obj.addEventListener){
             obj.addEventListener(type, fn, false);

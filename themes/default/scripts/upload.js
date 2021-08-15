@@ -3,50 +3,6 @@
 Dropzone.autoDiscover = false;
 var initializeUpload = function () {
 
-    var addLink = function ($input) {
-       var ext = $input.val().replace(/^(.*)(\..+)$/, "$2"),
-           img_exts = ['.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff', '.tif'],
-           is_img = false,
-           res;
-
-       for (var i=0; i< img_exts.length; i++) {
-           if (img_exts[i] == ext) {
-               is_img = true;
-               break;
-           }
-       }
-
-       var components = [];
-       var splitchar = '';
-       if ($input.val().indexOf("\\") > 0 && $input.val().indexOf("/") < 0) {
-           splitchar = "\\";
-       } else {
-           splitchar = "/";
-       }
-       components = $input.val().split(splitchar);
-       var fname = components[components.length - 1];
-
-       res = fname;
-
-       if (res) {
-           var body = document.getElementById('body');
-           if (is_img) {
-               if (document.getElementById('input_mode').value == 1) {
-                   lnblog.insertAtCursor(body, '[img='+fname+']'+res+'[/img]');
-               } else {
-                   lnblog.insertAtCursor(body, "<img src=\""+fname+"\" alt=\""+res+"\" title=\""+res+"\" />");
-               }
-           } else {
-               if (document.getElementById('input_mode').value == 1) {
-                   lnblog.insertAtCursor(body, '[url='+fname+']'+res+'[/url]');
-               } else {
-                   lnblog.insertAtCursor(body, "<a href=\""+fname+"\">"+res+"</a>");
-               }
-           }
-       }
-       return false;
-    };
-
     var generateUrl = function (action, use_entry) {
         var base = window.AJAX_URL || '';
         var url = base + '?action=' + action;
@@ -158,7 +114,7 @@ var initializeUpload = function () {
                     setTimeout(
                         function () {
                             $self.find('.status-label').fadeOut(
-                                400, 
+                                400,
                                 function () {
                                     $self.find('.scale-link').fadeIn(400, setAttachmentControls);
                                 }
@@ -170,7 +126,6 @@ var initializeUpload = function () {
             )
             .fail(
                 function (response) {
-                    var result = JSON.parse(response);
                     $self.find('.status-label').addClass('failure').text(strings.upload_imageStatusError);
                     setTimeout(
                         function () {
@@ -182,7 +137,7 @@ var initializeUpload = function () {
     };
 
     $('.attachment-list-toggle').on(
-        'click', 
+        'click',
         function() {
             var $this = $(this);
             var type = $this.attr('name');
@@ -193,45 +148,93 @@ var initializeUpload = function () {
     $('.attachment-list').toggle(false);
 
     var setAttachmentControls = function () {
-        $('.attachment .attachment-control').remove();
-        $('.attachment').each(
-            function() {
-                var $link = $('<a href="#" class="attachment-control remove-link" title="' + strings.editor_removeLink + '">&times;</a>');
-                $link.on('click', removeUpload);
-                $(this).append($link);
+        var $editor_body = $('textarea');
+        var page_has_edtor = $editor_body.length > 0;
 
-                var file_name = $(this).data('file') || '';
-                var is_supported_image = file_name.toLowerCase().match(/.+.(jpg|jpeg|png)/);
-                var is_scaled_version = file_name.match(/.+-(thumb|small|med|large).(jpg|png)/);
-                if (is_supported_image && !is_scaled_version) {
-                    var $scale_link = $(
-                        '<a href="#" class="attachment-control scale-link" title="' + strings.upload_scalerLink + '"></a>'
-                    );
-                    $scale_link.on(
-                        'click', function () {
-                            $scaler_box.toggle();
-                            return false;
-                        }
-                    );
-                    var $scaler_box = $(
-                        '<select class="scale-select attachment-control">' + 
-                        '<option>' + strings.upload_scalePlaceholderLabel + '</option>' +
-                        '<option value="thumb">' + strings.upload_scaleThumbLabel + '</option>' +
-                        '<option value="small">' + strings.upload_scaleSmallLabel + '</option>' +
-                        '<option value="med">' + strings.upload_scaleMediumLabel + '</option>' +
-                        '<option value="large">' + strings.upload_scaleLargeLabel + '</option>' +
-                        '</select>'
-                    );
-                    $scaler_box.on('change', resizeUpload);
-                    $scaler_box.hide();
-                    var $status_label = $('<span class="status-label attachment-control"></span>');
-                    $status_label.hide();
-                    $(this).append($scale_link);
-                    $(this).append($scaler_box);
-                    $(this).append($status_label);
+        $('.attachment .attachment-control').remove();
+        $('.attachment').each(function() {
+            var $link = $('<a href="#" class="attachment-control remove-link" title="' + strings.editor_removeLink + '">&times;</a>');
+            $link.on('click', removeUpload);
+            $(this).append($link);
+
+            var file_name = $(this).data('file') || '';
+
+            var is_image = file_name.toLowerCase().match(/.+.(jpg|jpeg|png|gif|tif|tiff|svg)/);
+            var is_supported_image = file_name.toLowerCase().match(/.+.(jpg|jpeg|png)/);
+            var is_scaled_version = file_name.match(/.+-(thumb|small|med|large).(jpg|png)/);
+
+            if (page_has_edtor) {
+                var $link_insert = $(
+                    '<a href="#" class="attachment-control insert-link"></a>'
+                );
+                $link_insert.attr('title', strings.upload_insertLink);
+                $link_insert.on('click', function () {
+                    var markup_type = lnblog.editor.getMarkupMode();
+                    var is_entry_attachment = $(this).closest('.attachment-list').hasClass('entry-attachments');
+                    var $attachment = $(this).closest('.attachment');
+                    var link = is_entry_attachment ?
+                        $attachment.data('file') :
+                        $attachment.find('.link').attr('href');
+                    lnblog.editor[markup_type].insertLinkHandler(file_name, link);
+                    return false;
+                });
+                $(this).append($link_insert);
+
+                var $image_insert = $(
+                    '<a href="#" class="attachment-control insert-image"></a>'
+                );
+                var text = is_scaled_version ? strings.upload_insertImageWithLink : strings.upload_insertImage;
+                $image_insert.attr('title', text);
+                $image_insert.on('click', function () {
+                    var markup_type = lnblog.editor.getMarkupMode();
+                    var is_entry_attachment = $(this).closest('.attachment-list').hasClass('entry-attachments');
+                    var $attachment = $(this).closest('.attachment');
+                    var link = is_entry_attachment ?
+                        $attachment.data('file') :
+                        $attachment.find('.link').attr('href');
+                    var full_link = is_scaled_version ?
+                        link.replace(/(.+)-(thumb|small|med|large).(jpg|png)/, '$1.$3') :
+                        undefined;
+                    if (lnblog.editor[markup_type].insertImageHandler) {
+                        lnblog.editor[markup_type].insertImageHandler(file_name, link, full_link);
+                    }
+                    return false;
+                });
+                var markup_type = lnblog.editor.getMarkupMode();
+                if (is_image && typeof(lnblog.editor[markup_type].insertImageHandler) !== 'undefined') {
+                    $(this).append($image_insert);
                 }
             }
-        );
+
+            if (is_supported_image && !is_scaled_version) {
+                var $scale_link = $(
+                    '<a href="#" class="attachment-control scale-link" title="' + strings.upload_scalerLink + '"></a>'
+                );
+                $scale_link.on(
+                    'click', function () {
+                        $scaler_box.toggle();
+                        return false;
+                    }
+                );
+                var $scaler_box = $(
+                    '<select class="scale-select attachment-control">' +
+                    '<option>' + strings.upload_scalePlaceholderLabel + '</option>' +
+                    '<option value="thumb">' + strings.upload_scaleThumbLabel + '</option>' +
+                    '<option value="small">' + strings.upload_scaleSmallLabel + '</option>' +
+                    '<option value="med">' + strings.upload_scaleMediumLabel + '</option>' +
+                    '<option value="large">' + strings.upload_scaleLargeLabel + '</option>' +
+                    '</select>'
+                );
+                $scaler_box.on('change', resizeUpload);
+                $scaler_box.hide();
+                var $status_label = $('<span class="status-label attachment-control"></span>');
+                $status_label.hide();
+                $(this).append($scale_link);
+                $(this).append($scaler_box);
+                $(this).append($status_label);
+            }
+
+        });
     };
 
     var uploadUrl = function (files) {
@@ -261,8 +264,6 @@ var initializeUpload = function () {
     };
 
     var uploadSuccess = function (file, response, data) {
-       var responseData = typeof response === 'string' ? JSON.parse(response) : response;
-       var hasEntryData = !!window.entryData;
        var entryData = window.entryData || {};
        var $new_file = $('<li class="attachment"></li>')
            .attr('data-file', file.name)

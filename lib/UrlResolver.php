@@ -95,6 +95,7 @@ class UrlResolver
             if (strpos($file, $real_root) === 0) {
                 $rel_path = str_replace($real_root, '', $file);
                 $url = $root->url() . ltrim($rel_path, Path::$sep);
+                $url = str_replace(DIRECTORY_SEPARATOR, '/', $url);
                 return $url;
             }
         }

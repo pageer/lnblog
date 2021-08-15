@@ -39,8 +39,8 @@ OutputComplete - Fired after output has finished being generated.
 POSTRetrieved  - Fired after data has been retrieved from an HTTP POST.
 */
 
-use LnBlog\Attachments\AttachmentContainer;
 use LnBlog\Attachments\FileManager;
+use LnBlog\Attachments\AttachmentContainer;
 
 class BlogEntry extends Entry implements AttachmentContainer
 {

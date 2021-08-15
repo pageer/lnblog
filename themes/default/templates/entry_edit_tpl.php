@@ -175,7 +175,9 @@
                     ?>>
                         <?php foreach ($ENTRY_ATTACHMENTS as $attachment): ?>
                             <li class="attachment" data-file="<?php echo $this->escape($attachment->getName())?>">
-                                <?php echo $this->escape($attachment->getName()) ?>
+                                <a href="<?php echo $attachment->getUrl()?>" class="link" target="_blank">
+                                    <?php echo $this->escape($attachment->getName()) ?>
+                                </a>
                             </li>
                         <?php endforeach ?>
                     </ul>
@@ -184,7 +186,9 @@
                         <ul class="blog-attachments attachment-list">
                             <?php foreach ($BLOG_ATTACHMENTS as $attachment): ?>
                                 <li class="attachment" data-file="<?php echo $this->escape($attachment->getName())?>">
-                                    <?php echo $this->escape($attachment->getName()) ?>
+                                    <a href="<?php echo $attachment->getUrl()?>" class="link" target="_blank">
+                                        <?php echo $this->escape($attachment->getName()) ?>
+                                    </a>
                                 </li>
                             <?php endforeach ?>
                         </ul>

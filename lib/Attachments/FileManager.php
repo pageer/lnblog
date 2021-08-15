@@ -2,24 +2,25 @@
 
 namespace LnBlog\Attachments;
 
-use Blog;
-use BlogEntry;
 use FileIsProtected;
 use FileNotFound;
 use Path;
 use RuntimeException;
+use SystemConfig;
+use UrlResolver;
 
 # Class: FileManager
 # Manage the files attached to an object.
 class FileManager
 {
-
     private $parent;
     private $fs;
+    private $resolver;
 
-    public function __construct($parent, $filesystem = null) {
+    public function __construct($parent, $filesystem = null, UrlResolver $resolver = null) {
         $this->parent = $parent;
         $this->fs = $filesystem ?: NewFS();
+        $this->resolver = $resolver ?: new UrlResolver(SystemConfig::instance(), $filesystem);
     }
 
     public function getAll() {
@@ -65,7 +66,8 @@ class FileManager
         foreach ($directory_content as $item) {
             $path = Path::mk($base_path, $item);
             if (!in_array($item, $excluded) && $this->fs->is_file($path)) {
-                $files[] = new AttachedFile($base_path, $item);
+                $url = $this->resolver->absoluteLocalpathToUri($path);
+                $files[] = new AttachedFile($base_path, $item, $url);
             }
         }
         return $files;

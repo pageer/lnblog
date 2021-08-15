@@ -29,7 +29,9 @@
         <ul class="entry-attachments attachment-list" <?php echo empty($ENTRY_ATTACHMENTS) ? 'style="display: none"' : ''?>>
             <?php foreach ($ENTRY_ATTACHMENTS as $attachment): ?>
                 <li class="attachment" data-file="<?php echo $this->escape($attachment->getName())?>">
-                    <?php echo $this->escape($attachment->getName()) ?>
+                    <a href="<?php echo $attachment->getUrl()?>" class="link" target="_blank">
+                        <?php echo $this->escape($attachment->getName()) ?>
+                    </a>
                 </li>
             <?php endforeach ?>
         </ul>
@@ -39,7 +41,9 @@
         <ul class="profile-attachments attachment-list" <?php echo empty($ENTRY_ATTACHMENTS) ? 'style="display: none"' : ''?>>
             <?php foreach ($PROFILE_ATTACHMENTS as $attachment): ?>
                 <li class="attachment" data-file="<?php echo $this->escape($attachment->getName())?>">
-                    <?php echo $this->escape($attachment->getName()) ?>
+                    <a href="<?php echo $attachment->getUrl()?>" class="link" target="_blank">
+                        <?php echo $this->escape($attachment->getName()) ?>
+                    </a>
                 </li>
             <?php endforeach ?>
         </ul>
@@ -49,7 +53,9 @@
         <ul class="blog-attachments attachment-list" <?php echo empty($BLOG_ATTACHMENTS) ? 'style="display: none"' : ''?>>
             <?php foreach ($BLOG_ATTACHMENTS as $attachment): ?>
                 <li class="attachment" data-file="<?php echo $this->escape($attachment->getName())?>">
-                    <?php echo $this->escape($attachment->getName()) ?>
+                    <a href="<?php echo $attachment->getUrl()?>" class="link" target="_blank">
+                        <?php echo $this->escape($attachment->getName()) ?>
+                    </a>
                 </li>
             <?php endforeach ?>
         </ul>

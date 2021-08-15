@@ -35,6 +35,9 @@ class TinyMCEEditor extends Plugin
         ?>
         // <script>
         /*global tinymce, tinyMCE, current_text_content:true */
+        var default_link_handler = lnblog.editor.html.insertLinkHandler;
+        var default_image_handler = lnblog.editor.html.insertImageHandler;
+
         var MARKUP_HTML = <?php echo MARKUP_HTML?>;
         var selector = "<?php echo $selector?>";
         <?php if ($this->theme == 'advanced'): ?>
@@ -73,6 +76,28 @@ class TinyMCEEditor extends Plugin
         };
         init['relative_urls'] = false;
 
+        var set_insert_handlers = function () {
+            lnblog.editor.html.insertLinkHandler = function (filename, link) {
+                if (tinymce.activeEditor) {
+                    var content = '<a href="' + link + '">' + filename + '</a>';
+                    tinymce.activeEditor.insertContent(content);
+                } else {
+                    default_image_handler(filename, link, full_link);
+                }
+            };
+            lnblog.editor.html.insertImageHandler = function (filename, link, full_link) {
+                if (tinymce.activeEditor) {
+                    var content = '<img src="' + link + '" alt="' + filename +'" />';
+                    if (full_link) {
+                        content = '<a href="' + full_link + '">' + content + '</a>';
+                    }
+                    tinymce.activeEditor.insertContent(content);
+                } else {
+                    default_image_handler(filename, link, full_link);
+                }
+            };
+        };
+
         var initialize_tinymce = function() {
             var $input_mode = $('#input_mode');
             var unconditional_display = selector ? true : false;
@@ -94,6 +119,7 @@ class TinyMCEEditor extends Plugin
 
             if (unconditional_display) {
                 tinymce.init(init);
+                set_insert_handlers();
                 $('#postform').addClass('rich-text');
 
                 var $toggle_button = $('<button style="float:right"><?php p_('Toggle HTML Editor')?></button>');
@@ -116,6 +142,7 @@ class TinyMCEEditor extends Plugin
             } else {
                 if ($input_mode.val() == MARKUP_HTML) {
                     tinymce.init(init);
+                    set_insert_handlers();
                     $('#postform').addClass('rich-text');
                 }
                 $input_mode.on('change.editor', function(e) {
@@ -123,9 +150,12 @@ class TinyMCEEditor extends Plugin
                     $('#postform').toggleClass('rich-text', mode == MARKUP_HTML);
                     if (mode == MARKUP_HTML) { // HTML mode
                         tinymce.init(init);
+                        set_insert_handlers();
                         setContentFetchInterval();
                     } else {
                         clearContentFetchInterval();
+                        lnblog.editor.html.insertLinkHandler = default_link_handler;
+                        lnblog.editor.html.insertImageHandler = default_image_handler;
                         tinymce.remove();
                     }
                 });
@@ -141,7 +171,7 @@ class TinyMCEEditor extends Plugin
             }
         };
 
-        jQuery(document).ready(function() {
+        jQuery(function() {
             try {
                 initialize_tinymce();
             } catch (error) {

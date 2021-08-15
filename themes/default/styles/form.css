@@ -221,12 +221,6 @@ form.centered input {
     display: inline-block;
 }
 
-#postform.html-markup.rich-text .insert-link,
-#postform.auto-markup .insert-link,
-#postform.markdown-markup .insert-link {
-    display: none;
-}
-
 /* This is used by the sitemap editor form */
 .formbox label {
     display: inline-block;
@@ -327,6 +321,23 @@ form.centered input {
 
 .attachment-list .failure {
     color: red;
+}
+
+.insert-link,
+.insert-image {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    margin-left: 8px;
+}
+
+.insert-link {
+    background-image: url(../images/link_add.png);
+}
+
+.insert-image {
+    background-image: url(../images/image_add.png);
 }
 
 /* Expanded post editor */

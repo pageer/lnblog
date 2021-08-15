@@ -31,5 +31,8 @@ var strings = {
     upload_scaleLargeLabel: "Large (1024x768)",
     upload_scaleStatusProgress: "Scaling image...",
     upload_scaleStatusSuccess: "Image created!",
-    upload_scaleStatusError: "Error: "
+    upload_scaleStatusError: "Error: ",
+    upload_insertLink: "Insert link",
+    upload_insertImage: "Insert image",
+    upload_insertImageWithLink: "Insert image with link to full-sized version"
 };
