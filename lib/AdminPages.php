@@ -805,7 +805,8 @@ class AdminPages extends BasePages
             $ret .= implode("\n", file($user_file));
         }
 
-        Page::instance()->title = _("User Information");
+        $name = $usr->fullname ?: $usr->username;
+        Page::instance()->title = spf_("Profile for %s", $name);
         Page::instance()->display($ret);
     }
 
