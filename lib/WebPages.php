@@ -118,7 +118,7 @@ class WebPages extends BasePages
     public function javascriptStrings() {
         $template = $this->createTemplate('ui_strings_tpl.php');
         $content = $template->process();
-        header('Content-Type', 'text/javascript');
+        header('Content-Type: text/javascript');
         echo $content;
         return false;
     }
