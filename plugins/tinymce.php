@@ -67,8 +67,7 @@ class TinyMCEEditor extends Plugin
         return $this->config;
     }
 
-    public function showConfig($page, $csrf_token)
-    {
+    public function showConfig($page, $csrf_token) {
         if (trim($this->config) === '') {
             $this->config = $this->getDefaultConfig();
         }
