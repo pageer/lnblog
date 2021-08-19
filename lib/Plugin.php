@@ -173,54 +173,7 @@ abstract class Plugin extends LnBlogObject
             '" value="' . $csrf_token . '" />';
 
         foreach ($this->member_list as $mem=>$config) {
-            if (! isset($config["control"])) {
-                $config["control"] = "text";
-            }
-            if ($config["control"] == "checkbox") {
-                echo '<div>';
-                echo '<input name="'.$mem.'" id="'.$mem.'" type="checkbox"';
-                if ($this->$mem) echo 'checked="checked" ';
-                echo " />";
-                echo '<label for="'.$mem.'">'.$config["description"].'</label>';
-                echo "</div>\n";
-            } elseif ($config["control"] == "radio") {
-                echo '<fieldset class="radio-buttons">';
-                echo '<legend>'.$config["description"].'</legend>';
-                foreach ($config["options"] as $val=>$desc) {
-                    echo '<label for="'.$val.'">';
-                    echo '<input name="'.$mem.'" id="'.$mem.'" type="radio" value="'.$val.'"';
-                    if ($this->$mem == $val) echo 'checked="checked"';
-                    echo ' />'.$desc.'</label>';
-                    echo '<br />';
-                }
-                echo "</fieldset>\n";
-            } elseif ($config["control"] == "select") {
-                echo '<div class="select-box">';
-                echo '<label for="'.$mem.'">'.$config["description"]."</label>\n";
-                echo '<select name="'.$mem.'" id="'.$mem."\">\n";
-                foreach ($config["options"] as $val=>$desc) {
-                    echo '<option value="'.$val.'"';
-                    if ($this->$mem == $val) echo ' selected="selected"';
-                    echo '>'.$desc."</option>\n";
-                }
-                echo "</select>\n</div>\n";
-            } elseif ($config["control"] == "file") {
-                echo '<div class="file-box">';
-                echo '<label for="'.$mem.'">'.$config['description']."</label>\n";
-                echo '<input name="'.$mem.'" id="'.$mem.'" type="text" value="'.$this->$mem.'" />';
-                echo '<input name="'.$mem.'_upload" id="'.$mem.'_upload" type="file" />';
-                echo "</div>\n";
-            } elseif ($config["control"] == "textarea") {
-                echo '<div class="textarea-box">';
-                echo '<label for="'.$mem.'">'.$config["description"].'</label>';
-                echo '<textarea name="'.$mem.'" id="'.$mem.'" rows="10" cols="50">'.$this->$mem.'</textarea>';
-                echo "</div>\n";
-            } else {
-                echo '<div class="input-box">';
-                echo '<label for="'.$mem.'">'.$config["description"].'</label>';
-                echo '<input name="'.$mem.'" id="'.$mem.'" type="'.$config['control'].'" value="'.$this->$mem.'"';
-                echo " /></div>\n";
-            }
+            $this->showField($mem, $config);
         }
 
         echo "<div>\n";
@@ -409,5 +362,61 @@ abstract class Plugin extends LnBlogObject
         $this->registerEventHandler("article", "InsertComplete", "invalidateCache");
         $this->registerEventHandler("article", "DeleteComplete", "invalidateCache");
         $this->registerEventHandler("blog", "UpdateComplete", "invalidateCache");
+    }
+
+    protected function showField(string $field, array $config = null) {
+        if ($config === null) {
+            $config = $this->member_list[$field];
+        }
+
+        if (! isset($config["control"])) {
+            $config["control"] = "text";
+        }
+
+        if ($config["control"] == "checkbox") {
+            echo '<div>';
+            echo '<input name="'.$field.'" id="'.$field.'" type="checkbox"';
+            if ($this->$field) echo 'checked="checked" ';
+            echo " />";
+            echo '<label for="'.$field.'">'.$config["description"].'</label>';
+            echo "</div>\n";
+        } elseif ($config["control"] == "radio") {
+            echo '<fieldset class="radio-buttons">';
+            echo '<legend>'.$config["description"].'</legend>';
+            foreach ($config["options"] as $val=>$desc) {
+                echo '<label for="'.$val.'">';
+                echo '<input name="'.$field.'" id="'.$field.'" type="radio" value="'.$val.'"';
+                if ($this->$field == $val) echo 'checked="checked"';
+                echo ' />'.$desc.'</label>';
+                echo '<br />';
+            }
+            echo "</fieldset>\n";
+        } elseif ($config["control"] == "select") {
+            echo '<div class="select-box">';
+            echo '<label for="'.$field.'">'.$config["description"]."</label>\n";
+            echo '<select name="'.$field.'" id="'.$field."\">\n";
+            foreach ($config["options"] as $val=>$desc) {
+                echo '<option value="'.$val.'"';
+                if ($this->$field == $val) echo ' selected="selected"';
+                echo '>'.$desc."</option>\n";
+            }
+            echo "</select>\n</div>\n";
+        } elseif ($config["control"] == "file") {
+            echo '<div class="file-box">';
+            echo '<label for="'.$field.'">'.$config['description']."</label>\n";
+            echo '<input name="'.$field.'" id="'.$field.'" type="text" value="'.$this->$field.'" />';
+            echo '<input name="'.$field.'_upload" id="'.$field.'_upload" type="file" />';
+            echo "</div>\n";
+        } elseif ($config["control"] == "textarea") {
+            echo '<div class="textarea-box">';
+            echo '<label for="'.$field.'">'.$config["description"].'</label>';
+            echo '<textarea name="'.$field.'" id="'.$field.'" rows="10" cols="50">'.$this->$field.'</textarea>';
+            echo "</div>\n";
+        } else {
+            echo '<div class="input-box">';
+            echo '<label for="'.$field.'">'.$config["description"].'</label>';
+            echo '<input name="'.$field.'" id="'.$field.'" type="'.$config['control'].'" value="'.$this->$field.'"';
+            echo " /></div>\n";
+        }
     }
 }

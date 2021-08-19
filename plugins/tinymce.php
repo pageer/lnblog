@@ -21,12 +21,120 @@ class TinyMCEEditor extends Plugin
 
     public function __construct() {
         $this->plugin_desc = _("Use TinyMCE for the post editor and file editor.");
-        $this->plugin_version = "0.4.0";
+        $this->plugin_version = "0.5.0";
         $this->addOption(
             "theme", _("TinyMCE theme to use"), "advanced", "select",
             array("basic" => _("Basic"), "advanced" => _("Advanced"))
         );
+        $config = $this->getDefaultConfig();
+        $this->addOption(
+            "config",
+            _("JSON configuration object to use for advanced theme."),
+            $config,
+            "textarea"
+        );
         parent::__construct();
+    }
+
+    private function getDefaultConfig() {
+        ob_start(); ?>
+{
+    "theme": "silver",
+    "convert_urls": false,
+    "plugins": [
+        "link lists image searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime",
+        "media nonbreaking hr charmap table directionality emoticons template paste preview"
+    ],
+    "browser_spellcheck": true,
+    "gecko_spellcheck": true,
+    "toolbar": "bold italic underline code | bullist numlist | forecolor backcolor | link image media emoticons | preview fullscreen",
+    "contextmenu": "link linkchecker image imagetools table spellchecker configurepermanentpen",
+    "removed_menuitems": "newdocument",
+    "mobile": {
+        "theme": "mobile",
+        "toolbar": ["bold", "italic", "underline", "link", "unlink", "image", "bullist", "numlist", "fontsizeselect", "forecolor", "styleselect", "undo", "redo", "removeformat"],
+        "plugins": ["autolink", "lists"]
+    }
+}<?php
+        return ob_get_clean();
+    }
+
+    private function getAdvancedConfig() {
+        $decoded_config = json_decode($this->config);
+        if (!$decoded_config) {
+            return $this->getDefaultConfig();
+        }
+        return $this->config;
+    }
+
+    public function showConfig($page, $csrf_token)
+    {
+        if (trim($this->config) === '') {
+            $this->config = $this->getDefaultConfig();
+        }
+        ?>
+        <script type="text/javascript">
+            $(function() {
+                var $theme = $('#theme');
+                var $config = $('#config');
+                var $box = $config.closest('div');
+                var $reset = $('#reset');
+
+                $theme.on('change', function () {
+                    $box.toggle($theme.val() == 'advanced');
+                });
+
+                $reset.on('click', function () {
+                    var default_content = $('#default-content').val();
+                    $config.val(default_content);
+                    return false;
+                });
+
+                $('#plugin_config').on('submit', function (ev) {
+                    var content = $config.val();
+                    var valid_json = true;
+                    try {
+                        JSON.parse(content);
+                    } catch {
+                        valid_json = false;
+                    }
+
+                    if (!valid_json && $theme.val() != 'basic') {
+                        alert('<?php p_("The configuration is not valid JSON")?>');
+                        ev.preventDefault();
+                        return false;
+                    }
+                });
+
+                $box.toggle($theme.val() == 'advanced');
+            });
+        </script>
+        <textarea id="default-content" style="display: none"><?php echo $this->getDefaultConfig()?></textarea>
+        <fieldset class="plugin-form">
+        <form method="post" action="<?php echo current_uri(true)?>" id="plugin_config">
+                <input type="hidden" name="<?php echo BasePages::TOKEN_POST_FIELD?>" value="<?php echo $csrf_token?>">
+                <?php $this->showField('theme')?>
+                <div class="textarea-box">
+                    <label for="config">
+                    <?php p_('JSON configuration object to use for advanced theme.')?>
+                    <br />
+                    <?php p_('Note: This must be valid JSON.')?>
+                    <br />
+                    <?php pf_(
+                        'View the <a href="%s" target="_blank">TinyMCE documentation</a> for available settings.',
+                        'https://www.tiny.cloud/docs/advanced/'
+                    )?>
+                    </label>
+                    <textarea name="config" id="config" rows="10" cols="50"><?php echo $this->config?></textarea>
+                </div>
+                <div>
+                    <input type="hidden" name="plugin" id="plugin" value="TinyMCEEditor">
+                    <input type="submit" value="<?php p_('Submit')?>">
+                    <a id="reset" href="#" style="float: right"><?php p_('Reset to default')?></a>
+                </div>
+            </form>
+        </fieldset>
+        <?php
     }
 
     public function show_editor($selector = '') {
@@ -41,24 +149,7 @@ class TinyMCEEditor extends Plugin
         var MARKUP_HTML = <?php echo MARKUP_HTML?>;
         var selector = "<?php echo $selector?>";
         <?php if ($this->theme == 'advanced'): ?>
-        var init = {
-            theme: "silver",
-            convert_urls: false,
-            plugins: [
-                "link lists image searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime",
-                "media nonbreaking hr charmap table directionality emoticons template paste preview"
-            ],
-            browser_spellcheck: true,
-            gecko_spellcheck: true,
-            toolbar: "bold italic underline | style-code | bullist numlist | forecolor backcolor | link image media emoticons | preview",
-            contextmenu: "link linkchecker image imagetools table spellchecker configurepermanentpen",
-            removed_menuitems: "newdocument",
-            mobile: {
-                theme: 'mobile',
-                toolbar: ['bold', 'italic', 'underline', 'link', 'unlink', 'image', 'bullist', 'numlist', 'fontsizeselect', 'forecolor', 'styleselect', 'undo', 'redo', 'removeformat'],
-                plugins: ['autolink', 'lists'],
-            }
-        };
+        var init = <?php echo $this->getAdvancedConfig()?>;
         <?php else: ?>
         var init = {
             mobile: {
