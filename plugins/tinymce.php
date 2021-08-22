@@ -16,6 +16,7 @@
 class TinyMCEEditor extends Plugin
 {
     public $theme;
+    public $config;
 
     protected $file_extensions = array('htm', 'html');
 
