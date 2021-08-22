@@ -58,18 +58,10 @@
 
     <?php
     EventRegister::instance()->activateEventFull($tmp=false, "posteditor", "ShowControls");
-    if (! System::instance()->sys_ini->value('entryconfig', 'EditorOnBottom', 0)) {
-        include $this->getTemplatePath("js_editor.php");
-    }
     ?>
     <div>
         <textarea id="body" name="body" accesskey="d" rows="18" cols="40"><?php echo @$DATA?></textarea>
     </div>
-    <?php
-    if (System::instance()->sys_ini->value('entryconfig', 'EditorOnBottom', 0)) {
-        include $this->getTemplatePath("js_editor.php");
-    }
-    ?>
 
     <div class="threebutton">
         <?php if ($PUBLISHED): ?>
@@ -90,7 +82,7 @@
                 <?php if (!$PUBLISHED): ?>
                 <div>
                     <?php $title = _("Publish this as an article instead of a regular blog entry");?>
-                    <input type="checkbox" class="checktoggle" id="publisharticle" name="publisharticle" data-for="short-path" value="1" <?php echo !empty($PUBLISHARTICLE) ? 'checked="checked"' : ''?> />
+                    <input type="checkbox" class="checktoggle" id="publisharticle" name="publisharticle" data-for="short_path" value="1" <?php echo !empty($PUBLISHARTICLE) ? 'checked="checked"' : ''?> />
                     <label for="publisharticle" title="<?php echo $title;?>"><?php p_("Publish as article")?></label>
                     <?php $url_val = isset($URL) ? ('value="' . $URL . '"') : ''; ?>
                     <input id="short_path" name="short_path" title="<?php p_("The last part of the URL path for this article");?>"
