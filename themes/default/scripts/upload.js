@@ -290,10 +290,30 @@ var initializeUpload = function () {
         return true;
     };
 
+    // Handle "paste to upload" anywhere on the page.
+    $(document).on('paste', function (e) {
+        var data = e.clipboardData || e.originalEvent.clipboardData;
+        for (var i = 0; i < data.items.length; i++) {
+            var item = data.items[i];
+            if (item.kind == 'file' && typeof(Dropzone.instances[0]) == 'object') {
+                var original_file = item.getAsFile();
+                var file = original_file;
+                var matches = original_file.name.match(/^(.+)\.(.+)$/);
+                // If we get a file named "image.png", give it a unique name.
+                // We can also get legitimate names if the user copies a file from Explorer.
+                if (matches && matches.length >= 3 && matches[1] == 'image') {
+                    var filename = (new Date()).toISOString().replace(/[^\w-_]/g, '-');
+                    filename = filename + '.' + matches[2];
+                    file = new File([original_file], filename, original_file);
+                }
+                Dropzone.instances[0].addFile(file);
+            }
+        }
+    });
+
     setAttachmentControls();
 
-    $("#filedrop").dropzone(
-        {
+    $("#filedrop").dropzone({
             url: uploadUrl,
             paramName: 'upload',
             params: parameterData,

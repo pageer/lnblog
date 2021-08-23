@@ -14,7 +14,7 @@ var strings = {
 
     editor_tagBoxPlaceholder: "<?php p_("Tags for this entry")?>",
 
-    upload_droponeText: "<?php p_("Drag-and-drop files or click here to upload")?>",
+    upload_droponeText: "<?php p_("Drag-and-drop files, copy and paste images, or click here to upload")?>",
     upload_scalerLink: "<?php p_("Scale down image")?>",
     upload_scalePlaceholderLabel: "<?php p_("Select a size")?>",
     upload_scaleThumbLabel: "<?php p_("Thumbnail (128x128)")?>",
