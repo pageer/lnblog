@@ -243,15 +243,9 @@ define("PACKAGE_COPYRIGHT", _("Copyright &copy; 2005 &ndash; 2014, Peter A. Geer
 
 # Constant: CACHEBUST_PARAMETER
 # Defines a cache-busting parameter for static assets.  You can set this if you want,
-# but the default is to use the current software version or, if this is a Git repo,
-# the current commit hash.  If the server can't run Git, fallback to the version.
+# but the default is to use the current software version.
 if (!defined('CACHEBUST_PARAMETER')) {
-    $cachebuster = PACKAGE_VERSION;
-    if (is_dir(__DIR__.'/.git')) {
-        $last_commit = exec('git rev-parse --short HEAD', $out, $code);
-        $cachebuster = $last_commit ?: $cachebuster;
-    }
-    define('CACHEBUST_PARAMETER', $cachebuster);
+    define('CACHEBUST_PARAMETER', PACKAGE_VERSION);
 }
 
 # Constant: USE_WRAPPER_SCRIPTS
