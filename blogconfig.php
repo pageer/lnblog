@@ -241,6 +241,19 @@ define("PACKAGE_COPYRIGHT", _("Copyright &copy; 2005 &ndash; 2014, Peter A. Geer
 # Section: Miscellaneous configuration
 # Assorted configuration constants that don't fit into any coherent category.
 
+# Constant: CACHEBUST_PARAMETER
+# Defines a cache-busting parameter for static assets.  You can set this if you want,
+# but the default is to use the current software version or, if this is a Git repo,
+# the current commit hash.  If the server can't run Git, fallback to the version.
+if (!defined('CACHEBUST_PARAMETER')) {
+    $cachebuster = PACKAGE_VERSION;
+    if (is_dir(__DIR__.'/.git')) {
+        $last_commit = exec('git rev-parse --short HEAD', $out, $code);
+        $cachebuster = $last_commit ?: $cachebuster;
+    }
+    define('CACHEBUST_PARAMETER', $cachebuster);
+}
+
 # Constant: USE_WRAPPER_SCRIPTS
 # Controls the use of PHP wrapper scripts for pages.
 # When this is turned on, LnBlog will use a series of wrapper PHP scripts to
@@ -339,43 +352,6 @@ if (ini_get("default_mimetype")) {
 #
 # If you get "invalid field name - upload not initiated" errors when you try to
 # post an entry, but were not trying to upload a file with it, then set this to true.
-
-/*
-Constant: LOCALPATH_TO_URI_MATCH_RE
-This is the regular expression used to determine if a local path refers to
-a user's web root, which would be referred to with a URI like
-http://www.example.com/~jowblow/
-and vice versa.  The generated URI will use the parent of the document root, e.g.
-/home/users/joeblow/www/ would be translated to /~joeblow/.
-Depending on your setup, you may need to add components before the username
-or change the document root from www to something else.  Of course, if you
-don't use ~user directories, you can probably ignore this.
-
-*Default* is "/^\/home\/([^\/]+)\/(www|public_html)\/(.*)/i".
-*/
-@define("LOCALPATH_TO_URI_MATCH_RE", "/^\/home\/([^\/]+)\/(www|public_html)\/(.*)/i");
-
-/* Constant: LOCALPATH_TO_URI_REPLACE_RE
-The corresponding replacement pattern to <LOCALPATH_TO_URI_MATCH_RE>.
-
-*Default* is "/~$1/$3".
-*/
-@define("LOCALPATH_TO_URI_REPLACE_RE", "/~$1/$3");
-
-/* Constant: URI_TO_LOCALPATH_MATCH_RE
-The reverse of <LOCALPATH_TO_URI_MATCH_RE>.  This is the regular expression
-that matches part of a root-relative URI and extracts a directory name.
-
-*Default* is "/^\/~([^\/]+)(.*)/i".
-*/
-@define("URI_TO_LOCALPATH_MATCH_RE", "/^\/~([^\/]+)(.*)/i");
-
-/* Constant: URI_TO_LOCALPATH_REPLACE_RE
-The corresponding replacement expression to <URI_TO_LOCALPATH_MATCH_RE>.
-
-*Default* is "$2".
-*/
-@define("URI_TO_LOCALPATH_REPLACE_RE", "$2");
 
 # Constant: UNICODE_ESCAPE_HACK
 # Use an ugly hack with htmlentities() instead of the simpler
