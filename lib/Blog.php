@@ -255,7 +255,6 @@ class Blog extends LnBlogObject implements AttachmentContainer
         foreach ($data as $key=>$val) {
             if (is_array($this->$key)) {
                 $this->$key = explode(",", $val);
-                if (! $this->$key) $this->$key = array();
             } else {
                 $this->$key = $val;
             }
@@ -1031,7 +1030,7 @@ class Blog extends LnBlogObject implements AttachmentContainer
     installation directory.
 
     Returns:
-    An array of failed files or false if the upgrade fails completely.
+    An array of failed files.  Throws if the process fails completely.
     */
     public function upgradeWrappers () {
         $this->raiseEvent("OnUpgrade");
@@ -1041,11 +1040,9 @@ class Blog extends LnBlogObject implements AttachmentContainer
         # Upgrade the base blog directory first.  All other directories will
         # get a copy of the config.php created here.
         $wrappers = new WrapperGenerator($this->fs);
-        $ret = $wrappers->createDirectoryWrappers($this->home_path, WrapperGenerator::BLOG_BASE, $inst_path);
-        if (! is_array($ret)) {
-            return false;
-        } else {
-            $files = $ret;
+        $files = $wrappers->createDirectoryWrappers($this->home_path, WrapperGenerator::BLOG_BASE, $inst_path);
+        if (! is_array($files)) {
+            throw new \Exception(_('Failed to create directory wrappers'));
         }
 
         # Upgrade the articles.
@@ -1310,7 +1307,7 @@ class Blog extends LnBlogObject implements AttachmentContainer
         if ($ret) {
             $result = $wrappers->createDirectoryWrappers($this->home_path, WrapperGenerator::BLOG_BASE, $inst_path);
             # Returns an array of errors, so convert empty array to true.
-            $ret = $ret && empty($result);
+            $ret = empty($result);
         }
 
         $path = Path::get($this->home_path, BLOG_ENTRY_PATH);
@@ -1318,7 +1315,7 @@ class Blog extends LnBlogObject implements AttachmentContainer
 
         if ($ret) {
             $result = $wrappers->createDirectoryWrappers($path, WrapperGenerator::BLOG_ENTRIES);
-            $ret = $ret && empty($result);
+            $ret = empty($result);
         }
         $path = Path::get($this->home_path, BLOG_FEED_PATH);
         $ret = $ret && $this->createDirectoryIfDoesNotExist($path);
@@ -1343,11 +1340,7 @@ class Blog extends LnBlogObject implements AttachmentContainer
         $this->raiseEvent("OnUpdate");
         $this->name = htmlentities($this->name);
         $this->description = htmlentities($this->description);
-        if (KEEP_EDIT_HISTORY) {
-            $ret = $this->delete() && $this->writeBlogData();
-        } else {
-            $ret = $this->writeBlogData();
-        }
+        $ret = $this->writeBlogData();
         $this->raiseEvent("UpdateComplete");
         return $ret;
     }
@@ -1355,32 +1348,12 @@ class Blog extends LnBlogObject implements AttachmentContainer
     # Method: delete
     # Removes an existing weblog.
     #
-    # Parameters:
-    # keep_history - If set to true, only delete the blog data file, making this a
-    #                non-blog directory, rather than totally destroy the data.  If not
-    #                set, defaults to KEEP_EDIT_HISTORY constant.
-    #
     # Returns:
     # True on success, false on failure.
 
-    public function delete($keep_history = null) {
-        if ($keep_history === null) {
-            $keep_history = KEEP_EDIT_HISTORY;
-        }
+    public function delete() {
         $this->raiseEvent("OnDelete");
-        if ($keep_history) {
-            $p = Path::get($this->home_path, BLOG_DELETED_PATH);
-            if (! is_dir($p)) {
-                $this->fs->mkdir_rec($p->get());
-            }
-            $p = Path::get(
-                $this->home_path, BLOG_DELETED_PATH,
-                BLOG_CONFIG_PATH."-".date(ENTRY_PATH_FORMAT_LONG)
-            );
-            $ret = $this->fs->rename(Path::get($this->home_path, BLOG_CONFIG_PATH), $p);
-        } else {
-            $ret = $this->fs->rmdir_rec($this->home_path);
-        }
+        $ret = $this->fs->rmdir_rec($this->home_path);
         $this->raiseEvent("DeleteComplete");
         return $ret;
     }

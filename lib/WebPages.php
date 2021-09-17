@@ -492,7 +492,7 @@ class WebPages extends BasePages
                     $email_body,
                     spf_(
                         "From: LnBlog Account Management <%s>",
-                        $this->getGlobalFunctions()->constant('EMAIL_FROM_ADDRESS')
+                        $this->globals->constant('EMAIL_FROM_ADDRESS')
                     )
                 );
                 if ($mail_result) {
@@ -803,7 +803,6 @@ class WebPages extends BasePages
 
     public function fileupload() {
         $num_fields = 1;
-        $target_under_blog = "";
 
         $ent = $this->getEntry();
         $tpl = $this->createTemplate(UPLOAD_TEMPLATE);
@@ -835,9 +834,6 @@ class WebPages extends BasePages
         } elseif (System::instance()->canModify($this->blog, $this->user)) {
             $target = $this->blog->home_path;
             $blog_files = $this->blog->getAttachments();
-            if ($target_under_blog) {
-                $target = Path::mk($target, $target_under_blog);
-            }
         }
 
         # Check that the user is logged in.
@@ -1232,7 +1228,7 @@ class WebPages extends BasePages
             $title = _("Permission denied");
             $message = _("You do not have permission to delete any of the selected responses.");
 
-        } elseif ( count($replies['allowed']) > 0 && count($replies['denied']) > 0 ) {
+        } elseif ( count($replies['denied']) > 0 ) {
             # We have some responses that can't be deleted, so confirm with the user.
             $title = _("Delete responses");
             $good_list = '';
@@ -1546,7 +1542,7 @@ class WebPages extends BasePages
     }
 
     public function showblog() {
-        if (!USE_CRON_SCRIPT) {
+        if (!$this->globals->constant('USE_CRON_SCRIPT')) {
             $this->getTaskManager()->runPendingTasks();
         }
 
@@ -1891,11 +1887,12 @@ class WebPages extends BasePages
             if ($ent->allow_tb) {
                 $content = $tb->receive();
             } else {
-                $content = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n".
-                           "<response>\n".
-                           "<error>1</error>\n";
-                           "<message>"._("This entry does not accept trackbacks.")."</message>\n";
-                           "</response>\n";
+                $content =
+                    "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n".
+                    "<response>\n" .
+                        "<error>1</error>\n" .
+                        "<message>"._("This entry does not accept trackbacks.")."</message>\n" .
+                    "</response>\n";
             }
             echo $content;
             exit;
@@ -2093,10 +2090,6 @@ class WebPages extends BasePages
 
     protected function getFs() {
         return NewFS();
-    }
-
-    protected function getGlobalFunctions() {
-        return new GlobalFunctions();
     }
 
     protected function getEntry($path = false) {
@@ -2389,5 +2382,9 @@ class WebPages extends BasePages
         }
 
         return $object;
+    }
+
+    private function config(string $constant) {
+        return $this->globals->constant($constant);
     }
 }

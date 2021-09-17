@@ -60,11 +60,16 @@ if (extension_loaded("gettext")) {
 # The formatted date string.
 
 function fmtdate($fmt, $ts=false) {
-    if (!$ts) $ts = time();
-    if (USE_STRFTIME) {
+    $globals = new GlobalFunctions();
+    if (!$ts) $ts = $globals->time();
+    if ($globals->constant('USE_STRFTIME')) {
         $ret = strftime($fmt, $ts);
-        if (defined("SYSTEM_CHARSET") && extension_loaded("iconv")) {
-            $conv = iconv(SYSTEM_CHARSET, DEFAULT_CHARSET, $ret);
+        if ($globals->defined("SYSTEM_CHARSET") && extension_loaded("iconv")) {
+            $conv = iconv(
+                $globals->constant('SYSTEM_CHARSET'),
+                $globals->constant('DEFAULT_CHARSET'),
+                $ret
+            );
             if ($conv) $ret = $conv;
         }
         return $ret;

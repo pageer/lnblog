@@ -125,12 +125,8 @@ class BlogComment extends Entry implements Reply
     */
     public function update() {
         $this->raiseEvent("OnUpdate");
-        if (KEEP_COMMENT_HISTORY) $ret = $this->delete();
-        else $ret = true;
-        if ($ret) {
-            $base_path = dirname($this->file);
-            $ret = $this->insert($base_path);
-        }
+        $base_path = dirname($this->file);
+        $ret = $this->insert($base_path);
         $this->raiseEvent("UpdateComplete");
         return $ret;
     }
@@ -145,19 +141,7 @@ class BlogComment extends Entry implements Reply
     public function delete() {
         $this->raiseEvent("OnDelete");
         $fs = NewFS();
-        if (KEEP_COMMENT_HISTORY) {
-            $curr_ts = time();
-            $dir_path = dirname($this->file);
-            if (! is_dir($dir_path.PATH_DELIM.COMMENT_DELETED_PATH) )
-                $fs->mkdir_rec($dir_path.PATH_DELIM.COMMENT_DELETED_PATH);
-            $source_file = $this->file;
-            $target_file = basename($this->file)."-".$this->getPath($curr_ts);
-            $target_file = $dir_path.PATH_DELIM.COMMENT_DELETED_PATH.
-                PATH_DELIM.$target_file;
-            $ret = $fs->rename($source_file, $target_file);
-        } else {
-            $ret = $fs->delete($this->file);
-        }
+        $ret = $fs->delete($this->file);
         $this->raiseEvent("DeleteComplete");
         return $ret;
     }
@@ -292,11 +276,7 @@ class BlogComment extends Entry implements Reply
     # Get the global identifier for this comment.
     public function globalID() {
         $parent = $this->getParent();
-        $id = $parent->globalID();
-        if (defined('ENTRY_COMMENT_DIR') && ENTRY_COMMENT_DIR) {
-            $id .= '/'.ENTRY_COMMENT_DIR;
-        }
-        $id .= '/#'.$this->getAnchor();
+        $id = $parent->globalID() . '/' . ENTRY_COMMENT_DIR . '/#' . $this->getAnchor();
         return $id;
     }
 

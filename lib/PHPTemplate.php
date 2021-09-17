@@ -287,7 +287,6 @@ class PHPTemplate extends LnBlogObject
             default:
                 return htmlspecialchars($data);
         }
-        return '';
     }
 
     public function attributeValueEscape($val) {

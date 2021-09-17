@@ -349,15 +349,6 @@ if (ini_get("default_mimetype")) {
 ###############################################
 # Section: Blog entry and Article configuration
 
-# Constant: KEEP_EDIT_HISTORY
-# Controls whether deleted and modified entries are kept archived, or if
-# they are just permanently deleted.
-#
-# The *default* is false, which mean that deleted items are gone forever.
-# In previous versions, the default behavior was to save these, despite
-# the fact that there was no interface for dealing with them.
-@define("KEEP_EDIT_HISTORY", false);
-
 # Constant: ENTRY_PATH_FORMAT
 # The date format used directories for blog entries.
 #
@@ -422,13 +413,6 @@ if (ini_get("default_mimetype")) {
 #
 #*Default* is true.
 @define("COMMENT_NOFOLLOW", true);
-
-# Constant: KEEP_COMMENT_HISTORY
-# Like <KEEP_EDIT_HISTORY>, except for comments.
-#
-# *Default* is false
-# Again, this was previously on my default, but is now off.
-@define("KEEP_COMMENT_HISTORY", false);
 
 # Constant: ANON_POST_NAME
 # Default name for users who don't enter a name.

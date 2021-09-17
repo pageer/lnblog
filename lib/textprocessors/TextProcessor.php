@@ -205,8 +205,8 @@ abstract class TextProcessor
        cause them to display in a web page as characters, not HTML markup.
      */
     protected function sanitizeText($data) {
-        
-        if (UNICODE_ESCAPE_HACK) {
+        $globals = new GlobalFunctions();
+        if ($globals->constant('UNICODE_ESCAPE_HACK')) {
             $ret = htmlentities($data);
             $ret = preg_replace("/&amp;(#\d+);/Usi", "&$1;", $ret);
             $ret = preg_replace("/&amp;(\w{2,7});/Usi", "&$1;", $ret);

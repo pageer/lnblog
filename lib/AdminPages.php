@@ -162,19 +162,13 @@ class AdminPages extends BasePages
         if ( POST('upgrade') && POST('upgrade_btn') ) {
 
             $b = NewBlog(POST('upgrade'));
-            $file_list = $b->upgradeWrappers();
-            if (empty($file_list)) {
-                $status = spf_(
-                    "Upgrade of %s completed successfully.",
-                    $b->blogid
-                );
-            } elseif ($file_list === false) {
+            try {
+                $file_list = $b->upgradeWrappers();
+                $status = empty($file_list) ?
+                    spf_("Upgrade of %s completed successfully.", $b->blogid) :
+                    spf_("Error: The following file could not be written - %s.", implode("<br />", $file_list));
+            } catch (\Exception $e) {
                 $status = spf_("Error: %s does not seem to exist.", $b->blogid);
-            } else {
-                $status = spf_(
-                    "Error: The following file could not be written - %s.",
-                    implode("<br />", $file_list)
-                );
             }
             $tpl->set("UPGRADE_STATUS", $status);
 
@@ -868,41 +862,6 @@ class AdminPages extends BasePages
             $ftp_root .= $dir.PATH_DELIM;
         }
 
-    }
-
-    # Test how and if native file writing works.
-    protected function nativefs_test() {
-
-        $ret = array('write'=>false, 'delete'=>false,
-                     'user'=>'', 'group'=>'',
-                     'summary'=>'');
-
-        $stat_data = false;
-
-        $f = @fopen("tempfile.tmp", "w");
-        if ($f !== false) {
-
-            $old = umask(0777);
-            $can_write = fwrite($f, "Test");
-            fclose($f);
-            umask($old);
-
-            $stat_data = stat("tempfile.tmp");
-            if ($stat_data) {
-                $ret['user'] = $stat_data['uid'];
-                $ret['group'] = $stat_data['gid'];
-            }
-
-            $ret['delete'] = @unlink("tempfile.tmp");
-        }
-
-        $ret['summary'] = _("NativeFS test results:")."<br />".
-            spf_("Create new files: %s", $ret['write'] ? "yes" : "no")."<br />".
-            spf_("Delete files: %s", $ret['delete'] ? "yes" : "no")."<br />".
-            spf_("File owner: %s", $ret['user'])."<br />".
-            spf_("File group: %s", $ret['group']);
-
-        return $ret;
     }
 
     protected function template_set_post_data(&$tpl) {

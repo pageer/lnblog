@@ -44,7 +44,11 @@ if (isset($options['u']) || isset($options['upgrade'])) {
     foreach ($blogs as $id => $urlpath) {
         $blog = new Blog($urlpath->path());
         echo spf_('Upgrading blog %1$s at %2$s...', $blog->blogid, $blog->home_path);
-        $result = $blog->upgradeWrappers();
+        try {
+            $result = $blog->upgradeWrappers();
+        } catch (\Exception $e) {
+            $result = [$e->getMessage()]
+        }
         if (empty($result)) {
             echo _("success!") . PHP_EOL;
         } else {

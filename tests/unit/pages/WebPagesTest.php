@@ -890,8 +890,4 @@ class TestableWebPages extends WebPages
     protected function getSocialWebServer() {
         return $this->test_social_server ?: parent::getSocialWebServer();
     }
-
-    protected function getGlobalFunctions() {
-        return $this->test_global_functions ?: parent::getGlobalFunctions();
-    }
 }

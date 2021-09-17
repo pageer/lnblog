@@ -58,7 +58,9 @@ class User extends LnBlogObject implements AttachmentContainer
         $s_usr = SESSION(CURRENT_USER);
         $c_usr = COOKIE(CURRENT_USER);
         if (!$usr && $c_usr) {
-            if ($s_usr == $c_usr || (! AUTH_USE_SESSION && $s_usr == '') ) {
+            $globals = new GlobalFunctions();
+            $use_session = $globals->constant('AUTH_USE_SESSION');
+            if ($s_usr == $c_usr || (! $use_session && $s_usr == '') ) {
                 $usr = $c_usr;
             }
         }

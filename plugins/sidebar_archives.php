@@ -49,7 +49,10 @@ class Archives extends Plugin
 <?php
         foreach ($month_list as $month):
             $ts = mktime(0, 0, 0, $month["month"], 1, $month["year"]);
-            $link_desc = USE_STRFTIME ? fmtdate("%B %Y", $ts) : fmtdate("F Y", $ts);
+            $globals = new GlobalFunctions();
+            $link_desc = $globals->constant('USE_STRFTIME') ?
+                fmtdate("%B %Y", $ts) :
+                fmtdate("F Y", $ts);
 ?>
 <li><a href="<?php echo $month["link"] ?>"><?php echo $link_desc ?></a></li>
 <?php

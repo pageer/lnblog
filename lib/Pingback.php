@@ -75,11 +75,7 @@ class Pingback extends Trackback implements Reply
     # Get the global identifier for this trackback.
     public function globalID() {
         $parent = $this->getParent();
-        $id = $parent->globalID();
-        if (defined('ENTRY_PINGBACK_DIR') && ENTRY_PINGBACK_DIR) {
-            $id .= '/'.ENTRY_PINGBACK_DIR;
-        }
-        $id .= '/#'.$this->getAnchor();
+        $id = $parent->globalID() . '/' . ENTRY_PINGBACK_DIR . '/#' . $this->getAnchor();
     }
 
     # Method: insert

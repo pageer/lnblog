@@ -126,11 +126,8 @@ function get_ping($params) {
             }
 
         }
-
-    } else {
-        return new xmlrpcresp(0, 33, "Target URI not recognized or does not support pingbacks.");
     }
-    return new xmlrpcresp(0, 0, "This should never be returned.");
+    return new xmlrpcresp(0, 33, "Target URI not recognized or does not support pingbacks.");
 }
 
 # Method: pingback.extensions.getPingbacks

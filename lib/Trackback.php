@@ -459,11 +459,7 @@ class Trackback extends LnBlogObject implements Reply
     # Get the global identifier for this trackback.
     function globalID() {
         $parent = $this->getParent();
-        $id = $parent->globalID();
-        if (defined('ENTRY_TRACKBACK_DIR') && ENTRY_TRACKBACK_DIR) {
-            $id .= '/'.ENTRY_TRACKBACK_DIR;
-        }
-        $id .= '/#'.$this->getAnchor();
+        $id = $parent->globalID() . '/' . ENTRY_TRACKBACK_DIR . '/#' . $this->getAnchor();
         return $id;
     }
 }

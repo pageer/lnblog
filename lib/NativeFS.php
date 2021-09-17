@@ -100,13 +100,12 @@ class NativeFS extends FS
         while ( ( false !== ( $ent = readdir($dirhand) ) ) && $ret ) {
             if ($ent == "." || $ent == "..") {
                 continue;
-            } else {
-                $ret = $ret && $this->rmdir_rec($dir.PATH_DELIM.$ent);
             }
+            $ret = $this->rmdir_rec($dir.PATH_DELIM.$ent);
         }
         closedir($dirhand);
         if ($ret) {
-            $ret = $ret && $this->rmdir($dir);
+            $ret = $this->rmdir($dir);
         }
         return $ret;
     }
