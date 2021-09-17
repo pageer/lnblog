@@ -216,7 +216,7 @@ class User extends LnBlogObject implements AttachmentContainer
     # String containing the reset code.
     public function createPasswordReset() {
         $timestamp = $this->globals->time();
-        $reset_token = sha1(random_int(PHP_INT_MIN, PHP_INT_MAX));
+        $reset_token = sha1((string)random_int(PHP_INT_MIN, PHP_INT_MAX));
         $tokens = $this->getPasswordResetTokens();
 
         foreach ($tokens as $token) {

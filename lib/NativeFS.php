@@ -132,7 +132,7 @@ class NativeFS extends FS
 
         if ($mask) {
             $old_umask = umask(0000);
-            umask($mask xor 0777);
+            umask($mask ^ 0777);
         }
 
         $fh = fopen($path, "w");

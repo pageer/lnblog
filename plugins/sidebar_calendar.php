@@ -90,7 +90,7 @@ class SidebarCalendar extends Plugin
         $intl_ts = mktime(0, 0, 0, $month, $day, $year);
         $first_ts = mktime(0, 0, 0, $month, 1, $year);
 
-        $num_days = date('t', $intl_ts);
+        $num_days = (int)date('t', $intl_ts);
         $first_day = date('w', $first_ts);
 
         $days = array();
@@ -246,10 +246,10 @@ class SidebarCalendar extends Plugin
 
     function show_page() {
         # Disable IE's page caching to avoid screwing up the request.
-        header("Expires", "Mon, 26 Jul 1997 05:00:00 GMT");
-        header("Last-Modified", gmdate("D, d M Y H:i:s")." GMT");
-        header("Cache-Control", "no-cache, must-revalidate");
-        header("Pragma", "no-cache");
+        header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+        header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+        header("Cache-Control: no-cache, must-revalidate");
+        header("Pragma: no-cache");
 
         $this->put_calendar(true);
     }

@@ -676,7 +676,7 @@ class WebPages extends BasePages
             'entryExists' => $ent->isEntry(),
             'entryIsDraft' => $ent->isDraft(),
         );
-        $this->getPage()->addInlineScript("window.entryData = " . json_encode($entry_data, true) . ";");
+        $this->getPage()->addInlineScript("window.entryData = " . json_encode($entry_data) . ";");
 
         $title = $is_art ? _("New Article") : _("New Entry");
         $this->getPage()->title = sprintf("%s - %s", $this->blog->name, $title);
@@ -826,7 +826,7 @@ class WebPages extends BasePages
                 'entryExists' => $ent->isEntry(),
                 'entryIsDraft' => $ent->isDraft(),
             );
-            $this->getPage()->addInlineScript("window.entryData = " . json_encode($entry_data, true) . ";");
+            $this->getPage()->addInlineScript("window.entryData = " . json_encode($entry_data) . ";");
 
             $target = $ent->localpath();
             $entry_files = $ent->getAttachments();
@@ -2300,7 +2300,7 @@ class WebPages extends BasePages
             $b_ts = isset($b->timestamp) ? $b->timestamp : strtotime($b->ping_date);
             return $a_ts <=> $b_ts;
         };
-        usort($replies, 'reply_compare');
+        usort($replies, $reply_compare);
 
         $ret = "";
         $count = 0;

@@ -22,26 +22,31 @@
 # Utility library.  Implements some general purpose functions plus some
 # wrappers that implement functionality available in PHP 5.
 
-# Function: class_autoload
-# Legacy auto-loader function.
-function class_autoload($className) {
-    $folders = [
-        implode(DIRECTORY_SEPARATOR, ['lib']),
-        implode(DIRECTORY_SEPARATOR, ['lib', 'textprocessors']),
-        implode(DIRECTORY_SEPARATOR, ['lib', 'uri']),
-        implode(DIRECTORY_SEPARATOR, ['lib', 'exceptions']),
-        implode(DIRECTORY_SEPARATOR, ['tests', 'unit']),
-        implode(DIRECTORY_SEPARATOR, ['tests', 'unit', 'publisher']),
-        implode(DIRECTORY_SEPARATOR, ['tests', 'unit', 'pages']),
-    ];
-    foreach ($folders as $fld) {
-        $fileName = [__DIR__, '..', $fld, $className.'.php'];
-        $file = implode(DIRECTORY_SEPARATOR, $fileName);
-        if (file_exists($file)) {
-            require $file;
-            break;
+# Function: get_class_autoload
+# Returns the legacy auto-loader function.
+/**
+ * @return callable(string): void
+ */
+function get_class_autoload(): callable {
+    return function (string $className): void {
+        $folders = [
+            implode(DIRECTORY_SEPARATOR, ['lib']),
+            implode(DIRECTORY_SEPARATOR, ['lib', 'textprocessors']),
+            implode(DIRECTORY_SEPARATOR, ['lib', 'uri']),
+            implode(DIRECTORY_SEPARATOR, ['lib', 'exceptions']),
+            implode(DIRECTORY_SEPARATOR, ['tests', 'unit']),
+            implode(DIRECTORY_SEPARATOR, ['tests', 'unit', 'publisher']),
+            implode(DIRECTORY_SEPARATOR, ['tests', 'unit', 'pages']),
+        ];
+        foreach ($folders as $fld) {
+            $fileName = [__DIR__, '..', $fld, $className.'.php'];
+            $file = implode(DIRECTORY_SEPARATOR, $fileName);
+            if (file_exists($file)) {
+                require $file;
+                break;
+            }
         }
-    }
+    };
 }
 
 # Function: initialize_session

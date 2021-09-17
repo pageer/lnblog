@@ -72,7 +72,7 @@ abstract class BasePages
 
     public function getCsrfToken() {
         if (empty($_SESSION[self::CSRF_TOKEN])) {
-            $_SESSION[self::CSRF_TOKEN] = hash('sha256', random_int(PHP_INT_MIN, PHP_INT_MAX));
+            $_SESSION[self::CSRF_TOKEN] = hash('sha256', (string)random_int(PHP_INT_MIN, PHP_INT_MAX));
         }
         return $_SESSION[self::CSRF_TOKEN];
     }

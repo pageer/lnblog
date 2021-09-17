@@ -13,7 +13,6 @@ use SystemConfig;
 use UrlPath;
 use User;
 use WrapperGenerator;
-use LnBlog\Model\Reply;
 use LnBlog\Storage\BlogRepository;
 use LnBlog\Storage\UserRepository;
 use LnBlog\Tasks\TaskManager;
@@ -168,7 +167,7 @@ class WordPressImporter implements Importer
             $this->user_map[$uid] = $login;
             if ($do_import && !$this->user_repo->exists($login)) {
                 $user = new User($login);
-                $user->password(md5(rand()));
+                $user->password(md5((string)rand()));
                 $user->name($name);
                 $user->email($email);
                 $this->user_repo->createUser($user);

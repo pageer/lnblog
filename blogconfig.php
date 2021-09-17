@@ -18,7 +18,8 @@ ini_set("magic_quotes_runtime", "off");
 require_once __DIR__.'/vendor/autoload.php';
 
 # Prepend our own autoloaders to the queue.
-spl_autoload_register('class_autoload', true, true);
+#
+spl_autoload_register(get_class_autoload(), true, true);
 
 # Pull in the base system config info and set up the handful of legacy constants
 # that we still depend on.

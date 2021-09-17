@@ -59,7 +59,7 @@ class FTPFS extends FS
         if ($colon_pos > 0) {
             $this->connection = ftp_connect(
                 substr($this->host, 0, $colon_pos),
-                substr($this->host, $colon_pos+1)
+                (int)substr($this->host, $colon_pos+1)
             );
         } else {
             $this->connection = ftp_connect($this->host);
@@ -121,7 +121,7 @@ class FTPFS extends FS
         if ($colon_pos > 0) {
             $this->connection = ftp_connect(
                 substr($this->host, 0, $colon_pos),
-                substr($this->host, $colon_pos+1)
+                (int)substr($this->host, $colon_pos+1)
             );
         } else {
             $this->connection = ftp_connect($this->host);

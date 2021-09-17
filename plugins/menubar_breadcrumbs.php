@@ -63,7 +63,7 @@ class Breadcrumbs extends Plugin
                 $year = $tok;
                 $ret .= $this->list_wrap($blog->uri('listyear', ['year' => $tok]), $tok);
             } elseif (is_numeric($tok) && strlen($tok) == 2 && isset($year)) {
-                $month = fmtdate("%B", mktime(0, 0, 0, $tok, 1, 2000));
+                $month = fmtdate("%B", mktime(0, 0, 0, (int)$tok, 1, 2000));
                 $ret .= $this->list_wrap($blog->uri('listmonth', ['year' => $year, 'month' => $tok]), $month);
             } elseif ($tok == ENTRY_PINGBACK_DIR) {
                 $ret .= $this->list_wrap($ent->uri('pingback'), _("Pingbacks"));

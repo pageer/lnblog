@@ -199,7 +199,7 @@ if ( isset($_POST['btn'])) {
         echo "It worked?";
     } else {
         echo "Fault: ";
-        echo "Code: " . htmlentities($r->faultCode())
+        echo "Code: " . htmlentities((string) $r->faultCode())
             . " Reason '" .htmlentities($r->faultString())."'<BR>";
     }   
 }

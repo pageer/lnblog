@@ -1,17 +1,17 @@
 <?php
 # Class: SimpleXMLReader
-# A class for parsing the XML produced by the <SimpleXMLWriter> class and 
+# A class for parsing the XML produced by the <SimpleXMLWriter> class and
 # creating or populating an object based on it.
 
 class SimpleXMLReader
 {
-    
+
     public $file = '';
     public $domtree = false;
     protected $stack = array();
     protected $stack_length = 0;
     protected $options = array();
-    
+
     public function __construct($file) {
         $this->file = $file;
     }
@@ -28,28 +28,34 @@ class SimpleXMLReader
         }
     }
 
-    public function do_open($parser, $tag, $attributes) {
-        $new = array('tag'=>strtolower($tag), 'attributes'=>$attributes, 'text'=>'');
-        $this->stack_length = array_push($this->stack, $new);
+    public function do_open(): callable {
+        return function ($parser, $tag, $attributes) {
+            $new = array('tag'=>strtolower($tag), 'attributes'=>$attributes, 'text'=>'');
+            $this->stack_length = array_push($this->stack, $new);
+        };
     }
 
-    public function do_close($parser, $tag) {
-        $full = array_pop($this->stack);
-        $this->stack_length--;
-        if ($this->stack_length > 0) {
-            $this->stack[$this->stack_length-1]['children'][] = $full;  
-        } else {
-            $this->domtree = $full;
-        }
+    public function do_close(): callable {
+        return function ($parser, $tag) {
+            $full = array_pop($this->stack);
+            $this->stack_length--;
+            if ($this->stack_length > 0) {
+                $this->stack[$this->stack_length-1]['children'][] = $full;
+            } else {
+                $this->domtree = $full;
+            }
+        };
     }
 
-    public function do_cdata($parser, $data) {
-        if ($this->getOption('no_blank_cdata')) {
-            if (! trim($data)) return false;
-        }
-        $this->stack[$this->stack_length-1]['text'] .= $data;   
+    public function do_cdata(): callable {
+        return function ($parser, $data) {
+            if ($this->getOption('no_blank_cdata')) {
+                if (! trim($data)) return false;
+            }
+            $this->stack[$this->stack_length-1]['text'] .= $data;
+        };
     }
-    
+
     public function parse() {
         if (is_file($this->file)) {
             $data = file_get_contents($this->file);
@@ -58,10 +64,10 @@ class SimpleXMLReader
         }
 
         $parser = xml_parser_create();
-        
+
         xml_set_object($parser, $this);
-        xml_set_element_handler($parser, "do_open", "do_close");
-        xml_set_character_data_handler($parser, "do_cdata");
+        xml_set_element_handler($parser, $this->do_open(), $this->do_close());
+        xml_set_character_data_handler($parser, $this->do_cdata());
 
         $ret = xml_parse($parser, $data);
         xml_parser_free($parser);
@@ -89,8 +95,8 @@ class SimpleXMLReader
         $this->populateObject($obj);
         return $obj;
     }
-    
-    public function getVal($childnode) {
+
+    public static function getVal($childnode) {
         if ( isset($childnode['attributes']['TYPE']) ) {
             $type = $childnode['attributes']['TYPE'];
             switch($type) {
@@ -106,7 +112,7 @@ class SimpleXMLReader
             return $childnode['text'];
         }
     }
-    
+
     public function setVal($obj, $node) {
         $tag = $node['tag'];
         if (isset($obj->$tag) && is_bool($obj->$tag)) {
@@ -130,7 +136,7 @@ class SimpleXMLReader
             $tag = $child['tag'];
             if ( isset($child['children']) ) {
                 @$obj->$tag = $this->make_array($child['children']);
-            } elseif ( isset($child['attributes']['TYPE']) && 
+            } elseif ( isset($child['attributes']['TYPE']) &&
                        $child['attributes']['TYPE'] == 'array' ) {
                 @$obj->$tag = array();
             } else {
