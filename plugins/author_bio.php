@@ -61,7 +61,9 @@ class AuthorBio extends Plugin
     public function styles($include_tag = false) {
         ob_start();
         // Hack for IDE syntax highlighting
-        if ($include_tag): ?><style type="text/css"><?php endif ?>
+        if ($include_tag): ?>
+            <style type="text/css"><?php
+        endif ?>
         .bio_picture img {
             border: 1px solid black;
             box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, .5);
@@ -71,7 +73,10 @@ class AuthorBio extends Plugin
         .bio_content {
             margin-top: 1em;
         }
-        <?php if ($include_tag): ?></style><?php endif;
+        <?php
+        if ($include_tag):
+            ?></style><?php
+        endif;
 
         $ret = ob_get_clean();
         return $ret;

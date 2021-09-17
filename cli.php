@@ -47,7 +47,7 @@ if (isset($options['u']) || isset($options['upgrade'])) {
         try {
             $result = $blog->upgradeWrappers();
         } catch (\Exception $e) {
-            $result = [$e->getMessage()]
+            $result = [$e->getMessage()];
         }
         if (empty($result)) {
             echo _("success!") . PHP_EOL;
