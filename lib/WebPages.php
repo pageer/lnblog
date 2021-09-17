@@ -1954,7 +1954,7 @@ class WebPages extends BasePages
                 $tpl = $this->createTemplate(LIST_TEMPLATE);
                 $tpl->set("LIST_TITLE", _("Entries filed under: ").implode(", ", $tag_list));
                 $tpl->set(
-                    "LIST_FOOTER", '<a href="?show=all&amp;tag='.$tags.'">'.
+                    "LIST_FOOTER", '<a href="?action=tags&amp;show=all&amp;tag='.$tags.'">'.
                     _("Display all entries at once").'</a>'
                 );
                 $tpl->set("LINK_LIST", $links);
