@@ -17,7 +17,7 @@ class SystemConfig
         $this->fs = $fs ?: new NativeFS();
     }
 
-    public static function instance() {
+    public static function instance(): self {
         if (!self::$single_instance) {
             self::$single_instance = new self();
         }

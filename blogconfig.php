@@ -7,34 +7,17 @@
 # do not exist in the default installation, but if created
 # by the user, it will be executed before the body of this file.
 
+# Pull in the various function's we'll need.
+require_once __DIR__."/lib/utils.php";
+
 # Turn off runtime magic quotes so that we don't have to filter input from
 # files to remove the escape characters.
 ini_set("magic_quotes_runtime", "off");
 
-function class_autoload($className) {
-    $folders = [
-        implode(DIRECTORY_SEPARATOR, ['lib']),
-        implode(DIRECTORY_SEPARATOR, ['lib', 'textprocessors']),
-        implode(DIRECTORY_SEPARATOR, ['lib', 'uri']),
-        implode(DIRECTORY_SEPARATOR, ['lib', 'exceptions']),
-        implode(DIRECTORY_SEPARATOR, ['tests', 'unit']),
-        implode(DIRECTORY_SEPARATOR, ['tests', 'unit', 'publisher']),
-        implode(DIRECTORY_SEPARATOR, ['tests', 'unit', 'pages']),
-    ];
-    foreach ($folders as $fld) {
-        $fileName = [__DIR__, $fld, $className.'.php'];
-        $file = implode(DIRECTORY_SEPARATOR, $fileName);
-        if (file_exists($file)) {
-            require $file;
-            break;
-        }
-    }
-}
-
-// Load Composer's autoloader first.
+# Load Composer's autoloader first.
 require_once __DIR__.'/vendor/autoload.php';
 
-// Prepend our own autoloaders to the queue.
+# Prepend our own autoloaders to the queue.
 spl_autoload_register('class_autoload', true, true);
 
 # Pull in the base system config info and set up the handful of legacy constants
@@ -48,80 +31,9 @@ SystemConfig::instance()->definePathConstants($BLOG_ROOT_DIR ?? '');
 # Alias for DIRECTORY_SEPARATOR
 define("PATH_DELIM", DIRECTORY_SEPARATOR);
 
-# Function: initialize_session
-# Starts the user's HTTP session
-function initialize_session() {
-    if (version_compare(phpversion(), '7.3.0', '>=')) {
-        session_set_cookie_params(['samesite' => 'Lax']);
-        session_start();
-    } else {
-        session_start();
-        $path = ini_get('session.cookie_path');
-        $domain = ini_get('session.cookie_domain');
-        $http_only = ini_get('session.cookie_httponly') ? 'HttpOnly;' : '';
-        $session_id = session_id();
-        header("Set-Cookie: PHPSESSID=$session_id; path=$path; domain=$domain; $http_only SameSite=Lax");
-    }
-}
-
-# Function: load_plugin
-# Loads a plugin.  This is used for plugins that do page output and will result
-# in the plugin outputing its markup.  Note that not all plugins support this
-# and for those that do, it is configurable as an option, with the alternative
-# being using the event system.
-#
-# Parameters:
-# plugin_name - The name of the class for this plugin.
-#
-# Returns:
-# An instance of the plugin.  The return value may safely be disregarded.
-function load_plugin($plugin_name) {
-    return new $plugin_name(true);
-}
-
 # Load the userconfig.cfg file and determine the userdata path.
-$curr_dir = dirname(__FILE__);
-$parent_dir = dirname($curr_dir);
-$dir_names = array('userdata', 'users', 'profiles');
 
-foreach ($dir_names as $dir) {
-    if (is_dir(Path::mk($parent_dir, $dir))) {
-        $data_path = Path::mk($parent_dir, $dir);
-        define("USER_DATA", $dir);
-    }
-}
-# Constant: USER_DATA
-# Directory name where user data is stored. The standard name is "userdata".
-
-if (! isset($data_path)) {
-    $data_path = Path::mk($curr_dir, 'userdata');
-    define("USER_DATA", "userdata");
-}
-
-$cfg_file = '';
-if (file_exists(Path::mk(USER_DATA_PATH, "userconfig.cfg"))) {
-    $cfg_file = Path::mk(USER_DATA_PATH, "userconfig.cfg");
-}
-
-# Look for the userconfig.cfg and define any variables in it.
-# This is a more "user friendly" alternative to userconfig.php.
-if (file_exists($cfg_file)) {
-    $data = file($cfg_file);
-    foreach ($data as $line) {
-        # Skip comments lines starting with a hash.
-        if (preg_match("/^\s*#/", $line)) continue;
-        $pieces = explode("=", $line, 2);
-        if (count($pieces) == 2) {
-            $pieces[1] = trim($pieces[1]);
-            $curr_piece = strtolower($pieces[1]);
-
-            if ($curr_piece == "true") $pieces[1] = true;
-            elseif ($curr_piece == "false") $pieces[1] = false;
-
-            define(strtoupper(trim($pieces[0])), $pieces[1]);
-        }
-    }
-}
+load_config_file();
 
 # Define config files for various parts of the plugin framework.
 define("FS_PLUGIN_CONFIG", "fsconfig.php");
@@ -131,34 +43,12 @@ define("FS_PLUGIN_CONFIG", "fsconfig.php");
 # have to worry about the exact path.
 @include_once(Path::mk(USER_DATA_PATH, FS_PLUGIN_CONFIG));
 
-# Check for the file's existence first, because it turns out this is
-# actually faster when the file doesn't exist.
-$USER_CONFIG_PATH = Path::mk(INSTALL_ROOT, USER_DATA, "userconfig.php");
-if (file_exists($USER_CONFIG_PATH)) {
-    include $USER_CONFIG_PATH;
-}
-
 # Constant: USE_CRON_SCRIPT
 # Determines whether tasks should be run asynchronously using cron or
 # some other scheuling system.  If this is false, tasks will be run on
 # page load, which can impact performance and execution time-frame.
 # Note that this affects scheduled publishing, so the default is false.
 @define("USE_CRON_SCRIPT", false);
-
-# Put this definition after we initialize userconfig.cfg, so that it can be
-# changed.
-
-# Constant: URI_TYPE
-# Tells the system what kind of URIs to generate.
-# The available values are as follows.
-# directory   - Convert local directory paths directly into URIs using the old
-#               wrapper script method.
-# querystring - Use ugly old query string URIs.
-# htaccess    - Use query strings made pretty with Apache rewrite rules.
-#               Note that this only works on Apache servers with support for
-#               mod_rewrite and .htaccess files.
-# The *default* mode is "directory".
-@define("URI_TYPE", "directory");
 
 # Constant: EMAIL_FROM_ADDRESS
 # The "from" address that should be used for any e-mails that are sent.
@@ -229,6 +119,7 @@ define("PACKAGE_URL", "http://lnblog.skepticats.com/");
 # Add I18N support here, as this is currently the earliest we can do it.
 # Refer to the lib/i18n.php file for details.
 require_once __DIR__."/lib/i18n.php";
+
 # Constant: PACKAGE_DESCRIPTION
 # The offical text-blurb description of the software.
 define("PACKAGE_DESCRIPTION", spf_("%s: a simple and (hopefully) elegant weblog", PACKAGE_NAME));
@@ -241,39 +132,16 @@ define("PACKAGE_COPYRIGHT", _("Copyright &copy; 2005 &ndash; 2014, Peter A. Geer
 # Section: Miscellaneous configuration
 # Assorted configuration constants that don't fit into any coherent category.
 
+# Types of files for use with the getlink() function.
+# For convenience, these are defined as the directories under a theme.
+define("LINK_IMAGE", "images");
+define("LINK_STYLESHEET", "styles");
+define("LINK_SCRIPT", "scripts");
+
 # Constant: CACHEBUST_PARAMETER
 # Defines a cache-busting parameter for static assets.  You can set this if you want,
 # but the default is to use the current software version.
-if (!defined('CACHEBUST_PARAMETER')) {
-    define('CACHEBUST_PARAMETER', PACKAGE_VERSION);
-}
-
-# Constant: USE_WRAPPER_SCRIPTS
-# Controls the use of PHP wrapper scripts for pages.
-# When this is turned on, LnBlog will use a series of wrapper PHP scripts to
-# include the files that build pages.  This results in a clean,
-# directory-based URL structure.
-#
-# If this is set to false, then LnBlog will revert to a URL scheme
-# based on query strings.  The up side of doing things this way is that
-# you never need to upgrade the wrapper scripts.  You can achieve a clean
-# URL structure this way if you have Apache and an appropriate .htacces file.
-#
-# *Defaults* to true.
-# *Note:* this is not yet implemented.
-@define("USE_WRAPPER_SCRIPTS", true);
-
-# Constant: LOCAL_JQUERY_NAME
-# The name of the local copy of jQuery.  If not specified, uses the jQuery CDN.
-@define('LOCAL_JQUERY_NAME', '');
-
-#Constant: LOCAL_JQUERYUI_NAME
-# The name of the local copy of jQUery UI.  If not specified, uses the jQuery CDN.
-@define('LOCAL_JQUERYUI_NAME', '');
-
-#Constant: LOCAL_JQUERYUI_THEME_NAME
-# The name of the local copy of jQUery UI theme CSS.  If not specified, uses the jQuery CDN.
-@define('LOCAL_JQUERYUI_THEME_NAME', '');
+@define('CACHEBUST_PARAMETER', PACKAGE_VERSION);
 
 # Constant: DEFAULT_JQUERYUI_THEME
 # The default theme to use for jQuery UI.  Individual themes can override this by setting
@@ -381,12 +249,6 @@ if (ini_get("default_mimetype")) {
 #
 # *Default* is 3.
 @define("LBCODE_HEADER_WEIGHT", 3);
-
-# Constant: FILE_UPLOAD_TARGET_DIRECTORIES
-# A comma-separated string of target location options for file uploads.
-# These will be used in the search path when trying to absolutize relative
-# URIs in entries.  The
-define("FILE_UPLOAD_TARGET_DIRECTORIES", "files");
 
 ########################################
 # Section: User Authentication
@@ -527,12 +389,6 @@ define("FILE_UPLOAD_TARGET_DIRECTORIES", "files");
 # The *default* is "entry.xml".
 @define("ENTRY_DEFAULT_FILE", "entry.xml");  # Formerly current.htm
 
-# Constant: TAG_SEPARATOR
-# The character used to separate individual tags entered for entries.
-#
-# The *default* is a comma (",").
-@define("TAG_SEPARATOR", ",");
-
 # Constant: ENTRY_DATE_FORMAT
 # Format used to display dates for entries and articles.
 # Note that, like <ENTRY_PATH_FORMAT> this string includes strftime()
@@ -542,31 +398,6 @@ define("FILE_UPLOAD_TARGET_DIRECTORIES", "files");
 # "2005-08-16 04:26 EST".
 @define("ENTRY_DATE_FORMAT", "%Y-%m-%d %H:%M %Z");
 
-# Constant: ENTRY_COMMENT_DIR
-# Directory name to access comments on entries and articles.
-#
-# *Default* is "comments".
-@define("ENTRY_COMMENT_DIR", "comments");
-
-# Constant: ENTRY_TRACKBACK_DIR
-# Directory name to access trackbacks on entries and articles.
-#
-# *Default* is "trackback".
-@define("ENTRY_TRACKBACK_DIR", "trackback");
-
-# Constant: ENTRY_PINGBACK_DIR
-# Directory name to access pingbacks on entries and articles.
-#
-# *Default* is "pingback".
-@define("ENTRY_PINGBACK_DIR", "pingback");
-
-# Constant: ENTRY_PATH_SUFFIX
-# The file suffix for old versions of entries and articles.
-# Note that this only applies to file-based storage when using history
-# tracking.
-#
-# The *default* is ".htm".
-@define("ENTRY_PATH_SUFFIX", ".xml");
 
 # Constant: STICKY_PATH
 # The name of the "sticky" file for articles.
@@ -579,26 +410,6 @@ define("FILE_UPLOAD_TARGET_DIRECTORIES", "files");
 #
 # The *default* value is "sticky.txt".
 @define("STICKY_PATH", "sticky.txt");
-
-########################################
-# Section: Trackback configuration
-
-# Constant: TRACKBACK_PATH_SUFFIX
-# File suffix used for storing TrackBacks.
-# Note that this is specific to file-based storage.
-#
-# The *default* is ".txt".
-@define("TRACKBACK_PATH_SUFFIX", ".xml");     # File suffix for saved pings.
-
-########################################
-# Section: Pingback configuration
-
-# Constant: PINGBACK_PATH_SUFFIX
-# File suffix used for storing Pingbacks.
-# Note that this is specific to file-based storage.
-#
-# The *default* is ".txt".
-@define("PINGBACK_PATH_SUFFIX", ".xml");     # File suffix for saved pings.
 
 #############################################
 # Section: Comment configuration
@@ -637,12 +448,6 @@ define("FILE_UPLOAD_TARGET_DIRECTORIES", "files");
 #The *default* is "Y-m-d_His".
 @define("COMMENT_PATH_FORMAT", "Y-m-d_His");
 
-# Constant: COMMENT_PATH_SUFFIX
-# File suffix to use for comment files.
-#
-#*Default* is ".txt".
-@define("COMMENT_PATH_SUFFIX", ".xml");
-
 # Constant: COMMENT_DELETED_PATH
 # Leaf directory name where deleted comments are stored.
 #
@@ -663,34 +468,7 @@ define("FILE_UPLOAD_TARGET_DIRECTORIES", "files");
 # Set the time zone for date functions.
 date_default_timezone_set(DEFAULT_TIME_ZONE);
 
-# Get the theme for the blog.  I'd like to do this in the Blog class, but
-# we need to set the constant even when we don't have a current blog, so
-# we'll do it here instead.
-if ( defined("BLOG_ROOT") ) {
-    $cfg_file = Path::mk(BLOG_ROOT, BLOG_CONFIG_PATH);
-} elseif (!empty($_GET['blog'])) {
-    $blogs = SystemConfig::instance()->blogRegistry();
-    if (isset($blogs[$_GET['blog']])) {
-        $cfg_file = Path::mk($blogs[$_GET['blog']]->path(), BLOG_CONFIG_PATH);
-    }
-}
-
-if (isset($cfg_file) && is_file($cfg_file)) {
-    $data = file($cfg_file);
-    foreach ($data as $line) {
-        $arr = explode("=", $line);
-        if (strtolower(trim($arr[0])) == "theme") {
-            define("THEME_NAME", trim($arr[1]));
-            break;
-        }
-    }
-}
-
-require_once __DIR__."/lib/utils.php";
-
-# Set constants to make themes work.  Most of these are defaults for when
-# there is no current blog set up.
-@define("THEME_NAME", "default");
+set_current_theme_name();
 
 # Include constants for classes.
 require_once __DIR__."/lib/constants.php";

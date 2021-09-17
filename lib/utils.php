@@ -22,11 +22,124 @@
 # Utility library.  Implements some general purpose functions plus some
 # wrappers that implement functionality available in PHP 5.
 
-# Types of files for use with the getlink() function.
-# For convenience, these are defined as the directories under a theme.
-define("LINK_IMAGE", "images");
-define("LINK_STYLESHEET", "styles");
-define("LINK_SCRIPT", "scripts");
+# Function: class_autoload
+# Legacy auto-loader function.
+function class_autoload($className) {
+    $folders = [
+        implode(DIRECTORY_SEPARATOR, ['lib']),
+        implode(DIRECTORY_SEPARATOR, ['lib', 'textprocessors']),
+        implode(DIRECTORY_SEPARATOR, ['lib', 'uri']),
+        implode(DIRECTORY_SEPARATOR, ['lib', 'exceptions']),
+        implode(DIRECTORY_SEPARATOR, ['tests', 'unit']),
+        implode(DIRECTORY_SEPARATOR, ['tests', 'unit', 'publisher']),
+        implode(DIRECTORY_SEPARATOR, ['tests', 'unit', 'pages']),
+    ];
+    foreach ($folders as $fld) {
+        $fileName = [__DIR__, '..', $fld, $className.'.php'];
+        $file = implode(DIRECTORY_SEPARATOR, $fileName);
+        if (file_exists($file)) {
+            require $file;
+            break;
+        }
+    }
+}
+
+# Function: initialize_session
+# Starts the user's HTTP session
+function initialize_session() {
+    if (version_compare(phpversion(), '7.3.0', '>=')) {
+        session_set_cookie_params(['samesite' => 'Lax']);
+        session_start();
+    } else {
+        session_start();
+        $path = ini_get('session.cookie_path');
+        $domain = ini_get('session.cookie_domain');
+        $http_only = ini_get('session.cookie_httponly') ? 'HttpOnly;' : '';
+        $session_id = session_id();
+        header("Set-Cookie: PHPSESSID=$session_id; path=$path; domain=$domain; $http_only SameSite=Lax");
+    }
+}
+
+# Function load_config_file
+# Loads the userconfig files.
+function load_config_file() {
+    $cfg_file = '';
+    if (file_exists(Path::mk(USER_DATA_PATH, "userconfig.cfg"))) {
+        $cfg_file = Path::mk(USER_DATA_PATH, "userconfig.cfg");
+    }
+
+    # Look for the userconfig.cfg and define any variables in it.
+    # This is a more "user friendly" alternative to userconfig.php.
+    if (file_exists($cfg_file)) {
+        $data = file($cfg_file);
+        foreach ($data as $line) {
+            # Skip comments lines starting with a hash.
+            if (preg_match("/^\s*#/", $line)) continue;
+            $pieces = explode("=", $line, 2);
+            if (count($pieces) == 2) {
+                $pieces[1] = trim($pieces[1]);
+                $curr_piece = strtolower($pieces[1]);
+
+                if ($curr_piece == "true") $pieces[1] = true;
+                elseif ($curr_piece == "false") $pieces[1] = false;
+
+                define(strtoupper(trim($pieces[0])), $pieces[1]);
+            }
+        }
+    }
+
+    $user_config_path = Path::mk(SystemConfig::instance()->installRoot()->path(), "userconfig.php");
+    if (file_exists($user_config_path)) {
+        include $user_config_path;
+    }
+}
+
+# Function: load_plugin
+# Loads a plugin.  This is used for plugins that do page output and will result
+# in the plugin outputing its markup.  Note that not all plugins support this
+# and for those that do, it is configurable as an option, with the alternative
+# being using the event system.
+#
+# Parameters:
+# plugin_name - The name of the class for this plugin.
+#
+# Returns:
+# An instance of the plugin.  The return value may safely be disregarded.
+function load_plugin($plugin_name) {
+    return new $plugin_name(true);
+}
+
+# Function set_current_theme_name
+# Sets the name of the current theme based on the current
+# blog, if any.
+function set_current_theme_name() {
+    # Get the theme for the blog.  I'd like to do this in the Blog class, but
+    # we need to set the constant even when we don't have a current blog, so
+    # we'll do it here instead.
+    if ( defined("BLOG_ROOT") ) {
+        $cfg_file = Path::mk(BLOG_ROOT, BLOG_CONFIG_PATH);
+    } elseif (!empty($_GET['blog'])) {
+        $blogs = SystemConfig::instance()->blogRegistry();
+        if (isset($blogs[$_GET['blog']])) {
+            $cfg_file = Path::mk($blogs[$_GET['blog']]->path(), BLOG_CONFIG_PATH);
+        }
+    }
+
+    if (isset($cfg_file) && is_file($cfg_file)) {
+        $data = file($cfg_file);
+        foreach ($data as $line) {
+            $arr = explode("=", $line);
+            if (strtolower(trim($arr[0])) == "theme") {
+                define("THEME_NAME", trim($arr[1]));
+                break;
+            }
+        }
+    }
+
+    # Set constants to make themes work.  Most of these are defaults for when
+    # there is no current blog set up.
+    @define("THEME_NAME", "default");
+}
 
 # Function: SESSION
 # A wrapper for the $_SESSION superglobal.  Provides a handy
@@ -206,7 +319,6 @@ function config_php_string($levels) {
     $file_part = 'dirname(__FILE__)';
     if ($levels > 0) {
         for ($i = 1; $i <= $levels; $i++) {
-            #$ret .= DIRECTORY_SEPARATOR.'..';
             $file_part = 'dirname(' . $file_part . ')';
         }
     }
@@ -278,6 +390,7 @@ function getlink($name, $type=false) {
     # configurable, though.
 
     $blog = NewBlog();
+    $sysconfig = SystemConfig::instance();
 
     $url_map = [];
     if (defined("BLOG_ROOT")) {
@@ -287,13 +400,13 @@ function getlink($name, $type=false) {
             $blog->uri('base')."third-party/$l_type/$name";
     }
     $url_map[Path::mk(USER_DATA_PATH, "themes", THEME_NAME, $l_type, $name)] =
-        INSTALL_ROOT_URL.USER_DATA."/themes/".THEME_NAME."/$l_type/$name";
+        $sysconfig->userData()->url()."/themes/".THEME_NAME."/$l_type/$name";
     $url_map[Path::mk(INSTALL_ROOT, "themes", THEME_NAME, $l_type, $name)] =
-        INSTALL_ROOT_URL."themes/".THEME_NAME."/$l_type/$name";
+        $sysconfig->installRoot()->url()."themes/".THEME_NAME."/$l_type/$name";
     $url_map[Path::mk(INSTALL_ROOT, "themes", "default", $l_type, $name)] =
-        INSTALL_ROOT_URL."themes/default/$l_type/$name";
+        $sysconfig->installRoot()->url()."themes/default/$l_type/$name";
     $url_map[Path::mk(INSTALL_ROOT, "third-party", $l_type, $name)] =
-        INSTALL_ROOT_URL."third-party/$l_type/$name";
+        $sysconfig->installRoot()->url()."third-party/$l_type/$name";
 
     $ret = $name;
     foreach ($url_map as $path => $url) {
@@ -461,13 +574,11 @@ function get_entry_from_uri($uri) {
 # text    - The main link text.
 # attribs - An associative array of additional attributes, with the key as the
 #           attribute name.
-function ahref($href, $text, $attribs=false) {
+function ahref($href, $text, $attribs=[]) {
     $text = htmlspecialchars($text);
     $base = "<a href=\"$href\"";
-    if ($attribs) {
-        foreach ($attribs as $key=>$val)
-            $base .= " $key=\"$val\"";
-    }
+    foreach ($attribs as $key=>$val)
+        $base .= " $key=\"$val\"";
     return "$base>$text</a>";
 }
 

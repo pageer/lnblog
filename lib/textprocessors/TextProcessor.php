@@ -173,12 +173,10 @@ abstract class TextProcessor
         }
         
         $parent = $this->entry->getParent();
-        $searchpath = array($this->entry->localpath());
-        $upload_dirs = explode(",", FILE_UPLOAD_TARGET_DIRECTORIES);
-        foreach ($upload_dirs as $dir) {
-            $searchpath[] = Path::mk($parent->home_path, $dir);
-        }
-        $searchpath[] = $parent->home_path;
+        $searchpath = [
+            $this->entry->localpath(),
+            $parent->home_path,
+        ];
         
         $temp_uri = str_replace("/", Path::$sep, $uri);
         

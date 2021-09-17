@@ -948,13 +948,14 @@ class AdminPages extends BasePages
         Page::instance()->title = sprintf(_("%s Configuration"), PACKAGE_NAME);
 
         $tpl = $this->createTemplate(FS_CONFIG_TEMPLATE);
+        $userdata_dir_name = 'userdata';
 
         $tpl->set("FORM_ACTION", '');
         $install_root = dirname(__DIR__);
         $install_root_url = preg_replace('|index\.php.*|', '', current_url());
         $lnblog_dir_name = basename(dirname(__DIR__));
-        $userdata = Path::mk(dirname(dirname(__DIR__)), USER_DATA);
-        $userdata_url = preg_replace("|$lnblog_dir_name/index.php\.*|i", USER_DATA . '/', current_url());
+        $userdata = Path::mk(dirname(dirname(__DIR__)), $userdata_dir_name);
+        $userdata_url = preg_replace("|$lnblog_dir_name/index.php\.*|i", $userdata_dir_name . '/', current_url());
 
         if (has_post()) {
 

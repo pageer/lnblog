@@ -110,3 +110,40 @@ define("LOGIN_TOKEN", "lToken");
 define("LAST_LOGIN_TIME", "lastLTime");
 define("CURRENT_USER", "uName");
 define("PW_HASH", "uHash");
+
+# Constant: ENTRY_COMMENT_DIR
+# Directory name to access comments on entries and articles.
+define("ENTRY_COMMENT_DIR", "comments");
+
+# Constant: ENTRY_TRACKBACK_DIR
+# Directory name to access trackbacks on entries and articles.
+define("ENTRY_TRACKBACK_DIR", "trackback");
+
+# Constant: ENTRY_PINGBACK_DIR
+# Directory name to access pingbacks on entries and articles.
+define("ENTRY_PINGBACK_DIR", "pingback");
+
+# Constant: COMMENT_PATH_SUFFIX
+# File suffix to use for comment files.
+@define("COMMENT_PATH_SUFFIX", ".xml");
+
+# Constant: TRACKBACK_PATH_SUFFIX
+# File suffix used for storing TrackBacks.
+# Note that this is specific to file-based storage.
+define("TRACKBACK_PATH_SUFFIX", ".xml");
+
+# Constant: PINGBACK_PATH_SUFFIX
+# File suffix used for storing Pingbacks.
+# Note that this is specific to file-based storage.
+define("PINGBACK_PATH_SUFFIX", ".xml");
+
+# Constant: ENTRY_PATH_SUFFIX
+# The file suffix for old versions of entries and articles.
+# Note that this only applies to file-based storage when using history
+# tracking.
+define("ENTRY_PATH_SUFFIX", ".xml");
+
+# Constant: TAG_SEPARATOR
+# The character used to separate individual tags entered for entries.
+define("TAG_SEPARATOR", ",");
+
