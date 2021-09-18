@@ -15,7 +15,7 @@ use LnBlog\Tasks\TaskManager;
 $short_options = '';
 $long_options = [];
 
-# Run "cron" tasks.  Runs any checks and tasks that should be done 
+# Run "cron" tasks.  Runs any checks and tasks that should be done
 # on a regular basis, e.g. every 15 minutes or so.
 $short_options .= 'c';
 $long_options[] = 'cron';

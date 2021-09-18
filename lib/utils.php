@@ -399,9 +399,9 @@ function getlink($name, $type=false) {
 
     $url_map = [];
     if (defined("BLOG_ROOT")) {
-        $url_map[Path::mk(BLOG_ROOT, $l_type, $name)] = 
+        $url_map[Path::mk(BLOG_ROOT, $l_type, $name)] =
             $blog->uri('base').$l_type."/".$name;
-        $url_map[Path::mk(BLOG_ROOT, "third-party", $l_type, $name)] = 
+        $url_map[Path::mk(BLOG_ROOT, "third-party", $l_type, $name)] =
             $blog->uri('base')."third-party/$l_type/$name";
     }
     $url_map[Path::mk(USER_DATA_PATH, "themes", THEME_NAME, $l_type, $name)] =

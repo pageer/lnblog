@@ -32,7 +32,6 @@
 # Note that this should really be a factory class, but PHP 4 doesn't allow
 # static methods, so it's more convenient just to make them functions.
 
-use Psr\Log\LoggerInterface;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 
