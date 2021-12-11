@@ -115,7 +115,7 @@ define("REQUIRED_VERSION", "2.2.0");
 
 # Constant: PACKAGE_URL
 # The full URL of the LnBlog project home page.
-define("PACKAGE_URL", "http://lnblog.skepticats.com/");
+define("PACKAGE_URL", "https://lnblog.skepticats.com/");
 
 # Add I18N support here, as this is currently the earliest we can do it.
 # Refer to the lib/i18n.php file for details.

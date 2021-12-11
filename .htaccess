@@ -1,5 +1,8 @@
 RewriteEngine On
 
+# Block access to the Git directory
+RewriteRule (^|/).git(/|$) - [F]
+
 <Files .gitignore>
     Order Allow,Deny
     Deny from all

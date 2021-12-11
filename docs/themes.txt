@@ -2,15 +2,42 @@ Title: LnBlog Theme System
 
 Section:Understanding the LnBlog Theme System
 
-Last update: 2005-Jun-30</p>
-
 This document describes the theme and template system used by LnBlog. It
-is a custom theme system based in part on the template system described in the article
-Beyond the Template Engine <http://www.sitepoint.com/print/beyond-template-engine></a>
+is a custom theme system inspired by the template system described in the article
+<Beyond the Template Engine: http://www.sitepoint.com/print/beyond-template-engine>,
+but also includes some elements of more modern systems such as Twig.
 It includes images, style sheets, and client-side scripts for each
-theme, as well as a path mechanism for determining which file to use.</p>
+theme, as well as a path mechanism for determining which file to use.
 
 Section: Overview
+
+The LnBlog theme system is designed to support multiple installed themes at once
+and allow each blog to switch between them.  The themes work on a file replacement 
+basis, meaning that there is a "default" theme that includes all the files required
+for basic operation and that other themes can override one or more of those files to
+change how things look or operate.
+
+Themes can be placed in the main LnBlog install directory, the userdata directory, or in
+an individual blog directory.  In each case, the themes live in a "themes/themeName/" directory.
+This directory contains subdirectories named "templates", "images", "scripts", and "styles"
+(empty directories may be omitted).  When looking for a file, LnBlog will check for a "themes/themeName/"
+directory in the current blog directory, userdata directory, and then LnBlog directory in that order.  If
+the requested file is not found in any of those locations, the version in the default theme will be used.
+
+Section: Templates
+
+Templates in LnBlog are plain-old PHP files.  There is no special templating language - it's just 
+vanilla PHP that gets run by an "include()" call.  You can use any function or language feature that
+PHP supports, but there are some conventions in place that you might want to observe.
+
+The templates are processed by the <PHPTemplate.process> method of the <PHPTemplate> class.  Variables can be
+injected into the template by the <PHPTemplate.set> method and these variables will be extracted into
+the local scope in the template file.  Note that the template will execute (i.e. is included in) 
+in the context of the <PHPTemplate.process> method, so it will have access to the members of the
+<PHPTemplate> class, including the "$this->pages" variable which represents the current <BasePages>
+instance, which can call <BasePages.getPage> to access the current <Page>, which can inject scripts,
+stylesheets, headers, and other resources into the request.
+
 
 The basic operation of the
 LnBlog theme system is quite simle, although tracking how files
@@ -181,7 +208,6 @@ As previously mentioned, LnBlog uses a series of templates nested inside each ot
 a page. One consequence of this is that if you want to make any
 significant changes to the layout of a page, you may need to change several files. The most important template files are probably the following:
 
-article_tpl.php - Controls the display of articles.
 blogentry_tpl.php - Controls the display of blog entries.
 blogcomment_tpl.php - Controls the display of comments.
 trackback_tpl.php - Controls the display of TrackBack entries.
