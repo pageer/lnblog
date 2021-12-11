@@ -21,6 +21,7 @@ class WordPressExporterTest extends \PHPUnit\Framework\TestCase
     public function testExport_NoEntries_NoItems() {
         $blog = $this->getTestBlog();
         $this->globals->time()->willReturn(strtotime('2000-01-01 12:13:14 GMT'));
+        $this->globals->constant('LANGUAGE')->willReturn('en_US');
 
         $target = new ExportTarget($this->fs->reveal());
         $exporter = new WordPressExporter($this->globals->reveal(), $this->user_repo->reveal());
@@ -33,6 +34,7 @@ class WordPressExporterTest extends \PHPUnit\Framework\TestCase
     }
 
     public function testExport_AllEntryTypes_MatchesXml() {
+        $this->globals->constant('LANGUAGE')->willReturn('en_US');
         $test_entry_data = $this->getTestEntry();
         $test_article_data = $this->getTestArticle();
         $test_draft_data = $this->getTestDraft();
@@ -71,6 +73,7 @@ class WordPressExporterTest extends \PHPUnit\Framework\TestCase
      * @dataProvider getCommentVariations
      */
     public function testExport_EntryWithComments_MatchesXml($use_comments, $use_pingbacks) {
+        $this->globals->constant('LANGUAGE')->willReturn('en_US');
         $test_entry_data = $this->getTestEntry($use_comments, $use_pingbacks);
         $entries = [
             $test_entry_data[0],
@@ -106,8 +109,6 @@ class WordPressExporterTest extends \PHPUnit\Framework\TestCase
         $this->fs = $this->prophet->prophesize(FS::class);
         $this->globals = $this->prophet->prophesize(GlobalFunctions::class);
         $this->user_repo = $this->prophet->prophesize(UserRepository::class);
-
-        $this->globals->constant('LANGUAGE')->willReturn('en_US');
     }
 
     protected function tearDown(): void {
