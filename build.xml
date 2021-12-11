@@ -44,6 +44,8 @@
     </target>
 
     <target name="checks">
+        <exec command="composer validate" dir="${srcDir}" passthru="true" checkreturn="true" />
+        <exec command="npm audit" dir="${srcDir}" passthru="true" checkreturn="true" />
         <apply executable="php" parallel="false" dir="${srcDir}" checkreturn="true">
             <arg value="-l" />
             <fileset dir=".">
