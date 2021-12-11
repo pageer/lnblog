@@ -106,6 +106,8 @@ class WordPressExporterTest extends \PHPUnit\Framework\TestCase
         $this->fs = $this->prophet->prophesize(FS::class);
         $this->globals = $this->prophet->prophesize(GlobalFunctions::class);
         $this->user_repo = $this->prophet->prophesize(UserRepository::class);
+
+        $this->globals->constant('LANGUAGE')->willReturn('en_US');
     }
 
     protected function tearDown(): void {

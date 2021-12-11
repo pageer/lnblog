@@ -36,7 +36,7 @@ class BlogTranslator implements Translator
         $root->addChild('link', $blog->getURL());
         $root->addChild('description', $blog->description());
         $root->addChild('pubDate', $now->format(DateTimeInterface::RSS));
-        $root->addChild('language', str_replace('_', '-', LANGUAGE));
+        $root->addChild('language', str_replace('_', '-', $this->globals->constant('LANGUAGE')));
         $root->addChild('wxr_version', '1.2', $wp_ns);
         $root->addChild('base_site_url', $blog->getURL(), $wp_ns);
         $root->addChild('base_blog_url', $blog->getURL(), $wp_ns);
