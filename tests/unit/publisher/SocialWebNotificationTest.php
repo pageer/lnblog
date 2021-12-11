@@ -203,7 +203,7 @@ class SocialWebNotificationTest extends PublisherTestBase
     }
 
     private function setUpDraftEntryForSuccessfulPublish() {
-        $entry = new BlogEntry(null, $this->fs->reveal());
+        $entry = new BlogEntry('', $this->fs->reveal());
         $entry->file = './drafts/02_1234/entry.xml';
         $fs = $this->fs;
         $fs->file_exists(Argument::any())->willReturn(false);

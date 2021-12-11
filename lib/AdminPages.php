@@ -18,14 +18,13 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+use LnBlog\Export\ExportTarget;
+use LnBlog\Export\ExporterFactory;
+use LnBlog\Forms\BlogExportForm;
 use LnBlog\Forms\BlogImportForm;
 use LnBlog\Forms\BlogRegistrationForm;
-use LnBlog\Import\FileImportSource;
-use LnBlog\Import\ImporterFactory;
-use LnBlog\Import\WordPressImporter;
 use LnBlog\Storage\BlogRepository;
 use LnBlog\Storage\UserRepository;
-use LnBlog\Tasks\TaskManager;
 
 class AdminPages extends BasePages
 {
@@ -35,6 +34,7 @@ class AdminPages extends BasePages
         return array(
             'index' => 'index',
             'import' => 'importblog',
+            'export' => 'exportblog',
             'login' => 'bloglogin',
             'logout' => 'bloglogout',
             'newblog' => 'newblog',
@@ -76,7 +76,7 @@ class AdminPages extends BasePages
         $tpl->set('CONFIRM_PAGE', $page);
         $tpl->set('OK_ID', $yes_id);
         $tpl->set('OK_LABEL', $yes_label);
-        $tpl->set('CANCEL_ID', $no_label);
+        $tpl->set('CANCEL_ID', $no_id);
         $tpl->set('CANCEL_LABEL', $no_label);
         $tpl->set('PASS_DATA_ID', $data_id);
         $tpl->set('PASS_DATA', $data);
@@ -362,6 +362,29 @@ class AdminPages extends BasePages
         $body = $form->render($this);
         Page::instance()->addPackage('jquery-ui');
         Page::instance()->title = _('Import blog');
+        Page::instance()->addStylesheet("form.css");
+        Page::instance()->display($body);
+    }
+
+    public function exportblog() {
+        $form = new BlogExportForm(new ExporterFactory(), SystemConfig::instance(), $this->getBlogRepository());
+
+        if (has_post()) {
+            try {
+                /** @var ExportTarget $export_data */
+                $export_data = $form->process($_POST);
+                $filename = $export_data->getExportFile();
+                header('Content-Type: application/xml');
+                header("Content-Disposition: attachment; filename=$filename");
+                echo $export_data->getAsText();
+                return;
+            } catch (Exception $e) {
+            }
+        }
+
+        $body = $form->render($this);
+        Page::instance()->addPackage('jquery-ui');
+        Page::instance()->title = _('Export blog');
         Page::instance()->addStylesheet("form.css");
         Page::instance()->display($body);
     }

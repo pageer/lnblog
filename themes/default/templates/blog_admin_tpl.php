@@ -35,7 +35,11 @@ $(document).ready(function () {
 <ul>
     <?php if (isset($SHOW_NEW)): ?>
     <li><a href="?action=newblog"><?php p_("Add new blog") ?></a></li>
-    <li><a href="?action=import"><?php p_("Import blog") ?></a></li>
+    <li>
+        <a href="?action=import"><?php p_("Import blog") ?></a>
+        |
+        <a href="?action=export"><?php p_("Export blog") ?></a>
+    </li>
     <?php endif ?>
     <li><a href="?action=newlogin"><?php p_("Add new user") ?></a></li>
     <li>

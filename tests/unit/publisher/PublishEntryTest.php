@@ -7,7 +7,7 @@ class PublishEntryTest extends PublisherTestBase
 
     public function testPublishEntry_WhenEntryDoesNotExists_SaveAsDraftAndMovesDirectory() {
         $fs = $this->fs;
-        $entry = new BlogEntry(null, $fs->reveal());
+        $entry = new BlogEntry('', $fs->reveal());
         $entry->subject = 'test';
         $fs->file_exists(Argument::containingString('test.php'))->willReturn(true);
         $fs->write_file(Argument::containingString('test.php'), Argument::any())->willReturn(true);
@@ -36,7 +36,7 @@ class PublishEntryTest extends PublisherTestBase
 
     public function testPublishEntry_WhenSavingDraft_SavesUploadOnlyOnce() {
         $fs = $this->fs;
-        $entry = new BlogEntry(null, $fs->reveal());
+        $entry = new BlogEntry('', $fs->reveal());
         $entry->subject = 'test';
         $event_stub = $this->setUpForMultipleUploadSuccess();
         $path = './drafts/02_1234/entry.xml';
@@ -72,7 +72,7 @@ class PublishEntryTest extends PublisherTestBase
 
     public function testPublishEntry_WhenPublishTargetDirAlreadyExists_AddsSecondsToTargetPath() {
         $fs = $this->fs;
-        $entry = new BlogEntry(null, $fs->reveal());
+        $entry = new BlogEntry('', $fs->reveal());
         $entry->file = './drafts/02_1234/entry.xml';
         $entry->subject = 'test';
         $fs->file_exists(Argument::containingString('test.php'))->willReturn(true);
@@ -94,7 +94,7 @@ class PublishEntryTest extends PublisherTestBase
 
     public function testPublishEntry_WhenBothPublishTargetDirsAlreadyExists_Throws() {
         $fs = $this->fs;
-        $entry = new BlogEntry(null, $fs->reveal());
+        $entry = new BlogEntry('', $fs->reveal());
         $entry->file = './drafts/02_1234/entry.xml';
         $fs->file_exists(Argument::any())->willReturn(true);
         $fs->is_dir(Argument::any())->willReturn(true);
@@ -116,7 +116,7 @@ class PublishEntryTest extends PublisherTestBase
 
     public function testPublishEntry_WhenRenameFails_Throws() {
         $fs = $this->fs;
-        $entry = new BlogEntry(null, $fs->reveal());
+        $entry = new BlogEntry('', $fs->reveal());
         $entry->file = './drafts/02_1234/entry.xml';
         $fs->file_exists(Argument::any())->willReturn(false);
         $fs->file_exists('./drafts/02_1234/entry.xml')->willReturn(true);
@@ -258,7 +258,7 @@ class PublishEntryTest extends PublisherTestBase
     }
 
     private function setUpDraftEntryForSuccessfulPublish() {
-        $entry = new BlogEntry(null, $this->fs->reveal());
+        $entry = new BlogEntry('', $this->fs->reveal());
         $entry->file = './drafts/02_1234/entry.xml';
         $fs = $this->fs;
         $fs->file_exists(Argument::any())->willReturn(false);

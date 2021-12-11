@@ -194,7 +194,7 @@ class CreateDraftTest extends PublisherTestBase
             }
         );
 
-        $entry = new BlogEntry(null, $this->fs->reveal());
+        $entry = new BlogEntry('', $this->fs->reveal());
         $entry->data = "This is some text";
         return $entry;
     }

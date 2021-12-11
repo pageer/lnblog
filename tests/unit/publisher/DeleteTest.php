@@ -5,7 +5,7 @@ class DeleteTest extends PublisherTestBase
 {
 
     public function testDelete_WhenEntryDoesNotExist_Throws() {
-        $entry =  new BlogEntry(null, $this->fs->reveal());
+        $entry =  new BlogEntry('', $this->fs->reveal());
 
         $this->expectException(EntryDoesNotExist::class);
 
@@ -15,7 +15,7 @@ class DeleteTest extends PublisherTestBase
     public function testDelete_WhenEntryHasPrettyPermalink_DeletesLink() {
         $path = './entries/2017/03/02_1234/entry.xml';
         $link_path = './entries/2017/03/Some_Stuff.php';
-        $entry = new BlogEntry(null, $this->fs->reveal());
+        $entry = new BlogEntry('', $this->fs->reveal());
         $entry->subject = 'Some Stuff';
         $entry->permalink_name = 'Some_Stuff.php';
         $entry->file = $path;
@@ -37,7 +37,7 @@ class DeleteTest extends PublisherTestBase
         $link_path = './entries/2017/03/Some_Stuff.php';
         $old_link_path1 = './entries/2017/03/Other_Stuff.php';
         $old_link_path2 = './entries/2017/03/Old_Stuff.php';
-        $entry = new BlogEntry(null, $this->fs->reveal());
+        $entry = new BlogEntry('', $this->fs->reveal());
         $entry->subject = 'Some Stuff';
         $entry->file = $path;
         $entry->permalink_name = 'Some_Stuff.php';
@@ -78,7 +78,7 @@ class DeleteTest extends PublisherTestBase
 
     public function testDelete_WhenNotTrackingHistory_DeletesEntryDirectory() {
         $path = './entries/2017/03/02_1234/entry.xml';
-        $entry = new BlogEntry(null, $this->fs->reveal());
+        $entry = new BlogEntry('', $this->fs->reveal());
         $entry->file = $path;
         $this->fs->scandir(Argument::any())->willReturn(array());
         $this->fs->file_exists($path)->willReturn(true);
@@ -94,7 +94,7 @@ class DeleteTest extends PublisherTestBase
     public function testDelete_WhenTrackingHistory_RenamesEntryFile() {
         $time = new DateTime('2017-01-02 12:34:00');
         $path = './entries/2017/03/02_1234/entry.xml';
-        $entry = new BlogEntry(null, $this->fs->reveal());
+        $entry = new BlogEntry('', $this->fs->reveal());
         $entry->file = $path;
         $this->fs->scandir(Argument::any())->willReturn(array());
         $this->fs->file_exists($path)->willReturn(true);
@@ -109,7 +109,7 @@ class DeleteTest extends PublisherTestBase
 
     public function testDelete_WhenNotTrackingHistoryAndDeleteFails_Throws() {
         $path = './entries/2017/03/02_1234/entry.xml';
-        $entry = new BlogEntry(null, $this->fs->reveal());
+        $entry = new BlogEntry('', $this->fs->reveal());
         $entry->file = $path;
         $this->fs->scandir(Argument::any())->willReturn(array());
         $this->fs->file_exists($path)->willReturn(true);
@@ -126,7 +126,7 @@ class DeleteTest extends PublisherTestBase
     public function testDelete_WhenTrackingHistoryAndRenameFails_Throws() {
         $path = './entries/2017/03/02_1234/entry.xml';
         $new_path = './entries/2017/03/02_1234/02_123400.xml';
-        $entry = new BlogEntry(null, $this->fs->reveal());
+        $entry = new BlogEntry('', $this->fs->reveal());
         $entry->file = $path;
         $this->fs->scandir(Argument::any())->willReturn(array());
         $this->fs->file_exists($path)->willReturn(true);

@@ -78,7 +78,7 @@ abstract class PublisherTestBase extends PHPUnit\Framework\TestCase
     }
 
     private function setUpEntryForSuccessfulSave($path) {
-        $entry = new BlogEntry(null, $this->fs->reveal(), null, $this->resolver->reveal());
+        $entry = new BlogEntry('', $this->fs->reveal(), null, $this->resolver->reveal());
         $entry->parent = new Blog();
         $entry->parent->blogid = '.';
         $entry->parent->home_path = '.';
@@ -108,7 +108,7 @@ abstract class PublisherTestBase extends PHPUnit\Framework\TestCase
     }
 
     private function setUpEntryForSuccessfulDelete($path) {
-        $entry = new BlogEntry(null, $this->fs->reveal());
+        $entry = new BlogEntry('', $this->fs->reveal());
         $entry->file = $path;
         $this->fs->file_exists($path)->willReturn(true);
         $this->fs->realpath($path)->willReturn($path);

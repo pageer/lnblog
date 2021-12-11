@@ -44,6 +44,7 @@
 
 use LnBlog\Attachments\AttachmentContainer;
 use LnBlog\Attachments\FileManager;
+use LnBlog\Storage\EntryRepository;
 use LnBlog\Tasks\AutoPublishTask;
 use LnBlog\Tasks\TaskManager;
 use LnBlog\Tasks\TaskRepository;
@@ -98,8 +99,7 @@ class Blog extends LnBlogObject implements AttachmentContainer
     private $task_manager;
     private $url_resolver;
     private $logger;
-
-    private $entry_list = [];
+    private $entry_repo;
 
     public function __construct(
         $path = "",
@@ -107,12 +107,14 @@ class Blog extends LnBlogObject implements AttachmentContainer
         $file_manager = null,
         TaskManager $task_manager = null,
         UrlResolver $url_resolver = null,
-        LoggerInterface $logger = null
+        LoggerInterface $logger = null,
+        EntryRepository $entry_repo = null
     ) {
         $this->fs = $fs ?: NewFS();
         $this->filemanager = $file_manager ?: new FileManager($this, $this->fs);
         $this->url_resolver = $url_resolver ?: new UrlResolver(SystemConfig::instance(), $this->fs);
         $this->logger = $logger ?: NewLogger();
+        $this->entry_repo = $entry_repo ?: new EntryRepository($this, $this->fs);
         $this->task_manager = $task_manager;
         if (!$task_manager) {
             $task_repository = new TaskRepository($this->fs);
@@ -215,7 +217,7 @@ class Blog extends LnBlogObject implements AttachmentContainer
     }
 
     public function getParent() {
- return false; 
+        return false;
     }
 
     /*
@@ -431,7 +433,7 @@ class Blog extends LnBlogObject implements AttachmentContainer
                 $ent_list = array_merge($ent_list, $this->getMonth($year, $dir));
             }
         }
-        $this->entry_list = $ent_list;
+        $this->entrylist = $ent_list;
         return $this->entrylist;
     }
 
@@ -607,88 +609,7 @@ class Blog extends LnBlogObject implements AttachmentContainer
     An array of BlogEntry objects.
     */
     public function getEntries($number = -1, $offset = 0) {
-        $this->getEntriesRecursive($number, $offset);
-        #$this->getEntriesByGlob($number, $offset);
-        return $this->entrylist;
-    }
-
-    private function getEntriesRecursive($number=-1,$offset=0) {
-
-        $entry = NewBlogEntry();
-        $this->entrylist = array();
-        if ($number == 0) {
-            return [];
-        }
-
-        $ent_dir = Path::mk($this->home_path, BLOG_ENTRY_PATH);
-        $num_scanned = 0;
-        $num_found = 0;
-
-        $this->has_more_entries = false;
-
-        $year_list = $this->fs->scan_directory($ent_dir, true);
-        rsort($year_list);
-
-        foreach ($year_list as $year) {
-            $month_list = $this->fs->scan_directory(Path::mk($ent_dir, $year), true);
-            rsort($month_list);
-            foreach ($month_list as $month) {
-                $path = Path::mk($ent_dir, $year, $month);
-                $ents = $this->fs->scan_directory($path, true);
-                rsort($ents);
-                foreach ($ents as $e) {
-                    $ent_path = Path::mk($path, $e);
-                    if ( $entry->isEntry($ent_path) ) {
-                        if ($num_scanned >= $offset) {
-                            $num_found++;
-                            # If we've hit the max, then break out of all 3 loops.
-                            if ($num_found > $number && $number >= 0) {
-                                $this->has_more_entries = true;
-                                break 3;
-                            }
-                            $this->entrylist[] = NewBlogEntry($ent_path);
-                        }
-                        $num_scanned++;
-                    }
-                }  # End month loop
-            }  # End year loop
-        }  # End archive loop
-        return $this->entrylist;
-    }
-
-    private function getEntriesByGlob($number = -1, $offset = 0) {
-        if ($number == 0) {
-            return [];
-        }
-
-        $this->entrylist = [];
-        $num_scanned = 0;
-        $num_found = 0;
-
-        # This glob should find all of the entry.xml files, which are required
-        # for valid entries, in a single step.
-        $entry_file_glob = Path::mk($this->home_path, BLOG_ENTRY_PATH, '*', '*', '*', ENTRY_DEFAULT_FILE);
-        $files = $this->fs->glob($entry_file_glob);
-        /*
-        $entry_list = array_reverse($files);
-
-        if ($number > 0) {
-            $entry_list = array_slice($entry_list, $offset, $number);
-        }
-         */
-        if ($number > 0) {
-            $offset = -1 * ($offset + $number);
-            $files2 = array_slice($files, $offset, $number);
-        }
-
-        $entry_list = array_reverse(isset($files2) ? $files2 : $files);
-
-        $instantiator = function ($entry_path) {
-            return NewBlogEntry(dirname($entry_path));
-        };
-        
-        $this->entrylist = array_map($instantiator, $entry_list);
-        $this->has_more_entries = count($entry_list) - $offset - $number > 0;
+        $this->entrylist = $this->entry_repo->getLimit($number, $offset);
         return $this->entrylist;
     }
 
@@ -761,26 +682,7 @@ class Blog extends LnBlogObject implements AttachmentContainer
     An array of BlogEntry objects.
     */
     public function getDrafts() {
-        $art = NewBlogEntry();
-        $art_path = Path::mk($this->home_path, BLOG_DRAFT_PATH);
-
-        $art_list = $this->fs->scan_directory($art_path);
-        $ret = array();
-        foreach ($art_list as $dir) {
-            if ($art->isEntry(Path::mk($art_path, $dir)) ) {
-                $ret[] = NewEntry(Path::mk($art_path, $dir));
-            }
-        }
-        usort($ret, array($this, '_sort_by_date'));
-        return $ret;
-    }
-
-    protected function _sort_by_date($e1, $e2) {
-        if ($e1->post_ts == $e2->post_ts) {
-            return 0;
-        } else {
-            return $e1->post_ts < $e2->post_ts ? -1 : 1;
-        }
+        return $this->entry_repo->getDrafts();
     }
 
     /*
@@ -794,22 +696,7 @@ class Blog extends LnBlogObject implements AttachmentContainer
     An array of Article objects.
     */
     public function getArticles($number = null) {
-        $art = NewEntry();
-        $art_path = Path::get($this->home_path, BLOG_ARTICLE_PATH);
-        $art_list = $this->fs->scan_directory($art_path);
-        $ret = array();
-        $count = 0;
-        foreach ($art_list as $dir) {
-            $path = Path::mk($art_path, $dir);
-            if ($art->checkArticlePath($path)) {
-                $ret[] = NewEntry($path);
-                $count++;
-            }
-            if ($number && $count >= $number) {
-                break;
-            }
-        }
-        return $ret;
+        return $this->entry_repo->getArticles($number);
     }
 
     /*

@@ -6,7 +6,7 @@ class UnpublishTest extends PublisherTestBase
 {
 
     public function testUnpublish_WhenNoConflictingDraft_MoveEntryToDraftWithPostTimestamp() {
-        $entry = new BlogEntry(null, $this->fs->reveal());
+        $entry = new BlogEntry('', $this->fs->reveal());
         $entry->file = './content/some_stuff/entry.xml';
         $entry->post_ts = strtotime('2017-01-02 12:34:00');
         $this->fs->file_exists('./content/some_stuff/entry.xml')->willReturn(true);
@@ -19,7 +19,7 @@ class UnpublishTest extends PublisherTestBase
     }
 
     public function testUnpublish_WhenEntryDoesNotExist_Throws() {
-        $entry = new BlogEntry(null, $this->fs->reveal());
+        $entry = new BlogEntry('', $this->fs->reveal());
         $this->fs->file_exists(Argument::any())->willReturn(false);
 
         $this->expectException(EntryDoesNotExist::class);
@@ -28,7 +28,7 @@ class UnpublishTest extends PublisherTestBase
     }
 
     public function testUnpublish_WhenEntryIsNotPublished_Throws() {
-        $entry = new BlogEntry(null, $this->fs->reveal());
+        $entry = new BlogEntry('', $this->fs->reveal());
         $entry->file = "./drafts/02_1234/entry.xml";
         $this->fs->file_exists('./drafts/02_1234/entry.xml')->willReturn(true);
         $this->fs->realpath($entry->file)->willReturn($entry->file);
@@ -39,7 +39,7 @@ class UnpublishTest extends PublisherTestBase
     }
 
     public function testUnpublish_WhenRenameFails_Throws() {
-        $entry = new BlogEntry(null, $this->fs->reveal());
+        $entry = new BlogEntry('', $this->fs->reveal());
         $entry->file = './content/some_stuff/entry.xml';
         $entry->post_ts = strtotime('2017-01-02 12:34:00');
         $this->fs->file_exists($entry->file)->willReturn($entry->file);
@@ -53,7 +53,7 @@ class UnpublishTest extends PublisherTestBase
     }
 
     public function testUnpublish_WhenRenameSucceeds_RemovesDirectoryWrappers() {
-        $entry = new BlogEntry(null, $this->fs->reveal());
+        $entry = new BlogEntry('', $this->fs->reveal());
         $entry->file = './content/some_stuff/entry.xml';
         $entry->post_ts = strtotime('2017-01-02 12:34:00');
         $this->fs->file_exists('./content/some_stuff/entry.xml')->willReturn(true);
@@ -67,7 +67,7 @@ class UnpublishTest extends PublisherTestBase
     }
 
     public function testUnpublish_WhenRenameSucceeds_RemovesPrettyPermalink() {
-        $entry = new BlogEntry(null, $this->fs->reveal());
+        $entry = new BlogEntry('', $this->fs->reveal());
         $entry->subject = 'Test Entry';
         $entry->permalink_name = 'Test_Entry.php';
         $entry->file = './entries/2017/01/02_1234/entry.xml';
@@ -134,7 +134,7 @@ class UnpublishTest extends PublisherTestBase
     /******** Utilities ********/
 
     private function setUpTestEntryForSuccessfulUnpublish() {
-        $entry = new BlogEntry(null, $this->fs->reveal());
+        $entry = new BlogEntry('', $this->fs->reveal());
         $entry->file = './content/some_stuff/entry.xml';
         $entry->post_ts = strtotime('2017-01-02 12:34:00');
         $this->fs->file_exists('./content/some_stuff/entry.xml')->willReturn(true);
@@ -153,7 +153,7 @@ class UnpublishTest extends PublisherTestBase
     }
 
     private function setUpTestEntryForFailedUnpublish($file_exists, $rename_success) {
-        $entry = new BlogEntry(null, $this->fs->reveal());
+        $entry = new BlogEntry('', $this->fs->reveal());
         $entry->file = './content/some_stuff/entry.xml';
         $entry->post_ts = strtotime('2017-01-02 12:34:00');
         $this->fs->file_exists('./content/some_stuff/entry.xml')->willReturn($file_exists);

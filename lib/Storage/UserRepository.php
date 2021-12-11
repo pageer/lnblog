@@ -12,6 +12,10 @@ class UserRepository
         return $user->exists();
     }
 
+    public function get(string $username) {
+        return User::get($username);
+    }
+
     public function createUser(User $user) {
         $user->save();
     }

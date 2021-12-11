@@ -22,7 +22,7 @@ class PublishArticleTest extends PublisherTestBase
     }
 
     public function testPublishArticle_WhenEntryDoesNotExist_SavesAsDraft() {
-        $entry = new BlogEntry(null, $this->fs->reveal());
+        $entry = new BlogEntry('', $this->fs->reveal());
         $entry = $this->setUpTestArticleForSuccessfulDraftSave();
         $entry->article_path = 'some_stuff';
         $this->fs->file_exists('./drafts/02_1234')->willReturn(false);
@@ -313,7 +313,7 @@ class PublishArticleTest extends PublisherTestBase
     }
 
     private function getTestDraftEntry() {
-        $entry = new BlogEntry(null, $this->fs->reveal(), null, $this->resolver->reveal());
+        $entry = new BlogEntry('', $this->fs->reveal(), null, $this->resolver->reveal());
         $entry->file = './drafts/02_1234/entry.xml';
         $entry->article_path = 'some_stuff';
         return $entry;
@@ -342,7 +342,7 @@ class PublishArticleTest extends PublisherTestBase
     } 
 
     private function setUpTestArticleForSuccessfulDraftSave() {
-        $entry = new BlogEntry(null, $this->fs->reveal());
+        $entry = new BlogEntry('', $this->fs->reveal());
         $fs = $this->fs;
         $fs->is_dir('./drafts')->willReturn(true);
         $fs->mkdir_rec('./drafts/02_1234')->willReturn(true);

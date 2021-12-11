@@ -41,6 +41,7 @@ POSTRetrieved  - Fired after data has been retrieved from an HTTP POST.
 
 use LnBlog\Attachments\FileManager;
 use LnBlog\Attachments\AttachmentContainer;
+use LnBlog\Storage\ReplyRepository;
 
 class BlogEntry extends Entry implements AttachmentContainer
 {
@@ -61,21 +62,36 @@ class BlogEntry extends Entry implements AttachmentContainer
     public $autopublish_date = '';
     public $permalink_name = '';
     
-    # Note: This is for test injection
     public $parent = null;
 
     private $filemanager;
+    private $reply_repo;
 
-    public function __construct($path = "", $filesystem = null, $file_manager = null, UrlResolver $resolver = null) {
+    static public function pathIsArticle($dir_path, FS $fs = null): bool {
+        if (!$fs) {
+            $fs = NewFS();
+        }
+        $article_dir = basename(dirname($dir_path));
+        return $fs->is_dir($dir_path) && $article_dir == BLOG_ARTICLE_PATH;
+    }
+
+    public function __construct(
+        string $path = "",
+        FS $filesystem = null,
+        FileManager $file_manager = null,
+        UrlResolver $resolver = null,
+        ReplyRepository $reply_repo = null
+    ) {
         $fs = $filesystem ?: NewFS();
         parent::__construct($fs, $resolver);
 
         $this->filemanager = $file_manager ?: new FileManager($this, $fs);
+        $this->reply_repo = $reply_repo ?: new ReplyRepository($fs);
 
         $this->initVars();
         $this->raiseEvent("OnInit");
 
-        if ($path !== null) {
+        if ($path !== '') {
             $this->getFile(
                 $path, ENTRY_DEFAULT_FILE,
                 array('entry', 'draft'),
@@ -430,7 +446,7 @@ class BlogEntry extends Entry implements AttachmentContainer
     */
     public function isSticky($path=false) {
         $path = $path ?: dirname($this->file);
-        return $this->checkArticlePath($path) &&
+        return self::pathIsArticle($path, $this->fs) &&
             $this->fs->file_exists(Path::mk($path, STICKY_PATH));
     }
 
@@ -528,11 +544,6 @@ class BlogEntry extends Entry implements AttachmentContainer
     public function isArticle() {
         $article_dir = basename(dirname(dirname($this->file)));
         return $this->fs->file_exists($this->file) && $article_dir == BLOG_ARTICLE_PATH;
-    }
-
-    public function checkArticlePath($dir_path) {
-        $article_dir = basename(dirname($dir_path));
-        return $this->fs->is_dir($dir_path) && $article_dir == BLOG_ARTICLE_PATH;
     }
 
     /*
@@ -867,23 +878,12 @@ class BlogEntry extends Entry implements AttachmentContainer
     # If the call fails for some reason, then false is returned.
 
     public function getReplyCount($params) {
-        $dir_path = dirname($this->file);
-        $dir_path = $dir_path.PATH_DELIM.$params['path'];
-        $dir_array = $this->fs->scan_directory($dir_path);
-        if ($dir_array === false) return false;
-
-        $count = 0;
-        foreach ($dir_array as $file) {
-            $cond = is_file($dir_path.PATH_DELIM.$file);
-            if ($cond) {
-                $cond = preg_match("/[\-_\d]+".$params['ext']."/", $file);
-                if (! $cond && isset($params['altext'])) {
-                    $cond = preg_match("/[\w\d]+".$params['altext']."/", $file);
-                }
-            }
-            if ($cond) $count++;
-        }
-        return $count;
+        return $this->reply_repo->getReplyCount(
+            $this,
+            $params['path'],
+            $params['ext'],
+            $params['altext'] ?? ''
+        );
     }
 
     # Method: getReplyArray
@@ -906,34 +906,14 @@ class BlogEntry extends Entry implements AttachmentContainer
     # the parameters.  Returns false on failure.
 
     public function getReplyArray($params) {
-        $dir_path = dirname($this->file);
-        $dir_path = $dir_path.PATH_DELIM.$params['path'];
-        if (! is_dir($dir_path)) return array();
-        else $reply_dir = $this->fs->scan_directory($dir_path);
-
-        $reply_files = array();
-        foreach ($reply_dir as $file) {
-            $cond = is_file($dir_path.PATH_DELIM.$file);
-            if ($cond) {
-                $cond = preg_match("/[\-_\d]+".$params['ext']."/", $file);
-                if (! $cond && isset($params['altext'])) {
-                    $cond = preg_match("/[\w\d]+".$params['altext']."/", $file);
-                }
-            if ($cond) $reply_files[] = $file;
-            }
-        }
-        if (isset($params['sort_asc']) && $params['sort_asc']) {
-            sort($reply_files);
-        } else {
-            rsort($reply_files);
-        }
-
-        $reply_array = array();
-        $creator = $params['creator'];
-        foreach ($reply_files as $file)
-            $reply_array[] = $creator($dir_path.PATH_DELIM.$file);
-
-        return $reply_array;
+        return $this->reply_repo->getReplyArray(
+            $this,
+            $params['path'],
+            $params['ext'],
+            $params['creator'],
+            $params['sort_asc'] ?? true,
+            $params['altext'] ?? ''
+        );
     }
 
     /*
