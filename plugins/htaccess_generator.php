@@ -70,7 +70,7 @@ class HTAccessGenerator extends Plugin
                     $head_lines[] = $line;
                 } elseif ($found_lnblog_start && $found_lnblog_end) {
                     $tail_lines[] = $line;
-                } elseif ($found_lnblog_start && !$found_lnblog_end) {
+                } elseif ($found_lnblog_start) {
                     # In the LnBlog section - skip the line
                 } else { # Found end but not start
                     # This should not happen - the file is probably corrupt.

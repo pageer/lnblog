@@ -47,7 +47,7 @@ class SidebarCalendar extends Plugin
         $year = GET("year");
         $month = sprintf("%02d", GET("month"));
         $day = GET("day") ? GET('day') : 1;
-        if ($year && $month) {
+        if ($year && (int)$month) {
             $days = date("t", strtotime($year."-".$month."-01"));
         } elseif (preg_match(
             "/.*".BLOG_ENTRY_PATH."\/(\d{4})\/(\d{2})\/.*/",

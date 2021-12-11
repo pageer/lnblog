@@ -332,8 +332,13 @@ function blogger_editPost($params) {
         return $error;
     }
 
+    $data = $content->scalarval();
+    if (!$data) {
+        return new xmlrpcresp(0, $xmlrpcerruser+4, "No data in message - cannot edit post");
+    }
+
     # Test for initial lines to set the subject and/or tags.
-    $data = explode("\n", $content->scalarval());
+    $data = explode("\n", $data);
 
     if (isset($data[0]) && preg_match("/^Subject:.+/i", trim($data[0]))) {
         $ent->subject = trim(preg_replace("/^Subject:(.+)/i", "$1", trim($data[0])));
@@ -345,10 +350,6 @@ function blogger_editPost($params) {
     }
 
     $data = implode("\n", $data);
-
-    if (!$data) {
-        return new xmlrpcresp(0, $xmlrpcerruser+4, "No data in message - cannot edit post");
-    }
 
     $ent->data = $data;
 
