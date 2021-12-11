@@ -28,7 +28,7 @@ class WordPressExporterTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(
             $this->prettyPrintXml($this->getExportContent()),
-            $this->prettyPrintXml($target->getAsText())
+            $target->getAsText()
         );
     }
 
@@ -63,7 +63,7 @@ class WordPressExporterTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(
             $this->prettyPrintXml($this->getExportContent($entry_lines)),
-            $this->prettyPrintXml($target->getAsText())
+            $target->getAsText()
         );
     }
 
@@ -87,7 +87,7 @@ class WordPressExporterTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(
             $this->prettyPrintXml($this->getExportContent($entry_lines)),
-            $this->prettyPrintXml($target->getAsText())
+            $target->getAsText()
         );
     }
 

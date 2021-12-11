@@ -61,10 +61,11 @@ class WordPressExporter implements Exporter
         $this->translateArticles($channel, $blog->getArticles());
         $this->translateDrafts($channel, $blog->getDrafts());
 
-        $target->setContent($xml->asXML());
+        $content = $this->prettyPrintXml($xml->asXML());
+        $target->setContent($content);
     }
 
-    public function translateEntries(SimpleXMLElement $channel, array $entries): void {
+    private function translateEntries(SimpleXMLElement $channel, array $entries): void {
         $entry_translator = new BlogEntryTranslator();
         foreach ($entries as $entry) {
             $item = $channel->addChild('item');
@@ -74,7 +75,7 @@ class WordPressExporter implements Exporter
         }
     }
 
-    public function translateDrafts(SimpleXMLElement $channel, array $entries): void {
+    private function translateDrafts(SimpleXMLElement $channel, array $entries): void {
         $entry_translator = new BlogEntryTranslator();
         foreach ($entries as $entry) {
             $item = $channel->addChild('item');
@@ -84,7 +85,7 @@ class WordPressExporter implements Exporter
         }
     }
 
-    public function translateArticles(SimpleXMLElement $channel, array $entries): void {
+    private function translateArticles(SimpleXMLElement $channel, array $entries): void {
         $entry_translator = new BlogEntryTranslator();
         foreach ($entries as $entry) {
             $item = $channel->addChild('item');
@@ -94,12 +95,21 @@ class WordPressExporter implements Exporter
         }
     }
 
-    public function translateReplies(SimpleXMLElement $item, array $replies): void {
+    private function translateReplies(SimpleXMLElement $item, array $replies): void {
         $id = 1;
 
         $reply_translator = new ReplyTranslator();
         foreach ($replies as $reply) {
             $reply_translator->translate($item, $reply, ['comment_id' => $id++]);
         }
+    }
+
+    private function prettyPrintXml(string $xml): string {
+        $dom = new \DOMDocument('1.0');
+        $dom->preserveWhiteSpace = true;
+        $dom->formatOutput = true;
+        $dom->loadXML($xml);
+        $pretty_xml = $dom->saveXML();
+        return $pretty_xml;
     }
 }
