@@ -208,7 +208,7 @@ abstract class Plugin extends LnBlogObject
             if (isset($config["control"]) && $config["control"] == "checkbox") {
                 $this->$mem = (POST($mem) ? "1":"0");
             } elseif (isset($config["control"]) && $config["control"] == "file") {
-                $upld = NewFileUpload($mem."_upload", $ul_path);
+                $upld = new FileUpload($mem."_upload", $ul_path);
                 if ( $upld->completed() ) {
                     $upld->moveFile();
                     $this->$mem = $upld->destname;

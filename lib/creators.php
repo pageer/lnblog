@@ -62,11 +62,6 @@ function NewLogger() {
     return $logger;
 }
 
-# Function: NewPage
-# Creates a new page object.
-function NewPage($ref=false) {
-    return new Page($ref);
-}
 # Function: NewBlog
 # Creates a new blog object
 function NewBlog($param=false) {
@@ -110,12 +105,6 @@ function NewBlogEntry($param=false) {
     return new BlogEntry($param);
 }
 
-# Function: NewBlogComment
-# Creates a new BlogComment on an entry or article.
-function NewBlogComment($param=false) {
-    return new BlogComment($param);
-}
-
 # Function: NewTemplate
 # Creates a new template object.
 function NewTemplate($tpl="", $page=null) {
@@ -129,17 +118,6 @@ function NewTemplate($tpl="", $page=null) {
 # usr - The *optional* username of the user represented by this object.
 function NewUser($usr=false) {
     return User::get($usr);
-}
-
-# Function: NewFileUpload
-# Creates a new file uploader object.
-#
-# Parameters:
-# field - The form field that this object represents.
-# dir   - Thfile:///home/Tallgeese/pageer/www/LnBlog/lib/creators.phpe *optional* target directory.
-# index - The *optional* index of this upload for file upload arrays.
-function NewFileUpload($field, $dir=false, $index=false) {
-    return new FileUpload($field, $dir, $index);
 }
 
 # Function: NewTrackback
@@ -164,19 +142,4 @@ function NewIniParser($file=false) {
 # Creates an XML config file parser object.
 function NewConfigFile($file=false) {
     return new XMLINI($file);
-}
-
-# Function: NewReply
-# Creates a new object based on a reply identifier.  The object is a
-# BlogComment, Trackback, or Pinback.  The type of object is based on the
-# parameter passed, which can be either an anchor name as displayed on the page
-# or a local file path.
-function NewReply($id) {
-    if (strpos($id, '#comment') !== false) {
-        return NewBlogComment($id);
-    } elseif (strpos($id, '#trackback') !== false) {
-        return NewTrackback($id);
-    } elseif (strpos($id, '#pingback') !== false) {
-        return NewPingback($id);
-    }
 }
