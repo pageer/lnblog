@@ -340,4 +340,27 @@ form.centered input {
     background-image: url(../images/image_add.png);
 }
 
-/* Expanded post editor */
+/* Login form */
+.login-form {
+    width: 12em;
+    margin: 0 auto;
+}
+
+.login-form label,
+.login-form input[type="text"],
+.login-form input[type="password"] {
+    display: block;
+    width: 100%;
+    max-width: -webkit-fill-available;
+    text-align: left;
+}
+
+.login-form input[type="submit"] {
+    display: block;
+    margin: 0.5em auto;
+}
+
+.login-form .forgot-password-block {
+    text-align: center;
+    margin-top: 3em;
+}
