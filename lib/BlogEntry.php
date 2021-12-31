@@ -959,7 +959,7 @@ class BlogEntry extends Entry implements AttachmentContainer
     */
     public function getComments($sort_asc=true) {
         $params = array('path'=>ENTRY_COMMENT_DIR, 'ext'=>COMMENT_PATH_SUFFIX, 'altext'=>'.txt',
-                        'creator'=>'NewBlogComment', 'sort_asc'=>$sort_asc);
+                        'creator'=>'BlogComment', 'sort_asc'=>$sort_asc);
         return $this->getReplyArray($params);
     }
 
@@ -998,7 +998,7 @@ class BlogEntry extends Entry implements AttachmentContainer
     public function getTrackbacks($sort_asc=true) {
         $params = array('path'=>ENTRY_TRACKBACK_DIR,
                         'ext'=>TRACKBACK_PATH_SUFFIX,
-                        'creator'=>'NewTrackback', 'sort_asc'=>$sort_asc);
+                        'creator'=>'Trackback', 'sort_asc'=>$sort_asc);
         return $this->getReplyArray($params);
     }
 
@@ -1037,7 +1037,7 @@ class BlogEntry extends Entry implements AttachmentContainer
     public function getPingbacks($sort_asc=true) {
         $params = array('path'=>ENTRY_PINGBACK_DIR,
                         'ext'=>PINGBACK_PATH_SUFFIX,
-                        'creator'=>'NewPingback', 'sort_asc'=>$sort_asc);
+                        'creator'=>'Pingback', 'sort_asc'=>$sort_asc);
         return $this->getReplyArray($params);
     }
 

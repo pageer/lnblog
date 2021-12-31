@@ -1748,7 +1748,7 @@ class WebPages extends BasePages
         $tpl = $this->createTemplate("send_trackback_tpl.php");
 
         if (System::instance()->canModify($ent, $usr) && $usr->checkLogin()) {
-            $tb = NewTrackback();
+            $tb = new Trackback();
 
             # Set default values for the trackback properties.
             $tb->title = $ent->title();
@@ -1880,7 +1880,7 @@ class WebPages extends BasePages
             $page_type = basename(getcwd());
         }
 
-        $tb = NewTrackback();
+        $tb = new Trackback();
 
         if ($tb->incomingPing() && strtolower(GET('action')) != 'ping') {
 
@@ -2282,15 +2282,15 @@ class WebPages extends BasePages
         # Get an array of each kind of reply.
         $pingbacks = $ent->getReplyArray(
             array('path'=>ENTRY_PINGBACK_DIR, 'ext'=>PINGBACK_PATH_SUFFIX,
-            'creator'=>'NewPingback', 'sort_asc'=>true)
+            'creator'=>'Pingback', 'sort_asc'=>true)
         );
         $trackbacks = $ent->getReplyArray(
             array('path'=>ENTRY_TRACKBACK_DIR, 'ext'=>TRACKBACK_PATH_SUFFIX,
-            'creator'=>'NewTrackback', 'sort_asc'=>true)
+            'creator'=>'Trackback', 'sort_asc'=>true)
         );
         $comments = $ent->getReplyArray(
             array('path'=>ENTRY_COMMENT_DIR, 'ext'=>COMMENT_PATH_SUFFIX,
-            'creator'=>'NewBlogComment', 'sort_asc'=>true)
+            'creator'=>'BlogComment', 'sort_asc'=>true)
         );
 
         # Merge the arrays and sort entries based on the ping_date and/or timestamp.

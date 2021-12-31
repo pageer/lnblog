@@ -120,18 +120,6 @@ function NewUser($usr=false) {
     return User::get($usr);
 }
 
-# Function: NewTrackback
-# Creates a new trackback object.
-function NewTrackback($param=false) {
-    return new Trackback($param);
-}
-
-# Function: NewPingback
-# Creates a new pingback object.
-function NewPingback($param=false) {
-    return new Pingback($param);
-}
-
 # Function: NewIniParser
 # Creates a new INI file parser object.
 function NewIniParser($file=false) {

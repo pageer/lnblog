@@ -38,7 +38,7 @@ class SocialWebServer
 
         $this->assertPageContainsLink($source_page, $target);
 
-        $pingback = NewPingback();
+        $pingback = new Pingback();
         $pingback->is_webmention = true;
         $pingback->source = $source;
         $pingback->target = $target;

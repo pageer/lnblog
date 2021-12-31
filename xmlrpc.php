@@ -90,7 +90,7 @@ function get_ping($params) {
             return new xmlrpcresp(0, 48, "A Pingback for this URI has already been registered.");
         }
 
-        $ping = NewPingback();
+        $ping = new Pingback();
 
         $client = new HttpClient();
         $content = $client->fetchUrl($sourceURI, false);

@@ -60,7 +60,7 @@ class ReplyRepository
 
         $reply_array = [];
         foreach ($reply_files as $file) {
-            $reply_array[] = $creator(Path::mk($dir_path, $file));
+            $reply_array[] = new $creator(Path::mk($dir_path, $file));
         }
 
         return $reply_array;
