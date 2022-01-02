@@ -13,6 +13,10 @@ use LnBlog\Notifications\Notifier;
 
 class ReplyNotifier extends Plugin
 {
+    public $notify_comment;
+    public $notify_trackback;
+    public $notify_pingback;
+
     private $notifier;
 
     function __construct(Notifier $notifier = null) {
@@ -31,7 +35,7 @@ class ReplyNotifier extends Plugin
             "notify_pingback", _("Send notification for Pingbacks"),
             true, "checkbox"
         );
-        $this->plugin_version = "0.1.1";
+        $this->plugin_version = "0.1.2";
         parent::__construct();
     }
 
