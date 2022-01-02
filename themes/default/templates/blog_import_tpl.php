@@ -92,6 +92,13 @@ $this->block(
                 display: block;
                 margin: 10px auto;
             }
+
+            #import_text.processing {
+                background-image: url(<?php echo getlink('ajax-loader.gif')?>);
+                background-position: center;
+                background-repeat: no-repeat;
+                color: lightgray;
+            }
         </style>
         <?php
     }
@@ -112,6 +119,11 @@ $this->block(
                     var path = default_path + path_sep + $(this).val().replace('/', path_sep) + path_sep;
                     $('#new_blog_path').val(path);
                     $('#new_blog_url').val(default_url + $(this).val() + '/');
+                });
+
+                $('#import-form').on('submit', function () {
+                    $('#import_text').attr('readonly', true).addClass('processing');
+                    $('#do-import').attr('disabled', true);
                 });
             });
 
@@ -174,7 +186,7 @@ $this->block(
             </p>
         <?php endif;?>
 
-        <form method="<?php echo $METHOD?>">
+        <form id="import-form" method="<?php echo $METHOD?>">
             <?php $this->outputCsrfField() ?>
             <!-- Note: this depends on the order of the jQuery UI tabs -->
             <?php echo $FIELDS['import_option']->render(

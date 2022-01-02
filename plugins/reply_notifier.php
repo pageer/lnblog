@@ -52,7 +52,9 @@ class ReplyNotifier extends Plugin
 
     function comment_notify(&$param) {
 
-        if (! $param->isComment()) return false;
+        if (! $param->isComment() || !$this->notify_comment) {
+            return false;
+        }
 
         $parent = $param->getParent();
 
@@ -83,7 +85,9 @@ class ReplyNotifier extends Plugin
 
     function trackback_notify(&$param) {
 
-        if (! $param->url) return false;
+        if (! $param->url || !$this->notify_trackback) {
+            return false;
+        }
 
         $parent = $param->getParent();
 
@@ -102,14 +106,16 @@ class ReplyNotifier extends Plugin
 
     function pingback_notify(&$param) {
 
-        if (! $param->source || ! $param->target) return false;
+        if (! $param->source || ! $param->target || !$this->notify_pingback) {
+            return false;
+        }
 
         $parent = $param->getParent();
 
         # Don't notify for pings to the author's other entries.
         if ($param->isLocal()) {
             $ent = get_entry_from_uri($param->source);
-            if ($ent->uid == $parent->uid) {
+            if ($ent && $ent->uid == $parent->uid) {
                 return false;
             }
         }

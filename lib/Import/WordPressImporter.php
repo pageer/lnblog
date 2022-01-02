@@ -158,10 +158,11 @@ class WordPressImporter implements Importer
         $do_import = $this->getImportOptions()[self::IMPORT_USERS] ?? false;
 
         $authors = $xml->xpath('//wp:author');
+        $last_uid = 0;
 
         foreach ($authors as $author) {
             $login = (string) $author->xpath('./wp:author_login')[0];
-            $uid = (int) $author->xpath('./wp:author_id')[0];
+            $uid = (int)($author->xpath('./wp:author_id')[0] ?? $last_uid++);
             $name = (string) $author->xpath('./wp:author_display_name')[0];
             $email = (string) $author->xpath('./wp:author_email')[0];
             $this->user_map[$uid] = $login;
@@ -229,7 +230,7 @@ class WordPressImporter implements Importer
         $entry->data = (string)$item->xpath('./content:encoded')[0];
         $entry->allow_comment = (string)$item->xpath('./wp:comment_status')[0] == 'open';
         $entry->allow_pingback = (string)$item->xpath('./wp:ping_status')[0] == 'open';
-        $entry->article_path = (string)$item->xpath('./wp:post_name')[0];
+        $entry->article_path = (string)($item->xpath('./wp:post_name')[0] ?? '');
 
         $tags = [];
         $post_tags = $item->xpath("./category[@domain='post_tag']");
@@ -259,7 +260,7 @@ class WordPressImporter implements Importer
             if ($is_comment) {
                 $comment = new BlogComment();
                 $comment->data = (string) $xml->xpath('./wp:comment_content')[0];
-                $comment->uid = $this->mapUserId((int)$xml->xpath('./wp:comment_user_id')[0]);
+                $comment->uid = $this->mapUserId((int)($xml->xpath('./wp:comment_user_id')[0] ?? 0));
                 $comment->name = (string) $xml->xpath('./wp:comment_author')[0];
                 $comment->email = (string) $xml->xpath('./wp:comment_author_email')[0];
                 $comment->url = (string) $xml->xpath('./wp:comment_author_url')[0];
