@@ -350,6 +350,8 @@ class AdminPages extends BasePages
     }
 
     public function importblog() {
+        $this->requireAdministrator();
+
         $form = new BlogImportForm($this->fs, SystemConfig::instance(), $this->getBlogRepository());
 
         if (has_post()) {
@@ -367,6 +369,8 @@ class AdminPages extends BasePages
     }
 
     public function exportblog() {
+        $this->requireAdministrator();
+
         $form = new BlogExportForm(new ExporterFactory(), SystemConfig::instance(), $this->getBlogRepository());
 
         if (has_post()) {
@@ -827,66 +831,6 @@ class AdminPages extends BasePages
         Page::instance()->display($ret);
     }
 
-    private function ftp_file_exists($file, $ftp_obj) {
-
-        $dir_list = ftp_nlist($ftp_obj->connection, $ftp_obj->localpathToFSPath(dirname($file)));
-        if (! is_array($dir_list)) $dir_list = array();
-
-        foreach ($dir_list as $ent) {
-            if (basename($file) == basename($ent)) {
-                #echo basename($file)." == $ent<br />";
-                return true;
-            } #else echo basename($file)." != $ent<br />";
-        }
-        return false;
-    }
-
-    # Takes a file or directory on the local host and an FTP connection.
-    # Connects to the FTP server, changes to the root directory, and
-    # checks the directory listing.  It then goes down the local directory
-    # tree until it finds a directory that contains one of the entries in the
-    # listing.  This directory is the FTP root.
-
-    private function find_dir($dir, $conn) {
-        # Change to the root directory.
-        ftp_chdir($conn, "/");
-        $ftp_list = ftp_nlist($conn, ".");
-
-        # Save the drive letter (if it exists).
-        $drive = substr($dir, 0, 2);
-
-        # Get the current path into an array.
-        if (PATH_DELIM != "/") {
-            if (substr($dir, 1, 1) == ":") $dir = substr($dir, 3);
-            $dir = str_replace(PATH_DELIM, "/", $dir);
-        }
-
-        if (substr($dir, 0, 1) == "/") $dir = substr($dir, 1);
-        $dir_list = explode("/", $dir);
-
-        # For each local directory element, loop through contents of the FTP
-        # root directory.  If the current element is in FTP root, then the
-        # parent of the current element is the root.
-        # $ftp_root starts at root and has the current directory appended at the
-        # end of each outer loop iteration.  Thus, $ftp_root always holds the
-        # parent of the currently processing directory.
-        # Note that we must account for Windows drive letters, grubmle, grumble.
-        if (PATH_DELIM == "/") {
-            $ftp_root = "/";
-        } else {
-            $ftp_root = $drive.PATH_DELIM;
-        }
-        foreach ($dir_list as $dir) {
-            foreach ($ftp_list as $ftpdir) {
-                if ($dir == $ftpdir && $ftpdir != ".." && $ftpdir != ".") {
-                    return $ftp_root;
-                }
-            }
-            $ftp_root .= $dir.PATH_DELIM;
-        }
-
-    }
-
     protected function template_set_post_data(&$tpl) {
         if (POST("use_ftp") == "ftpfs") $tpl->set("USE_FTP", POST("use_ftp"));
         $tpl->set("USER", POST("ftp_user"));
@@ -1051,6 +995,19 @@ class AdminPages extends BasePages
 
         if (!filter_var($userdata_url, FILTER_VALIDATE_URL)) {
             throw new Exception(spf_("The URL '%s' is not valid", $userdata_url));
+        }
+    }
+
+    private function requireAdministrator(User $user = null): void {
+        if ($user === null) {
+            $user = User::get();
+        }
+        if (!$user->checkLogin()) {
+            $this->redirect("login");
+            exit;
+        }
+        if (!$user->isAdministrator()) {
+            $this->getPage()->error(403);
         }
     }
 
