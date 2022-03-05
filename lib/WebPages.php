@@ -1017,6 +1017,10 @@ class WebPages extends BasePages
 
         $this->getPage()->setDisplayObject($main_obj);
 
+        if (!System::instance()->canModify($main_obj, $this->user)) {
+            $this->getPage()->error(403);
+        }
+
         $responses = POST('replies') ?: [];
         if ($responses) {
             $body = $this->handleDeletes($responses);
