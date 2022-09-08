@@ -28,6 +28,8 @@
 
 abstract class Plugin extends LnBlogObject
 {
+    const ROUTING_PARAMETER = 'do';
+
     const CONTEXT_WEB = 'web';
     const CONTEXT_CLI = 'cli';
     const CONTEXT_IMPORT = 'import';
@@ -164,24 +166,14 @@ abstract class Plugin extends LnBlogObject
     public function showConfig($page, $csrf_token) {
         if (! $this->member_list) return false;
 
-        echo "<fieldset class=\"plugin-form\">\n";
-        echo '<form method="post" ';
-        echo 'action="'.current_uri(true).'" ';
-        echo "id=\"plugin_config\">\n";
-        echo '<input type="hidden" name="' .
-            BasePages::TOKEN_POST_FIELD .
-            '" value="' . $csrf_token . '" />';
+        $this->showFormHeader($csrf_token);
 
         foreach ($this->member_list as $mem=>$config) {
             $this->showField($mem, $config);
         }
 
-        echo "<div>\n";
-        echo '<input type="hidden" name="plugin" id="plugin" value="'.get_class($this).'" />';
-        echo '<input type="submit" value="Submit" />';
-        echo "</div>\n";
-        echo "</form>\n";
-        echo "</fieldset>\n";
+        $this->showFormFooter();
+
         return false;
     }
 
@@ -241,10 +233,17 @@ abstract class Plugin extends LnBlogObject
     public function getConfig() {
         $parser = PluginManager::instance()->plugin_config;
         foreach ($this->member_list as $mem=>$config) {
-            $this->$mem = (isset($config["default"]) ? $config["default"] : "");
-            $val = $parser->value(get_class($this), $mem, $this->$mem);
-            if ($val == "1" || $val == "0") $this->$mem = intval($val);
-            else $this->$mem = $val;
+            $val = $parser->value(get_class($this), $mem, $config['default'] ?? '');
+            // NOTE: Explicitly use "==" so because we want the type-casting.
+            /*
+            if ($val == intval($val)) {
+                $this->$mem = intval($val);
+            } elseif ($val == floatval($val)) {
+                $this->$mem = floatval($val);
+            } else {
+             */
+                $this->$mem = $val;
+            //}
         }
     }
 
@@ -364,7 +363,30 @@ abstract class Plugin extends LnBlogObject
         $this->registerEventHandler("blog", "UpdateComplete", "invalidateCache");
     }
 
-    protected function showField(string $field, array $config = null) {
+    # Method: outputPage
+    # Handle output for a "plugin page" request.  This should read any request parameters
+    # and then perform whatever action or generate whatever output is
+    # appropriate.
+    #
+    # If the plugin implements getLoader(), then the router will automatically
+    # handle calling this function when a "plugin page" is requested.
+    #
+    # To route to a "plugin page", use the URL paremeter "https://your_blog_url/index.php?action=plugin"
+    # for your requests.  You may append whatever additional request parameters
+    # are necessary to do your processing.
+    #
+    # Parameters:
+    # web_page - The webpage object that invoked this method.
+    # action   - An optional string that indicates the routing for the request.
+    #            This will be taken from the "do" URL parameter.  For example,
+    #            this URL would invoke the "rss_management" plugin with the "purgeblog"
+    #            route: "?plugin=rss_management&do=purgeblog".  The individual plugin
+    #            is responsible for processing any additional parameters.
+    public function outputPage(BasePages $web_page, string $action = ''): void {
+        // Override this to do output.
+    }
+
+    public function showField(string $field, array $config = null) {
         if ($config === null) {
             $config = $this->member_list[$field];
         }
@@ -418,5 +440,24 @@ abstract class Plugin extends LnBlogObject
             echo '<input name="'.$field.'" id="'.$field.'" type="'.$config['control'].'" value="'.$this->$field.'"';
             echo " /></div>\n";
         }
+    }
+
+    public function showFormHeader(string $csrf_token): void {
+        echo "<fieldset class=\"plugin-form\">\n";
+        echo '<form method="post" ';
+        echo 'action="'.current_uri(true).'" ';
+        echo "id=\"plugin_config\">\n";
+        echo '<input type="hidden" name="' .
+            BasePages::TOKEN_POST_FIELD .
+            '" value="' . $csrf_token . '" />';
+    }
+
+    public function showFormFooter(): void {
+        echo "<div>\n";
+        echo '<input type="hidden" name="plugin" id="plugin" value="'.get_class($this).'" />';
+        echo '<input type="submit" value="Submit" />';
+        echo "</div>\n";
+        echo "</form>\n";
+        echo "</fieldset>\n";
     }
 }

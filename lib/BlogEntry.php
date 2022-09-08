@@ -45,8 +45,8 @@ use LnBlog\Storage\ReplyRepository;
 
 class BlogEntry extends Entry implements AttachmentContainer
 {
-
     const AUTO_PUBLISH_FILE = 'publish.txt';
+    public const RSS_COMMENT_FEED_EVENT = 'ListCommentFeeds';
 
     public $send_pingback = true;
     public $allow_pingback = true;
@@ -66,6 +66,7 @@ class BlogEntry extends Entry implements AttachmentContainer
 
     private $filemanager;
     private $reply_repo;
+    private $globals;
 
     static public function pathIsArticle($dir_path, FS $fs = null): bool {
         if (!$fs) {
@@ -80,13 +81,15 @@ class BlogEntry extends Entry implements AttachmentContainer
         FS $filesystem = null,
         FileManager $file_manager = null,
         UrlResolver $resolver = null,
-        ReplyRepository $reply_repo = null
+        ReplyRepository $reply_repo = null,
+        GlobalFunctions $globals = null
     ) {
         $fs = $filesystem ?: NewFS();
         parent::__construct($fs, $resolver);
 
         $this->filemanager = $file_manager ?: new FileManager($this, $fs);
         $this->reply_repo = $reply_repo ?: new ReplyRepository($fs);
+        $this->globals = $globals ?: new GlobalFunctions();
 
         $this->initVars();
         $this->raiseEvent("OnInit");
@@ -370,9 +373,8 @@ class BlogEntry extends Entry implements AttachmentContainer
             $ret = array();
             $ret['url'] = $this->url_resolver->localpathToUri($path, $this->getParent());
             $ret['length'] = $this->fs->filesize($path);
-            $globals = new GlobalFunctions();
-            $ret['type'] = $globals->getMimeType($path);
-
+            $ret['type'] = $this->globals->getMimeType($path);
+        // TODO: This is terrible and I'm not sure it ever worked...
         } elseif (strpos($this->enclosure, 'url')    !== false &&
                   strpos($this->enclosure, 'length') !== false &&
                   strpos($this->enclosure, 'type')   !== false) {
@@ -769,13 +771,12 @@ class BlogEntry extends Entry implements AttachmentContainer
         $tmp->set("SEND_PINGBACKS", $send_pingbacks);
 
         # Added so the template can know whether or not to advertise RSS feeds.
-        if (PluginManager::instance()->pluginLoaded("RSS2FeedGenerator")) {
-            $gen = new RSS2FeedGenerator();
-            if ($gen->comment_file) {
-                $feed_uri = $this->url_resolver->localpathToUri(Path::mk($this->localpath(), $gen->comment_file), $this->getParent());
-                $tmp->set("COMMENT_RSS_ENABLED");
-                $tmp->set("COMMENT_FEED_LINK", $feed_uri);
-            }
+        $rss_feeds = $this->raiseEventAndPassthruReturn(self::RSS_COMMENT_FEED_EVENT, []);
+        if (!empty($rss_feeds)) {
+            $tmp->set("COMMENT_RSS_ENABLED", 1);
+            $tmp->set("COMMENT_FEED_LINK", $rss_feeds);
+        } else {
+            $tmp->set("COMMENT_RSS_ENABLED", 0);
         }
 
         # RSS compatibility variables

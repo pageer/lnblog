@@ -2,20 +2,18 @@
 
 require_once __DIR__ . "/../../../plugins/htaccess_generator.php";
 
-class HTAccessGeneratorTest extends \PHPUnit\Framework\TestCase
+class HTAccessGeneratorTest extends \LnBlog\Tests\LnBlogBaseTestCase
 {
-    private $prophet;
     private $fs;
 
     public function testCreateFile_WhenNoBlogHtaccess_CreatesNewFile() {
         $expected_content = implode("\n", $this->getLnBlogSection());
-        $fs = $this->prophet->prophesize(FS::class);
-        $fs->file_exists('./.htaccess')->willReturn(false);
+        $this->fs->file_exists('./.htaccess')->willReturn(false);
         $blog_instance = $this->createBlogInstance();
 
-        $fs->write_file('./.htaccess', $expected_content)->shouldBeCalled();
+        $this->fs->write_file('./.htaccess', $expected_content)->shouldBeCalled();
 
-        $generator = new HTAccessGenerator($fs->reveal());
+        $generator = new HTAccessGenerator($this->fs->reveal());
         $generator->create_file($blog_instance);
     }
 
@@ -23,14 +21,13 @@ class HTAccessGeneratorTest extends \PHPUnit\Framework\TestCase
         $existing_file = $this->getExistingFileSection();
         $all_lines = array_merge($existing_file, $this->getLnBlogSection());
         $expected_content = implode("\n", $all_lines);
-        $fs = $this->prophet->prophesize(FS::class);
-        $fs->file_exists('./.htaccess')->willReturn(true);
-        $fs->file('./.htaccess')->willReturn($existing_file);
+        $this->fs->file_exists('./.htaccess')->willReturn(true);
+        $this->fs->file('./.htaccess')->willReturn($existing_file);
         $blog_instance = $this->createBlogInstance();
 
-        $fs->write_file('./.htaccess', $expected_content)->shouldBeCalled();
+        $this->fs->write_file('./.htaccess', $expected_content)->shouldBeCalled();
 
-        $generator = new HTAccessGenerator($fs->reveal());
+        $generator = new HTAccessGenerator($this->fs->reveal());
         $generator->create_file($blog_instance);
     }
 
@@ -56,14 +53,13 @@ class HTAccessGeneratorTest extends \PHPUnit\Framework\TestCase
                 $this->getLnBlogSection()
             )
         );
-        $fs = $this->prophet->prophesize(FS::class);
-        $fs->file_exists('./.htaccess')->willReturn(true);
-        $fs->file('./.htaccess')->willReturn($existing_file);
+        $this->fs->file_exists('./.htaccess')->willReturn(true);
+        $this->fs->file('./.htaccess')->willReturn($existing_file);
         $blog_instance = $this->createBlogInstance();
 
-        $fs->write_file('./.htaccess', $expected_content)->shouldBeCalled();
+        $this->fs->write_file('./.htaccess', $expected_content)->shouldBeCalled();
 
-        $generator = new HTAccessGenerator($fs->reveal());
+        $generator = new HTAccessGenerator($this->fs->reveal());
         $generator->create_file($blog_instance);
     }
 
@@ -81,14 +77,13 @@ class HTAccessGeneratorTest extends \PHPUnit\Framework\TestCase
                 ['# The end']
             )
         );
-        $fs = $this->prophet->prophesize(FS::class);
-        $fs->file_exists('./.htaccess')->willReturn(true);
-        $fs->file('./.htaccess')->willReturn($existing_file);
+        $this->fs->file_exists('./.htaccess')->willReturn(true);
+        $this->fs->file('./.htaccess')->willReturn($existing_file);
         $blog_instance = $this->createBlogInstance();
 
-        $fs->write_file('./.htaccess', $expected_content)->shouldBeCalled();
+        $this->fs->write_file('./.htaccess', $expected_content)->shouldBeCalled();
 
-        $generator = new HTAccessGenerator($fs->reveal());
+        $generator = new HTAccessGenerator($this->fs->reveal());
         $generator->create_file($blog_instance);
     }
 
@@ -102,28 +97,22 @@ class HTAccessGeneratorTest extends \PHPUnit\Framework\TestCase
                 $this->getLnBlogSection()
             )
         );
-        $fs = $this->prophet->prophesize(FS::class);
-        $fs->file_exists('./foo/.htaccess')->willReturn(false);
-        $fs->file_exists('./.htaccess')->willReturn(true);
-        $fs->file('./.htaccess')->willReturn($parent_file);
+        $this->fs->file_exists('./foo/.htaccess')->willReturn(false);
+        $this->fs->file_exists('./.htaccess')->willReturn(true);
+        $this->fs->file('./.htaccess')->willReturn($parent_file);
         $blog_instance = $this->createBlogInstance();
         $blog_instance->home_path = './foo/';
 
-        $fs->write_file('./foo/.htaccess', $expected_content)->shouldBeCalled();
+        $this->fs->write_file('./foo/.htaccess', $expected_content)->shouldBeCalled();
 
-        $generator = new HTAccessGenerator($fs->reveal());
+        $generator = new HTAccessGenerator($this->fs->reveal());
         $generator->copy_parent = true;
         $generator->create_file($blog_instance);
     }
 
     protected function setUp(): void {
-        Path::$sep = '/';
-        $this->prophet = new \Prophecy\Prophet();
+        parent::setUp();
         $this->fs = $this->prophet->prophesize('FS');
-    }
-
-    protected function tearDown(): void {
-        $this->prophet->checkPredictions();
     }
 
     private function getExistingFileSection() {
@@ -158,12 +147,12 @@ class HTAccessGeneratorTest extends \PHPUnit\Framework\TestCase
             '    Deny from all',
             '</FilesMatch>',
             '',
-            'RewriteRule ^(entries/\d{4}/\d{2}/\d{2}_\d{4,6}/comments/).+\.xml$ $1 [nc]',
+            'RewriteRule ^(entries/\d{4}/\d{2}/\d{2}_\d{4,6}/comments/)[\d\-_]+\.xml$ $1 [nc]',
             'RewriteRule ^(entries/\d{4}/\d{2}/\d{2}_\d{4,6}/pingback/).+\.xml$ $1 [nc]',
             'RewriteRule ^(entries/\d{4}/\d{2}/\d{2}_\d{4,6}/trackback/).+\.xml$ $1 [nc]',
             'RewriteRule ^(entries/\d{4}/\d{2}/\d{2}_\d{4,6}/)entry.xml$ $1 [nc]',
             'RewriteRule ^(entries/\d{4}/\d{2}/\d{2}_\d{4,6}/comments/)deleted.*$ $1 [nc]',
-            'RewriteRule ^(content/.+/comments/).+\.xml$ $1 [nc]',
+            'RewriteRule ^(content/.+/comments/)[\d\-_]+\.xml$ $1 [nc]',
             'RewriteRule ^(content/.+/pingback/).+\.xml$ $1 [nc]',
             'RewriteRule ^(content/.+/trackback/).+\.xml$ $1 [nc]',
             'RewriteRule ^(content/.+/)entry.xml$ $1 [nc]',

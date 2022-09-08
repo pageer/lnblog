@@ -10,13 +10,15 @@
 
 class TagList extends Plugin
 {
+    const TAG_ITEM_OUTPUT_EVENT = 'ItemOutput';
+
     public $header;
     public $page_title;
     public $show_feeds;
 
     public function __construct($do_output=0) {
         $this->plugin_desc = _("Provides a list of links to view post for each tag used in the blog.");
-        $this->plugin_version = "0.3.1";
+        $this->plugin_version = "0.4.0";
         $this->addOption("header", _("Sidebar section heading"), _("Topics"));
         $this->addOption(
             "page_title",
@@ -40,8 +42,6 @@ class TagList extends Plugin
     }
 
     function buildList() {
-        $parser = PluginManager::instance()->plugin_config;
-        
         $blg = new Blog();
         if (! $blg->isBlog() ) {
             return false;
@@ -50,49 +50,17 @@ class TagList extends Plugin
             return false;
         }
 
-        $show_rss1 = PluginManager::instance()->pluginLoaded('RSS1FeedGenerator');
-        $show_rss2 = PluginManager::instance()->pluginLoaded('RSS2FeedGenerator');
-
-        $base_feed_path = $blg->home_path.PATH_DELIM.BLOG_FEED_PATH;
-        $base_feed_uri = $blg->uri('base').BLOG_FEED_PATH.'/';
-        
-        $links = array();
+        $links = [];
         foreach ($blg->tag_list as $tag) {
             if (! $tag) {
                 continue;
             }
             $l = '<a href="'.$blg->uri('tags', ['tag' => urlencode($tag)]).'">'.
                  htmlspecialchars($tag).'</a>';
-            if ($this->show_feeds) {
-                $topic = preg_replace('/\W/', '', $tag);
-
-                $rdf_file = $topic.'_'.
-                    $parser->value("RSS1FeedGenerator", "feed_file", "news.rdf");
-                $xml_file = $topic.'_'.
-                    $parser->value("RSS2FeedGenerator", "cat_suffix", "news.xml");
-                
-                $rdf_uri = false;
-                $xml_uri = false;
-
-                if ($show_rss1 && file_exists($base_feed_path.PATH_DELIM.$rdf_file)) {
-                    $rdf_uri = $base_feed_uri.$rdf_file;
-                }
-                if ($show_rss2 && file_exists($base_feed_path.PATH_DELIM.$xml_file)) {
-                    $xml_uri = $base_feed_uri.$xml_file;
-                }
-
-                if ($rdf_uri) { 
-                    $l .= ' <a href="'.$rdf_uri.'"><img src="'.
-                        getlink('rdf_feed.png').'" alt="'._("RSS 1.0 feed").
-                        '" title="'._("RSS 1.0 feed").'" /></a> ';
-                }
-                if ($xml_uri) { 
-                    $l .= ' <a href="'.$xml_uri.'"><img src="'.
-                        getlink('xml_feed.png').'" alt="'._("RSS 2.0 feed").
-                        '" title="'._("RSS 2.0 feed").'" /></a>';
-                }
-            }
-            $links[] = $l;
+            ob_start();
+            $this->raiseEvent(self::TAG_ITEM_OUTPUT_EVENT, [$tag], $blg);
+            $extra_content = ob_get_clean();
+            $links[] = $l . $extra_content;
         }
         return $links;
     }

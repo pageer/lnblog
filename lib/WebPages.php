@@ -2088,6 +2088,10 @@ class WebPages extends BasePages
         $this->last_upload_error = $data;
     }
 
+    public function getCurrentUser(): User {
+        return $this->user;
+    }
+
     protected function getUserByName($username) {
         return NewUser($username);
     }

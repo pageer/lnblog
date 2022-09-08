@@ -95,8 +95,8 @@ $this->block(
             </div>
         <?php 
         # Activate the sidebar plugins.
-        EventRegister::instance()->activateEventFull($tmp=false, "sidebar", "OnOutput");
-        EventRegister::instance()->activateEventFull($tmp=false, "sidebar", "OutputComplete");
+        EventRegister::instance()->activateEventFull($PAGE, "sidebar", "OnOutput");
+        EventRegister::instance()->activateEventFull($PAGE, "sidebar", "OutputComplete");
         ?>
     </div><?php
     }

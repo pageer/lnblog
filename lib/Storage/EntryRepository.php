@@ -87,9 +87,69 @@ class EntryRepository
         return $ret;
     }
 
+    # Method: getEntriesByTag
+    # Get a list of entries tagged with a given string.
+    #
+    # Parameter:
+    # taglist   - An array of tags to search for.
+    # limit     - Maximum number of entries to return.  The *default* is
+    #             zero, which means return *all* matching entries.
+    # match_all - Optional boolean that determines whether the entry must
+    #             have every tag in taglist to match.  The *default* is false.
+    #
+    # Returns:
+    # An array of entry objects, in reverse chronological order by post date.
+    public function getEntriesByTag($taglist, $limit=0, $match_all=false) {
+
+        $entry = NewBlogEntry();
+        $this->entrylist = [];
+
+        $ent_dir = Path::mk($this->blog->home_path, BLOG_ENTRY_PATH);
+        $num_found = 0;
+
+        $year_list = $this->fs->scan_directory($ent_dir, true);
+        rsort($year_list);
+
+        foreach ($year_list as $year) {
+            $month_list = $this->fs->scan_directory(Path::mk($ent_dir, $year), true);
+            rsort($month_list);
+            foreach ($month_list as $month) {
+                $path = Path::mk($ent_dir, $year, $month);
+                $ents = $this->fs->scan_directory($path, true);
+                rsort($ents);
+                foreach ($ents as $e) {
+                    $ent_path = Path::mk($path, $e);
+                    if ( $entry->isEntry($ent_path) ) {
+                        $tmp = NewBlogEntry($ent_path);
+                        $ent_tags = $tmp->tags();
+                        if (empty($ent_tags)) continue;
+                        if (! $match_all) {
+                            foreach ($taglist as $tag) {
+                                if (in_arrayi($tag, $ent_tags)) {
+                                    $this->entrylist[] = $tmp;
+                                    $num_found++;
+                                }
+                            }
+                        } else {
+                            $hit_count = 0;
+                            foreach ($taglist as $tag)
+                                if (in_arrayi($tag, $ent_tags)) $hit_count++;
+                            if ($hit_count == count($taglist)) {
+                                    $this->entrylist[] = $tmp;
+                                    $num_found++;
+                            }
+                        }
+                        if ($limit > 0 && $num_found == $limit) break 3;
+                    }
+                }  # End month loop
+            }  # End year loop
+        }  # End archive loop
+        return $this->entrylist;
+    }
+
     private function getEntriesRecursive(int $number = -1, int $offset = 0): array {
         $entry = NewBlogEntry();
-        $this->entrylist = array();
+        $this->entrylist = [];
         if ($number == 0) {
             return [];
         }

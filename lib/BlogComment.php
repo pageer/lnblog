@@ -54,8 +54,8 @@ class BlogComment extends Entry implements Reply
     public $parent;
     public $control_bar= [];
 
-    public function __construct ($path = "", $filesystem = null) {
-        parent::__construct($filesystem ?: NewFS());
+    public function __construct ($path = "", $filesystem = null, UrlResolver $resolver = null) {
+        parent::__construct($filesystem ?: NewFS(), $resolver);
         $this->raiseEvent("OnInit");
         $this->ip = get_ip();
         $this->timestamp = 0;

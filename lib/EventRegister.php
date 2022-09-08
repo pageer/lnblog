@@ -179,7 +179,7 @@ class EventRegister
      * <activateEvent>
      */
 
-    function activateEventFull($param, $raisecls, $event, $data=false) {
+    function activateEventFull($param, $raisecls, $event, $data=false, &$callback_result = null) {
         if (!$data) $data = array();
 
         $rcls = strtolower($raisecls);
@@ -211,9 +211,9 @@ class EventRegister
 
             foreach ($this->event_list[$rcls][$ename][$classname]['instance'] as $hnd) {
                 if ( method_exists($tmp_class, $hnd) ) {
-                    $tmp_class->$hnd($param, $data);
+                    $callback_result = $tmp_class->$hnd($param, $data);
                 } else {
-                    call_user_func($hnd, $param, $data);
+                    $callback_result = call_user_func($hnd, $param, $data);
                 }
 
             }
@@ -222,9 +222,9 @@ class EventRegister
                 $methods = get_class_methods($classname);
                 $ret = array_search(strtolower($hnd), $methods);
                 if ($ret !== false && $ret !== null) {
-                    call_user_func(array($classname, $hnd), $param, $data);
+                    $callback_result = call_user_func(array($classname, $hnd), $param, $data);
                 } else {
-                    call_user_func($hnd, $param, $data);
+                    $callback_result = call_user_func($hnd, $param, $data);
                 }
             }
         }

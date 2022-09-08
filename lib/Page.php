@@ -312,6 +312,7 @@ class Page extends LnBlogObject
         $this->vendor->addSelectedPackagesToPage($this);
 
         $head = NewTemplate(PAGE_HEAD_TEMPLATE);
+        $head->set("PAGE", $this);
         $head->set("DOCTYPE", $this->doctype);
         $head->set("PAGE_TITLE", $this->title);
         $head->set("METADATA", $this->metatags);

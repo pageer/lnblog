@@ -924,15 +924,8 @@ function metaWeblog_getCategories($params) {
             $cat['htmlUrl'] = new xmlrpcval($blog->uri('tags', ['tag' => urlencode($tag)]), 'string');
 
             $topic = preg_replace('/\W/', '', $tag);
-            $rdf_file = $topic.'_'.PluginManager::instance()->plugin_config->value("RSS1FeedGenerator", "feed_file", "news.rdf");
-            $xml_file = $topic.'_'.PluginManager::instance()->plugin_config->value("RSS2FeedGenerator", "feed_file", "news.xml");
-            if (file_exists($base_feed_path.PATH_DELIM.$xml_file)) {
-                $rss_url = $base_feed_uri.$xml_file;
-            } elseif (file_exists($base_feed_path.PATH_DELIM.$rdf_file)) {
-                $rss_url = $base_feed_uri.$rdf_file;
-            } else {
-                $rss_url = '';
-            }
+            $rss_feeds = $blog->raiseEventAndPassthruReturn(Blog::RSS_FEED_EVENT, [$topic]);
+            $rss_url = $rss_feeds[0] ?? '';
 
             $cat['rssUrl'] = new xmlrpcval($rss_url, 'string');
             $arr[$tag] = new xmlrpcval($cat, 'struct');

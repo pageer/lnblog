@@ -25,6 +25,8 @@ class SidebarArticlesTest extends \PHPUnit\Framework\TestCase
         $system = $this->system->reveal();
 
         $plugin = new Articles(0, $blog, $user, $fs, $system);
+        $plugin->header = 'Articles';
+        $plugin->showall_text = 'All static pages';
         $output = $plugin->buildOutput();
 
         $expected = [
@@ -150,6 +152,7 @@ class SidebarArticlesTest extends \PHPUnit\Framework\TestCase
         $plugin = new Articles(0, $blog, $user, $fs, $system);
         $plugin->static_link = false;
         $plugin->header = '';
+        $plugin->custom_links = 'links.htm';
         $output = $plugin->buildOutput();
 
         $expected = [
@@ -185,6 +188,7 @@ class SidebarArticlesTest extends \PHPUnit\Framework\TestCase
         $plugin = new Articles(0, $blog, $user, $fs, $system);
         $plugin->static_link = false;
         $plugin->header = '';
+        $plugin->custom_links = 'links.htm';
         $output = $plugin->buildOutput();
 
         $expected = [
@@ -219,6 +223,7 @@ class SidebarArticlesTest extends \PHPUnit\Framework\TestCase
         $plugin = new Articles(0, $blog, $user, $fs, $system);
         $plugin->static_link = false;
         $plugin->header = '';
+        $plugin->custom_links = 'links.htm';
         $output = $plugin->buildOutput();
 
         $expected = [

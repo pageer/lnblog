@@ -119,13 +119,26 @@ abstract class BasePages
             foreach ($paths as $path) {
                 $plugin = Path::mk($path, 'plugins', "$plugin_name.php");
                 if ($this->fs->file_exists($plugin)) {
-                    require $plugin;
+                    $instance = PluginManager::instance()->getInstanceForFile($plugin);
+                    if ($instance === null) {
+                        $loader = require $plugin;
+                        if (is_callable($loader)) {
+                            $object = $loader();
+                            $object->outputPage($this, $_GET[Plugin::ROUTING_PARAMETER] ?? '');
+                        }
+                    } else {
+                        $instance->outputPage($this, $_GET[Plugin::ROUTING_PARAMETER] ?? '');
+                    }
                     return true;
                 }
             }
         }
 
         $this->defaultAction();
+    }
+
+    public function getCurrentUser(): User {
+        return User::get();
     }
 
     # Attempt to log in.  If the user is locked out, just totally bail out.

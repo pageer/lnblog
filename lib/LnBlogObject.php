@@ -82,6 +82,37 @@ class LnBlogObject
         return EventRegister::instance()->activateEvent($this, $name, $params);
     }
 
+    /* Method: raiseEventAndPassthruReturn
+     * Raises the given event name for this class and pass through the value
+     * returned by the underlying callback.
+     *
+     * Note that if the call triggers more than one callback, you will only
+     * get one of the results
+     *
+     * Parameters:
+     * name   - The name of the event.
+     * params - Any number of additional parameters may be passed to this method.
+     *
+     * Returns:
+     * The result of the last callback triggered or null on failure.
+     */
+    public function raiseEventAndPassthruReturn(string $name, array $params) {
+        $result = null;
+        $success = EventRegister::instance()->activateEventFull(
+            $this,
+            strtolower(get_class($this)),
+            $name,
+            $params,
+            $result
+        );
+
+        if ($success) {
+            return $result;
+        }
+
+        return null;
+    }
+
     /* Method: registerEventHandler
      * Registers a handler for an event of this class.
      *

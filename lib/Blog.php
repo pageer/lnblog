@@ -52,6 +52,7 @@ use Psr\Log\LoggerInterface;
 
 class Blog extends LnBlogObject implements AttachmentContainer
 {
+    public const RSS_FEED_EVENT = 'ListFeeds';
 
     public $blogid = '';
     public $name = '';
@@ -193,6 +194,16 @@ class Blog extends LnBlogObject implements AttachmentContainer
 
     public function description() {
         return htmlspecialchars($this->description);
+    }
+
+    public function getRssFeeds(array $tags = []): array {
+        $result = $this->raiseEventAndPassthruReturn(self::RSS_FEED_EVENT, $tags);
+        
+        if (is_array($result)) {
+            return $result;
+        }
+
+        return [];
     }
 
     private function getBlogPath($id) {
@@ -561,10 +572,7 @@ class Blog extends LnBlogObject implements AttachmentContainer
     An array of BlogEntry objects.
     */
     public function getRecent($num_entries=false) {
-
         $show_max = $num_entries ? $num_entries : $this->max_entries;
-        if (! $num_entries) $show_max = $this->max_entries;
-        else $show_max = $num_entries;
 
         $this->getEntries($show_max);
         return $this->entrylist;
@@ -627,50 +635,7 @@ class Blog extends LnBlogObject implements AttachmentContainer
     # An array of entry objects, in reverse chronological order by post date.
 
     public function getEntriesByTag($taglist, $limit=0, $match_all=false) {
-
-        $entry = NewBlogEntry();
-        $this->entrylist = array();
-
-        $ent_dir = Path::mk($this->home_path, BLOG_ENTRY_PATH);
-        $num_found = 0;
-
-        $year_list = $this->fs->scan_directory($ent_dir, true);
-        rsort($year_list);
-
-        foreach ($year_list as $year) {
-            $month_list = $this->fs->scan_directory(Path::mk($ent_dir, $year), true);
-            rsort($month_list);
-            foreach ($month_list as $month) {
-                $path = Path::mk($ent_dir, $year, $month);
-                $ents = $this->fs->scan_directory($path, true);
-                rsort($ents);
-                foreach ($ents as $e) {
-                    $ent_path = Path::mk($path, $e);
-                    if ( $entry->isEntry($ent_path) ) {
-                        $tmp = NewBlogEntry($ent_path);
-                        $ent_tags = $tmp->tags();
-                        if (empty($ent_tags)) continue;
-                        if (! $match_all) {
-                            foreach ($taglist as $tag) {
-                                if (in_arrayi($tag, $ent_tags)) {
-                                    $this->entrylist[] = $tmp;
-                                    $num_found++;
-                                }
-                            }
-                        } else {
-                            $hit_count = 0;
-                            foreach ($taglist as $tag)
-                                if (in_arrayi($tag, $ent_tags)) $hit_count++;
-                            if ($hit_count == count($taglist)) {
-                                    $this->entrylist[] = $tmp;
-                                    $num_found++;
-                            }
-                        }
-                        if ($limit > 0 && $num_found == $limit) break 3;
-                    }
-                }  # End month loop
-            }  # End year loop
-        }  # End archive loop
+        $this->entrylist = $this->entry_repo->getEntriesByTag($taglist, $limit, $match_all);
         return $this->entrylist;
     }
 

@@ -136,29 +136,44 @@ class MyPlugin extends Plugin
 
 }
 
-# Section: Instantiation
-# Here, outside the class declaration, is where we attach the callback
-# function to an event.
-# First, we create an instance of the class.
+# Function: Loader
+# To initialize the plugin, we have the main plugin file return a function.
+# This function, if it exists, will be invoked by the plugin loader after the
+# file is included.  This one just returns an instance of the plugin class, but
+# you can do anything here that needs to be done to successfully instantiate
+# the plugin.
 #
-# After that, we can use the registerEventHandler() and
-# registerStaticEventHandler() methods to attach the event handler and call
-# it as either a member function or a static function, respectively.
-# The difference is that static functions do not require an instance of the
-# class to be created, which means they cannot use any member variables
-# of the class.  They are good mainly for things like doing output.
+# The function must return an instance of the plugin.  If the plugin was
+# created as part of a direct web request, i.e. the browser requested a
+# plugin-specific URL, then the router will automatically call the plugin's
+# outputPage() method.  If the plugin was instantiated by an event, then only
+# this function will be called.
 #
-# The arguments to these methods are, in order, a class name, event name,
-# and the name of your callback function.  Note that the class name can
-# either be the name of a real class, e.g. "blogentry", or a place-holder,
-# such as "sidebar".  If it is a real class, the function will be passed
-# an instance of it.
-#
-# As a further note, be careful what you put outside the class declaration,
-# as all code outside class and function declarations will be run when each
-# page is initialized, i.e. before anything else is done.
-
-$plug = new MyPlugin();
-$plug->registerEventHandler("blogentry", "OnOutput", "myOutput");
-$plug->registerStaticEventHandler("page", "OnOutput", "myStaticOutput");
+# If the plugin file does not return a function, then the plugin file will be
+# loaded with an "include" call, but not further action will be taken.
+return function (): Plugin {
+    # Here is where we attach the callback function to an event.
+    # First, we create an instance of the class.
+    #
+    # After that, we can use the registerEventHandler() and
+    # registerStaticEventHandler() methods to attach the event handler and call
+    # it as either a member function or a static function, respectively.
+    # The difference is that static functions do not require an instance of the
+    # class to be created, which means they cannot use any member variables
+    # of the class.  They are good mainly for things like doing output.
+    #
+    # The arguments to these methods are, in order, a class name, event name,
+    # and the name of your callback function.  Note that the class name can
+    # either be the name of a real class, e.g. "blogentry", or a place-holder,
+    # such as "sidebar".  If it is a real class, the function will be passed
+    # an instance of it.
+    #
+    # As a further note, be careful what you put outside the class declaration,
+    # as all code outside class and function declarations will be run when each
+    # page is initialized, i.e. before anything else is done.
+    $plug = new MyPlugin();
+    $plug->registerEventHandler("blogentry", "OnOutput", "myOutput");
+    $plug->registerStaticEventHandler("page", "OnOutput", "myStaticOutput");
+    return $plug;
+};
 

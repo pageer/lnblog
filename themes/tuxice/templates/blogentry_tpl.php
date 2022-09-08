@@ -67,7 +67,23 @@ if ($ALLOW_PINGBACKS) {
     pf_('This entry accepts Pingbacks from other blogs.');
 }
 if ($COMMENT_RSS_ENABLED) {
-    pf_('You can follow comments on this entry by subscribing to the <a href="%s">RSS feed</a>.', $COMMENT_FEED_LINK);
+    if (count($COMMENT_FEED_LINK) > 1):
+        p_(
+            'You can follow comments on this entry by subscribing to the RSS feeds.'
+        );
+        $links = [];
+        foreach ($COMMENT_FEED_LINK as $link) {
+            $links[] = '<a href="' . $link['href'] . '">' .
+                $link['description'] .
+                '</a>';
+        }
+        echo ' (' . implode(' | ', $links) . ')';
+    else:
+        pf_(
+            'You can follow comments on this entry by subscribing to the <a href="%s">RSS feed</a>.',
+            $COMMENT_FEED_LINK[0]['href']
+        );
+    endif;
 }
 ?>
 </p>

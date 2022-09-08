@@ -53,6 +53,10 @@ class PluginManager
         'sidebar_poweredby.php',
         'sidebar_loginlink.php',
     );
+    /**
+     * @var array<string, string> $instance_list
+     */
+    private array $instance_list = [];
     
     static function instance() {
         if (! isset($GLOBALS['PLUGIN_MANAGER'])) {
@@ -226,7 +230,10 @@ class PluginManager
                 foreach ($paths as $path) {
                     $file = Path::mk($path, 'plugins', $f);
                     if (file_exists($file)) {
-                        include $file;
+                        $loader_function = include $file;
+                        if (is_callable($loader_function)) {
+                            $this->instance_list[$file] = $loader_function();
+                        }
                     }
                 }
             }
@@ -258,6 +265,10 @@ class PluginManager
             }
         }
         return false;
+    }
+
+    public function getInstanceForFile(string $file) {
+        return $this->instance_list[$file] ?? null;
     }
     
     private function getBlogPath() {

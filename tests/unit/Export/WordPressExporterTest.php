@@ -1,19 +1,32 @@
 <?php
 
+namespace LnBlog\Tests\Export;
+
+use Blog;
+use BlogComment;
+use BlogEntry;
+use FS;
+use GlobalFunctions;
 use LnBlog\Attachments\FileManager;
 use LnBlog\Export\ExportTarget;
+use LnBlog\Export\BaseExporter;
 use LnBlog\Export\WordPressExporter;
 use LnBlog\Storage\EntryRepository;
 use LnBlog\Storage\ReplyRepository;
 use LnBlog\Storage\UserRepository;
 use LnBlog\Tasks\TaskManager;
+use LnBlog\Tests\LnBlogBaseTestCase;
+use Path;
+use Pingback;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
+use SystemConfig;
+use UrlPath;
+use UrlResolver;
+use User;
 
-class WordPressExporterTest extends \PHPUnit\Framework\TestCase
+class WordPressExporterTest extends LnBlogBaseTestCase
 {
-    private $prophet;
-
     private $fs;
     private $globals;
     private $user_repo;
@@ -28,7 +41,7 @@ class WordPressExporterTest extends \PHPUnit\Framework\TestCase
         $exporter->export($blog, $target);
 
         $this->assertEquals(
-            $this->prettyPrintXml($this->getExportContent()),
+            BaseExporter::prettyPrintXml($this->getExportContent()),
             $target->getAsText()
         );
     }
@@ -64,7 +77,7 @@ class WordPressExporterTest extends \PHPUnit\Framework\TestCase
         $exporter->export($blog, $target);
 
         $this->assertEquals(
-            $this->prettyPrintXml($this->getExportContent($entry_lines)),
+            BaseExporter::prettyPrintXml($this->getExportContent($entry_lines)),
             $target->getAsText()
         );
     }
@@ -89,7 +102,7 @@ class WordPressExporterTest extends \PHPUnit\Framework\TestCase
         $exporter->export($blog, $target);
 
         $this->assertEquals(
-            $this->prettyPrintXml($this->getExportContent($entry_lines)),
+            BaseExporter::prettyPrintXml($this->getExportContent($entry_lines)),
             $target->getAsText()
         );
     }
@@ -104,15 +117,10 @@ class WordPressExporterTest extends \PHPUnit\Framework\TestCase
     }
 
     protected function setUp(): void {
-        Path::$sep = Path::UNIX_SEP;
-        $this->prophet = new \Prophecy\Prophet();
+        parent::setUp();
         $this->fs = $this->prophet->prophesize(FS::class);
         $this->globals = $this->prophet->prophesize(GlobalFunctions::class);
         $this->user_repo = $this->prophet->prophesize(UserRepository::class);
-    }
-
-    protected function tearDown(): void {
-        $this->prophet->checkPredictions();
     }
 
     private function getTestBlog(array $data = []): Blog {
@@ -457,14 +465,5 @@ class WordPressExporterTest extends \PHPUnit\Framework\TestCase
         );
 
         return $entry;
-    }
-
-    private function prettyPrintXml(string $xml): string {
-        $dom = new \DOMDocument('1.0');
-        $dom->preserveWhiteSpace = true;
-        $dom->formatOutput = true;
-        $dom->loadXML($xml);
-        $pretty_xml = $dom->saveXML();
-        return $pretty_xml;
     }
 }

@@ -9,7 +9,7 @@
         }
     },
     "require": {
-        "php": ">=7.0.0",
+        "php": ">=7.4.0",
         "ext-dom": "*",
         "erusev/parsedown": "1.6.*",
         "phpxmlrpc/phpxmlrpc": "~4.0",

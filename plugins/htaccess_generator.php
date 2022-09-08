@@ -120,12 +120,12 @@ class HTAccessGenerator extends Plugin
         $lines[] = '    Deny from all';
         $lines[] = '</FilesMatch>';
         $lines[] = '';
-        $lines[] = "RewriteRule ^($entry_base/comments/).+\.xml$ $1 [nc]";
+        $lines[] = "RewriteRule ^($entry_base/comments/)[\d\-_]+\.xml$ $1 [nc]";
         $lines[] = "RewriteRule ^($entry_base/pingback/).+\.xml$ $1 [nc]";
         $lines[] = "RewriteRule ^($entry_base/trackback/).+\.xml$ $1 [nc]";
         $lines[] = "RewriteRule ^($entry_base/)" . ENTRY_DEFAULT_FILE . "$ $1 [nc]";
         $lines[] = "RewriteRule ^($entry_base/comments/)" . COMMENT_DELETED_PATH . ".*$ $1 [nc]";
-        $lines[] = "RewriteRule ^($content_base/comments/).+\.xml$ $1 [nc]";
+        $lines[] = "RewriteRule ^($content_base/comments/)[\d\-_]+\.xml$ $1 [nc]";
         $lines[] = "RewriteRule ^($content_base/pingback/).+\.xml$ $1 [nc]";
         $lines[] = "RewriteRule ^($content_base/trackback/).+\.xml$ $1 [nc]";
         $lines[] = "RewriteRule ^($content_base/)" . ENTRY_DEFAULT_FILE . "$ $1 [nc]";
