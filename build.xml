@@ -104,7 +104,7 @@
     </target>
 
     <target name="clientbuild">
-        <echo msg="Copyign from ${outputDir} to ${clientOutputDir}" />
+        <echo msg="Copying from ${outputDir} to ${clientOutputDir}" />
         <mkdir dir="${clientOutputDir}/" />
         <copy file="${outputDir}/node_modules/jquery/dist/jquery.min.js" 
              todir="${clientOutputDir}/scripts/" />
@@ -173,6 +173,9 @@
     </target>
 	
     <target name="dist" depends="distclean">
+        <echo msg="Checking version in blogconfig.php..." />
+        <exec command="php version_check.php ${version}" dir="${buildDir}" passthru="true" checkreturn="true" />
+
         <echo msg="Creating archive..." />
 
         <zip destfile="${buildDir}/LnBlog-${version}.zip">
