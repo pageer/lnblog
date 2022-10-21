@@ -79,7 +79,6 @@ class Blog extends LnBlogObject implements AttachmentContainer
     public $url_method = '';
 
     public $entrylist = array();
-    public $has_more_entries = false;
     public $last_blogentry = null;
     public $last_article = null;
     public $custom_fields = array();
@@ -662,6 +661,18 @@ class Blog extends LnBlogObject implements AttachmentContainer
     */
     public function getArticles($number = null) {
         return $this->entry_repo->getArticles($number);
+    }
+
+    /*
+        Method: hasMoreEntries
+        Tells us if there are more entries than what we just fetched.
+
+        Returns:
+        A boolean indicating if there are more entries left from the
+        last retreival operation.
+     */
+    public function hasMoreEntries(): bool {
+        return $this->entry_repo->hasMoreEntries();
     }
 
     /*

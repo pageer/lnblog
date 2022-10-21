@@ -9,7 +9,7 @@ use Path;
 
 class EntryRepository
 {
-    public $has_more_entries = false;
+    private $has_more_entries = false;
 
     private $blog;
     private $fs;
@@ -19,6 +19,10 @@ class EntryRepository
     public function __construct(Blog $blog, FS $fs = null) {
         $this->blog = $blog;
         $this->fs = $fs ?? NewFS();
+    }
+
+    public function hasMoreEntries(): bool {
+        return $this->has_more_entries;
     }
 
     public function getAll(): array {

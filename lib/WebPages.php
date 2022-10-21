@@ -2180,7 +2180,7 @@ class WebPages extends BasePages
         $template->set('PAGE_VAR', 'page');
         $template->set('INCREMENT', 1);
         $template->set('START_PAGE', 1);
-        $template->set('MORE_ENTRIES', $this->blog->has_more_entries);
+        $template->set('MORE_ENTRIES', $this->blog->hasMoreEntries());
         return $template->process();
     }
 
