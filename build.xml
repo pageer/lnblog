@@ -172,10 +172,12 @@
         <delete dir="${outputDir}/node_modules" />
     </target>
 	
-    <target name="dist" depends="distclean">
+    <target name="version-check">
         <echo msg="Checking version in blogconfig.php..." />
-        <exec command="php version_check.php ${version}" dir="${buildDir}" passthru="true" checkreturn="true" />
+        <exec command="php version_check.php ${version}" dir="${outputDir}" passthru="true" checkreturn="true" />
+    </target>
 
+    <target name="dist" depends="version-check,distclean">
         <echo msg="Creating archive..." />
 
         <zip destfile="${buildDir}/LnBlog-${version}.zip">
