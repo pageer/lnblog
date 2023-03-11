@@ -343,8 +343,8 @@ class WebPages extends BasePages
             $tpl->set("FILE_PATH", $file);
             $tpl->set("FILE_SIZE", file_exists($file)?filesize($file):0);
             $tpl->set("FILE_URL", $this->resolver->localpathToUri($file, $this->blog));
-            $tpl->set("FILE", $file);
         }
+        $tpl->set("FILE", $file);
 
         if (! defined("BLOG_ROOT")) {
             $this->blog = false;
