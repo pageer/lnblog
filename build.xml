@@ -99,7 +99,7 @@
 
         <echo msg="Installing JavaScript sependencies with NPM..." />
         <exec command="npm install" dir="${outputDir}" />
-        
+
         <phingcall target="clientbuild" />
     </target>
 
@@ -139,6 +139,16 @@
         <copy todir="${clientOutputDir}/scripts">
             <fileset dir="${outputDir}/node_modules/tinymce">
                 <include name="**/*.min.js" />
+                <include name="**/*.min.css" />
+            </fileset>
+        </copy>
+        <copy todir="${clientOutputDir}/scripts">
+            <fileset dir="${outputDir}/node_modules/bootstrap/dist/js">
+                <include name="*.min.js" />
+            </fileset>
+        </copy>
+        <copy todir="${clientOutputDir}/styles">
+            <fileset dir="${outputDir}/node_modules/bootstrap/dist/css">
                 <include name="**/*.min.css" />
             </fileset>
         </copy>
