@@ -8,6 +8,7 @@ parameters:
         - blogconfig.php
         - index.php
         - cli.php
+        - version_check.php
         - xmlrpc.php
     bootstrapFiles:
         - blogconfig.php
