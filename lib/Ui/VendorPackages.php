@@ -75,6 +75,12 @@ class VendorPackages
             ),
             new ClientPackage('tag-it', ['tag-it.js'], ['jquery.tagit.css'], ['jquery-ui']),
             new ClientPackage('tinymce', [$tiny_mce_url], [], []),
+            new ClientPackage(
+                'bootstrap',
+                ['bootstrap.bundle.min.js'],
+                ['bootstrap.min.css'],
+                []
+            ),
         ];
 
         foreach ($packages as $package) {

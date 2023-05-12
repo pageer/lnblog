@@ -18,6 +18,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+use LnBlog\Ui\Theme;
 use LnBlog\Ui\VendorPackages;
 
 /*
@@ -96,6 +97,17 @@ class Page extends LnBlogObject
             $inst = new Page();
         }
         return $inst;
+    }
+
+    public function getBlog(): ?Blog {
+        $blg = null;
+        if ($this->display_object instanceof Blog) {
+            $blg = $this->display_object;
+        } elseif ($this->display_object instanceof BlogEntry) {
+            $blg = $this->display_object->getParent();
+        }
+
+        return $blg;
     }
     
     # Method: addPackage
@@ -302,6 +314,8 @@ class Page extends LnBlogObject
         foreach ($this->headers as $name=>$value) {
             header($name.": ".$value);
         }
+
+        Theme::getActive()->initialize($this);
     
         // Put this last so that it can actually override things more easily.
         $this->addStylesheet("override.css");
@@ -311,7 +325,7 @@ class Page extends LnBlogObject
 
         $this->vendor->addSelectedPackagesToPage($this);
 
-        $head = NewTemplate(PAGE_HEAD_TEMPLATE);
+        $head = new PHPTemplate(PAGE_HEAD_TEMPLATE);
         $head->set("PAGE", $this);
         $head->set("DOCTYPE", $this->doctype);
         $head->set("PAGE_TITLE", $this->title);
@@ -321,7 +335,7 @@ class Page extends LnBlogObject
         $head->set("SCRIPTS", $this->scripts);
         $head->set("LINKS", $this->links);
         
-        if ($blog && is_a($blog, 'Blog')) {
+        if ($blog instanceof Blog) {
             $blog->exportVars($head);
         }
         $head->set("PAGE_CONTENT", $page_body);
