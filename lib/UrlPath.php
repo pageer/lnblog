@@ -18,13 +18,6 @@ class UrlPath
         return $this->url;
     }
 
-    public function toArray(): array {
-        return [
-            'path' => $this->path,
-            'url' => $this->url,
-        ];
-    }
-
     public static function __set_state(array $data) {
         return new self($data['path'], $data['url']);
     }

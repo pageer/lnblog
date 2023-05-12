@@ -83,9 +83,6 @@ class Blog extends LnBlogObject implements AttachmentContainer
     public $last_article = null;
     public $custom_fields = array();
 
-    # HACK: because the menubar is messed up and I'm too lazy to fix it properly.
-    public $skip_root = false;
-
     private $managed_file_list = [
         'index.php',
         'pathconfig.php',
@@ -156,7 +153,7 @@ class Blog extends LnBlogObject implements AttachmentContainer
         }
     }
 
-    private function getPathFromPassedValue($path) {
+    private function getPathFromPassedValue(string $path) {
         if ($this->fs->is_dir($path)) {
             $path = $this->fs->realpath($path);
             $this->home_path = $this->fs->realpath($path);
@@ -220,7 +217,7 @@ class Blog extends LnBlogObject implements AttachmentContainer
     Returns:
     True if the blog metadata exists, false otherwise.
     */
-    public function isBlog($blog=false) {
+    public function isBlog() {
 
         return $this->fs->file_exists(Path::mk($this->home_path, BLOG_CONFIG_PATH)) ||
                $this->fs->file_exists(Path::mk($this->home_path, 'blogdata.txt'));
@@ -1020,7 +1017,7 @@ class Blog extends LnBlogObject implements AttachmentContainer
             if ($this->fs->is_dir($third_party_path)) {
                 $ret = $this->fs->copy_rec($src_path, $third_party_path);
             } else {
-                $ret = $this->fs->symlink($src_path, $third_party_path);
+                $ret = @$this->fs->symlink($src_path, $third_party_path);
                 # If the symlinking fails (maybe we're running on Windows and lack permissions),
                 # then try to fall back to copying the directory.
                 if (!$ret) {

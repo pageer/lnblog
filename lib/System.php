@@ -99,7 +99,6 @@ class System
         $ret = array();
         foreach ($list as $key => $item) {
             $b = NewBlog($item->path());
-            $b->skip_root = true;
             $ret[] = $b;
         }
         return $ret;
