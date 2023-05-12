@@ -11,14 +11,24 @@ class HTAccessGenerator extends Plugin
 {
     public $copy_parent;
 
+    public const PLUGIN_VERSION = '1.0.1';
     const LNBLOG_START_MARKER = '# START LnBlog section';
     const LNBLOG_END_MARKER = '# END LnBlog section';
 
     private $fs;
 
+    /**
+     * @codeCoverageIgnore
+     */
+    public static function getLoader(): callable {
+        return function (): Plugin {
+            return new self();
+        };
+    }
+
     public function __construct(FS $fs = null) {
         $this->plugin_desc = _("Adds an .htaccess file to blogs that blocks access to system-managed files.  Enabling this globally is recommended if you're running Apache.");
-        $this->plugin_version = "1.0.0";
+        $this->plugin_version = self::PLUGIN_VERSION;
 
         # Useful for sub-directories because the child file is the only one used.
         $this->addOption("copy_parent", _("Copy of parent directory's .htaccess (if current does not have one)."), false, "checkbox");
@@ -138,4 +148,6 @@ class HTAccessGenerator extends Plugin
 
 # NOTE: Currently this does not work when enabled on a per-blog basis.
 # It has to be enabled globally.
-$gen = new HTAccessGenerator();
+// @codeCoverageIgnoreStart
+return HtAccessGenerator::getLoader();
+// @codeCoverageIgnoreEnd

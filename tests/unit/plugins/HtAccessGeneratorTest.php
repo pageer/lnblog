@@ -87,6 +87,30 @@ class HTAccessGeneratorTest extends \LnBlog\Tests\LnBlogBaseTestCase
         $generator->create_file($blog_instance);
     }
 
+    public function testCreateFile_WhenBlogHtaccessExistsWithEndingLnBlogBlockButNoStart_UpdateBlock() {
+        $existing_file = [
+            '# This is a .htaccess file',
+            '# END LnBlog section',
+            '# The end',
+        ];
+        $expected_content = implode(
+            "\n", array_merge(
+                ['# This is a .htaccess file',],
+                ['# END LnBlog section',],
+                ['# The end'],
+                $this->getLnBlogSection(),
+            )
+        );
+        $this->fs->file_exists('./.htaccess')->willReturn(true);
+        $this->fs->file('./.htaccess')->willReturn($existing_file);
+        $blog_instance = $this->createBlogInstance();
+
+        $this->fs->write_file('./.htaccess', $expected_content)->shouldBeCalled();
+
+        $generator = new HTAccessGenerator($this->fs->reveal());
+        $generator->create_file($blog_instance);
+    }
+
     public function testCreateFile_WhenCopyParentEnabledAndNoCurrentHtaccess_UsesParent() {
         $parent_file = [
             '# This is a .htaccess file',
@@ -137,7 +161,7 @@ class HTAccessGeneratorTest extends \LnBlog\Tests\LnBlogBaseTestCase
 
     private function getLnBlogSection() {
         return [
-            '# START LnBlog section - 1.0.0',
+            '# START LnBlog section - ' . HtAccessGenerator::PLUGIN_VERSION,
             '# This section managed by LnBlog HtAccessGenerator',
             'RewriteEngine On',
             'Options +FollowSymlinks',
