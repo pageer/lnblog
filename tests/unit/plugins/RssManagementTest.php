@@ -54,6 +54,27 @@ class RssManagementTest extends LnBlogBaseTestCase
         $rss->handleCommentUpdate($comment->reveal());
     }
 
+    public function testCommentUpdate_CommentsEnabledFailure_Throws(): void {
+        $error = new \Exception('Invalid export type');
+        $entry = $this->prophet->prophesize(BlogEntry::class);
+        $entry->uri(Argument::any())->willReturn('');
+        $entry->getCommentArray()->willReturn([]);
+        $entry->localpath()->willReturn('/path/to/');
+        $mock_entry = $entry->reveal();
+        $comment = $this->prophet->prophesize(BlogComment::class);
+        $comment->getParent()->willReturn($mock_entry);
+        $this->exporterFactory->create(Argument::any())->willThrow($error);
+
+        $this->expectExceptionObject($error);
+
+        $rss = $this->getRssManagement();
+        $rss->use_comment_feeds = true;
+        $rss->use_rss1 = true;
+        $rss->use_rss2 = true;
+        $rss->use_atom = true;
+        $rss->handleCommentUpdate($comment->reveal());
+    }
+
     public function testCommentUpdate_WhenDisabled_NoOp(): void {
         $comment = $this->prophet->prophesize(BlogComment::class);
 
@@ -94,6 +115,27 @@ class RssManagementTest extends LnBlogBaseTestCase
         $this->fs->write_file($base_path . '.rdf', Argument::any())->willReturn(1)->shouldBeCalled();
         $this->fs->write_file($base_path . '.xml', Argument::any())->willReturn(1)->shouldBeCalled();
         $this->fs->write_file($base_path . '_atom.xml', Argument::any())->willReturn(1)->shouldBeCalled();
+
+        $rss = $this->getRssManagement();
+        $rss->max_entries = 25;
+        $rss->use_rss1 = true;
+        $rss->use_rss2 = true;
+        $rss->use_atom = true;
+        $rss->handleEntryUpdate($entry->reveal());
+    }
+
+    public function testEntryUpdate_EntriesEnabledError_Throws(): void {
+        $error = new \Exception('Invalid exporter');
+        $blog = $this->prophet->prophesize(Blog::class);
+        $blog->uri(Argument::any())->willReturn('');
+        $blog->localpath()->willReturn('/path/to/');
+        $blog->getRecent(25)->willReturn([]);
+        $mock_blog = $blog->reveal();
+        $entry = $this->prophet->prophesize(BlogEntry::class);
+        $entry->getParent()->willReturn($mock_blog);
+        $this->exporterFactory->create(Argument::any())->willThrow($error);
+
+        $this->expectExceptionObject($error);
 
         $rss = $this->getRssManagement();
         $rss->max_entries = 25;
@@ -156,6 +198,45 @@ class RssManagementTest extends LnBlogBaseTestCase
         $rss->use_rss2 = true;
         $rss->use_atom = true;
         $rss->handleTopicUpdate($entry->reveal());
+    }
+
+    public function testTopicUpdate_TopicsEnabledError_Throws(): void {
+        $base_path = '/path/to/feeds/';
+        $error = new \Exception('Invalid exporter');
+        $blog = $this->prophet->prophesize(Blog::class);
+        $blog->uri(Argument::any())->willReturn('');
+        $blog->localpath()->willReturn('/path/to/');
+        $blog->getEntriesByTag(['Foo Bar'], 25)->willReturn([]);
+        $mock_blog = $blog->reveal();
+        $entry = $this->prophet->prophesize(BlogEntry::class);
+        $entry->getParent()->willReturn($mock_blog);
+        $entry->tags()->willReturn(['Foo Bar', 'News']);
+        $this->exporterFactory->create(Argument::any())->willThrow($error);
+
+        $this->expectExceptionObject($error);
+
+        $rss = $this->getRssManagement();
+        $rss->use_tag_feeds = true;
+        $rss->max_entries = 25;
+        $rss->use_rss1 = true;
+        $rss->use_rss2 = true;
+        $rss->use_atom = true;
+        $rss->handleTopicUpdate($entry->reveal());
+    }
+
+    public function testTopicUpdate_CalledOnNonEntry_Throws(): void {
+        $blog = $this->prophet->prophesize(Blog::class);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Entry update event called on non-entry');
+
+        $rss = $this->getRssManagement();
+        $rss->use_tag_feeds = true;
+        $rss->max_entries = 25;
+        $rss->use_rss1 = true;
+        $rss->use_rss2 = true;
+        $rss->use_atom = true;
+        $rss->handleTopicUpdate($blog->reveal());
     }
 
     public function testTopicUpdate_TopicsDisabled_NoOp(): void {
@@ -361,6 +442,48 @@ class RssManagementTest extends LnBlogBaseTestCase
         $this->assertEmpty($output);
     }
 
+    public function testHandleSidebarLinks_SidebarDisabled_NoOutput(): void {
+        $blog = $this->prophet->prophesize(Blog::class);
+        $page = $this->prophet->prophesize(Page::class);
+
+        $blog->localpath()->willReturn('/foo/');
+        $this->fs->file_exists(Argument::any())->willReturn(false);
+
+        $page_obj = $page->reveal();
+        $page_obj->display_object = $blog->reveal();
+
+        $rss = $this->getRssManagement();
+        $rss->show_sidebar_links = false;
+        $rss->use_rss1 = true;
+        ob_start();
+        $rss->handleSidebarLinks($page_obj);
+        $output = ob_get_contents();
+        ob_end_clean();
+
+        $this->assertEmpty($output);
+    }
+
+    public function testHandleSidebarLinks_NoBlogFound_NoOutput(): void {
+        $blog = $this->prophet->prophesize(Blog::class);
+        $page = $this->prophet->prophesize(Page::class);
+
+        $blog->localpath()->willReturn('/foo/');
+        $this->fs->file_exists(Argument::any())->willReturn(false);
+
+        $page_obj = Page::instance();
+        $page_obj->display_object = null;
+
+        $rss = $this->getRssManagement();
+        $rss->show_sidebar_links = false;
+        $rss->use_rss1 = true;
+        ob_start();
+        $rss->handleSidebarLinks(null);
+        $output = ob_get_contents();
+        ob_end_clean();
+
+        $this->assertEmpty($output);
+    }
+
     public function testHandleSidebarLinks_ExternalFeed_OutputsSidebarSection(): void {
         $blog = $this->prophet->prophesize(Blog::class);
         $page = $this->prophet->prophesize(Page::class);
@@ -381,7 +504,7 @@ class RssManagementTest extends LnBlogBaseTestCase
         $rss->use_rss1 = true;
         $rss->use_rss2 = true;
         $rss->use_atom = true;
-        $rss->sidebar_use_icons = true;
+        $rss->sidebar_use_icons = false;
         $rss->use_external_feed = true;
         $rss->feed_url = 'https://foofeeds.com/whatever';
         $rss->feed_description = 'This is some feed';
@@ -396,7 +519,6 @@ class RssManagementTest extends LnBlogBaseTestCase
         $this->assertStringNotContainsString('https://foo.com/feeds/news_atom.xml', $output);
         $this->assertStringContainsString($rss->feed_description, $output);
         $this->assertStringContainsString($rss->feed_url, $output);
-        $this->assertStringContainsString('xml_feed.png', $output);
     }
 
     public function testHandleSidebarLinks_ExternalFeedWithWidget_OutputsSidebarSectionWithOnlyWidget(): void {

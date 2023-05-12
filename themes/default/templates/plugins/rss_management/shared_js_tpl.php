@@ -1,3 +1,6 @@
+<?php if (!empty($INCLUDE_SCRIPT_TAGS)): ?>
+<script type="text/javascript">
+<?php endif?>
 $(function () {
     $('.rss-ajax-link').off('click').on('click', function () {
         var $self = $(this);
@@ -18,3 +21,6 @@ $(function () {
         return false;
     });
 });
+<?php if (!empty($INCLUDE_SCRIPT_TAGS)): ?>
+</script>
+<?php endif;

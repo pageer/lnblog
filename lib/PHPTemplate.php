@@ -254,29 +254,24 @@ class PHPTemplate extends LnBlogObject
        Process the template and get the output.
 
        If the template is using blocks rather than plain-old PHP/HTML, then
-       this method will look for a block named "main" and execute it if 
+       this method will look for a block named "main" and execute it if
        it is found.
 
-       Parameters:
-       return_results - (boolean) Determines whether the output should be returned
-                        in a string instead of sent straight to the client.  Default is true.
        Returns:
        The output string if return_results is true.  Otherwise, true on success and false on failure.
      */
-    public function process($return_results=true) {
+    public function process() {
         ob_start();
-        extract($this->vars, EXTR_OVERWRITE);
-        include $this->getTemplatePath();
-        if (isset($this->block_registry['main'])) {
-            $this->showBlock('main');
-        }
-        if ($return_results) {
-            $ret = ob_get_contents();
-            ob_end_clean();
-            return $ret;
-        } else {
-            return ob_end_flush();
-        }
+        $this->runTemplate();
+        $ret = ob_get_contents();
+        ob_end_clean();
+        return $ret;
+    }
+
+    public function output(): void {
+        ob_start();
+        $this->runTemplate();
+        ob_end_flush();
     }
 
     public function escape($data, $method = '') {
@@ -335,5 +330,13 @@ class PHPTemplate extends LnBlogObject
     public function img($src, $data=array()) {
         $data['src'] = $src;
         return $this->tag('img', $data);
+    }
+
+    private function runTemplate(): void {
+        extract($this->vars, EXTR_OVERWRITE);
+        include $this->getTemplatePath();
+        if (isset($this->block_registry['main'])) {
+            $this->showBlock('main');
+        }
     }
 }

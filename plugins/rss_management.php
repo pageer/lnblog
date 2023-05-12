@@ -3,12 +3,15 @@
 use LnBlog\Export\BaseFeedExporter;
 use LnBlog\Export\ExporterFactory;
 use LnBlog\Export\ExportTarget;
+use LnBlog\Plugins\PluginTemplate;
 use Psr\Log\LoggerInterface;
 
 class RssManagement extends Plugin
 {
     const PLUGIN_VERSION = '1.0.0';
     const MAX_ENTRIES_DEFAULT = 10;
+
+    private const PLUGIN_DIR = 'rss_management';
 
     public int $max_entries = self::MAX_ENTRIES_DEFAULT;
     public bool $use_rss1 = false;
@@ -42,9 +45,12 @@ class RssManagement extends Plugin
     private System $system;
     private LoggerInterface $logger;
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function getLoader(): callable {
         return function (): Plugin {
-            return new RssManagement();
+            return new self();
         };
     }
 
@@ -201,8 +207,8 @@ class RssManagement extends Plugin
         }
     }
 
-    public function handleSidebarLinks($page): void {
-        $blog = null;
+public function handleSidebarLinks($page): void {
+    $blog = null;
         $entry = null;
         // TODO: This is because the "sidebar" isn't an object.  We need to fix this.
         if (!is_object($page)) {
@@ -270,9 +276,9 @@ class RssManagement extends Plugin
             $template->set('PANEL_LIST', $items);
             echo $template->process();
 
-            echo '<script type="text/javascript">';
-            include Path::mk(__DIR__, 'rss_management', 'shared_js_tpl.php');
-            echo '</script>';
+            $js_template = new PluginTemplate(self::PLUGIN_DIR, 'shared_js_tpl.php');
+            $js_template->set('INCLUDE_SCRIPT_TAGS', true);
+            echo $js_template->process();
         }
     }
 
@@ -356,12 +362,18 @@ class RssManagement extends Plugin
         }
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function showConfig($page, $csrf_token) {
-        $file = Path::mk(__DIR__, 'rss_management', 'admin_tpl.php');
+        $template = new PluginTemplate(self::PLUGIN_DIR, 'admin_tpl.php');
+        $js_template = new PluginTemplate(self::PLUGIN_DIR, 'shared_js_tpl.php');
 
-        $BLOG = $this->getBlog();
+        $template->set('BLOG', $this->getBlog());
+        $template->set('PLUGIN', $this);
+        $template->set('JS_TEMPLATE', $js_template);
         $this->showFormHeader($csrf_token);
-        include $file;
+        $template->output();
         $this->showFormFooter();
 
         return false;
@@ -650,35 +662,22 @@ class RssManagement extends Plugin
      * @param array{'description': string, 'href': string, 'icon': string} $feed
      */
     private function showSidebarLink(array $feed): string {
-        $description = $feed['description'];
-        $image = $feed['icon'] ?? '';
-        $class = $feed['class'] ?? 'news-feed-link';
-        ob_start(); ?>
-        <a href="<?php echo $feed['href']?>" class="<?php echo $class?>">
-    <?php echo htmlspecialchars($description)?>
-    <?php if ($image && $this->sidebar_use_icons): ?>
-    <img class="feed-icon" alt="<?php echo htmlspecialchars($description)?>" 
-         title="<?php echo htmlspecialchars($description)?>" src="<?php echo $image?>" />
-    <?php endif ?>
-</a>
-        <?php
-        return ob_get_clean();
+        $template = new PluginTemplate(self::PLUGIN_DIR, 'link_tpl.php');
+        $template->set('USE_ICONS', $this->sidebar_use_icons);
+        $template->set('feed', $feed);
+        $template->set('SHOW_SIDEBAR');
+        return $template->process();
     }
 
     /**
      * @param array{'description': string, 'href': string, 'icon': string} $feed
      */
     private function showTagLink(array $feed): void {
-        $description = $feed['description'];
-        $image = $feed['icon']; ?>
-<a href="<?php echo $feed['href']?>" class="news-feed-link">
-    <?php if ($this->sidebar_use_icons): ?>
-        <img class="feed-icon" alt="<?php echo htmlspecialchars($description)?>" 
-             title="<?php echo htmlspecialchars($description)?>" src="<?php echo $image?>" />
-    <?php else: ?>
-    (<?php echo htmlspecialchars($description)?>)
-    <?php endif ?>
-</a><?php
+        $template = new PluginTemplate(self::PLUGIN_DIR, 'link_tpl.php');
+        $template->set('USE_ICONS', $this->sidebar_use_icons);
+        $template->set('feed', $feed);
+        $template->set('SHOW_TAG');
+        $template->output();
     }
 
     private function configureCallbacks(): void {
@@ -702,4 +701,6 @@ class RssManagement extends Plugin
     }
 }
 
+// @codeCoverageIgnoreStart
 return RssManagement::getLoader();
+// @codeCoverageIgnoreEnd

@@ -1,44 +1,44 @@
 <?php
 /**
- * @var RssManagement $this
+ * @var RssManagement $PLUGIN
  */
 ?>
 <div id="rss-feed-formats">
     <h4><?php p_('Feed formats')?></h4>
     <?php
-    $this->showField('use_rss1');
-    $this->showField('use_rss2');
-    $this->showField('use_atom');
+    $PLUGIN->showField('use_rss1');
+    $PLUGIN->showField('use_rss2');
+    $PLUGIN->showField('use_atom');
     ?>
 </div>
 
 <div id="rss-feed-types">
     <h4><?php p_('Feed types')?></h4>
     <?php
-    $this->showField('use_blog_feeds');
-    $this->showField('use_tag_feeds');
-    $this->showField('use_comment_feeds');
+    $PLUGIN->showField('use_blog_feeds');
+    $PLUGIN->showField('use_tag_feeds');
+    $PLUGIN->showField('use_comment_feeds');
     ?>
 </div>
 
 <div id="fss-display-options">
     <h4><?php p_('Display options')?></h4>
     <?php
-    $this->showField('max_entries');
-    $this->showField('show_header_links');
-    $this->showField('show_sidebar_links');
-    $this->showField('sidebar_section_header');
-    $this->showField('sidebar_use_icons');
-    $this->showField('show_comment_links');
-    $this->showField('show_tag_links');
-    $this->showField('use_external_feed');
+    $PLUGIN->showField('max_entries');
+    $PLUGIN->showField('show_header_links');
+    $PLUGIN->showField('show_sidebar_links');
+    $PLUGIN->showField('sidebar_section_header');
+    $PLUGIN->showField('sidebar_use_icons');
+    $PLUGIN->showField('show_comment_links');
+    $PLUGIN->showField('show_tag_links');
+    $PLUGIN->showField('use_external_feed');
     ?>
     <div id="rss-external-feed-options">
         <?php
-        $this->showField('feed_url');
-        $this->showField('feed_format');
-        $this->showField('feed_description');
-        $this->showField('feed_widget');
+        $PLUGIN->showField('feed_url');
+        $PLUGIN->showField('feed_format');
+        $PLUGIN->showField('feed_description');
+        $PLUGIN->showField('feed_widget');
         ?>
     </div>
 </div>
@@ -148,5 +148,8 @@
         $('input').change();
     });
 
-    <?php include __DIR__ . DIRECTORY_SEPARATOR . 'shared_js_tpl.php';?>
+    <?php
+        $JS_TEMPLATE->set('INCLUDE_SCRIPT_TAGS', false);
+        $JS_TEMPLATE->output();
+    ?>
 </script>
