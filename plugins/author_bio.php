@@ -4,15 +4,28 @@
 # It includes a configurable title and HTML text input as well as an option to display
 # a picture.
 
+use LnBlog\Plugins\PluginTemplate;
+
 class AuthorBio extends Plugin
 {
+    const PLUGIN_DIR = 'author_bio';
+    const TEMPLATE = 'panel_tpl.php';
 
     public $title;
     public $picture_url;
     public $bio;
     public $markup_type;
 
-    public function __construct($do_output=false) {
+    /**
+     * @codeCoverageIgnore
+     */
+    public static function getLoader(): callable {
+        return function (): Plugin {
+            return new self();
+        };
+    }
+
+    public function __construct() {
         $this->plugin_version = '0.1.2';
         $this->plugin_desc = _('Display information about the author in the sidebar.');
 
@@ -49,37 +62,7 @@ class AuthorBio extends Plugin
 
         parent::__construct();
 
-        Page::instance()->addInlineStylesheet($this->styles());
-
         $this->registerNoEventOutputHandler("sidebar", "output");
-
-        if ($do_output) {
-            $this->output();
-        }
-    }
-
-    public function styles($include_tag = false) {
-        ob_start();
-        // Hack for IDE syntax highlighting
-        if ($include_tag): ?>
-            <style type="text/css"><?php
-        endif ?>
-        .bio_picture img {
-            border: 1px solid black;
-            box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, .5);
-            max-width: 100%;
-            border-radius: 5px;
-        }
-        .bio_content {
-            margin-top: 1em;
-        }
-        <?php
-        if ($include_tag):
-            ?></style><?php
-        endif;
-
-        $ret = ob_get_clean();
-        return $ret;
     }
 
     public function output() {
@@ -87,29 +70,20 @@ class AuthorBio extends Plugin
             return;
         }
 
-        $tpl = NewTemplate('sidebar_panel_tpl.php');
+        $pluginTpl = new PluginTemplate(self::PLUGIN_DIR, self::TEMPLATE);
+        $pluginTpl->set('BIO_PIC', $this->picture_url);
+        $bio_text = TextProcessor::get($this->markup_type, null, $this->bio)->getHTML();
+        $pluginTpl->set('BIO', $bio_text);
 
+        $tpl = new PHPTemplate('sidebar_panel_tpl.php');
         $tpl->set('PANEL_TITLE', $this->title);
-
-        ob_start();
-        ?>
-        <?php if ($this->picture_url): ?>
-        <div class="bio_picture">
-            <img src="<?php echo $this->picture_url;?>" alt="" style="display: block; margin: 0 auto"/>
-        </div>
-        <?php endif; ?>
-        <div class="bio_content">
-            <?php echo TextProcessor::get($this->markup_type, null, $this->bio)->getHTML();?>
-        </div>
-        <?php
-        $content = ob_get_clean();
         $tpl->set('PANEL_CLASS', 'panel');
-        $tpl->set('PANEL_CONTENT', $content);
-        echo $tpl->process();
+        $tpl->set('PANEL_CONTENT', $pluginTpl->process());
+
+        $tpl->output();
     }
 }
 
-if (! PluginManager::instance()->plugin_config->value('author_bio', 'creator_output', 0)) {
-    $plug = new AuthorBio();
-}
-
+// @codeCoverageIgnoreStart
+return AuthorBio::getLoader();
+// @codeCoverageIgnoreEnd

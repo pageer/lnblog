@@ -3,14 +3,15 @@
 namespace LnBlog\Tests;
 
 use Path;
+use Prophecy\Prophet;
 
-class LnBlogBaseTestCase extends \PHPUnit\Framework\TestCase
+abstract class LnBlogBaseTestCase extends \PHPUnit\Framework\TestCase
 {
     protected $prophet;
 
     protected function setUp(): void {
         Path::$sep = '/';
-        $this->prophet = new \Prophecy\Prophet();
+        $this->prophet = new Prophet();
     }
 
     protected function tearDown(): void {
