@@ -19,8 +19,16 @@ class Articles extends Plugin
     private $fs;
     private $system;
 
+    /**
+     * @codeCoverageIgnore
+     */
+    public static function getLoader(): callable {
+        return function (): Plugin {
+            return new self();
+        };
+    }
+
     public function __construct(
-        $do_output = 0,
         Blog $blog = null,
         User $user = null,
         FS $fs = null,
@@ -68,17 +76,13 @@ class Articles extends Plugin
         $this->registerNoEventOutputHandler("sidebar", "outputCache");
         $this->registerStandardInvalidators();
         $this->registerEventHandler("blog", "OnInit", "updateManagedFiles");
-
-        if ($do_output) {
-            $this->buildOutput();
-        }
     }
 
     public function updateManagedFiles($blog) {
         $blog->addManagedFile($this->custom_links);
     }
 
-    function buildOutput($parm=false) {
+    public function buildOutput($parm=false) {
 
         $blg = $this->blog ?: NewBlog();
         $u = $this->user ?: NewUser();
@@ -93,7 +97,7 @@ class Articles extends Plugin
             return '';
         }
 
-        $tpl = NewTemplate("sidebar_panel_tpl.php");
+        $tpl = new PHPTemplate("sidebar_panel_tpl.php");
         $items = [];
 
         if ($this->header) {
@@ -142,7 +146,6 @@ class Articles extends Plugin
 
 }
 
-if (! PluginManager::instance()->plugin_config->value('articles', 'creator_output', 0)) {
-    $art = new Articles();
-}
-
+// @codeCoverageIgnoreStart
+return Articles::getLoader();
+// @CodeCoverageIgnoreEnd

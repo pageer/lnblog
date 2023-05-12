@@ -24,7 +24,7 @@ class SidebarArticlesTest extends \PHPUnit\Framework\TestCase
         $this->system->canModify($blog, $user)->willReturn(false);
         $system = $this->system->reveal();
 
-        $plugin = new Articles(0, $blog, $user, $fs, $system);
+        $plugin = new Articles($blog, $user, $fs, $system);
         $plugin->header = 'Articles';
         $plugin->showall_text = 'All static pages';
         $output = $plugin->buildOutput();
@@ -54,7 +54,7 @@ class SidebarArticlesTest extends \PHPUnit\Framework\TestCase
         $this->system->canModify($blog, $user)->willReturn(false);
         $system = $this->system->reveal();
 
-        $plugin = new Articles(0, $blog, $user, $fs, $system);
+        $plugin = new Articles($blog, $user, $fs, $system);
         $plugin->header = 'ALL THE CONTENT';
         $plugin->showall_text = 'EVEN MORE CONTENT';
         $output = $plugin->buildOutput();
@@ -84,7 +84,7 @@ class SidebarArticlesTest extends \PHPUnit\Framework\TestCase
         $this->system->canModify($blog, $user)->willReturn(false);
         $system = $this->system->reveal();
 
-        $plugin = new Articles(0, $blog, $user, $fs, $system);
+        $plugin = new Articles($blog, $user, $fs, $system);
         $plugin->static_link = false;
         $plugin->header = '';
         $output = $plugin->buildOutput();
@@ -112,7 +112,7 @@ class SidebarArticlesTest extends \PHPUnit\Framework\TestCase
         $this->system->canModify($blog, $user)->willReturn(true);
         $system = $this->system->reveal();
 
-        $plugin = new Articles(0, $blog, $user, $fs, $system);
+        $plugin = new Articles($blog, $user, $fs, $system);
         $plugin->static_link = false;
         $plugin->header = '';
         $output = $plugin->buildOutput();
@@ -149,7 +149,7 @@ class SidebarArticlesTest extends \PHPUnit\Framework\TestCase
         $this->system->canModify($blog, $user)->willReturn(false);
         $system = $this->system->reveal();
 
-        $plugin = new Articles(0, $blog, $user, $fs, $system);
+        $plugin = new Articles($blog, $user, $fs, $system);
         $plugin->static_link = false;
         $plugin->header = '';
         $plugin->custom_links = 'links.htm';
@@ -185,7 +185,7 @@ class SidebarArticlesTest extends \PHPUnit\Framework\TestCase
         $this->system->canModify($blog, $user)->willReturn(false);
         $system = $this->system->reveal();
 
-        $plugin = new Articles(0, $blog, $user, $fs, $system);
+        $plugin = new Articles($blog, $user, $fs, $system);
         $plugin->static_link = false;
         $plugin->header = '';
         $plugin->custom_links = 'links.htm';
@@ -220,7 +220,7 @@ class SidebarArticlesTest extends \PHPUnit\Framework\TestCase
         $this->system->canModify($blog, $user)->willReturn(false);
         $system = $this->system->reveal();
 
-        $plugin = new Articles(0, $blog, $user, $fs, $system);
+        $plugin = new Articles($blog, $user, $fs, $system);
         $plugin->static_link = false;
         $plugin->header = '';
         $plugin->custom_links = 'links.htm';
@@ -245,7 +245,7 @@ class SidebarArticlesTest extends \PHPUnit\Framework\TestCase
         $fs = $this->fs->reveal();
         $system = $this->system->reveal();
 
-        $plugin = new Articles(0, $blog, $user, $fs, $system);
+        $plugin = new Articles($blog, $user, $fs, $system);
         $plugin->static_link = false;
         $output = $plugin->buildOutput();
 
@@ -259,7 +259,7 @@ class SidebarArticlesTest extends \PHPUnit\Framework\TestCase
         $fs = $this->fs->reveal();
         $system = $this->system->reveal();
 
-        $plugin = new Articles(0, $blog, $user, $fs, $system);
+        $plugin = new Articles($blog, $user, $fs, $system);
         $plugin->static_link = false;
         $output = $plugin->buildOutput();
 
