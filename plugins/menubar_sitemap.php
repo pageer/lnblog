@@ -24,18 +24,46 @@
 # both, then the auto-generated links will be shown first and the custom ones
 # will be second.
 
+use LnBlog\Plugins\PluginTemplate;
+use LnBlog\Storage\BlogRepository;
+
 class SiteMap extends Plugin
 {
+    public const TEMPLATE = 'menubar_sitemap_tpl.php';
+    private const PLUGIN_DIR = 'menubar_sitemap';
 
-    public $link_file;
-    public $auto_map;
-    public $list_header;
-    public $no_markup;
+    public string $link_file;
+    public bool $auto_map;
+    public string $list_header;
+    public bool $no_markup;
 
-    function __construct($do_output=0) {
+    private Blog $blog;
+    private BlogRepository $blogRepository;
+    private FS $fs;
+    private SystemConfig $systemConfig;
+
+    /**
+     * @codeCoverageIgnore
+     */
+    public static function getLoader(): callable {
+        return function (): Plugin {
+            return new self();
+        };
+    }
+
+    function __construct(
+        Blog $blog = null,
+        FS $fs = null,
+        SystemConfig $systemConfig = null,
+        BlogRepository $blogRepository = null
+    ) {
+        $this->blog = $blog ?: NewBlog();
+        $this->fs = $fs ?: NewFS();
+        $this->systemConfig = $systemConfig ?: SystemConfig::instance();
+        $this->blogRepository = $blogRepository ?? new BlogRepository();
 
         $this->plugin_desc = _("Show a sitemap in the menubar");
-        $this->plugin_version = "0.3.1";
+        $this->plugin_version = "0.4.0";
         $this->list_header = _("Site Map");
         $this->no_markup = false;
         $this->addOption(
@@ -62,78 +90,89 @@ class SiteMap extends Plugin
 
         $this->registerNoEventOutputHandler("menubar", "output");
         $this->registerEventHandler("blog", "OnInit", "updateManagedFiles");
-
-        if ($do_output) {
-            $this->output();
-        }
+        $this->registerEventHandler("loginops", "PluginOutput", "showLink");
     }
 
     public function updateManagedFiles($blog) {
         $blog->addManagedFile($this->link_file);
     }
 
-    function get_map_file() {
-        $blog = NewBlog();
-        if ( $blog->isBlog() &&
-             file_exists($blog->home_path.PATH_DELIM.$this->link_file) ) {
-            $map_file = $blog->home_path.PATH_DELIM.$this->link_file;
-        } elseif (is_file(Path::mk(USER_DATA_PATH, $this->link_file))) {
-            $map_file = Path::mk(USER_DATA_PATH, $this->link_file);
+    public function output($parm=false) {
+        $map_file = $this->getMapFile();
+        $template = new PluginTemplate(self::PLUGIN_DIR, self::TEMPLATE);
+
+        $links = [];
+        if ($this->auto_map) {
+            $links = $this->getBlogList();
+        }
+
+
+        if ($this->no_markup && $map_file) {
+            $data = $this->fs->read_file($map_file);
+            $template->set('RAW_MARKUP', $this->fs->read_file($map_file));
         } else {
-            $map_file = '';
+            #echo $markup;  # Output the auto-generated links, if any.
+            if ($this->fs->is_file($map_file)) {
+                $data = $this->fs->file($map_file);
+                foreach ($data as $line) {
+                    if (trim($line) != '') {
+                        $links[] = $line;
+                    }
+                }
+            } elseif (! $this->auto_map) {
+                $links[] = '<a href="/" title="<?php p_("Site home page"); ?>"><?php p_("Home"); ?></a>';
+            }
+
+            $template->set('LINKS', $links);
+            $template->set('HEADER', $this->list_header);
+        }
+
+        echo $template->process();
+    }
+
+    public function showLink() {
+        $url = $this->blog->uri(
+            'editfile',
+            [
+                'map' => 'yes',
+                'file' => $this->link_file,
+                'list' => 'yes',
+                'richedit' => 'false'
+            ]
+        );
+        $template = new PluginTemplate(self::PLUGIN_DIR, self::TEMPLATE);
+        $template->set('SHOW_EDIT_LINK', true);
+        $template->set('EDIT_URL', $url);
+        $template->output();
+    }
+
+    private function getMapFile() {
+        $map_file = '';
+        $blog_file = Path::mk($this->blog->home_path, $this->link_file);
+        $global_file = Path::mk($this->systemConfig->userData()->path(), $this->link_file);
+
+        if ($this->blog->isBlog() && $this->fs->is_file($blog_file)) {
+            $map_file = $blog_file;
+        } elseif ($this->fs->is_file($global_file)) {
+            $map_file = $global_file;
         }
         return $map_file;
     }
 
-    function output($parm=false) {
-
-        $blog = NewBlog();
-        $map_file = $this->get_map_file();
-
-        $markup = '';
-        if ($this->auto_map) {
-            $blogs = System::instance()->getBlogList();
-            foreach ($blogs as $b) {
-                $markup .= '<li><a href="'.$b->getURL().'" title="'.
-                           $b->description.'">'.$b->name."</a></li>\n";
-            }
+    private function getBlogList(): array {
+        $list = $this->blogRepository->getAll();
+        $ret = [];
+        foreach ($list as $item) {
+            $ret[] = [
+                'name' => $item->name,
+                'description' => $item->description,
+                'url' => $item->getUrl(),
+            ];
         }
-
-        if ($this->no_markup && is_file($map_file)) {
-            $data = file($map_file);
-            if ($markup) echo "<ul>\n$markup</ul>\n";  #Auto-generated links.
-            foreach ($data as $line) echo $line;
-        } else {
-?>
-<h2><?php echo $this->list_header; ?></h2>
-<ul>
-<?php
-            echo $markup;  # Output the auto-generated links, if any.
-            if (is_file($map_file)) {
-                $data = file($map_file);
-                foreach ($data as $line) {
-                    if (trim($line) != '') {
-?>
-<li><?php echo $line; ?></li>
-<?php
-                    }
-                }
-            } elseif (! $this->auto_map) { ?>
-<li><a href="/" title="<?php p_("Site home page"); ?>"><?php p_("Home"); ?></a></li>
-<?php
-            } ?>
-</ul>
-<?php
-        }
+        return $ret;
     }
-
-    function showLink($param) {
-        $blog = NewBlog();
-        $url = $blog->uri('editfile', array('map' => 'yes', 'file' => $this->link_file, 'list' => 'yes', 'richedit' => 'false'));
-        echo '<li><a href="'.$url.'">'.
-            _("Edit custom sitemap").'</a></li>';
-    }
-
 }
-$map = new SiteMap(0);
-$map->registerEventHandler("loginops", "PluginOutput", "showLink");
+
+// @codeCoverageIgnoreStart
+return SiteMap::getLoader();
+// @CodeCoverageIgnoreEnd
