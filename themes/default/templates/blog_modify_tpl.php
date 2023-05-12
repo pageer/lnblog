@@ -80,10 +80,9 @@ $(document).ready(function () {
     <?php endif ?>
     <?php if (isset($BLOG_OWNER)):?>
         <div class="form-row">
+            <?php $msg = _("The username of whoever will own this blog.");?>
             <label for="owner" title="<?php echo $msg;?>"><?php p_("Blog owner"); ?></label>
-            <select id="owner" name="owner"
-                title="<?php p_("The username of whoever will own this blog.")?>"
-            >
+            <select id="owner" name="owner" title="<?php echo $msg?>">
                 <?php foreach ($USER_LIST as $user): ?>
                     <?php $selected = $BLOG_OWNER == $user->username() ? 'selected' : ''; ?>
                     <option <?php echo $selected?>><?php echo $user->username()?></option>
