@@ -455,14 +455,7 @@ class Blog extends LnBlogObject implements AttachmentContainer
     4-digit year and a permalink to the archive of that year respectively.
     */
     public function getYearList() {
-        $year_list = $this->fs->scan_directory(Path::mk($this->home_path, BLOG_ENTRY_PATH), true);
-        if ($year_list) rsort($year_list);
-        $ret = array();
-        foreach ($year_list as $yr) {
-            $ret[] = array("year"=>$yr,
-                           "link"=>$this->getURL().BLOG_ENTRY_PATH."/".$yr."/");
-        }
-        return $ret;
+        return $this->entry_repo->getYearList();
     }
 
     /*
@@ -481,19 +474,7 @@ class Blog extends LnBlogObject implements AttachmentContainer
     to the archive for that month.
     */
     public function getMonthList($year=false) {
-        if (! $year) {
-            if (sanitize(GET("year"), "/\D/")) {
-                $year = sanitize(GET("year"), "/\D/");
-            } else $year = basename(getcwd());
-        }
-        $month_list = $this->fs->scan_directory(Path::mk($this->home_path, BLOG_ENTRY_PATH, $year), true);
-        rsort($month_list);
-        $ret = array();
-        foreach ($month_list as $mo) {
-            $ret[] = array("year"=>$year, "month"=>$mo,
-                           "link"=>$this->getURL().BLOG_ENTRY_PATH."/".$year."/".$mo."/");
-        }
-        return $ret;
+        return $this->entry_repo->getMonthList($year);
     }
 
     /*
@@ -511,17 +492,7 @@ class Blog extends LnBlogObject implements AttachmentContainer
     should be nummonths long.
     */
     public function getRecentMonthList($nummonths=12) {
-        $count = 0;
-        $ret = array();
-        $year_list = $this->getYearList();
-        foreach ($year_list as $year) {
-            $month_list = $this->getMonthList($year["year"]);
-            foreach ($month_list as $month) {
-                $ret[] = $month;
-                if ($nummonths > 0 && ++$count >= $nummonths) break 2;
-            }
-        }
-        return $ret;
+        return $this->entry_repo->getRecentMonthList($nummonths);
     }
 
     /*

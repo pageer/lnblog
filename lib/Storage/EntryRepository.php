@@ -91,6 +91,80 @@ class EntryRepository
         return $ret;
     }
 
+    # Method: getYearList
+    # Get a list of all years in the archive, sorted in reverse chronological
+    # order.
+    # 
+    # Returns:
+    # A two-dimensional array.  The first dimension has numeric indexes.  The
+    # second has two elements, indexed as "year" and "link", which hold the
+    # 4-digit year and a permalink to the archive of that year respectively.
+    public function getYearList() {
+        $year_list = $this->fs->scan_directory(Path::mk($this->blog->home_path, BLOG_ENTRY_PATH), true);
+        if ($year_list) rsort($year_list);
+        $ret = array();
+        foreach ($year_list as $yr) {
+            $ret[] = array("year"=>$yr,
+                           "link"=>$this->blog->getURL().BLOG_ENTRY_PATH."/".$yr."/");
+        }
+        return $ret;
+    }
+
+    # Method: getMonthList
+    # Get a list of the months for the given year.  If no year is given, try
+    # to extract it from the current directory/URL.
+    #
+    # Parameters:
+    # year - The year you want.
+    #
+    # Returns:
+    # A two-dimensional array.  The first dimension is numerically indexed, with
+    # elements sorted in reverse chronological order.  The second dimension has
+    # three elements, indexed as "year", "month", and "link".  These hold,
+    # respectively, the year you specified, the 2-digit month, and a permalink
+    # to the archive for that month.
+    public function getMonthList($year=false) {
+        if (! $year) {
+            if (sanitize(GET("year"), "/\D/")) {
+                $year = sanitize(GET("year"), "/\D/");
+            } else $year = basename(getcwd());
+        }
+        $month_list = $this->fs->scan_directory(Path::mk($this->blog->home_path, BLOG_ENTRY_PATH, $year), true);
+        rsort($month_list);
+        $ret = array();
+        foreach ($month_list as $mo) {
+            $ret[] = array("year"=>$year, "month"=>$mo,
+                           "link"=>$this->blog->getURL().BLOG_ENTRY_PATH."/".$year."/".$mo."/");
+        }
+        return $ret;
+    }
+
+    # Method: getRecentMonthList
+    # Get a list of recent months, starting from the current month and going
+    # backward.  This is essentially a wrapper around <getMonthList>.
+    #
+    # Parameters:
+    # nummonths - *Optional* number of months to return.  The default is 12.
+    #             If set to zero or less, then all months will be retreived.
+    #
+    # Returns:
+    # An array of the most recent months in the same format used by
+    # <getMonthList>.  The total length of the first dimension of the array
+    # should be nummonths long.
+    public function getRecentMonthList($nummonths=12) {
+        $count = 0;
+        $ret = array();
+        $year_list = $this->getYearList();
+        foreach ($year_list as $year) {
+            $month_list = $this->getMonthList($year["year"]);
+            foreach ($month_list as $month) {
+                $ret[] = $month;
+                if ($nummonths > 0 && ++$count >= $nummonths) break 2;
+            }
+        }
+        return $ret;
+    }
+
     # Method: getEntriesByTag
     # Get a list of entries tagged with a given string.
     #
