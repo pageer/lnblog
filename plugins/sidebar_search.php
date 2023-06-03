@@ -1,4 +1,7 @@
 <?php
+
+use LnBlog\Plugins\PluginTemplate;
+
 # Plugin: SidebarSearch
 # This plugin adds a configurable search feature to blogs.
 #
@@ -27,23 +30,31 @@
 # if you don't get many search requests then the search performance will probably
 # be "good enough".  However, if you start getting lots of traffic, you'll probably
 # want to switch to Google or Bing.
-
-$do_page_output = (isset($_GET["show"]) && $_GET["show"] == "sb_search_results");
-
-# Add this really massive if statements so that we don't end up declaring the
-# same class twice, i.e. if the page is called directly, this class will be defined
-# when it first loads and then again when the plugins are loaded.
-if (! class_exists("SidebarSearch")):  # Start massive if statement
-
 class SidebarSearch extends Plugin
 {
+    public const TEMPLATE = 'search_form_tpl.php';
+    private const PLUGIN_DIR = 'sidebar_search';
+
     public $caption;
     public $label;
     public $label_in_box;
     public $search_provider;
     public $show_in;
 
-    public function __construct($do_output=0) {
+    private $blog;
+
+    /**
+     * @codeCoverageIgnore
+     */
+    public static function getLoader(): callable {
+        return function (): Plugin {
+            return new self();
+        };
+    }
+
+    public function __construct(Blog $blog = null) {
+        $this->blog = $blog ?: NewBlog();
+
         $this->plugin_desc = _("Search for terms in blog entries.");
         $this->plugin_version = "0.3.0";
         $this->addOption("caption", _("Caption for search panel"), _("Search"));
@@ -83,13 +94,10 @@ class SidebarSearch extends Plugin
                     $this->registerEventHandler("sidebar", "OnOutput", "sidebar_panel");
             }
         }
-
-        if ($do_output) $this->sidebar_panel();
-
     }
 
-    function sidebar_panel($param=false) {
-        $blg = NewBlog();
+    public function sidebar_panel($param=false) {
+        $blg = $this->blog;
         if (! $blg->isBlog()) return true;
 
         $tooltip = _("Search for posts containing a space-separated list of words. If the search sting is enclosed in forward slashes, it will be treated as a regular expression.");
@@ -106,7 +114,7 @@ class SidebarSearch extends Plugin
 
         switch ($this->search_provider) {
             case 'google':
-                $form_url = "http://www.google.com/search";
+                $form_url = "https://www.google.com/search";
                 $method = "get";
                 $search_boxes = array(
                     'visible' => 'q',
@@ -114,7 +122,7 @@ class SidebarSearch extends Plugin
                 );
                 break;
             case 'bing':
-                $form_url = "http://www.bing.com/search";
+                $form_url = "https://www.bing.com/search";
                 $method = "get";
                 $search_boxes = array(
                     'visible' => 'q',
@@ -123,7 +131,6 @@ class SidebarSearch extends Plugin
                 break;
             case 'native':
             default:
-                #$form_url = INSTALL_ROOT_URL."plugins/sidebar_search.php?blog=".$blg->blogid."&amp;show=sb_search_results";
                 $form_url = $blg->getURL().'?plugin=sidebar_search&amp;show=sb_search_results';
                 $method = "get";
                 $search_boxes = array(
@@ -137,109 +144,101 @@ class SidebarSearch extends Plugin
                 break;
         }
 
-        if ($this->caption && $this->show_in == 'sidebar'): /* Suppress empty header */ ?>
-        <h3><?php echo $this->caption; ?></h3>
-        <?php endif; ?>
-        <div class="<?php echo $class?>">
-        <form method="<?php echo $method?>" action="<?php echo $form_url?>">
-        <fieldset style="border: 0">
-            <?php if ($this->label && ! $this->label_in_box): ?>
-            <label for="sb_search_terms" title="<?php echo $tooltip?>"><?php echo $this->label?></label>
-            <?php endif; ?>
-            <input type="text" id="sb_search_terms" name="<?php echo $search_boxes['visible']?>" <?php echo $placeholder?> />
-            <?php foreach ($search_boxes['hidden'] as $name => $val): ?>
-            <input type="hidden" name="<?php echo $name?>" value="<?php echo $val?>" />
-            <?php endforeach;?>
-            <input type="submit" value="<?php p_("Search"); ?>" />
-        </fieldset>
-        </form>
-        </div><?php
+        $template = new PHPTemplate('sidebar_panel_tpl.php');
+        $template->set('PANEL_CLASS', $class);
+
+        $form = new PluginTemplate(self::PLUGIN_DIR, self::TEMPLATE);
+        $form->set('METHOD', $method);
+        $form->set('FORM_URL', $form_url);
+        $form->set('LABEL', $this->label);
+        $form->set('LABEL_IN_BOX', $this->label_in_box);
+        $form->set('SEARCH_BOXES', $search_boxes);
+
+        if ($this->caption && $this->show_in == 'sidebar') {
+            $template->set('PANEL_TITLE', $this->caption);
+        }
+
+        $template->set('PANEL_CONTENT', $form->process());
+        $template->output();
     }
 
-    function find_entries() {
+    private function findEntries(string $search_terms) {
         # Start by parsing out the search terms.  We use a painfully simple
         # syntax where search terms are separated by spaces.  There are no
         # logical connectives and only pages that match all terms are found.
         # Alternatively, if the search term is enclosed in slashes, then the
         # search term is treated as a raw regular expression.
-        $blg = NewBlog();
-        if (! isset($_GET["sb_search_terms"])) {
-            return false;
-        }
-        $search_data = trim(GET("sb_search_terms"));
+        $ret = [];
+        $search_data = trim($search_terms);
         if (preg_match("/\/.+\//", $search_data)) {
-            $terms = array(trim($_GET["sb_search_terms"])."i");
+            $terms = [$search_data];
         } else {
             $temp_terms = explode(" ", $search_data);
-            $terms = array();
+            $terms = [];
             foreach ($temp_terms as $term) {
-                if (trim($term) != "") $terms[] = "/".trim($term)."/i";
-            }
-        }
-        if (count($terms) > 0) {
-            $entry_list = $blg->getEntries(-1);
-            $ret = array();
-            foreach ($entry_list as $ent) {
-                $res = 0;
-                foreach ($terms as $trm) {
-                    if (preg_match($trm, $ent->data) || preg_match($trm, $ent->subject)) {
-                        $res++;
-                    } else {
-                        break;
-                    }
-                }
-                if ($res == count($terms)) {
-                    $subject = $ent->subject ?: $ent->prettyDate($ent->post_ts);
-                    $ret[] = array("link"=>$ent->permalink(), "title"=>$subject);
+                if (trim($term) != "") {
+                    $terms[] = "/" . trim($term) . "/i";
                 }
             }
-        } else {
-            $ret = false;
         }
+
+        if (!$terms) {
+            return $ret;
+        }
+
+        $entry_list = $this->blog->getEntries(-1);
+        foreach ($entry_list as $ent) {
+            $res = 0;
+            foreach ($terms as $trm) {
+                if (preg_match($trm, $ent->data) || preg_match($trm, $ent->subject)) {
+                    $res++;
+                } else {
+                    break;
+                }
+            }
+            if ($res == count($terms)) {
+                $subject = $ent->subject ?: $ent->prettyDate($ent->post_ts);
+                $ret[] = [
+                    "link"=>$ent->permalink(),
+                    "title"=>$subject
+                ];
+            }
+        }
+
         return $ret;
     }
 
-    function show_page($param=false) {
-        $blog = NewBlog();
-        Page::instance()->setDisplayObject($blog);
-        $LINK_LIST = $this->find_entries();
-        if (! count($LINK_LIST)) $LINK_LIST = false;
+    public function outputPage(BasePages $web_page, string $action = ''): void {
+        $blog = $this->blog;
+        $web_page->getPage()->setDisplayObject($blog);
+        $search_terms = trim(strip_tags(GET('sb_search_terms')));
+
+        $link_list = [];
+        if ($search_terms) {
+            $link_list = $this->findEntries($search_terms);
+        }
 
         $tpl = NewTemplate(LIST_TEMPLATE);
-        if (! $LINK_LIST) {
+        
+        if (!$search_terms) {
+            $tpl->set("LIST_TITLE", spf_('No search terms'));
+            $tpl->set("LINK_LIST", $link_list);
+        } elseif (! $link_list) {
             $tpl->set("LIST_TITLE", _("No search results found."));
             $tpl->set("ITEM_LIST", array(_("No posts matched")));
-        } elseif (trim(GET("sb_search_terms"))) {
+        } elseif ($search_terms) {
             $tpl->set(
                 "LIST_TITLE",
-                spf_('Search results for "%s"', GET("sb_search_terms"))
+                spf_('Search results for "%s"', $search_terms)
             );
-            $tpl->set("LINK_LIST", $LINK_LIST);
-        } else {
-            $tpl->set(
-                "LIST_TITLE",
-                spf_('No search terms')
-            );
-            $tpl->set("LINK_LIST", $LINK_LIST);
+            $tpl->set("LINK_LIST", $link_list);
         }
 
         $body = $tpl->process();
 
-        Page::instance()->title = spf_("Search results -  %s", $blog->name);
-        Page::instance()->display($body, $blog);
+        $web_page->getPage()->title = spf_("Search results -  %s", $blog->name);
+        $web_page->getPage()->display($body, $blog);
     }
-
 }
 
-else:
-
-    if ($do_page_output) {
-        $sbsearch = new SidebarSearch();
-        $sbsearch->show_page();
-    }
-
-endif; # End massive if statement
-
-if (! PluginManager::instance()->plugin_config->value('sidebarsearch', 'creator_output', 0)) {
-    $sb = new SidebarSearch();
-}
+return SidebarSearch::getLoader();

@@ -119,10 +119,12 @@ abstract class BasePages
             foreach ($paths as $path) {
                 $plugin = Path::mk($path, 'plugins', "$plugin_name.php");
                 if ($this->fs->file_exists($plugin)) {
+                    /** @var ?Plugin */
                     $instance = PluginManager::instance()->getInstanceForFile($plugin);
                     if ($instance === null) {
                         $loader = require $plugin;
                         if (is_callable($loader)) {
+                            /** @var Plugin */
                             $object = $loader();
                             $object->outputPage($this, $_GET[Plugin::ROUTING_PARAMETER] ?? '');
                         }

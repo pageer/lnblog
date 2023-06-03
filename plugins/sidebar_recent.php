@@ -86,38 +86,38 @@ class Recent extends Plugin
             $next_list = $blg->getRecent($num_entries);
         }
 
-        ob_start();
+        if (!$next_list) {
+            return '';
+        }
 
-        if ( count($next_list) > 0 ) {
-            if ($is_index) {
-?>
-<h3><a href="<?php echo $blg->getURL(); ?>"><?php echo htmlspecialchars($this->old_header); ?></a></h3>
-<?php
-            } else { # !$is_index
-?>
-<h3><a href="<?php echo $blg->getURL(); ?>"><?php echo htmlspecialchars($this->recent_header); ?></a></h3>
-<?php
-            } # End inner if
-?>
-<ul>
-<?php
-            foreach ($next_list as $ent) {
-?>
-<li><a href="<?php echo $ent->permalink(); ?>"><?php echo htmlspecialchars($ent->subject); ?></a></li>
-<?php
-            }    # End foreach
-            if ($this->show_main) { /* Link to main page */ ?>
-<li style="margin-top: 0.5em"><a href="<?php echo $blg->getURL();?>"><?php p_("Show home page");?></a></li><?php
-            } ?>
-</ul>
-<?php
-        }  # End outer if
+        $template = new PHPTemplate('sidebar_panel_tpl.php');
+        $template->set('TITLE_LINK', $blg->getURL());
 
-        $content = ob_get_contents();
-        ob_end_clean();
-        return $content;
+        if ($is_index) {
+            $template->set('PANEL_TITLE', htmlspecialchars($this->old_header));
+        } else {
+            $template->set('PANEL_TITLE', htmlspecialchars($this->recent_header));
+        }
 
-    } #End function
+        $items = [];
+        $link_pattern = '<a href="%s">%s</a>';
+
+        foreach ($next_list as $ent) {
+            $items[] = sprintf($link_pattern, $ent->permalink(), htmlspecialchars($ent->subject));
+        }
+
+        if ($this->show_main) {
+            $items[] = [
+                'style' => 'margin-top: 0.5em',
+                'description' => sprintf($link_pattern, $blg->getURL(), _("Show home page")),
+            ];
+        }
+
+        $template->set('PANEL_LIST', $items);
+
+        return $template->process();
+
+    }
 
     function cachepath($new=false) {
         if ($this->cache_base_path) {
