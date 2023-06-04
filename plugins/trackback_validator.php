@@ -23,12 +23,27 @@
 
 class TrackbackValidator extends Plugin
 {
+    public const SUPPORTED_SCHEMES = ['http', 'https'];
+
     public $allow_self;
     public $base_uri;
 
-    function __construct() {
+    private $client;
+
+    /**
+     * @codeCoverageIgnore
+     */
+    public static function getLoader(): callable {
+        return function (): Plugin {
+            return new self();
+        };
+    }
+
+    function __construct(HttpClient $client = null) {
+        $this->client = $client ?? new HttpClient();
+
         $this->plugin_desc = _('Allow only TrackBacks that link to your URL in the page body.');
-        $this->plugin_version = '0.1.0';
+        $this->plugin_version = '0.2.0';
 
         $this->addOption(
             'allow_self',
@@ -42,29 +57,25 @@ class TrackbackValidator extends Plugin
         );
         parent::__construct();
 
-        $this->registerEventHandler("trackback", "POSTRetreived", "check_for_link");
+        $this->registerEventHandler("trackback", "POSTRetreived", "checkForLink");
     }
 
-    function check_for_link(&$param) {
-        $url = parse_url($param->url);
+    function checkForLink(&$param) {
+        $scheme = parse_url($param->url, PHP_URL_SCHEME);
+        $host = parse_url($param->url, PHP_URL_HOST);
 
         # The trackback is not to a valid URL.
-
-        if ( !$url ||
-             ! isset($url['host']) ||
-             strpos($param->url, "http://") !== 0 ) {
+        if (!$host || !in_array($scheme, self::SUPPORTED_SCHEMES)) {
             $param->url = '';
             return false;
         }
 
-
-        if ( $this->allow_self && $url['host'] == SERVER("SERVER_NAME") ) {
+        if ( $this->allow_self && $host == SERVER("SERVER_NAME") ) {
             return true;
         }
 
         $ent = $param->getParent();
-        $client = new HttpClient();
-        $data = $client->fetchUrl($param->url, false);
+        $data = $this->client->fetchUrl($param->url, false);
         # If the permalink is in the page, it's legitimate, so return true.
         if (strpos($data, $ent->permalink()) > 0) {
             return true;
@@ -78,12 +89,11 @@ class TrackbackValidator extends Plugin
         # option.
         if ($this->base_uri && strpos($data, $ent->uri('base')) > 0) {
             return true;
-        } else {
-            $param->url = '';
-            return false;
         }
-    }
 
+        $param->url = '';
+        return false;
+    }
 }
 
-$plug = new TrackbackValidator();
+return TrackbackValidator::getLoader();
