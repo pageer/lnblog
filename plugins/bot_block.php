@@ -11,26 +11,41 @@
 # transparent to the user, as it is done in JavaScript.  In most cases,
 # this is effectively a test of whether the client knows how to execute JavaScript.
 # However, there is also an accessibility option
+
+use LnBlog\Plugins\PluginTemplate;
+
 class BotBlock extends Plugin
 {
+    const PLUGIN_DIR = 'botblock';
+    const SCRIPT_TEMPLATE = 'script_tpl.php';
+    const FORM_TEMPLATE = 'form_tpl.php';
+
     public $block_links;
     public $accessible;
 
-    private $rand1;
-    private $rand2;
-    private $operator;
-    private $salt;
-    private $tok;
+    protected $rand1;
+    protected $rand2;
+    protected $operator;
+    protected $salt;
+    protected $tok;
 
-    function __construct() {
+    /**
+     * @codeCoverageIgnore
+     */
+    public static function getLoader(): callable {
+        return function (): Plugin {
+            return new self();
+        };
+    }
 
-        $this->plugin_version = "0.2.1";
+    public function __construct() {
+        $this->plugin_version = "0.3.0";
         $this->plugin_desc = _("Attempts to block spambots from posting comments.");
 
         # Option: Block comments with HTML links
         # When enabled, this will cause the plugin to reject any comments that contian
         # HTML link code.  URLs will still be linkified via auto-code, but since HTML is
-        # not allowed in comments, and that contain HTML links will be rejected.
+        # not allowed in comments, any that contain HTML links will be rejected.
         $this->addOption(
             'block_links',
             _('Block comments with HTML links in them.'),
@@ -57,7 +72,57 @@ class BotBlock extends Plugin
         $this->rand1 = rand(1, 100);
         $this->rand2 = rand(1, 100);
         $this->operator = rand(1, 3);
-        $this->salt = phpversion().(isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'localhost');
+        $this->salt = phpversion() . ($_SERVER['REMOTE_ADDR'] ?? 'localhost');
+        $tmp = $this->computeValue();
+        $this->tok = $this->makeToken($tmp);
+
+        $this->registerEventHandler("blogcomment", "OnInsert", "checkICToken");
+        $this->registerEventHandler("commentform", "FormBegin", "addICForm");
+        $this->registerEventHandler('page', 'OnOutput', 'outputScript');
+    }
+
+    public function checkMarkup($cmt): void {
+        // Bail out if we're not blocking links.
+        if (!$this->block_links) {
+           return;
+        }
+
+        if (preg_match('/<a[^>]+href=/i', $cmt->data)) {
+            $cmt->data = '';
+        }
+    }
+
+    public function outputScript($page): void {
+        $page = $page ?: Page::instance();
+        $template = new PluginTemplate(self::PLUGIN_DIR, self::SCRIPT_TEMPLATE);
+        $template->set('RAND1', $this->rand1);
+        $template->set('RAND2', $this->rand2);
+        $template->set('OPERATION', $this->getOper());
+        $script_data = $template->process();
+        $page->addInlineScript($script_data);
+    }
+
+    public function checkICToken($cmt): void {
+        if (self::globalContext() !== self::CONTEXT_WEB) {
+            return;
+        }
+        $tok = $this->makeToken($_POST['link'] ?? '');
+        if ($tok != ($_POST['ictok'] ?? '')) {
+            $cmt->data = '';
+        }
+    }
+
+    public function addICForm(): void {
+        $template = new PluginTemplate(self::PLUGIN_DIR, self::FORM_TEMPLATE);
+        $template->set('ACCESSIBLE', $this->accessible);
+        $template->set('RAND1', $this->rand1);
+        $template->set('RAND2', $this->rand2);
+        $template->set('TOKEN', $this->tok);
+        $template->set('OPERATION', $this->getOper(true));
+        $template->output();
+    }
+
+    protected function computeValue(): int {
         $tmp = $this->rand1;
         switch ($this->operator) {
             case 1: $tmp += $this->rand2; 
@@ -68,20 +133,10 @@ class BotBlock extends Plugin
                 break;
         }
 
-        $this->tok = md5($tmp.$this->salt);
-
-        $this->registerEventHandler("blogcomment", "OnInsert", "checkICToken");
-        $this->registerEventHandler("commentform", "FormBegin", "addICForm");
-        $this->registerEventHandler('page', 'OnOutput', 'outputScript');
+        return $tmp;
     }
 
-    function checkMarkup(&$cmt) {
-        if (preg_match('/<a\s+href=/i', $cmt->data)) {
-            $cmt->data = '';
-        }
-    }
-
-    function getOper($text=false) {
+    protected function getOper($text=false): string {
         switch ($this->operator) {
             case 1:
                 return $text ? 'sum' : '+';
@@ -90,50 +145,13 @@ class BotBlock extends Plugin
             case 3:
                 return $text ? 'product' : '*';
         }
+
+        return '';
     }
 
-    function outputScript() {
-        ob_start();
-?>
-function addIt() {
-    var res = <?php echo $this->rand1.' '.$this->getOper().' '.$this->rand2; ?>;
-    if (document.getElementById('link')) {
-        document.getElementById('link').value = res;
-        document.getElementById('ic_block').style.display = 'none';
+    private function makeToken(string $value): string {
+        return md5($value . $this->salt);
     }
 }
-window.addEventListener('load', addIt, false);
-<?php
-        $script_data = ob_get_contents();
-        ob_end_clean();
-        Page::instance()->addInlineScript($script_data);
-    }
 
-    function checkICToken(&$cmt) {
-        if (self::globalContext() !== self::CONTEXT_WEB) {
-            return;
-        }
-        $tok = md5($_POST['link'].$this->salt);
-        if ($tok != $_POST['ictok']) {
-            $cmt->data = '';
-        }
-    }
-
-    function addICForm() {
-?>
-<div id="ic_block">
-<?php if ($this->accessible): ?>
-    <label for="link"><?php pf_("Enter the %s of %s and %s.", $this->getOper(true), $this->rand1, $this->rand2);?></label>
-    <input type="text" name="link" id="link" />
-<?php else: ?>
-    <em><?php p_("Sorry, but you must have JavaScript enabled to post comments.");?></em>
-    <input type="hidden" name="link" id="link" />
-<?php endif; ?>
-    <input type="hidden" name="ictok" value="<?php echo $this->tok;?>" />
-</div>
-<?php
-    }
-
-}
-
-$cftok = new BotBlock();
+return BotBlock::getLoader();
