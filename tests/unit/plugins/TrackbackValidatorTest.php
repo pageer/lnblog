@@ -11,7 +11,7 @@ use Trackback;
 use TrackbackValidator;
 use LnBlog\Tests\LnBlogBaseTestCase;
 
-class TrackbackRdfTest extends LnBlogBaseTestCase
+class TrackbackValidatorTest extends LnBlogBaseTestCase
 {
     /**
      * @dataProvider schemeProvider

@@ -13,7 +13,7 @@ use LnBlog\Storage\UserRepository;
 use Prophecy\Argument;
 use UrlResolver;
 
-class AtomExporterTest extends BaseExporterTest
+class AtomExporterTest extends BaseExporterTestCase
 {
     public function testExport_NoFeedUrl_Throws() {
         $blog = $this->getTestBlog();

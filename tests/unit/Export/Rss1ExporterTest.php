@@ -15,7 +15,7 @@ use Path;
 use Prophecy\Argument;
 use UrlResolver;
 
-class Rss1ExporterTest extends BaseExporterTest
+class Rss1ExporterTest extends BaseExporterTestCase
 {
     public function testExport_BlogWithNoEntries_Throws() {
         $this->setupTestUser();

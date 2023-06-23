@@ -13,7 +13,7 @@ use Path;
 use Prophecy\Argument;
 use UrlResolver;
 
-class Rss2ExporterTest extends BaseExporterTest
+class Rss2ExporterTest extends BaseExporterTestCase
 {
     public function testExport_BlogWithNoEntries_NoItems() {
         $blog = $this->getTestBlog();

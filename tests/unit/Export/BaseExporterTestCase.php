@@ -18,7 +18,7 @@ use UrlPath;
 use UrlResolver;
 use User;
 
-abstract class BaseExporterTest extends LnBlogBaseTestCase
+abstract class BaseExporterTestCase extends LnBlogBaseTestCase
 {
     protected $prophet;
 

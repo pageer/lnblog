@@ -2,7 +2,7 @@
 
 require_once __DIR__ . "/../../../plugins/htaccess_generator.php";
 
-class HTAccessGeneratorTest extends \LnBlog\Tests\LnBlogBaseTestCase
+class HtAccessGeneratorTest extends \LnBlog\Tests\LnBlogBaseTestCase
 {
     private $fs;
 
