@@ -229,10 +229,18 @@ abstract class BasePages
             $target_origin_domain = $server_vars['HTTP_X_FORWARDED_HOST'];
         }
 
+        $parse = function ($url) {
+            $parsed_data = parse_url($url);
+            $domain = $parsed_data['host'];
+            if (isset($parsed_data['port'])) {
+                $domain .= ':' . $parsed_data['port'];
+            }
+            return $domain;
+        };
         if (!empty($server_vars['HTTP_ORIGIN'])) {
-            $source_origin_domain = parse_url($server_vars['HTTP_ORIGIN'], PHP_URL_HOST);
+            $source_origin_domain = $parse($server_vars['HTTP_ORIGIN']);
         } elseif (!empty($server_vars['HTTP_REFERER'])) {
-            $source_origin_domain = parse_url($server_vars['HTTP_REFERER'], PHP_URL_HOST);
+            $source_origin_domain = $parse($server_vars['HTTP_REFERER']);
         }
 
         if (!$source_origin_domain && $this->shouldBlockOnMissingOrigin()) {

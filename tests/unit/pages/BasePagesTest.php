@@ -87,10 +87,6 @@ class BasePagesTest extends PHPUnit\Framework\TestCase
         $this->assertEquals('defaultAction', $this->page->method_called);
     }
     
-    public function testRouteRequest_WhenActionIsScript_ReadsFileToOutput() {
-        
-    }
-
     public function testRouteRequest_WhenPostAndNoToken_ReturnsBadRequest() {
         $_POST = ['foo' => 'bar'];
         $_SERVER['HTTP_HOST'] = 'somedomain.com';
@@ -134,6 +130,54 @@ class BasePagesTest extends PHPUnit\Framework\TestCase
         $this->page->action_map = array('thing1' => 'thing2');
 
         $this->page_mock->error(400)->shouldNotBeCalled();
+        
+        $this->page->routeRequest();
+    }
+    
+    public function testRouteRequest_WhenPostAndTokenValidWithPortInUrl_ReturnsSuccess() {
+        $token = $this->page->getCsrfToken();
+        $_POST = ['foo' => 'bar', BasePages::TOKEN_POST_FIELD => $token];
+        $_SERVER['HTTP_HOST'] = 'somedomain.com:1234';
+        $_SERVER['HTTP_ORIGIN'] = 'http://somedomain.com:1234/test';
+        $this->page->action_map = array('thing1' => 'thing2');
+
+        $this->page_mock->error(400)->shouldNotBeCalled();
+        
+        $this->page->routeRequest();
+    }
+    
+    public function testRouteRequest_WhenValidButPortInUrlDoesNotMatch_ReturnsBadRequest() {
+        $token = $this->page->getCsrfToken();
+        $_POST = ['foo' => 'bar', BasePages::TOKEN_POST_FIELD => $token];
+        $_SERVER['HTTP_HOST'] = 'somedomain.com:1234';
+        $_SERVER['HTTP_ORIGIN'] = 'http://somedomain.com:5678/test';
+        $this->page->action_map = array('thing1' => 'thing2');
+
+        $this->page_mock->error(400)->shouldBeCalled();
+        
+        $this->page->routeRequest();
+    }
+    
+    public function testRouteRequest_WhenValidButOnlyOriginHasPort_ReturnsBadRequest() {
+        $token = $this->page->getCsrfToken();
+        $_POST = ['foo' => 'bar', BasePages::TOKEN_POST_FIELD => $token];
+        $_SERVER['HTTP_HOST'] = 'somedomain.com';
+        $_SERVER['HTTP_ORIGIN'] = 'http://somedomain.com:5678/test';
+        $this->page->action_map = array('thing1' => 'thing2');
+
+        $this->page_mock->error(400)->shouldBeCalled();
+        
+        $this->page->routeRequest();
+    }
+    
+    public function testRouteRequest_WhenValidButOnlyHostHasPort_ReturnsBadRequest() {
+        $token = $this->page->getCsrfToken();
+        $_POST = ['foo' => 'bar', BasePages::TOKEN_POST_FIELD => $token];
+        $_SERVER['HTTP_HOST'] = 'somedomain.com:1234';
+        $_SERVER['HTTP_ORIGIN'] = 'http://somedomain.com/test';
+        $this->page->action_map = array('thing1' => 'thing2');
+
+        $this->page_mock->error(400)->shouldBeCalled();
         
         $this->page->routeRequest();
     }
