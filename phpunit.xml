@@ -1,22 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Prophecy does not play well with the strict tests... -->
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/5.7/phpunit.xsd"
-         bootstrap="tests/bootstrap.php"
-         backupGlobals="true"
-         beStrictAboutCoversAnnotation="true"
-         beStrictAboutOutputDuringTests="true"
-         beStrictAboutTestsThatDoNotTestAnything="false"
-         beStrictAboutTodoAnnotatedTests="true"
-         verbose="true">
-    <testsuite name="All tests">
-        <directory suffix="Test.php">tests</directory>
-    </testsuite>
-
-    <filter>
-        <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">lib</directory>
-            <directory suffix=".php">plugins</directory>
-        </whitelist>
-    </filter>
+<phpunit
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+    bootstrap="tests/bootstrap.php"
+    backupGlobals="true"
+    beStrictAboutCoversAnnotation="true"
+    beStrictAboutOutputDuringTests="true"
+    beStrictAboutTestsThatDoNotTestAnything="false"
+    beStrictAboutTodoAnnotatedTests="true"
+    verbose="true">
+  <coverage>
+    <include>
+      <directory suffix=".php">.</directory>
+    </include>
+      <exclude>
+        <directory>vendor</directory>
+      </exclude>
+  </coverage>
+<!--
+  <coverage processUncoveredFiles="true">
+    <include>
+      <directory suffix=".php">plugins</directory>
+      <directory suffix=".php">lib</directory>
+    </include>
+  </coverage>
+-->
+  <testsuite name="All tests">
+    <directory suffix="Test.php">tests</directory>
+  </testsuite>
 </phpunit>

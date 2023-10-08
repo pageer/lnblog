@@ -22,7 +22,15 @@ class ContentBan extends Plugin
     public $ban_list;
     public $user_exempt;
 
-    function __construct() {
+    private $fs;
+    private $blog;
+    private $user;
+
+    function __construct(FS $fs = null, User $user = null, Blog $blog = null) {
+        $this->fs = $fs ?? NewFS();
+        $this->user = $user ?? NewUser();
+        $this->blog = $blog ?? NewBlog();
+
         $this->plugin_desc = _("Allows you to ban comments or trackbacks that match certain regular expressions.");
         $this->plugin_version = "0.1.0";
 
@@ -59,8 +67,8 @@ class ContentBan extends Plugin
     # Write the ban list to disk.
 
     function checkBan(&$obj) {
-        $blog = NewBlog();
-        $usr = NewUser();
+        $blog = $obj->getParent();
+        $usr = $this->user;
         $local_list = array();
         $global_list = array();
 
@@ -68,12 +76,14 @@ class ContentBan extends Plugin
             return false;
         }
 
-        if ( $blog->isBlog() &&
-             file_exists($blog->home_path.PATH_DELIM.$this->ban_list)) {
-            $local_list = file($blog->home_path.PATH_DELIM.$this->ban_list);
+        if (
+            $blog->isBlog() &&
+            $this->fs->file_exists(Path::mk($blog->home_path, $this->ban_list))
+        ) {
+            $local_list = $this->fs->file(Path::mk($blog->home_path, $this->ban_list));
         }
-        if (file_exists(USER_DATA_PATH.PATH_DELIM.$this->ban_list)) {
-            $global_list = file(USER_DATA_PATH.PATH_DELIM.$this->ban_list);
+        if ($this->fs->file_exists(Path::mk(USER_DATA_PATH, $this->ban_list))) {
+            $global_list = $this->fs->file(Path::mk(USER_DATA_PATH, $this->ban_list));
         }
         $banned_res = array_merge($global_list, $local_list);
         $ban_post = false;
@@ -94,7 +104,7 @@ class ContentBan extends Plugin
     }
 
     # Sets the comment data to an empty string so that it cannot be added.
-    function clearData(&$cmt) {
+    public function clearData(&$cmt) {
         if ($this->checkBan($cmt)) {
             $cmt->data = '';
             $cmt->subject = '';
@@ -114,9 +124,9 @@ class ContentBan extends Plugin
         }
     }
 
-    function sidebarLink($param) {
-        $blg = NewBlog();
-        $usr = NewUser();
+    function sidebarLink() {
+        $blg = $this->blog;
+        $usr = $this->user;
         $banfile = $this->ban_list;
         echo '<li><a href="'.$blg->uri('editfile', array("file" => $banfile)).'">'.
             _("Blog RegEx blacklist").'</a></li>';
