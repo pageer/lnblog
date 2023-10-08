@@ -883,6 +883,15 @@ class AdminPages extends BasePages
         $userdata = Path::mk(dirname(dirname(__DIR__)), $userdata_dir_name);
         $userdata_url = preg_replace("|$lnblog_dir_name/index.php\.*|i", $userdata_dir_name . '/', current_url());
 
+        // Setting a userdata directory outside the document root is currently
+        // not supported, so if we detect that LnBlog IS the document root, 
+        // adjust the default path accordingly.
+        $root_url_path = parse_url($install_root_url, PHP_URL_PATH);
+        if ($root_url_path === '/') {
+            $userdata = Path::mk($install_root, $userdata_dir_name);
+            $userdata_url = $install_root_url . $userdata_dir_name . '/';
+        }
+
         if (has_post()) {
 
             $this->template_set_post_data($tpl);
