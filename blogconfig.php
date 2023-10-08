@@ -104,7 +104,7 @@ define("PACKAGE_NAME", "LnBlog");
 # Constant: PACKAGE_VERSION
 # The version number of the software.  This is a string in the format
 # "1.2.3".  Note that each number may be more than one digit.
-define("PACKAGE_VERSION", "2.3.1");
+define("PACKAGE_VERSION", "2.3.2");
 
 # Constant: REQUIRED_VERSION
 # The minimum software version required by your blog to properly
