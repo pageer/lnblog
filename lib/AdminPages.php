@@ -478,7 +478,7 @@ class AdminPages extends BasePages
                     Page::instance()->redirect($blog->getURL());
                     exit;
                 } else {
-                    $tpl->set("UPDATE_MESSAGE", _("Error creating blog.  This could be a problem with the file permissions on your server.  Please refer to the <a href=\"http://www.skepticats.com/LnBlog/documentation/\">documentation</a> for more information."));
+                    $tpl->set("UPDATE_MESSAGE", spf_("Error creating blog.  This could be a problem with the file permissions on your server.  Please refer to the <a href=\"%s/\">documentation</a> for more information.", DOCUMENTATION_URL));
                 }
             }
         }

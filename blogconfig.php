@@ -117,6 +117,10 @@ define("REQUIRED_VERSION", "2.3.0");
 # The full URL of the LnBlog project home page.
 define("PACKAGE_URL", "https://lnblog.skepticats.com/");
 
+# Constant: DOCUMENTATION_URL
+# Full URL of the LnBlog documentation.
+define("DOCUMENTATION_URL", "https://lnblog.skepticats.com/documentation/");
+
 # Add I18N support here, as this is currently the earliest we can do it.
 # Refer to the lib/i18n.php file for details.
 require_once __DIR__."/lib/i18n.php";
