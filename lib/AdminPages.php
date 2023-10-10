@@ -438,7 +438,7 @@ class AdminPages extends BasePages
         $blogurl = POST('blogurl');
         if (!$blogurl) {
             $lnblog_name = basename(SystemConfig::instance()->installRoot()->path());
-            $blogurl = preg_replace("|$lnblog_name/|i", $blog->blogid, SystemConfig::instance()->installRoot()->url());
+            $blogurl = preg_replace("|$lnblog_name|i", $blog->blogid, SystemConfig::instance()->installRoot()->url());
         }
 
         $this->populateBlogPathDefaults($tpl);
@@ -970,6 +970,10 @@ class AdminPages extends BasePages
 
         if (!filter_var($url, FILTER_VALIDATE_URL)) {
             throw new Exception(spf_("The URL '%s' is not a valid URL", $url));
+        }
+
+        if (substr($url, -1, 1) !== '/') {
+            throw new Exception(spf_("The URL '%s' must end with a slash", $url));
         }
 
         if ($realpath == $this->fs->realpath($install_root->path())) {
