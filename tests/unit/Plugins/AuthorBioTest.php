@@ -2,7 +2,7 @@
 
 namespace LnBlog\Tests\Plugins;
 
-require_once __DIR__ . '/../../../plugins/author_bio.php';
+//require_once __DIR__ . '/../../../plugins/author_bio.php';
 
 use AuthorBio;
 use LnBlog\Tests\LnBlogBaseTestCase;

@@ -5,8 +5,12 @@
     "autoload": {
         "psr-4": {
             "LnBlog\\": "lib",
-            "LnBlog\\Tests\\": "tests/unit"
-        }
+            "LnBlog\\Tests\\": "tests/unit",
+            "LnBlog\\Plugins\\": ["lib/Plugins", "plugins"]
+        },
+        "classmap": [
+            "plugins/*"
+        ]
     },
     "require": {
         "php": ">=7.4.0",
