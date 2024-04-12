@@ -62,10 +62,15 @@ class Pingback extends Trackback implements Reply
 
         $this->file = $path;
         if ($this->file) {
-            if (! $this->fs->is_file($this->file))
+            if (! $this->fs->is_file($this->file)) {
                 $this->file = $this->getFilename($this->file);
-            if ($this->fs->is_file($this->file))
+            }
+            if (! $this->fs->is_file($this->file)) {
+                $this->file = $this->getFilenameFromGlobalId($path);
+            }
+            if ($this->fs->is_file($this->file)) {
                 $this->readFileData($this->file);
+            }
         }
 
         $this->raiseEvent("InitComplete");
@@ -154,6 +159,16 @@ class Pingback extends Trackback implements Reply
         $ret = substr($anchor, 8);
         $ret .= PINGBACK_PATH_SUFFIX;
         $ret = Path::mk($ent->localpath(), ENTRY_PINGBACK_DIR, $ret);
+        $ret = $this->fs->realpath($ret);
+        return $ret;
+    }
+
+    public function getFilenameFromGlobalId($anchor) {
+        $blog = $this->getParent()->getParent();
+        $ret = str_replace("#pingback", "", $anchor);
+        $ret = $ret . PINGBACK_PATH_SUFFIX;
+        $ret = str_replace($blog->blogid, "", $ret);
+        $ret = Path::mk($blog->home_path, $ret);
         $ret = $this->fs->realpath($ret);
         return $ret;
     }
