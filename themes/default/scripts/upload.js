@@ -295,7 +295,7 @@ var initializeUpload = function () {
         var data = e.clipboardData || e.originalEvent.clipboardData;
         for (var i = 0; i < data.items.length; i++) {
             var item = data.items[i];
-            if (item.kind == 'file' && typeof(Dropzone.instances[0]) == 'object') {
+            if (item.kind == 'file' && typeof(Dropzone.instances[0]) === 'object') {
                 var original_file = item.getAsFile();
                 var file = original_file;
                 var matches = original_file.name.match(/^(.+)\.(.+)$/);

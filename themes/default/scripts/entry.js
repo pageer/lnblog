@@ -39,7 +39,7 @@ function reply_delete () {
     for (var i = 0; i < boxes.length; i++) {
         if (boxes[i].getAttribute('type') == 'hidden') {
             //window.alert(boxes[i].getAttribute('value'));
-            
+
         }
     }
     return false;
@@ -78,7 +78,7 @@ $(document).ready(
         current_text_content = $(this).val();
         }
     );
-    
+
     $('#commentform').on(
         'submit', function commentSubmit() {
         current_text_content = original_text_content;

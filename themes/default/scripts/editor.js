@@ -10,7 +10,7 @@ $(window).on('beforeunload', function unloadHandler() {
 
 var auto_save_key = "savepostdata." + window.location.pathname;
 var post_save_timeout = function () {
-    if (typeof localStorage != 'undefined') {
+    if (typeof localStorage !== 'undefined') {
         localStorage.setItem(auto_save_key, current_text_content);
         setTimeout(post_save_timeout, 5000);
     }
@@ -22,7 +22,7 @@ $(function () {
     original_text_content = $('#body').val();
     current_text_content = original_text_content;
 
-    if (typeof localStorage != 'undefined') {
+    if (typeof localStorage !== 'undefined') {
         var saved_data = localStorage.getItem(auto_save_key);
         if (saved_data && saved_data != original_text_content) {
             if (window.confirm(strings.editor_restoreText)) {
@@ -102,7 +102,7 @@ $(function () {
 
     $('#postform').on('submit', function () {
         // Make sure the WYSIWYG editor syncs to the text area.
-        if (typeof(editor_commit_current) == 'function') {
+        if (typeof(editor_commit_current) === 'function') {
             editor_commit_current();
         }
 
@@ -155,7 +155,7 @@ $(function () {
             return false;
         } else {
             // Clear out the stored post data because it's being saved now.
-            if (typeof localStorage != 'undefined') {
+            if (typeof localStorage !== 'undefined') {
                 localStorage.removeItem(auto_save_key);
             }
         }
