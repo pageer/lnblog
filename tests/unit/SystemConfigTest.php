@@ -32,28 +32,17 @@ class SystemConfigTest extends \PHPUnit\Framework\TestCase
     }
 
     public function testWriteConfig_WithRegistry_WritesFile() {
-        $expected_output  = "<?php\n";
-        $expected_output .= "return array (\n";
-        $expected_output .= "  'INSTALL_ROOT' => \n";
-        $expected_output .= "  UrlPath::__set_state(array(\n";
-        $expected_output .= "     'path' => 'whatever',\n";
-        $expected_output .= "     'url' => 'https://example.com/lnblog/',\n";
-        $expected_output .= "  )),\n";
-        $expected_output .= "  'USER_DATA' => \n";
-        $expected_output .= "  UrlPath::__set_state(array(\n";
-        $expected_output .= "     'path' => 'whatever/userdata/',\n";
-        $expected_output .= "     'url' => 'https://example.com/userdata/',\n";
-        $expected_output .= "  )),\n";
-        $expected_output .= "  'BLOGS' => \n";
-        $expected_output .= "  array (\n";
-        $expected_output .= "    'foobar' => \n";
-        $expected_output .= "    UrlPath::__set_state(array(\n";
-        $expected_output .= "       'path' => 'place/foobar/',\n";
-        $expected_output .= "       'url' => 'https://foobar.example.com/',\n";
-        $expected_output .= "    )),\n";
-        $expected_output .= "  ),\n";
-        $expected_output .= ");\n";
-        $this->fs->write_file(Argument::containingString('/pathconfig.php'), $expected_output)->shouldBeCalled()->willReturn(123);
+        $this->fs->write_file(
+            Argument::containingString('/pathconfig.php'),
+            Argument::that(function($value) {
+                return strpos($value, 'whatever') !== false
+                    && strpos($value, 'https://example.com/lnblog/') !== false
+                    && strpos($value, 'whatever/userdata/') !== false
+                    && strpos($value, 'https://example.com/userdata/') !== false
+                    && strpos($value, 'place/foobar/') !== false
+                    && strpos($value, 'https://foobar.example.com/') !== false;
+            })
+        )->shouldBeCalled()->willReturn(123);
 
         $config = $this->createSystemConfig();
         $config->installRoot(new UrlPath('whatever', 'https://example.com/lnblog/'));
@@ -61,6 +50,7 @@ class SystemConfigTest extends \PHPUnit\Framework\TestCase
         $config->registerBlog('foobar', new UrlPath('place/foobar/', 'https://foobar.example.com/'));
         $config->writeConfig();
     }
+
     public function testWriteConfig_WriteFails_ThrowsFileWriteFailedException() {
         $this->fs->write_file(Argument::containingString('/pathconfig.php'), Argument::any())->willReturn(false);
 

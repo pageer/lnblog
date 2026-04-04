@@ -10,15 +10,15 @@
   "dependencies": {
     "bootstrap": "^5.2.3",
     "dropzone": "^5.9.3",
+    "eslint": "^10.2.0",
     "jquery": "^3.6.0",
     "jquery-datetime-picker": "^2.5.11",
     "jquery-form": "^4.3.0",
     "jquery-ui-dist": "^1.13.0",
     "tag-it": "^2.0.0",
-    "tinymce": "^5.10.2"
+    "tinymce": "^8.4.0"
   },
   "devDependencies": {
-    "csslint": "^1.0.5",
-    "jshint": "^2.13.4"
+    "csslint": "^1.0.5"
   }
 }

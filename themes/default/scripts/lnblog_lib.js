@@ -1,8 +1,9 @@
+/*globals strings */
 // lnblog_common.js - Shared function library for LnBlog pages.
 // Copyright (C) 2007 Peter A. Geer <pageer@skepticats.com>
 // This file is distributed under the terms of the GNU GPL version 2 or greater.
 
-// Create a top-level lnblog object.  We use this as a poor-man's namespacing 
+// Create a top-level lnblog object.  We use this as a poor-man's namespacing
 // mechanism.
 var lnblog = {
 
@@ -84,19 +85,19 @@ var lnblog = {
             obj["on"+type] = obj["e"+type+fn];
         }
     },
-    
+
     insertAtCursor: function (myField, myValue) {
         //IE support
         if (document.selection) {
             myField.focus();
-            sel = document.selection.createRange();
+            var sel = document.selection.createRange();
             sel.text = myValue;
         }
         //MOZILLA/NETSCAPE support
         else if (myField.selectionStart || myField.selectionStart == '0') {
             var startPos = myField.selectionStart;
             var endPos = myField.selectionEnd;
-            myField.value = myField.value.substring(0, startPos) + 
+            myField.value = myField.value.substring(0, startPos) +
                 myValue +
                 myField.value.substring(endPos, myField.value.length);
         } else {
@@ -110,7 +111,7 @@ var lnblog = {
         //IE support
         if (document.selection) {
             myField.focus();
-            sel = document.selection.createRange();
+            var sel = document.selection.createRange();
             ret = sel.text;
         }
         //MOZILLA/NETSCAPE support
@@ -123,14 +124,14 @@ var lnblog = {
         }
         return ret;
     },
-    
+
 };
 
 lnblog.addEvent(
     window, 'load', function() {
-    if (typeof strings != 'undefined') {
+    if (typeof strings !== 'undefined') {
         strings.get = function (string_id) {
-            ret = this[string_id];
+            var ret = this[string_id];
             for (var i = 1; i < arguments.length; i++) {
                 ret = ret.replace('%'+i+'$s', arguments[i]);
             }

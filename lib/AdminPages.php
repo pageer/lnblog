@@ -438,7 +438,7 @@ class AdminPages extends BasePages
         $blogurl = POST('blogurl');
         if (!$blogurl) {
             $lnblog_name = basename(SystemConfig::instance()->installRoot()->path());
-            $blogurl = preg_replace("|$lnblog_name/|i", $blog->blogid, SystemConfig::instance()->installRoot()->url());
+            $blogurl = preg_replace("|$lnblog_name|i", $blog->blogid, SystemConfig::instance()->installRoot()->url());
         }
 
         $this->populateBlogPathDefaults($tpl);
@@ -478,7 +478,7 @@ class AdminPages extends BasePages
                     Page::instance()->redirect($blog->getURL());
                     exit;
                 } else {
-                    $tpl->set("UPDATE_MESSAGE", _("Error creating blog.  This could be a problem with the file permissions on your server.  Please refer to the <a href=\"http://www.skepticats.com/LnBlog/documentation/\">documentation</a> for more information."));
+                    $tpl->set("UPDATE_MESSAGE", spf_("Error creating blog.  This could be a problem with the file permissions on your server.  Please refer to the <a href=\"%s/\">documentation</a> for more information.", DOCUMENTATION_URL));
                 }
             }
         }
@@ -883,6 +883,15 @@ class AdminPages extends BasePages
         $userdata = Path::mk(dirname(dirname(__DIR__)), $userdata_dir_name);
         $userdata_url = preg_replace("|$lnblog_dir_name/index.php\.*|i", $userdata_dir_name . '/', current_url());
 
+        // Setting a userdata directory outside the document root is currently
+        // not supported, so if we detect that LnBlog IS the document root, 
+        // adjust the default path accordingly.
+        $root_url_path = parse_url($install_root_url, PHP_URL_PATH);
+        if ($root_url_path === '/') {
+            $userdata = Path::mk($install_root, $userdata_dir_name);
+            $userdata_url = $install_root_url . $userdata_dir_name . '/';
+        }
+
         if (has_post()) {
 
             $this->template_set_post_data($tpl);
@@ -961,6 +970,10 @@ class AdminPages extends BasePages
 
         if (!filter_var($url, FILTER_VALIDATE_URL)) {
             throw new Exception(spf_("The URL '%s' is not a valid URL", $url));
+        }
+
+        if (substr($url, -1, 1) !== '/') {
+            throw new Exception(spf_("The URL '%s' must end with a slash", $url));
         }
 
         if ($realpath == $this->fs->realpath($install_root->path())) {

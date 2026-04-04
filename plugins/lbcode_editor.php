@@ -11,7 +11,7 @@ class LBCodeEditor extends Plugin
     public function show_editor() {
         ?>
 <div id="lbcode_editor" style="display: none">
-    <strong><a href="https://lnblog.skepticats.com/documentation/#File:docs/lbcode.txt" target="_blank">
+    <strong><a href="<?php echo DOCUMENTATION_URL?>#File:docs/lbcode.txt" target="_blank">
     <?php p_("LBCode");?></a></strong><a onclick="lbcode_editor.toggle_show('editorbox', this);" href="#dummy" >(-)</a>
     <div id="editorbox" style="display:inline">
         <button type="button" id="bold" accesskey="b" title="<?php p_('Bold');?>" onclick="lbcode_editor.one_parm('b', '<?php p_('Bold text');?>');"><strong><?php p_("B");?></strong></button>

@@ -89,8 +89,6 @@ class Breadcrumbs extends Plugin
                 $subject = $this->entry->subject ?: _('New entry');
                 $items[] = $this->packageItem($this->entry->uri('base'), $subject);
             }
-
-            $tok = strtok(DIRECTORY_SEPARATOR);
         }
 
         if (GET('action') == 'tags') {
