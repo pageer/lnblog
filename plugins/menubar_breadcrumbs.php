@@ -76,8 +76,6 @@ class Breadcrumbs extends Plugin
             } elseif ($ent && $ent->isEntry()) {
                 $ret .= $this->list_wrap($ent->uri('permalink'), $ent->subject);
             }
-
-            $tok = strtok(DIRECTORY_SEPARATOR);
         }
 
         if (GET('action') == 'tags') {
