@@ -14,10 +14,10 @@
     "jquery-form": "^4.3.0",
     "jquery-ui-dist": "^1.13.0",
     "tag-it": "^2.0.0",
-    "tinymce": "^5.10.2"
+    "tinymce": "^8.4.0"
   },
   "devDependencies": {
     "csslint": "^1.0.5",
-    "jshint": "^2.13.4"
+    "jshint": "^0.5.9"
   }
 }

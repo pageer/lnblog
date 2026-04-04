@@ -40,14 +40,29 @@ class TinyMCEEditor extends Plugin
     private function getDefaultConfig() {
         ob_start(); ?>
 {
+    "license_key": "gpl",
     "theme": "silver",
     "convert_urls": false,
     "plugins": [
-        "link lists image searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime",
-        "media nonbreaking hr charmap table directionality emoticons template paste preview"
+        "link",
+        "lists",
+        "image",
+        "searchreplace",
+        "wordcount",
+        "visualblocks",
+        "visualchars",
+        "code",
+        "fullscreen",
+        "insertdatetime",
+        "media",
+        "nonbreaking",
+        "charmap",
+        "table",
+        "directionality",
+        "emoticons",
+        "preview"
     ],
     "browser_spellcheck": true,
-    "gecko_spellcheck": true,
     "toolbar": "bold italic underline code | bullist numlist | forecolor backcolor | link image media emoticons | preview fullscreen",
     "contextmenu": "link linkchecker image imagetools table spellchecker configurepermanentpen",
     "removed_menuitems": "newdocument",
