@@ -56,7 +56,7 @@
         </apply>
         <exec command="${vendorDir}phpcs" dir="${srcDir}" passthru="true" checkreturn="true" />
         <exec command="${vendorDir}phpstan analyze" dir="${srcDir}" passthru="true" checkreturn="true" />
-        <exec command="${nodeDir}jshint themes" dir="${srcDir}" passthru="true" checkreturn="true" />
+        <exec command="${nodeDir}eslint themes" dir="${srcDir}" passthru="true" checkreturn="true" />
     </target>
 
     <target name="tests">
