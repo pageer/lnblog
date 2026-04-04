@@ -99,13 +99,13 @@ abstract class BasePages
         } elseif ( isset($_GET['script']) ) {
 
             $file = $this->scriptPath($_GET['script']);
-            $this->dumpAssetFile($file, "// Failed to find $file");
+            $this->dumpAssetFile($file, "// Failed to find requested script");
             return true;
 
         } elseif ( isset($_GET['style']) ) {
 
             $file = $this->stylePath($_GET['style']);
-            $this->dumpAssetFile($file, "/* Failed to find $file */");
+            $this->dumpAssetFile($file, "/* Failed to find requested stylesheet */");
             return true;
 
         } elseif ( isset($_GET['plugin']) ) {

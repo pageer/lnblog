@@ -71,7 +71,7 @@ is not recommended because you will need to install dev tools in your production
 But if you're fine with that, then go for it.)  You can do this by running the following:
 
 ```
-composer instal --dev
+composer install --dev
 npm install
 vendor/bin/phing client-local
 ```
