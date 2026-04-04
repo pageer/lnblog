@@ -1,3 +1,4 @@
+/*exported addLink, clearBoxes */
 function addLink() {
     var ret;
     var text = document.getElementById("linktext");

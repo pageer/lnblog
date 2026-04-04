@@ -1,4 +1,4 @@
-/*global strings */
+/*global strings, editor_commit_current */
 var original_text_content = '';
 var current_text_content = '';
 
@@ -24,7 +24,7 @@ $(function () {
 
     if (typeof localStorage !== 'undefined') {
         var saved_data = localStorage.getItem(auto_save_key);
-        if (saved_data && saved_data != original_text_content) {
+        if (saved_data && saved_data !== original_text_content) {
             if (window.confirm(strings.editor_restoreText)) {
                 $('#body').val(saved_data);
                 current_text_content = saved_data;
@@ -106,7 +106,7 @@ $(function () {
             editor_commit_current();
         }
 
-        if ($('#preview').attr('rel') == 'clicked') {
+        if ($('#preview').attr('rel') === 'clicked') {
             var form_url = $('#postform').attr('action');
             form_url += (form_url.indexOf('?') >= 0) ? '&' : '?';
             form_url += 'preview=yes&ajax=1';

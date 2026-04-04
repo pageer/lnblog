@@ -1,3 +1,4 @@
+/*globals strings */
 // lnblog_common.js - Shared function library for LnBlog pages.
 // Copyright (C) 2007 Peter A. Geer <pageer@skepticats.com>
 // This file is distributed under the terms of the GNU GPL version 2 or greater.
@@ -89,7 +90,7 @@ var lnblog = {
         //IE support
         if (document.selection) {
             myField.focus();
-            sel = document.selection.createRange();
+            var sel = document.selection.createRange();
             sel.text = myValue;
         }
         //MOZILLA/NETSCAPE support
@@ -110,7 +111,7 @@ var lnblog = {
         //IE support
         if (document.selection) {
             myField.focus();
-            sel = document.selection.createRange();
+            var sel = document.selection.createRange();
             ret = sel.text;
         }
         //MOZILLA/NETSCAPE support
@@ -130,7 +131,7 @@ lnblog.addEvent(
     window, 'load', function() {
     if (typeof strings !== 'undefined') {
         strings.get = function (string_id) {
-            ret = this[string_id];
+            var ret = this[string_id];
             for (var i = 1; i < arguments.length; i++) {
                 ret = ret.replace('%'+i+'$s', arguments[i]);
             }
