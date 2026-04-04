@@ -21,7 +21,7 @@ jobs:
       run: npm audit
 
     - name: Installing PHP dependencies
-      run: composer install --prefer-dist --no-progress --no-suggest
+      run: composer install --prefer-dist --no-progress
 
     - name: Installing JavaScript dependencies
       run: npm install
