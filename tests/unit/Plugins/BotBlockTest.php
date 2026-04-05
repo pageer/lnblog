@@ -8,7 +8,26 @@ use BlogComment;
 use BotBlock;
 use Generator;
 use LnBlog\Tests\LnBlogBaseTestCase;
-use Page;
+use LnBlog\Tests\MockPage;
+
+class CheckableBotBlockPlugin extends BotBlock
+{
+    public function getProperties(): array {
+        return [
+            'rand1' => $this->rand1,
+            'rand2' => $this->rand2,
+            'operator' => $this->operator,
+            'operator_text' => $this->getOper(true),
+            'operator_symbol' => $this->getOper(false),
+            'salt' => $this->salt,
+            'tok' => $this->tok,
+        ];
+    }
+
+    public function getLinkValue(): int {
+        return $this->computeValue();
+    }
+}
 
 class BotBlockTest extends LnBlogBaseTestCase
 {
@@ -110,7 +129,7 @@ class BotBlockTest extends LnBlogBaseTestCase
         $this->assertEmpty($comment->data);
     }
 
-   public function testCheckICToken_CheckTokenMissing_BlanksComment(): void {
+    public function testCheckICToken_CheckTokenMissing_BlanksComment(): void {
         $text = 'This is a test';
         $comment = new BlogComment();
         $comment->data = $text;
@@ -123,7 +142,7 @@ class BotBlockTest extends LnBlogBaseTestCase
         $this->assertEmpty($comment->data);
     }
 
-   public function testCheckICToken_NonWebContext_CommentUnchanged(): void {
+    public function testCheckICToken_NonWebContext_CommentUnchanged(): void {
         $text = 'This is a test';
         $comment = new BlogComment();
         $comment->data = $text;
@@ -183,32 +202,11 @@ class BotBlockTest extends LnBlogBaseTestCase
         parent::setUp();
     }
 
-    private function getCheckablePlugin(): BotBlock {
-        return new class () extends BotBlock {
-            public function getProperties(): array {
-                return [
-                    'rand1' => $this->rand1,
-                    'rand2' => $this->rand2,
-                    'operator' => $this->operator,
-                    'operator_text' => $this->getOper(true),
-                    'operator_symbol' => $this->getOper(false),
-                    'salt' => $this->salt,
-                    'tok' => $this->tok,
-                ];
-            }
-            public function getLinkValue(): int {
-                return $this->computeValue();
-            }
-        };
+    private function getCheckablePlugin(): CheckableBotBlockPlugin {
+        return new CheckableBotBlockPlugin();
     }
 
-    private function getMockPage(): Page {
-        return new class () extends Page {
-            public $scripts = [];
-            public function __construct() {}
-            public function addInlineScript($text, $type = "text/javascript"): void {
-                $this->scripts[] = $text;
-            }
-        };
+    private function getMockPage(): MockPage {
+        return new MockPage();
     }
 }

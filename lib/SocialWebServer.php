@@ -80,8 +80,8 @@ class SocialWebServer
 
     private function extractLinks($source) {
         $regex = '|<a\s+[^>]*\s?href\s*=\s*[\'"]([^\'">]+)[\'"][^>]*>|is';
-        $ret = preg_match_all($regex, $source, $matches);
-        return isset($matches[1]) ? $matches[1] : [];
+        preg_match_all($regex, $source, $matches);
+        return $matches[1];
     }
 
     private function getPageTitle($source_page) {

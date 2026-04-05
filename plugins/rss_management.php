@@ -207,8 +207,8 @@ class RssManagement extends Plugin
         }
     }
 
-public function handleSidebarLinks($page): void {
-    $blog = null;
+    public function handleSidebarLinks($page): void {
+        $blog = null;
         $entry = null;
         // TODO: This is because the "sidebar" isn't an object.  We need to fix this.
         if (!is_object($page)) {

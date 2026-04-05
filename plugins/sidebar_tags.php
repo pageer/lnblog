@@ -84,9 +84,7 @@ class TagList extends Plugin
         $tpl = NewTemplate("sidebar_panel_tpl.php");
         if ($this->header) {
             $tpl->set("PANEL_TITLE", $this->header);
-            if ($blg->isBlog()) {
-                $tpl->set("TITLE_LINK", $blg->uri('tags'));
-            }
+            $tpl->set("TITLE_LINK", $blg->uri('tags'));
         }
         
         $tpl->set("PANEL_ID", 'tagpanel');

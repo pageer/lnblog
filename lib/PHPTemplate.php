@@ -155,6 +155,7 @@ class PHPTemplate extends LnBlogObject
             return $this->search_paths;
         } else {
             $ret = array();
+            /**@phpstan-ignore-next-line */
             if (defined('THEME_NAME') && THEME_NAME != 'default') {
                 if (defined('BLOG_ROOT')) {
                     $ret[] = Path::mk(BLOG_ROOT, 'themes', THEME_NAME, 'templates');

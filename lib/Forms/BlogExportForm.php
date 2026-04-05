@@ -18,7 +18,6 @@ class BlogExportForm extends BaseForm
 
     private $repository;
     private $exporter_factory;
-    private $blog;
 
     public function __construct(
         ExporterFactory $factory = null,
@@ -65,8 +64,6 @@ class BlogExportForm extends BaseForm
 
     protected function addTemplateData(PHPTemplate $template) {
         $this->setCommonValidationData($template);
-
-        $template->set('BLOG', $this->blog);
     }
 
     private function blogidToBlog(): callable {

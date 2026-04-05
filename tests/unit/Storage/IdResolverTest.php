@@ -1,0 +1,64 @@
+<?php
+
+namespace LnBlog\Tests\Storage;
+
+use Generator;
+use LnBlog\Storage\IdResolver;
+use LnBlog\Tests\LnBlogBaseTestCase;
+use Prophecy\Prophecy\ObjectProphecy;
+use SystemConfig;
+use UrlPath;
+
+class IdResolverTest extends LnBlogBaseTestCase
+{
+    private ObjectProphecy $sysConfig;
+    private array $blogList;
+
+    public function baseTestProvider(): Generator {
+        yield 'blog' => [
+            'testblog',
+            '/path/to/testblog'
+        ];
+        yield 'entry' => [
+            'testblog/entries/2024/01/02_1234',
+            '/path/to/testblog/entries/2024/01/02_1234/entry.xml',
+        ];
+        yield 'pingback' => [
+            'testblog/entries/2020/12/10_1949/pingback/#pingback1641077732',
+            '/path/to/testblog/entries/2020/12/10_1949/pingback/1641077732.xml',
+        ];
+        yield 'trackback' => [
+            'testblog/entries/2020/12/10_1949/pingback/#pingback1641077732',
+            '/path/to/testblog/entries/2020/12/10_1949/pingback/1641077732.xml',
+        ];
+        yield 'comment' => [
+            'testblog/entries/2022/07/10_1612/comments/#comment2022-09-05_213808',
+            '/path/to/testblog/entries/2022/07/10_1612/comments/2022-09-05_213808.xml',
+        ];
+    }
+
+    /**
+     * @dataProvider baseTestProvider
+     */
+    public function testSimpleItemResolution($globalId, $expectedPath): void {
+        $resolver = $this->createResolver();
+        $result = $resolver->idToPath($globalId);
+
+        $this->assertEquals($expectedPath, $result->itemPath);
+        $this->assertEquals('/path/to/testblog', $result->blogPath);
+    }
+
+    protected function setUp(): void {
+        parent::setUp();
+        $this->sysConfig = $this->prophet->prophesize(SystemConfig::class);
+
+        $this->blogList = [
+            'testblog' => new UrlPath('/path/to/testblog', 'http://testblog.com/'),
+        ];
+        $this->sysConfig->blogRegistry()->willReturn($this->blogList);
+    }
+
+    private function createResolver(): IdResolver {
+        return new IdResolver($this->sysConfig->reveal());
+    }
+}

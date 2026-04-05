@@ -64,6 +64,7 @@ class WebPages extends BasePages
             'editfile'     => 'editfile',
             'blogpaths'    => 'blogpaths',
             'webmention'   => 'webmention',
+            'tbping'       => 'tbping',
             'drafts'       => 'showdrafts',
             'queuepub'     => 'queuePublication',
             'forgot'       => 'forgotPassword',
@@ -718,10 +719,7 @@ class WebPages extends BasePages
             $tpl->set("TRACKBACKS", false);
             $tpl->set("PINGBACKS", false);
             $tpl->set("HAS_HTML", $blog->default_markup);
-            $send_pingbacks = $entry->isEntry() ?
-                $entry->send_pingback :
-                $blog->autoPingbackEnabled();
-            $tpl->set('SEND_PINGBACKS', $send_pingbacks);
+            $tpl->set('SEND_PINGBACKS', $entry->send_pingback);
         } else {
             $tpl->set('ARTICLE', true);
             $tpl->set("HAS_HTML", $blog->default_markup);
@@ -1862,6 +1860,30 @@ class WebPages extends BasePages
         return $content;
     }
 
+    public function tbping() {
+        $ent = NewEntry();
+        $this->getPage()->setDisplayObject($ent);
+
+        $tb = new Trackback();
+
+        if (!$tb->incomingPing()) {
+            $this->getPage()->error(400);
+        }
+
+        if ($ent->allow_tb) {
+            $content = $tb->receive();
+        } else {
+            $content =
+                "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n".
+                "<response>\n" .
+                    "<error>1</error>\n" .
+                    "<message>"._("This entry does not accept trackbacks.")."</message>\n" .
+                "</response>\n";
+        }
+        echo $content;
+        exit;
+    }
+
     public function showitem() {
         # Handle inclusion of other pages.  This is basically the "wrapper wrapper"
         # portion of the script.
@@ -1884,24 +1906,7 @@ class WebPages extends BasePages
             $page_type = basename(getcwd());
         }
 
-        $tb = new Trackback();
-
-        if ($tb->incomingPing() && strtolower(GET('action')) != 'ping') {
-
-            if ($ent->allow_tb) {
-                $content = $tb->receive();
-            } else {
-                $content =
-                    "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n".
-                    "<response>\n" .
-                        "<error>1</error>\n" .
-                        "<message>"._("This entry does not accept trackbacks.")."</message>\n" .
-                    "</response>\n";
-            }
-            echo $content;
-            exit;
-
-        } elseif ( strtolower(GET("action")) == 'ping' ) {
+        if ( strtolower(GET("action")) == 'ping' ) {
             $content = $this->showTrackbackPingPage($this->blog, $ent, $this->user);
         } elseif ( $page_type == 'pingback' || $page_type == ENTRY_PINGBACK_DIR) {
             $content = $this->showPingbackPage($this->blog, $ent, $this->user);
@@ -2063,13 +2068,6 @@ class WebPages extends BasePages
 
     private function editIsPreview() {
         return POST('preview') || GET('preview');
-    }
-
-    private function editIsDraft($ent) {
-        return (POST('draft') && !$ent->isEntry()) || (
-                (POST('preview') || GET('preview')) &&
-                GET('save') == 'draft' && !$ent->isEntry()
-            );
     }
 
     private function editIsSave($ent) {
@@ -2390,9 +2388,5 @@ class WebPages extends BasePages
         }
 
         return $object;
-    }
-
-    private function config(string $constant) {
-        return $this->globals->constant($constant);
     }
 }

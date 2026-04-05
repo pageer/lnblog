@@ -13,7 +13,7 @@ class HtAccessGeneratorTest extends \LnBlog\Tests\LnBlogBaseTestCase
 
         $this->fs->write_file('./.htaccess', $expected_content)->shouldBeCalled();
 
-        $generator = new HTAccessGenerator($this->fs->reveal());
+        $generator = new HtAccessGenerator($this->fs->reveal());
         $generator->create_file($blog_instance);
     }
 
@@ -27,7 +27,7 @@ class HtAccessGeneratorTest extends \LnBlog\Tests\LnBlogBaseTestCase
 
         $this->fs->write_file('./.htaccess', $expected_content)->shouldBeCalled();
 
-        $generator = new HTAccessGenerator($this->fs->reveal());
+        $generator = new HtAccessGenerator($this->fs->reveal());
         $generator->create_file($blog_instance);
     }
 
@@ -59,7 +59,7 @@ class HtAccessGeneratorTest extends \LnBlog\Tests\LnBlogBaseTestCase
 
         $this->fs->write_file('./.htaccess', $expected_content)->shouldBeCalled();
 
-        $generator = new HTAccessGenerator($this->fs->reveal());
+        $generator = new HtAccessGenerator($this->fs->reveal());
         $generator->create_file($blog_instance);
     }
 
@@ -83,7 +83,7 @@ class HtAccessGeneratorTest extends \LnBlog\Tests\LnBlogBaseTestCase
 
         $this->fs->write_file('./.htaccess', $expected_content)->shouldBeCalled();
 
-        $generator = new HTAccessGenerator($this->fs->reveal());
+        $generator = new HtAccessGenerator($this->fs->reveal());
         $generator->create_file($blog_instance);
     }
 
@@ -107,7 +107,7 @@ class HtAccessGeneratorTest extends \LnBlog\Tests\LnBlogBaseTestCase
 
         $this->fs->write_file('./.htaccess', $expected_content)->shouldBeCalled();
 
-        $generator = new HTAccessGenerator($this->fs->reveal());
+        $generator = new HtAccessGenerator($this->fs->reveal());
         $generator->create_file($blog_instance);
     }
 
@@ -129,7 +129,7 @@ class HtAccessGeneratorTest extends \LnBlog\Tests\LnBlogBaseTestCase
 
         $this->fs->write_file('./foo/.htaccess', $expected_content)->shouldBeCalled();
 
-        $generator = new HTAccessGenerator($this->fs->reveal());
+        $generator = new HtAccessGenerator($this->fs->reveal());
         $generator->copy_parent = true;
         $generator->create_file($blog_instance);
     }

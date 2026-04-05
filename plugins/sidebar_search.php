@@ -226,7 +226,7 @@ class SidebarSearch extends Plugin
         } elseif (! $link_list) {
             $tpl->set("LIST_TITLE", _("No search results found."));
             $tpl->set("ITEM_LIST", array(_("No posts matched")));
-        } elseif ($search_terms) {
+        } else {
             $tpl->set(
                 "LIST_TITLE",
                 spf_('Search results for "%s"', $search_terms)

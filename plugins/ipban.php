@@ -127,7 +127,7 @@ class IPBan extends Plugin
 
             if ($this->checkBan($cmt->ip) || $cmt->ip == GET('banip')) {
                 $cb_link .= _(" (Banned)");
-            } elseif ($usr->checkLogin() && $usr->isAdministrator()) {
+            } elseif ($usr->isAdministrator()) {
                 if ($this->admin_local) {
                     $cb_link .= $cb_link_loc.$cb_link_glob;
                 } else {

@@ -22,7 +22,8 @@ if (extension_loaded("gettext")) {
     # The translated string.  If no translated version is found for the
     # current language, then the str parameter is returned.
 
-    function _($str) {
+    function _(string $str) {
+        /** @var array<string, string> $strings */
         $strings = [];
         if (file_exists(
             INSTALL_ROOT.PATH_DELIM.
@@ -30,8 +31,11 @@ if (extension_loaded("gettext")) {
         )) {
             include_once(LOCALEDIR."/".LANGUAGE.".php");
         }
-        if (isset($strings[$str])) return $strings[$str];
-        else return $str;
+        if (isset($strings[$str])) {
+            return $strings[$str];
+        } else {
+            return $str;
+        }
     }
 }
 

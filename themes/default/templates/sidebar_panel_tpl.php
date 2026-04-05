@@ -34,11 +34,17 @@ if (! function_exists('sidebar_panel_show_item')) {
     }
 }
 
-if (isset($PANEL_ID)) $id_markup = ' id="'.$PANEL_ID.'"';
-else $id_markup = '';
+if (isset($PANEL_ID)) {
+    $id_markup = ' id="'.$PANEL_ID.'"';
+} else {
+    $id_markup = '';
+}
 
-if (isset($PANEL_CLASS)) $class_markup = ' class="'.$PANEL_CLASS.'"';
-else $class_markup = '';
+if (isset($PANEL_CLASS)) {
+    $class_markup = ' class="'.$PANEL_CLASS.'"';
+} else {
+    $class_markup = '';
+}
 
 if (isset($PANEL_TITLE)) {
     if (isset($TITLE_LINK)) {

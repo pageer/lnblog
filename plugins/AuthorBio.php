@@ -7,6 +7,8 @@
 namespace LnBlog\Plugins;
 
 use LnBlog\Plugins\PluginTemplate;
+use PHPTemplate;
+use TextProcessor;
 
 class AuthorBio extends \Plugin
 {
@@ -22,8 +24,8 @@ class AuthorBio extends \Plugin
      * @codeCoverageIgnore
      */
     public static function getLoader(): callable {
-        return function (): Plugin {
-            return new self();
+        return function (): \Plugin {
+            return new AuthorBio();
         };
     }
 
@@ -86,6 +88,3 @@ class AuthorBio extends \Plugin
     }
 }
 
-// @codeCoverageIgnoreStart
-//return AuthorBio::getLoader();
-// @codeCoverageIgnoreEnd

@@ -83,9 +83,9 @@ class Breadcrumbs extends Plugin
                 $items[] = $this->packageItem($this->entry->uri('comment'), _("Comments"));
             } elseif ($tok == 'index.php') {
                 # Do nothing - we don't show the wrapper scripts.
-            } elseif ($this->entry && $this->entry->isEntry() && !$this->entry->isDraft()) {
+            } elseif ($this->entry->isEntry() && !$this->entry->isDraft()) {
                 $items[] = $this->packageItem($this->entry->uri('permalink'), $this->entry->subject);
-            } elseif ($this->entry && $this->entry->isEntry() && $this->entry->isDraft()) {
+            } elseif ($this->entry->isEntry() && $this->entry->isDraft()) {
                 $subject = $this->entry->subject ?: _('New entry');
                 $items[] = $this->packageItem($this->entry->uri('base'), $subject);
             }

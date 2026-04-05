@@ -9,4 +9,4 @@
         <?php p_("Global RegEx blacklist") ?>
     </a>
 </li>
-<?php endif ?>
+<?php endif;

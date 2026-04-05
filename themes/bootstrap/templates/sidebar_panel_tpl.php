@@ -50,8 +50,7 @@ $this->block('main', function ($vars) {
     $title = $PANEL_TITLE ?? '';
     if (isset($TITLE_LINK)) {
         $title = "<a href=\"$TITLE_LINK\">$title</a>";
-    }
-?>
+    } ?>
     <div <?php echo $id?> class="card mb-3 <?php echo $PANEL_CLASS ?? ''?>">
         <div class="card-body">
             <?php if ($title):?>

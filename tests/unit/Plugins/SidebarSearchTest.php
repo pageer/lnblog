@@ -7,8 +7,7 @@ use Blog;
 use BlogEntry;
 use Generator;
 use LnBlog\Tests\LnBlogBaseTestCase;
-use Page;
-use Prophecy\Argument;
+use LnBlog\Tests\MockPage;
 use SidebarSearch;
 
 require_once __DIR__ . "/../../../plugins/sidebar_search.php";
@@ -178,12 +177,7 @@ class SidebarSearchTest extends LnBlogBaseTestCase
         $this->assertStringNotContainsString('<b>', $page->body);
     }
 
-    private function getMockPage(): Page {
-        return new class () extends Page {
-            public $body;
-            public function display($page_body, $blog = false) {
-                $this->body = $page_body;
-            }
-        };
+    private function getMockPage(): MockPage {
+        return new MockPage();
     }
 }

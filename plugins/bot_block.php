@@ -74,7 +74,7 @@ class BotBlock extends Plugin
         $this->operator = rand(1, 3);
         $this->salt = phpversion() . ($_SERVER['REMOTE_ADDR'] ?? 'localhost');
         $tmp = $this->computeValue();
-        $this->tok = $this->makeToken($tmp);
+        $this->tok = $this->makeToken((string)$tmp);
 
         $this->registerEventHandler("blogcomment", "OnInsert", "checkICToken");
         $this->registerEventHandler("commentform", "FormBegin", "addICForm");

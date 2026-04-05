@@ -50,7 +50,7 @@ class UserIntTest extends \PHPUnit\Framework\TestCase
         $file_content = file_get_contents($password_file);
         $this->assertCount(2, explode("\n", trim($file_content)));
         $this->assertFalse(strpos($file_content, $hash));
-        $this->assertRegexp("/return '.*';/", $file_content);
+        $this->assertEquals(1, preg_match("/return '.*';/", $file_content));
     }
 
     protected function setUp(): void {

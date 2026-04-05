@@ -63,6 +63,9 @@ class TaskManager
         if ($task_key !== null) {
             $index = $this->findIndexByKey($task, $task_queue);
             if ($index !== false) {
+                $this->logger->warning(
+                    "Attempted to add a task that is not unique.  Task class: " . get_class($task) . " Task key: " . $task_key
+                );
                 throw new TaskNotUnique();
             }
         }

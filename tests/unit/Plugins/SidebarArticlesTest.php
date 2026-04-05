@@ -288,11 +288,4 @@ class SidebarArticlesTest extends \PHPUnit\Framework\TestCase
             }, $lines
         );
     }
-
-    private function createArticle($path, $sticky_title = '') {
-        $article = $this->prophet->prophesize(BlogEntry::class);
-        $article->isSticky($path)->willReturn($sticky_title === '');
-        $article->readSticky($path)->willReturn($sticky_title);
-        return $article->reveal();
-    }
 }

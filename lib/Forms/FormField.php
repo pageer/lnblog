@@ -16,7 +16,6 @@ class FormField
     private $converter;
 
     private $raw_value = '';
-    private $converted_value = null;
     private $is_validated = false;
     private $errors = [];
 

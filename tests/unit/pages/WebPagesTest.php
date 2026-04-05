@@ -826,33 +826,6 @@ class WebPagesTest extends \PHPUnit\Framework\TestCase
         $this->system->canAddTo($this->blog, $this->user)->willReturn(true);
         $this->system->canModify($this->entry, $this->user)->willReturn(true);
     }
-
-    private function setUpForSuccessfulSave($is_published) {
-        $_POST['body'] = "This is a test entry";
-        if ($is_published) {
-            $_POST['post'] = 'post';
-        } else {
-            $_POST['draft'] = 'draft';
-        }
-        $this->setUpEntryEditStubs();
-        $this->entry->data = 'This is a test entry';
-        $this->entry->isEntry()->willReturn(true);
-        $this->entry->isPublished()->willReturn($is_published);
-        $this->system->canAddTo($this->blog, $this->user)->willReturn(true);
-        $this->system->canModify($this->entry, $this->user)->willReturn(true);
-    }
-
-    private function setUpForSuccessfulPreviewWithSave() {
-        $_POST['body'] = "This is a test entry";
-        $_POST['preview'] = 'preview';
-        $_GET['save'] = 'draft';
-        $this->setUpEntryEditStubs();
-        $this->entry->data = 'This is a test entry';
-        $this->entry->isEntry()->willReturn(true);
-        $this->entry->isPublished()->willReturn(true);
-        $this->system->canAddTo($this->blog, $this->user)->willReturn(true);
-        $this->system->canModify($this->entry, $this->user)->willReturn(true);
-    }
 }
 
 class TestableWebPages extends WebPages

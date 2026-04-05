@@ -22,7 +22,6 @@ class AutoPublishTask implements Task
 
     private $logger;
     private $run_time;
-    private $data;
     private $has_executed = false;
 
     public function __construct(

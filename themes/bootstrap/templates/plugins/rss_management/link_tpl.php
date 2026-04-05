@@ -20,4 +20,4 @@ $class = $feed['class'] ?? 'news-feed-link';
     (<?php echo htmlspecialchars($description)?>)
     <?php endif ?>
 </a>
-<?php endif ?>
+<?php endif;

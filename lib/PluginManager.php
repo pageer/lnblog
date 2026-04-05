@@ -78,20 +78,15 @@ class PluginManager
         $excl = $this->plugin_config->value("Plugin_Manager", "exclude_list", $defaults);
         
         $this->disabled = explode(",", $excl);
-        if (! is_array($this->disabled)) {
-            $this->disabled = array();
-        }
 
         $defaults = implode(',', $this->default_load_first);
         $lf = $this->plugin_config->value("Plugin_Manager", "load_first", $defaults);
         $this->load_first = explode(",", $lf);
         
         $this->load_list = array();
-        if (is_array($this->load_first)) {
-            foreach ($this->load_first as $val) {
-                if ($this->testFile($val)) {
-                    $this->load_list[$val] = $val;
-                }
+        foreach ($this->load_first as $val) {
+            if ($this->testFile($val)) {
+                $this->load_list[$val] = $val;
             }
         }
         
