@@ -26,3 +26,5 @@ tags.temp
 
 .komodotools
 .phpunit.result.cache
+ 
+.claude
