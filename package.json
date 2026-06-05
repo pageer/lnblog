@@ -15,7 +15,7 @@
     "jquery-form": "^4.3.0",
     "jquery-ui-dist": "^1.13.0",
     "tag-it": "^2.0.0",
-    "tinymce": "^8.4.0"
+    "tinymce": "^8.5.1"
   },
   "devDependencies": {
     "csslint": "^1.0.5"
