@@ -30,7 +30,7 @@ $long_options[] = 'upgrade::';
 
 $options = getopt(implode('', $short_options), $long_options);
 
-function print_help_message($options) {//use ($short_options, $long_options) {
+function print_help_message($options) {
     global $short_options, $long_options;
     echo "Usage: php " . basename(__FILE__) . " [OPTION]\n\nOptions:\n";
     foreach ($long_options as $idx => $long) {
