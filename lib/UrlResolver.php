@@ -6,7 +6,7 @@ class UrlResolver
     private $config;
     private $fs;
 
-    public function __construct(SystemConfig $config = null, FS $fs = null) {
+    public function __construct(?SystemConfig $config = null, ?FS $fs = null) {
         $this->config = $config ?: SystemConfig::instance();
         $this->fs = $fs ?: new NativeFS();
     }
@@ -25,7 +25,7 @@ class UrlResolver
     #
     # Returns:
     # String containing the URI or the unmodified path if it could not be converted.
-    public function localpathToUri($path, Blog $blog = null, BlogEntry $entry = null) {
+    public function localpathToUri($path, ?Blog $blog = null, ?BlogEntry $entry = null) {
         $path_obj = new Path();
         $file = '';
         $roots = [];
@@ -112,7 +112,7 @@ class UrlResolver
     #
     # Returns:
     # String containing the local path or the unmodified URI if resolution failed
-    public function uriToLocalpath($uri, Blog $blog = null) {
+    public function uriToLocalpath($uri, ?Blog $blog = null) {
         $roots = [
             $this->config->userData(),
             $this->config->installRoot(),
@@ -133,7 +133,7 @@ class UrlResolver
         return $uri;
     }
 
-    public function generateRoute($action, LnBlogObject $entity = null, array $params = []) {
+    public function generateRoute($action, ?LnBlogObject $entity = null, array $params = []) {
         if ($entity instanceof Blog) {
             return $this->getBlogRoute($action, $entity, $params);
         } elseif ($entity instanceof BlogEntry) {

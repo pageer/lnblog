@@ -55,11 +55,11 @@ class RssManagement extends Plugin
     }
 
     public function __construct(
-        FS $fs = null,
-        ExporterFactory $exporterFactory = null,
-        UrlResolver $urlResolver = null,
-        System $system = null,
-        LoggerInterface $logger = null
+        ?FS $fs = null,
+        ?ExporterFactory $exporterFactory = null,
+        ?UrlResolver $urlResolver = null,
+        ?System $system = null,
+        ?LoggerInterface $logger = null
     ) {
         $this->fs = $fs ?: NewFS();
         $this->exporterFactory = $exporterFactory ?: new ExporterFactory();

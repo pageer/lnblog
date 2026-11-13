@@ -6,7 +6,7 @@ class InvalidImport extends Exception
 {
     private $errors = [];
 
-    public function __construct($message = null, $code = 0, Throwable $previous = null, array $errors = []) {
+    public function __construct($message = null, $code = 0, ?Throwable $previous = null, array $errors = []) {
         parent::__construct($message, $code, $previous);
         $this->errors = $errors;
     }

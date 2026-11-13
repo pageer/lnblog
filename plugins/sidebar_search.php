@@ -52,7 +52,7 @@ class SidebarSearch extends Plugin
         };
     }
 
-    public function __construct(Blog $blog = null) {
+    public function __construct(?Blog $blog = null) {
         $this->blog = $blog ?: NewBlog();
 
         $this->plugin_desc = _("Search for terms in blog entries.");

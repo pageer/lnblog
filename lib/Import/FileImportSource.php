@@ -18,7 +18,7 @@ class FileImportSource
     private $fs;
     private $xml;
 
-    public function __construct(FS $fs = null) {
+    public function __construct(?FS $fs = null) {
         $this->fs = $fs ?: NewFS();
     }
 

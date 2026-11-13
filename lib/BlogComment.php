@@ -54,7 +54,7 @@ class BlogComment extends Entry implements Reply
     public $parent;
     public $control_bar= [];
 
-    public function __construct ($path = "", $filesystem = null, UrlResolver $resolver = null) {
+    public function __construct ($path = "", $filesystem = null, ?UrlResolver $resolver = null) {
         parent::__construct($filesystem ?: NewFS(), $resolver);
         $this->raiseEvent("OnInit");
         $this->ip = get_ip();
@@ -157,7 +157,7 @@ class BlogComment extends Entry implements Reply
     Returns:
     True on success, false on failure.
     */
-    public function insert($entry, DateTime $datetime = null) {
+    public function insert($entry, ?DateTime $datetime = null) {
 
         $curr_ts = $datetime ? $datetime->getTimestamp() : time();
         $usr = NewUser();

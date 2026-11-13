@@ -39,7 +39,7 @@ class TrackbackValidator extends Plugin
         };
     }
 
-    function __construct(HttpClient $client = null) {
+    function __construct(?HttpClient $client = null) {
         $this->client = $client ?? new HttpClient();
 
         $this->plugin_desc = _('Allow only TrackBacks that link to your URL in the page body.');

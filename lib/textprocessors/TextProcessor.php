@@ -50,7 +50,7 @@ abstract class TextProcessor
        Returns:
        The instantiated TextProcessor
      */
-    static public function get($markup_type, Entry $entry = null, $text = '') {
+    static public function get($markup_type, ?Entry $entry = null, $text = '') {
         $filters = self::getAvailableFilters();
         foreach ($filters as $f) {
             if ($f->filter_id == $markup_type) {
@@ -100,7 +100,7 @@ abstract class TextProcessor
         return $filters;
     }
     
-    public function __construct(Entry $entry = null, $text = '', UrlResolver $resolver = null) {
+    public function __construct(?Entry $entry = null, $text = '', ?UrlResolver $resolver = null) {
         $this->entry = $entry;
         $this->text = $text;
         $this->url_resolver = $resolver ?: new UrlResolver(SystemConfig::instance(), NewFS());
@@ -133,7 +133,7 @@ abstract class TextProcessor
        Parameters:
        entry - (Entry) The entry object for resolution
      */
-    public function setEntry(Entry $entry = null) {
+    public function setEntry(?Entry $entry = null) {
         $this->entry = $entry;
     }
     

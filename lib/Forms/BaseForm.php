@@ -24,7 +24,7 @@ abstract class BaseForm
 
     # Method: validate
     # Checks that form input matches the defined validation rules
-    public function validate(array $data = null): bool {
+    public function validate(?array $data = null): bool {
         if ($data !== null) {
             $this->setFieldData($data);
         }

@@ -80,7 +80,7 @@ abstract class Plugin extends LnBlogObject
     Get or set the context in which plugins will run.  The available options are in the CONTEXT_*
     constants.  It is up to each plugin to decide how it should handle a specific context.
      */
-    public static function globalContext(string $context = null): string {
+    public static function globalContext(?string $context = null): string {
         if ($context !== null) {
             self::$global_context = $context;
         }
@@ -386,7 +386,7 @@ abstract class Plugin extends LnBlogObject
         // Override this to do output.
     }
 
-    public function showField(string $field, array $config = null) {
+    public function showField(string $field, ?array $config = null) {
         if ($config === null) {
             $config = $this->member_list[$field];
         }

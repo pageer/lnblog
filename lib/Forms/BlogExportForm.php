@@ -20,9 +20,9 @@ class BlogExportForm extends BaseForm
     private $exporter_factory;
 
     public function __construct(
-        ExporterFactory $factory = null,
-        SystemConfig $config = null,
-        BlogRepository $repo = null
+        ?ExporterFactory $factory = null,
+        ?SystemConfig $config = null,
+        ?BlogRepository $repo = null
     ) {
         $this->exporter_factory = $factory ?? new ExporterFactory();
         $this->system_config = $config ?? SystemConfig::instance();

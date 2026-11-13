@@ -17,8 +17,8 @@ class BlogTranslator implements Translator
     private $user_repo;
 
     public function __construct(
-        GlobalFunctions $global = null,
-        UserRepository $user_repo = null
+        ?GlobalFunctions $global = null,
+        ?UserRepository $user_repo = null
     ) {
         $this->globals = $global ?: new GlobalFunctions();
         $this->user_repo = $user_repo ?: new UserRepository();

@@ -52,10 +52,10 @@ class SiteMap extends Plugin
     }
 
     function __construct(
-        Blog $blog = null,
-        FS $fs = null,
-        SystemConfig $systemConfig = null,
-        BlogRepository $blogRepository = null
+        ?Blog $blog = null,
+        ?FS $fs = null,
+        ?SystemConfig $systemConfig = null,
+        ?BlogRepository $blogRepository = null
     ) {
         $this->blog = $blog ?: NewBlog();
         $this->fs = $fs ?: NewFS();

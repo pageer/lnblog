@@ -5,7 +5,7 @@ class EntryMapper
     private $fs = null;
     private $resolver = null;
 
-    public function __construct(FS $filesystem = null, UrlResolver $resolver = null) {
+    public function __construct(?FS $filesystem = null, ?UrlResolver $resolver = null) {
         $this->fs = $filesystem ?: NewFS();
         $this->resolver = $resolver ?: new UrlResolver(SystemConfig::instance(), $this->fs);
     }

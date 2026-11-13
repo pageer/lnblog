@@ -11,7 +11,7 @@ class ReplyRepository
 {
     private $fs;
 
-    public function __construct(FS $fs = null) {
+    public function __construct(?FS $fs = null) {
         $this->fs = $fs ?? NewFS();
     }
 

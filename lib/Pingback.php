@@ -53,7 +53,7 @@ class Pingback extends Trackback implements Reply
 
     public $control_bar = [];
 
-    public function __construct($path=false, $fs = null, $http_client = null, UrlResolver $resolver = null) {
+    public function __construct($path=false, $fs = null, $http_client = null, ?UrlResolver $resolver = null) {
         $this->fs = $fs ?: NewFS();
         $this->url_resolver = $resolver ?: new UrlResolver(SystemConfig::instance(), $this->fs);
         $this->http_client = $http_client ?: new HttpClient();
@@ -92,7 +92,7 @@ class Pingback extends Trackback implements Reply
     # Parameters:
     # ent - The entry into which to insert this pingback.
     # datetime - The optional datetime at which to insert the reply (default to now)
-    public function insert($ent, DateTime $datetime = null) {
+    public function insert($ent, ?DateTime $datetime = null) {
         $this->raiseEvent("OnInsert");
         $ts = $datetime ? $datetime->getTimestamp() : time();
         $this->ping_date = date("Y-m-d H:i:s T", $ts);

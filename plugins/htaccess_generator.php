@@ -26,7 +26,7 @@ class HtAccessGenerator extends Plugin
         };
     }
 
-    public function __construct(FS $fs = null) {
+    public function __construct(?FS $fs = null) {
         $this->plugin_desc = _("Adds an .htaccess file to blogs that blocks access to system-managed files.  Enabling this globally is recommended if you're running Apache.");
         $this->plugin_version = self::PLUGIN_VERSION;
 

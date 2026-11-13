@@ -102,10 +102,10 @@ class Blog extends LnBlogObject implements AttachmentContainer
         $path = "",
         $fs = null,
         $file_manager = null,
-        TaskManager $task_manager = null,
-        UrlResolver $url_resolver = null,
-        LoggerInterface $logger = null,
-        EntryRepository $entry_repo = null
+        ?TaskManager $task_manager = null,
+        ?UrlResolver $url_resolver = null,
+        ?LoggerInterface $logger = null,
+        ?EntryRepository $entry_repo = null
     ) {
         $this->fs = $fs ?: NewFS();
         $this->filemanager = $file_manager ?: new FileManager($this, $this->fs);

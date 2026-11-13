@@ -16,7 +16,7 @@ class EntryRepository
 
     private $entrylist = [];
 
-    public function __construct(Blog $blog, FS $fs = null) {
+    public function __construct(Blog $blog, ?FS $fs = null) {
         $this->blog = $blog;
         $this->fs = $fs ?? NewFS();
     }

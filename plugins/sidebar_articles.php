@@ -29,10 +29,10 @@ class Articles extends Plugin
     }
 
     public function __construct(
-        Blog $blog = null,
-        User $user = null,
-        FS $fs = null,
-        System $system = null
+        ?Blog $blog = null,
+        ?User $user = null,
+        ?FS $fs = null,
+        ?System $system = null
     ) {
         $this->blog = $blog;
         $this->user = $user;

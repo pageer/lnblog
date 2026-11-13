@@ -10,7 +10,7 @@ interface Task
 
     # Method: runAfterTime
     # Sets or gets the time after which the task should run.
-    public function runAfterTime(DateTime $time = null);
+    public function runAfterTime(?DateTime $time = null);
 
     # Method: shouldRun
     # Determines if the task should be run based on the current time.

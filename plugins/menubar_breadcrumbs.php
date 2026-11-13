@@ -25,7 +25,7 @@ class Breadcrumbs extends Plugin
         };
     }
 
-    public function __construct(Blog $blog = null, BlogEntry $entry = null) {
+    public function __construct(?Blog $blog = null, ?BlogEntry $entry = null) {
         $this->blog = $blog ?: NewBlog();
         $this->entry = $entry ?: NewEntry();
 

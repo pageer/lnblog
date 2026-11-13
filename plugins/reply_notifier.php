@@ -19,7 +19,7 @@ class ReplyNotifier extends Plugin
 
     private $notifier;
 
-    function __construct(Notifier $notifier = null) {
+    function __construct(?Notifier $notifier = null) {
         $this->notifier = $notifier ?: new Notifier();
 
         $this->plugin_desc = _("Sends an e-mail notification when a comment, TrackBack, or Pingback is submitted.");

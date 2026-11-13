@@ -26,7 +26,7 @@ class ContentBan extends Plugin
     private $blog;
     private $user;
 
-    function __construct(FS $fs = null, User $user = null, Blog $blog = null) {
+    function __construct(?FS $fs = null, ?User $user = null, ?Blog $blog = null) {
         $this->fs = $fs ?? NewFS();
         $this->user = $user ?? NewUser();
         $this->blog = $blog ?? NewBlog();

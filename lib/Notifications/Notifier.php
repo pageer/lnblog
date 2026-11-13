@@ -25,14 +25,14 @@ class Notifier
     #
     # Returns:
     # Boolean containing the current (i.e. new) enablement status.
-    public function enabled(bool $is_enabled = null): bool {
+    public function enabled(?bool $is_enabled = null): bool {
         if ($is_enabled !== null) {
             self::$is_enabled = $is_enabled;
         }
         return self::$is_enabled;
     }
 
-    public function __construct(GlobalFunctions $globals = null) {
+    public function __construct(?GlobalFunctions $globals = null) {
         $this->globals = $globals ?: new GlobalFunctions();
     }
 

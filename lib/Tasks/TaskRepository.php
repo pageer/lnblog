@@ -20,7 +20,7 @@ class TaskRepository
     private $fs;
     private $queue_path;
 
-    public function __construct(FS $fs = null) {
+    public function __construct(?FS $fs = null) {
         $this->fs = $fs ?: NewFS();
     }
 

@@ -25,16 +25,16 @@ class AutoPublishTask implements Task
     private $has_executed = false;
 
     public function __construct(
-        LoggerInterface $logger = null,
-        Publisher $publisher = null,
-        EntryMapper $mapper = null
+        ?LoggerInterface $logger = null,
+        ?Publisher $publisher = null,
+        ?EntryMapper $mapper = null
     ) {
         $this->logger = $logger ?: NewLogger();
         $this->publisher = $publisher;
         $this->mapper = $mapper ?: new EntryMapper();
     }
 
-    public function runAfterTime(DateTime $time = null) {
+    public function runAfterTime(?DateTime $time = null) {
         if (func_num_args() > 0) {
             $this->run_time = $time;
         }

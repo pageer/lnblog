@@ -12,7 +12,7 @@ class SystemConfig
 
     private static $single_instance;
 
-    public function __construct(FS $fs = null, GlobalFunctions $globals = null) {
+    public function __construct(?FS $fs = null, ?GlobalFunctions $globals = null) {
         $this->globals = $globals ?: new GlobalFunctions();
         $this->fs = $fs ?: new NativeFS();
     }
@@ -32,7 +32,7 @@ class SystemConfig
     #
     # Returns:
     # UrlPath containing the path and URL
-    public function installRoot(UrlPath $path = null): UrlPath {
+    public function installRoot(?UrlPath $path = null): UrlPath {
         $this->loadPathConfig();
         if ($path) {
             $this->path_config['INSTALL_ROOT'] = $path;
@@ -48,7 +48,7 @@ class SystemConfig
     #
     # Returns:
     # UrlPath containing the path and URL
-    public function userData(UrlPath $path = null): UrlPath {
+    public function userData(?UrlPath $path = null): UrlPath {
         $this->loadPathConfig();
         if ($path) {
             $this->path_config['USER_DATA'] = $path;

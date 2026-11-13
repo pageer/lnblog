@@ -31,7 +31,7 @@ class BlogImportForm extends BaseForm
     private $import_report;
     private $blog;
 
-    public function __construct(FS $fs, SystemConfig $config = null, BlogRepository $repo = null) {
+    public function __construct(FS $fs, ?SystemConfig $config = null, ?BlogRepository $repo = null) {
         $this->fs = $fs;
         $this->system_config = $config ?? SystemConfig::instance();
         $this->repository = $repo ?? new BlogRepository();

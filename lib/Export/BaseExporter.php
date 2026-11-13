@@ -29,8 +29,8 @@ abstract class BaseExporter implements Exporter
     }
 
     public function __construct(
-        GlobalFunctions $globals = null,
-        UserRepository $user_repo = null
+        ?GlobalFunctions $globals = null,
+        ?UserRepository $user_repo = null
     ) {
         $this->globals = $globals ?: new GlobalFunctions();
         $this->user_repo = $user_repo ?: new UserRepository();

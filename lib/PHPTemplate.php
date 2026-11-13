@@ -46,7 +46,7 @@ class PHPTemplate extends LnBlogObject
 
     public static $template_paths = array();
 
-    public function __construct($file="", BasePages $pages_obj = null) {
+    public function __construct($file="", ?BasePages $pages_obj = null) {
         $this->file = $file;
         $this->vars = array();
         $this->pages = $pages_obj;

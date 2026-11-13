@@ -86,7 +86,7 @@ abstract class Entry extends LnBlogObject
     protected $fs;
     protected $url_resolver;
 
-    protected function __construct(FS $filesystem, UrlResolver $resolver = null) {
+    protected function __construct(FS $filesystem, ?UrlResolver $resolver = null) {
         $this->fs = $filesystem;
         $this->url_resolver = $resolver ?: new UrlResolver(SystemConfig::instance(), $this->fs);
     }

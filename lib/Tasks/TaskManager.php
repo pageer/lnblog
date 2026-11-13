@@ -14,8 +14,8 @@ class TaskManager
     private $logger;
 
     public function __construct(
-        TaskRepository $repository = null,
-        LoggerInterface $logger = null
+        ?TaskRepository $repository = null,
+        ?LoggerInterface $logger = null
     ) {
         $this->repository = $repository ?: new TaskRepository();
         $this->logger = $logger ?: NewLogger();
@@ -77,7 +77,7 @@ class TaskManager
     #
     # Parameters:
     # task - The task to remove.
-    public function remove(Task $task = null) {
+    public function remove(?Task $task = null) {
         if ($task) {
             $this->repository->delete($task);
         }
@@ -104,7 +104,7 @@ class TaskManager
     # Executes any tasks that are ready to be run.  After executing, this
     # will remove any tasks that indicate they should be deleted,
     # i.e. one-shot tasks.
-    public function runPendingTasks(DateTime $current_time = null) {
+    public function runPendingTasks(?DateTime $current_time = null) {
         $current_time = $current_time ?: new DateTime('now');
         $tasks = $this->repository->getAll();
 

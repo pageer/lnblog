@@ -27,7 +27,7 @@ class PageHeader extends Plugin
         };
     }
 
-    public function __construct(Blog $blog = null) {
+    public function __construct(?Blog $blog = null) {
         $this->blog = $blog ?: NewBlog();
 
         $this->plugin_desc = _("Output a banner for the page.");

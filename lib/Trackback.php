@@ -63,7 +63,7 @@ class Trackback extends LnBlogObject implements Reply
     protected $http_client;
     protected $url_resolver;
 
-    public function __construct($path=false, $fs = null, $http_client = null, UrlResolver $resolver = null) {
+    public function __construct($path=false, $fs = null, $http_client = null, ?UrlResolver $resolver = null) {
         $this->fs = $fs ?: NewFS();
         $this->url_resolver = $resolver ?: new UrlResolver(SystemConfig::instance(), $this->fs);
          $this->http_client = $http_client ?: new HttpClient();

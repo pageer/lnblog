@@ -402,7 +402,7 @@ class WordPressExporterTest extends LnBlogBaseTestCase
     private function createTestEntry(
         string $dir,
         string $entry_url,
-        int $timestamp = null,
+        ?int $timestamp = null,
         array $test_comment = [],
         array $test_pingback = []
     ): BlogEntry {

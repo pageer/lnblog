@@ -18,15 +18,15 @@ class PluginTemplate extends PHPTemplate
     public function __construct(
         string $pluginPath,
         string $file,
-        BasePages $basePages = null,
-        SystemConfig $systemConfig = null
+        ?BasePages $basePages = null,
+        ?SystemConfig $systemConfig = null
     ) {
         parent::__construct($file, $basePages);
         $this->pluginPath = $pluginPath;
         $this->systemConfig = $systemConfig ?? SystemConfig::instance();
     }
 
-    public function getSearchPath(Blog $blog = null) {
+    public function getSearchPath(?Blog $blog = null) {
         $blog = $blog ?? NewBlog();
         $inst_root = $this->systemConfig->installRoot()->path();
         $user_data = $this->systemConfig->userData()->path();

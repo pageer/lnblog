@@ -56,6 +56,7 @@ class AuthLog implements JsonSerializable
         return $this->user_agent;
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return [
             'status' => $this->status,

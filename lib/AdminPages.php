@@ -1011,7 +1011,7 @@ class AdminPages extends BasePages
         }
     }
 
-    private function requireAdministrator(User $user = null): void {
+    private function requireAdministrator(?User $user = null): void {
         if ($user === null) {
             $user = User::get();
         }

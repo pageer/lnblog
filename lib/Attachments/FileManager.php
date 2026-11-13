@@ -17,7 +17,7 @@ class FileManager
     private $fs;
     private $resolver;
 
-    public function __construct($parent, $filesystem = null, UrlResolver $resolver = null) {
+    public function __construct($parent, $filesystem = null, ?UrlResolver $resolver = null) {
         $this->parent = $parent;
         $this->fs = $filesystem ?: NewFS();
         $this->resolver = $resolver ?: new UrlResolver(SystemConfig::instance(), $filesystem);

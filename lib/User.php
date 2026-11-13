@@ -54,7 +54,7 @@ class User extends LnBlogObject implements AttachmentContainer
     private $limiter = null;
     private $file_manager = null;
 
-    public static function get($usr=false, $pwd=false, FS $fs = null) {
+    public static function get($usr=false, $pwd=false, ?FS $fs = null) {
         $s_usr = SESSION(CURRENT_USER);
         $c_usr = COOKIE(CURRENT_USER);
         if (!$usr && $c_usr) {
@@ -81,10 +81,10 @@ class User extends LnBlogObject implements AttachmentContainer
 
     public function __construct(
         $uname=false,
-        FS $fs = null,
-        GlobalFunctions $globals = null,
-        LoginLimiter $limiter = null,
-        FileManager $file_manager = null
+        ?FS $fs = null,
+        ?GlobalFunctions $globals = null,
+        ?LoginLimiter $limiter = null,
+        ?FileManager $file_manager = null
     ) {
         $this->username = $uname ? $uname : '';
         $this->fs = $fs ?: NewFS();

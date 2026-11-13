@@ -24,7 +24,7 @@ class CDataHelper
         SimpleXMLElement $element,
         string $tag,
         string $value,
-        string $namespace = null
+        ?string $namespace = null
     ): SimpleXMLElement {
         $child = $element->addChild($tag, '', $namespace);
         $node = dom_import_simplexml($child);
