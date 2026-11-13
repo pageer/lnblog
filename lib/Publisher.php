@@ -75,7 +75,7 @@ class Publisher
        Throws:
        Exception or EntryRenameFailed when rename fails.
      */
-    public function publishEntry(BlogEntry $entry, DateTime $time = null) {
+    public function publishEntry(BlogEntry $entry, ?DateTime $time = null) {
         $time = $time ?: new DateTime();
         $curr_ts = $time->getTimestamp();
 
@@ -127,7 +127,7 @@ class Publisher
        Throws:
        Exception or EntryRenameFailed
      */
-    public function publishArticle(BlogEntry $entry, DateTime $time = null) {
+    public function publishArticle(BlogEntry $entry, ?DateTime $time = null) {
 
         $time = $time ?: new DateTime();
         $curr_ts = $time->getTimestamp();
@@ -210,7 +210,7 @@ class Publisher
        Throws:
        CouldNotCreateDirectory or EntryAlreadyExists or EntryWriteFailed
      */
-    public function createDraft(BlogEntry $entry, DateTime $time = null) {
+    public function createDraft(BlogEntry $entry, ?DateTime $time = null) {
         $time = $time ?: new DateTime();
         $ts = $time->getTimestamp();
         $draft_path = Path::mk($this->blog->home_path, BLOG_DRAFT_PATH);
@@ -266,7 +266,7 @@ class Publisher
        Throws:
        EntryDoesNotExist or EntryWriteFailed or EntryRenameFailed
      */
-    public function update(BlogEntry $entry, DateTime $time = null) {
+    public function update(BlogEntry $entry, ?DateTime $time = null) {
         $time = $time ?: new DateTime();
 
         if (! $this->fs->file_exists($entry->file)) {
@@ -313,7 +313,7 @@ class Publisher
        Throws:
        EntryDoesNotExist or EntryDeleteFailed
      */
-    public function delete(BlogEntry $entry, DateTime $time = null) {
+    public function delete(BlogEntry $entry, ?DateTime $time = null) {
         if (!$entry->isEntry()) {
             throw new EntryDoesNotExist();
         }
@@ -333,7 +333,7 @@ class Publisher
         }
     }
 
-    public function publishReply(Reply $reply, BlogEntry $entry, \DateTime $datetime = null) {
+    public function publishReply(Reply $reply, BlogEntry $entry, ?\DateTime $datetime = null) {
         return $entry->addReply($reply, $datetime);
     }
 
@@ -429,7 +429,7 @@ class Publisher
         }
     }
 
-    private function deleteEntry(BlogEntry $entry, DateTime $time = null) {
+    private function deleteEntry(BlogEntry $entry, ?DateTime $time = null) {
         if ($this->keepEditHistory()) {
             $time = $time ?: new DateTime();
             $target_file = Path::mk($entry->localpath(), $entry->getPath($time->getTimestamp(), true, true).ENTRY_PATH_SUFFIX);

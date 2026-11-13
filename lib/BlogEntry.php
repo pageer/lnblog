@@ -68,7 +68,7 @@ class BlogEntry extends Entry implements AttachmentContainer
     private $reply_repo;
     private $globals;
 
-    static public function pathIsArticle($dir_path, FS $fs = null): bool {
+    static public function pathIsArticle($dir_path, ?FS $fs = null): bool {
         if (!$fs) {
             $fs = NewFS();
         }
@@ -78,11 +78,11 @@ class BlogEntry extends Entry implements AttachmentContainer
 
     public function __construct(
         string $path = "",
-        FS $filesystem = null,
-        FileManager $file_manager = null,
-        UrlResolver $resolver = null,
-        ReplyRepository $reply_repo = null,
-        GlobalFunctions $globals = null
+        ?FS $filesystem = null,
+        ?FileManager $file_manager = null,
+        ?UrlResolver $resolver = null,
+        ?ReplyRepository $reply_repo = null,
+        ?GlobalFunctions $globals = null
     ) {
         $fs = $filesystem ?: NewFS();
         parent::__construct($fs, $resolver);
@@ -1148,7 +1148,7 @@ class BlogEntry extends Entry implements AttachmentContainer
     # Parameters:
     # reply - The reply object ot insert
     # datetime - The optional datetime at which to insert the comment (default is now)
-    public function addReply($reply, DateTime $datetime = null) {
+    public function addReply($reply, ?DateTime $datetime = null) {
         return $reply->insert($this, $datetime);
     }
 

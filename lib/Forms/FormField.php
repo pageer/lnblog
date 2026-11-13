@@ -21,9 +21,9 @@ class FormField
 
     public function __construct(
         string $name,
-        FieldRenderer $renderer = null,
-        callable $validator = null,
-        callable $converter = null
+        ?FieldRenderer $renderer = null,
+        ?callable $validator = null,
+        ?callable $converter = null
     ) {
         $this->name = $name;
         $this->renderer = $renderer;
@@ -131,7 +131,7 @@ class FormField
     #               This sets the LABEL_AFTER variable in the template.
     # noerrors    - (bool) Suppress the display of error fields in the template.
     #               This sets the SUPPReSS_ERRORS variable in the template.
-    public function render(BasePages $pages_obj, array $options = null): string {
+    public function render(BasePages $pages_obj, ?array $options = null): string {
         if (!$this->renderer) {
             $this->renderer = new InputRenderer();
         }
@@ -139,7 +139,7 @@ class FormField
         return $this->renderer->render($this, $pages_obj);
     }
 
-    protected function resolveAndSetOptions(array $options = null) {
+    protected function resolveAndSetOptions(?array $options = null) {
         if (isset($options['label'])) {
             $this->renderer->setLabel($options['label']);
             unset($options['label']);

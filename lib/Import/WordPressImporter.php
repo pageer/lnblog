@@ -44,12 +44,12 @@ class WordPressImporter implements Importer
 
     public function __construct(
         User $user,
-        FS $fs = null,
-        WrapperGenerator $wrappers = null,
-        TaskManager $task_manager = null,
-        UserRepository $user_repo = null,
-        BlogRepository $blog_repo = null,
-        Publisher $publisher = null
+        ?FS $fs = null,
+        ?WrapperGenerator $wrappers = null,
+        ?TaskManager $task_manager = null,
+        ?UserRepository $user_repo = null,
+        ?BlogRepository $blog_repo = null,
+        ?Publisher $publisher = null
     ) {
         $this->user = $user;
         $this->fs = $fs ?: NewFS();
