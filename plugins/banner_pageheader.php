@@ -14,6 +14,7 @@ class PageHeader extends Plugin
     private const TEMPLATE = 'header_tpl.php';
 
     public $show_desc;
+    public $logo;
 
     private Blog $blog;
 
@@ -35,6 +36,10 @@ class PageHeader extends Plugin
         # Option: Show description
         # If enabled, the blog description will be displayed beneath the title.
         $this->addOption("show_desc", _("Show description"), false, "checkbox");
+
+        # Option: Logo
+        # URL or path to a logo image. When set, an IMG tag is added inside the banner link.
+        $this->addOption("logo", _("Logo image URL"), "", "text");
 
         $this->addNoEventOption();
 
@@ -58,6 +63,7 @@ class PageHeader extends Plugin
         $template->set('NAME', $name);
         $template->set('DESCRIPTION', $description);
         $template->set('URL', $url);
+        $template->set('LOGO', $this->logo);
 
         $template->output();
     }
@@ -66,7 +72,7 @@ class PageHeader extends Plugin
 if (! PluginManager::instance()->plugin_config->value('pageheader', 'creator_output', 0)) {
     $plug = new PageHeader();
 }
-//
+
 // @codeCoverageIgnoreStart
 return PageHeader::getLoader();
 // @codeCoverageIgnoreEnd
