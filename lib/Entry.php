@@ -152,11 +152,7 @@ abstract class Entry extends LnBlogObject
             $this->tags = implode(TAG_SEPARATOR, $list);
         } else {
             if (! $this->tags) return array();
-            $ret = explode(TAG_SEPARATOR, $this->tags);
-            foreach ($ret as $key=>$val) {
-                $ret[$key] = trim($val);
-            }
-            return $ret;
+            return array_map('trim', explode(TAG_SEPARATOR, $this->tags));
         }
     }
 

@@ -131,7 +131,7 @@ define("PACKAGE_DESCRIPTION", spf_("%s: a simple and (hopefully) elegant weblog"
 
 # Constant: PACKAGE_COPYRIGHT
 # The offical LnBlog copyright notice.
-define("PACKAGE_COPYRIGHT", _("Copyright &copy; 2005 &ndash; 2014, Peter A. Geer <pageer@skepticats.com>"));
+define("PACKAGE_COPYRIGHT", _("Copyright &copy; 2005 &ndash; 2026, Peter A. Geer <pageer@skepticats.com>"));
 
 ######################################
 # Section: Miscellaneous configuration

@@ -72,15 +72,9 @@ function NewBlog($param=false) {
 }
 
 function NewEntry($param = false, $fs = null) {
-    $entid = false;
+    $entid = $_GET['article'] ?? $_GET['entry'] ?? $_GET['draft'] ?? false;
 
-    if (isset($_GET['article'])) {
-        $entid = $_GET['article'];
-    } elseif (isset($_GET['entry'])) {
-        $entid = $_GET['entry'];
-    } elseif (isset($_GET['draft'])) {
-        $entid = $_GET['draft'];
-    } else {
+    if ($entid === false) {
         if (! $param) $param = getcwd();
         if (strpos($param, BLOG_ARTICLE_PATH) !== false) {
             $entid = $param;
