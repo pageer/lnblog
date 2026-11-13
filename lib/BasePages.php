@@ -35,7 +35,7 @@ abstract class BasePages
     abstract protected function getActionMap();
     abstract protected function defaultAction();
 
-    public function __construct(FS $fs = null, GlobalFunctions $globals = null, LoggerInterface $logger = null) {
+    public function __construct(?FS $fs = null, ?GlobalFunctions $globals = null, ?LoggerInterface $logger = null) {
         $this->fs = $fs ?: NewFS();
         $this->globals = $globals ?: new GlobalFunctions();
         $this->logger = $logger ?: NewLogger();
@@ -79,6 +79,14 @@ abstract class BasePages
 
     public function getPage() {
         return Page::instance();
+    }
+
+    protected function redirectOr403($redirect = '', $message = '') {
+        if ($redirect) {
+            $this->getPage()->redirect($redirect);
+        } else {
+            $this->getPage()->error(403, $message);
+        }
     }
 
     protected function handleRequestRouting($action) {

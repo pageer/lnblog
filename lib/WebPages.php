@@ -1,15 +1,20 @@
 <?php
 
 use LnBlog\Attachments\ImageScaler;
+use LnBlog\Controllers\EditFilePage;
+use LnBlog\Controllers\EditLoginPage;
 use LnBlog\Forms\CommentForm;
 use LnBlog\Model\EntryFactory;
 use LnBlog\Model\Reply;
 use LnBlog\Storage\UserRepository;
+use LnBlog\Controllers\UserAuthorizationTrait;
 use LnBlog\Tasks\TaskManager;
 use Psr\Log\LoggerInterface;
 
 class WebPages extends BasePages
 {
+    use UserAuthorizationTrait;
+
     protected $blog;
     protected $user;
     protected $publisher;
@@ -22,14 +27,14 @@ class WebPages extends BasePages
     private $last_upload_error = array();
 
     public function __construct(
-        Blog $blog = null,
-        User $user = null,
-        EntryFactory $factory = null,
-        ImageScaler $scaler = null,
-        UrlResolver $resolver = null,
-        FS $fs = null,
-        GlobalFunctions $globals = null,
-        LoggerInterface $logger = null
+        ?Blog $blog = null,
+        ?User $user = null,
+        ?EntryFactory $factory = null,
+        ?ImageScaler $scaler = null,
+        ?UrlResolver $resolver = null,
+        ?FS $fs = null,
+        ?GlobalFunctions $globals = null,
+        ?LoggerInterface $logger = null
     ) {
         parent::__construct($fs, $globals, $logger);
         $this->user = $user ?: NewUser();
@@ -78,28 +83,6 @@ class WebPages extends BasePages
 
     protected function defaultAction() {
         return $this->showblog();
-    }
-
-    protected function redirectOr403($redirect = '', $message = '') {
-        if ($redirect) {
-            $this->getPage()->redirect($redirect);
-        } else {
-            $this->getPage()->error(403, $message);
-        }
-    }
-
-    protected function verifyUserCanModifyBlog($redirect = '', $message = '') {
-        if (! $this->user->checkLogin() || ! System::instance()->canModify($this->blog, $this->user)) {
-            $this->redirectOr403($redirect, $message);
-            return false;
-        }
-        return true;
-    }
-
-    protected function verifyUserIsLoggedIn($redirect = '', $message = '') {
-        if (! $this->user->checkLogin()) {
-            $this->redirectOr403($redirect, $message);
-        }
     }
 
     protected function reqVar($key) {
@@ -248,209 +231,26 @@ class WebPages extends BasePages
     }
 
     public function editfile() {
-
-        $file = GET("file");
-        if (Path::isWindows()) {
-            $file = str_replace('/', Path::$sep, $file);
-        }
-        $file = str_replace("..".Path::$sep, '', $file);
-
-        $ent = NewBlogEntry();
-
-        $relpath = INSTALL_ROOT;
-
-        $message_403 = _("You do not have permission to edit this file.");
-
-        $this->verifyUserIsLoggedIn(SERVER("referer"), $message_403);
-
-        if ( GET("profile") == $this->user->username() ) {
-            $relpath = Path::get(USER_DATA_PATH, $this->user->username());
-        } elseif (GET('target') == 'userdata') {
-            $relpath = USER_DATA_PATH;
-        } elseif ($ent->isEntry() ) {
-            $this->getPage()->setDisplayObject($ent);
-            $relpath = $ent->localpath();
-            if (System::instance()->canModify($ent, $this->user) ) {
-                $this->redirectOr403(SERVER("referer"), $message_403);
-            }
-        } elseif ($this->blog->isBlog() ) {
-            $this->getPage()->setDisplayObject($this->blog);
-            $relpath = $this->blog->home_path;
-            $this->verifyUserCanModifyBlog(SERVER("referer"), $message_403);
-        } elseif (! $this->user->isAdministrator() ) {
-            $this->redirectOr403(SERVER("referer"), $message_403);
-        }
-
-        $tpl = $this->createTemplate("file_edit_tpl.php");
-
-        # Prepare template for link list display.
-        if (GET("list")) {
-            $tpl->set("SHOW_LINK_EDITOR");
-            $this->getPage()->addScript("sitemap.js");
-        }
-
-        $tpl->set("FORM_ACTION", make_uri(false, false, false));
-        if (isset($_GET["list"])) {
-            $tpl->set("PAGE_TITLE", _("Edit Link List"));
-        } else {
-            $tpl->set("PAGE_TITLE", _("Edit Text File"));
-        }
-
-        if (substr($file, 0, 9) == 'userdata' . DIRECTORY_SEPARATOR) {
-            $file = Path::mk(USER_DATA_PATH, substr($file, 9));
-        } else {
-            $file = Path::mk($relpath, $file);
-        }
-
-        if (has_post()) {
-
-            $data = POST("output");
-            $ret = $this->fs->write_file($file, $data);
-
-            if (! $ret) {
-                $tpl->set("EDIT_ERROR", _("Cannot create file"));
-                $tpl->set(
-                    "ERROR_MESSAGE",
-                    spf_("Unable to create file %s.", $file)
-                );
-                $tpl->set("FILE_TEXT", htmlentities($data));
-            }
-
-        } else {
-
-            if (is_file($file)) {
-                $data = file_get_contents($file);
-            } else {
-                $data = "";
-                if (! GET('map')) {
-                    $tpl->set("EDIT_ERROR", _("Create new file"));
-                    $tpl->set("ERROR_MESSAGE", _("The selected file does not exist.  It will be created."));
-                }
-            }
-        }
-
-        $tpl->set("FILE_TEXT", htmlentities($data));
-
-        if (GET('map')) {
-            $tpl->set("SITEMAP_MODE");
-            $tpl->set(
-                "FORM_MESSAGE", spf_(
-                    'This page will help you create a site map to display in the navigation bar at the top of your blog.  This file is stored under the name %s in the root directory of your weblog for a personal sitemap or in the %s installation directory for the system default.  This file in simply a series of <abbr title="Hypertext Markup Language">HTML</abbr> links, each on it\'s own line, which the template will process into a list.  If you require a more complicated menu bar, you will have to create a custom template.',
-                    basename(SITEMAP_FILE), PACKAGE_NAME
-                )
-            );
-            $tpl->set("PAGE_TITLE", _("Create site map"));
-        } else {
-            $tpl->set("FILE_PATH", $file);
-            $tpl->set("FILE_SIZE", file_exists($file)?filesize($file):0);
-            $tpl->set("FILE_URL", $this->resolver->localpathToUri($file, $this->blog));
-        }
-        $tpl->set("FILE", $file);
-
-        if (! defined("BLOG_ROOT")) {
-            $this->blog = false;
-        }
-
-        $this->getPage()->raiseEvent('FileEditorReady');
-
-        $this->getPage()->title = _("Edit file");
-        $this->getPage()->addStylesheet("form.css");
-        $this->getPage()->display($tpl->process(), $this->blog);
+        $page = new EditFilePage(
+            $this->user,
+            $this->blog,
+            $this->resolver,
+            $this->fs,
+            $this->globals,
+            $this->logger
+        );
+        $page->defaultAction();
     }
 
     public function editlogin() {
-        $edit_user = NewUser();
-
-        $redir_url = $this->blog->isBlog() ? $this->blog->uri('blog') : INSTALL_ROOT_URL;
-        $this->verifyUserIsLoggedIn($redir_url);
-
-        if ($edit_user->isAdministrator() && isset($_GET['user'])) {
-            $usr = NewUser($_GET['user']);
-            if (! $usr->exists()) {
-                $usr = NewUser();
-            }
-        } else {
-            $usr = NewUser();
-        }
-        $this->getPage()->setDisplayObject($usr);
-
-        # Allow us to use this to create the admin login.
-        if ($this->blog->isBlog()) {
-            $page_name = _("Change User Information");
-            $form_title = spf_("New Login for %s", $this->blog->name);
-            $redir_page = $this->blog->uri('blog');
-        } else {
-            $page_name = _("Change Administrator Login");
-            $form_title = _("System Aministration Login");
-            $redir_page = INSTALL_ROOT_URL;
-        }
-
-        $form_title = spf_("Modify User - %s", $usr->username());
-        $user_name = "user";
-        $reset="reset";  # Set to 1 to reset the password.
-
-        $tpl = $this->createTemplate("login_create_tpl.php");
-        $tpl->set("FORM_TITLE", $form_title);
-        $tpl->set("FORM_ACTION", current_file());
-        $tpl->set("FULLNAME_VALUE", htmlentities($usr->name()));
-        $tpl->set("EMAIL_VALUE", htmlentities($usr->email()));
-        $tpl->set("HOMEPAGE_VALUE", htmlentities($usr->homepage()));
-        $tpl->set("PROFILEPAGE_VALUE", htmlentities($usr->profileUrl()));
-
-        $tpl->set("UPLOAD_LINK", $this->blog->uri("upload", ['profile' => $usr->username()]));
-        $edit_link_data = ["file"=>"profile.htm", 'profile'=>$usr->username()];
-        $tpl->set("PROFILE_EDIT_LINK", $this->blog->uri("editfile", $edit_link_data));
-        $tpl->set("PROFILE_EDIT_DESC", _("Edit extra profile data"));
-        $tpl->set("UPLOAD_DESC", _("Upload file to profile"));
-
-        # Populate the form with custom profile fields.
-        $priv_path = Path::mk(USER_DATA_PATH, $usr->username(), CUSTOM_PROFILE);
-        $cust_path = Path::mk(USER_DATA_PATH, CUSTOM_PROFILE);
-        $cust_ini = NewINIParser($priv_path);
-        $cust_ini->merge(NewINIParser($cust_path));
-
-        $section = $cust_ini->getSection(CUSTOM_PROFILE_SECTION);
-        $tpl->set("CUSTOM_FIELDS", $section);
-        $tpl->set("CUSTOM_VALUES", $usr->custom);
-
-        if (has_post()) {
-
-            $pwd_change = false;
-            if ( trim(POST('passwd')) &&
-                 trim(POST('passwd')) == trim(POST('confirm'))) {
-                $pwd_change = true;
-                $usr->password(trim(POST('passwd')));
-            } elseif ( trim(POST('passwd')) &&
-                       trim(POST('passwd')) == trim(POST('confirm'))) {
-                $tpl->set("FORM_MESSAGE", _("The passwords you entered do not match."));
-            }
-
-            $usr->name(trim(POST('fullname')));
-            $usr->email(trim(POST('email')));
-            $usr->homepage(trim(POST('homepage')));
-            $usr->profileUrl(trim(POST('profile_url')));
-
-            foreach ($section as $key=>$val) {
-                $usr->custom[$key] = trim(POST($key));
-            }
-
-            $usr->save();
-
-            if ($pwd_change) {
-                $this->attemptLogin($usr, POST('passwd'));
-            }
-
-            $this->getPage()->redirect($redir_page);
-
-        }
-
-        $body = $tpl->process();
-        if (! defined("BLOG_ROOT")) {
-            $this->blog = false;
-        }
-        $this->getPage()->addStylesheet("form.css");
-        $this->getPage()->title = $page_name;
-        $this->getPage()->display($body, $this->blog);
+        $page = new EditLoginPage(
+            $this->user,
+            $this->blog,
+            $this->fs,
+            $this->globals,
+            $this->logger
+        );
+        $page->defaultAction();
     }
 
     public function forgotPassword() {
