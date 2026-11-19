@@ -28,3 +28,8 @@ tags.temp
 .phpunit.result.cache
  
 .claude
+
+# vibediff review workflow state files
+.vibediff.pid
+review-comments.txt
+vibediff.log
