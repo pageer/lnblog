@@ -27,11 +27,11 @@ class HttpClient
 
             $hnd = curl_init();
             curl_setopt($hnd, CURLOPT_URL, $url);
-            curl_setopt($hnd, CURLOPT_FOLLOWLOCATION, 1);
-            curl_setopt($hnd, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($hnd, CURLOPT_HEADER, 1);
+            curl_setopt($hnd, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt($hnd, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($hnd, CURLOPT_HEADER, true);
             if ($headers) {
-                curl_setopt($hnd, CURLOPT_NOBODY, 1);
+                curl_setopt($hnd, CURLOPT_NOBODY, true);
             }
             $response = curl_exec($hnd);
 
@@ -87,10 +87,10 @@ class HttpClient
             # Initialize CURL and POST to the target URL.
             $hnd = curl_init();
             curl_setopt($hnd, CURLOPT_URL, $url);
-            curl_setopt($hnd, CURLOPT_POST, 1);
-            curl_setopt($hnd, CURLOPT_FOLLOWLOCATION, 1);
-            curl_setopt($hnd, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($hnd, CURLOPT_HEADER, 1);
+            curl_setopt($hnd, CURLOPT_POST, true);
+            curl_setopt($hnd, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt($hnd, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($hnd, CURLOPT_HEADER, true);
             curl_setopt($hnd, CURLOPT_POSTFIELDS, $data);
             $response = curl_exec($hnd);
 

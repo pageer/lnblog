@@ -29,7 +29,9 @@ if (extension_loaded("gettext")) {
             INSTALL_ROOT.PATH_DELIM.
             LOCALEDIR.PATH_DELIM.LANGUAGE.".php"
         )) {
-            include_once(LOCALEDIR."/".LANGUAGE.".php");
+            include_once(
+                INSTALL_ROOT.PATH_DELIM.LOCALEDIR.PATH_DELIM.LANGUAGE.".php"
+            );
         }
         if (isset($strings[$str])) {
             return $strings[$str];

@@ -120,10 +120,9 @@ class WordPressImporterTest extends \PHPUnit\Framework\TestCase
 
         $urlpath = new UrlPath('/tmp/foo', 'http://foobar.com/');
         try {
-            $blog = $importer->importAsNewBlog('testblog', $urlpath, $source);
-            $this->assertTrue(false, 'Expected exception');
+            $importer->importAsNewBlog('testblog', $urlpath, $source);
+            $this->fail('Expected exception');
         } catch (SaveFailure $e) {
-            $this->assertTrue(true);
         }
 
         $import_report = $importer->getImportReport();

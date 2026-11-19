@@ -22,8 +22,8 @@ class FileImportSourceTest extends \PHPUnit\Framework\TestCase
         $importer->setText('FAIL');
 
         try {
-            $xml = $importer->getAsXml();
-            $this->assertTrue(false, 'Expected an exception');
+            $importer->getAsXml();
+            $this->fail('Expected an exception');
         } catch (InvalidImport $e) {
             $this->assertNotEmpty($e->getErrors());
         }

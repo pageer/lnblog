@@ -1046,13 +1046,8 @@ class Blog extends LnBlogObject implements AttachmentContainer
         }
     }
 
-    private function backupOldFileData($entry_path) {
-        // Nothing to do for now.  May need in the future.
-    }
-
     private function writeEntryFileIfNeeded($entry_path) {
         if ($entry = $this->shouldWriteEntryDataFile($entry_path)) {
-            $this->backupOldFileData($entry);
             if (!$entry->uid) {
                 $entry->uid = $this->owner;
             }

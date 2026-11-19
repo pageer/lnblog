@@ -1743,7 +1743,6 @@ class WebPages extends BasePages
 
             $tag_list = explode(",", $tags);
 
-            if (! is_array($tag_list)) $tag_list = array();
             foreach ($tag_list as $key=>$val) {
                 $tag_list[$key] = trim($val);
             }

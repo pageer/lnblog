@@ -71,6 +71,9 @@ class IPBan extends Plugin
 
     # Write the ban list to disk.
 
+    /**
+     * @param string[] $add_list
+     */
     function updateList($add_list, $do_global=false) {
         $fs = NewFS();
         $blog = NewBlog();
@@ -82,8 +85,8 @@ class IPBan extends Plugin
         } else {
             return false;
         }
-        if (file_exists($file)) $list = file($file);
-        else $list = array();
+        if (file_exists($file)) $list = file($file) ?: [];
+        else $list = [];
         $list = array_merge($list, $add_list);
         $list = array_unique($list);
         sort($list);

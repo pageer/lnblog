@@ -5,13 +5,11 @@ namespace LnBlog\Tests\Storage;
 use Generator;
 use LnBlog\Storage\IdResolver;
 use LnBlog\Tests\LnBlogBaseTestCase;
-use Prophecy\Prophecy\ObjectProphecy;
 use SystemConfig;
 use UrlPath;
 
 class IdResolverTest extends LnBlogBaseTestCase
 {
-    private ObjectProphecy $sysConfig;
     private array $blogList;
 
     public function baseTestProvider(): Generator {
@@ -60,15 +58,15 @@ class IdResolverTest extends LnBlogBaseTestCase
 
     protected function setUp(): void {
         parent::setUp();
-        $this->sysConfig = $this->prophet->prophesize(SystemConfig::class);
 
         $this->blogList = [
             'testblog' => new UrlPath('/path/to/testblog', 'http://testblog.com/'),
         ];
-        $this->sysConfig->blogRegistry()->willReturn($this->blogList);
     }
 
     private function createResolver(): IdResolver {
-        return new IdResolver($this->sysConfig->reveal());
+        $sysConfig = $this->prophet->prophesize(SystemConfig::class);
+        $sysConfig->blogRegistry()->willReturn($this->blogList);
+        return new IdResolver($sysConfig->reveal());
     }
 }

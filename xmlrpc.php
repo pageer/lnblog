@@ -267,7 +267,7 @@ function blogger_newPost($params) {
 
     # Test for initial lines to set the subject and/or tags.
     $data = explode("\n", $content->scalarval());
-    if (isset($data[0]) && preg_match("/^Subject:.+/i", trim($data[0]))) {
+    if (preg_match("/^Subject:.+/i", trim($data[0]))) {
         $ent->subject = trim(preg_replace("/^Subject:(.+)/i", "$1", trim($data[0])));
         $data[0] = '';
     }
@@ -340,7 +340,7 @@ function blogger_editPost($params) {
     # Test for initial lines to set the subject and/or tags.
     $data = explode("\n", $data);
 
-    if (isset($data[0]) && preg_match("/^Subject:.+/i", trim($data[0]))) {
+    if (preg_match("/^Subject:.+/i", trim($data[0]))) {
         $ent->subject = trim(preg_replace("/^Subject:(.+)/i", "$1", trim($data[0])));
         $data[0] = '';
     }

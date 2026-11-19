@@ -221,7 +221,7 @@ class EventRegister
             foreach ($this->event_list[$rcls][$ename][$classname]['static'] as $hnd) {
                 $methods = get_class_methods($classname);
                 $ret = array_search(strtolower($hnd), $methods);
-                if ($ret !== false && $ret !== null) {
+                if ($ret !== false) {
                     $callback_result = call_user_func(array($classname, $hnd), $param, $data);
                 } else {
                     $callback_result = call_user_func($hnd, $param, $data);

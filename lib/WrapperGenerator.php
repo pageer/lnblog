@@ -144,7 +144,7 @@ class WrapperGenerator
             $this->fs->delete($current."config.php");
         }
     
-        if (isset($removelist) && is_array($removelist)) {
+        if (isset($removelist)) {
             foreach ($removelist as $file) {
                 $f = $current.$file.".php";
                 if ($this->fs->file_exists($f)) {
