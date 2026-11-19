@@ -54,9 +54,15 @@ if (extension_loaded("gettext")) {
 # strftime, which respects the locale and hence causes problems, or date,
 # which is stupid and ignores the locale.
 #
-# Note that this function now attempts to auto-convert from strftime() format
-# codes to date() format codes.  Since all strftime() codes start with a %,
-# old code that uses date() codes will be unaffacted.
+# Since all strftime() codes start with a %, old code that uses date()
+# codes will be unaffected by the format conversion done here.
+#
+# As of PHP 8.1, strftime() itself is deprecated.  When the USE_STRFTIME
+# option is on and the intl extension is loaded, dates are formatted with
+# IntlDateFormatter, which provides the same locale-aware output without
+# the deprecation.  Otherwise, the format codes are converted and the
+# dates are formatted with date(), which loses locale-aware month and day
+# names.
 #
 # Parameters:
 # fmt - The format string for the date
@@ -68,25 +74,142 @@ if (extension_loaded("gettext")) {
 function fmtdate($fmt, $ts=false) {
     $globals = new GlobalFunctions();
     if (!$ts) $ts = $globals->time();
-    if ($globals->constant('USE_STRFTIME')) {
-        $ret = strftime($fmt, $ts);
-        if ($globals->defined("SYSTEM_CHARSET") && extension_loaded("iconv")) {
-            $conv = iconv(
-                $globals->constant('SYSTEM_CHARSET'),
-                $globals->constant('DEFAULT_CHARSET'),
-                $ret
-            );
-            if ($conv) $ret = $conv;
+
+    $locale = $globals->defined('LANGUAGE') ? $globals->constant('LANGUAGE') : '';
+    if ($globals->constant('USE_STRFTIME') && $locale &&
+        class_exists('IntlDateFormatter')
+    ) {
+        $ret = fmtdate_intl($fmt, $ts, $locale);
+        if ($ret !== false) {
+            return $ret;
         }
-        return $ret;
-    } else {
-        $strftime_codes = array('%a','%A','%b','%B','%c','%C','%d','%D','%e','%g',
-                                '%Y');
-        $date_codes = array('D', 'l', 'M', 'F', 'c', 'Y', 'd', 'm/d/y', 'j', 'Y',
-                            'Y');
-        $fmt = str_replace($strftime_codes, $date_codes, $fmt);
-        return date($fmt, $ts);
+        # The format could not be converted, so fall through to date().
     }
+
+    # Codes with no direct date() equivalent get expanded to literal values
+    # first, since they depend on the timestamp.
+    $fmt = fmtdate_expand_codes($fmt, $ts);
+
+    $strftime_codes = array('%a','%A','%b','%h','%B','%c','%d','%D',
+                            '%F','%H','%I','%m','%M','%n','%p',
+                            '%r','%R','%S','%t','%T','%x','%X','%y',
+                            '%Y','%z','%Z');
+    $date_codes = array('D', 'l', 'M', 'M', 'F', 'D M j H:i:s Y', 'd', 'm/d/y',
+                        'Y-m-d', 'H', 'h', 'm', 'i', "\n", 'A',
+                        'h:i:s A', 'H:i', 's', "\t", 'H:i:s', 'm/d/y',
+                        'H:i:s', 'y', 'Y', 'O', 'T');
+    $fmt = str_replace($strftime_codes, $date_codes, $fmt);
+    return date($fmt, $ts);
+}
+
+# Function: fmtdate_intl
+# Format a date with IntlDateFormatter, converting strftime-style format
+# codes to ICU patterns.  Returns false if the format cannot be handled,
+# so the caller can fall back to date()-based formatting.
+
+function fmtdate_intl($fmt, $ts, $locale) {
+    $pattern = fmtdate_icu_pattern($fmt, $ts);
+    if ($pattern === false) {
+        return false;
+    }
+    try {
+        $formatter = new IntlDateFormatter(
+            $locale,
+            IntlDateFormatter::FULL,
+            IntlDateFormatter::FULL,
+            date_default_timezone_get(),
+            IntlDateFormatter::GREGORIAN,
+            $pattern
+        );
+        return $formatter->format($ts);
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
+# Function: fmtdate_icu_pattern
+# Convert a strftime-style format string into an ICU date pattern.
+# Codes without an ICU equivalent are expanded to literal values; literal
+# text is quoted as ICU requires.
+
+function fmtdate_icu_pattern($fmt, $ts) {
+    # Codes with no direct ICU equivalent get expanded to literal values
+    # first, since they depend on the timestamp.
+    $fmt = fmtdate_expand_codes($fmt, $ts);
+
+    $icu_codes = array(
+        '%a' => 'EEE',   '%A' => 'EEEE', '%b' => 'MMM', '%h' => 'MMM',
+        '%B' => 'MMMM',  '%c' => 'EEE MMM d HH:mm:ss yyyy',
+        '%d' => 'dd',    '%D' => 'MM/dd/yy', '%F' => 'y-MM-dd',
+        '%H' => 'HH',    '%I' => 'hh',
+        '%m' => 'MM',    '%M' => 'mm',   '%n' => "\n",  '%p' => 'a',
+        '%r' => 'hh:mm:ss a', '%R' => 'HH:mm', '%S' => 'ss',
+        '%t' => "\t",    '%T' => 'HH:mm:ss', '%x' => 'MM/dd/yy',
+        '%X' => 'HH:mm:ss', '%y' => 'yy', '%Y' => 'yyyy',
+        '%z' => 'ZZZ',   '%Z' => 'zzzz',
+    );
+
+    $pattern = '';
+    $literal = '';
+    $length = strlen($fmt);
+    for ($i = 0; $i < $length; $i++) {
+        if ($fmt[$i] == '%' && $i + 1 < $length) {
+            $code = $fmt[$i].$fmt[$i + 1];
+            $i++;
+            if ($code == '%%') {
+                $literal .= '%';
+                continue;
+            }
+            if (isset($icu_codes[$code])) {
+                $pattern .= fmtdate_quote($literal).$icu_codes[$code];
+                $literal = '';
+                continue;
+            }
+            # Unknown code - treat it as literal text.
+        }
+        $literal .= $fmt[$i];
+    }
+    return $pattern !== '' || $literal !== '' ?
+        $pattern.fmtdate_quote($literal) : false;
+}
+
+# Function: fmtdate_quote
+# Quote a literal string for use in an ICU date pattern.
+
+function fmtdate_quote($literal) {
+    if ($literal === '') {
+        return '';
+    }
+    return "'".str_replace("'", "''", $literal)."'";
+}
+
+# Function: fmtdate_expand_codes
+# Expand strftime codes that have no format-string equivalent into literal
+# values based on the timestamp.  Used by both the IntlDateFormatter and
+# date() formatting paths.
+
+function fmtdate_expand_codes($fmt, $ts) {
+    $year = (int)date('Y', $ts);
+    $wday = (int)date('w', $ts);          # 0 = Sunday
+    $wday_mon = ($wday + 6) % 7;          # 0 = Monday
+    $yday = (int)date('z', $ts);          # 0-based day of year
+
+    return str_replace(
+        array('%C', '%e', '%G', '%g', '%j', '%U', '%u', '%V', '%w', '%W'),
+        array(
+            sprintf('%02d', intdiv($year, 100)),
+            sprintf('%2d', (int)date('j', $ts)),
+            (string)(int)date('o', $ts),
+            sprintf('%02d', (int)date('o', $ts) % 100),
+            sprintf('%03d', $yday + 1),
+            sprintf('%02d', intdiv($yday + 7 - $wday, 7)),
+            (string)((int)date('N', $ts)),
+            date('W', $ts),
+            (string)$wday,
+            sprintf('%02d', intdiv($yday + 7 - $wday_mon, 7)),
+        ),
+        $fmt
+    );
 }
 
 # Function: p_

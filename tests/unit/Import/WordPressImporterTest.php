@@ -1,5 +1,6 @@
 <?php
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use LnBlog\Import\FileImportSource;
 use LnBlog\Import\WordPressImporter;
 use LnBlog\Storage\BlogRepository;
@@ -21,21 +22,17 @@ class WordPressImporterTest extends \PHPUnit\Framework\TestCase
     private $user;
     private $testfile;
 
-    /**
-     * @dataProvider optionsProvider
-     */
+    #[DataProvider('optionsProvider')]
     public function testImport_WhenSuccessful_AddsImportDataToBlog(array $options, string $existing_user) {
         $this->runImportTest($options, $existing_user, false);
     }
 
-    /**
-     * @dataProvider optionsProvider
-     */
+    #[DataProvider('optionsProvider')]
     public function testImportAsNewBlog_CreatesBlogWithData(array $options, string $existing_user) {
         $this->runImportTest($options, $existing_user, true);
     }
 
-    public function optionsProvider(): array {
+    public static function optionsProvider(): array {
         return [
             'No user import, user does not exist' => [
                 [],

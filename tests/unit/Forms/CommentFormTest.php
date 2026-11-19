@@ -2,6 +2,7 @@
 
 namespace LnBlog\Tests\Forms;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use BasePages;
 use BlogComment;
 use BlogEntry;
@@ -38,9 +39,7 @@ class CommentFormTest extends LnBlogBaseTestCase
         $this->assertTrue($result);
     }
 
-    /**
-     * @dataProvider fieldValidationFailureProvider
-     */
+    #[DataProvider('fieldValidationFailureProvider')]
     public function testValidate_WhenFieldHasInvalidValue_ReturnsFalse(array $changedData) {
         $data = $changedData + $this->getValidData();
 
@@ -50,7 +49,7 @@ class CommentFormTest extends LnBlogBaseTestCase
         $this->assertFalse($result);
     }
 
-    public function fieldValidationFailureProvider(): array {
+    public static function fieldValidationFailureProvider(): array {
         return [
             'subject contains newlines' => [
                 ['subject' => "This is a test\nand you fail"],

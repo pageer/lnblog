@@ -1,5 +1,6 @@
 <?php
 
+use PHPUnit\Framework\Attributes\Depends;
 use LnBlog\Tasks\TaskManager;
 
 class PublisherIntTest extends \PHPUnit\Framework\TestCase
@@ -20,9 +21,7 @@ class PublisherIntTest extends \PHPUnit\Framework\TestCase
         return $publisher;
     }
 
-    /**
-     * @depends testCreatePublisher
-     */
+    #[Depends('testCreatePublisher')]
     public function testCreateDraftEntry($publisher) {
         $entry = new BlogEntry();
         $entry->subject = "Some Stuff";
@@ -40,9 +39,7 @@ class PublisherIntTest extends \PHPUnit\Framework\TestCase
         return $publisher;
     }
 
-    /**
-     * @depends testCreateDraftEntry
-     */
+    #[Depends('testCreateDraftEntry')]
     public function testPublishEntryFromDraft($publisher) {
         $draft_path = self::TESTPATH . "/drafts/02_0345";
         $entry = new BlogEntry($draft_path);
@@ -61,9 +58,7 @@ class PublisherIntTest extends \PHPUnit\Framework\TestCase
         return array($publisher, $entry);
     }
 
-    /**
-     * @depends testPublishEntryFromDraft
-     */
+    #[Depends('testPublishEntryFromDraft')]
     public function testUnpublishEntry($data) {
         list($publisher, $entry) = $data;
         $entry_path = self::TESTPATH . "/entries/2017/03/04_1234";
@@ -82,9 +77,7 @@ class PublisherIntTest extends \PHPUnit\Framework\TestCase
         return array($publisher, $draft);
     }
 
-    /**
-     * @depends testUnpublishEntry
-     */
+    #[Depends('testUnpublishEntry')]
     public function testDeleteDraftEntry($data) {
         list($publisher, $entry) = $data;
         $draft_path = self::TESTPATH . "/drafts/04_123400";
@@ -95,9 +88,7 @@ class PublisherIntTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(is_dir($draft_path));
     }
 
-    /**
-     * @depends testCreatePublisher
-     */
+    #[Depends('testCreatePublisher')]
     public function testPublishEntryFromNothing_CreatesFileAndPermalink($publisher) {
         $entry = new BlogEntry();
         $entry->subject = "Some Published Stuff";
@@ -116,9 +107,7 @@ class PublisherIntTest extends \PHPUnit\Framework\TestCase
         return array($publisher, $published_entry);
     }
 
-    /**
-     * @depends testPublishEntryFromNothing_CreatesFileAndPermalink
-     */
+    #[Depends('testPublishEntryFromNothing_CreatesFileAndPermalink')]
     public function testUpdatePublishedEntry_UpdatesPermalinkAndContentAndMaintainsOldPermalink($data) {
         list($publisher, $entry) = $data;
         $entry_path = self::TESTPATH . "/entries/2017/02/03_0345";
@@ -136,9 +125,7 @@ class PublisherIntTest extends \PHPUnit\Framework\TestCase
         return array($publisher, $updated_entry);
     }
 
-    /**
-     * @depends testUpdatePublishedEntry_UpdatesPermalinkAndContentAndMaintainsOldPermalink
-     */
+    #[Depends('testUpdatePublishedEntry_UpdatesPermalinkAndContentAndMaintainsOldPermalink')]
     public function testDeletePublishedEntry_DeletesEntryAndAllPermalinks($data) {
         list($publisher, $entry) = $data;
 
@@ -149,9 +136,7 @@ class PublisherIntTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(file_exists(self::TESTPATH."/entries/2017/02/03_0345/entry.xml"));
     }
 
-    /**
-     * @depends testCreatePublisher
-     */
+    #[Depends('testCreatePublisher')]
     public function testPublishArticle_CreatesFile($publisher) {
         $entry = new BlogEntry();
         $entry->subject = "Some Published Stuff";
@@ -169,9 +154,7 @@ class PublisherIntTest extends \PHPUnit\Framework\TestCase
         return array($publisher, $published_entry);
     }
 
-    /**
-     * @depends testPublishArticle_CreatesFile
-     */
+    #[Depends('testPublishArticle_CreatesFile')]
     public function testUnpublishArticle_MovesToDraft($data) {
         list($publisher, $entry) = $data;
         $article_path = self::TESTPATH . "/content/some_published_stuff";
@@ -186,9 +169,7 @@ class PublisherIntTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals("This is some published stuff.", $draft->data);
     }
 
-    /**
-     * @depends testCreatePublisher
-     */
+    #[Depends('testCreatePublisher')]
     public function testPublishArticleFromDraft_UsesArticlePath($publisher) {
         $entry = new BlogEntry();
         $entry->subject = "Some Published Stuff";
@@ -207,9 +188,7 @@ class PublisherIntTest extends \PHPUnit\Framework\TestCase
         return array($publisher, $entry);
     }
 
-    /**
-     * @depends testPublishArticleFromDraft_UsesArticlePath
-     */
+    #[Depends('testPublishArticleFromDraft_UsesArticlePath')]
     public function testDeleteArticle_RemovesFiles($data) {
         list($publisher, $entry) = $data;
 

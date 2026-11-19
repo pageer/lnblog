@@ -2,9 +2,10 @@
 # Class: LnBlogXMLConfig
 # A dummy class for use with the <SimpleXMLWriter> class.  This is used simply
 # to create blank objects that XML elements can be inserted into.
+#[\AllowDynamicProperties]
 class LnBlogXMLConfig extends LnBlogObject
 {
- 
+
 }
 
 # Class: XMLINI

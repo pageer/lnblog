@@ -4,6 +4,7 @@ namespace LnBlog\Tests\Plugins;
 
 require_once __DIR__ . '/../../../plugins/trackback_validator.php';
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use BlogEntry;
 use HttpClient;
 use Generator;
@@ -13,9 +14,7 @@ use LnBlog\Tests\LnBlogBaseTestCase;
 
 class TrackbackValidatorTest extends LnBlogBaseTestCase
 {
-    /**
-     * @dataProvider schemeProvider
-     */
+    #[DataProvider('schemeProvider')]
     public function testCheckForLink_PermalinkInPage_Success(string $scheme): void {
         $permalink = 'https://foo.com/entry1/link';
         $baselink = 'https://foo.com/entry1/';
@@ -31,7 +30,7 @@ class TrackbackValidatorTest extends LnBlogBaseTestCase
         $this->assertNotEmpty($tb->url);
     }
 
-    public function schemeProvider(): Generator {
+    public static function schemeProvider(): Generator {
         yield 'HTTP' => ['http'];
         yield 'HTTPS' => ['https'];
     }

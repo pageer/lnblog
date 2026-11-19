@@ -2,6 +2,7 @@
 
 namespace LnBlog\Tests\Export;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Blog;
 use BlogComment;
 use BlogEntry;
@@ -82,9 +83,7 @@ class WordPressExporterTest extends LnBlogBaseTestCase
         );
     }
 
-    /**
-     * @dataProvider getCommentVariations
-     */
+    #[DataProvider('getCommentVariations')]
     public function testExport_EntryWithComments_MatchesXml($use_comments, $use_pingbacks) {
         $this->globals->constant('LANGUAGE')->willReturn('en_US');
         $test_entry_data = $this->getTestEntry($use_comments, $use_pingbacks);
@@ -107,7 +106,7 @@ class WordPressExporterTest extends LnBlogBaseTestCase
         );
     }
 
-    public function getCommentVariations(): array {
+    public static function getCommentVariations(): array {
         return [
             'nothing' => [false, false],
             'just comments' => [true, false],

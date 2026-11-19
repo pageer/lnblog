@@ -2,6 +2,7 @@
 
 namespace LnBlog\Tests\Storage;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Generator;
 use LnBlog\Storage\IdResolver;
 use LnBlog\Tests\LnBlogBaseTestCase;
@@ -12,7 +13,7 @@ class IdResolverTest extends LnBlogBaseTestCase
 {
     private array $blogList;
 
-    public function baseTestProvider(): Generator {
+    public static function baseTestProvider(): Generator {
         yield 'blog' => [
             'testblog',
             '/path/to/testblog'
@@ -35,9 +36,7 @@ class IdResolverTest extends LnBlogBaseTestCase
         ];
     }
 
-    /**
-     * @dataProvider baseTestProvider
-     */
+    #[DataProvider('baseTestProvider')]
     public function testSimpleItemResolution($globalId, $expectedPath): void {
         $resolver = $this->createResolver();
         $result = $resolver->idToPath($globalId);
@@ -46,9 +45,7 @@ class IdResolverTest extends LnBlogBaseTestCase
         $this->assertEquals('/path/to/testblog', $result->blogPath);
     }
 
-    /**
-     * @dataProvider baseTestProvider
-     */
+    #[DataProvider('baseTestProvider')]
     public function testPathToIdRoundTrip($globalId, $path): void {
         $resolver = $this->createResolver();
         $result = $resolver->pathToId($path);

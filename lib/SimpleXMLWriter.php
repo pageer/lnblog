@@ -80,7 +80,7 @@ class SimpleXMLWriter
                 } elseif (in_array($field, $this->cdata_list)) {
                     $ret .="<$field><![CDATA[$value]]></$field>\n";
                 } else {
-                    $ret .= "<$field>".htmlspecialchars($value)."</$field>\n";
+                    $ret .= "<$field>".htmlspecialchars($value ?? '')."</$field>\n";
                 }
             }
         }

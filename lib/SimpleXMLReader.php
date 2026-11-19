@@ -65,12 +65,10 @@ class SimpleXMLReader
 
         $parser = xml_parser_create();
 
-        xml_set_object($parser, $this);
         xml_set_element_handler($parser, $this->do_open(), $this->do_close());
         xml_set_character_data_handler($parser, $this->do_cdata());
 
         $ret = xml_parse($parser, $data);
-        xml_parser_free($parser);
     }
 
     public function make_array($arr) {

@@ -214,7 +214,7 @@ class PublishArticleTest extends PublisherTestBase
         $entry->data = 'This is a <a href="http://www.example.com/test">link</a> thing.';
         $entry->has_html = MARKUP_HTML;
         $entry->file = './drafts/02_1234/entry.xml';
-        $entry->send_pingbacks = true;
+        $entry->send_pingback = true;
         $this->http_client->fetchUrl('http://www.example.com/test', true)->willReturn("X-Pingback: http://www.example.com/ping\r\nContent-Type: text/html");
         $this->http_client->fetchUrl('http://www.example.com/test')->willReturn("<link rel=\"pingback\" href=\"http://www.example.com/ping\">");
 

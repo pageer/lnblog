@@ -187,11 +187,16 @@ class Publisher
 
         $this->raiseEvent($entry, 'BlogEntry', 'OnDelete');
 
+        # Remove the entry's directory wrappers before renaming it.  After
+        # the rename, the entry no longer exists at its old path, so
+        # localpath() is invalid and removeForEntry() would compute paths
+        # relative to the current working directory.
+        $this->wrappers->removeForEntry($entry);
+
         $path = date('d_His', $entry->post_ts);
         $draft_path = Path::mk($this->blog->home_path, BLOG_DRAFT_PATH, $path);
         $this->renameEntry($entry->localpath(), $draft_path);
 
-        $this->wrappers->removeForEntry($entry);
         $this->deletePermalinkFile($entry);
 
         $this->raiseEvent($entry, 'BlogEntry', 'DeleteComplete');

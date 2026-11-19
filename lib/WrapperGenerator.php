@@ -162,9 +162,15 @@ class WrapperGenerator
     # Parameters:
     # entry - The BlogEntry for which to remove the wrappers.
     public function removeForEntry(BlogEntry $entry) {
+        $localpath = $entry->localpath();
+        if (! $localpath) {
+            // The entry does not exist on disk.  Bail out rather than
+            // resolving wrapper paths relative to the current directory.
+            return;
+        }
         $removeList = array("index", "edit", "delete", "trackback", "uploadfile");
         foreach ($removeList as $item) {
-            $path = Path::mk($entry->localpath(), "$item.php");
+            $path = Path::mk($localpath, "$item.php");
             if ($this->fs->file_exists($path)) {
                 $this->fs->delete($path);
             }

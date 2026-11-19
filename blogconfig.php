@@ -193,11 +193,15 @@ if (ini_get("default_mimetype")) {
 }
 
 # Constant: USE_STRFTIME
-# Determine whether to use strftime() or date() for user-readable dates.
+# Control locale-aware date formatting in <fmtdate>.
 #
-# *Defaults* to true.  When set to false, things like entry dates will be
-# formatted using the function date() instead of strftime().  If you
-# change this, you will also need to change the <ENTRY_DATE_FORMAT>.
+# *Defaults* to true.  Since strftime() is deprecated as of PHP 8.1, when
+# this is true <fmtdate> formats dates with the intl extension's
+# IntlDateFormatter, which provides the same locale-aware output without
+# the deprecation.  If USE_STRFTIME is set to false, or the intl extension
+# is not loaded, <fmtdate> falls back to formatting dates with date(),
+# after converting strftime-style format codes.  The date() fallback
+# ignores the locale, so dates are not localized in that case.
 @define("USE_STRFTIME", true);
 
 # Constant: SYSTEM_CHARSET

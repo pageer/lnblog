@@ -4,6 +4,7 @@ namespace LnBlog\Tests\Plugins;
 
 require_once __DIR__ . '/../../../plugins/bot_block.php';
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use BlogComment;
 use BotBlock;
 use Generator;
@@ -31,9 +32,7 @@ class CheckableBotBlockPlugin extends BotBlock
 
 class BotBlockTest extends LnBlogBaseTestCase
 {
-    /**
-     * @dataProvider getLinkMarkup
-     */
+    #[DataProvider('getLinkMarkup')]
     public function testCheckMarkup(string $text, string $expected_text): void {
         $comment = new BlogComment();
         $comment->data = $text;
@@ -44,7 +43,7 @@ class BotBlockTest extends LnBlogBaseTestCase
         $this->assertEquals($expected_text, $comment->data);
     }
 
-    public function getLinkMarkup(): Generator {
+    public static function getLinkMarkup(): Generator {
         yield ['This has no link', 'This has no link'];
         yield ['This has a <a href="http://foo.com">link</a>', ''];
         yield ['This has a <A HREF="HTTP://FOO.COM">LINK</A>', ''];
@@ -192,8 +191,13 @@ class BotBlockTest extends LnBlogBaseTestCase
         $output = ob_get_clean();
 
         $this->assertStringContainsString($properties['tok'], $output);
-        $this->assertStringNotContainsString($properties['rand1'], $output);
-        $this->assertStringNotContainsString($properties['rand2'], $output);
+        // The math operands are only rendered in the accessible branch, which
+        // is replaced here by a plain JavaScript notice.  Checking for the
+        // label and text input is deterministic, while the raw operand values
+        // are not: a random operand like "3" can occur inside the random hex
+        // token, making substring checks flaky.
+        $this->assertStringNotContainsString('<label', $output);
+        $this->assertStringNotContainsString('type="text"', $output);
         $this->assertStringNotContainsString($properties['operator_text'], $output);
     }
 

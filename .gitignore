@@ -23,6 +23,7 @@ design
 
 tags
 tags.temp
+.phpunit.cache
 
 .komodotools
 .phpunit.result.cache

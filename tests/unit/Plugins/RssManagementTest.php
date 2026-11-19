@@ -4,6 +4,7 @@ namespace LnBlog\Tests\Plugins;
 
 require_once __DIR__ . "/../../../plugins/rss_management.php";
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use BasePages;
 use Blog;
 use BlogComment;
@@ -744,9 +745,7 @@ class RssManagementTest extends LnBlogBaseTestCase
         $rss->outputPage($page->reveal(), 'purgeblog');
     }
 
-    /**
-     * @dataProvider actionProvider
-     */
+    #[DataProvider('actionProvider')]
     public function testOutputPage_NotLoggedIn_Error403(string $action): void {
         $blog = $this->prophet->prophesize(Blog::class);
         $entry = $this->prophet->prophesize(BlogEntry::class);
@@ -768,9 +767,7 @@ class RssManagementTest extends LnBlogBaseTestCase
         $rss->outputPage($webpage->reveal(), $action);
     }
 
-    /**
-     * @dataProvider actionProvider
-     */
+    #[DataProvider('actionProvider')]
     public function testOutputPage_NotAuthorized_Error403(string $action): void {
         $blog = $this->prophet->prophesize(Blog::class);
         $entry = $this->prophet->prophesize(BlogEntry::class);
@@ -799,7 +796,7 @@ class RssManagementTest extends LnBlogBaseTestCase
     /**
      * @return array<string[]>
      */
-    public function actionProvider(): array {
+    public static function actionProvider(): array {
         return [
             ['purgeblog'],
             ['regenblog'],
@@ -1024,6 +1021,9 @@ class RssManagementTest extends LnBlogBaseTestCase
     protected function setUp(): void {
         parent::setUp();
         $this->fs = $this->prophet->prophesize(FS::class);
+        // ExportTarget::save() checks that the target directory exists before
+        // writing; tests that stub write_file() expect it to exist already.
+        $this->fs->file_exists(Argument::any())->willReturn(true);
         $this->exporterFactory = $this->prophet->prophesize(ExporterFactory::class);
         $this->urlResolver = $this->prophet->prophesize(UrlResolver::class);
         $this->system = $this->prophet->prophesize(System::class);

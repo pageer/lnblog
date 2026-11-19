@@ -15,7 +15,7 @@
     "require": {
         "php": ">=7.4.0",
         "ext-dom": "*",
-        "erusev/parsedown": "1.7.4",
+        "erusev/parsedown": "^1.8.0",
         "phpxmlrpc/phpxmlrpc": "~4.0",
         "monolog/monolog": "1.*"
     },

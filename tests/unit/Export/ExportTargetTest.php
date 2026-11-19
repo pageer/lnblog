@@ -14,6 +14,12 @@ class ExportTargetTest extends LnBlogBaseTestCase
     public function testSave_Success(): void {
         $file = '/path/to/whatever';
         $this->fs
+             ->file_exists('/path/to')
+             ->willReturn(false);
+        $this->fs
+             ->mkdir_rec('/path/to')
+             ->willReturn(true);
+        $this->fs
              ->write_file($file, 'test123')
              ->willReturn(7)
              ->shouldBeCalled();
@@ -26,6 +32,9 @@ class ExportTargetTest extends LnBlogBaseTestCase
 
     public function testSave_Failure(): void {
         $file = '/path/to/whatever';
+        $this->fs
+             ->file_exists('/path/to')
+             ->willReturn(true);
         $this->fs
              ->write_file($file, 'test123')
              ->willReturn(false)

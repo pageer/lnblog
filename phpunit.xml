@@ -1,25 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Prophecy does not play well with the strict tests... -->
-<phpunit
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
-    bootstrap="tests/bootstrap.php"
-    backupGlobals="true"
-    beStrictAboutCoversAnnotation="true"
-    beStrictAboutOutputDuringTests="true"
-    beStrictAboutTestsThatDoNotTestAnything="false"
-    beStrictAboutTodoAnnotatedTests="true"
-    verbose="true">
-  <coverage>
-    <include>
-        <directory suffix=".php">plugins/</directory>
-      <directory suffix=".php">lib</directory>
-    </include>
-    <exclude>
-      <directory>vendor</directory>
-    </exclude>
-  </coverage>
-<!--
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/13.4/phpunit.xsd" bootstrap="tests/bootstrap.php" backupGlobals="true" beStrictAboutOutputDuringTests="true" beStrictAboutTestsThatDoNotTestAnything="false" cacheDirectory=".phpunit.cache" beStrictAboutCoverageMetadata="true">
+  <!--
   <coverage processUncoveredFiles="true">
     <include>
       <directory suffix=".php">plugins</directory>
@@ -30,4 +12,13 @@
   <testsuite name="All tests">
     <directory suffix="Test.php">tests</directory>
   </testsuite>
+  <source>
+    <include>
+      <directory suffix=".php">plugins/</directory>
+      <directory suffix=".php">lib</directory>
+    </include>
+    <exclude>
+      <directory>vendor</directory>
+    </exclude>
+  </source>
 </phpunit>

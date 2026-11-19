@@ -36,7 +36,11 @@ abstract class TextProcessor
     # Property: no_surround
     # (boolean) Skip the surrounding markup, i.e. don't wrap in <P> tags.
     public $no_surround = false;
-    
+
+    # Property: use_nofollow
+    # (boolean) Apply rel="nofollow" to links in the output.
+    public $use_nofollow = false;
+
     abstract protected function toHTML();
     
     /* Method: get

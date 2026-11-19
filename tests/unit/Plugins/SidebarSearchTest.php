@@ -2,6 +2,7 @@
 
 namespace LnBlog\Tests\Plugins;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use BasePages;
 use Blog;
 use BlogEntry;
@@ -14,9 +15,7 @@ require_once __DIR__ . "/../../../plugins/sidebar_search.php";
 
 class SidebarSearchTest extends LnBlogBaseTestCase
 {
-    /**
-     * @dataProvider getSearchTypes
-     */
+    #[DataProvider('getSearchTypes')]
     public function testSidebarPanel_SearchType_InOutput(string $searchType, string $expectedUrl): void {
         $blog = $this->prophet->prophesize(Blog::class);
         $blog->isBlog()->willReturn(true);
@@ -36,7 +35,7 @@ class SidebarSearchTest extends LnBlogBaseTestCase
         $this->assertStringContainsString($expectedUrl, $output);
     }
 
-    public function getSearchTypes(): Generator {
+    public static function getSearchTypes(): Generator {
         yield 'Native search' => ['native', '?plugin=sidebar_search'];
         yield 'Google search' => ['google', 'https://www.google.com/search'];
         yield 'Bing search' => ['bing', 'https://www.bing.com/search'];

@@ -41,6 +41,12 @@ class ExportTarget
     }
 
     public function save(): void {
+        // Ensure the containing directory exists so the write can succeed
+        // even if it was removed (e.g. manually deleted feeds directory).
+        $dir = dirname($this->getExportFile());
+        if (! $this->fs->file_exists($dir)) {
+            $this->fs->mkdir_rec($dir);
+        }
         $result = $this->fs->write_file($this->getExportFile(), $this->getAsText());
         if (!$result) {
             throw new FileWriteFailed(spf_('Failed to write %s', $this->getExportFile()));

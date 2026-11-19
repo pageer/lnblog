@@ -1,5 +1,6 @@
 <?php
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Prophecy\Argument;
 
 class UrlResolverTest extends \PHPUnit\Framework\TestCase
@@ -11,9 +12,7 @@ class UrlResolverTest extends \PHPUnit\Framework\TestCase
     private $fs;
     private $config;
 
-    /**
-     * @dataProvider localpathToUriProvider
-     */
+    #[DataProvider('localpathToUriProvider')]
     public function testLocalpathToUri_ReturnsExpected($path, $existence_map, $use_blog, $use_entry, $expected_uri) {
         $blog = new Blog();
         $blog->blogid = 'foobar';
@@ -34,7 +33,7 @@ class UrlResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected_uri, $url);
     }
 
-    public function localpathToUriProvider() {
+    public static function localpathToUriProvider() {
         return [
             'relative in entry, returns in entry' => [
                 'buzz.png',
@@ -157,9 +156,7 @@ class UrlResolverTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @dataProvider localpathToUriAbsoluteMissingProvider
-     */
+    #[DataProvider('localpathToUriAbsoluteMissingProvider')]
     public function testLocalpathToUri_MissingAbsolutePath_ReturnsUnmodified($path, $use_blog) {
         $blog = new Blog();
         $blog->blogid = 'foobar';
@@ -177,7 +174,7 @@ class UrlResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($path, $url);
     }
 
-    public function localpathToUriAbsoluteMissingProvider() {
+    public static function localpathToUriAbsoluteMissingProvider() {
         return [
             'in blog' => [
                 '/var/www/foobar/public_html/content/foo/buzz.png',
@@ -194,9 +191,7 @@ class UrlResolverTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @dataProvider absoluteLocalpathProvider
-     */
+    #[DataProvider('absoluteLocalpathProvider')]
     public function testAbsoluteLocalpathToUri_ReturnsExpected($path, $expected_uri) {
         $blog = new Blog();
         $blog->blogid = 'foobar';
@@ -210,7 +205,7 @@ class UrlResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected_uri, $url);
     }
 
-    public function absoluteLocalpathProvider() {
+    public static function absoluteLocalpathProvider() {
         return [
             'in blog' => [
                 '/var/www/foobar/public_html/content/foo/buzz.png',
@@ -301,9 +296,7 @@ class UrlResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($url, $result);
     }
 
-    /**
-     * @dataProvider routeProvider
-     */
+    #[DataProvider('routeProvider')]
     public function testGenerateRoute_ValidParams($route, $entity, $params, $expected_result) {
         $this->setUpSystemUrlRegistry();
         $this->fs->read_file(Argument::any())->willReturn('');
@@ -364,7 +357,7 @@ class UrlResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected_result, $route);
     }
 
-    public function routeProvider() {
+    public static function routeProvider() {
         return [
             # Blog URLs
             'blog permalink' => ['permalink', 'blog', [], 'https://foobar.mysite.com/'],
