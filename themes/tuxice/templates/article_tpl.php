@@ -23,7 +23,7 @@
     <li class="bloguserurl">(<a href="<?php echo $USER_HOMEPAGE; ?>"><?php echo $USER_HOMEPAGE; ?></a>)</li>
 <?php } ?>
 <?php } # End user profile block ?>
-<?php	if ($SHOW_CONTROLS) { ?>
+<?php if ($SHOW_CONTROLS) { ?>
         <li class="blogadmin">
             <a href="<?php echo $PERMALINK; ?>uploadfile.php"><?php p_('Upload File');?></a>
         </li>

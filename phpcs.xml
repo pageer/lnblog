@@ -24,6 +24,12 @@
         <exclude name="Generic.Files.LineLength" />
     </rule>
 
+    <rule ref="PEAR.WhiteSpace.ScopeClosingBrace">
+        <!-- Templates are mostly HTML with small PHP blocks; brace-indent
+             sniffing doesn't work well there. -->
+        <exclude-pattern>*/themes/*_tpl.php</exclude-pattern>
+    </rule>
+
     <rule ref="Generic.Functions.OpeningFunctionBraceKernighanRitchie" />
     <rule ref="Squiz.PHP.NonExecutableCode" />
     <rule ref="Squiz.Classes.SelfMemberReference" />
