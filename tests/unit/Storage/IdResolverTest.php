@@ -48,6 +48,16 @@ class IdResolverTest extends LnBlogBaseTestCase
         $this->assertEquals('/path/to/testblog', $result->blogPath);
     }
 
+    /**
+     * @dataProvider baseTestProvider
+     */
+    public function testPathToIdRoundTrip($globalId, $path): void {
+        $resolver = $this->createResolver();
+        $result = $resolver->pathToId($path);
+
+        $this->assertEquals($globalId, $result);
+    }
+
     protected function setUp(): void {
         parent::setUp();
         $this->sysConfig = $this->prophet->prophesize(SystemConfig::class);
