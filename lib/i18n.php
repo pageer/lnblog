@@ -76,10 +76,11 @@ function fmtdate($fmt, $ts=false) {
     if (!$ts) $ts = $globals->time();
 
     $locale = $globals->defined('LANGUAGE') ? $globals->constant('LANGUAGE') : '';
-    if ($globals->constant('USE_STRFTIME') && $locale &&
+    $icu_locale = $locale ? fmtdate_icu_locale($locale) : false;
+    if ($globals->constant('USE_STRFTIME') && $icu_locale &&
         class_exists('IntlDateFormatter')
     ) {
-        $ret = fmtdate_intl($fmt, $ts, $locale);
+        $ret = fmtdate_intl($fmt, $ts, $icu_locale);
         if ($ret !== false) {
             return $ret;
         }
@@ -122,9 +123,34 @@ function fmtdate_intl($fmt, $ts, $locale) {
             $pattern
         );
         return $formatter->format($ts);
-    } catch (Exception $e) {
+    } catch (Throwable $e) {
+        # Bad locale, pattern, or ICU error - let the caller fall back.
         return false;
     }
+}
+
+# Function: fmtdate_icu_locale
+# Convert a LANGUAGE setting into a locale ID that ICU will accept.
+# POSIX-locale values like "en_US.UTF-8" or "C.UTF-8" are not valid ICU
+# locale IDs, so any charset or modifier is stripped, and the C/POSIX
+# locales (which have no locale-specific formatting) return false so the
+# caller uses the date()-based logic.
+
+function fmtdate_icu_locale($language) {
+    $locale = str_replace('-', '_', $language);
+    $modifier = strpos($locale, '@');
+    if ($modifier !== false) {
+        $locale = substr($locale, 0, $modifier);
+    }
+    $charset = strpos($locale, '.');
+    if ($charset !== false) {
+        $locale = substr($locale, 0, $charset);
+    }
+    $locale = trim($locale);
+    if ($locale === '' || $locale === 'C' || $locale === 'POSIX') {
+        return false;
+    }
+    return $locale;
 }
 
 # Function: fmtdate_icu_pattern
