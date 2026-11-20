@@ -253,6 +253,27 @@ class BasePagesTest extends PHPUnit\Framework\TestCase
         
         $this->page->routeRequest('thing1');
     }
+
+    public function testSanitizePluginName_StripsPathTraversalAndSpecialCharacters() {
+        $this->assertEquals('somedir', BasePages::sanitizePluginName('../../somedir'));
+        $this->assertEquals('ab', BasePages::sanitizePluginName('a.b'));
+        $this->assertEquals('ab', BasePages::sanitizePluginName("a\tb"));
+        $this->assertEquals('', BasePages::sanitizePluginName('../..'));
+    }
+
+    public function testSanitizePluginName_AllowsWordCharactersAndHyphen() {
+        $this->assertEquals('My_Plugin-1', BasePages::sanitizePluginName('My_Plugin-1'));
+        $this->assertEquals('', BasePages::sanitizePluginName(''));
+    }
+
+    public function testRouteRequest_WhenPluginParamGivenAndFileNotFound_CallsDefaultAction() {
+        $_GET = array('plugin' => '../../nonexistent');
+        $this->fs->file_exists(\Prophecy\Argument::type('string'))->willReturn(false);
+
+        $this->page->routeRequest();
+
+        $this->assertEquals('defaultAction', $this->page->method_called);
+    }
     
     protected function setUp(): void {
         $this->prophet = new \Prophecy\Prophet();

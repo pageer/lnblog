@@ -89,6 +89,17 @@ abstract class BasePages
         }
     }
 
+    /* Method: sanitizePluginName
+     * Strip characters that are not allowed in a plugin file name from a
+     * "plugin" request parameter, i.e. anything other than letters, digits,
+     * underscores, and hyphens.  This prevents path traversal and similar
+     * abuse when the name is used to build a file path.
+     */
+
+    public static function sanitizePluginName(string $name): string {
+        return preg_replace('/[^A-Za-z0-9_\-]/', '', $name) ?? '';
+    }
+
     protected function handleRequestRouting($action) {
         $action_map = $this->getActionMap();
         $action = $action ?: GET('action');
@@ -119,7 +130,7 @@ abstract class BasePages
         } elseif ( isset($_GET['plugin']) ) {
 
             define("PLUGIN_DO_OUTPUT", true);
-            $plugin_name = preg_replace('[^A-Za-z0-9_\-]', '', $_GET['plugin']);
+            $plugin_name = self::sanitizePluginName($_GET['plugin']);
             $paths = array(USER_DATA_PATH, INSTALL_ROOT);
             if (defined('BLOG_ROOT')) {
                 array_unshift($paths, BLOG_ROOT);

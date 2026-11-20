@@ -371,9 +371,10 @@ abstract class Plugin extends LnBlogObject
     # If the plugin implements getLoader(), then the router will automatically
     # handle calling this function when a "plugin page" is requested.
     #
-    # To route to a "plugin page", use the URL paremeter "https://your_blog_url/index.php?action=plugin"
-    # for your requests.  You may append whatever additional request parameters
-    # are necessary to do your processing.
+    # To route to a "plugin page", use a URL of the form
+    # "https://your_blog_url/index.php?plugin=PLUGIN_CLASS", where PLUGIN_CLASS
+    # is the plugin's class name.  You may append whatever additional request
+    # parameters are necessary to do your processing.
     #
     # Parameters:
     # web_page - The webpage object that invoked this method.
