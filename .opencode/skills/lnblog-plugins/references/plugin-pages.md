@@ -13,11 +13,11 @@ index.php?plugin=ClassName&do=subroute[&other params]
 The `do` query parameter (`Plugin::ROUTING_PARAMETER`) selects a sub-route;
 everything else is plugin-defined (e.g. `entry`, `blog`).
 
-**Note:** the docblock on `Plugin::outputPage()` says to use
-`?action=plugin&plugin=...` — that is **stale**. `BasePages::handleRequestRouting()`
-never requires an `action` value for plugin routing (a fix to the docblock is
-planned). `UrlResolver::getRoute('plugin', $params)` also builds plain
-`?plugin=...&...` URLs; use it for link generation.
+**Note:** the docblock on `Plugin::outputPage()` previously said to use
+`?action=plugin&plugin=...` — that was **stale** and has been corrected; the
+router never requires an `action` value for plugin routing.
+`UrlResolver::getRoute('plugin', $params)` builds plain `?plugin=...&...`
+URLs; use it for link generation.
 
 ## Routing mechanics (`lib/BasePages.php`, `handleRequestRouting()`)
 
@@ -39,9 +39,10 @@ plugins have a stored instance to reuse; legacy bottom-of-file plugins get a
 second instance constructed for the request (see
 `references/legacy-and-roadmap.md`).
 
-⚠️ The `preg_replace('[^A-Za-z0-9_\-]', '', $_GET['plugin'])` "sanitization"
-in this branch is broken (no regex delimiters → effectively a no-op). It is a
-known bug with a planned fix; **do not copy it** as a pattern.
+The plugin name is sanitized via `BasePages::sanitizePluginName()` (letters,
+digits, underscore, hyphen only — added when the original inline
+`preg_replace('[^A-Za-z0-9_\-]', ...)` was fixed; that old idiom had no
+delimiters and was effectively a no-op, so don't copy it from history).
 
 ## The `outputPage()` contract
 

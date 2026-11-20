@@ -18,8 +18,8 @@ file records what is legacy, why it exists, and its confirmed disposition.
 | `EventRegister` re-instantiating handler targets | Legacy behavior; to be fixed. Currently harmless because plugins are written to avoid it. |
 | Load-order logic (three overlapping lists) | Evolved over time; refactor planned. |
 | CLI plugins running in `web` context (`CONTEXT_CLI` unused in production) | Not currently a problem; fix planned. |
-| Broken plugin-name regex in `BasePages` | **Bug**; fix planned. Do not copy. |
-| Stale `?action=plugin` docblock in `Plugin::outputPage()` | Stale doc; fix planned. Real scheme is `?plugin=ClassName&do=route`. |
+| Broken plugin-name regex in `BasePages` | **Fixed** — now `BasePages::sanitizePluginName()`, properly delimited and unit-tested. Do not copy the old inline `preg_replace('[^A-Za-z0-9_\-]', ...)` idiom from history. |
+| Stale `?action=plugin` docblock in `Plugin::outputPage()` | **Fixed** — docblock now documents the real `?plugin=PLUGIN_CLASS` scheme. |
 | `getClassNameFromFile()` in `PluginManager` | Unused legacy. |
 | `default_excluded` entry `sidebar_googlesearch.php` | Stale — plugin no longer exists. Also `sidebar_news.php` and `sidebar_loginlink.php` in the load-order defaults no longer exist. |
 | `FTPFS` (`lib/FS.php` interface) | The FTP implementation was **removed**; the `FS` abstraction remains (`NativeFS`). See history below. |
@@ -82,8 +82,9 @@ scanned (`plugins/disabled/` is the convention for shelving).
 2. Modernize bundled legacy plugins to that style; delete the dead
    `author_bio.php` duplicate.
 3. Rewrite `plugins/disabled/template.php` to the canonical style.
-4. Fix the `BasePages` plugin-name sanitization regex.
-5. Fix the stale `outputPage()` docblock (`?action=plugin`).
+4. ~~Fix the `BasePages` plugin-name sanitization regex.~~ Done —
+   `BasePages::sanitizePluginName()`.
+5. ~~Fix the stale `outputPage()` docblock (`?action=plugin`).~~ Done.
 6. Refactor the load-order logic (`default_load_first` / `load_first` /
    `default_load_last` split).
 7. Address CLI context handling (`Plugin::globalContext()` vs. `CONTEXT_CLI`).
