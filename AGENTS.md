@@ -49,6 +49,9 @@ a fresh clone needs `phing client-local` before rendering correctly.
 
 ## Gotchas
 
+- **Ask before committing.** Never run `git commit` (or other state-changing git
+  operations like `push`) without explicit user approval for each commit. Prepare
+  the changes and propose the commit; wait for the user to confirm.
 - **`pathconfig.php` is gitignored but required.** It defines `INSTALL_ROOT`,
   `USER_DATA_PATH`, and the blog registry. Every entry point and the test bootstrap
   (`tests/bootstrap.php` → `blogconfig.php`) depend on it. A fresh clone cannot run or test
